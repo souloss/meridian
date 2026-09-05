@@ -111,6 +111,40 @@ async function mockWriteApi(page: Page, requests: { repository?: unknown; creden
   })
 }
 
+async function mockResourceApi(page: Page, requests: Record<string, unknown>) {
+  let repositoryPresent = true
+  let credentialPresent = true
+  await page.route('**/api/v1/auth/me', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(me) }))
+  await page.route('**/api/v1/t/acme/repositories**', async (route) => {
+    const method = route.request().method()
+    if (method === 'PATCH') {
+      requests.repositoryPatch = route.request().postDataJSON()
+      requests.repositoryIfMatch = route.request().headers()['if-match']
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(repository) })
+    }
+    if (method === 'DELETE') {
+      requests.repositoryDeleteIfMatch = route.request().headers()['if-match']
+      repositoryPresent = false
+      return route.fulfill({ status: 204 })
+    }
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: repositoryPresent ? [repository] : [], page: 1, pageSize: 20, total: repositoryPresent ? 1 : 0 }) })
+  })
+  await page.route('**/api/v1/t/acme/credentials**', async (route) => {
+    const method = route.request().method()
+    if (method === 'PATCH') {
+      requests.credentialPatch = route.request().postDataJSON()
+      requests.credentialIfMatch = route.request().headers()['if-match']
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(credential) })
+    }
+    if (method === 'DELETE') {
+      requests.credentialDeleteIfMatch = route.request().headers()['if-match']
+      credentialPresent = false
+      return route.fulfill({ status: 204 })
+    }
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: credentialPresent ? [credential] : [], page: 1, pageSize: 20, total: credentialPresent ? 1 : 0 }) })
+  })
+}
+
 test('login screen is keyboard reachable and accessible', async ({ page }) => {
   test.setTimeout(60_000)
   await page.route('**/api/v1/auth/me', async (route) => route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ code: 'unauthenticated', message: 'sign in', requestId: 'e2e' }) }))
@@ -178,4 +212,45 @@ test('credential creation keeps secret fields write-only in the UI', async ({ pa
   expect((requests.credential as { sshKey: { privateKeyPem: string } }).sshKey.privateKeyPem).toContain('BEGIN OPENSSH')
   await expect(page.getByText('deploy-key')).toBeVisible()
   await expect(page.getByText('BEGIN OPENSSH')).toHaveCount(0)
+})
+
+test('resource controls use ETag guarded edit and delete requests', async ({ page }) => {
+  test.setTimeout(60_000)
+  const requests: Record<string, unknown> = {}
+  await mockResourceApi(page, requests)
+  await page.goto('/t/acme/repos')
+  await expect(page.getByText(repository.url)).toBeVisible({ timeout: 15_000 })
+  await page.getByRole('button', { name: '编辑仓库' }).click()
+  await expect(page.getByRole('heading', { name: '编辑仓库' })).toBeVisible()
+  await page.getByRole('textbox', { name: '默认分支' }).fill('develop')
+  await page.getByRole('button', { name: '保存修改' }).click()
+  await expect(page.getByRole('heading', { name: '编辑仓库' })).toBeHidden()
+  expect(requests.repositoryPatch).toMatchObject({ defaultBranch: 'develop', credentialId: null, note: null })
+  expect(requests.repositoryIfMatch).toBe(repository.etag)
+  await page.getByRole('button', { name: '删除仓库' }).click()
+  await expect(page.getByRole('heading', { name: '删除仓库' })).toBeVisible()
+  await page.getByRole('button', { name: '确认删除' }).click()
+  await expect(page.getByText(repository.url)).toBeHidden()
+  expect(requests.repositoryDeleteIfMatch).toBe(repository.etag)
+})
+
+test('credential edits stay secret-free and deletion preserves If-Match', async ({ page }) => {
+  test.setTimeout(60_000)
+  const requests: Record<string, unknown> = {}
+  await mockResourceApi(page, requests)
+  await page.goto('/t/acme/credentials')
+  await expect(page.getByText(credential.name)).toBeVisible({ timeout: 15_000 })
+  await page.getByRole('button', { name: '编辑凭据' }).click()
+  await expect(page.getByRole('heading', { name: '编辑凭据' })).toBeVisible()
+  await page.getByRole('textbox', { name: '凭据名称' }).fill('deploy-key-renamed')
+  await page.getByRole('button', { name: '保存修改' }).click()
+  await expect(page.getByRole('heading', { name: '编辑凭据' })).toBeHidden()
+  expect(requests.credentialPatch).toEqual({ name: 'deploy-key-renamed', sharedScope: 'private', teamIds: [] })
+  expect(JSON.stringify(requests.credentialPatch)).not.toContain('privateKey')
+  expect(requests.credentialIfMatch).toBe(credential.etag)
+  await page.getByRole('button', { name: '删除凭据' }).click()
+  await expect(page.getByRole('heading', { name: '删除凭据' })).toBeVisible()
+  await page.getByRole('button', { name: '确认删除' }).click()
+  await expect(page.getByText(credential.name)).toBeHidden()
+  expect(requests.credentialDeleteIfMatch).toBe(credential.etag)
 })
