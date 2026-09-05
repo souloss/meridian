@@ -64,9 +64,10 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	identityStore := repository.NewIdentityStore(db.Pool)
 	identity := service.NewIdentity(identityStore, digester)
 	credentials := service.NewCredentials(repository.NewCredentialStore(db.Pool), identityStore, keyring)
+	repositories := service.NewRepositories(repository.NewRepositoryStore(db.Pool), identityStore)
 	server := &http.Server{
 		Addr:              addr,
-		Handler:           handler.NewWithServices(identity, credentials, secureCookies).Handler(),
+		Handler:           handler.NewWithAllServices(identity, credentials, repositories, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
 		WriteTimeout:      30 * time.Second,

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 	"uuid"
 )
@@ -24,7 +25,27 @@ var (
 	ErrCredentialInUse = errors.New("credential is still referenced")
 	// ErrIdempotencyConflict means one idempotency key was reused with a different request digest.
 	ErrIdempotencyConflict = errors.New("idempotency key was reused for a different request")
+	// ErrQuotaExceeded means a tenant resource ceiling would be exceeded by the operation.
+	ErrQuotaExceeded = errors.New("tenant quota would be exceeded")
 )
+
+// QuotaExceededError preserves the safe resource counters needed by a quota response.
+type QuotaExceededError struct {
+	// Resource identifies the quota dimension, such as repositories.
+	Resource string
+	// Current is the active resource count before the rejected operation.
+	Current  int64
+	// Limit is the tenant's configured maximum for the resource.
+	Limit    int64
+}
+
+// Error implements error without including tenant identifiers or request secrets.
+func (err *QuotaExceededError) Error() string {
+	return fmt.Sprintf("tenant quota exceeded for %s", err.Resource)
+}
+
+// Unwrap allows errors.Is to match ErrQuotaExceeded.
+func (err *QuotaExceededError) Unwrap() error { return ErrQuotaExceeded }
 
 // User is a local identity without password or session secret material.
 type User struct {

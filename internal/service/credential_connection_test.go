@@ -10,8 +10,6 @@ import (
 )
 
 func TestGitConnectionProbeReturnsRedactedResults(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		name        string
 		stderr      string
@@ -28,7 +26,6 @@ func TestGitConnectionProbeReturnsRedactedResults(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
 			binary := writeProbeScript(t, test.stderr, test.exitCode)
 			result, err := (GitConnectionProbe{GitBinary: binary, Timeout: time.Second}).Probe(t.Context(), "https://example.com/repository.git", nil)
 			if err != nil {
@@ -42,8 +39,6 @@ func TestGitConnectionProbeReturnsRedactedResults(t *testing.T) {
 }
 
 func TestGitConnectionProbeRejectsUnsafeRemote(t *testing.T) {
-	t.Parallel()
-
 	for _, remote := range []string{
 		"",
 		" https://example.com/repository.git",
@@ -63,8 +58,6 @@ func TestGitConnectionProbeRejectsUnsafeRemote(t *testing.T) {
 }
 
 func TestGitConnectionProbeTimeoutIsClassified(t *testing.T) {
-	t.Parallel()
-
 	binary := writeProbeScript(t, "", "")
 	probe := GitConnectionProbe{GitBinary: binary, Timeout: 5 * time.Millisecond}
 	result, err := probe.Probe(context.Background(), "https://example.com/repository.git", nil)

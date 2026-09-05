@@ -24,6 +24,11 @@ type Querier interface {
 	CountGlobalCredentials(ctx context.Context) (int64, error)
 	// CountKnownHosts counts approved host identities in one tenant.
 	CountKnownHosts(ctx context.Context, tenantID uuid.UUID) (int64, error)
+	// CountListedRepositories returns the number of active repositories matching one tenant search.
+	CountListedRepositories(ctx context.Context, arg CountListedRepositoriesParams) (int64, error)
+	// CountRepositories returns active repository count and the tenant's frozen repository quota.
+	// The quota is read from the tenant snapshot, never from a mutable platform default.
+	CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error)
 	// CountTenantCredentials counts visible tenant-owned and global credentials for one tenant member.
 	CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error)
 	// CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
@@ -46,6 +51,9 @@ type Querier interface {
 	CreateGlobalCredentialRotationIdempotency(ctx context.Context, arg CreateGlobalCredentialRotationIdempotencyParams) error
 	// CreateKnownHost inserts a server-derived approved SSH host identity.
 	CreateKnownHost(ctx context.Context, arg CreateKnownHostParams) (KnownHost, error)
+	// CreateRepository persists repository configuration and initializes an empty health summary.
+	// URL fields are credential-free; credentials are referenced only by UUID foreign keys.
+	CreateRepository(ctx context.Context, arg CreateRepositoryParams) (Repository, error)
 	// CreateSession persists keyed session and CSRF digests without storing either plaintext token.
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	// CreateTenant inserts one tenant with explicit quota and settings snapshots copied from platform defaults.
@@ -60,6 +68,9 @@ type Querier interface {
 	DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCredentialParams) (int64, error)
 	// DeleteGlobalCredentialRotationIdempotency removes an expired platform rotation replay before reuse.
 	DeleteGlobalCredentialRotationIdempotency(ctx context.Context, arg DeleteGlobalCredentialRotationIdempotencyParams) error
+	// DeleteRepository soft-deletes a repository and makes its URL/branch reusable only per policy.
+	// Historical job and audit rows remain tenant-scoped after this update.
+	DeleteRepository(ctx context.Context, arg DeleteRepositoryParams) (int64, error)
 	// GetAPITokenPrincipalByTokenHash authenticates one active PAT whose user, membership, and tenant remain active.
 	GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAPITokenPrincipalByTokenHashParams) (GetAPITokenPrincipalByTokenHashRow, error)
 	// GetActiveTenantBySlug returns only an active tenant for tenant-scoped business access.
@@ -74,6 +85,8 @@ type Querier interface {
 	GetGlobalCredentialRotationIdempotency(ctx context.Context, arg GetGlobalCredentialRotationIdempotencyParams) (GetGlobalCredentialRotationIdempotencyRow, error)
 	// GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
+	// GetRepository returns one active repository; soft-deleted rows intentionally appear absent.
+	GetRepository(ctx context.Context, arg GetRepositoryParams) (Repository, error)
 	// GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
 	GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error)
 	// GetTenantBySlug returns a tenant in any lifecycle state for platform administration.
@@ -97,6 +110,9 @@ type Querier interface {
 	ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error)
 	// ListKnownHosts returns one stable page of tenant-approved SSH host identities.
 	ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error)
+	// ListRepositories returns active repositories in deterministic canonical URL and UUID order.
+	// The query and all predicates retain the tenant boundary even when the search string is empty.
+	ListRepositories(ctx context.Context, arg ListRepositoriesParams) ([]Repository, error)
 	// ListRepositoriesForCredential returns non-deleted repository references in contract response order.
 	ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error)
 	// ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
@@ -111,10 +127,17 @@ type Querier interface {
 	// LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
 	// A pending or running row is reused; terminal rows advance active_generation for new work.
 	LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error)
+	// LockRepositoryQuota serializes repository creation against the tenant's repository quota.
+	// The repository adapter holds this row lock while counting and inserting, so concurrent creates cannot oversubscribe a quota.
+	LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
 	PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error)
 	// ReplaceCredentialTeamShares removes and recreates the complete team-share projection in one transaction.
 	ReplaceCredentialTeamShares(ctx context.Context, arg ReplaceCredentialTeamSharesParams) error
+	// ResolveRepositoryCredential resolves one tenant-visible credential UUID to exactly one owning table.
+	// Tenant credentials are filtered by the same visibility predicate as the credential list endpoint;
+	// global credentials are selectable by every active member but remain platform-admin managed.
+	ResolveRepositoryCredential(ctx context.Context, arg ResolveRepositoryCredentialParams) (ResolveRepositoryCredentialRow, error)
 	// RevokeAPIToken idempotently revokes a PAT owned by one user in one tenant and returns its identifier.
 	// Returning an already-revoked matching row preserves idempotency while an absent or foreign row remains not found.
 	RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error)
@@ -138,6 +161,9 @@ type Querier interface {
 	UpdateCredentialMetadata(ctx context.Context, arg UpdateCredentialMetadataParams) (Credential, error)
 	// UpdateGlobalCredentialMetadata conditionally updates a global credential name and advances its revision.
 	UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error)
+	// UpdateRepository conditionally updates explicit repository fields and advances its revision.
+	// Set flags preserve the distinction between omitted fields and explicit JSON null values.
+	UpdateRepository(ctx context.Context, arg UpdateRepositoryParams) (Repository, error)
 	// UpsertTenantMember creates or replaces a tenant role assignment and records the caller-supplied update time.
 	UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error)
 }

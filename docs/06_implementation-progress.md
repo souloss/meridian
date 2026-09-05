@@ -40,7 +40,7 @@
 | Go 1.27.1、Node 24 LTS、pnpm 11 与 vfox 工具链 | 已完成 | 切片门禁已通过 | `b29514f`，`.vfox.toml`、Makefile |
 | `cmd/meridian` 单入口、Nuxt 静态产物嵌入、健康检查和 API/static 404 边界 | 已完成 | 后端自动化覆盖存在；M0 全量前端 Spike 尚未放行 | `b29514f`，`internal/handler/server_test.go` |
 | OpenAPI 驱动的 oapi-codegen/Orval 生成和无漂移检查 | 已完成 | 生成门禁已建立 | `b29514f`、`5e3a45a`、`ddeae8d` |
-| 生成 API 导出声明/字段注释与应用 DDL 每列注释 | 已完成 | 契约检查已建立 | `5e3a45a`，`internal/contracttest/openapi_documentation_test.go` |
+| 生成 API 导出声明/字段注释与应用 DDL 每列注释 | 已完成 | OpenAPI/生成 Go 导出注释和实际迁移列注释均由契约测试强制 | `5e3a45a`，`internal/contracttest/openapi_documentation_test.go`，`internal/contracttest/storage_documentation_test.go` |
 | Goose 应用迁移、River 迁移及 up/down/up 生命周期 | 已完成 | SMK-001 的数据库主路径已有集成覆盖，里程碑 Smoke 尚未统一放行 | `ab1635f`、`7ef39f8`，`internal/database/database_integration_test.go` |
 | sqlc + pgx 强类型持久化基础 | 已完成 | 切片门禁已通过 | `ddeae8d` |
 | 登录、CSRF、用户、租户、成员、RBAC 和 PAT | 已完成 | US-01、SMK-002/003/004 部分覆盖；全租户 operation 隔离矩阵和控制面 E2E 未完成 | `ac8da08`，`internal/handler/identity_integration_test.go` |
@@ -49,7 +49,7 @@
 | 租户/全局凭据连接探测和仓库连接预检 | 已完成 | 成功、分类失败、超时和秘密脱敏已有单元/集成覆盖 | `354af57` |
 | 全局凭据管理及强制删除 | 部分完成 | CRUD/轮换/删除已实现；引用仓库解绑后的 API 可见状态和 `getPlatformJob` 尚未闭环 | `66f473c`、`394ffe7`、`b270b9d` |
 | Known Host 创建、派生指纹和列表 | 部分完成 | 服务端派生规则已有单测和 handler；SMK-035 独立 API 场景尚未统一放行 | `31e3440`、`66f473c` |
-| 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 开发中 | SMK-029/031 未通过 | 当前未提交的 repository SQL、生成代码和 service 实现 |
+| 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | 本阶段提交，`internal/handler/identity_integration_test.go` |
 | River Worker 与通用 Job 控制面 | 部分完成 | River schema 和凭据轮换任务已实现；Worker 编排、阶段日志和平台 Job 读取未闭环 | `ab1635f`、`394ffe7` |
 | Audit 与 Outbox 事务闭环 | 未开始 | 只有 M0 DDL，尚无业务写入、分发和读取闭环 | `ab1635f` |
 | 本地 SHA-256 CAS Blob 驱动 | 未开始 | 只有 M0 DDL，尚无存储驱动和签名读取闭环 | `ab1635f` |
@@ -75,24 +75,24 @@
 
 最后稳定基线是 `354af57`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、生成无漂移和 `git diff --check` 均已通过。
 
-2026-09-05 核对时，工作区正在开发仓库切片，包含：
+2026-09-05 核对时，仓库切片已通过门禁，包含：
 
 - `migrations/queries/repository.sql`；
 - sqlc 生成的 repository 查询代码；
-- repository service 类型、URL/配置校验和配额错误模型。
+- repository service 类型、URL/配置校验和配额错误模型；
+- 仓库 API 的三态 PATCH、ETag、凭据绑定和软删除集成断言；
+- 实际 M0 DDL 列注释审计测试。
 
-当前工作区不是绿色基线：`vfox exec golang@1.27.1 -- go test ./...` 在 `internal/service/repositories.go` 的凭据指针类型处理处编译失败。该问题属于开发中切片，修复并通过全部门禁前不得提交，也不得把仓库 CRUD 或 SMK-029 标记为完成。
+本阶段提交前已通过 `vfox exec golang@1.27.1 -- go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
 
 ## 下一步顺序
 
-1. 完成仓库 repository adapter、service、handler、运行时装配和单元/数据库/API 集成测试。
-2. 完成原子仓库配额、`quota_exceeded` details 和拒绝后计数不变断言。
-3. 用实际仓库绑定闭环全局凭据强制删除后的解绑、认证健康状态及轮换 Job 数量。
-4. 完成平台 Job 查询、River Worker 基础和阶段日志。
-5. 完成 Audit/Outbox 的同事务写入与分发闭环。
-6. 完成本地 SHA-256 CAS Blob 驱动。
-7. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
-8. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
+1. 用实际仓库绑定闭环全局凭据强制删除后的轮换 Job 数量断言。
+2. 完成平台 Job 查询、River Worker 基础和阶段日志。
+3. 完成 Audit/Outbox 的同事务写入与分发闭环。
+4. 完成本地 SHA-256 CAS Blob 驱动。
+5. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
+6. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
 
 ## 更新流程
 

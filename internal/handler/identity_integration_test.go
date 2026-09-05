@@ -64,7 +64,9 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("bootstrap platform administrator: %v", err)
 	}
-	httpHandler := NewWithServices(identity, service.NewCredentials(repository.NewCredentialStore(db.Pool), store, keyring), false).Handler()
+	credentials := service.NewCredentials(repository.NewCredentialStore(db.Pool), store, keyring)
+	repositories := service.NewRepositories(repository.NewRepositoryStore(db.Pool), store)
+	httpHandler := NewWithAllServices(identity, credentials, repositories, false).Handler()
 
 	adminLogin := requestJSON(t, httpHandler, http.MethodPost, "/api/v1/auth/login", map[string]any{
 		"username": "padmin", "password": "correct horse battery staple",
@@ -245,6 +247,77 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if strings.Contains(checkedRepository.Body.String(), "first-secret-token") {
 		t.Fatal("repository connection response disclosed secret material")
 	}
+	if _, err := db.Pool.Exec(t.Context(), `UPDATE tenants SET quota = jsonb_set(quota, '{maxRepositories}', '1'::jsonb) WHERE slug = 'acme'`); err != nil {
+		t.Fatalf("set repository quota: %v", err)
+	}
+	createdRepository := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/repositories", map[string]any{
+		"url": "https://git.example.com:443/Team/Repo.git/", "credentialId": credentialID.String(), "defaultBranch": "main",
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	assertStatus(t, createdRepository, http.StatusCreated)
+	repositoryID, err := uuid.Parse(responseString(t, createdRepository, "id"))
+	if err != nil {
+		t.Fatalf("parse repository ID: %v", err)
+	}
+	repositoryETag := responseString(t, createdRepository, "etag")
+	if !strings.Contains(createdRepository.Body.String(), "https://git.example.com:443/Team/Repo.git/") || !strings.Contains(createdRepository.Body.String(), "main") {
+		t.Fatalf("repository response lost display/default values: %s", createdRepository.Body.String())
+	}
+	listedRepositories := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, []*http.Cookie{aliceCookie})
+	assertStatus(t, listedRepositories, http.StatusOK)
+	var repositoryPage struct {
+		Total int `json:"total"`
+		Items []struct {
+			ID string `json:"id"`
+		} `json:"items"`
+	}
+	if err := json.Unmarshal(listedRepositories.Body.Bytes(), &repositoryPage); err != nil {
+		t.Fatalf("decode repository page: %v", err)
+	}
+	if repositoryPage.Total != 1 || len(repositoryPage.Items) != 1 || repositoryPage.Items[0].ID != repositoryID.String() {
+		t.Fatalf("repository page = %#v", repositoryPage)
+	}
+	updatedRepository := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/t/acme/repositories/"+repositoryID.String(), map[string]any{
+		"defaultBranch": "develop", "note": "managed by integration",
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF, "If-Match": repositoryETag})
+	assertStatus(t, updatedRepository, http.StatusOK)
+	repositoryETag = responseString(t, updatedRepository, "etag")
+	if !strings.Contains(updatedRepository.Body.String(), "develop") || !strings.Contains(updatedRepository.Body.String(), "managed by integration") {
+		t.Fatalf("repository patch response = %s", updatedRepository.Body.String())
+	}
+	staleRepositoryUpdate := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/t/acme/repositories/"+repositoryID.String(), map[string]any{
+		"note": nil,
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF, "If-Match": `"repository:` + repositoryID.String() + `:1"`})
+	assertError(t, staleRepositoryUpdate, http.StatusPreconditionFailed, "precondition_failed")
+	quotaRejected := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/repositories", map[string]any{
+		"url": "https://git.example.com/another.git", "defaultBranch": "main",
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	assertError(t, quotaRejected, http.StatusConflict, "quota_exceeded")
+	var quotaPayload struct {
+		Details struct {
+			Quota   string `json:"quota"`
+			Current int64  `json:"current"`
+			Limit   int64  `json:"limit"`
+		} `json:"details"`
+	}
+	if err := json.Unmarshal(quotaRejected.Body.Bytes(), &quotaPayload); err != nil {
+		t.Fatalf("decode quota error: %v", err)
+	}
+	if quotaPayload.Details.Quota != "repositories" || quotaPayload.Details.Current != 1 || quotaPayload.Details.Limit != 1 {
+		t.Fatalf("quota details = %#v", quotaPayload.Details)
+	}
+	listedAfterQuota := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, []*http.Cookie{aliceCookie})
+	assertStatus(t, listedAfterQuota, http.StatusOK)
+	if !strings.Contains(listedAfterQuota.Body.String(), `"total":1`) {
+		t.Fatalf("repository count changed after rejected create: %s", listedAfterQuota.Body.String())
+	}
+	boundGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/t/acme/repositories/"+repositoryID.String(), map[string]any{
+		"credentialId": globalID.String(),
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF, "If-Match": repositoryETag})
+	assertStatus(t, boundGlobal, http.StatusOK)
+	repositoryETag = responseString(t, boundGlobal, "etag")
+	if !strings.Contains(boundGlobal.Body.String(), globalID.String()) {
+		t.Fatalf("global credential binding missing from repository: %s", boundGlobal.Body.String())
+	}
 	tenantCredentials := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/credentials", nil, []*http.Cookie{aliceCookie})
 	assertStatus(t, tenantCredentials, http.StatusOK)
 	if !strings.Contains(tenantCredentials.Body.String(), "integration global credential") || !strings.Contains(tenantCredentials.Body.String(), `"isGlobal":true`) {
@@ -274,6 +347,18 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		csrfHeaderName: rotatedCSRF, "If-Match": globalETag,
 	})
 	assertStatus(t, deletedGlobal, http.StatusNoContent)
+	unboundGlobal := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, []*http.Cookie{aliceCookie})
+	assertStatus(t, unboundGlobal, http.StatusOK)
+	if !strings.Contains(unboundGlobal.Body.String(), `"credentialId":null`) || !strings.Contains(unboundGlobal.Body.String(), `"class":"auth"`) {
+		t.Fatalf("forced global deletion did not expose unbound health state: %s", unboundGlobal.Body.String())
+	}
+	repositoryETag = responseString(t, unboundGlobal, "etag")
+	deletedRepository := requestJSONWithHeaders(t, httpHandler, http.MethodDelete, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, []*http.Cookie{aliceCookie}, map[string]string{
+		csrfHeaderName: aliceCSRF, "If-Match": repositoryETag,
+	})
+	assertStatus(t, deletedRepository, http.StatusNoContent)
+	missingRepository := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, []*http.Cookie{aliceCookie})
+	assertError(t, missingRepository, http.StatusNotFound, "not_found")
 
 	if _, err := db.Pool.Exec(t.Context(), `UPDATE tenants SET status = 'disabled' WHERE slug = 'acme'`); err != nil {
 		t.Fatalf("disable tenant: %v", err)

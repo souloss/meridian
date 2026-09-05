@@ -22,6 +22,7 @@ type Server struct {
 	assets        fs.FS
 	identity      *service.Identity
 	credentials   *service.Credentials
+	repositories  *service.Repositories
 	secureCookies bool
 }
 
@@ -39,9 +40,15 @@ func NewWithIdentity(identity *service.Identity, secureCookies bool) *Server {
 // NewWithServices constructs an HTTP server with explicitly wired M0 use cases.
 // A nil use case leaves its generated strict operations returning the contract's 501 stub.
 func NewWithServices(identity *service.Identity, credentials *service.Credentials, secureCookies bool) *Server {
+	return NewWithAllServices(identity, credentials, nil, secureCookies)
+}
+
+// NewWithAllServices constructs an HTTP server with every currently implemented M0 use case.
+func NewWithAllServices(identity *service.Identity, credentials *service.Credentials, repositories *service.Repositories, secureCookies bool) *Server {
 	s := New()
 	s.identity = identity
 	s.credentials = credentials
+	s.repositories = repositories
 	s.secureCookies = secureCookies
 	return s
 }
@@ -56,6 +63,12 @@ func (s *Server) Handler() http.Handler {
 			writeError(w, r, http.StatusBadRequest, "validation_error", "request does not satisfy the API contract")
 		},
 		ResponseErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
+			if quotaErr, ok := errors.AsType[*service.QuotaExceededError](err); ok {
+				writeErrorDetails(w, r, http.StatusConflict, "quota_exceeded", "tenant resource quota would be exceeded", map[string]any{
+					"quota": quotaErr.Resource, "current": quotaErr.Current, "limit": quotaErr.Limit,
+				})
+				return
+			}
 			switch {
 			case errors.Is(err, service.ErrUnauthenticated):
 				writeError(w, r, http.StatusUnauthorized, "unauthenticated", "authentication required")

@@ -214,7 +214,7 @@ SET
   credential_id = NULL,
   revision = revision + 1,
   updated_at = sqlc.arg(updated_at),
-  health = jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth_required","message":"credential was deleted"}'::jsonb, true)
+  health = jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"credential was deleted"}'::jsonb, true)
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND credential_id = sqlc.arg(credential_id)
   AND deleted_at IS NULL;
@@ -408,7 +408,7 @@ SET
   global_credential_id = NULL,
   revision = revision + 1,
   updated_at = sqlc.arg(updated_at),
-  health = jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth_required","message":"global credential was deleted"}'::jsonb, true)
+  health = jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"global credential was deleted"}'::jsonb, true)
 WHERE global_credential_id = sqlc.arg(credential_id)
   AND deleted_at IS NULL;
 

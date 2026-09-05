@@ -19,15 +19,19 @@ func (s *Server) notFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func writeError(w http.ResponseWriter, r *http.Request, status int, code, message string) {
-	writeJSON(w, status, struct {
-		Code      string `json:"code"`
-		Message   string `json:"message"`
-		RequestID string `json:"requestId"`
+	writeErrorDetails(w, r, status, code, message, nil)
+}
+
+func writeErrorDetails(w http.ResponseWriter, r *http.Request, status int, code, message string, details map[string]any) {
+	payload := struct {
+		Code      string         `json:"code"`
+		Details   map[string]any `json:"details,omitempty"`
+		Message   string         `json:"message"`
+		RequestID string         `json:"requestId"`
 	}{
-		Code:      code,
-		Message:   message,
-		RequestID: middleware.GetReqID(r.Context()),
-	})
+		Code: code, Details: details, Message: message, RequestID: middleware.GetReqID(r.Context()),
+	}
+	writeJSON(w, status, payload)
 }
 
 func writeJSON(w http.ResponseWriter, status int, payload any) {
