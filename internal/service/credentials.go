@@ -114,7 +114,7 @@ func (credentials *Credentials) RotateTenant(ctx context.Context, actor Principa
 		return CredentialRecord{}, nil, ErrPrecondition
 	}
 	if err := validateCredentialSecret(rotation.Secret); err != nil {
-		return CredentialRecord{}, nil, err
+		return CredentialRecord{}, nil, ErrValidation
 	}
 	current, err := credentials.store.GetCredential(ctx, membership.TenantID, id, actor.User.ID)
 	if err != nil {
@@ -210,7 +210,7 @@ func (credentials *Credentials) RotateGlobal(ctx context.Context, actor Principa
 		return GlobalCredentialRecord{}, nil, ErrPrecondition
 	}
 	if err := validateCredentialSecret(rotation.Secret); err != nil {
-		return GlobalCredentialRecord{}, nil, err
+		return GlobalCredentialRecord{}, nil, ErrValidation
 	}
 	current, err := credentials.store.GetGlobalCredential(ctx, id)
 	if err != nil {

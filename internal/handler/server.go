@@ -21,6 +21,7 @@ type Server struct {
 	ready         atomic.Bool
 	assets        fs.FS
 	identity      *service.Identity
+	credentials   *service.Credentials
 	secureCookies bool
 }
 
@@ -32,8 +33,15 @@ func New() *Server {
 
 // NewWithIdentity constructs a server with M0 identity use cases enabled.
 func NewWithIdentity(identity *service.Identity, secureCookies bool) *Server {
+	return NewWithServices(identity, nil, secureCookies)
+}
+
+// NewWithServices constructs an HTTP server with explicitly wired M0 use cases.
+// A nil use case leaves its generated strict operations returning the contract's 501 stub.
+func NewWithServices(identity *service.Identity, credentials *service.Credentials, secureCookies bool) *Server {
 	s := New()
 	s.identity = identity
+	s.credentials = credentials
 	s.secureCookies = secureCookies
 	return s
 }
@@ -63,6 +71,12 @@ func (s *Server) Handler() http.Handler {
 				return
 			case errors.Is(err, service.ErrValidation):
 				writeError(w, r, http.StatusUnprocessableEntity, "validation_error", "request violates a domain rule")
+				return
+			case errors.Is(err, service.ErrPrecondition):
+				writeError(w, r, http.StatusPreconditionFailed, "precondition_failed", "resource changed; refresh and retry")
+				return
+			case errors.Is(err, service.ErrCredentialInUse):
+				writeError(w, r, http.StatusConflict, "credential_in_use", "credential is still referenced by a repository")
 				return
 			}
 			if errors.Is(err, api.ErrStrictOperationNotImplemented) {

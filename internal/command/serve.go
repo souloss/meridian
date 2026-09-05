@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,6 +48,10 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	if err != nil {
 		return err
 	}
+	keyring, err := credentialKeyringFromEnvironment()
+	if err != nil {
+		return err
+	}
 	db, err := openDatabase(ctx, databaseURL, output)
 	if err != nil {
 		return err
@@ -55,12 +61,12 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		return err
 	}
 
+	identityStore := repository.NewIdentityStore(db.Pool)
+	identity := service.NewIdentity(identityStore, digester)
+	credentials := service.NewCredentials(repository.NewCredentialStore(db.Pool), identityStore, keyring)
 	server := &http.Server{
-		Addr: addr,
-		Handler: handler.NewWithIdentity(
-			service.NewIdentity(repository.NewIdentityStore(db.Pool), digester),
-			secureCookies,
-		).Handler(),
+		Addr:              addr,
+		Handler:           handler.NewWithServices(identity, credentials, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
 		WriteTimeout:      30 * time.Second,
@@ -87,6 +93,38 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		}
 		return nil
 	}
+}
+
+// credentialKeyringFromEnvironment parses the immutable credential encryption
+// configuration used by the HTTP process. Secrets are never included in errors.
+func credentialKeyringFromEnvironment() (service.CredentialKeyring, error) {
+	activeVersionText := strings.TrimSpace(os.Getenv("MERIDIAN_MASTER_KEY_VERSION"))
+	activeVersion, err := strconv.ParseInt(activeVersionText, 10, 32)
+	if err != nil || activeVersion < 1 {
+		return service.CredentialKeyring{}, errors.New("MERIDIAN_MASTER_KEY_VERSION must be a positive integer")
+	}
+	previous := make(map[int32]string)
+	previousFile := strings.TrimSpace(os.Getenv("MERIDIAN_MASTER_KEY_PREVIOUS_FILE"))
+	if previousFile != "" {
+		encoded, err := os.ReadFile(previousFile)
+		if err != nil {
+			return service.CredentialKeyring{}, fmt.Errorf("read MERIDIAN_MASTER_KEY_PREVIOUS_FILE: %w", err)
+		}
+		var values map[string]string
+		if err := json.Unmarshal(encoded, &values); err != nil {
+			return service.CredentialKeyring{}, fmt.Errorf("decode MERIDIAN_MASTER_KEY_PREVIOUS_FILE: %w", err)
+		}
+		for versionText, key := range values {
+			version, err := strconv.ParseInt(versionText, 10, 32)
+			if err != nil || version < 1 {
+				return service.CredentialKeyring{}, errors.New("MERIDIAN_MASTER_KEY_PREVIOUS_FILE contains an invalid version")
+			}
+			previous[int32(version)] = key
+		}
+	}
+	return service.NewCredentialKeyringWithPrevious(
+		os.Getenv("MERIDIAN_MASTER_KEY"), int32(activeVersion), os.Getenv("MERIDIAN_CREDENTIAL_FINGERPRINT_KEY"), previous,
+	)
 }
 
 func isLoopbackAddress(addr string) bool {

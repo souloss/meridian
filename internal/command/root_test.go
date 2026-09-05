@@ -2,10 +2,15 @@ package command
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/json/v2"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"uuid"
+
+	"github.com/meridian-labs/meridian/internal/service"
 )
 
 func TestVersionCommand(t *testing.T) {
@@ -84,5 +89,41 @@ func TestInsecureCookiesRequireLoopbackListener(t *testing.T) {
 		if isLoopbackAddress(addr) {
 			t.Errorf("non-loopback address %q was accepted", addr)
 		}
+	}
+}
+
+func TestCredentialKeyringFromEnvironment(t *testing.T) {
+	t.Setenv("MERIDIAN_MASTER_KEY", base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{0x11}, 32)))
+	t.Setenv("MERIDIAN_MASTER_KEY_VERSION", "3")
+	t.Setenv("MERIDIAN_CREDENTIAL_FINGERPRINT_KEY", base64.RawURLEncoding.EncodeToString(bytes.Repeat([]byte{0x22}, 32)))
+	t.Setenv("MERIDIAN_MASTER_KEY_PREVIOUS_FILE", "")
+
+	keyring, err := credentialKeyringFromEnvironment()
+	if err != nil {
+		t.Fatalf("load keyring: %v", err)
+	}
+	if _, err := keyring.Encrypt("tenant", uuid.NewV7(), service.CredentialSecret{Kind: "http_token", HTTPUsername: "bot", HTTPToken: "secret-token"}); err != nil {
+		t.Fatalf("encrypt with loaded keyring: %v", err)
+	}
+}
+
+func TestCredentialKeyringFromPreviousFile(t *testing.T) {
+	master := base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{0x11}, 32))
+	previous := base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{0x33}, 32))
+	filename := filepath.Join(t.TempDir(), "previous-keys.json")
+	encoded, err := json.Marshal(map[string]string{"1": previous})
+	if err != nil {
+		t.Fatalf("encode previous key file: %v", err)
+	}
+	if err := os.WriteFile(filename, encoded, 0o600); err != nil {
+		t.Fatalf("write previous key file: %v", err)
+	}
+	t.Setenv("MERIDIAN_MASTER_KEY", master)
+	t.Setenv("MERIDIAN_MASTER_KEY_VERSION", "2")
+	t.Setenv("MERIDIAN_CREDENTIAL_FINGERPRINT_KEY", base64.RawURLEncoding.EncodeToString(bytes.Repeat([]byte{0x22}, 32)))
+	t.Setenv("MERIDIAN_MASTER_KEY_PREVIOUS_FILE", filename)
+
+	if _, err := credentialKeyringFromEnvironment(); err != nil {
+		t.Fatalf("load previous key file: %v", err)
 	}
 }
