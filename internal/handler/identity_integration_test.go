@@ -175,6 +175,25 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		t.Fatalf("parse credential ID: %v", err)
 	}
 	credentialETag := responseString(t, createdCredential, "etag")
+	testedCredential := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials/"+credentialID.String()+":test", map[string]any{
+		"repositoryUrl": "https://127.0.0.1:1/repository.git",
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	assertStatus(t, testedCredential, http.StatusOK)
+	var connectionResult struct {
+		OK          bool   `json:"ok"`
+		ErrorClass  string `json:"errorClass"`
+		Message     string `json:"message"`
+		HostKeyData any    `json:"hostKeyCandidate"`
+	}
+	if err := json.Unmarshal(testedCredential.Body.Bytes(), &connectionResult); err != nil {
+		t.Fatalf("decode credential connection result: %v", err)
+	}
+	if connectionResult.OK || connectionResult.ErrorClass == "" || connectionResult.Message == "" {
+		t.Fatalf("credential connection result = %#v, want structured unsuccessful result", connectionResult)
+	}
+	if strings.Contains(testedCredential.Body.String(), "first-secret-token") {
+		t.Fatal("credential connection response disclosed secret material")
+	}
 	rotationHeaders := map[string]string{
 		csrfHeaderName:    aliceCSRF,
 		"If-Match":        credentialETag,
@@ -212,6 +231,20 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		t.Fatalf("parse global credential ID: %v", err)
 	}
 	globalETag := responseString(t, createdGlobal, "etag")
+	testedGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials/"+globalID.String()+":test", map[string]any{
+		"repositoryUrl": "https://127.0.0.1:1/repository.git",
+	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
+	assertStatus(t, testedGlobal, http.StatusOK)
+	if strings.Contains(testedGlobal.Body.String(), "global-first-token") {
+		t.Fatal("global credential connection response disclosed secret material")
+	}
+	checkedRepository := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/repositories:check-connection", map[string]any{
+		"url": "https://127.0.0.1:1/repository.git", "credentialId": nil,
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	assertStatus(t, checkedRepository, http.StatusOK)
+	if strings.Contains(checkedRepository.Body.String(), "first-secret-token") {
+		t.Fatal("repository connection response disclosed secret material")
+	}
 	tenantCredentials := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/credentials", nil, []*http.Cookie{aliceCookie})
 	assertStatus(t, tenantCredentials, http.StatusOK)
 	if !strings.Contains(tenantCredentials.Body.String(), "integration global credential") || !strings.Contains(tenantCredentials.Body.String(), `"isGlobal":true`) {

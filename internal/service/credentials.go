@@ -22,12 +22,22 @@ type Credentials struct {
 	store      CredentialStore
 	identities IdentityStore
 	keyring    CredentialKeyring
+	probe      ConnectionProbe
 	now        func() time.Time
 }
 
 // NewCredentials constructs credential use cases with caller-owned persistence and key material.
 func NewCredentials(store CredentialStore, identities IdentityStore, keyring CredentialKeyring) *Credentials {
-	return &Credentials{store: store, identities: identities, keyring: keyring, now: time.Now}
+	return NewCredentialsWithProbe(store, identities, keyring, NewGitConnectionProbe())
+}
+
+// NewCredentialsWithProbe constructs credential use cases with an explicit connection probe.
+// Tests and controlled deployments can inject a deterministic probe without changing authorization behavior.
+func NewCredentialsWithProbe(store CredentialStore, identities IdentityStore, keyring CredentialKeyring, probe ConnectionProbe) *Credentials {
+	if probe == nil {
+		probe = NewGitConnectionProbe()
+	}
+	return &Credentials{store: store, identities: identities, keyring: keyring, probe: probe, now: time.Now}
 }
 
 // ListTenant returns tenant-owned credentials visible to the authenticated tenant member.
