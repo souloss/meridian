@@ -2,6 +2,7 @@
 import { useListCredentials } from '~/api/generated/tenant/tenant'
 import type { CredentialPage } from '~/api/generated/models/credentialPage'
 import { responseData } from '~/composables/useResponseData'
+import { useQueryClient } from '@tanstack/vue-query'
 
 definePageMeta({ layout: 'tenant', middleware: ['auth', 'tenant'] })
 
@@ -10,11 +11,17 @@ const tenantSlug = computed(() => String(route.params.tenant))
 const page = ref(1)
 const params = computed(() => ({ page: page.value, pageSize: 20 }))
 const query = useListCredentials(tenantSlug, params)
+const queryClient = useQueryClient()
+const createOpen = ref(false)
 const result = computed(() => responseData<CredentialPage>(query.data.value))
 const credentials = computed(() => result.value?.items ?? [])
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
+}
+
+async function refreshCredentials() {
+  await queryClient.invalidateQueries({ queryKey: ['api', 'v1', 't', tenantSlug.value, 'credentials'] })
 }
 </script>
 
@@ -22,7 +29,7 @@ function formatDate(value: string) {
   <div class="space-y-6">
     <section class="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end">
       <div><p class="text-sm font-medium text-teal-700">安全与连接</p><h2 class="mt-1 text-2xl font-semibold tracking-tight text-slate-950">凭据</h2><p class="mt-2 text-sm text-slate-600">查看已授权凭据的元数据和共享范围，秘密永不回显。</p></div>
-      <UButton color="primary" icon="i-lucide-plus" label="创建凭据" disabled />
+      <UButton color="primary" icon="i-lucide-plus" label="创建凭据" @click="createOpen = true" />
     </section>
     <UAlert v-if="query.error.value" color="error" variant="subtle" icon="i-lucide-circle-alert" title="凭据列表加载失败" description="请刷新页面后重试。" />
     <UCard :ui="{ body: 'p-0' }">
@@ -36,5 +43,6 @@ function formatDate(value: string) {
       </div>
       <template v-if="result && result.total > result.pageSize" #footer><div class="flex items-center justify-between"><p class="text-xs text-slate-600">共 {{ result.total }} 条凭据</p><div class="flex gap-2"><UButton color="neutral" variant="outline" size="sm" label="上一页" :disabled="page <= 1" @click="page--" /><UButton color="neutral" variant="outline" size="sm" label="下一页" :disabled="page * result.pageSize >= result.total" @click="page++" /></div></div></template>
     </UCard>
+    <CredentialCreateModal v-model:open="createOpen" :tenant-slug="tenantSlug" @created="refreshCredentials" />
   </div>
 </template>

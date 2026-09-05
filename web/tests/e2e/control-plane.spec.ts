@@ -49,6 +49,37 @@ const job = {
   capabilities: ['job:read', 'job:run']
 }
 
+const repository = {
+  id: '01999c55-8d0c-7c1e-8c2d-000000000030',
+  etag: 'v1-repository',
+  url: 'https://git.example.com/team/service.git',
+  credentialId: null,
+  defaultBranch: 'main',
+  branchPolicy: { branchPatterns: ['main'], tagPatterns: [] },
+  fetchConfig: { shallow: false, depth: 50, submodules: false, proxy: null, pathAllow: [], pathIgnore: [], knownHostPolicy: 'strict' },
+  syncCron: null,
+  note: null,
+  health: { lastSyncAt: null, lastCommit: null, lastError: null, failStreak: 0, durationMs: null },
+  capabilities: ['repository:read', 'repository:write'],
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z'
+}
+
+const credential = {
+  id: '01999c55-8d0c-7c1e-8c2d-000000000040',
+  etag: 'v1-credential',
+  name: 'deploy-key',
+  kind: 'ssh_key',
+  fingerprint: 'SHA256:e2e',
+  sharedScope: 'private',
+  teamIds: [],
+  isGlobal: false,
+  createdBy: me.user.id,
+  lastUsedAt: null,
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z'
+}
+
 async function mockTenantApi(page: Page) {
   await page.route('**/api/v1/auth/me', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(me) }))
   await page.route(/\/api\/v1\/t\/acme\/jobs(?:\?.*)?$/, async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [job], page: 1, pageSize: 20, total: 1 }) }))
@@ -56,6 +87,28 @@ async function mockTenantApi(page: Page) {
   await page.route('**/api/v1/t/acme/credentials**', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], page: 1, pageSize: 5, total: 0 }) }))
   await page.route('**/api/v1/t/acme/jobs/*', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(job) }))
   await page.route('**/api/v1/t/acme/jobs/*/logs', async (route) => route.fulfill({ status: 200, contentType: 'text/event-stream', body: 'event: state\ndata: {"event":"state","id":"0","status":"running","progress":20,"at":"2026-01-01T00:00:00Z"}\n\n' }))
+}
+
+async function mockWriteApi(page: Page, requests: { repository?: unknown; credential?: unknown }) {
+  let repositoryCreated = false
+  let credentialCreated = false
+  await page.route('**/api/v1/auth/me', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(me) }))
+  await page.route('**/api/v1/t/acme/repositories**', async (route) => {
+    if (route.request().method() === 'POST') {
+      requests.repository = route.request().postDataJSON()
+      repositoryCreated = true
+      return route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(repository) })
+    }
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: repositoryCreated ? [repository] : [], page: 1, pageSize: 20, total: repositoryCreated ? 1 : 0 }) })
+  })
+  await page.route('**/api/v1/t/acme/credentials**', async (route) => {
+    if (route.request().method() === 'POST') {
+      requests.credential = route.request().postDataJSON()
+      credentialCreated = true
+      return route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(credential) })
+    }
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: credentialCreated ? [credential] : [], page: 1, pageSize: 20, total: credentialCreated ? 1 : 0 }) })
+  })
 }
 
 test('login screen is keyboard reachable and accessible', async ({ page }) => {
@@ -90,4 +143,39 @@ test('mobile navigation opens without covering the page controls', async ({ page
   await expect(page.getByRole('link', { name: '凭据' })).toBeVisible()
   const results = await new AxeBuilder({ page }).analyze()
   expect(results.violations).toEqual([])
+})
+
+test('repository creation follows the contract and refreshes the tenant list', async ({ page }) => {
+  test.setTimeout(60_000)
+  const requests: { repository?: unknown } = {}
+  await mockWriteApi(page, requests)
+  await page.goto('/t/acme/repos')
+  await expect(page.getByRole('heading', { name: '仓库' })).toBeVisible({ timeout: 15_000 })
+  await page.getByRole('button', { name: '添加仓库' }).click()
+  await expect(page.getByRole('heading', { name: '添加仓库' })).toBeVisible()
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+  await page.getByRole('textbox', { name: 'Git 远程地址' }).fill('https://git.example.com/team/service.git')
+  await page.getByRole('textbox', { name: '默认分支' }).fill('main')
+  await page.getByRole('button', { name: '创建仓库' }).click()
+  await expect(page.getByRole('heading', { name: '添加仓库' })).toBeHidden()
+  expect(requests.repository).toMatchObject({ url: 'https://git.example.com/team/service.git', defaultBranch: 'main', credentialId: null, note: null })
+})
+
+test('credential creation keeps secret fields write-only in the UI', async ({ page }) => {
+  test.setTimeout(60_000)
+  const requests: { credential?: unknown } = {}
+  await mockWriteApi(page, requests)
+  await page.goto('/t/acme/credentials')
+  await expect(page.getByRole('heading', { name: '凭据' })).toBeVisible({ timeout: 15_000 })
+  await page.getByRole('button', { name: '创建凭据' }).click()
+  await expect(page.getByRole('heading', { name: '创建凭据' })).toBeVisible()
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+  await page.getByRole('textbox', { name: '凭据名称' }).fill('deploy-key')
+  await page.getByRole('textbox', { name: 'SSH 私钥' }).fill('-----BEGIN OPENSSH PRIVATE KEY-----\ne2e-key-material-that-is-long-enough\n-----END OPENSSH PRIVATE KEY-----')
+  await page.getByRole('button', { name: '创建凭据' }).click()
+  await expect(page.getByRole('heading', { name: '创建凭据' })).toBeHidden()
+  expect(requests.credential).toMatchObject({ name: 'deploy-key', kind: 'ssh_key', sharedScope: 'private' })
+  expect((requests.credential as { sshKey: { privateKeyPem: string } }).sshKey.privateKeyPem).toContain('BEGIN OPENSSH')
+  await expect(page.getByText('deploy-key')).toBeVisible()
+  await expect(page.getByText('BEGIN OPENSSH')).toHaveCount(0)
 })

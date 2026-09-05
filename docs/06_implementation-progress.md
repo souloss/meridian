@@ -4,7 +4,7 @@
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
 > 最新稳定提交：`f3b20fe feat: add nuxt tenant control plane`
-> 当前开发切片：M0 Acceptance/Smoke 与 executable spikes
+> 当前开发切片：M0 Nuxt 仓库/凭据写入（开发中）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -54,7 +54,7 @@
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
 | Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
 | 本地 SHA-256 CAS Blob 驱动 | 已完成 | 流式摘要、排他原子发布、去重、损坏检测、短时内容能力、租户唯一字节配额和真实 PG 覆盖均已通过；内容 HTTP endpoint 按契约在 M1 资产消费者接入 | `6c79863` |
-| M0 Nuxt 控制面 | 部分完成 | 登录、租户壳、认证/租户守卫、仓库/凭据/Job 查询、Job 取消/重试/SSE、桌面/移动导航已实现；创建仓库/凭据表单、平台级管理视图和完整 Smoke fixture 仍未闭环 | `f3b20fe` |
+| M0 Nuxt 控制面 | 开发中 | 登录、租户壳、认证/租户守卫、仓库/凭据/Job 查询、Job 取消/重试/SSE、桌面/移动导航已实现；当前补齐仓库/凭据创建表单和负向 E2E | `f3b20fe`、当前工作区 |
 | M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；Nuxt 类型检查、静态生成、桌面/移动 Playwright 与 axe 已通过；CodeMirror 大文件、Table/Cytoscape 性能 spike 尚未放行 | `f3b20fe`、[`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
 
 ## M0 验收矩阵
