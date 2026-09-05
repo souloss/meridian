@@ -18,6 +18,10 @@ var (
 	ErrDuplicate = errors.New("resource already exists")
 	// ErrValidation means use-case input violates a frozen domain rule.
 	ErrValidation = errors.New("input violates a domain rule")
+	// ErrPrecondition means an If-Match token is missing or no longer matches the row revision.
+	ErrPrecondition = errors.New("resource precondition failed")
+	// ErrCredentialInUse means deletion would leave a repository without an explicit credential policy.
+	ErrCredentialInUse = errors.New("credential is still referenced")
 )
 
 // User is a local identity without password or session secret material.

@@ -383,8 +383,15 @@ func roleAllows(role, permission string) bool {
 	if role == "tenant_admin" {
 		return true
 	}
-	if permission == "token:manage" {
+	switch permission {
+	case "token:manage":
 		return role == "maintainer" || role == "viewer"
+	case "repository:read":
+		return role == "maintainer" || role == "viewer"
+	case "repository:write", "repository:sync":
+		return role == "maintainer"
+	case "credential:read", "credential:manage":
+		return false
 	}
 	return false
 }
