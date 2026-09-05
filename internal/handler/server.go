@@ -23,6 +23,7 @@ type Server struct {
 	identity      *service.Identity
 	credentials   *service.Credentials
 	repositories  *service.Repositories
+	jobs          *service.Jobs
 	secureCookies bool
 }
 
@@ -45,10 +46,16 @@ func NewWithServices(identity *service.Identity, credentials *service.Credential
 
 // NewWithAllServices constructs an HTTP server with every currently implemented M0 use case.
 func NewWithAllServices(identity *service.Identity, credentials *service.Credentials, repositories *service.Repositories, secureCookies bool) *Server {
+	return NewWithRuntimeServices(identity, credentials, repositories, nil, secureCookies)
+}
+
+// NewWithRuntimeServices constructs an HTTP server with all wired use cases and the platform job query service.
+func NewWithRuntimeServices(identity *service.Identity, credentials *service.Credentials, repositories *service.Repositories, jobs *service.Jobs, secureCookies bool) *Server {
 	s := New()
 	s.identity = identity
 	s.credentials = credentials
 	s.repositories = repositories
+	s.jobs = jobs
 	s.secureCookies = secureCookies
 	return s
 }

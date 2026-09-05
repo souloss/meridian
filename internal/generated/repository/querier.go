@@ -26,6 +26,9 @@ type Querier interface {
 	CountKnownHosts(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountListedRepositories returns the number of active repositories matching one tenant search.
 	CountListedRepositories(ctx context.Context, arg CountListedRepositoriesParams) (int64, error)
+	// CountPlatformJobs returns the total redacted platform-job rows matching the supplied filters.
+	// It repeats the exact predicates used by ListPlatformJobs so page totals cannot drift from the result set.
+	CountPlatformJobs(ctx context.Context, arg CountPlatformJobsParams) (int64, error)
 	// CountRepositories returns active repository count and the tenant's frozen repository quota.
 	// The quota is read from the tenant snapshot, never from a mutable platform default.
 	CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error)
@@ -83,6 +86,9 @@ type Querier interface {
 	GetGlobalCredential(ctx context.Context, id uuid.UUID) (GlobalCredential, error)
 	// GetGlobalCredentialRotationIdempotency returns a retained platform rotation replay record.
 	GetGlobalCredentialRotationIdempotency(ctx context.Context, arg GetGlobalCredentialRotationIdempotencyParams) (GetGlobalCredentialRotationIdempotencyRow, error)
+	// GetPlatformJob returns one redacted platform job without tenant-owned payload or execution details.
+	// Scope identifiers are retained only for tenant and repository scopes, matching the public PlatformJob contract.
+	GetPlatformJob(ctx context.Context, id uuid.UUID) (GetPlatformJobRow, error)
 	// GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
 	// GetRepository returns one active repository; soft-deleted rows intentionally appear absent.
@@ -110,6 +116,10 @@ type Querier interface {
 	ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error)
 	// ListKnownHosts returns one stable page of tenant-approved SSH host identities.
 	ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error)
+	// ListPlatformJobs returns redacted cross-tenant job metadata in newest-first order.
+	// Inputs, results, errors, attempts, refs, River identifiers, and logs are intentionally excluded.
+	// Empty filter arrays and strings mean no restriction; scope identifiers are exposed only for tenant/repository jobs.
+	ListPlatformJobs(ctx context.Context, arg ListPlatformJobsParams) ([]ListPlatformJobsRow, error)
 	// ListRepositories returns active repositories in deterministic canonical URL and UUID order.
 	// The query and all predicates retain the tenant boundary even when the search string is empty.
 	ListRepositories(ctx context.Context, arg ListRepositoriesParams) ([]Repository, error)

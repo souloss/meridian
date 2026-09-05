@@ -65,8 +65,10 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		t.Fatalf("bootstrap platform administrator: %v", err)
 	}
 	credentials := service.NewCredentials(repository.NewCredentialStore(db.Pool), store, keyring)
-	repositories := service.NewRepositories(repository.NewRepositoryStore(db.Pool), store)
-	httpHandler := NewWithAllServices(identity, credentials, repositories, false).Handler()
+	repositoryStore := repository.NewRepositoryStore(db.Pool)
+	repositories := service.NewRepositories(repositoryStore, store)
+	jobs := service.NewJobs(repositoryStore)
+	httpHandler := NewWithRuntimeServices(identity, credentials, repositories, jobs, false).Handler()
 
 	adminLogin := requestJSON(t, httpHandler, http.MethodPost, "/api/v1/auth/login", map[string]any{
 		"username": "padmin", "password": "correct horse battery staple",
@@ -335,6 +337,29 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if strings.Contains(rotatedGlobal.Body.String(), "global-second-token") || strings.Contains(rotatedGlobal.Body.String(), "global-first-token") {
 		t.Fatal("global credential rotation response disclosed secret material")
 	}
+	var globalRotationBody struct {
+		SyncJobs []struct {
+			JobID uuid.UUID `json:"jobId"`
+		} `json:"syncJobs"`
+	}
+	if err := json.Unmarshal(rotatedGlobal.Body.Bytes(), &globalRotationBody); err != nil {
+		t.Fatalf("decode global rotation jobs: %v", err)
+	}
+	if len(globalRotationBody.SyncJobs) != 1 || globalRotationBody.SyncJobs[0].JobID == uuid.Nil() {
+		t.Fatalf("global rotation jobs = %#v", globalRotationBody.SyncJobs)
+	}
+	platformJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs", nil, []*http.Cookie{adminCookie})
+	assertStatus(t, platformJobs, http.StatusOK)
+	if !strings.Contains(platformJobs.Body.String(), globalRotationBody.SyncJobs[0].JobID.String()) || strings.Contains(platformJobs.Body.String(), "global-second-token") || strings.Contains(platformJobs.Body.String(), "credentialId") {
+		t.Fatalf("platform job projection leaked or omitted data: %s", platformJobs.Body.String())
+	}
+	platformJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{adminCookie})
+	assertStatus(t, platformJob, http.StatusOK)
+	if strings.Contains(platformJob.Body.String(), "input") || strings.Contains(platformJob.Body.String(), "result") || strings.Contains(platformJob.Body.String(), "error") {
+		t.Fatalf("platform job detail contains redacted fields: %s", platformJob.Body.String())
+	}
+	platformJobAsTenant := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{aliceCookie})
+	assertError(t, platformJobAsTenant, http.StatusNotFound, "not_found")
 	globalReplay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials/"+globalID.String()+":rotate", map[string]any{
 		"secret": map[string]any{"username": "global-bot", "token": "global-second-token"}, "resyncRepositories": true,
 	}, []*http.Cookie{adminCookie}, globalRotationHeaders)
