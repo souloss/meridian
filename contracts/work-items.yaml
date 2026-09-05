@@ -64,7 +64,7 @@ items:
   - id: M0-AGENT-002
     milestone: M0
     priority: P0
-    status: needs_retry
+    status: needs_human_acceptance
     title: close-m0-credential-known-host-smoke
     dependsOn: [M0-AGENT-001]
     operationIds: [createCredential, rotateCredential, createGlobalCredential, rotateGlobalCredential, deleteGlobalCredential, createKnownHost]
@@ -72,15 +72,15 @@ items:
     assertions: [SMK-005, SMK-031, SMK-035]
     verify: [smoke-m0-credentials, backend-test-integration]
     owner: coding-agent
-    attempt: 2
+    attempt: 3
     maxAttempts: 3
-    leaseUntil: '2026-09-05T19:36:06Z'
-    startedAt: '2026-09-05T19:06:06Z'
-    baseCommit: f76025ac0d9563c5fe87542693538c86966b8e20
+    leaseUntil: '2026-09-05T19:39:06Z'
+    startedAt: '2026-09-05T19:09:06Z'
+    baseCommit: 667cc9489766576fda8eb8590f396368433d2195
     contractDigest: sha256:627bc17f91f02ba5d8bbb4bd8b6bc7071de94e9ca8465b9027be14ca49b14a9a
-    reportPath: artifacts/agent/M0-AGENT-002/20260905T190606Z/report.json
-    lastEvidence: artifacts/agent/M0-AGENT-002/20260905T190606Z/report.json
-    nextAction: retry attempt 3 after checking gate definition
+    reportPath: artifacts/agent/M0-AGENT-002/20260905T190906Z/report.json
+    lastEvidence: artifacts/agent/M0-AGENT-002/20260905T190906Z/report.json
+    nextAction: 'human-accept: provide smoke-m0-credentials gate or update queue contract'
 
   - id: M0-AGENT-003
     milestone: M0

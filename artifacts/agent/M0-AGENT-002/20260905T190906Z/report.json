@@ -1,0 +1,25 @@
+{
+  "itemId": "M0-AGENT-002",
+  "workItem": "M0-AGENT-002",
+  "status": "needs_human_acceptance",
+  "attempt": 3,
+  "commit": "667cc9489766576fda8eb8590f396368433d2195",
+  "baseCommit": "667cc9489766576fda8eb8590f396368433d2195",
+  "contractDigest": "sha256:627bc17f91f02ba5d8bbb4bd8b6bc7071de94e9ca8465b9027be14ca49b14a9a",
+  "stories": ["US-11"],
+  "assertions": [
+    {"id": "SMK-005", "status": "failed", "evidence": "make smoke-m0-credentials: missing target (third identical failure)"},
+    {"id": "SMK-031", "status": "failed", "evidence": "make smoke-m0-credentials: missing target (third identical failure)"},
+    {"id": "SMK-035", "status": "failed", "evidence": "make smoke-m0-credentials: missing target (third identical failure)"}
+  ],
+  "commands": [
+    {"command": "make smoke-m0-credentials", "exitCode": 2, "durationSeconds": 0},
+    {"command": "./scripts/test-integration.sh", "exitCode": 0, "durationSeconds": 13}
+  ],
+  "changedFiles": [],
+  "deferred": [],
+  "failures": [
+    {"category": "code_failure", "command": "make smoke-m0-credentials", "reason": "Makefile has no smoke-m0-credentials target; identical root cause reached maxAttempts=3"}
+  ],
+  "nextAction": "human-accept: provide the declared smoke-m0-credentials gate or update the queue contract"
+}
