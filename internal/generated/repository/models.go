@@ -313,7 +313,7 @@ type Job struct {
 	// Optional normalized Git reference name.
 	RefName *string `json:"ref_name"`
 	// Trigger is the generated trigger database value for Job.
-	// Origin of the request: manual, schedule, webhook, api, cli, system, or retry.
+	// Origin of the request: manual, schedule, webhook, api, cli, system, retry, or credential-rotated.
 	Trigger string `json:"trigger"`
 	// Input is the generated input database value for Job.
 	// Non-secret immutable JSON input needed to execute the job.

@@ -3090,7 +3090,7 @@ components:
     ConfigSource: {type: string, enum: [db_manual, repo_file, repo_bootstrap], description: "identifies one supported config source value."}
     RevisionStatus: {type: string, enum: [not_required, pending_review, approved, rejected, superseded], description: "identifies one supported revision status value."}
     JobStatus: {type: string, enum: [pending, running, succeeded, succeeded_with_warnings, failed, outcome_unknown, cancelled], description: "identifies one supported job status value."}
-    JobTrigger: {type: string, enum: [manual, schedule, webhook, api, cli, system, retry], description: "identifies one supported job trigger value."}
+    JobTrigger: {type: string, enum: [manual, schedule, webhook, api, cli, system, retry, credential-rotated], description: "identifies one supported job trigger value."}
     JobType: {type: string, enum: [tenant.delete, repo.sync, repo.discover, asset.produce, asset.merge, asset.index, asset.ai_generate, asset.reindex, diff.run, outbox.dispatch, workspace.gc, blob.gc, retention.cleanup], description: "identifies one supported job type value."}
     JobScopeType: {type: string, enum: [tenant, repository, service, source, track, version, asset, diff, system], description: "identifies one supported job scope type value."}
     PipelineStage: {type: string, enum: [resolve, discover, extract, merge, normalize, index], description: "identifies one supported pipeline stage value."}

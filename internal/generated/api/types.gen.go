@@ -789,13 +789,14 @@ func (e JobStatus) Valid() bool {
 
 // Defines values for JobTrigger.
 const (
-	JobTriggerApi      JobTrigger = "api"
-	JobTriggerCli      JobTrigger = "cli"
-	JobTriggerManual   JobTrigger = "manual"
-	JobTriggerRetry    JobTrigger = "retry"
-	JobTriggerSchedule JobTrigger = "schedule"
-	JobTriggerSystem   JobTrigger = "system"
-	JobTriggerWebhook  JobTrigger = "webhook"
+	JobTriggerApi               JobTrigger = "api"
+	JobTriggerCli               JobTrigger = "cli"
+	JobTriggerCredentialRotated JobTrigger = "credential-rotated"
+	JobTriggerManual            JobTrigger = "manual"
+	JobTriggerRetry             JobTrigger = "retry"
+	JobTriggerSchedule          JobTrigger = "schedule"
+	JobTriggerSystem            JobTrigger = "system"
+	JobTriggerWebhook           JobTrigger = "webhook"
 )
 
 // Valid indicates whether the value is a known member of the JobTrigger enum.
@@ -804,6 +805,8 @@ func (e JobTrigger) Valid() bool {
 	case JobTriggerApi:
 		return true
 	case JobTriggerCli:
+		return true
+	case JobTriggerCredentialRotated:
 		return true
 	case JobTriggerManual:
 		return true

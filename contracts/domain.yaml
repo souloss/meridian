@@ -1112,6 +1112,7 @@ diffResolution:
 
 jobs:
   scopeTypes: [tenant, repository, service, source, track, version, asset, diff, system]
+  triggerTypes: [manual, schedule, webhook, api, cli, system, retry, credential-rotated]
   scopeIdRules:
     tenant: tenant-id
     repository: repository-id

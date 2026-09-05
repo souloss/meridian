@@ -245,7 +245,7 @@ CREATE TABLE jobs (
   scope_id uuid,
   ref_type text CHECK (ref_type IN ('branch', 'tag')),
   ref_name text,
-  trigger text NOT NULL CHECK (trigger IN ('manual', 'schedule', 'webhook', 'api', 'cli', 'system', 'retry')),
+  trigger text NOT NULL CHECK (trigger IN ('manual', 'schedule', 'webhook', 'api', 'cli', 'system', 'retry', 'credential-rotated')),
   input jsonb NOT NULL DEFAULT '{}'::jsonb,
   result jsonb,
   status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'running', 'succeeded', 'succeeded_with_warnings', 'failed', 'outcome_unknown', 'cancelled')),
@@ -535,7 +535,7 @@ COMMENT ON COLUMN jobs.scope_type IS 'Resource category used for authorization, 
 COMMENT ON COLUMN jobs.scope_id IS 'Optional UUID of the scoped resource; null for system scope.';
 COMMENT ON COLUMN jobs.ref_type IS 'Optional Git reference category: branch or tag.';
 COMMENT ON COLUMN jobs.ref_name IS 'Optional normalized Git reference name.';
-COMMENT ON COLUMN jobs.trigger IS 'Origin of the request: manual, schedule, webhook, api, cli, system, or retry.';
+COMMENT ON COLUMN jobs.trigger IS 'Origin of the request: manual, schedule, webhook, api, cli, system, retry, or credential-rotated.';
 COMMENT ON COLUMN jobs.input IS 'Non-secret immutable JSON input needed to execute the job.';
 COMMENT ON COLUMN jobs.result IS 'Optional non-secret JSON result identifiers and counters.';
 COMMENT ON COLUMN jobs.status IS 'Current durable state from the domain job state machine.';

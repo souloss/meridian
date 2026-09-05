@@ -21,4 +21,5 @@ export const JobTrigger = {
   cli: 'cli',
   system: 'system',
   retry: 'retry',
+  'credential-rotated': 'credential-rotated',
 } as const;
