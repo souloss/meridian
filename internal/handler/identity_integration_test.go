@@ -68,7 +68,10 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
 	repositories := service.NewRepositories(repositoryStore, store)
 	jobs := service.NewJobs(repositoryStore)
-	httpHandler := NewWithRuntimeServices(identity, credentials, repositories, jobs, false).Handler()
+	audits := service.NewAudits(repositoryStore, store)
+	httpHandler := NewWithRuntimeServices(Dependencies{
+		Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
+	}, false).Handler()
 
 	adminLogin := requestJSON(t, httpHandler, http.MethodPost, "/api/v1/auth/login", map[string]any{
 		"username": "padmin", "password": "correct horse battery staple",
@@ -129,6 +132,27 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	me := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, []*http.Cookie{aliceCookie})
 	assertStatus(t, me, http.StatusOK)
 	assertTenantMembership(t, me, "acme", "tenant_admin")
+
+	var tenantID uuid.UUID
+	if err := db.Pool.QueryRow(t.Context(), `SELECT id FROM tenants WHERE slug = 'acme'`).Scan(&tenantID); err != nil {
+		t.Fatalf("resolve audit tenant fixture: %v", err)
+	}
+	if _, err := db.Pool.Exec(t.Context(), `
+		INSERT INTO audit_logs (id, tenant_id, actor_id, actor_type, action, target_type, target_id, detail, request_id)
+		VALUES
+		  ($1, $2, $3, 'user', 'repository.created', 'repository', $4, '{"source":"api"}'::jsonb, $5),
+		  ($6, NULL, NULL, 'system', 'runtime.started', 'runtime', NULL, '{"workers":4}'::jsonb, NULL)
+	`, uuid.NewV7(), tenantID, userID, uuid.NewV7(), uuid.NewV7(), uuid.NewV7()); err != nil {
+		t.Fatalf("create audit fixtures: %v", err)
+	}
+	tenantAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/audit-logs", nil, []*http.Cookie{aliceCookie})
+	assertStatus(t, tenantAudits, http.StatusOK)
+	assertAuditPage(t, tenantAudits, 1, "acme", "repository.created")
+	platformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs?filter%5BtenantSlug%5D=acme", nil, []*http.Cookie{adminCookie})
+	assertStatus(t, platformAudits, http.StatusOK)
+	assertAuditPage(t, platformAudits, 1, "acme", "repository.created")
+	forbiddenPlatformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs", nil, []*http.Cookie{aliceCookie})
+	assertError(t, forbiddenPlatformAudits, http.StatusNotFound, "not_found")
 
 	invalidBearer := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, []*http.Cookie{aliceCookie}, map[string]string{
 		"Authorization": "Bearer invalid",
@@ -393,6 +417,24 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}, nil)
 	assertStatus(t, disabledTenantLogin, http.StatusOK)
 	assertNoTenantMemberships(t, disabledTenantLogin)
+}
+
+func assertAuditPage(t *testing.T, response *httptest.ResponseRecorder, total int, tenantSlug, action string) {
+	t.Helper()
+	var page struct {
+		Total int `json:"total"`
+		Items []struct {
+			TenantSlug string         `json:"tenantSlug"`
+			Action     string         `json:"action"`
+			Metadata   map[string]any `json:"metadata"`
+		} `json:"items"`
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &page); err != nil {
+		t.Fatalf("decode audit page: %v", err)
+	}
+	if page.Total != total || len(page.Items) != total || page.Items[0].TenantSlug != tenantSlug || page.Items[0].Action != action || len(page.Items[0].Metadata) == 0 {
+		t.Fatalf("audit page = %#v, want one redacted %s/%s fact", page, tenantSlug, action)
+	}
 }
 
 func authenticatePAT(identity *service.Identity, t *testing.T, token string) error {

@@ -31,12 +31,18 @@ type Querier interface {
 	CountKnownHosts(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountListedRepositories returns the number of active repositories matching one tenant search.
 	CountListedRepositories(ctx context.Context, arg CountListedRepositoriesParams) (int64, error)
+	// CountPlatformAuditLogs returns the exact total for ListPlatformAuditLogs by
+	// repeating its cross-tenant predicates and every optional filter.
+	CountPlatformAuditLogs(ctx context.Context, arg CountPlatformAuditLogsParams) (int64, error)
 	// CountPlatformJobs returns the total redacted platform-job rows matching the supplied filters.
 	// It repeats the exact predicates used by ListPlatformJobs so page totals cannot drift from the result set.
 	CountPlatformJobs(ctx context.Context, arg CountPlatformJobsParams) (int64, error)
 	// CountRepositories returns active repository count and the tenant's frozen repository quota.
 	// The quota is read from the tenant snapshot, never from a mutable platform default.
 	CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error)
+	// CountTenantAuditLogs returns the exact total for ListTenantAuditLogs by
+	// repeating its tenant predicate and every optional filter.
+	CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error)
 	// CountTenantCredentials counts visible tenant-owned and global credentials for one tenant member.
 	CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error)
 	// CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
@@ -125,6 +131,9 @@ type Querier interface {
 	ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error)
 	// ListKnownHosts returns one stable page of tenant-approved SSH host identities.
 	ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error)
+	// ListPlatformAuditLogs returns one newest-first cross-tenant page for the
+	// platform control plane. Nullable tenant ownership is retained for platform facts.
+	ListPlatformAuditLogs(ctx context.Context, arg ListPlatformAuditLogsParams) ([]ListPlatformAuditLogsRow, error)
 	// ListPlatformJobs returns redacted cross-tenant job metadata in newest-first order.
 	// Inputs, results, errors, attempts, refs, River identifiers, and logs are intentionally excluded.
 	// Empty filter arrays and strings mean no restriction; scope identifiers are exposed only for tenant/repository jobs.
@@ -136,6 +145,10 @@ type Querier interface {
 	ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error)
 	// ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
 	ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error)
+	// ListTenantAuditLogs returns one newest-first page of append-only audit metadata
+	// inside an explicit tenant boundary. Business content and secret-bearing columns
+	// do not exist in this projection.
+	ListTenantAuditLogs(ctx context.Context, arg ListTenantAuditLogsParams) ([]ListTenantAuditLogsRow, error)
 	// ListTenantCredentials returns credentials visible to one user inside one active tenant.
 	// Team visibility is evaluated by a same-tenant team membership predicate. Global credentials are
 	// appended as tenant-visible records with is_global=true and a tenant-wide sharing projection.

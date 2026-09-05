@@ -24,7 +24,22 @@ type Server struct {
 	credentials   *service.Credentials
 	repositories  *service.Repositories
 	jobs          *service.Jobs
+	audits        *service.Audits
 	secureCookies bool
+}
+
+// Dependencies groups the independently testable use cases exposed by the HTTP server.
+type Dependencies struct {
+	// Identity provides authentication, user, tenant, membership, and PAT use cases.
+	Identity *service.Identity
+	// Credentials provides tenant and platform credential use cases.
+	Credentials *service.Credentials
+	// Repositories provides tenant repository configuration use cases.
+	Repositories *service.Repositories
+	// Jobs provides redacted platform job query use cases.
+	Jobs *service.Jobs
+	// Audits provides tenant and platform audit query use cases.
+	Audits *service.Audits
 }
 
 func New() *Server {
@@ -46,16 +61,17 @@ func NewWithServices(identity *service.Identity, credentials *service.Credential
 
 // NewWithAllServices constructs an HTTP server with every currently implemented M0 use case.
 func NewWithAllServices(identity *service.Identity, credentials *service.Credentials, repositories *service.Repositories, secureCookies bool) *Server {
-	return NewWithRuntimeServices(identity, credentials, repositories, nil, secureCookies)
+	return NewWithRuntimeServices(Dependencies{Identity: identity, Credentials: credentials, Repositories: repositories}, secureCookies)
 }
 
-// NewWithRuntimeServices constructs an HTTP server with all wired use cases and the platform job query service.
-func NewWithRuntimeServices(identity *service.Identity, credentials *service.Credentials, repositories *service.Repositories, jobs *service.Jobs, secureCookies bool) *Server {
+// NewWithRuntimeServices constructs an HTTP server from explicit application use-case dependencies.
+func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Server {
 	s := New()
-	s.identity = identity
-	s.credentials = credentials
-	s.repositories = repositories
-	s.jobs = jobs
+	s.identity = dependencies.Identity
+	s.credentials = dependencies.Credentials
+	s.repositories = dependencies.Repositories
+	s.jobs = dependencies.Jobs
+	s.audits = dependencies.Audits
 	s.secureCookies = secureCookies
 	return s
 }
