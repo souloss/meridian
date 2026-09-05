@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/meridian-labs/meridian/internal/generated/api"
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
@@ -147,5 +148,20 @@ func TestStaticDeepLinkHead(t *testing.T) {
 	New().Handler().ServeHTTP(response, request)
 	if response.Code != http.StatusOK {
 		t.Fatalf("status = %d, want %d", response.Code, http.StatusOK)
+	}
+}
+
+func TestGlobalCredentialInputAcceptsHTTPUnion(t *testing.T) {
+	t.Parallel()
+	var body api.GlobalCredentialCreateRequest
+	if err := json.Unmarshal([]byte(`{"name":"global","kind":"http_token","httpToken":{"username":"bot","token":"global-first-token"}}`), &body); err != nil {
+		t.Fatalf("decode global credential body: %v", err)
+	}
+	input, err := globalCredentialInput(body)
+	if err != nil {
+		t.Fatalf("global credential input: %v", err)
+	}
+	if input.Name != "global" || input.Secret.Kind != "http_token" || input.Secret.HTTPToken != "global-first-token" {
+		t.Fatalf("global credential input = %#v", input)
 	}
 }

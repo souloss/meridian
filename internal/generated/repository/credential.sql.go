@@ -208,6 +208,46 @@ func (q *Queries) CreateCredential(ctx context.Context, arg CreateCredentialPara
 	return i, err
 }
 
+const createCredentialRotationIdempotency = `-- name: CreateCredentialRotationIdempotency :exec
+INSERT INTO idempotency_records (
+  tenant_id, principal_type, principal_id, operation_id, idempotency_key,
+  request_hash, response_status, response_body, expires_at
+) VALUES (
+  $1, $2, $3, 'rotateCredential', $4,
+  $5, 200, $6::jsonb, now() + interval '24 hours'
+)
+`
+
+// CreateCredentialRotationIdempotencyParams contains the strongly typed arguments for the CreateCredentialRotationIdempotency query.
+type CreateCredentialRotationIdempotencyParams struct {
+	// TenantID is the tenant id value supplied to the CreateCredentialRotationIdempotency query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// PrincipalType is the principal type value supplied to the CreateCredentialRotationIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the CreateCredentialRotationIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the CreateCredentialRotationIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+	// RequestHash is the request hash value supplied to the CreateCredentialRotationIdempotency query.
+	RequestHash []byte `json:"request_hash"`
+	// ResponseBody is the response body value supplied to the CreateCredentialRotationIdempotency query.
+	ResponseBody []byte `json:"response_body"`
+}
+
+// CreateCredentialRotationIdempotency stores a safe tenant rotation response for 24-hour exact replay.
+// Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+func (q *Queries) CreateCredentialRotationIdempotency(ctx context.Context, arg CreateCredentialRotationIdempotencyParams) error {
+	_, err := q.db.Exec(ctx, createCredentialRotationIdempotency,
+		arg.TenantID,
+		arg.PrincipalType,
+		arg.PrincipalID,
+		arg.IdempotencyKey,
+		arg.RequestHash,
+		arg.ResponseBody,
+	)
+	return err
+}
+
 const createCredentialSyncJob = `-- name: CreateCredentialSyncJob :one
 INSERT INTO jobs (
   tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
@@ -343,6 +383,43 @@ func (q *Queries) CreateGlobalCredential(ctx context.Context, arg CreateGlobalCr
 	return i, err
 }
 
+const createGlobalCredentialRotationIdempotency = `-- name: CreateGlobalCredentialRotationIdempotency :exec
+INSERT INTO global_idempotency_records (
+  context_type, principal_type, principal_id, operation_id, idempotency_key,
+  request_hash, response_status, response_body, expires_at
+) VALUES (
+  'platform', $1, $2, 'rotateGlobalCredential', $3,
+  $4, 200, $5::jsonb, now() + interval '24 hours'
+)
+`
+
+// CreateGlobalCredentialRotationIdempotencyParams contains the strongly typed arguments for the CreateGlobalCredentialRotationIdempotency query.
+type CreateGlobalCredentialRotationIdempotencyParams struct {
+	// PrincipalType is the principal type value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+	// RequestHash is the request hash value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	RequestHash []byte `json:"request_hash"`
+	// ResponseBody is the response body value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	ResponseBody []byte `json:"response_body"`
+}
+
+// CreateGlobalCredentialRotationIdempotency stores a safe platform rotation response for 24-hour exact replay.
+// Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+func (q *Queries) CreateGlobalCredentialRotationIdempotency(ctx context.Context, arg CreateGlobalCredentialRotationIdempotencyParams) error {
+	_, err := q.db.Exec(ctx, createGlobalCredentialRotationIdempotency,
+		arg.PrincipalType,
+		arg.PrincipalID,
+		arg.IdempotencyKey,
+		arg.RequestHash,
+		arg.ResponseBody,
+	)
+	return err
+}
+
 const createKnownHost = `-- name: CreateKnownHost :one
 INSERT INTO known_hosts (
   tenant_id, id, host, port, key_type, public_key, fingerprint, source, created_by
@@ -431,6 +508,38 @@ func (q *Queries) DeleteCredential(ctx context.Context, arg DeleteCredentialPara
 	return result.RowsAffected(), nil
 }
 
+const deleteCredentialRotationIdempotency = `-- name: DeleteCredentialRotationIdempotency :exec
+DELETE FROM idempotency_records
+WHERE tenant_id = $1
+  AND principal_type = $2
+  AND principal_id = $3
+  AND operation_id = 'rotateCredential'
+  AND idempotency_key = $4
+`
+
+// DeleteCredentialRotationIdempotencyParams contains the strongly typed arguments for the DeleteCredentialRotationIdempotency query.
+type DeleteCredentialRotationIdempotencyParams struct {
+	// TenantID is the tenant id value supplied to the DeleteCredentialRotationIdempotency query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// PrincipalType is the principal type value supplied to the DeleteCredentialRotationIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the DeleteCredentialRotationIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the DeleteCredentialRotationIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+}
+
+// DeleteCredentialRotationIdempotency removes an expired tenant rotation replay before reuse.
+func (q *Queries) DeleteCredentialRotationIdempotency(ctx context.Context, arg DeleteCredentialRotationIdempotencyParams) error {
+	_, err := q.db.Exec(ctx, deleteCredentialRotationIdempotency,
+		arg.TenantID,
+		arg.PrincipalType,
+		arg.PrincipalID,
+		arg.IdempotencyKey,
+	)
+	return err
+}
+
 const deleteGlobalCredential = `-- name: DeleteGlobalCredential :execrows
 DELETE FROM global_credentials
 WHERE id = $1
@@ -452,6 +561,77 @@ func (q *Queries) DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCr
 		return 0, err
 	}
 	return result.RowsAffected(), nil
+}
+
+const deleteGlobalCredentialRotationIdempotency = `-- name: DeleteGlobalCredentialRotationIdempotency :exec
+DELETE FROM global_idempotency_records
+WHERE context_type = 'platform'
+  AND principal_type = $1
+  AND principal_id = $2
+  AND operation_id = 'rotateGlobalCredential'
+  AND idempotency_key = $3
+`
+
+// DeleteGlobalCredentialRotationIdempotencyParams contains the strongly typed arguments for the DeleteGlobalCredentialRotationIdempotency query.
+type DeleteGlobalCredentialRotationIdempotencyParams struct {
+	// PrincipalType is the principal type value supplied to the DeleteGlobalCredentialRotationIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the DeleteGlobalCredentialRotationIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the DeleteGlobalCredentialRotationIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+}
+
+// DeleteGlobalCredentialRotationIdempotency removes an expired platform rotation replay before reuse.
+func (q *Queries) DeleteGlobalCredentialRotationIdempotency(ctx context.Context, arg DeleteGlobalCredentialRotationIdempotencyParams) error {
+	_, err := q.db.Exec(ctx, deleteGlobalCredentialRotationIdempotency, arg.PrincipalType, arg.PrincipalID, arg.IdempotencyKey)
+	return err
+}
+
+const getCredentialRotationIdempotency = `-- name: GetCredentialRotationIdempotency :one
+SELECT request_hash, response_body, expires_at
+FROM idempotency_records
+WHERE tenant_id = $1
+  AND principal_type = $2
+  AND principal_id = $3
+  AND operation_id = 'rotateCredential'
+  AND idempotency_key = $4
+FOR UPDATE
+`
+
+// GetCredentialRotationIdempotencyParams contains the strongly typed arguments for the GetCredentialRotationIdempotency query.
+type GetCredentialRotationIdempotencyParams struct {
+	// TenantID is the tenant id value supplied to the GetCredentialRotationIdempotency query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// PrincipalType is the principal type value supplied to the GetCredentialRotationIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the GetCredentialRotationIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the GetCredentialRotationIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+}
+
+// GetCredentialRotationIdempotencyRow contains the columns returned by the GetCredentialRotationIdempotency query.
+type GetCredentialRotationIdempotencyRow struct {
+	// RequestHash is the request hash value returned by the GetCredentialRotationIdempotency query.
+	RequestHash []byte `json:"request_hash"`
+	// ResponseBody is the response body value returned by the GetCredentialRotationIdempotency query.
+	ResponseBody []byte `json:"response_body"`
+	// ExpiresAt is the expires at value returned by the GetCredentialRotationIdempotency query.
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+}
+
+// GetCredentialRotationIdempotency returns a retained tenant rotation replay record, including its expiry.
+func (q *Queries) GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error) {
+	row := q.db.QueryRow(ctx, getCredentialRotationIdempotency,
+		arg.TenantID,
+		arg.PrincipalType,
+		arg.PrincipalID,
+		arg.IdempotencyKey,
+	)
+	var i GetCredentialRotationIdempotencyRow
+	err := row.Scan(&i.RequestHash, &i.ResponseBody, &i.ExpiresAt)
+	return i, err
 }
 
 const getGlobalCredential = `-- name: GetGlobalCredential :one
@@ -476,6 +656,45 @@ func (q *Queries) GetGlobalCredential(ctx context.Context, id uuid.UUID) (Global
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
+	return i, err
+}
+
+const getGlobalCredentialRotationIdempotency = `-- name: GetGlobalCredentialRotationIdempotency :one
+SELECT request_hash, response_body, expires_at
+FROM global_idempotency_records
+WHERE context_type = 'platform'
+  AND principal_type = $1
+  AND principal_id = $2
+  AND operation_id = 'rotateGlobalCredential'
+  AND idempotency_key = $3
+FOR UPDATE
+`
+
+// GetGlobalCredentialRotationIdempotencyParams contains the strongly typed arguments for the GetGlobalCredentialRotationIdempotency query.
+type GetGlobalCredentialRotationIdempotencyParams struct {
+	// PrincipalType is the principal type value supplied to the GetGlobalCredentialRotationIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the GetGlobalCredentialRotationIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the GetGlobalCredentialRotationIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+}
+
+// GetGlobalCredentialRotationIdempotencyRow contains the columns returned by the GetGlobalCredentialRotationIdempotency query.
+type GetGlobalCredentialRotationIdempotencyRow struct {
+	// RequestHash is the request hash value returned by the GetGlobalCredentialRotationIdempotency query.
+	RequestHash []byte `json:"request_hash"`
+	// ResponseBody is the response body value returned by the GetGlobalCredentialRotationIdempotency query.
+	ResponseBody []byte `json:"response_body"`
+	// ExpiresAt is the expires at value returned by the GetGlobalCredentialRotationIdempotency query.
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+}
+
+// GetGlobalCredentialRotationIdempotency returns a retained platform rotation replay record.
+func (q *Queries) GetGlobalCredentialRotationIdempotency(ctx context.Context, arg GetGlobalCredentialRotationIdempotencyParams) (GetGlobalCredentialRotationIdempotencyRow, error) {
+	row := q.db.QueryRow(ctx, getGlobalCredentialRotationIdempotency, arg.PrincipalType, arg.PrincipalID, arg.IdempotencyKey)
+	var i GetGlobalCredentialRotationIdempotencyRow
+	err := row.Scan(&i.RequestHash, &i.ResponseBody, &i.ExpiresAt)
 	return i, err
 }
 
@@ -1048,6 +1267,17 @@ func (q *Queries) ListTenantCredentials(ctx context.Context, arg ListTenantCrede
 		return nil, err
 	}
 	return items, nil
+}
+
+const lockCredentialRotationIdempotency = `-- name: LockCredentialRotationIdempotency :exec
+SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
+`
+
+// LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
+// The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
+func (q *Queries) LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error {
+	_, err := q.db.Exec(ctx, lockCredentialRotationIdempotency, lockKey)
+	return err
 }
 
 const lockLatestCredentialSyncJob = `-- name: LockLatestCredentialSyncJob :one

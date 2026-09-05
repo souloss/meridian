@@ -31,6 +31,9 @@ type Querier interface {
 	// CreateCredential inserts one tenant-owned encrypted credential and returns metadata plus ciphertext.
 	// Secret plaintext is never accepted by SQL; the service supplies the encrypted projection only.
 	CreateCredential(ctx context.Context, arg CreateCredentialParams) (Credential, error)
+	// CreateCredentialRotationIdempotency stores a safe tenant rotation response for 24-hour exact replay.
+	// Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+	CreateCredentialRotationIdempotency(ctx context.Context, arg CreateCredentialRotationIdempotencyParams) error
 	// CreateCredentialSyncJob records one durable default-branch repository sync request.
 	// The input contains only the non-secret credential identifier and rotation reason.
 	CreateCredentialSyncJob(ctx context.Context, arg CreateCredentialSyncJobParams) (Job, error)
@@ -38,6 +41,9 @@ type Querier interface {
 	CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
 	// CreateGlobalCredential inserts one platform-owned encrypted credential.
 	CreateGlobalCredential(ctx context.Context, arg CreateGlobalCredentialParams) (GlobalCredential, error)
+	// CreateGlobalCredentialRotationIdempotency stores a safe platform rotation response for 24-hour exact replay.
+	// Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+	CreateGlobalCredentialRotationIdempotency(ctx context.Context, arg CreateGlobalCredentialRotationIdempotencyParams) error
 	// CreateKnownHost inserts a server-derived approved SSH host identity.
 	CreateKnownHost(ctx context.Context, arg CreateKnownHostParams) (KnownHost, error)
 	// CreateSession persists keyed session and CSRF digests without storing either plaintext token.
@@ -48,16 +54,24 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	// DeleteCredential removes a tenant credential after the caller has applied reference and ETag checks.
 	DeleteCredential(ctx context.Context, arg DeleteCredentialParams) (int64, error)
+	// DeleteCredentialRotationIdempotency removes an expired tenant rotation replay before reuse.
+	DeleteCredentialRotationIdempotency(ctx context.Context, arg DeleteCredentialRotationIdempotencyParams) error
 	// DeleteGlobalCredential removes one platform credential after reference and ETag checks.
 	DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCredentialParams) (int64, error)
+	// DeleteGlobalCredentialRotationIdempotency removes an expired platform rotation replay before reuse.
+	DeleteGlobalCredentialRotationIdempotency(ctx context.Context, arg DeleteGlobalCredentialRotationIdempotencyParams) error
 	// GetAPITokenPrincipalByTokenHash authenticates one active PAT whose user, membership, and tenant remain active.
 	GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAPITokenPrincipalByTokenHashParams) (GetAPITokenPrincipalByTokenHashRow, error)
 	// GetActiveTenantBySlug returns only an active tenant for tenant-scoped business access.
 	GetActiveTenantBySlug(ctx context.Context, slug string) (Tenant, error)
 	// GetActiveTenantMembership returns one active tenant membership without revealing disabled tenant records.
 	GetActiveTenantMembership(ctx context.Context, arg GetActiveTenantMembershipParams) (GetActiveTenantMembershipRow, error)
+	// GetCredentialRotationIdempotency returns a retained tenant rotation replay record, including its expiry.
+	GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error)
 	// GetGlobalCredential returns one platform-owned credential.
 	GetGlobalCredential(ctx context.Context, id uuid.UUID) (GlobalCredential, error)
+	// GetGlobalCredentialRotationIdempotency returns a retained platform rotation replay record.
+	GetGlobalCredentialRotationIdempotency(ctx context.Context, arg GetGlobalCredentialRotationIdempotencyParams) (GetGlobalCredentialRotationIdempotencyRow, error)
 	// GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
 	// GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
@@ -91,6 +105,9 @@ type Querier interface {
 	// Team visibility is evaluated by a same-tenant team membership predicate. Global credentials are
 	// appended as tenant-visible records with is_global=true and a tenant-wide sharing projection.
 	ListTenantCredentials(ctx context.Context, arg ListTenantCredentialsParams) ([]ListTenantCredentialsRow, error)
+	// LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
+	// The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
+	LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error
 	// LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
 	// A pending or running row is reused; terminal rows advance active_generation for new work.
 	LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error)

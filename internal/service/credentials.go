@@ -109,6 +109,19 @@ func (credentials *Credentials) RotateTenant(ctx context.Context, actor Principa
 	if err != nil {
 		return CredentialRecord{}, nil, err
 	}
+	rotation.PrincipalType, rotation.PrincipalID = rotationPrincipal(actor)
+	if err := validateCredentialRotationReplay(rotation); err != nil {
+		return CredentialRecord{}, nil, err
+	}
+	if rotation.IdempotencyKey != uuid.Nil() {
+		replayed, jobs, found, err := credentials.store.LookupCredentialRotation(ctx, membership.TenantID, rotation.PrincipalType, rotation.PrincipalID, rotation.IdempotencyKey, rotation.RequestHash)
+		if err != nil {
+			return CredentialRecord{}, nil, err
+		}
+		if found {
+			return replayed, jobs, nil
+		}
+	}
 	expectedRevision, err := parseRevisionETag(etag, "credential", id)
 	if err != nil {
 		return CredentialRecord{}, nil, ErrPrecondition
@@ -137,6 +150,8 @@ func (credentials *Credentials) RotateTenant(ctx context.Context, actor Principa
 	updated, jobs, err := credentials.store.RotateCredential(ctx, RotateCredential{
 		TenantID: membership.TenantID, ID: id, ExpectedRevision: expectedRevision,
 		Encrypted: encrypted, ResyncRepositories: rotation.ResyncRepositories, UpdatedAt: credentials.now().UTC(),
+		IdempotencyKey: rotation.IdempotencyKey, RequestHash: rotation.RequestHash,
+		PrincipalType: rotation.PrincipalType, PrincipalID: rotation.PrincipalID,
 	})
 	if err != nil {
 		return CredentialRecord{}, nil, err
@@ -205,6 +220,19 @@ func (credentials *Credentials) RotateGlobal(ctx context.Context, actor Principa
 	if !isPlatformAdministrator(actor) {
 		return GlobalCredentialRecord{}, nil, ErrNotFound
 	}
+	rotation.PrincipalType, rotation.PrincipalID = rotationPrincipal(actor)
+	if err := validateCredentialRotationReplay(rotation); err != nil {
+		return GlobalCredentialRecord{}, nil, err
+	}
+	if rotation.IdempotencyKey != uuid.Nil() {
+		replayed, jobs, found, err := credentials.store.LookupGlobalCredentialRotation(ctx, rotation.PrincipalType, rotation.PrincipalID, rotation.IdempotencyKey, rotation.RequestHash)
+		if err != nil {
+			return GlobalCredentialRecord{}, nil, err
+		}
+		if found {
+			return replayed, jobs, nil
+		}
+	}
 	expectedRevision, err := parseRevisionETag(etag, "global-credential", id)
 	if err != nil {
 		return GlobalCredentialRecord{}, nil, ErrPrecondition
@@ -233,7 +261,26 @@ func (credentials *Credentials) RotateGlobal(ctx context.Context, actor Principa
 	return credentials.store.RotateGlobalCredential(ctx, RotateGlobalCredential{
 		ID: id, ExpectedRevision: expectedRevision, Encrypted: encrypted,
 		ResyncRepositories: rotation.ResyncRepositories, UpdatedAt: credentials.now().UTC(),
+		IdempotencyKey: rotation.IdempotencyKey, RequestHash: rotation.RequestHash,
+		PrincipalType: rotation.PrincipalType, PrincipalID: rotation.PrincipalID,
 	})
+}
+
+func rotationPrincipal(actor Principal) (string, uuid.UUID) {
+	if actor.Kind == PrincipalPAT {
+		return string(actor.Kind), actor.TokenID
+	}
+	return string(actor.Kind), actor.SessionID
+}
+
+func validateCredentialRotationReplay(rotation CredentialRotation) error {
+	if rotation.IdempotencyKey == uuid.Nil() {
+		return nil
+	}
+	if len(rotation.RequestHash) != 32 || rotation.PrincipalType == "" || rotation.PrincipalID == uuid.Nil() {
+		return ErrValidation
+	}
+	return nil
 }
 
 // ListKnownHosts returns approved SSH host-key identities for one tenant.

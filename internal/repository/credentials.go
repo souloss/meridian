@@ -185,6 +185,29 @@ func (store *CredentialStore) DeleteCredential(ctx context.Context, tenantID, id
 	return nil
 }
 
+// LookupCredentialRotation checks a tenant rotation replay under the same transaction lock used by writes.
+func (store *CredentialStore) LookupCredentialRotation(ctx context.Context, tenantID uuid.UUID, principalType string, principalID, idempotencyKey uuid.UUID, requestHash []byte) (service.CredentialRecord, []service.CredentialSyncJob, bool, error) {
+	if err := validateRotationIdempotency(idempotencyKey, requestHash, principalType, principalID); err != nil {
+		return service.CredentialRecord{}, nil, false, err
+	}
+	if !rotationIdempotencyEnabled(idempotencyKey) {
+		return service.CredentialRecord{}, nil, false, nil
+	}
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return service.CredentialRecord{}, nil, false, fmt.Errorf("begin lookup credential rotation transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	record, jobs, found, err := loadTenantRotationReplay(ctx, generated.New(tx), tenantID, principalType, principalID, idempotencyKey, requestHash)
+	if err != nil {
+		return service.CredentialRecord{}, nil, false, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return service.CredentialRecord{}, nil, false, normalizeError(err)
+	}
+	return record, jobs, found, nil
+}
+
 // RotateCredential atomically updates encrypted secret material and optional repository sync jobs.
 func (store *CredentialStore) RotateCredential(ctx context.Context, input service.RotateCredential) (service.CredentialRecord, []service.CredentialSyncJob, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
@@ -193,6 +216,14 @@ func (store *CredentialStore) RotateCredential(ctx context.Context, input servic
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 	queries := generated.New(tx)
+	if err := validateRotationIdempotency(input.IdempotencyKey, input.RequestHash, input.PrincipalType, input.PrincipalID); err != nil {
+		return service.CredentialRecord{}, nil, err
+	}
+	if replay, jobs, found, err := loadTenantRotationReplay(ctx, queries, input.TenantID, input.PrincipalType, input.PrincipalID, input.IdempotencyKey, input.RequestHash); err != nil {
+		return service.CredentialRecord{}, nil, err
+	} else if found {
+		return replay, jobs, nil
+	}
 	current, err := queries.GetTenantCredentialForMutation(ctx, generated.GetTenantCredentialForMutationParams{TenantID: input.TenantID, ID: input.ID})
 	if err != nil {
 		return service.CredentialRecord{}, nil, normalizeError(err)
@@ -228,6 +259,9 @@ func (store *CredentialStore) RotateCredential(ctx context.Context, input servic
 		if err != nil {
 			return service.CredentialRecord{}, nil, err
 		}
+	}
+	if err := saveTenantRotationReplay(ctx, queries, input.TenantID, input.PrincipalType, input.PrincipalID, input.IdempotencyKey, input.RequestHash, credentialFromRow(row, teamIDs), jobs); err != nil {
+		return service.CredentialRecord{}, nil, err
 	}
 	if err := tx.Commit(ctx); err != nil {
 		return service.CredentialRecord{}, nil, normalizeError(err)
@@ -330,6 +364,29 @@ func (store *CredentialStore) DeleteGlobalCredential(ctx context.Context, id uui
 	return nil
 }
 
+// LookupGlobalCredentialRotation checks a platform rotation replay under the write lock boundary.
+func (store *CredentialStore) LookupGlobalCredentialRotation(ctx context.Context, principalType string, principalID, idempotencyKey uuid.UUID, requestHash []byte) (service.GlobalCredentialRecord, []service.CredentialSyncJob, bool, error) {
+	if err := validateRotationIdempotency(idempotencyKey, requestHash, principalType, principalID); err != nil {
+		return service.GlobalCredentialRecord{}, nil, false, err
+	}
+	if !rotationIdempotencyEnabled(idempotencyKey) {
+		return service.GlobalCredentialRecord{}, nil, false, nil
+	}
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return service.GlobalCredentialRecord{}, nil, false, fmt.Errorf("begin lookup global credential rotation transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	record, jobs, found, err := loadGlobalRotationReplay(ctx, generated.New(tx), principalType, principalID, idempotencyKey, requestHash)
+	if err != nil {
+		return service.GlobalCredentialRecord{}, nil, false, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return service.GlobalCredentialRecord{}, nil, false, normalizeError(err)
+	}
+	return record, jobs, found, nil
+}
+
 // RotateGlobalCredential atomically updates a platform credential secret and optional sync jobs.
 func (store *CredentialStore) RotateGlobalCredential(ctx context.Context, input service.RotateGlobalCredential) (service.GlobalCredentialRecord, []service.CredentialSyncJob, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
@@ -338,6 +395,14 @@ func (store *CredentialStore) RotateGlobalCredential(ctx context.Context, input 
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 	queries := generated.New(tx)
+	if err := validateRotationIdempotency(input.IdempotencyKey, input.RequestHash, input.PrincipalType, input.PrincipalID); err != nil {
+		return service.GlobalCredentialRecord{}, nil, err
+	}
+	if replay, jobs, found, err := loadGlobalRotationReplay(ctx, queries, input.PrincipalType, input.PrincipalID, input.IdempotencyKey, input.RequestHash); err != nil {
+		return service.GlobalCredentialRecord{}, nil, err
+	} else if found {
+		return replay, jobs, nil
+	}
 	row, err := queries.RotateGlobalCredentialSecret(ctx, generated.RotateGlobalCredentialSecretParams{
 		ID: input.ID, ExpectedRevision: input.ExpectedRevision, Ciphertext: input.Encrypted.Ciphertext,
 		Nonce: input.Encrypted.Nonce, KeyVersion: input.Encrypted.KeyVersion, Fingerprint: input.Encrypted.Fingerprint,
@@ -360,10 +425,14 @@ func (store *CredentialStore) RotateGlobalCredential(ctx context.Context, input 
 			return service.GlobalCredentialRecord{}, nil, err
 		}
 	}
+	updated := globalCredentialFromRow(row)
+	if err := saveGlobalRotationReplay(ctx, queries, input.PrincipalType, input.PrincipalID, input.IdempotencyKey, input.RequestHash, updated, jobs); err != nil {
+		return service.GlobalCredentialRecord{}, nil, err
+	}
 	if err := tx.Commit(ctx); err != nil {
 		return service.GlobalCredentialRecord{}, nil, normalizeError(err)
 	}
-	return globalCredentialFromRow(row), jobs, nil
+	return updated, jobs, nil
 }
 
 // ListKnownHosts returns approved host identities without private material.

@@ -4,6 +4,7 @@ package database
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"log/slog"
 	"os"
@@ -119,10 +120,13 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 	}
 
 	store := repository.NewCredentialStore(db.Pool)
+	idempotencyKey := uuid.NewV7()
+	requestHash := bytes.Repeat([]byte{0x55}, 32)
 	rotated, jobs, err := store.RotateCredential(t.Context(), service.RotateCredential{
 		TenantID: tenantID, ID: credentialID, ExpectedRevision: 1,
 		Encrypted:          service.EncryptedCredential{Ciphertext: []byte("new-ciphertext"), Nonce: bytes.Repeat([]byte{0x02}, 12), KeyVersion: 1, Fingerprint: "fingerprint-new"},
 		ResyncRepositories: true,
+		IdempotencyKey:     idempotencyKey, RequestHash: requestHash, PrincipalType: "session", PrincipalID: userID,
 	})
 	if err != nil {
 		t.Fatalf("rotate credential: %v", err)
@@ -142,10 +146,30 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 		t.Fatalf("stored job = count %d type %q trigger %q status %q", jobCount, jobType, trigger, status)
 	}
 
+	replayed, replayJobs, err := store.RotateCredential(t.Context(), service.RotateCredential{
+		TenantID: tenantID, ID: credentialID, ExpectedRevision: 999,
+		Encrypted:      service.EncryptedCredential{Ciphertext: []byte("must-not-write"), Nonce: bytes.Repeat([]byte{0x09}, 12), KeyVersion: 1, Fingerprint: "must-not-write"},
+		IdempotencyKey: idempotencyKey, RequestHash: requestHash, PrincipalType: "session", PrincipalID: userID,
+	})
+	if err != nil {
+		t.Fatalf("replay credential rotation: %v", err)
+	}
+	if replayed.Revision != rotated.Revision || replayed.Encrypted.Fingerprint != rotated.Encrypted.Fingerprint || len(replayJobs) != 1 || replayJobs[0] != jobs[0] {
+		t.Fatalf("rotation replay = record %#v jobs %#v, want original result", replayed, replayJobs)
+	}
+	if _, _, err := store.RotateCredential(t.Context(), service.RotateCredential{
+		TenantID: tenantID, ID: credentialID, ExpectedRevision: 999,
+		Encrypted:      service.EncryptedCredential{Ciphertext: []byte("different"), Nonce: bytes.Repeat([]byte{0x08}, 12), KeyVersion: 1, Fingerprint: "different"},
+		IdempotencyKey: idempotencyKey, RequestHash: bytes.Repeat([]byte{0x77}, 32), PrincipalType: "session", PrincipalID: userID,
+	}); !errors.Is(err, service.ErrIdempotencyConflict) {
+		t.Fatalf("different rotation request error = %v, want ErrIdempotencyConflict", err)
+	}
+
 	rotatedAgain, jobsAgain, err := store.RotateCredential(t.Context(), service.RotateCredential{
 		TenantID: tenantID, ID: credentialID, ExpectedRevision: rotated.Revision,
 		Encrypted:          service.EncryptedCredential{Ciphertext: []byte("third-ciphertext"), Nonce: bytes.Repeat([]byte{0x03}, 12), KeyVersion: 1, Fingerprint: "fingerprint-third"},
 		ResyncRepositories: true,
+		IdempotencyKey:     uuid.NewV7(), RequestHash: bytes.Repeat([]byte{0x66}, 32), PrincipalType: "session", PrincipalID: userID,
 	})
 	if err != nil {
 		t.Fatalf("rotate credential with active dedupe job: %v", err)

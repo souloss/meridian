@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/json/v2"
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
@@ -115,8 +117,13 @@ func (s *Server) RotateCredential(ctx context.Context, request api.RotateCredent
 	if err != nil {
 		return nil, err
 	}
+	requestHash, err := credentialRotationRequestHash("rotateCredential", request.TenantSlug, serviceUUID(request.CredentialId), request.Params.IfMatch, secret, request.Body.ResyncRepositories != nil && *request.Body.ResyncRepositories)
+	if err != nil {
+		return nil, service.ErrValidation
+	}
 	rotated, jobs, err := s.credentials.RotateTenant(ctx, principal, request.TenantSlug, serviceUUID(request.CredentialId), request.Params.IfMatch, service.CredentialRotation{
 		Secret: secret, ResyncRepositories: request.Body.ResyncRepositories != nil && *request.Body.ResyncRepositories,
+		IdempotencyKey: serviceUUID(api.Uuid(request.Params.IdempotencyKey)), RequestHash: requestHash,
 	})
 	if err != nil {
 		return nil, err
@@ -225,8 +232,13 @@ func (s *Server) RotateGlobalCredential(ctx context.Context, request api.RotateG
 	if err != nil {
 		return nil, err
 	}
+	requestHash, err := credentialRotationRequestHash("rotateGlobalCredential", "", serviceUUID(request.CredentialId), request.Params.IfMatch, secret, request.Body.ResyncRepositories != nil && *request.Body.ResyncRepositories)
+	if err != nil {
+		return nil, service.ErrValidation
+	}
 	rotated, jobs, err := s.credentials.RotateGlobal(ctx, principal, serviceUUID(request.CredentialId), request.Params.IfMatch, service.CredentialRotation{
 		Secret: secret, ResyncRepositories: request.Body.ResyncRepositories != nil && *request.Body.ResyncRepositories,
+		IdempotencyKey: serviceUUID(api.Uuid(request.Params.IdempotencyKey)), RequestHash: requestHash,
 	})
 	if err != nil {
 		return nil, err
@@ -304,7 +316,7 @@ func globalCredentialInput(body api.GlobalCredentialCreateRequest) (service.Cred
 		if sshInput.SshKey.PrivateKeyPem == nil {
 			return service.CredentialInput{}, service.ErrValidation
 		}
-		return service.CredentialInput{Name: sshInput.Name, Secret: service.CredentialSecret{
+		return service.CredentialInput{Name: sshInput.Name, SharedScope: "private", Secret: service.CredentialSecret{
 			Kind: "ssh_key", PrivateKey: *sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase),
 		}}, nil
 	}
@@ -312,7 +324,7 @@ func globalCredentialInput(body api.GlobalCredentialCreateRequest) (service.Cred
 		if httpInput.HttpToken.Token == nil {
 			return service.CredentialInput{}, service.ErrValidation
 		}
-		return service.CredentialInput{Name: httpInput.Name, Secret: service.CredentialSecret{
+		return service.CredentialInput{Name: httpInput.Name, SharedScope: "private", Secret: service.CredentialSecret{
 			Kind: "http_token", HTTPUsername: httpInput.HttpToken.Username, HTTPToken: *httpInput.HttpToken.Token,
 		}}, nil
 	}
@@ -400,4 +412,28 @@ func uuidResponses(values []uuid.UUID) []api.Uuid {
 		responses[index] = api.Uuid(value)
 	}
 	return responses
+}
+
+func credentialRotationRequestHash(operation, tenantSlug string, credentialID uuid.UUID, ifMatch string, secret service.CredentialSecret, resyncRepositories bool) ([]byte, error) {
+	payload, err := json.Marshal(struct {
+		Operation          string    `json:"operation"`
+		TenantSlug         string    `json:"tenantSlug"`
+		CredentialID       uuid.UUID `json:"credentialId"`
+		IfMatch            string    `json:"ifMatch"`
+		Kind               string    `json:"kind"`
+		PrivateKey         string    `json:"privateKey,omitempty"`
+		Passphrase         *string   `json:"passphrase,omitempty"`
+		HTTPUsername       string    `json:"httpUsername,omitempty"`
+		HTTPToken          string    `json:"httpToken,omitempty"`
+		ResyncRepositories bool      `json:"resyncRepositories"`
+	}{
+		Operation: operation, TenantSlug: tenantSlug, CredentialID: credentialID, IfMatch: ifMatch,
+		Kind: secret.Kind, PrivateKey: secret.PrivateKey, Passphrase: secret.Passphrase,
+		HTTPUsername: secret.HTTPUsername, HTTPToken: secret.HTTPToken, ResyncRepositories: resyncRepositories,
+	})
+	if err != nil {
+		return nil, err
+	}
+	digest := sha256.Sum256(payload)
+	return digest[:], nil
 }

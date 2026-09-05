@@ -22,6 +22,8 @@ var (
 	ErrPrecondition = errors.New("resource precondition failed")
 	// ErrCredentialInUse means deletion would leave a repository without an explicit credential policy.
 	ErrCredentialInUse = errors.New("credential is still referenced")
+	// ErrIdempotencyConflict means one idempotency key was reused with a different request digest.
+	ErrIdempotencyConflict = errors.New("idempotency key was reused for a different request")
 )
 
 // User is a local identity without password or session secret material.

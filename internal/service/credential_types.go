@@ -57,14 +57,21 @@ type CredentialPatch struct {
 type CredentialRotation struct {
 	Secret             CredentialSecret
 	ResyncRepositories bool
+	// IdempotencyKey identifies the semantic rotation request; zero disables replay persistence for internal callers.
+	IdempotencyKey uuid.UUID
+	// RequestHash is the 32-byte canonical digest excluding authentication and the idempotency key.
+	RequestHash []byte
+	// PrincipalType and PrincipalID identify the authenticated replay boundary.
+	PrincipalType string
+	PrincipalID   uuid.UUID
 }
 
 // CredentialSyncJob is the minimal metadata returned when a credential rotation enqueues repository work.
 type CredentialSyncJob struct {
-	TenantSlug   string
-	RepositoryID uuid.UUID
-	JobID        uuid.UUID
-	Deduplicated bool
+	TenantSlug   string    `json:"tenantSlug"`
+	RepositoryID uuid.UUID `json:"repositoryId"`
+	JobID        uuid.UUID `json:"jobId"`
+	Deduplicated bool      `json:"deduplicated"`
 }
 
 // NewCredential is the encrypted row written by the credential use case.
@@ -98,6 +105,10 @@ type RotateCredential struct {
 	Encrypted          EncryptedCredential
 	ResyncRepositories bool
 	UpdatedAt          time.Time
+	IdempotencyKey     uuid.UUID
+	RequestHash        []byte
+	PrincipalType      string
+	PrincipalID        uuid.UUID
 }
 
 // NewGlobalCredential is the encrypted row written by the platform credential use case.
@@ -124,6 +135,10 @@ type RotateGlobalCredential struct {
 	Encrypted          EncryptedCredential
 	ResyncRepositories bool
 	UpdatedAt          time.Time
+	IdempotencyKey     uuid.UUID
+	RequestHash        []byte
+	PrincipalType      string
+	PrincipalID        uuid.UUID
 }
 
 // NewKnownHost contains a fully derived, validated host-key identity.
@@ -162,6 +177,7 @@ type CredentialStore interface {
 	GetCredential(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) (CredentialRecord, error)
 	UpdateCredential(context.Context, UpdateCredential) (CredentialRecord, error)
 	DeleteCredential(context.Context, uuid.UUID, uuid.UUID, int64, bool, time.Time) error
+	LookupCredentialRotation(context.Context, uuid.UUID, string, uuid.UUID, uuid.UUID, []byte) (CredentialRecord, []CredentialSyncJob, bool, error)
 	RotateCredential(context.Context, RotateCredential) (CredentialRecord, []CredentialSyncJob, error)
 
 	ListGlobalCredentials(context.Context, int32, int32) ([]GlobalCredentialRecord, int64, error)
@@ -169,6 +185,7 @@ type CredentialStore interface {
 	GetGlobalCredential(context.Context, uuid.UUID) (GlobalCredentialRecord, error)
 	UpdateGlobalCredential(context.Context, UpdateGlobalCredential) (GlobalCredentialRecord, error)
 	DeleteGlobalCredential(context.Context, uuid.UUID, int64, bool, time.Time) error
+	LookupGlobalCredentialRotation(context.Context, string, uuid.UUID, uuid.UUID, []byte) (GlobalCredentialRecord, []CredentialSyncJob, bool, error)
 	RotateGlobalCredential(context.Context, RotateGlobalCredential) (GlobalCredentialRecord, []CredentialSyncJob, error)
 
 	ListKnownHosts(context.Context, uuid.UUID, int32, int32) ([]KnownHostRecord, int64, error)

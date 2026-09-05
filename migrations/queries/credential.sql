@@ -280,6 +280,73 @@ INSERT INTO jobs (
 ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
 RETURNING *;
 
+-- LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
+-- The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
+-- name: LockCredentialRotationIdempotency :exec
+SELECT pg_advisory_xact_lock(hashtextextended(sqlc.arg(lock_key), 0));
+
+-- GetCredentialRotationIdempotency returns a retained tenant rotation replay record, including its expiry.
+-- name: GetCredentialRotationIdempotency :one
+SELECT request_hash, response_body, expires_at
+FROM idempotency_records
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND principal_type = sqlc.arg(principal_type)
+  AND principal_id = sqlc.arg(principal_id)
+  AND operation_id = 'rotateCredential'
+  AND idempotency_key = sqlc.arg(idempotency_key)
+FOR UPDATE;
+
+-- DeleteCredentialRotationIdempotency removes an expired tenant rotation replay before reuse.
+-- name: DeleteCredentialRotationIdempotency :exec
+DELETE FROM idempotency_records
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND principal_type = sqlc.arg(principal_type)
+  AND principal_id = sqlc.arg(principal_id)
+  AND operation_id = 'rotateCredential'
+  AND idempotency_key = sqlc.arg(idempotency_key);
+
+-- CreateCredentialRotationIdempotency stores a safe tenant rotation response for 24-hour exact replay.
+-- Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+-- name: CreateCredentialRotationIdempotency :exec
+INSERT INTO idempotency_records (
+  tenant_id, principal_type, principal_id, operation_id, idempotency_key,
+  request_hash, response_status, response_body, expires_at
+) VALUES (
+  sqlc.arg(tenant_id), sqlc.arg(principal_type), sqlc.arg(principal_id), 'rotateCredential', sqlc.arg(idempotency_key),
+  sqlc.arg(request_hash), 200, sqlc.arg(response_body)::jsonb, now() + interval '24 hours'
+);
+
+-- GetGlobalCredentialRotationIdempotency returns a retained platform rotation replay record.
+-- name: GetGlobalCredentialRotationIdempotency :one
+SELECT request_hash, response_body, expires_at
+FROM global_idempotency_records
+WHERE context_type = 'platform'
+  AND principal_type = sqlc.arg(principal_type)
+  AND principal_id = sqlc.arg(principal_id)
+  AND operation_id = 'rotateGlobalCredential'
+  AND idempotency_key = sqlc.arg(idempotency_key)
+FOR UPDATE;
+
+-- DeleteGlobalCredentialRotationIdempotency removes an expired platform rotation replay before reuse.
+-- name: DeleteGlobalCredentialRotationIdempotency :exec
+DELETE FROM global_idempotency_records
+WHERE context_type = 'platform'
+  AND principal_type = sqlc.arg(principal_type)
+  AND principal_id = sqlc.arg(principal_id)
+  AND operation_id = 'rotateGlobalCredential'
+  AND idempotency_key = sqlc.arg(idempotency_key);
+
+-- CreateGlobalCredentialRotationIdempotency stores a safe platform rotation response for 24-hour exact replay.
+-- Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+-- name: CreateGlobalCredentialRotationIdempotency :exec
+INSERT INTO global_idempotency_records (
+  context_type, principal_type, principal_id, operation_id, idempotency_key,
+  request_hash, response_status, response_body, expires_at
+) VALUES (
+  'platform', sqlc.arg(principal_type), sqlc.arg(principal_id), 'rotateGlobalCredential', sqlc.arg(idempotency_key),
+  sqlc.arg(request_hash), 200, sqlc.arg(response_body)::jsonb, now() + interval '24 hours'
+);
+
 -- ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
 -- name: ListRepositoriesForGlobalCredential :many
 SELECT

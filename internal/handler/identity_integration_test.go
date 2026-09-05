@@ -4,6 +4,7 @@ package handler
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json/v2"
 	"errors"
 	"io"
@@ -50,12 +51,20 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		t.Fatalf("construct token digester: %v", err)
 	}
 	identity := service.NewIdentity(store, digester)
+	keyring, err := service.NewCredentialKeyring(
+		base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{0x11}, 32)),
+		1,
+		base64.RawURLEncoding.EncodeToString(bytes.Repeat([]byte{0x22}, 32)),
+	)
+	if err != nil {
+		t.Fatalf("construct credential keyring: %v", err)
+	}
 	if _, err := identity.BootstrapPlatformAdmin(t.Context(), service.CreateUserInput{
 		Username: "padmin", Password: "correct horse battery staple", DisplayName: "Platform Admin",
 	}); err != nil {
 		t.Fatalf("bootstrap platform administrator: %v", err)
 	}
-	httpHandler := NewWithIdentity(identity, false).Handler()
+	httpHandler := NewWithServices(identity, service.NewCredentials(repository.NewCredentialStore(db.Pool), store, keyring), false).Handler()
 
 	adminLogin := requestJSON(t, httpHandler, http.MethodPost, "/api/v1/auth/login", map[string]any{
 		"username": "padmin", "password": "correct horse battery staple",
@@ -153,6 +162,85 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		"Authorization": "Bearer " + plaintextPAT,
 	})
 	assertError(t, revokedRequest, http.StatusUnauthorized, "unauthenticated")
+
+	createdCredential := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials", map[string]any{
+		"name": "integration credential", "kind": "http_token", "httpToken": map[string]any{"username": "bot", "token": "first-secret-token"},
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	assertStatus(t, createdCredential, http.StatusCreated)
+	if strings.Contains(createdCredential.Body.String(), "first-secret-token") || strings.Contains(createdCredential.Body.String(), "\"token\"") {
+		t.Fatal("credential create response disclosed secret material")
+	}
+	credentialID, err := uuid.Parse(responseString(t, createdCredential, "id"))
+	if err != nil {
+		t.Fatalf("parse credential ID: %v", err)
+	}
+	credentialETag := responseString(t, createdCredential, "etag")
+	rotationHeaders := map[string]string{
+		csrfHeaderName:    aliceCSRF,
+		"If-Match":        credentialETag,
+		"Idempotency-Key": uuid.NewV7().String(),
+	}
+	rotatedCredential := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials/"+credentialID.String()+":rotate", map[string]any{
+		"secret": map[string]any{"username": "bot", "token": "second-secret-token"}, "resyncRepositories": true,
+	}, []*http.Cookie{aliceCookie}, rotationHeaders)
+	assertStatus(t, rotatedCredential, http.StatusOK)
+	if strings.Contains(rotatedCredential.Body.String(), "second-secret-token") || strings.Contains(rotatedCredential.Body.String(), "first-secret-token") {
+		t.Fatal("credential rotation response disclosed secret material")
+	}
+	replay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials/"+credentialID.String()+":rotate", map[string]any{
+		"secret": map[string]any{"username": "bot", "token": "second-secret-token"}, "resyncRepositories": true,
+	}, []*http.Cookie{aliceCookie}, rotationHeaders)
+	assertStatus(t, replay, http.StatusOK)
+	if replay.Body.String() != rotatedCredential.Body.String() {
+		t.Fatalf("idempotent rotation body differs\nfirst: %s\nreplay: %s", rotatedCredential.Body.String(), replay.Body.String())
+	}
+	conflictHeaders := map[string]string{csrfHeaderName: aliceCSRF, "If-Match": credentialETag, "Idempotency-Key": rotationHeaders["Idempotency-Key"]}
+	conflict := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials/"+credentialID.String()+":rotate", map[string]any{
+		"secret": map[string]any{"username": "bot", "token": "third-secret-token"}, "resyncRepositories": true,
+	}, []*http.Cookie{aliceCookie}, conflictHeaders)
+	assertError(t, conflict, http.StatusConflict, "idempotency_conflict")
+
+	createdGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials", map[string]any{
+		"name": "integration global credential", "kind": "http_token", "httpToken": map[string]any{"username": "global-bot", "token": "global-first-token"},
+	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
+	assertStatus(t, createdGlobal, http.StatusCreated)
+	if strings.Contains(createdGlobal.Body.String(), "global-first-token") || strings.Contains(createdGlobal.Body.String(), "\"token\"") {
+		t.Fatal("global credential create response disclosed secret material")
+	}
+	globalID, err := uuid.Parse(responseString(t, createdGlobal, "id"))
+	if err != nil {
+		t.Fatalf("parse global credential ID: %v", err)
+	}
+	globalETag := responseString(t, createdGlobal, "etag")
+	tenantCredentials := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/credentials", nil, []*http.Cookie{aliceCookie})
+	assertStatus(t, tenantCredentials, http.StatusOK)
+	if !strings.Contains(tenantCredentials.Body.String(), "integration global credential") || !strings.Contains(tenantCredentials.Body.String(), `"isGlobal":true`) {
+		t.Fatalf("tenant credential list did not expose selectable global credential: %s", tenantCredentials.Body.String())
+	}
+	globalRotationHeaders := map[string]string{
+		csrfHeaderName:    rotatedCSRF,
+		"If-Match":        globalETag,
+		"Idempotency-Key": uuid.NewV7().String(),
+	}
+	rotatedGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials/"+globalID.String()+":rotate", map[string]any{
+		"secret": map[string]any{"username": "global-bot", "token": "global-second-token"}, "resyncRepositories": true,
+	}, []*http.Cookie{adminCookie}, globalRotationHeaders)
+	assertStatus(t, rotatedGlobal, http.StatusOK)
+	if strings.Contains(rotatedGlobal.Body.String(), "global-second-token") || strings.Contains(rotatedGlobal.Body.String(), "global-first-token") {
+		t.Fatal("global credential rotation response disclosed secret material")
+	}
+	globalReplay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials/"+globalID.String()+":rotate", map[string]any{
+		"secret": map[string]any{"username": "global-bot", "token": "global-second-token"}, "resyncRepositories": true,
+	}, []*http.Cookie{adminCookie}, globalRotationHeaders)
+	assertStatus(t, globalReplay, http.StatusOK)
+	if globalReplay.Body.String() != rotatedGlobal.Body.String() {
+		t.Fatalf("global idempotent rotation body differs\nfirst: %s\nreplay: %s", rotatedGlobal.Body.String(), globalReplay.Body.String())
+	}
+	globalETag = responseString(t, rotatedGlobal, "etag")
+	deletedGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodDelete, "/api/v1/admin/global-credentials/"+globalID.String()+"?force=true", nil, []*http.Cookie{adminCookie}, map[string]string{
+		csrfHeaderName: rotatedCSRF, "If-Match": globalETag,
+	})
+	assertStatus(t, deletedGlobal, http.StatusNoContent)
 
 	if _, err := db.Pool.Exec(t.Context(), `UPDATE tenants SET status = 'disabled' WHERE slug = 'acme'`); err != nil {
 		t.Fatalf("disable tenant: %v", err)
