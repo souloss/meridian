@@ -185,8 +185,7 @@ func (store *CredentialStore) DeleteCredential(ctx context.Context, tenantID, id
 	return nil
 }
 
-// RotateCredential atomically updates encrypted secret material and returns safe repository references.
-// Job insertion is intentionally delegated to the worker queue phase; the returned slice is empty until that adapter is enabled.
+// RotateCredential atomically updates encrypted secret material and optional repository sync jobs.
 func (store *CredentialStore) RotateCredential(ctx context.Context, input service.RotateCredential) (service.CredentialRecord, []service.CredentialSyncJob, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -217,10 +216,23 @@ func (store *CredentialStore) RotateCredential(ctx context.Context, input servic
 	if err != nil {
 		return service.CredentialRecord{}, nil, err
 	}
+	var jobs []service.CredentialSyncJob
+	if input.ResyncRepositories {
+		references, err := queries.ListRepositoriesForCredential(ctx, generated.ListRepositoriesForCredentialParams{
+			TenantID: input.TenantID, CredentialID: new(input.ID),
+		})
+		if err != nil {
+			return service.CredentialRecord{}, nil, normalizeError(err)
+		}
+		jobs, err = enqueueCredentialSyncJobs(ctx, queries, credentialSyncReferences(references), input.ID)
+		if err != nil {
+			return service.CredentialRecord{}, nil, err
+		}
+	}
 	if err := tx.Commit(ctx); err != nil {
 		return service.CredentialRecord{}, nil, normalizeError(err)
 	}
-	return credentialFromRow(row, teamIDs), nil, nil
+	return credentialFromRow(row, teamIDs), jobs, nil
 }
 
 // ListGlobalCredentials returns one page of platform-owned credential metadata.
@@ -318,10 +330,15 @@ func (store *CredentialStore) DeleteGlobalCredential(ctx context.Context, id uui
 	return nil
 }
 
-// RotateGlobalCredential atomically updates a platform credential secret.
-// Job insertion is intentionally delegated to the worker queue phase; the returned slice is empty until that adapter is enabled.
+// RotateGlobalCredential atomically updates a platform credential secret and optional sync jobs.
 func (store *CredentialStore) RotateGlobalCredential(ctx context.Context, input service.RotateGlobalCredential) (service.GlobalCredentialRecord, []service.CredentialSyncJob, error) {
-	row, err := store.queries.RotateGlobalCredentialSecret(ctx, generated.RotateGlobalCredentialSecretParams{
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return service.GlobalCredentialRecord{}, nil, fmt.Errorf("begin rotate global credential transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	queries := generated.New(tx)
+	row, err := queries.RotateGlobalCredentialSecret(ctx, generated.RotateGlobalCredentialSecretParams{
 		ID: input.ID, ExpectedRevision: input.ExpectedRevision, Ciphertext: input.Encrypted.Ciphertext,
 		Nonce: input.Encrypted.Nonce, KeyVersion: input.Encrypted.KeyVersion, Fingerprint: input.Encrypted.Fingerprint,
 		UpdatedAt: timestamp(input.UpdatedAt),
@@ -332,7 +349,21 @@ func (store *CredentialStore) RotateGlobalCredential(ctx context.Context, input 
 		}
 		return service.GlobalCredentialRecord{}, nil, normalizeError(err)
 	}
-	return globalCredentialFromRow(row), nil, nil
+	var jobs []service.CredentialSyncJob
+	if input.ResyncRepositories {
+		references, err := queries.ListRepositoriesForGlobalCredential(ctx, new(input.ID))
+		if err != nil {
+			return service.GlobalCredentialRecord{}, nil, normalizeError(err)
+		}
+		jobs, err = enqueueCredentialSyncJobs(ctx, queries, globalCredentialSyncReferences(references), input.ID)
+		if err != nil {
+			return service.GlobalCredentialRecord{}, nil, err
+		}
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return service.GlobalCredentialRecord{}, nil, normalizeError(err)
+	}
+	return globalCredentialFromRow(row), jobs, nil
 }
 
 // ListKnownHosts returns approved host identities without private material.
@@ -398,6 +429,78 @@ func valueOrEmpty(value *[]uuid.UUID) []uuid.UUID {
 		return nil
 	}
 	return *value
+}
+
+type credentialSyncReference struct {
+	tenantID      uuid.UUID
+	tenantSlug    string
+	repositoryID  uuid.UUID
+	defaultBranch string
+}
+
+func credentialSyncReferences(references []generated.ListRepositoriesForCredentialRow) []credentialSyncReference {
+	converted := make([]credentialSyncReference, len(references))
+	for index, reference := range references {
+		converted[index] = credentialSyncReference{tenantID: reference.TenantID, tenantSlug: reference.TenantSlug, repositoryID: reference.RepositoryID, defaultBranch: reference.DefaultBranch}
+	}
+	return converted
+}
+
+func globalCredentialSyncReferences(references []generated.ListRepositoriesForGlobalCredentialRow) []credentialSyncReference {
+	converted := make([]credentialSyncReference, len(references))
+	for index, reference := range references {
+		converted[index] = credentialSyncReference{tenantID: reference.TenantID, tenantSlug: reference.TenantSlug, repositoryID: reference.RepositoryID, defaultBranch: reference.DefaultBranch}
+	}
+	return converted
+}
+
+func enqueueCredentialSyncJobs(ctx context.Context, queries *generated.Queries, references []credentialSyncReference, credentialID uuid.UUID) ([]service.CredentialSyncJob, error) {
+	jobs := make([]service.CredentialSyncJob, 0, len(references))
+	for _, reference := range references {
+		job, err := enqueueCredentialSyncJob(ctx, queries, reference.tenantID, reference.tenantSlug, reference.repositoryID, reference.defaultBranch, credentialID)
+		if err != nil {
+			return nil, err
+		}
+		jobs = append(jobs, job)
+	}
+	return jobs, nil
+}
+
+func enqueueCredentialSyncJob(ctx context.Context, queries *generated.Queries, tenantID uuid.UUID, tenantSlug string, repositoryID uuid.UUID, refName string, credentialID uuid.UUID) (service.CredentialSyncJob, error) {
+	dedupeKey := "repository:" + repositoryID.String() + ":branch:" + refName
+	jobInput, err := json.Marshal(struct {
+		CredentialID uuid.UUID `json:"credentialId"`
+		Reason       string    `json:"reason"`
+	}{CredentialID: credentialID, Reason: "credential-rotated"})
+	if err != nil {
+		return service.CredentialSyncJob{}, fmt.Errorf("encode credential sync job input: %w", err)
+	}
+	for {
+		latest, err := queries.LockLatestCredentialSyncJob(ctx, generated.LockLatestCredentialSyncJobParams{TenantID: tenantID, DedupeKey: dedupeKey})
+		generation := int64(1)
+		if err == nil {
+			if latest.Status == "pending" || latest.Status == "running" {
+				return service.CredentialSyncJob{TenantSlug: tenantSlug, RepositoryID: repositoryID, JobID: latest.ID, Deduplicated: true}, nil
+			}
+			generation = latest.ActiveGeneration + 1
+		} else if !errors.Is(err, pgx.ErrNoRows) {
+			return service.CredentialSyncJob{}, normalizeError(err)
+		}
+
+		jobID := uuid.NewV7()
+		row, err := queries.CreateCredentialSyncJob(ctx, generated.CreateCredentialSyncJobParams{
+			TenantID: tenantID, ID: jobID, RepositoryID: new(repositoryID), RefName: new(refName), JobInput: jobInput,
+			DedupeKey: dedupeKey, ActiveGeneration: generation,
+		})
+		if err == nil {
+			return service.CredentialSyncJob{TenantSlug: tenantSlug, RepositoryID: repositoryID, JobID: row.ID, Deduplicated: false}, nil
+		}
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return service.CredentialSyncJob{}, normalizeError(err)
+		}
+		// Another transaction won the unique dedupe key between the lock query and
+		// insert. Its row is now visible to the next lock iteration.
+	}
 }
 
 func credentialFromRow(row generated.Credential, teamIDs []uuid.UUID) service.CredentialRecord {

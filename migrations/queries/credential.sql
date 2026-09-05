@@ -250,9 +250,35 @@ SELECT
   repositories.default_branch
 FROM repositories
 JOIN tenants ON tenants.id = repositories.tenant_id
-WHERE repositories.credential_id = sqlc.arg(credential_id)
+WHERE repositories.tenant_id = sqlc.arg(tenant_id)
+  AND repositories.credential_id = sqlc.arg(credential_id)
   AND repositories.deleted_at IS NULL
 ORDER BY tenants.slug, repositories.id;
+
+-- LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
+-- A pending or running row is reused; terminal rows advance active_generation for new work.
+-- name: LockLatestCredentialSyncJob :one
+SELECT id, tenant_id, status, active_generation
+FROM jobs
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND dedupe_key = sqlc.arg(dedupe_key)
+ORDER BY active_generation DESC
+LIMIT 1
+FOR UPDATE;
+
+-- CreateCredentialSyncJob records one durable default-branch repository sync request.
+-- The input contains only the non-secret credential identifier and rotation reason.
+-- name: CreateCredentialSyncJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  sqlc.arg(tenant_id), sqlc.arg(id), 'repo.sync', 'repository', sqlc.arg(repository_id),
+  'branch', sqlc.arg(ref_name), 'credential-rotated', sqlc.arg(job_input)::jsonb,
+  'pending', 3, sqlc.arg(dedupe_key), sqlc.arg(active_generation), true
+)
+ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
+RETURNING *;
 
 -- ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
 -- name: ListRepositoriesForGlobalCredential :many

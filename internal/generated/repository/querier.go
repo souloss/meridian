@@ -31,6 +31,9 @@ type Querier interface {
 	// CreateCredential inserts one tenant-owned encrypted credential and returns metadata plus ciphertext.
 	// Secret plaintext is never accepted by SQL; the service supplies the encrypted projection only.
 	CreateCredential(ctx context.Context, arg CreateCredentialParams) (Credential, error)
+	// CreateCredentialSyncJob records one durable default-branch repository sync request.
+	// The input contains only the non-secret credential identifier and rotation reason.
+	CreateCredentialSyncJob(ctx context.Context, arg CreateCredentialSyncJobParams) (Job, error)
 	// CreateDefaultUserPreferences creates the locale, theme, and view defaults required for a new identity.
 	CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
 	// CreateGlobalCredential inserts one platform-owned encrypted credential.
@@ -81,13 +84,16 @@ type Querier interface {
 	// ListKnownHosts returns one stable page of tenant-approved SSH host identities.
 	ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error)
 	// ListRepositoriesForCredential returns non-deleted repository references in contract response order.
-	ListRepositoriesForCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForCredentialRow, error)
+	ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error)
 	// ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
 	ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error)
 	// ListTenantCredentials returns credentials visible to one user inside one active tenant.
 	// Team visibility is evaluated by a same-tenant team membership predicate. Global credentials are
 	// appended as tenant-visible records with is_global=true and a tenant-wide sharing projection.
 	ListTenantCredentials(ctx context.Context, arg ListTenantCredentialsParams) ([]ListTenantCredentialsRow, error)
+	// LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
+	// A pending or running row is reused; terminal rows advance active_generation for new work.
+	LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error)
 	// PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
 	PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error)
 	// ReplaceCredentialTeamShares removes and recreates the complete team-share projection in one transaction.

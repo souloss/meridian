@@ -208,6 +208,81 @@ func (q *Queries) CreateCredential(ctx context.Context, arg CreateCredentialPara
 	return i, err
 }
 
+const createCredentialSyncJob = `-- name: CreateCredentialSyncJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  $1, $2, 'repo.sync', 'repository', $3,
+  'branch', $4, 'credential-rotated', $5::jsonb,
+  'pending', 3, $6, $7, true
+)
+ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
+RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+`
+
+// CreateCredentialSyncJobParams contains the strongly typed arguments for the CreateCredentialSyncJob query.
+type CreateCredentialSyncJobParams struct {
+	// TenantID is the tenant id value supplied to the CreateCredentialSyncJob query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the id value supplied to the CreateCredentialSyncJob query.
+	ID uuid.UUID `json:"id"`
+	// RepositoryID is the repository id value supplied to the CreateCredentialSyncJob query.
+	RepositoryID *uuid.UUID `json:"repository_id"`
+	// RefName is the ref name value supplied to the CreateCredentialSyncJob query.
+	RefName *string `json:"ref_name"`
+	// JobInput is the job input value supplied to the CreateCredentialSyncJob query.
+	JobInput []byte `json:"job_input"`
+	// DedupeKey is the dedupe key value supplied to the CreateCredentialSyncJob query.
+	DedupeKey string `json:"dedupe_key"`
+	// ActiveGeneration is the active generation value supplied to the CreateCredentialSyncJob query.
+	ActiveGeneration int64 `json:"active_generation"`
+}
+
+// CreateCredentialSyncJob records one durable default-branch repository sync request.
+// The input contains only the non-secret credential identifier and rotation reason.
+func (q *Queries) CreateCredentialSyncJob(ctx context.Context, arg CreateCredentialSyncJobParams) (Job, error) {
+	row := q.db.QueryRow(ctx, createCredentialSyncJob,
+		arg.TenantID,
+		arg.ID,
+		arg.RepositoryID,
+		arg.RefName,
+		arg.JobInput,
+		arg.DedupeKey,
+		arg.ActiveGeneration,
+	)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const createGlobalCredential = `-- name: CreateGlobalCredential :one
 INSERT INTO global_credentials (
   id, name, kind, ciphertext, nonce, key_version, fingerprint, created_by
@@ -706,10 +781,19 @@ SELECT
   repositories.default_branch
 FROM repositories
 JOIN tenants ON tenants.id = repositories.tenant_id
-WHERE repositories.credential_id = $1
+WHERE repositories.tenant_id = $1
+  AND repositories.credential_id = $2
   AND repositories.deleted_at IS NULL
 ORDER BY tenants.slug, repositories.id
 `
+
+// ListRepositoriesForCredentialParams contains the strongly typed arguments for the ListRepositoriesForCredential query.
+type ListRepositoriesForCredentialParams struct {
+	// TenantID is the tenant id value supplied to the ListRepositoriesForCredential query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// CredentialID is the credential id value supplied to the ListRepositoriesForCredential query.
+	CredentialID *uuid.UUID `json:"credential_id"`
+}
 
 // ListRepositoriesForCredentialRow contains the columns returned by the ListRepositoriesForCredential query.
 type ListRepositoriesForCredentialRow struct {
@@ -724,8 +808,8 @@ type ListRepositoriesForCredentialRow struct {
 }
 
 // ListRepositoriesForCredential returns non-deleted repository references in contract response order.
-func (q *Queries) ListRepositoriesForCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForCredentialRow, error) {
-	rows, err := q.db.Query(ctx, listRepositoriesForCredential, credentialID)
+func (q *Queries) ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error) {
+	rows, err := q.db.Query(ctx, listRepositoriesForCredential, arg.TenantID, arg.CredentialID)
 	if err != nil {
 		return nil, err
 	}
@@ -964,6 +1048,50 @@ func (q *Queries) ListTenantCredentials(ctx context.Context, arg ListTenantCrede
 		return nil, err
 	}
 	return items, nil
+}
+
+const lockLatestCredentialSyncJob = `-- name: LockLatestCredentialSyncJob :one
+SELECT id, tenant_id, status, active_generation
+FROM jobs
+WHERE tenant_id = $1
+  AND dedupe_key = $2
+ORDER BY active_generation DESC
+LIMIT 1
+FOR UPDATE
+`
+
+// LockLatestCredentialSyncJobParams contains the strongly typed arguments for the LockLatestCredentialSyncJob query.
+type LockLatestCredentialSyncJobParams struct {
+	// TenantID is the tenant id value supplied to the LockLatestCredentialSyncJob query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// DedupeKey is the dedupe key value supplied to the LockLatestCredentialSyncJob query.
+	DedupeKey string `json:"dedupe_key"`
+}
+
+// LockLatestCredentialSyncJobRow contains the columns returned by the LockLatestCredentialSyncJob query.
+type LockLatestCredentialSyncJobRow struct {
+	// ID is the id value returned by the LockLatestCredentialSyncJob query.
+	ID uuid.UUID `json:"id"`
+	// TenantID is the tenant id value returned by the LockLatestCredentialSyncJob query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// Status is the status value returned by the LockLatestCredentialSyncJob query.
+	Status string `json:"status"`
+	// ActiveGeneration is the active generation value returned by the LockLatestCredentialSyncJob query.
+	ActiveGeneration int64 `json:"active_generation"`
+}
+
+// LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
+// A pending or running row is reused; terminal rows advance active_generation for new work.
+func (q *Queries) LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error) {
+	row := q.db.QueryRow(ctx, lockLatestCredentialSyncJob, arg.TenantID, arg.DedupeKey)
+	var i LockLatestCredentialSyncJobRow
+	err := row.Scan(
+		&i.ID,
+		&i.TenantID,
+		&i.Status,
+		&i.ActiveGeneration,
+	)
+	return i, err
 }
 
 const replaceCredentialTeamShares = `-- name: ReplaceCredentialTeamShares :exec
