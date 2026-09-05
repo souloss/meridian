@@ -3,8 +3,8 @@
 > 最后核对：2026-09-05
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`db920bc feat: expose redacted audit queries`
-> 当前开发切片：Outbox 同事务写入与至少一次分发
+> 最新稳定提交：`78cbc38 feat: close M0 audit outbox transaction loop`
+> 当前开发切片：本地 SHA-256 CAS Blob 驱动
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -52,7 +52,7 @@
 | 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | `bd954d4`、`internal/handler/identity_integration_test.go` |
 | River Worker 与通用 Job 控制面 | 部分完成 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；租户 Job 查询/取消/重试/SSE 仍属后续切片 | `147b155` |
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
-| Outbox 事务与分发闭环 | 开发中 | DDL 已冻结；正在实现业务同事务写入、租约回收、退避和至少一次分发 | `ab1635f` |
+| Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
 | 本地 SHA-256 CAS Blob 驱动 | 未开始 | 只有 M0 DDL，尚无存储驱动和签名读取闭环 | `ab1635f` |
 | M0 Nuxt 控制面 | 未开始 | 当前只有静态应用壳、生成客户端和 Query 插件；登录、租户壳、凭据/仓库页面及 E2E 未完成 | `b29514f` |
 | M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；CodeMirror 大文件、Table/Cytoscape 性能、桌面/移动端 Playwright 与 axe 尚未放行 | [`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
@@ -74,9 +74,9 @@
 
 ## 当前工作区快照
 
-最后稳定基线是 `db920bc`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
+最后稳定基线是 `78cbc38`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
 
-2026-09-05 核对时，仓库、平台 Job、River Worker 与审计查询切片已通过门禁，包含：
+2026-09-05 核对时，仓库、平台 Job、River Worker、审计查询与 M0 Outbox 基础切片已通过门禁，包含：
 
 - `migrations/queries/repository.sql`；
 - sqlc 生成的 repository 查询代码；
@@ -90,16 +90,18 @@
 - Worker/数据库集成测试验证 terminal failure、阶段日志数量、River kind 和应用状态。
 - 租户/平台审计列表使用独立强类型查询；租户端固定 `tenant_id`，平台端要求平台管理员，并只映射契约允许的脱敏元数据。
 - HTTP/PG 集成验证 deepObject 租户过滤、平台事实隔离和未授权 404。
+- `collect.failed` 完整 AsyncAPI 信封与 terminal Job、阶段日志和 `job.failed` 审计使用同一 PostgreSQL 事务写入；共享 `eventId` 作为接收方去重键。
+- River 启动及每分钟触发有界 Outbox 扫描；领取使用 `FOR UPDATE SKIP LOCKED`，失败只保留稳定错误码，五档退避覆盖六次尝试，过期租约可恢复且旧租约回写被栅栏拒绝。
+- M0 默认没有通知通道；具体订阅匹配、配置解密和 webhook/in-app/email 投递适配保持在 M5，不以假成功冒充分发。
 
 本阶段提交前已通过 `vfox exec golang@1.27.1 -- go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
 
 ## 下一步顺序
 
-1. 完成 Outbox 的同事务写入、租约回收和至少一次分发闭环。
-2. 完成本地 SHA-256 CAS Blob 驱动。
-3. 补齐租户 Job 查询/取消/重试/SSE 控制面。
-4. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
-5. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
+1. 完成本地 SHA-256 CAS Blob 驱动。
+2. 补齐租户 Job 查询/取消/重试/SSE 控制面。
+3. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
+4. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
 
 ## 更新流程
 
