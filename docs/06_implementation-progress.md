@@ -4,7 +4,7 @@
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
 > 最新稳定提交：`ee9fcd9 feat(M0-AGENT-001): implement tenant control-plane update`
-> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（待领取）
+> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（待重试）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项和依赖以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 和工作项门禁为准。
 
@@ -118,7 +118,7 @@
 
 ## 下一步顺序
 
-下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前队列为：`M0-AGENT-001` → `M0-AGENT-002` → `M0-AGENT-003`，完成 M0 放行后进入 M1。每个工作项的命令、断言和报告路径以该文件为准。
+下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前队列为：`M0-AGENT-001`（passed）→ `M0-AGENT-002`（needs_retry）→ `M0-AGENT-003`，完成 M0 放行后进入 M1。每个工作项的命令、断言和报告路径以该文件为准。
 
 ## 更新流程
 
@@ -148,5 +148,7 @@ git diff --check
 涉及前端时还必须执行生成、类型检查、Playwright、移动/桌面视口和 axe；涉及迁移时必须额外执行空库 up、显式 down、再次 up 和事务回滚验证。
 
 ## 当前阻塞
+
+`M0-AGENT-002` 的声明门禁 `make smoke-m0-credentials` 当前不存在，已按运行手册记录为 `needs_retry`，不能用已有集成测试替代。修复 Make target/对应 Smoke fixture 后，必须从该工作项重新领取并重跑全部声明门禁。
 
 没有需要人工决策的阻塞。

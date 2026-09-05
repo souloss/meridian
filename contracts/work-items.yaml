@@ -64,14 +64,23 @@ items:
   - id: M0-AGENT-002
     milestone: M0
     priority: P0
-    status: ready
+    status: needs_retry
     title: close-m0-credential-known-host-smoke
     dependsOn: [M0-AGENT-001]
     operationIds: [createCredential, rotateCredential, createGlobalCredential, rotateGlobalCredential, deleteGlobalCredential, createKnownHost]
     stories: [US-11]
     assertions: [SMK-005, SMK-031, SMK-035]
     verify: [smoke-m0-credentials, backend-test-integration]
-    reportPath: artifacts/work-items/M0-AGENT-002.json
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    leaseUntil: '2026-09-05T19:31:03Z'
+    startedAt: '2026-09-05T19:01:03Z'
+    baseCommit: e79ecf8bcb677a7359e171c43fc75450ed51fc06
+    contractDigest: sha256:627bc17f91f02ba5d8bbb4bd8b6bc7071de94e9ca8465b9027be14ca49b14a9a
+    reportPath: artifacts/agent/M0-AGENT-002/20260905T190103Z/report.json
+    lastEvidence: artifacts/agent/M0-AGENT-002/20260905T190103Z/report.json
+    nextAction: investigate missing smoke-m0-credentials gate
 
   - id: M0-AGENT-003
     milestone: M0
