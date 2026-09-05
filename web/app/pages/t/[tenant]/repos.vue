@@ -1,0 +1,40 @@
+<script setup lang="ts">
+import { useListRepositories } from '~/api/generated/repository/repository'
+import type { RepositoryPage } from '~/api/generated/models/repositoryPage'
+import { responseData } from '~/composables/useResponseData'
+
+definePageMeta({ layout: 'tenant', middleware: ['auth', 'tenant'] })
+
+const route = useRoute()
+const tenantSlug = computed(() => String(route.params.tenant))
+const page = ref(1)
+const params = computed(() => ({ page: page.value, pageSize: 20 }))
+const query = useListRepositories(tenantSlug, params)
+const result = computed(() => responseData<RepositoryPage>(query.data.value))
+const repositories = computed(() => result.value?.items ?? [])
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
+}
+</script>
+
+<template>
+  <div class="space-y-6">
+    <section class="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end">
+      <div><p class="text-sm font-medium text-teal-700">资源目录</p><h2 class="mt-1 text-2xl font-semibold tracking-tight text-slate-950">仓库</h2><p class="mt-2 text-sm text-slate-600">管理 Git 连接、默认分支和同步健康状态。</p></div>
+      <UButton color="primary" icon="i-lucide-plus" label="添加仓库" disabled />
+    </section>
+    <UAlert v-if="query.error.value" color="error" variant="subtle" icon="i-lucide-circle-alert" title="仓库列表加载失败" description="请刷新页面后重试。" />
+    <UCard :ui="{ body: 'p-0' }">
+      <div v-if="query.isLoading.value" class="space-y-3 p-5"><USkeleton v-for="index in 5" :key="index" class="h-14 w-full" /></div>
+      <div v-else-if="repositories.length === 0" class="p-12 text-center"><UIcon name="i-lucide-git-branch" class="mx-auto size-8 text-slate-300" /><p class="mt-3 text-sm font-medium text-slate-700">暂无仓库</p><p class="mt-1 text-sm text-slate-600">添加仓库后，它们会出现在这里。</p></div>
+      <div v-else class="divide-y divide-slate-100">
+        <div v-for="repository in repositories" :key="repository.id" class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="min-w-0"><p class="truncate text-sm font-semibold text-slate-800">{{ repository.url }}</p><p class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-600"><span class="font-mono">{{ repository.defaultBranch }}</span><span class="text-slate-300">·</span><span>更新于 {{ formatDate(repository.updatedAt) }}</span></p></div>
+          <div class="flex items-center gap-3"><UBadge :color="repository.health.failStreak === 0 ? 'success' : repository.health.lastSyncAt ? 'warning' : 'error'" variant="subtle">{{ repository.health.failStreak === 0 ? 'healthy' : repository.health.lastSyncAt ? 'stale' : 'invalid' }}</UBadge><UButton color="neutral" variant="ghost" icon="i-lucide-chevron-right" aria-label="打开仓库" disabled /></div>
+        </div>
+      </div>
+      <template v-if="result && result.total > result.pageSize" #footer><div class="flex items-center justify-between"><p class="text-xs text-slate-600">共 {{ result.total }} 个仓库</p><div class="flex gap-2"><UButton color="neutral" variant="outline" size="sm" label="上一页" :disabled="page <= 1" @click="page--" /><UButton color="neutral" variant="outline" size="sm" label="下一页" :disabled="page * result.pageSize >= result.total" @click="page++" /></div></div></template>
+    </UCard>
+  </div>
+</template>

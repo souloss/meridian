@@ -7,7 +7,8 @@
     "generate": "nuxt generate",
     "generate:api": "orval --config orval.config.ts && node scripts/document-generated-api.mjs",
     "check:generated-docs": "node scripts/document-generated-api.mjs --check",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test:e2e": "playwright test"
   },
   "engines": {
     "node": ">=24.20.0 <25"
@@ -26,6 +27,8 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.1.0",
+    "@axe-core/playwright": "^4.11.0",
+    "@playwright/test": "^1.55.1",
     "@redocly/cli": "^2.51.1",
     "msw": "^2.11.6",
     "orval": "^8.23.0",

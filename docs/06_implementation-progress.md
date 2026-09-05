@@ -4,7 +4,7 @@
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
 > 最新稳定提交：`ea589ad feat: add tenant job control plane`
-> 当前开发切片：M0 Nuxt 控制面
+> 当前开发切片：M0 Nuxt 控制面（开发中）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -54,7 +54,7 @@
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
 | Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
 | 本地 SHA-256 CAS Blob 驱动 | 已完成 | 流式摘要、排他原子发布、去重、损坏检测、短时内容能力、租户唯一字节配额和真实 PG 覆盖均已通过；内容 HTTP endpoint 按契约在 M1 资产消费者接入 | `6c79863` |
-| M0 Nuxt 控制面 | 未开始 | 当前只有静态应用壳、生成客户端和 Query 插件；登录、租户壳、凭据/仓库页面及 E2E 未完成 | `b29514f` |
+| M0 Nuxt 控制面 | 开发中 | 当前开始实现登录、租户壳、凭据/仓库/Job 页面、桌面/移动导航和认证守卫；E2E、axe 与静态产物门禁待本切片完成后执行 | `b29514f`、当前工作区 |
 | M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；CodeMirror 大文件、Table/Cytoscape 性能、桌面/移动端 Playwright 与 axe 尚未放行 | [`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
 
 ## M0 验收矩阵
@@ -106,7 +106,7 @@
 
 ## 下一步顺序
 
-1. 开始 M0 Nuxt 控制面。
+1. 完成 M0 Nuxt 控制面并通过前端类型、静态生成、桌面/移动视口和 axe 门禁。
 2. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
 3. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
 

@@ -1,5 +1,11 @@
 export default defineNuxtConfig({
   ssr: false,
+  app: {
+    head: {
+      htmlAttrs: { lang: 'zh-CN' },
+      title: 'Meridian 控制面'
+    }
+  },
   devtools: { enabled: false },
   modules: ['@nuxt/ui', '@pinia/nuxt', '@nuxtjs/i18n', '@nuxt/icon'],
   css: ['~/assets/css/main.css'],

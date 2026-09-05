@@ -1,40 +1,26 @@
 <script setup lang="ts">
-const status = ref<'loading' | 'ready'>('loading')
+definePageMeta({ layout: false })
+
+const { refresh } = useSession()
+const loading = ref(true)
 
 onMounted(async () => {
   try {
-    await $fetch('/healthz')
+    const me = await refresh()
+    await navigateTo(me?.tenants[0] ? `/t/${me.tenants[0].slug}/dashboard` : '/no-tenant')
+  } catch {
+    await navigateTo('/login')
   } finally {
-    status.value = 'ready'
+    loading.value = false
   }
 })
 </script>
 
 <template>
-  <main class="min-h-screen bg-neutral-950 px-6 py-16 text-neutral-100">
-    <section class="mx-auto max-w-5xl">
-      <div class="mb-12 flex items-center justify-between border-b border-neutral-800 pb-6">
-        <div>
-          <p class="text-sm font-medium uppercase tracking-[0.18em] text-cyan-400">Meridian</p>
-          <h1 class="mt-3 text-4xl font-semibold">Asset control plane</h1>
-        </div>
-        <UBadge color="primary" variant="subtle">M0 foundation</UBadge>
-      </div>
-
-      <div class="grid gap-5 md:grid-cols-3">
-        <UCard>
-          <template #header><h2 class="font-semibold">Static SPA</h2></template>
-          <p class="text-sm text-neutral-400">Nuxt 4 output is ready to be embedded by the Go binary.</p>
-        </UCard>
-        <UCard>
-          <template #header><h2 class="font-semibold">Contract first</h2></template>
-          <p class="text-sm text-neutral-400">The API contract is served at <code>/api/v1/openapi.yaml</code>.</p>
-        </UCard>
-        <UCard>
-          <template #header><h2 class="font-semibold">Runtime</h2></template>
-          <p class="text-sm text-neutral-400">Backend health: <span class="font-medium text-cyan-300">{{ status }}</span></p>
-        </UCard>
-      </div>
-    </section>
+  <main class="flex min-h-screen items-center justify-center bg-[#f4f7f8] px-6">
+    <div class="text-center">
+      <div class="mx-auto flex size-12 items-center justify-center rounded-xl bg-teal-600 text-lg font-bold text-white">M</div>
+      <p class="mt-5 text-sm font-medium text-slate-600">{{ loading ? '正在加载 Meridian…' : '正在跳转…' }}</p>
+    </div>
   </main>
 </template>
