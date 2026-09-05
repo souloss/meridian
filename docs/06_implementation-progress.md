@@ -3,7 +3,7 @@
 > 最后核对：2026-09-05
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`354af57 feat: add credential connection probes`
+> 最新稳定提交：`bd954d4 feat: implement repository configuration lifecycle`
 > 当前开发切片：仓库 CRUD、凭据绑定和仓库配额
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
@@ -73,7 +73,7 @@
 
 ## 当前工作区快照
 
-最后稳定基线是 `354af57`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、生成无漂移和 `git diff --check` 均已通过。
+最后稳定基线是 `bd954d4`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
 
 2026-09-05 核对时，仓库切片已通过门禁，包含：
 
