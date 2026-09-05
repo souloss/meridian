@@ -3,8 +3,8 @@
 > 最后核对：2026-09-05
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`bd954d4 feat: implement repository configuration lifecycle`
-> 当前开发切片：仓库 CRUD、凭据绑定和仓库配额
+> 最新稳定提交：`b8d2ef6 feat: add redacted platform job queries`
+> 当前开发切片：River Worker 基础与 Job 阶段日志
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -45,12 +45,12 @@
 | sqlc + pgx 强类型持久化基础 | 已完成 | 切片门禁已通过 | `ddeae8d` |
 | 登录、CSRF、用户、租户、成员、RBAC 和 PAT | 已完成 | US-01、SMK-002/003/004 部分覆盖；全租户 operation 隔离矩阵和控制面 E2E 未完成 | `ac8da08`，`internal/handler/identity_integration_test.go` |
 | 凭据加密、服务端指纹和非回显 | 已完成 | SMK-005 部分覆盖，正式独立 fixture 尚未统一放行 | `31e3440`、`d976cde`、`66f473c` |
-| 凭据轮换、原子仓库同步任务投递和幂等重放 | 已完成 | SMK-005/031 部分覆盖；平台 Job 查询仍未实现 | `394ffe7`、`b270b9d` |
+| 凭据轮换、原子仓库同步任务投递和幂等重放 | 已完成 | SMK-005/031 部分覆盖；平台 Job 查询已接入，Worker 执行仍待闭环 | `394ffe7`、`b270b9d`、`b8d2ef6` |
 | 租户/全局凭据连接探测和仓库连接预检 | 已完成 | 成功、分类失败、超时和秘密脱敏已有单元/集成覆盖 | `354af57` |
-| 全局凭据管理及强制删除 | 部分完成 | CRUD/轮换/删除已实现；引用仓库解绑后的 API 可见状态和 `getPlatformJob` 尚未闭环 | `66f473c`、`394ffe7`、`b270b9d` |
+| 全局凭据管理及强制删除 | 部分完成 | CRUD/轮换/删除、引用仓库解绑健康状态和平台 Job 投影已实现；正式 Smoke fixture 仍待统一放行 | `66f473c`、`394ffe7`、`b270b9d`、`b8d2ef6` |
 | Known Host 创建、派生指纹和列表 | 部分完成 | 服务端派生规则已有单测和 handler；SMK-035 独立 API 场景尚未统一放行 | `31e3440`、`66f473c` |
 | 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | 本阶段提交，`internal/handler/identity_integration_test.go` |
-| River Worker 与通用 Job 控制面 | 部分完成 | River schema 和凭据轮换任务已实现；Worker 编排、阶段日志和平台 Job 读取未闭环 | `ab1635f`、`394ffe7` |
+| River Worker 与通用 Job 控制面 | 部分完成 | 平台管理员可读取脱敏 Job 投影；River Worker 编排、阶段日志和持久化状态推进仍待闭环 | `ab1635f`、`394ffe7`、`b8d2ef6` |
 | Audit 与 Outbox 事务闭环 | 未开始 | 只有 M0 DDL，尚无业务写入、分发和读取闭环 | `ab1635f` |
 | 本地 SHA-256 CAS Blob 驱动 | 未开始 | 只有 M0 DDL，尚无存储驱动和签名读取闭环 | `ab1635f` |
 | M0 Nuxt 控制面 | 未开始 | 当前只有静态应用壳、生成客户端和 Query 插件；登录、租户壳、凭据/仓库页面及 E2E 未完成 | `b29514f` |
@@ -61,34 +61,35 @@
 | 验收项 | 当前状态 | 未闭环内容 |
 | --- | --- | --- |
 | US-01 | 部分完成 | 平台控制面、完整权限反例和独立 E2E fixture |
-| US-11 | 部分完成 | 全 operation 隔离矩阵、仓库绑定后的全局凭据删除、平台 Job 查询和统一 Smoke |
+| US-11 | 部分完成 | 全 operation 隔离矩阵和统一 Smoke 仍未完成；仓库绑定后的全局凭据删除与平台 Job 查询已有覆盖 |
 | SMK-001 | 部分完成 | 数据库迁移集成覆盖已有；仍需按 Smoke 入口统一执行 health/readiness/migration 断言 |
 | SMK-002 | 部分完成 | 后端登录/租户切换已有；租户路由及前端缓存隔离未完成 |
 | SMK-003 | 部分完成 | 认证错误和部分跨租户规则已有；尚未生成并执行所有租户资源 operation 的隔离矩阵 |
 | SMK-004 | 部分完成 | PAT 创建、非回显、撤销和撤销后 401 已有集成覆盖；仍需独立 fixture 放行 |
 | SMK-005 | 部分完成 | 加密、指纹、轮换、幂等、连接结果和脱敏已有；仍需完整引用仓库数量及正式连通 fixture |
-| SMK-029 | 开发中 | 原子配额检查、409 details、计数不变断言和 API 集成测试 |
-| SMK-031 | 部分完成 | 全局凭据生命周期已有；绑定仓库解绑/health、平台 Job 投影尚未闭环 |
+| SMK-029 | 部分完成 | 原子配额检查、409 details、计数不变断言和 API 集成测试已覆盖；仍需独立 Smoke fixture 放行 |
+| SMK-031 | 部分完成 | 全局凭据生命周期、绑定仓库解绑/health 和平台 Job 投影已有；仍需正式 Smoke fixture 放行 |
 | SMK-035 | 部分完成 | 派生算法与服务已有；完整 API 正反例 fixture 尚未统一放行 |
 
 ## 当前工作区快照
 
-最后稳定基线是 `bd954d4`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
+最后稳定基线是 `b8d2ef6`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
 
-2026-09-05 核对时，仓库切片已通过门禁，包含：
+2026-09-05 核对时，仓库与平台 Job 投影切片已通过门禁，包含：
 
 - `migrations/queries/repository.sql`；
 - sqlc 生成的 repository 查询代码；
 - repository service 类型、URL/配置校验和配额错误模型；
 - 仓库 API 的三态 PATCH、ETag、凭据绑定和软删除集成断言；
 - 实际 M0 DDL 列注释审计测试。
+- 平台管理员 Job 列表/详情的脱敏查询、过滤、分页和跨租户拒绝断言；`input`、`result`、`error`、凭据秘密和 River 内部字段不进入响应。
 
 本阶段提交前已通过 `vfox exec golang@1.27.1 -- go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
 
 ## 下一步顺序
 
 1. 用实际仓库绑定闭环全局凭据强制删除后的轮换 Job 数量断言。
-2. 完成平台 Job 查询、River Worker 基础和阶段日志。
+2. 完成 River Worker 基础、事务内入队和 Job 阶段日志。
 3. 完成 Audit/Outbox 的同事务写入与分发闭环。
 4. 完成本地 SHA-256 CAS Blob 驱动。
 5. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
