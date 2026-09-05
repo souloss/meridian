@@ -65,7 +65,9 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	identityStore := repository.NewIdentityStore(db.Pool)
 	identity := service.NewIdentity(identityStore, digester)
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
-	runtime, err := task.NewRuntime(db.Pool, repositoryStore, nil, logger)
+	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
+		Executions: repositoryStore, Outbox: repositoryStore,
+	}, logger)
 	if err != nil {
 		return fmt.Errorf("configure River runtime: %w", err)
 	}

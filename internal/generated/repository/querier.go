@@ -14,11 +14,17 @@ import (
 type Querier interface {
 	// AddCredentialTeamShare grants one same-tenant team visibility entry.
 	AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error
+	// AppendJobFailureAudit records one append-only, redacted system fact in the
+	// same transaction as the job terminal state and its outbound event rows.
+	AppendJobFailureAudit(ctx context.Context, arg AppendJobFailureAuditParams) (AuditLog, error)
 	// AppendJobStageLog persists one redacted stage event with its caller-supplied cursor.
 	AppendJobStageLog(ctx context.Context, arg AppendJobStageLogParams) (JobStageLog, error)
 	// AttachRiverJobID links the application UUID job to the internal River sequence
 	// in the same transaction that inserted both rows.
 	AttachRiverJobID(ctx context.Context, arg AttachRiverJobIDParams) (int64, error)
+	// ClaimNextOutboxDelivery atomically leases one due delivery with SKIP LOCKED.
+	// A stale delivering row is eligible after its lease expires, providing crash recovery.
+	ClaimNextOutboxDelivery(ctx context.Context, arg ClaimNextOutboxDeliveryParams) (ClaimNextOutboxDeliveryRow, error)
 	// CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
 	CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error)
 	// CountCredentialRepositories counts active repositories referencing a tenant credential.
@@ -65,6 +71,9 @@ type Querier interface {
 	CreateGlobalCredentialRotationIdempotency(ctx context.Context, arg CreateGlobalCredentialRotationIdempotencyParams) error
 	// CreateKnownHost inserts a server-derived approved SSH host identity.
 	CreateKnownHost(ctx context.Context, arg CreateKnownHostParams) (KnownHost, error)
+	// CreateNotifyOutbox inserts one channel-specific delivery row while preserving
+	// the shared event identifier used by receivers for at-least-once deduplication.
+	CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error)
 	// CreateRepository persists repository configuration and initializes an empty health summary.
 	// URL fields are credential-free; credentials are referenced only by UUID foreign keys.
 	CreateRepository(ctx context.Context, arg CreateRepositoryParams) (Repository, error)
@@ -117,6 +126,8 @@ type Querier interface {
 	// GetTenantCredentialForMutation returns one tenant credential without visibility filtering.
 	// The service has already authorized the tenant operation; this query preserves a 404/412 distinction.
 	GetTenantCredentialForMutation(ctx context.Context, arg GetTenantCredentialForMutationParams) (Credential, error)
+	// GetTenantSlugForEvent resolves the stable tenant slug embedded in a domain event envelope.
+	GetTenantSlugForEvent(ctx context.Context, tenantID uuid.UUID) (string, error)
 	// GetUserByID returns the global identity matching the supplied UUID.
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
 	// GetUserByUsername returns the global identity matching the exact unique login name.
@@ -127,6 +138,9 @@ type Querier interface {
 	ListActiveTenantMemberships(ctx context.Context, userID uuid.UUID) ([]ListActiveTenantMembershipsRow, error)
 	// ListCredentialTeamShares returns the complete ordered team-share set for one tenant credential.
 	ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error)
+	// ListEnabledNotificationChannelIDs returns deterministic channel targets for
+	// an M0 operational event. M5 subscription routing will provide the narrower target set.
+	ListEnabledNotificationChannelIDs(ctx context.Context, tenantID uuid.UUID) ([]uuid.UUID, error)
 	// ListGlobalCredentials returns one stable page of platform-owned credentials.
 	ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error)
 	// ListKnownHosts returns one stable page of tenant-approved SSH host identities.
@@ -165,6 +179,12 @@ type Querier interface {
 	// LockRepositoryQuota serializes repository creation against the tenant's repository quota.
 	// The repository adapter holds this row lock while counting and inserting, so concurrent creates cannot oversubscribe a quota.
 	LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
+	// MarkOutboxDelivered completes only the exact active lease so a stale worker
+	// cannot overwrite a delivery reclaimed by a newer dispatcher.
+	MarkOutboxDelivered(ctx context.Context, arg MarkOutboxDeliveredParams) (int64, error)
+	// MarkOutboxFailed records one redacted failed attempt and its next eligible
+	// time while fencing updates from expired delivery leases.
+	MarkOutboxFailed(ctx context.Context, arg MarkOutboxFailedParams) (int64, error)
 	// NextJobStageSequence returns the next replay cursor after the caller acquires
 	// the job-specific advisory transaction lock.
 	NextJobStageSequence(ctx context.Context, arg NextJobStageSequenceParams) (int64, error)

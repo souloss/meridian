@@ -95,7 +95,8 @@ func (worker *CredentialSyncWorker) finishFailure(ctx context.Context, args Cred
 		return err
 	}
 	finishErr := worker.store.FinishJob(ctx, FinishInput{
-		TenantID: args.TenantID, JobID: args.JobID, Status: "failed", Error: errorPayload,
+		TenantID: args.TenantID, JobID: args.JobID, RepositoryID: args.RepositoryID,
+		Status: "failed", Error: errorPayload, ErrorCode: "worker_failed",
 		ExpectedAttempt: expectedAttempt,
 		Stage:           StageResolve, Level: "error", Message: message, Terminal: true, FinishedAt: worker.now().UTC(),
 	})

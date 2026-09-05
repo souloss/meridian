@@ -3,6 +3,7 @@ package task
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -11,6 +12,19 @@ import (
 )
 
 const riverSchema = "river"
+const outboxDispatchInterval = time.Minute
+
+// RuntimeDependencies groups worker persistence and execution ports.
+type RuntimeDependencies struct {
+	// Executions persists repository synchronization lifecycle transitions.
+	Executions ExecutionStore
+	// SyncRunner executes the M1 repository synchronization pipeline.
+	SyncRunner SyncRunner
+	// Outbox persists delivery leases, retries, and completions.
+	Outbox OutboxStore
+	// OutboxDeliverer sends events through configured channel adapters.
+	OutboxDeliverer OutboxDeliverer
+}
 
 // Runtime owns the River client and the registered Meridian workers.
 type Runtime struct {
@@ -19,17 +33,22 @@ type Runtime struct {
 
 // NewRuntime constructs an executable River client for the application queue.
 // The caller must start it only after database migrations have completed.
-func NewRuntime(pool *pgxpool.Pool, store ExecutionStore, runner SyncRunner, logger *slog.Logger) (*Runtime, error) {
+func NewRuntime(pool *pgxpool.Pool, dependencies RuntimeDependencies, logger *slog.Logger) (*Runtime, error) {
 	if logger == nil {
 		logger = slog.Default()
 	}
 	workers := river.NewWorkers()
-	river.AddWorker(workers, NewCredentialSyncWorker(store, runner))
+	river.AddWorker(workers, NewCredentialSyncWorker(dependencies.Executions, dependencies.SyncRunner))
+	river.AddWorker(workers, NewOutboxDispatchWorker(dependencies.Outbox, dependencies.OutboxDeliverer))
 	client, err := river.NewClient(riverpgxv5.New(pool), &river.Config{
-		Logger:  logger,
-		Queues:  map[string]river.QueueConfig{river.QueueDefault: {MaxWorkers: 4}},
-		Schema:  riverSchema,
-		Workers: workers,
+		Logger: logger,
+		PeriodicJobs: []*river.PeriodicJob{river.NewPeriodicJob(
+			river.PeriodicInterval(outboxDispatchInterval),
+			func() (river.JobArgs, *river.InsertOpts) { return OutboxDispatchArgs{}, nil },
+			&river.PeriodicJobOpts{ID: "meridian_outbox_dispatch", RunOnStart: true},
+		)},
+		Queues: map[string]river.QueueConfig{river.QueueDefault: {MaxWorkers: 4}},
+		Schema: riverSchema, Workers: workers,
 	})
 	if err != nil {
 		return nil, err

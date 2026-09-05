@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"time"
@@ -91,10 +92,98 @@ func (store *RepositoryStore) FinishJob(ctx context.Context, input task.FinishIn
 	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.Stage, input.Level, input.Message, input.FinishedAt); err != nil {
 		return err
 	}
+	if input.Terminal && input.Status == "failed" {
+		if err := appendJobFailureFacts(ctx, queries, input); err != nil {
+			return err
+		}
+	}
 	if err := tx.Commit(ctx); err != nil {
 		return normalizeError(err)
 	}
 	_ = row
+	return nil
+}
+
+type jobFailureAuditDetail struct {
+	// Stage is the pipeline stage that produced the failure.
+	Stage string `json:"stage"`
+	// ErrorCode is the stable secret-free failure classification.
+	ErrorCode string `json:"errorCode"`
+}
+
+type collectFailedPayload struct {
+	// RepositoryID identifies the repository whose collection failed.
+	RepositoryID uuid.UUID `json:"repositoryId"`
+	// JobID identifies the durable job that reached a failed terminal state.
+	JobID uuid.UUID `json:"jobId"`
+	// Stage identifies the pipeline stage that failed.
+	Stage string `json:"stage"`
+	// ErrorCode is the stable secret-free failure classification.
+	ErrorCode string `json:"errorCode"`
+}
+
+type collectFailedEnvelope struct {
+	// EventID is the stable receiver deduplication identifier.
+	EventID uuid.UUID `json:"eventId"`
+	// EventType identifies the AsyncAPI message schema.
+	EventType string `json:"eventType"`
+	// OccurredAt is the UTC instant when the job failure transaction committed.
+	OccurredAt time.Time `json:"occurredAt"`
+	// TenantSlug identifies the tenant without exposing an internal lookup key.
+	TenantSlug string `json:"tenantSlug"`
+	// AggregateType identifies the event-producing domain aggregate category.
+	AggregateType string `json:"aggregateType"`
+	// AggregateID identifies the job aggregate that emitted the event.
+	AggregateID uuid.UUID `json:"aggregateId"`
+	// AggregateVersion orders failure events for the job aggregate.
+	AggregateVersion int `json:"aggregateVersion"`
+	// Payload contains collect.failed fields frozen by the AsyncAPI contract.
+	Payload collectFailedPayload `json:"payload"`
+}
+
+func appendJobFailureFacts(ctx context.Context, queries *generated.Queries, input task.FinishInput) error {
+	auditDetail, err := json.Marshal(jobFailureAuditDetail{Stage: string(input.Stage), ErrorCode: input.ErrorCode})
+	if err != nil {
+		return fmt.Errorf("encode job failure audit metadata: %w", err)
+	}
+	if _, err := queries.AppendJobFailureAudit(ctx, generated.AppendJobFailureAuditParams{
+		ID: uuid.NewV7(), TenantID: new(input.TenantID), JobID: new(input.JobID),
+		Detail: auditDetail,
+	}); err != nil {
+		return normalizeError(err)
+	}
+	channelIDs, err := queries.ListEnabledNotificationChannelIDs(ctx, input.TenantID)
+	if err != nil {
+		return normalizeError(err)
+	}
+	if len(channelIDs) == 0 {
+		return nil
+	}
+	tenantSlug, err := queries.GetTenantSlugForEvent(ctx, input.TenantID)
+	if err != nil {
+		return normalizeError(err)
+	}
+	eventID := uuid.NewV7()
+	payload, err := json.Marshal(collectFailedEnvelope{
+		EventID: eventID, EventType: "collect.failed", OccurredAt: input.FinishedAt.UTC(),
+		TenantSlug: tenantSlug, AggregateType: "job", AggregateID: input.JobID,
+		AggregateVersion: input.ExpectedAttempt,
+		Payload: collectFailedPayload{
+			RepositoryID: input.RepositoryID, JobID: input.JobID, Stage: string(input.Stage), ErrorCode: input.ErrorCode,
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("encode collect.failed event envelope: %w", err)
+	}
+	for _, channelID := range channelIDs {
+		if _, err := queries.CreateNotifyOutbox(ctx, generated.CreateNotifyOutboxParams{
+			TenantID: input.TenantID, ID: uuid.NewV7(), EventID: eventID, EventType: "collect.failed",
+			AggregateID: input.JobID, AggregateVersion: int64(input.ExpectedAttempt), Payload: payload,
+			ChannelID: channelID,
+		}); err != nil {
+			return normalizeError(err)
+		}
+	}
 	return nil
 }
 

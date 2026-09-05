@@ -661,6 +661,7 @@ tables:
     primaryKey: [tenant_id, id]
     unique: [[tenant_id, event_id, channel_id]]
     fields: [tenant_id, id, event_id, event_type, aggregate_id, aggregate_version, payload, channel_id, status, retry_count, next_attempt_at, last_error, created_at, updated_at]
+    indexes: [[next_attempt_at, created_at, tenant_id, id]]
   notifications:
     tenantScoped: true
     primaryKey: [tenant_id, id]

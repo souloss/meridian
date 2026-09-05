@@ -5,6 +5,7 @@ package database
 import (
 	"bytes"
 	"context"
+	"encoding/json/v2"
 	"errors"
 	"io"
 	"log/slog"
@@ -126,7 +127,10 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 		t.Fatalf("create credential fixtures: %v", err)
 	}
 
-	riverRuntime, err := task.NewRuntime(db.Pool, repository.NewRepositoryStore(db.Pool), task.UnsupportedSyncRunner{}, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	riverStore := repository.NewRepositoryStore(db.Pool)
+	riverRuntime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
+		Executions: riverStore, SyncRunner: task.UnsupportedSyncRunner{}, Outbox: riverStore,
+	}, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	if err != nil {
 		t.Fatalf("configure River runtime: %v", err)
 	}
@@ -235,6 +239,13 @@ func TestRiverWorkerPersistsTerminalFailureAndStageLogs(t *testing.T) {
 	`, tenantID); err != nil {
 		t.Fatalf("create worker tenant: %v", err)
 	}
+	channelID := uuid.NewV7()
+	if _, err := db.Pool.Exec(t.Context(), `
+		INSERT INTO notification_channels (tenant_id, id, type, name, encrypted_config)
+		VALUES ($1, $2, 'webhook', 'Worker failures', $3)
+	`, tenantID, channelID, []byte("opaque-encrypted-config")); err != nil {
+		t.Fatalf("create worker notification channel: %v", err)
+	}
 	if _, err := db.Pool.Exec(t.Context(), `
 		INSERT INTO jobs (tenant_id, id, type, scope_type, scope_id, trigger, input, dedupe_key, replay_safe)
 		VALUES ($1, $2, 'repo.sync', 'repository', $3, 'system', '{}'::jsonb, $4, true)
@@ -242,7 +253,10 @@ func TestRiverWorkerPersistsTerminalFailureAndStageLogs(t *testing.T) {
 		t.Fatalf("create worker domain job: %v", err)
 	}
 
-	runtime, err := task.NewRuntime(db.Pool, repository.NewRepositoryStore(db.Pool), task.UnsupportedSyncRunner{}, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	riverStore := repository.NewRepositoryStore(db.Pool)
+	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
+		Executions: riverStore, SyncRunner: task.UnsupportedSyncRunner{}, Outbox: riverStore,
+	}, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	if err != nil {
 		t.Fatalf("configure River runtime: %v", err)
 	}
@@ -272,11 +286,7 @@ func TestRiverWorkerPersistsTerminalFailureAndStageLogs(t *testing.T) {
 	if err := tx.Commit(t.Context()); err != nil {
 		t.Fatalf("commit River insert: %v", err)
 	}
-	select {
-	case <-completed:
-	case <-time.After(10 * time.Second):
-		t.Fatal("timed out waiting for River worker completion")
-	}
+	waitForRiverCompletionKind(t, completed, task.CredentialSyncArgs{}.Kind())
 
 	var status string
 	var stage *string
@@ -292,5 +302,132 @@ func TestRiverWorkerPersistsTerminalFailureAndStageLogs(t *testing.T) {
 	}
 	if logCount != 2 {
 		t.Fatalf("worker stage log count = %d, want start and terminal failure", logCount)
+	}
+	var auditCount int
+	if err := db.Pool.QueryRow(t.Context(), `
+		SELECT count(*) FROM audit_logs
+		WHERE tenant_id = $1 AND action = 'job.failed' AND target_type = 'job' AND target_id = $2
+	`, tenantID, jobID).Scan(&auditCount); err != nil {
+		t.Fatalf("read job failure audit: %v", err)
+	}
+	if auditCount != 1 {
+		t.Fatalf("job failure audit count = %d, want 1", auditCount)
+	}
+	var eventID uuid.UUID
+	var outboxID uuid.UUID
+	var outboxStatus string
+	var outboxPayload []byte
+	var aggregateVersion int64
+	if err := db.Pool.QueryRow(t.Context(), `
+		SELECT id, event_id, status, payload, aggregate_version
+		FROM notify_outbox
+		WHERE tenant_id = $1 AND channel_id = $2 AND aggregate_id = $3
+	`, tenantID, channelID, jobID).Scan(&outboxID, &eventID, &outboxStatus, &outboxPayload, &aggregateVersion); err != nil {
+		t.Fatalf("read collect.failed outbox row: %v", err)
+	}
+	var envelope struct {
+		EventID          string `json:"eventId"`
+		EventType        string `json:"eventType"`
+		TenantSlug       string `json:"tenantSlug"`
+		AggregateType    string `json:"aggregateType"`
+		AggregateID      string `json:"aggregateId"`
+		AggregateVersion int    `json:"aggregateVersion"`
+		Payload          struct {
+			RepositoryID string `json:"repositoryId"`
+			JobID        string `json:"jobId"`
+			Stage        string `json:"stage"`
+			ErrorCode    string `json:"errorCode"`
+		} `json:"payload"`
+	}
+	if err := json.Unmarshal(outboxPayload, &envelope); err != nil {
+		t.Fatalf("decode collect.failed envelope: %v", err)
+	}
+	if (outboxStatus != "pending" && outboxStatus != "delivering" && outboxStatus != "failed") || eventID.String() != envelope.EventID || envelope.EventType != "collect.failed" || envelope.TenantSlug != "worker-acme" || envelope.AggregateType != "job" || envelope.AggregateID != jobID.String() || envelope.AggregateVersion != 1 || aggregateVersion != 1 || envelope.Payload.RepositoryID != repositoryID.String() || envelope.Payload.JobID != jobID.String() || envelope.Payload.Stage != "resolve" || envelope.Payload.ErrorCode != "worker_failed" {
+		t.Fatalf("collect.failed outbox/envelope = %s/%#v", outboxStatus, envelope)
+	}
+	if _, err := runtime.Client().Insert(t.Context(), task.OutboxDispatchArgs{}, nil); err != nil {
+		t.Fatalf("insert outbox dispatch job: %v", err)
+	}
+	waitForRiverCompletionKind(t, completed, task.OutboxDispatchArgs{}.Kind())
+	retryCount, lastError := waitForOutboxFailure(t, db, tenantID, eventID, channelID, &outboxStatus)
+	if outboxStatus != "failed" || retryCount != 1 || lastError != "delivery_unavailable" {
+		t.Fatalf("dispatched outbox state = %s/%d/%q, want failed/1/delivery_unavailable", outboxStatus, retryCount, lastError)
+	}
+	staleClaimedAt := time.Now().UTC().Add(-10 * time.Minute)
+	if _, err := db.Pool.Exec(t.Context(), `
+		UPDATE notify_outbox
+		SET status = 'delivering', updated_at = $4, next_attempt_at = now() + interval '1 hour'
+		WHERE tenant_id = $1 AND id = $2 AND event_id = $3
+	`, tenantID, outboxID, eventID, staleClaimedAt); err != nil {
+		t.Fatalf("make outbox lease stale: %v", err)
+	}
+	reclaimedAt := time.Now().UTC()
+	reclaimed, claimed, err := riverStore.ClaimOutboxDelivery(t.Context(), task.ClaimDeliveryInput{
+		ClaimedAt: reclaimedAt, LeaseExpiredAt: reclaimedAt.Add(-5 * time.Minute), MaxAttempts: 6,
+	})
+	if err != nil || !claimed || reclaimed.ID != outboxID {
+		t.Fatalf("reclaim stale outbox = %#v/%v/%v, want outbox %s", reclaimed, claimed, err, outboxID)
+	}
+	if err := riverStore.MarkOutboxDelivered(t.Context(), task.OutboxDelivery{
+		TenantID: tenantID, ID: outboxID, ClaimedAt: staleClaimedAt,
+	}, time.Now().UTC()); err != nil {
+		t.Fatalf("fence stale delivery completion: %v", err)
+	}
+	if err := db.Pool.QueryRow(t.Context(), `SELECT status FROM notify_outbox WHERE tenant_id = $1 AND id = $2`, tenantID, outboxID).Scan(&outboxStatus); err != nil {
+		t.Fatalf("read fenced outbox status: %v", err)
+	}
+	if outboxStatus != "delivering" {
+		t.Fatalf("stale completion changed outbox status to %q", outboxStatus)
+	}
+	if err := riverStore.MarkOutboxDelivered(t.Context(), reclaimed, time.Now().UTC()); err != nil {
+		t.Fatalf("complete reclaimed outbox: %v", err)
+	}
+	if err := db.Pool.QueryRow(t.Context(), `SELECT status FROM notify_outbox WHERE tenant_id = $1 AND id = $2`, tenantID, outboxID).Scan(&outboxStatus); err != nil {
+		t.Fatalf("read completed outbox status: %v", err)
+	}
+	if outboxStatus != "delivered" {
+		t.Fatalf("reclaimed outbox status = %q, want delivered", outboxStatus)
+	}
+}
+
+func waitForRiverCompletionKind(t *testing.T, completed <-chan *river.Event, kind string) {
+	t.Helper()
+	timeout := time.NewTimer(10 * time.Second)
+	defer timeout.Stop()
+	for {
+		select {
+		case event := <-completed:
+			if event != nil && event.Job != nil && event.Job.Kind == kind {
+				return
+			}
+		case <-timeout.C:
+			t.Fatalf("timed out waiting for River completion kind %q", kind)
+		}
+	}
+}
+
+func waitForOutboxFailure(t *testing.T, database *Database, tenantID, eventID, channelID uuid.UUID, status *string) (int, string) {
+	t.Helper()
+	deadline := time.NewTimer(10 * time.Second)
+	defer deadline.Stop()
+	ticker := time.NewTicker(20 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		var retryCount int
+		var lastError string
+		if err := database.Pool.QueryRow(t.Context(), `
+			SELECT status, retry_count, last_error FROM notify_outbox
+			WHERE tenant_id = $1 AND event_id = $2 AND channel_id = $3
+		`, tenantID, eventID, channelID).Scan(status, &retryCount, &lastError); err != nil {
+			t.Fatalf("read dispatched outbox row: %v", err)
+		}
+		if *status == "failed" {
+			return retryCount, lastError
+		}
+		select {
+		case <-ticker.C:
+		case <-deadline.C:
+			t.Fatalf("timed out waiting for outbox failure; last status %q", *status)
+		}
 	}
 }

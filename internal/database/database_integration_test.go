@@ -41,7 +41,7 @@ var expectedM0Tables = []string{
 	"users",
 }
 
-const expectedApplicationMigrationVersion = 2
+const expectedApplicationMigrationVersion = 3
 
 func TestMigrationLifecycle(t *testing.T) {
 	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")
@@ -75,7 +75,7 @@ func TestMigrationLifecycle(t *testing.T) {
 	if status.ApplicationVersion != expectedApplicationMigrationVersion-1 || len(status.RiverVersions) == 0 {
 		t.Fatalf("migration status after latest down = %#v, want application %d with River versions", status, expectedApplicationMigrationVersion-1)
 	}
-	if err := db.MigrateDown(t.Context(), 1); err != nil {
+	if err := db.MigrateDown(t.Context(), expectedApplicationMigrationVersion-1); err != nil {
 		t.Fatalf("baseline migration down: %v", err)
 	}
 	assertSchemaRemoved(t, db.SQL)

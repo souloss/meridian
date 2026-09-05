@@ -80,6 +80,8 @@ type FinishInput struct {
 	TenantID uuid.UUID
 	// JobID identifies the application-owned job row.
 	JobID uuid.UUID
+	// RepositoryID identifies the repository included in a collect.failed event.
+	RepositoryID uuid.UUID
 	// Status is one of the durable Meridian job states.
 	Status string
 	// ExpectedAttempt is the one-based River attempt that owns the transition.
@@ -88,6 +90,8 @@ type FinishInput struct {
 	Result []byte
 	// Error is non-secret structured error metadata, or nil.
 	Error []byte
+	// ErrorCode is the stable non-secret failure classification used by audit and events.
+	ErrorCode string
 	// Terminal indicates whether finishedAt should be written.
 	Terminal bool
 	// Stage is the stage associated with the final log event.

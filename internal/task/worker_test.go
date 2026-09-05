@@ -82,6 +82,9 @@ func TestCredentialSyncWorkerRecordsUnsupportedProducerAsTerminalFailure(t *test
 	if len(store.finished) != 1 || store.finished[0].Status != "failed" || !store.finished[0].Terminal || store.finished[0].ExpectedAttempt != 1 {
 		t.Fatalf("finished events = %#v, want terminal failure", store.finished)
 	}
+	if store.finished[0].RepositoryID != args.RepositoryID || store.finished[0].ErrorCode != "worker_failed" {
+		t.Fatalf("failure repository/code = %s/%q, want %s/worker_failed", store.finished[0].RepositoryID, store.finished[0].ErrorCode, args.RepositoryID)
+	}
 	if string(store.finished[0].Error) != `{"code":"worker_failed"}` {
 		t.Fatalf("failure payload = %s, want redacted stable payload", store.finished[0].Error)
 	}
