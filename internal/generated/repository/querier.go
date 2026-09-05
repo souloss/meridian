@@ -12,30 +12,60 @@ import (
 
 // Querier exposes every generated Meridian database query for dependency injection and tests.
 type Querier interface {
+	// AddCredentialTeamShare grants one same-tenant team visibility entry.
+	AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error
 	// CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
 	CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error)
+	// CountCredentialRepositories counts active repositories referencing a tenant credential.
+	CountCredentialRepositories(ctx context.Context, arg CountCredentialRepositoriesParams) (int64, error)
+	// CountGlobalCredentialRepositories counts active repositories referencing a global credential.
+	CountGlobalCredentialRepositories(ctx context.Context, credentialID *uuid.UUID) (int64, error)
+	// CountGlobalCredentials counts all platform-owned credentials.
+	CountGlobalCredentials(ctx context.Context) (int64, error)
+	// CountKnownHosts counts approved host identities in one tenant.
+	CountKnownHosts(ctx context.Context, tenantID uuid.UUID) (int64, error)
+	// CountTenantCredentials counts visible tenant-owned and global credentials for one tenant member.
+	CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error)
 	// CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
 	CreateAPIToken(ctx context.Context, arg CreateAPITokenParams) (ApiToken, error)
+	// CreateCredential inserts one tenant-owned encrypted credential and returns metadata plus ciphertext.
+	// Secret plaintext is never accepted by SQL; the service supplies the encrypted projection only.
+	CreateCredential(ctx context.Context, arg CreateCredentialParams) (Credential, error)
 	// CreateDefaultUserPreferences creates the locale, theme, and view defaults required for a new identity.
 	CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
+	// CreateGlobalCredential inserts one platform-owned encrypted credential.
+	CreateGlobalCredential(ctx context.Context, arg CreateGlobalCredentialParams) (GlobalCredential, error)
+	// CreateKnownHost inserts a server-derived approved SSH host identity.
+	CreateKnownHost(ctx context.Context, arg CreateKnownHostParams) (KnownHost, error)
 	// CreateSession persists keyed session and CSRF digests without storing either plaintext token.
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	// CreateTenant inserts one tenant with explicit quota and settings snapshots copied from platform defaults.
 	CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error)
 	// CreateUser inserts one global identity with an Argon2id PHC verifier and no plaintext password.
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	// DeleteCredential removes a tenant credential after the caller has applied reference and ETag checks.
+	DeleteCredential(ctx context.Context, arg DeleteCredentialParams) (int64, error)
+	// DeleteGlobalCredential removes one platform credential after reference and ETag checks.
+	DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCredentialParams) (int64, error)
 	// GetAPITokenPrincipalByTokenHash authenticates one active PAT whose user, membership, and tenant remain active.
 	GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAPITokenPrincipalByTokenHashParams) (GetAPITokenPrincipalByTokenHashRow, error)
 	// GetActiveTenantBySlug returns only an active tenant for tenant-scoped business access.
 	GetActiveTenantBySlug(ctx context.Context, slug string) (Tenant, error)
 	// GetActiveTenantMembership returns one active tenant membership without revealing disabled tenant records.
 	GetActiveTenantMembership(ctx context.Context, arg GetActiveTenantMembershipParams) (GetActiveTenantMembershipRow, error)
+	// GetGlobalCredential returns one platform-owned credential.
+	GetGlobalCredential(ctx context.Context, id uuid.UUID) (GlobalCredential, error)
 	// GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
 	// GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
 	GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error)
 	// GetTenantBySlug returns a tenant in any lifecycle state for platform administration.
 	GetTenantBySlug(ctx context.Context, slug string) (Tenant, error)
+	// GetTenantCredential returns one visible tenant credential and its team-share identifiers.
+	GetTenantCredential(ctx context.Context, arg GetTenantCredentialParams) (GetTenantCredentialRow, error)
+	// GetTenantCredentialForMutation returns one tenant credential without visibility filtering.
+	// The service has already authorized the tenant operation; this query preserves a 404/412 distinction.
+	GetTenantCredentialForMutation(ctx context.Context, arg GetTenantCredentialForMutationParams) (Credential, error)
 	// GetUserByID returns the global identity matching the supplied UUID.
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
 	// GetUserByUsername returns the global identity matching the exact unique login name.
@@ -44,19 +74,47 @@ type Querier interface {
 	ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUserParams) ([]ApiToken, error)
 	// ListActiveTenantMemberships returns a user's active tenant memberships in stable slug and UUID order.
 	ListActiveTenantMemberships(ctx context.Context, userID uuid.UUID) ([]ListActiveTenantMembershipsRow, error)
+	// ListCredentialTeamShares returns the complete ordered team-share set for one tenant credential.
+	ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error)
+	// ListGlobalCredentials returns one stable page of platform-owned credentials.
+	ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error)
+	// ListKnownHosts returns one stable page of tenant-approved SSH host identities.
+	ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error)
+	// ListRepositoriesForCredential returns non-deleted repository references in contract response order.
+	ListRepositoriesForCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForCredentialRow, error)
+	// ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
+	ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error)
+	// ListTenantCredentials returns credentials visible to one user inside one active tenant.
+	// Team visibility is evaluated by a same-tenant team membership predicate. Global credentials are
+	// appended as tenant-visible records with is_global=true and a tenant-wide sharing projection.
+	ListTenantCredentials(ctx context.Context, arg ListTenantCredentialsParams) ([]ListTenantCredentialsRow, error)
 	// PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
 	PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error)
+	// ReplaceCredentialTeamShares removes and recreates the complete team-share projection in one transaction.
+	ReplaceCredentialTeamShares(ctx context.Context, arg ReplaceCredentialTeamSharesParams) error
 	// RevokeAPIToken idempotently revokes a PAT owned by one user in one tenant and returns its identifier.
 	// Returning an already-revoked matching row preserves idempotency while an absent or foreign row remains not found.
 	RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error)
 	// RevokeSession atomically revokes one active browser session and reports whether a row changed.
 	RevokeSession(ctx context.Context, arg RevokeSessionParams) (int64, error)
+	// RotateCredentialSecret conditionally replaces encrypted secret material and advances its revision.
+	RotateCredentialSecret(ctx context.Context, arg RotateCredentialSecretParams) (Credential, error)
+	// RotateGlobalCredentialSecret conditionally replaces global encrypted secret material and advances revision.
+	RotateGlobalCredentialSecret(ctx context.Context, arg RotateGlobalCredentialSecretParams) (GlobalCredential, error)
 	// RotateSessionCSRFHash replaces the keyed CSRF digest for one active browser session.
 	RotateSessionCSRFHash(ctx context.Context, arg RotateSessionCSRFHashParams) (int64, error)
 	// TouchAPIToken records the latest successful use of a non-revoked tenant PAT.
 	TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error
 	// TouchSession records the latest accepted request time for a non-revoked browser session.
 	TouchSession(ctx context.Context, arg TouchSessionParams) error
+	// UnbindCredentialRepositories clears tenant credential references for forced deletion.
+	UnbindCredentialRepositories(ctx context.Context, arg UnbindCredentialRepositoriesParams) error
+	// UnbindGlobalCredentialRepositories clears global credential references and marks authentication required.
+	UnbindGlobalCredentialRepositories(ctx context.Context, arg UnbindGlobalCredentialRepositoriesParams) error
+	// UpdateCredentialMetadata conditionally updates tenant credential metadata and advances its revision.
+	UpdateCredentialMetadata(ctx context.Context, arg UpdateCredentialMetadataParams) (Credential, error)
+	// UpdateGlobalCredentialMetadata conditionally updates a global credential name and advances its revision.
+	UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error)
 	// UpsertTenantMember creates or replaces a tenant role assignment and records the caller-supplied update time.
 	UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error)
 }

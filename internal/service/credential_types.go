@@ -11,6 +11,7 @@ import (
 type CredentialRecord struct {
 	TenantID    uuid.UUID
 	ID          uuid.UUID
+	IsGlobal    bool
 	Name        string
 	Kind        string
 	Encrypted   EncryptedCredential

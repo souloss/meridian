@@ -41,6 +41,8 @@ var expectedM0Tables = []string{
 	"users",
 }
 
+const expectedApplicationMigrationVersion = 2
+
 func TestMigrationLifecycle(t *testing.T) {
 	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")
 	if databaseURL == "" {
@@ -64,10 +66,20 @@ func TestMigrationLifecycle(t *testing.T) {
 	assertM0Schema(t, db)
 
 	if err := db.MigrateDown(t.Context(), 1); err != nil {
-		t.Fatalf("migration down: %v", err)
+		t.Fatalf("latest migration down: %v", err)
+	}
+	status, err := db.MigrationStatus(t.Context())
+	if err != nil {
+		t.Fatalf("migration status after latest down: %v", err)
+	}
+	if status.ApplicationVersion != expectedApplicationMigrationVersion-1 || len(status.RiverVersions) == 0 {
+		t.Fatalf("migration status after latest down = %#v, want application %d with River versions", status, expectedApplicationMigrationVersion-1)
+	}
+	if err := db.MigrateDown(t.Context(), 1); err != nil {
+		t.Fatalf("baseline migration down: %v", err)
 	}
 	assertSchemaRemoved(t, db.SQL)
-	status, err := db.MigrationStatus(t.Context())
+	status, err = db.MigrationStatus(t.Context())
 	if err != nil {
 		t.Fatalf("migration status after down: %v", err)
 	}
@@ -192,8 +204,8 @@ func assertM0Schema(t *testing.T, database *Database) {
 	if err != nil {
 		t.Fatalf("read migration status: %v", err)
 	}
-	if status.ApplicationVersion != 1 || len(status.RiverVersions) == 0 {
-		t.Fatalf("migration status = %#v, want application version 1 and River versions", status)
+	if status.ApplicationVersion != expectedApplicationMigrationVersion || len(status.RiverVersions) == 0 {
+		t.Fatalf("migration status = %#v, want application version %d and River versions", status, expectedApplicationMigrationVersion)
 	}
 }
 
