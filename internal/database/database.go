@@ -10,10 +10,11 @@ import (
 	"sync"
 	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/meridian-labs/meridian/migrations"
 	"github.com/pressly/goose/v3"
-	"github.com/riverqueue/river/riverdriver/riverdatabasesql"
+	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 	"github.com/riverqueue/river/rivermigrate"
 )
 
@@ -22,6 +23,10 @@ const riverSchema = "river"
 
 // Database owns a connected PostgreSQL pool and its migration lifecycle.
 type Database struct {
+	// Pool is the native pgx pool used by sqlc queries and River transactions.
+	Pool *pgxpool.Pool
+	// SQL is a database/sql adapter over Pool used only by goose and SQL-based
+	// diagnostics. Closing it does not close Pool.
 	SQL    *sql.DB
 	logger *slog.Logger
 	mu     sync.Mutex
@@ -36,25 +41,39 @@ func Open(ctx context.Context, databaseURL string, logger *slog.Logger) (*Databa
 		logger = slog.Default()
 	}
 
-	db, err := sql.Open("pgx", databaseURL)
+	poolConfig, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
-		return nil, fmt.Errorf("open database: %w", err)
+		return nil, fmt.Errorf("parse database configuration: %w", err)
 	}
-	db.SetMaxOpenConns(16)
-	db.SetMaxIdleConns(4)
-	if err := db.PingContext(ctx); err != nil {
-		_ = db.Close()
+	poolConfig.MaxConns = 16
+	poolConfig.MinIdleConns = 4
+	pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
+	if err != nil {
+		return nil, fmt.Errorf("open database pool: %w", err)
+	}
+	if err := pool.Ping(ctx); err != nil {
+		pool.Close()
 		return nil, fmt.Errorf("ping database: %w", err)
 	}
-	return &Database{SQL: db, logger: logger}, nil
+	return &Database{
+		Pool:   pool,
+		SQL:    stdlib.OpenDBFromPool(pool),
+		logger: logger,
+	}, nil
 }
 
 // Close releases every PostgreSQL connection owned by Database.
-func (db *Database) Close() error {
-	if db == nil || db.SQL == nil {
+func (db *Database) Close() (err error) {
+	if db == nil {
 		return nil
 	}
-	return db.SQL.Close()
+	if db.SQL != nil {
+		err = db.SQL.Close()
+	}
+	if db.Pool != nil {
+		db.Pool.Close()
+	}
+	return err
 }
 
 // MigrateUp upgrades River and then the Meridian schema to their pinned targets.
@@ -139,7 +158,7 @@ func (db *Database) MigrationStatus(ctx context.Context) (Status, error) {
 	if !riverInitialized {
 		return Status{ApplicationVersion: applicationVersion}, nil
 	}
-	river, err := rivermigrate.New(riverdatabasesql.New(db.SQL), &rivermigrate.Config{Schema: riverSchema})
+	river, err := rivermigrate.New(riverpgxv5.New(db.Pool), &rivermigrate.Config{Schema: riverSchema})
 	if err != nil {
 		return Status{}, fmt.Errorf("create River migrator: %w", err)
 	}
@@ -151,7 +170,7 @@ func (db *Database) MigrationStatus(ctx context.Context) (Status, error) {
 }
 
 func (db *Database) migrateRiver(ctx context.Context, direction rivermigrate.Direction, opts *rivermigrate.MigrateOpts) (*rivermigrate.MigrateResult, error) {
-	migrator, err := rivermigrate.New(riverdatabasesql.New(db.SQL), &rivermigrate.Config{Schema: riverSchema})
+	migrator, err := rivermigrate.New(riverpgxv5.New(db.Pool), &rivermigrate.Config{Schema: riverSchema})
 	if err != nil {
 		return nil, err
 	}
@@ -165,19 +184,19 @@ func (db *Database) withMigrationLock(ctx context.Context, operation func(contex
 	// A dedicated connection owns the session-level lock while River and goose
 	// use the pool. Other Meridian processes must acquire the same lock before
 	// they can mutate either schema.
-	lockConnection, err := db.SQL.Conn(ctx)
+	lockConnection, err := db.Pool.Acquire(ctx)
 	if err != nil {
 		return fmt.Errorf("reserve migration lock connection: %w", err)
 	}
-	defer lockConnection.Close()
+	defer lockConnection.Release()
 
-	if _, err := lockConnection.ExecContext(ctx, `SELECT pg_advisory_lock(hashtextextended($1, 0))`, migrationLockName); err != nil {
+	if _, err := lockConnection.Exec(ctx, `SELECT pg_advisory_lock(hashtextextended($1, 0))`, migrationLockName); err != nil {
 		return fmt.Errorf("acquire migration lock: %w", err)
 	}
 	defer func() {
 		unlockContext, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
 		defer cancel()
-		if _, err := lockConnection.ExecContext(unlockContext, `SELECT pg_advisory_unlock(hashtextextended($1, 0))`, migrationLockName); err != nil {
+		if _, err := lockConnection.Exec(unlockContext, `SELECT pg_advisory_unlock(hashtextextended($1, 0))`, migrationLockName); err != nil {
 			db.logger.Error("release migration lock failed", "error", err)
 		}
 	}()

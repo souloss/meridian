@@ -44,10 +44,11 @@ configs                    oapi-codegen 等生成器配置
 contracts                  唯一机器可读契约源
 internal/command           Cobra 命令、参数与进程生命周期
 internal/generated/api     oapi-codegen 生成的 types/server/client/spec，只读
+internal/generated/repository sqlc 生成的 models/queries/DBTX，只读
 internal/handler           HTTP 适配与生成接口实现，按业务域拆文件
 internal/domain            纯领域模型、状态机和不变量
 internal/service           用例、事务和权限编排
-internal/repository        sqlc 生成查询与手写事务适配
+internal/repository        手写事务边界与仓储适配；依赖 generated/repository
 internal/engine            合并、overlay 与 provenance 纯函数
 internal/differ            结构化 diff 与 breaking 分析
 internal/producer          builtin/command/AI provider 调度

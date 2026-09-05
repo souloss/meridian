@@ -46,9 +46,13 @@ func TestOpenAPIDocumentsGeneratedSurface(t *testing.T) {
 }
 
 func TestGeneratedGoExportsHaveComments(t *testing.T) {
-	generatedFiles, err := filepath.Glob(filepath.Join("..", "generated", "api", "*.gen.go"))
-	if err != nil {
-		t.Fatalf("find generated Go files: %v", err)
+	var generatedFiles []string
+	for _, directory := range []string{"api", "repository"} {
+		matches, err := filepath.Glob(filepath.Join("..", "generated", directory, "*.go"))
+		if err != nil {
+			t.Fatalf("find generated %s Go files: %v", directory, err)
+		}
+		generatedFiles = append(generatedFiles, matches...)
 	}
 	if len(generatedFiles) == 0 {
 		t.Fatal("no generated Go files found")
@@ -227,5 +231,5 @@ func assertNoMissingDocumentation(t *testing.T, missing []string) {
 	if len(reported) > maximumReportedDocumentationFailures {
 		reported = reported[:maximumReportedDocumentationFailures]
 	}
-	t.Fatalf("%d generated surfaces lack clear source documentation (showing %d):\n%s", len(missing), len(reported), strings.Join(reported, "\n"))
+	t.Fatalf("%d contract or generated surfaces lack clear source documentation (showing %d):\n%s", len(missing), len(reported), strings.Join(reported, "\n"))
 }

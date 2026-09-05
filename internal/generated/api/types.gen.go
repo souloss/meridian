@@ -2238,7 +2238,7 @@ type AssetAiGenerateRequest struct {
 // AssetItem represents asset item data exchanged through the Meridian API.
 type AssetItem struct {
 	// Display specifies the display associated with this asset item.
-	Display map[string]interface{} `json:"display"`
+	Display map[string]any `json:"display"`
 
 	// ItemType specifies the item type associated with this asset item.
 	ItemType string `json:"itemType"`
@@ -2511,7 +2511,7 @@ type AuditEntry struct {
 	Id Uuid `json:"id"`
 
 	// Metadata specifies the metadata associated with this audit entry.
-	Metadata map[string]interface{} `json:"metadata"`
+	Metadata map[string]any `json:"metadata"`
 
 	// RequestId correlates this result with server logs and audit records.
 	RequestId string `json:"requestId"`
@@ -2706,10 +2706,10 @@ type CommentPage struct {
 // ConfigFieldDiff represents config field diff data exchanged through the Meridian API.
 type ConfigFieldDiff struct {
 	// DatabaseValue specifies the database value associated with this config field diff.
-	DatabaseValue interface{} `json:"databaseValue"`
+	DatabaseValue any `json:"databaseValue"`
 
 	// FileValue specifies the file value associated with this config field diff.
-	FileValue interface{} `json:"fileValue"`
+	FileValue any `json:"fileValue"`
 
 	// Pointer specifies the pointer associated with this config field diff.
 	Pointer string `json:"pointer"`
@@ -3010,7 +3010,7 @@ type DashboardViewResolution struct {
 	Kind DashboardViewResolutionKind `json:"kind"`
 
 	// Metrics specifies the metrics associated with this dashboard view resolution.
-	Metrics map[string]interface{} `json:"metrics"`
+	Metrics map[string]any `json:"metrics"`
 
 	// View contains the view definition associated with this dashboard view resolution.
 	View ViewDefinition `json:"view"`
@@ -3040,10 +3040,10 @@ type DefaultNotificationChannelTemplateKind string
 // DiffChange represents diff change data exchanged through the Meridian API.
 type DiffChange struct {
 	// After specifies the after associated with this diff change.
-	After interface{} `json:"after"`
+	After any `json:"after"`
 
 	// Before specifies the before associated with this diff change.
-	Before interface{} `json:"before"`
+	Before any `json:"before"`
 
 	// Code specifies the code associated with this diff change.
 	Code string `json:"code"`
@@ -3324,7 +3324,7 @@ type ErrorResponse struct {
 	Code ErrorCode `json:"code"`
 
 	// Details contains error-code-specific structured diagnostics, or null when no detail is available.
-	Details map[string]interface{} `json:"details,omitempty"`
+	Details map[string]any `json:"details,omitempty"`
 
 	// Message is a safe human-readable explanation and never contains a stack trace or secret.
 	Message string `json:"message"`
@@ -3509,7 +3509,7 @@ type GlobalCredentialRotationResult struct {
 // GraphEdge represents graph edge data exchanged through the Meridian API.
 type GraphEdge struct {
 	// Details specifies the details associated with this graph edge.
-	Details map[string]interface{} `json:"details"`
+	Details map[string]any `json:"details"`
 
 	// From specifies the from associated with this graph edge.
 	From string `json:"from"`
@@ -3629,7 +3629,7 @@ type Job struct {
 	RefType RefType `json:"refType"`
 
 	// Result Operation-specific non-secret result identifiers and counters.
-	Result map[string]interface{} `json:"result"`
+	Result map[string]any `json:"result"`
 
 	// RetryOfJobId specifies the retry of job id associated with this job.
 	RetryOfJobId Uuid `json:"retryOfJobId"`
@@ -3991,7 +3991,7 @@ type LayerPatchRequest struct {
 // LayerRevision represents layer revision data exchanged through the Meridian API.
 type LayerRevision struct {
 	// AiMeta specifies the ai meta associated with this layer revision.
-	AiMeta map[string]interface{} `json:"aiMeta"`
+	AiMeta map[string]any `json:"aiMeta"`
 
 	// ContentHash specifies the content hash associated with this layer revision.
 	ContentHash string `json:"contentHash"`
@@ -4807,7 +4807,7 @@ type PublicViewResolveRequest struct {
 	Kind KindId `json:"kind"`
 
 	// Options specifies the options associated with this public view resolve request.
-	Options map[string]interface{} `json:"options,omitempty"`
+	Options map[string]any `json:"options,omitempty"`
 
 	// ViewId specifies the view id associated with this public view resolve request.
 	ViewId PublicViewResolveRequestViewId `json:"viewId"`
@@ -5557,7 +5557,7 @@ type ShareLinkCreateRequest struct {
 	Inputs []DocumentSelector `json:"inputs,omitempty"`
 
 	// Options specifies the options associated with this share link create request.
-	Options map[string]interface{} `json:"options,omitempty"`
+	Options map[string]any `json:"options,omitempty"`
 
 	// ResourceType specifies the resource type associated with this share link create request.
 	ResourceType ShareLinkCreateRequestResourceType `json:"resourceType"`
@@ -5942,7 +5942,7 @@ type SubscriptionPutRequest_ScopeId struct {
 }
 
 // SubscriptionScopeConstraints represents subscription scope constraints data exchanged through the Meridian API.
-type SubscriptionScopeConstraints = interface{}
+type SubscriptionScopeConstraints = any
 
 // SubscriptionScopeType identifies one supported subscription scope type value.
 type SubscriptionScopeType string
@@ -6601,7 +6601,7 @@ type VersionSelectorType string
 // ViewDefinition represents view definition data exchanged through the Meridian API.
 type ViewDefinition struct {
 	// Columns contains the ordered columns associated with this view definition.
-	Columns []map[string]interface{} `json:"columns,omitempty"`
+	Columns []map[string]any `json:"columns,omitempty"`
 
 	// ColumnsSource specifies the columns source associated with this view definition.
 	ColumnsSource string `json:"columnsSource,omitempty"`
@@ -6610,7 +6610,7 @@ type ViewDefinition struct {
 	Component string `json:"component,omitempty"`
 
 	// DefaultOptions specifies the default options associated with this view definition.
-	DefaultOptions map[string]interface{} `json:"defaultOptions"`
+	DefaultOptions map[string]any `json:"defaultOptions"`
 
 	// Entrypoint specifies the entrypoint associated with this view definition.
 	Entrypoint string `json:"entrypoint,omitempty"`
@@ -6619,7 +6619,7 @@ type ViewDefinition struct {
 	ExternalUrl string `json:"externalUrl,omitempty"`
 
 	// FallbackColumns contains the ordered fallback columns associated with this view definition.
-	FallbackColumns []map[string]interface{} `json:"fallbackColumns,omitempty"`
+	FallbackColumns []map[string]any `json:"fallbackColumns,omitempty"`
 
 	// Id uniquely identifies this resource.
 	Id string `json:"id"`
@@ -6640,10 +6640,10 @@ type ViewDefinition struct {
 	NameKey string `json:"nameKey"`
 
 	// OptionsSchema specifies the options schema associated with this view definition.
-	OptionsSchema map[string]interface{} `json:"optionsSchema"`
+	OptionsSchema map[string]any `json:"optionsSchema"`
 
 	// Query specifies the query associated with this view definition.
-	Query map[string]interface{} `json:"query,omitempty"`
+	Query map[string]any `json:"query,omitempty"`
 }
 
 // ViewDefinitionMount specifies the mount associated with this view definition.
@@ -6723,7 +6723,7 @@ type ViewOverridePutRequest = ViewOverrideValue
 // ViewOverrideValue represents view override value data exchanged through the Meridian API.
 type ViewOverrideValue struct {
 	// DefaultOptions specifies the default options associated with this view override value.
-	DefaultOptions map[string]interface{} `json:"defaultOptions,omitempty"`
+	DefaultOptions map[string]any `json:"defaultOptions,omitempty"`
 
 	// Enabled indicates whether enabled applies to this view override value.
 	Enabled bool `json:"enabled,omitempty"`
@@ -6740,7 +6740,7 @@ type ViewResolveRequest struct {
 	Inputs []DocumentSelector `json:"inputs,omitempty"`
 
 	// Options specifies the options associated with this view resolve request.
-	Options map[string]interface{} `json:"options,omitempty"`
+	Options map[string]any `json:"options,omitempty"`
 
 	// Scope Required by scope views; omitted for document-input views.
 	Scope ScopeSelector `json:"scope,omitempty"`
@@ -8396,7 +8396,7 @@ func (t DocumentSelector) Discriminator() (string, error) {
 }
 
 // ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
-func (t DocumentSelector) ValueByDiscriminator() (interface{}, error) {
+func (t DocumentSelector) ValueByDiscriminator() (any, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
 		return nil, err
@@ -8567,7 +8567,7 @@ func (t JobSseEvent) Discriminator() (string, error) {
 }
 
 // ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
-func (t JobSseEvent) ValueByDiscriminator() (interface{}, error) {
+func (t JobSseEvent) ValueByDiscriminator() (any, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
 		return nil, err
@@ -8996,7 +8996,7 @@ func (t ViewResolution) Discriminator() (string, error) {
 }
 
 // ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
-func (t ViewResolution) ValueByDiscriminator() (interface{}, error) {
+func (t ViewResolution) ValueByDiscriminator() (any, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
 		return nil, err

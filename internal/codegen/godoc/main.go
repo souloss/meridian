@@ -1,4 +1,4 @@
-// Command godoc completes documentation on oapi-codegen transport plumbing.
+// Command godoc completes documentation on generated API and repository code.
 package main
 
 import (
@@ -21,6 +21,13 @@ type insertion struct {
 	text   string
 }
 
+type generatedKind string
+
+const (
+	apiKind        generatedKind = "api"
+	repositoryKind generatedKind = "repository"
+)
+
 func main() {
 	directory := flag.String("dir", "internal/generated/api", "directory containing generated Go files")
 	flag.Parse()
@@ -31,26 +38,36 @@ func main() {
 }
 
 func documentDirectory(directory string) error {
-	files, err := filepath.Glob(filepath.Join(directory, "*.gen.go"))
+	files, err := filepath.Glob(filepath.Join(directory, "*.go"))
 	if err != nil {
 		return fmt.Errorf("find generated files: %w", err)
 	}
 	if len(files) == 0 {
 		return errors.New("no generated Go files found")
 	}
+	kind := apiKind
+	if filepath.Base(directory) == "repository" {
+		kind = repositoryKind
+	}
 	for _, filename := range files {
-		if err := documentFile(filename); err != nil {
+		if strings.HasSuffix(filename, "_test.go") {
+			continue
+		}
+		if err := documentFile(filename, kind); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func documentFile(filename string) error {
+func documentFile(filename string, kind generatedKind) error {
 	source, err := os.ReadFile(filename)
 	if err != nil {
 		return fmt.Errorf("read %s: %w", filename, err)
 	}
+	// Upstream generators still emit the pre-Go 1.18 spelling in a few stable
+	// interfaces. The generated surface targets Go 1.27 exclusively.
+	source = bytes.ReplaceAll(source, []byte("interface{}"), []byte("any"))
 	files := token.NewFileSet()
 	parsed, err := parser.ParseFile(files, filename, source, parser.ParseComments)
 	if err != nil {
@@ -59,7 +76,7 @@ func documentFile(filename string) error {
 
 	var insertions []insertion
 	for _, declaration := range parsed.Decls {
-		collectDeclarationComments(files, source, declaration, &insertions)
+		collectDeclarationComments(files, source, declaration, kind, &insertions)
 	}
 	if len(insertions) == 0 {
 		return nil
@@ -78,7 +95,7 @@ func documentFile(filename string) error {
 	return nil
 }
 
-func collectDeclarationComments(files *token.FileSet, source []byte, declaration ast.Decl, insertions *[]insertion) {
+func collectDeclarationComments(files *token.FileSet, source []byte, declaration ast.Decl, kind generatedKind, insertions *[]insertion) {
 	switch declaration := declaration.(type) {
 	case *ast.FuncDecl:
 		if declaration.Name.IsExported() && !validComment(declaration.Name.Name, declaration.Doc) {
@@ -86,7 +103,7 @@ func collectDeclarationComments(files *token.FileSet, source []byte, declaration
 			if declaration.Doc != nil {
 				position = declaration.Doc.Pos()
 			}
-			addLineComment(files, source, position, functionComment(declaration.Name.Name), insertions)
+			addLineComment(files, source, position, functionComment(declaration.Name.Name, kind), insertions)
 		}
 	case *ast.GenDecl:
 		for _, specification := range declaration.Specs {
@@ -102,10 +119,10 @@ func collectDeclarationComments(files *token.FileSet, source []byte, declaration
 						if documentation != nil {
 							position = documentation.Pos()
 						}
-						addLineComment(files, source, position, typeComment(specification.Name.Name), insertions)
+						addLineComment(files, source, position, typeComment(specification.Name.Name, kind), insertions)
 					}
 				}
-				collectFieldComments(files, source, specification.Name.Name, specification.Type, insertions)
+				collectFieldComments(files, source, specification.Name.Name, specification.Type, kind, insertions)
 			case *ast.ValueSpec:
 				for _, name := range specification.Names {
 					if name.IsExported() && declaration.Doc == nil && specification.Doc == nil && specification.Comment == nil {
@@ -118,7 +135,7 @@ func collectDeclarationComments(files *token.FileSet, source []byte, declaration
 	}
 }
 
-func collectFieldComments(files *token.FileSet, source []byte, owner string, expression ast.Expr, insertions *[]insertion) {
+func collectFieldComments(files *token.FileSet, source []byte, owner string, expression ast.Expr, kind generatedKind, insertions *[]insertion) {
 	ast.Inspect(expression, func(node ast.Node) bool {
 		field, ok := node.(*ast.Field)
 		if !ok {
@@ -134,7 +151,7 @@ func collectFieldComments(files *token.FileSet, source []byte, owner string, exp
 				if documentation != nil {
 					position = documentation.Pos()
 				}
-				addLineComment(files, source, position, fieldComment(owner, name.Name), insertions)
+				addLineComment(files, source, position, fieldComment(owner, name.Name, kind), insertions)
 				break
 			}
 		}
@@ -161,7 +178,23 @@ func addLineComment(files *token.FileSet, source []byte, position token.Pos, com
 	*insertions = append(*insertions, insertion{offset: offset, text: "/* " + comment + " */ "})
 }
 
-func typeComment(name string) string {
+func typeComment(name string, kind generatedKind) string {
+	if kind == repositoryKind {
+		switch {
+		case name == "DBTX":
+			return "DBTX is the pgx query and transaction surface required by generated repository methods."
+		case name == "Queries":
+			return "Queries executes the strongly typed SQL statements generated from migrations/queries."
+		case name == "Querier":
+			return "Querier exposes every generated Meridian database query for dependency injection and tests."
+		case strings.HasSuffix(name, "Params"):
+			return name + " contains the strongly typed arguments for the " + strings.TrimSuffix(name, "Params") + " query."
+		case strings.HasSuffix(name, "Row"):
+			return name + " contains the columns returned by the " + strings.TrimSuffix(name, "Row") + " query."
+		default:
+			return name + " is the generated PostgreSQL representation of the corresponding Meridian table row."
+		}
+	}
 	switch {
 	case name == "HttpRequestDoer":
 		return "HttpRequestDoer sends generated client requests and returns HTTP responses."
@@ -182,7 +215,17 @@ func typeComment(name string) string {
 	}
 }
 
-func functionComment(name string) string {
+func functionComment(name string, kind generatedKind) string {
+	if kind == repositoryKind {
+		switch name {
+		case "New":
+			return "New binds generated repository queries to a pgx pool or transaction."
+		case "WithTx":
+			return "WithTx returns generated repository queries bound to the supplied pgx transaction."
+		default:
+			return name + " executes the generated " + name + " database query."
+		}
+	}
 	return name + " implements generated transport behavior for the Meridian OpenAPI contract."
 }
 
@@ -190,7 +233,20 @@ func valueComment(name string) string {
 	return name + " is generated from the Meridian OpenAPI contract."
 }
 
-func fieldComment(owner, name string) string {
+func fieldComment(owner, name string, kind generatedKind) string {
+	if kind == repositoryKind {
+		if owner == "Querier" || owner == "DBTX" {
+			return name + " exposes the corresponding strongly typed database operation."
+		}
+		query := strings.TrimSuffix(strings.TrimSuffix(owner, "Params"), "Row")
+		if strings.HasSuffix(owner, "Row") {
+			return name + " is the " + splitIdentifier(name) + " value returned by the " + query + " query."
+		}
+		if strings.HasSuffix(owner, "Params") {
+			return name + " is the " + splitIdentifier(name) + " value supplied to the " + query + " query."
+		}
+		return name + " is the generated " + splitIdentifier(name) + " database value for " + owner + "."
+	}
 	switch name {
 	case "Do":
 		return "Do sends one HTTP request and returns its response."
@@ -228,8 +284,12 @@ func fieldComment(owner, name string) string {
 
 func splitIdentifier(value string) string {
 	var result strings.Builder
-	for index, character := range value {
-		if index > 0 && character >= 'A' && character <= 'Z' {
+	characters := []rune(value)
+	for index, character := range characters {
+		isUpper := character >= 'A' && character <= 'Z'
+		previousLower := index > 0 && characters[index-1] >= 'a' && characters[index-1] <= 'z'
+		nextLower := index+1 < len(characters) && characters[index+1] >= 'a' && characters[index+1] <= 'z'
+		if index > 0 && isUpper && (previousLower || nextLower) {
 			result.WriteByte(' ')
 		}
 		result.WriteRune(character)

@@ -42,15 +42,16 @@ compatibility:
     optionalFieldAddition: compatible
 generatedArtifacts:
   goAPI: internal/generated/api
+  goRepository: internal/generated/repository
   typescriptClient: web/app/api/generated
   typescriptMocks: web/app/api/generated/mocks
   frontendStatic: web/.output/public
   openapiBundle: dist/contracts/openapi.yaml
 documentationPolicy:
-  generatedCode: descriptions-must-originate-in-openapi-and-survive-regeneration
+  generatedCode: api-descriptions-or-query-contracts-must-survive-regeneration-and-every-exported-go-symbol-must-have-godoc
   databaseTablesAndColumns: every-application-owned-table-and-column-must-have-a-postgresql-comment
   enforcement:
-    api: go-contract-tests-check-source-and-generated-comments
+    generated: go-contract-tests-check-source-and-generated-comments
     database: postgresql-integration-tests-query-pg-description
 toolchain:
   decisionRecord: ../docs/05_technology-stack-decision.md
@@ -67,7 +68,7 @@ toolchain:
     cli: {module: github.com/spf13/cobra, minor: '1.10'}
     router: {module: github.com/go-chi/chi/v5, major: 5}
     databaseDriver: {module: github.com/jackc/pgx/v5, major: 5}
-    queryGenerator: {module: github.com/sqlc-dev/sqlc, major: 1}
+    queryGenerator: {module: github.com/sqlc-dev/sqlc, minor: '1.31'}
     queue: {module: github.com/riverqueue/river, minor: '0.33'}
     migrations: {module: github.com/pressly/goose/v3, major: 3, source: embedded-sql}
     assetParser: {module: github.com/pb33f/libopenapi, major: 0}

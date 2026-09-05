@@ -49,9 +49,10 @@ frontend-typecheck:
 contracts-generate: backend-generate frontend-api
 
 contracts-generate-then-git-diff-exit-code: contracts-generate
-	git diff --exit-code -- internal/generated/api web/app/api/generated
+	git diff --exit-code -- internal/generated/api internal/generated/repository web/app/api/generated
 
 contracts-validate:
+	vfox exec golang@1.27.1 -- go tool sqlc vet
 	vfox exec nodejs@24.20.0 -- pnpm --dir web exec redocly lint --config ../contracts/.redocly.yaml ../contracts/openapi.yaml
 	vfox exec nodejs@24.20.0 -- pnpm --dir web check:generated-docs
 

@@ -61,7 +61,7 @@ func TestMigrationLifecycle(t *testing.T) {
 		t.Fatalf("initial migration up: %v", err)
 	}
 	first := schemaSnapshot(t, db.SQL)
-	assertM0Schema(t, db.SQL)
+	assertM0Schema(t, db)
 
 	if err := db.MigrateDown(t.Context(), 1); err != nil {
 		t.Fatalf("migration down: %v", err)
@@ -82,7 +82,7 @@ func TestMigrationLifecycle(t *testing.T) {
 	if !reflect.DeepEqual(first, second) {
 		t.Fatalf("schema differs after up/down/up\nfirst:  %v\nsecond: %v", first, second)
 	}
-	assertM0Schema(t, db.SQL)
+	assertM0Schema(t, db)
 }
 
 func TestConcurrentMigrationUp(t *testing.T) {
@@ -121,11 +121,12 @@ func TestConcurrentMigrationUp(t *testing.T) {
 			t.Fatalf("concurrent migration instance %d: %v", index, err)
 		}
 	}
-	assertM0Schema(t, databases[0].SQL)
+	assertM0Schema(t, databases[0])
 }
 
-func assertM0Schema(t *testing.T, db *sql.DB) {
+func assertM0Schema(t *testing.T, database *Database) {
 	t.Helper()
+	db := database.SQL
 
 	if got := publicTables(t, db); !reflect.DeepEqual(got, expectedM0Tables) {
 		t.Fatalf("public tables = %v, want %v", got, expectedM0Tables)
@@ -187,7 +188,7 @@ func assertM0Schema(t *testing.T, db *sql.DB) {
 		t.Fatal("River schema has no tables")
 	}
 
-	status, err := (&Database{SQL: db, logger: slog.Default()}).MigrationStatus(t.Context())
+	status, err := database.MigrationStatus(t.Context())
 	if err != nil {
 		t.Fatalf("read migration status: %v", err)
 	}
