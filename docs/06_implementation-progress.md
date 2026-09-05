@@ -3,8 +3,8 @@
 > 最后核对：2026-09-05
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`b8d2ef6 feat: add redacted platform job queries`
-> 当前开发切片：River Worker 基础与 Job 阶段日志（待提交）
+> 最新稳定提交：`db920bc feat: expose redacted audit queries`
+> 当前开发切片：Outbox 同事务写入与至少一次分发
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -45,13 +45,14 @@
 | sqlc + pgx 强类型持久化基础 | 已完成 | 切片门禁已通过 | `ddeae8d` |
 | 登录、CSRF、用户、租户、成员、RBAC 和 PAT | 已完成 | US-01、SMK-002/003/004 部分覆盖；全租户 operation 隔离矩阵和控制面 E2E 未完成 | `ac8da08`，`internal/handler/identity_integration_test.go` |
 | 凭据加密、服务端指纹和非回显 | 已完成 | SMK-005 部分覆盖，正式独立 fixture 尚未统一放行 | `31e3440`、`d976cde`、`66f473c` |
-| 凭据轮换、原子仓库同步任务投递和幂等重放 | 已完成 | SMK-005/031 部分覆盖；平台 Job 查询已接入，Worker 执行仍待闭环 | `394ffe7`、`b270b9d`、`b8d2ef6` |
+| 凭据轮换、原子仓库同步任务投递和幂等重放 | 已完成 | SMK-005/031 部分覆盖；平台 Job 查询和 Worker 终态执行已接入 | `394ffe7`、`b270b9d`、`b8d2ef6`、`147b155` |
 | 租户/全局凭据连接探测和仓库连接预检 | 已完成 | 成功、分类失败、超时和秘密脱敏已有单元/集成覆盖 | `354af57` |
 | 全局凭据管理及强制删除 | 部分完成 | CRUD/轮换/删除、引用仓库解绑健康状态和平台 Job 投影已实现；正式 Smoke fixture 仍待统一放行 | `66f473c`、`394ffe7`、`b270b9d`、`b8d2ef6` |
 | Known Host 创建、派生指纹和列表 | 部分完成 | 服务端派生规则已有单测和 handler；SMK-035 独立 API 场景尚未统一放行 | `31e3440`、`66f473c` |
-| 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | 本阶段提交，`internal/handler/identity_integration_test.go` |
-| River Worker 与通用 Job 控制面 | 开发中 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；本切片完整门禁尚未提交 | `ab1635f`、`394ffe7`、`b8d2ef6` |
-| Audit 与 Outbox 事务闭环 | 未开始 | 只有 M0 DDL，尚无业务写入、分发和读取闭环 | `ab1635f` |
+| 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | `bd954d4`、`internal/handler/identity_integration_test.go` |
+| River Worker 与通用 Job 控制面 | 部分完成 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；租户 Job 查询/取消/重试/SSE 仍属后续切片 | `147b155` |
+| Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
+| Outbox 事务与分发闭环 | 开发中 | DDL 已冻结；正在实现业务同事务写入、租约回收、退避和至少一次分发 | `ab1635f` |
 | 本地 SHA-256 CAS Blob 驱动 | 未开始 | 只有 M0 DDL，尚无存储驱动和签名读取闭环 | `ab1635f` |
 | M0 Nuxt 控制面 | 未开始 | 当前只有静态应用壳、生成客户端和 Query 插件；登录、租户壳、凭据/仓库页面及 E2E 未完成 | `b29514f` |
 | M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；CodeMirror 大文件、Table/Cytoscape 性能、桌面/移动端 Playwright 与 axe 尚未放行 | [`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
@@ -73,9 +74,9 @@
 
 ## 当前工作区快照
 
-最后稳定基线是 `b8d2ef6`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
+最后稳定基线是 `db920bc`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
 
-2026-09-05 核对时，仓库与平台 Job 投影切片已通过门禁，包含：
+2026-09-05 核对时，仓库、平台 Job、River Worker 与审计查询切片已通过门禁，包含：
 
 - `migrations/queries/repository.sql`；
 - sqlc 生成的 repository 查询代码；
@@ -83,24 +84,22 @@
 - 仓库 API 的三态 PATCH、ETag、凭据绑定和软删除集成断言；
 - 实际 M0 DDL 列注释审计测试。
 - 平台管理员 Job 列表/详情的脱敏查询、过滤、分页和跨租户拒绝断言；`input`、`result`、`error`、凭据秘密和 River 内部字段不进入响应。
-
-当前未提交的 Worker 切片已通过：
-
 - 凭据轮换事务同时写入 Meridian `jobs`、River `river_job`，并在同一事务回填 `river_job_id`；
 - River worker 启动时按 attempt fencing 抢占 durable job，避免旧 attempt 覆盖新 attempt；
 - `resolve -> discover -> extract -> merge -> normalize -> index` 六阶段均写入带 advisory-lock 序列的 `job_stage_logs`，失败路径只写入脱敏错误；
 - Worker/数据库集成测试验证 terminal failure、阶段日志数量、River kind 和应用状态。
+- 租户/平台审计列表使用独立强类型查询；租户端固定 `tenant_id`，平台端要求平台管理员，并只映射契约允许的脱敏元数据。
+- HTTP/PG 集成验证 deepObject 租户过滤、平台事实隔离和未授权 404。
 
 本阶段提交前已通过 `vfox exec golang@1.27.1 -- go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
 
 ## 下一步顺序
 
-1. 用实际仓库绑定闭环全局凭据强制删除后的轮换 Job 数量断言。
-2. 提交并保持 River Worker 基础、事务内入队和 Job 阶段日志切片。
-3. 完成 Audit/Outbox 的同事务写入与分发闭环。
-4. 完成本地 SHA-256 CAS Blob 驱动。
-5. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
-6. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
+1. 完成 Outbox 的同事务写入、租约回收和至少一次分发闭环。
+2. 完成本地 SHA-256 CAS Blob 驱动。
+3. 补齐租户 Job 查询/取消/重试/SSE 控制面。
+4. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
+5. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
 
 ## 更新流程
 
@@ -129,4 +128,4 @@ git diff --check
 
 ## 当前阻塞
 
-没有需要人工决策的阻塞。当前编译错误是普通开发问题，应由正在进行的仓库切片自行修复。
+没有需要人工决策的阻塞。
