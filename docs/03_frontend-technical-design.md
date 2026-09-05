@@ -1,569 +1,242 @@
-# Meridian · 前端技术设计（需求 01）
+# Meridian 前端技术设计
 
-> 需求文档：[01_requirement-specification.md](./01_requirement-specification.md)
-> 配套后端设计：[02_backend-technical-design.md](./02_backend-technical-design.md)（下称"后端 §N"）
-> 代码基线：**全新项目（greenfield）**，无现状代码；本文档全部为目标设计。
-> 文档状态：目标设计（页面尚未实现，不得据此推断已上线）
+> 状态：可实施基线（2026-09-04）
+> 需求来源：[01_requirement-specification.md](./01_requirement-specification.md)
+> 机器可读契约入口：[contracts/manifest.yaml](../contracts/manifest.yaml)
+> 技术选型依据：[05_technology-stack-decision.md](./05_technology-stack-decision.md)
+> 本文只定义信息架构、交互和前端实现策略。路径、DTO、枚举、权限和错误均引用 YAML，不另建副本。
 
-## 1. 目标与设计原则
+## 1. 契约与范围
 
-### 1.1 业务目标
+前端构建首先从 `contracts/openapi.yaml` 生成 TypeScript client 和 schema types；视图定义来自 `contracts/views.yaml`；角色和状态来自 `contracts/domain.yaml`；验收状态由 `contracts/acceptance.yaml` 决定。手写类型只能用于纯 UI 状态。
 
-为资产目录提供多角色门户：目录浏览与检索、资产多视图查看（含层管理/合并预览/DIFF/全局视图）、AI 修订审批、仓库与租户管理。核心体验指标：录入仓库后 5 分钟看到首个文档；新增视图零侵入接入。
+若设计稿文案与生成类型不一致，以契约为准并阻断 CI。禁止用 `as unknown as`、本地枚举或前端计算的 publish/approve 谓词掩盖契约漂移。
 
-### 1.2 范围边界
+首发实现 `M0-M3`：控制面、仓库接入、OpenAPI Viewer、层/审批/AI、分支版本、diff/分享/todo、CLI 所需管理面和最小通知。M4-M5 的多 kind、分组全局视图、通用订阅渠道按 manifest 后续启用。
 
-- 本期范围：Nuxt 4 SPA 前端（打包产物交后端 `embed`）、视图插件框架、iframe 视图桥。
-- 外部依赖（不在本期范围）：后端 API（以后端 §7 为契约）、Swagger UI / Redoc dist 资源包（后端托管）、视觉稿（本设计给出布局与组件级定义，视觉细节由 UI 走查补充）。
+## 2. 技术栈与工程边界
 
-### 1.3 设计原则
+- Nuxt 4 + Vue 3 + TypeScript 5.9，`ssr: false` 的纯 SPA 模式；`nuxt generate` 产出 `.output/public` 并由 Go embed；
+- Nuxt file-based router：租户、资源和固定版本路由；`server/`、Nitro API、server middleware 和 SSR-only composable 禁止进入前端；
+- Orval 8 从同一 OpenAPI 生成 models、Fetch request、TanStack Vue Query hooks/query keys 和 MSW handlers；不采用已转入维护模式的 `openapi-fetch`；
+- TanStack Vue Query 5：所有 API server state、缓存、轮询、重试和失效；Pinia 3：仅客户端壳状态，不保存 API entity 或路由事实；
+- Nuxt UI 4 + Tailwind CSS 4：应用壳、表单、弹层、Tree、Splitter、Table 与虚拟列表；不再并用 Naive UI、UnoCSS 或单独封装的 TanStack Table；
+- Zod 4：静态 UI 表单；Ajv 8（JSON Schema 2020-12）：View options、仓库配置和 kind 动态 schema；两者不得手写复制 OpenAPI wire DTO；
+- CodeMirror 6 + `@codemirror/merge`：YAML/JSON 编辑、只读源码和 side-by-side diff；
+- Cytoscape.js 3：依赖关系分析图；直接封装生命周期，不引入 Vue wrapper；
+- `@nuxtjs/i18n` 10：`zh-CN`/`en`，`no_prefix` 路由策略，翻译资源按 locale 懒加载；
+- `@nuxt/icon` + 本地 `@iconify-json/lucide` 图标集，构建和运行时均不依赖公共 CDN；
+- 视图插件：内建 Vue component 或受限 iframe；
+- 测试：Vitest/Vue Test Utils、Mock Service Worker、Playwright。
 
-- **视图是插件**：核心壳（Viewer Shell）只依赖 `ViewDef + input descriptor`，任何视图不进壳的代码。
-- **URL 即状态**：租户、视图、版本选择、diff 选择、筛选条件全部可从 URL 还原（分享/回退/刷新一致）。
-- **服务端权威**：前端不自行判定权限/可发布性，只消费后端返回的 `capabilities` 字段渲染操作项；错误码驱动交互（如 `asset_path_not_found` → 候选修正 UI）。
-- **大文档不阻塞**：5MB+ 文档解析/高亮进 Web Worker；列表虚拟滚动。
-- **失败默认可见**：所有 mutation 有 pending/错误态，绝不静默失败。
+选择 Nuxt 不是为了 SSR。Meridian 的价值页面全部依赖登录态、租户和实时 API 数据，SPA 与单二进制交付更匹配；Nuxt 提供约定式路由、布局、自动导入、代码分割和 Vite HMR，减少 B 端多模块装配成本。CI 必须执行 `nuxt generate`，确认所有深链经 Go fallback 可刷新，并拒绝运行时服务端依赖。
 
-### 1.4 技术栈与关键选型
+Orval custom fetcher 的职责仅限同源 base URL、`credentials: same-origin`、cookie 会话的 CSRF header、统一 ErrorResponse/requestId 和 401 处理。`If-Match`、`Idempotency-Key`、上传 body 和 operation 参数必须由生成签名显式传入，不能在 wrapper 中猜测。生成目录禁止手改，代码生成后必须 typecheck 且 git diff 为空。
 
-| 项 | 选型 | 说明 |
-| --- | --- | --- |
-| 框架 | Nuxt 4（SPA 模式，`ssr: false`） | 后端 embed 托管，无 SSR 运维负担 |
-| UI 组件库 | Naive UI | 表格/树/表单完备，暗色主题原生支持 |
-| 样式 | UnoCSS + 设计 token（CSS variables） | 亮/暗主题切换，viewer 主题跟随 |
-| 状态 | Pinia | stores 见 §7 |
-| 请求 | `ofetch` 封装 `useApi()` + TanStack Query (vue-query) | 缓存、重试、失效联动 |
-| 图 | X6（dep-graph）+ mermaid 不使用（交互图需自绘） | 依赖图需拖拽/聚焦/展开 |
-| 编辑器 | CodeMirror 6 | YAML/JSON 高亮、行级错误标注、只读 diff 模式 |
-| Diff 文本视图 | CodeMirror merge view | side-by-side |
-| 表格 | Naive UI DataTable + 虚拟滚动 | 条目表/端点表 |
-| i18n | `@nuxtjs/i18n`，`zh-CN` 默认 + `en` | 文案全部抽 key |
-| 类型 | 后端 OpenAPI 自描述 → `openapi-typescript` 生成 API 类型 | CI 校验漂移 |
+建议目录：
 
-## 2. 信息架构与路由表
-
-URL 前缀规则：登录后除平台管理外全部挂在 `/t/{tenantSlug}` 下（后端 F1.5）。
-
-| 路由 | 页面 | 权限 |
-| --- | --- | --- |
-| `/login` | 登录 | 匿名 |
-| `/t/{t}` | 目录首页（Dashboard/Catalog） | viewer |
-| `/t/{t}/search?q=` | 全局搜索结果 | viewer |
-| `/t/{t}/repos` / `/repos/{id}` | 仓库列表 / 仓库详情（含候选服务、健康、同步历史） | viewer（写操作 maintainer） |
-| `/t/{t}/repos/new` | 录入仓库向导 | maintainer |
-| `/t/{t}/services/{slug}` | 服务主页 | viewer（受 visibility） |
-| `/t/{t}/services/{slug}/assets/{kind}/{name}` | **资产查看器（Viewer Shell，核心页）**；query：`?view=&version=&branch=&opts=` | viewer |
-| `/t/{t}/services/{slug}/assets/{kind}/{name}/diff?left=&right=` | diff 视图直达（Shell 的 versions 模式入口） | viewer |
-| `/t/{t}/reviews` | 审批中心（AI/第三方修订待审队列） | `layer:approve` |
-| `/t/{t}/todos` | 待办（breaking 确认） | 登录 |
-| `/t/{t}/groups` / `/groups/{slug}` | 系统分组列表 / 分组详情（scope 视图入口：dep-graph、大盘） | viewer |
-| `/t/{t}/jobs` / `/jobs/{id}` | 任务中心 / 任务详情（SSE 日志） | maintainer |
-| `/t/{t}/notifications` | 站内信 | 登录 |
-| `/t/{t}/settings/{tab}` | 租户设置：members / tokens / credentials / kinds / views / notify / audit | tenant_admin（credentials 对 maintainer 开放） |
-| `/admin/{tab}` | 平台管理：tenants / users / jobs / audit | platform_admin |
-| `/shared/{token}` | 分享链接落地页（无导航壳，只渲染目标视图） | 匿名（验签） |
-| `/me/settings` | 个人偏好（默认视图、语言、主题） | 登录 |
-
-### 2.1 全局布局
-
-```
-┌────────────────────────────────────────────────────────┐
-│ TopBar: Logo | 租户切换器▾ | 全局搜索(⌘K) | 通知铃 | 主题 | 头像▾ │
-├─────────┬──────────────────────────────────────────────┤
-│ SideNav │  <NuxtPage>                                  │
-│ 目录     │                                              │
-│ 仓库     │                                              │
-│ 系统分组 │                                              │
-│ 审批中心 │  (badge: 待审数)                              │
-│ 待办     │  (badge: breaking 未确认数)                   │
-│ 任务中心 │                                              │
-│ 设置     │                                              │
-└─────────┴──────────────────────────────────────────────┘
+```text
+web/app/pages               Nuxt 路由页
+web/app/layouts             admin/tenant/public/share 布局
+web/app/middleware          auth/tenant 路由守卫
+web/app/api/generated        Orval 生成 models/client/query/MSW，禁止手改
+web/app/api/fetcher.ts       唯一手写 transport adapter
+web/app/composables         API client/query/csrf/capability
+web/app/stores              仅导航、drawer、未提交草稿等 UI 状态
+web/app/features/admin      平台控制面
+web/app/features/catalog    repository/service/source/group
+web/app/features/assets     viewer/layers/revisions/versions
+web/app/features/diff       compare/snapshot/share/todo
+web/app/features/jobs       drawer/progress/retry
+web/app/features/inbox      approval/minimal notifications
+web/app/views               ViewHost/component/iframe bridge
+web/app/components/ui       无业务语义的基础组件
 ```
 
-- 租户切换器：下拉当前用户的租户列表（`GET /auth/me`），切换 = 路由跳转 `/t/{newSlug}` + 全部 query 缓存失效。
-- ⌘K 全局搜索：弹层，输入即请求 `GET /search`（300ms 防抖），结果分组（条目/资产/服务/仓库），条目命中直接深链到 Viewer Shell 并定位条目。
-- 权限渲染：路由中间件 `tenant-guard` 读 `me.tenants` 判断角色；页面内操作按钮由资源响应的 `capabilities: string[]` 控制显隐（后端权威）。
+## 3. 路由与访问边界
 
-## 3. 设计系统
-
-### 3.1 设计 token
-
-| token 组 | 内容 |
-| --- | --- |
-| 色板 | `--color-primary`（品牌蓝）、语义色 success/warning/danger/info；**层来源色**：repo=灰蓝、manual=绿、ai_generated=紫、third_party=橙（层标注/徽章/provenance 全局一致） |
-| 严重级色 | breaking=红、risky=橙、non-breaking=蓝、informational=灰（diff/徽章/统计卡全局一致） |
-| 暗色主题 | CSS variables 双套；`useTheme()` 写 `<html data-theme>`；iframe 视图经 postMessage 下发主题（§6.3） |
-| 排版 | 正文 14px；代码 `JetBrains Mono` 13px；页面标题 20px |
-| 间距/圆角 | 4px 基线网格；卡片圆角 8px |
-
-### 3.2 通用组件清单
-
-| 组件 | 用途 |
-| --- | --- |
-| `LifecycleBadge` | draft/published/deprecated/retired 徽章 |
-| `OriginBadge` | 层来源徽章（含色点 + 文案） |
-| `RevisionStatusTag` | active/pending_review/approved/rejected/archived |
-| `KindIcon` | 每 AssetKind 一个图标（registry 提供，缺省通用图标） |
-| `VersionPicker` | 版本/分支选择器：下拉含"已发布版本列表 + 分支最新 + 输入版本号"，diff 场景可多选 2 |
-| `DocSelectorModal` | diff/collection 的文档选择器：级联 服务→资产→版本/分支，或本地上传 |
-| `EmptyState` | 空态 + 主行动按钮（如"资产缺失 → 用 AI 生成"） |
-| `CodeBlock` / `YamlEditor` | CM6 只读/可编辑封装，支持行级错误、来源层行高亮 |
-| `ConfirmModal` | 破坏性操作二次确认（删除、驳回、retire） |
-| `CandidateFixCard` | `asset_path_not_found` 候选文件列表 + 一键改路径 |
-| `SseLogViewer` | 任务日志流式滚动 + 阶段分组折叠 |
-| `ShareButton` | 生成分享链接弹层（过期时间选择 → 复制 URL） |
-
-## 4. 页面设计（逐页）
-
-### 4.1 目录首页 `/t/{t}`
-
-```
-┌ 统计条: 服务数 | 资产数 | 待审 N | breaking 未确认 N | 覆盖率(有 openapi 的服务占比) ┐
-├ Tab: 全部 | 我负责的 | 我收藏的 | 最近更新 | 待我处理                             ┤
-├ 筛选条: 分组▾ 标签▾ 生命周期▾ 资产类型▾ [卡片/列表切换]                          ┤
-│ ServiceCard*N: 名称+徽章 | 资产 kind 图标行 | 质量分 | 最近变更时间 | Star        │
-└ 分页                                                                            ┘
+```text
+/login
+/admin/users
+/admin/tenants
+/admin/global-credentials
+/admin/producer-profiles
+/admin/audit
+/t/:tenant/dashboard
+/t/:tenant/repos
+/t/:tenant/repos/new
+/t/:tenant/repos/:repositoryId
+/t/:tenant/services/:serviceSlug
+/t/:tenant/assets/:assetId
+/t/:tenant/assets/:assetId/versions/:versionId
+/t/:tenant/reviews
+/t/:tenant/todos
+/t/:tenant/jobs
+/t/:tenant/search
+/t/:tenant/groups/:groupId
+/share/:token
+/public/t/:tenant/services/:serviceSlug/...
 ```
 
-- 数据：`GET /services`（分面参数透传 URL query）；统计条 `GET /views/resolve`（scope=tenant 的 catalog-dashboard 查询，复用后端聚合）。
-- "待我处理" tab = `/breaking-todos?status=open` + `/reviews` 数量合并展示，点击跳对应中心页。
+路由进入租户区域前读取 auth/me，并校验 active tenant membership。资源能力由 API 返回；`CapabilityGuard` 只控制展示，提交失败仍按服务端 404 处理。platform admin 没有租户成员身份时，不渲染租户业务路由。
 
-### 4.2 录入仓库向导 `/t/{t}/repos/new`（3 步）
+平台控制面提供 global credential 与 producer profile 管理。secret 只在创建/轮换表单提交且绝不回填；producer profile 使用 executable、args 数组、环境变量白名单、网络模式和资源上限等结构化控件，不提供 shell 文本框。租户侧凭据下拉合并可读的本地凭据和 global 凭据，global 项只读标记；producer 下拉只展示 API 返回的 enabled/available 选项。
 
-1. **连接**：URL + 凭证选择（下拉已有凭证 + "新建凭证"内联抽屉）+ 默认分支；[测试连接] 按钮调 `POST /credentials/{id}/test`，错误分类文案化（dns/auth/host_key/timeout 各自给修复建议）。
-2. **发现**：保存仓库后触发 `POST /repositories/{id}/discover`，轮询 job 完成 → 展示候选服务清单（checkbox 表格：目录、探测依据、语言），支持手工添加行；勾选确认调 `candidates:accept`。若存在 `.asset-platform.yaml` 则展示"从配置文件导入"预览面板（服务/资产源树 + 漂移标记），确认后 `import-config?apply=true`。
-3. **资产源**：对每个已确认服务展示推断出的资产源配置表单（kind/path 预填探测结果），保存后触发首次 `sync`，页面跳仓库详情并打开任务日志抽屉。
+公开页和分享页使用独立 layout/client：不加载租户导航，不调用内部列表接口，不把 bearer/cookie 信息写入内容 URL。
 
-### 4.3 仓库详情 `/t/{t}/repos/{id}`
+## 4. 全局壳与状态
 
-- 头部：URL、分支、凭证指纹、健康状态（lastSync/failStreak/duration）、[立即同步] [发现服务] 按钮。
-- Tab：**服务列表**（含漂移提示行内 banner：`配置漂移 → [对比] [采纳] [忽略]`）/ **同步历史**（collection_jobs 表格，行点击开日志抽屉）/ **设置**（分支策略、拉取策略、webhook 地址与 secret 展示、sync_cron）。
+桌面端左侧栏包括目录、仓库、审批、待办、任务；顶栏包括租户切换、全局搜索、任务状态、通知和用户菜单。移动端改为抽屉导航；Viewer 工具栏横向滚动，不压缩固定按钮。
 
-### 4.4 服务主页 `/t/{t}/services/{slug}`
-
-```
-┌ 头部: 名称+LifecycleBadge | owners | 标签 | Star | 订阅▾ | [设置]              ┐
-├ 概览卡: 仓库/分支/根目录 | 质量分 | 最近版本 | 健康                             ┤
-├ 资产列表(按 kind 分组):                                                        │
-│   openapi ▸ admin-api   [v1.4.0 published] [层: R M A] [查看] [diff]           │
-│   dbschema ▸ main       [资产缺失? EmptyState → 用 AI 生成 / 配置资产源]        │
-├ Tab: 变更历史(版本时间线,breaking 红点) | 资产源配置 | 成员 | 备注              ┤
-```
-
-- 层指示器 `[R M A]`：以来源色点表示该资产有 repo/manual/ai 层，hover 显示层数与待审数。
-- **资产源配置 tab**（maintainer）：表格 = 一行一个 source（kind/name/role/origin/mode/path/enabled/最后错误）；`last_error.code=asset_path_not_found` 的行内嵌 `CandidateFixCard`；新增源用抽屉表单，**mode 联动校验**（builtin⇒path 必填；command/ai⇒command 必填），role=base 且已存在 base 时禁用并提示。
-
-### 4.5 资产查看器 Viewer Shell（核心页）
-
-```
-┌ Crumb: 服务 / kind:name        VersionPicker▾   [发布状态Badge] [ShareButton] ┐
-├ ViewTab 条: Swagger UI | Redoc | 源码 | 层 | 端点 | Diff | …(按 ViewDef.order) ┤
-│ ┌──────────────────────────────────────────────────────────────────────────┐ │
-│ │                     <ViewHost>  (component / iframe)                     │ │
-│ └──────────────────────────────────────────────────────────────────────────┘ │
-└ 底部状态条: 版本 v1.4.0 · commit abc123 · 引擎 v1 · 质量分 87 · 下载▾          ┘
-```
-
-- 流程：路由 query（`view/version/branch/opts`）→ 组装 input descriptor → `POST /views/resolve` → 结果注入目标视图。descriptor 校验失败（422）时回退默认视图并 toast。
-- ViewTab 条来源 `GET /views` 过滤（kind 匹配 + enabled），顺序按 `order`；用户切换视图写回 URL 并记忆偏好（`/me/settings`）。
-- 下载菜单：merged / bundled / 各层原始 / provenance JSON（后端签名 URL 直下）。
-
-#### 4.5.1 `layers` 视图（自研 component，P0 重点）
-
-```
-┌ 左栏(层列表, 可拖拽排序 overlay):                    ┬ 右栏:                    ┐
-│ ▣ base   repo    docs/openapi.yaml   [rev abc·active]│ 选中层的修订时间线:      │
-│ ▣ ovl#1  manual  补充描述           [rev def·active] │  rev def 2026-09-01 由张三│
-│ ▢ ovl#2  ai      AI补全            [rev ghi·待审🟣] │  [查看内容][设为当前(回滚)]│
-│ [＋новый层/源]                                       │  [与上一修订对比]         │
-├ 底部: 合并预览开关 → 并排显示 合并前(base)/合并后 diff，高亮各 overlay 命中处    ┤
-```
-
-- 操作与 API 对应：启停 checkbox=`PATCH /layers/{id}`；拖拽排序=`PATCH ord`（乐观更新+失败回滚）；回滚=`POST /layers/{id}:rollback`（ConfirmModal 说明"将产生新版本"）。
-- **manual 层编辑**：`[编辑]` 打开全屏 YamlEditor 双栏——左编辑 overlay 内容，右实时合并预览（`POST /assets/preview-merge`，800ms 防抖，1MB 内起用）；保存 = `POST /layers/{id}/revisions`，`overlay_invalid` 行级错误直接标注在编辑器行号上。
-- 待审修订（🟣）行内 `[审批]` 快捷入口 → 审批抽屉（见 4.7，复用同一组件）。
-
-#### 4.5.2 `source` 视图
-
-- CM6 只读 + 折叠；顶部开关 **[层标注]**：开启后按 provenance 给行背景着层来源色，hover 行显示 `来自: manual 层 · rev def`（provenance ptr → 行号映射在 Worker 中用 YAML source map 计算）。
-
-#### 4.5.3 `operations` / `items-table` 视图
-
-- DataTable 虚拟滚动；operations 列：method(色标)/path/summary/tag/废弃标记；items-table 列由 `display` JSONB 的 kind 声明列配置驱动（`GET /views` 返回的 `optionsSchema` 内含列定义），两视图共用一个表格组件不同列配置。
-- 行点击开右侧 Detail 抽屉（该条目 JSON + provenance 徽章）。
-
-#### 4.5.4 `diff` 视图
-
-```
-┌ 选择条: [左: v1.3.0 ▾]  ⇄  [右: release/2.0 最新 ▾]   规则集▾  [保存快照]     ┐
-├ 统计卡: +12 新增 | -3 删除 | 9 修改 | 2 breaking(红)                          ┤
-├ 呈现切换: ◉树  ○并排  ○清单     级别筛选: ☑breaking ☑risky ☐info             ┤
-│ tree: 层级变更树(Path→Operation→字段)，节点带级别色点，点击展开 before/after    │
-│ side-by-side: CM6 merge view                                                 │
-│ list: 条目级表格(itemKey/type/level/byLayer)                                  │
-└ [导出 Markdown] [导出 JSON] [分享]                                            ┘
-```
-
-- 左右选择器 = `VersionPicker`（多态：版本/分支/本地上传→`POST /uploads`）；变更即改 URL query 并重发 `POST /diff`。
-- `byLayer` 存在时（层感知 diff，P1）清单模式提供"按层分组"切换。
-
-#### 4.5.5 iframe 视图（swagger-ui / redoc / rapidoc）
-
-- `ViewHost` 渲染 `<iframe src="/viewer-assets/{viewId}/index.html">`（后端托管 dist），通过 postMessage 桥（§6.3）传 `{docUrl, theme, options}`；Try it out 请求由 iframe 直接发起（同源，携带会话）。
-
-### 4.6 系统分组与全局视图 `/t/{t}/groups/{slug}`
-
-- 头部：分组树面包屑（域→系统）+ 成员服务 chips（可增删，`systemgroup:manage`）。
-- Tab：
-  - **依赖图（dep-graph）**：X6 画布；节点=服务（按分组着色，双击进服务主页），边=dependency 条目（hover 显示协议/中间件）；工具条：布局切换（力导/层次）、聚焦模式（只显选中节点 1 度邻居）、导出 PNG。数据 = `POST /views/resolve`（scope descriptor）分页拉全量边后前端建图；>2000 边时提示切换聚焦模式。
-  - **资产大盘（catalog-dashboard）**：统计卡（服务/资产/条目数、质量分分布直方图、覆盖率环图：无 openapi 的服务列表可下钻）。
-  - **成员服务列表**。
-
-### 4.7 审批中心 `/t/{t}/reviews`
-
-```
-┌ 筛选: 状态(待审/已审) | 来源(ai/third_party) | 服务▾                          ┐
-│ 列表行: [🟣ai] order-service / openapi:admin-api  rev ghi  2026-09-04  [审批] │
-├ 审批抽屉(点击行展开, 占屏 80%):                                               │
-│  上: 元信息(模型/promptDigest/token 用量/任务链接)                             │
-│  中: Tab[修订内容 | 合并前后对比(preview-merge diff) | 影响条目]               │
-│  下: [✓通过]  [✗驳回(意见必填)]  [重新生成]                                   │
-```
-
-- 通过=`:approve`（成功后 toast"已触发合并"并列表移除）；驳回=`:reject`（comment 必填校验）；重新生成=`POST /assets/{id}/ai-generate`（确认弹层提示将产生新修订）。
-- 侧栏 badge 数量 = 待审列表 total，60s 轮询 + 站内信事件即时刷新。
-
-### 4.8 待办中心 `/t/{t}/todos`
-
-- breaking 确认列表：行=资产版本 + breaking 摘要（红色统计）+ [查看 diff]（深链 diff 视图）+ [确认知悉]（`:ack`，可填备注）。已确认历史 tab。
-
-### 4.9 任务中心 `/t/{t}/jobs`
-
-- 表格：类型/仓库/触发方式/阶段进度条（六段 stage 点亮）/状态/耗时；筛选类型与状态。
-- 详情 `/jobs/{id}`：阶段时间线 + `SseLogViewer`（`GET /jobs/{id}/logs` SSE，断线自动降级 3s 轮询）；[取消] 按钮（running 时）。
-
-### 4.10 设置页 `/t/{t}/settings/{tab}`
-
-| tab | 内容要点 |
-| --- | --- |
-| members | 成员表格 + 邀请（用户名搜索）+ 角色下拉；移除最后 admin 时按后端 `last_admin` 错误提示 |
-| tokens | PAT 列表（掩码+最后使用）；创建弹层选 scopes/过期 → **明文仅展示一次**（复制按钮 + 关闭确认） |
-| credentials | 凭证卡片（指纹/类型/共享范围）；创建抽屉按 kind 联动表单；删除遇 `credential_in_use` 展示引用仓库并提供强制解绑确认 |
-| kinds | AssetKind 开关列表（停用二次确认："存量数据只读不删"） |
-| views | ViewDef 表格：启停/拖拽排序/默认参数（optionsSchema 动态渲染表单） |
-| notify | 渠道配置：站内(默认开)/webhook(URL+secret+测试发送)/邮件 provider |
-| audit | 审计表格：时间/操作者/action/target + 过滤器 |
-
-### 4.11 分享落地页 `/shared/{token}`
-
-- 无侧栏/顶栏壳，仅 logo 水印 + 目标视图全屏渲染；`GET /shared/{token}` 404 时展示"链接已失效"空态。只读：隐藏一切操作按钮（编辑/审批/下载可配）。
-
-## 5. 视图插件框架（前端侧）
-
-### 5.1 注册机制
+所有 query key 使用 Orval 生成的 key factory，并必须包含 tenant 和稳定资源标识；禁止在组件中手拼另一套 key。以下是语义形态，不是待手写 DTO：
 
 ```ts
-// app/views/registry.ts
-export interface FrontViewPlugin {
-  id: string                              // 与后端 ViewDef.id 一致
-  component?: Component                   // mount=component 时
-  // mount=iframe 时无需前端代码，Shell 直接 iframe 化
-}
-// 新增 component 视图 = 在 views/ 下加一个目录并在 registry 注册一行
+['asset', tenant, assetId, refType, refName]
+['version', tenant, versionId]
+['layer-head', tenant, layerId, scopeType, scopeKey]
+['job', tenant, jobId]
 ```
 
-- Shell 渲染逻辑：`ViewDef.mount==='component'` → 查 registry 取组件动态加载（`defineAsyncComponent`，视图代码分包）；`'iframe'` → 通用 IframeHost；`'external'` → 新窗口打开。后端有 ViewDef 而前端无注册 ⇒ tab 隐藏并 console.warn（向前兼容）。
+禁止用 Asset 级缓存承载分支 current/latest。切换 branch/tag 后必须换 Track query key。写成功后按响应中 affected resource 精确失效；任务完成后再刷新版本、source health 和 todo。
 
-### 5.2 视图组件统一 Props 契约
+当前租户以 URL 的 `:tenant` 为唯一事实源，auth/me、membership、用户偏好和 capability 都属于 Query server state。Pinia 只保存移动导航展开、JobDrawer 当前选择、未提交的本地草稿等无需后端持久化的 UI 状态；主题由 Nuxt color mode 管理，locale 由 i18n 与用户偏好同步。刷新页面后必须能只凭 URL 和 API 恢复业务页面，不能依赖 Pinia 中残留的 tenant/entity。
 
-```ts
-interface ViewProps {
-  docs?: DocRef[]            // single/versions/collection 解析结果
-  itemQuery?: ItemQueryPage  // scope 解析结果（含 fetchMore 回调）
-  descriptor: InputDescriptor
-  options: Record<string, unknown>   // 经 optionsSchema 校验的参数
-  theme: 'light' | 'dark'
-}
-// 视图对外事件: emit('update:options'), emit('navigate', deepLink)
-```
+所有错误通过生成的 ErrorResponse 处理：401 跳登录并保留 return URL；404 显示统一不可用状态；409 保留用户输入并提示刷新；412 提示资源已更新；413 标出容量限制；422 映射字段或编辑器 line/column；其余展示 requestId。
 
-`options` 变化由 Shell 序列化进 URL `?opts=`（base64url JSON）并纳入分享链接。
+## 5. 核心用户流程
 
-### 5.3 iframe 桥协议
+### 5.1 平台初始化
 
-| 方向 | message | payload |
-| --- | --- | --- |
-| Shell→iframe | `init` | `{docUrl, theme, options}` |
-| Shell→iframe | `theme` | `{theme}`（主题切换实时下发） |
-| iframe→Shell | `ready` / `resize` | `—` / `{height}` |
+`/admin/users` 和 `/admin/tenants` 提供列表、创建、停用和成员绑定。创建租户后在同一流程绑定首位 tenant admin。平台审计页只展示脱敏元数据；任何正文链接都不出现。
 
-iframe 沙箱：`sandbox="allow-scripts allow-same-origin allow-forms"`；仅接受同源 dist。
+空部署 bootstrap 的认证方式由运维配置提供，UI 不承担默认密码生成。首次完成后页面提示停用 bootstrap credential。
 
-## 6. 状态管理与 API 层
+### 5.2 仓库接入向导
 
-### 6.1 Pinia stores
+`/repos/new` 为三步同页向导：
 
-| store | 职责 |
+1. 连接：URL、可空 credential、默认分支，调用 connection test；按 dns/auth/host_key/timeout 给出可操作错误；
+2. 发现：保存后启动 discover job，展示稳定排序的候选；支持勾选批量接受和手工创建服务；若存在配置文件，先 preview 再 apply；
+3. 资产源：为确认的服务填写 SourceSpec，mode 改变时切换 path/profile 等字段；保存并触发首轮 sync。
+
+JobDrawer 展示阶段、attempt、结构化错误和 retry。接口返回 deduplicated 时继续观察原 jobId，不创建第二个假任务。
+
+### 5.3 服务主页与缺失资产
+
+服务页头显示 lifecycle、visibility、owners、标签、仓库/ref 与 capability 操作。正文包含：
+
+- 资产列表：按 kind 分组，明确 current published、latest draft、ref、health 和待审数；
+- 缺失 kind：展示“配置资产源”和“用 AI 生成”，后者调用服务级冷启动 operation；
+- 资产源：SourceSpec 与展开 binding 分层展示，避免把 glob 误当单文件；
+- 变更历史、成员、备注；后两项按里程碑和 capability 显示。
+
+health 文案固定：stale 表示仍有历史有效版本但最新采集失败；invalid 表示从未成功；历史查看入口始终保留。
+
+生命周期控件只显示服务端允许的下一状态并始终携带当前 ETag；deprecated 显示全局告警徽章，retired 页面切为历史只读并隐藏内容写入。public URL 只在 visibility=public 且 lifecycle 为 published/deprecated 时展示；生命周期冲突统一按 409 `invalid_state` 保留页面数据并刷新能力。
+
+### 5.4 Viewer Shell
+
+Viewer 路由固定 assetId/versionId；只在用户明确选择“跟随分支最新”时解析 Track head，并立即把解析后的 versionId 写入 URL。这样分享、刷新和 deep link 不随 latest 漂移。
+
+Viewer 顶部包含 ref/version picker、lifecycle、分享和下载；View tabs 来自 views contract。切换时构造 InputDescriptor，调用 resolve，成功后才写 URL 和偏好。422 时保留旧视图并展示 descriptor 错误。
+
+`source`、`operations`、`items-table`、`layers`、`diff` 是内建 Vue 组件；Swagger/Redoc 等第三方 renderer 在不含 `allow-same-origin` 的 opaque-origin iframe 中运行。父页先取签名 artifact，再以 document text 通过一次性 nonce 建立的 transferred MessagePort 传入；之后忽略 window message，frame 自身 `connect-src 'none'`。Try-it-out 默认关闭；启用时 iframe 通过该 port 请求父页面执行 tenant allowlist 内、`credentials: omit` 的浏览器 fetch，不经过平台后端代理，也不向 iframe 传 session。表格 columns 使用 ViewDef 独立字段，不能塞进 optionsSchema。
+
+### 5.5 层与人工 Overlay
+
+Layers view 左侧展示 Layer，右侧展示 scoped timeline 和 head：latest、candidate、effective 必须分别标注，不能以 `active` 文案代替“当前”。ref selector 默认仓库 default branch，global 继承要显式显示。
+
+支持：
+
+- 启停 Layer；
+- 原子排序全部 overlay，提交 expected revision；
+- 创建 manual SourceSpec（响应返回 `initialLayerId`）并提交 manual revision；
+- 查看 revision 原文、元数据、review context 和 provenance；
+- rollback 到允许的历史修订；
+- merge preview。
+
+编辑器左侧编辑，右侧 800ms 防抖 preview；保存携带 `expectedEffectiveRevisionId` 和 Idempotency-Key。422 的 1-based line/column 映射 CodeMirror。关闭、重开或 rollback 后出现新版本是正常行为；内容 hash 可以复用，versionId 不得被前端当成 hash。
+
+交互编辑严格受 `manualOrPushRevisionBytes=1 MiB` 约束。超过 1 MiB 的版本只读展示；达到 5 MiB 时关闭全量语法树、折叠和自动格式化，仅渲染 viewport，YAML/JSON parse、搜索索引和格式化放入 Web Worker。大文档 diff 直接消费后端 DiffResult/hunks，不在主线程对两份全文做 diff。CodeMirror 及语言包只在 Viewer/source/diff 路由懒加载。
+
+### 5.6 AI 冷启动与审批
+
+缺失资产没有 assetId，因此从 Service 的 missingKinds 入口调用 service-level AI generate，选择平台允许的 profile/kind/name/ref，不展示 shell 输入。
+
+任务完成后跳到审批中心。ReviewDrawer 展示 revision 内容、before/after、结构化 diff、影响项、producer 摘要和意见：
+
+- approve/reject 只对当前 candidate 开放；
+- reject 必填意见；
+- approve 响应中的 mergeJobId 直接交给 JobDrawer；
+- 409 candidate 已变化时关闭按钮、刷新上下文；
+- 无有效 base 时 before 是契约定义的预览骨架，但审批前绝不宣称已有 AssetVersion。
+
+信任模式 UI 明确写“免审批，不自动发布”。相同内容如果等于 current candidate/effective 可显示 unchanged；曾被 reject 的同内容再次生成仍是新的 review attempt。
+
+### 5.7 Diff、快照与分享
+
+Diff 输入选择器支持固定版本、branch/tag 和临时 upload。提交后响应中的 resolved version 和 baseline 写入 URL/页面，不保留漂移的 `latest` 别名。
+
+展示 tree、side-by-side、list 三种模式，共用同一 DiffResult；等级枚举固定 `breaking|risky|non_breaking|informational`。Diff 保存快照后才能分享或导出。普通 Viewer 分享则提交 viewId、input descriptor、scope 和 options；服务端在创建时将 ref 与 scope 成员解析成固定 versionId 并冻结 artifact allowlist。分享页只能读取冻结 descriptor 绑定的结果，过期、撤销或替换资源都返回 404。
+
+非默认分支首版的自动 diff 基线由后端解析为默认分支 current/latest。前端只展示 `baselineVersionId`，不自行猜测。breaking todo 在版本 index 后出现，用户只可 ack 自己的 todo。
+
+### 5.8 GitOps 漂移
+
+Repository 配置导入采用 preview/apply 两阶段。Preview 页面按字段展示 DB value、file value、source 和差异；apply 使用 previewId/configDigest。漂移解决的动作固定为 take_file、keep_db、ignore：
+
+- take_file 显式接受 file 值；
+- keep_db 令字段变为 db_manual；
+- ignore 只忽略当前 file digest，下一次仓库变化重新提示。
+
+不得在 Service 或 Source 顶层用单一 `configSource` badge 代替字段级来源。
+
+### 5.9 搜索、分组、订阅与通知
+
+搜索结果包括固定 versionId/itemKey 的 deep link、结构化高亮和 facets。前端不执行 HTML 高亮。SystemGroup 依赖图只呈现返回范围内的服务，覆盖率分母使用未删除成员服务。
+
+依赖图固定使用 Cytoscape.js canvas renderer：`hierarchical` 映射内建 `breadthfirst`，`force` 映射内建 `cose`，首版不增加布局插件。默认请求最多 500 节点/2000 边；超过默认值必须先请求服务端 neighborhood，5000 边是单次硬上限而不是默认全量。边标签默认不渲染，交互时按需显示；1000 边以上启用 `hideEdgesOnViewport`、关闭动画并将 pixel ratio 固定为 1。实例、事件和 resize observer 必须在组件卸载时销毁。不得把 React Flow/Vue Flow 用作图分析引擎；它们面向可编辑 node-flow，和当前只读依赖分析不匹配。
+
+订阅写操作对 viewer 合法；同样合法的还有通知已读和自己的 todo ack。因此只按 capability/operation 判定写权限，不建立“viewer 禁止全部 POST/PATCH”的规则。
+
+breaking publish 展示两条独立通知：`version.published` 与 `version.breaking`。Webhook 配置只在创建/轮换时显示一次 secret，之后只显示指纹；轮换使用独立 rotate operation 和 ETag/If-Match，不能通过普通资料编辑静默替换。
+
+## 6. ViewHost 与安全
+
+`views.yaml` 决定每个 ViewDef 的 kind、输入 schema、renderer、order、columns 和 options。组件视图只接收解析后的 descriptor，不自行抓任意 URL。
+
+iframe 使用独立静态入口、严格 CSP 和 sandbox。父页创建 MessageChannel，以 `postMessage('*', [port])` 仅传一次性 nonce 和 port；opaque-origin frame 必须在该 port 回显 nonce，父页随后只经 port 传 `documentText/mediaType/theme/options`，并忽略后续 window message。不得加 `allow-same-origin`，不得传文档 URL 或会话 token，也不提供平台代理。Try it out 默认关闭；用户开启后仅由父页浏览器直连租户 allowlist 内的 HTTPS origin（本地开发可 HTTP），每次新 origin 明确确认，credentials 固定 omit，目标必须自行允许 CORS。
+
+下载由后端返回短时签名 URL；前端不把正文长期写入 localStorage、日志、analytics 或 error report。
+
+## 7. 并发、乐观更新与可访问性
+
+表单写操作使用 ETag/If-Match；Layer revision 使用 expected head。409/412 时显示 server/current 对比，不静默覆盖。排序可以先乐观移动，但必须保持原快照，失败立即回滚并可重试。
+
+固定尺寸用于 toolbar、图标按钮、表格行和状态 badge，避免 job 文案或长 ref 引起布局跳动。图标按钮必须有 accessible name 和 tooltip；表格、树、dialog、drawer 支持键盘；颜色之外再用文字/图标区分状态。长 slug、branch、itemKey 可换行或省略并提供完整 tooltip。
+
+Nuxt UI Table 不允许把“点击整行”作为唯一操作入口；查看、编辑和更多操作必须有可聚焦的 link/button，并通过键盘触发。虚拟列表仍需保留表头语义、焦点恢复和屏幕阅读器可理解的总数/当前位置。
+
+## 8. 测试策略
+
+- 生成 client 的 compile test：OpenAPI 更新后无手写调用漂移；
+- 组件测试：CapabilityGuard、ErrorBoundary、VersionPicker、Layers heads、ReviewDrawer、Diff modes；
+- MSW contract test：请求和响应均通过生成 schema，覆盖 401/404/409/412/413/422；
+- Playwright：逐个执行 `acceptance.yaml` 的 US 和 Smoke，每场景独立 seed；
+- 安全回归：public/share 页面不请求内部 API，PAT 撤销为 401，无权与不存在除 requestId 外一致；
+- 响应式截图：桌面与移动端检查 Viewer、向导、审批、Diff，无溢出和重叠；
+- 大数据：10k item 虚拟滚动、500 节点/5000 边依赖图首屏、1 MiB 交互编辑上限、5 MiB/10 MiB 只读文档主线程 long-task 门禁；
+- 可访问性：axe + 键盘主路径，关键状态不只依赖颜色。
+
+## 9. 实施顺序
+
+| 里程碑 | 前端交付 |
 | --- | --- |
-| `useAuthStore` | me、当前租户、角色；租户切换动作（跳转+失效全部 query） |
-| `useViewPrefStore` | 用户级/服务级默认视图（localStorage + `/me/settings` 同步） |
-| `useNotifyStore` | 站内信未读数、审批/待办 badge（事件驱动刷新） |
-| `useThemeStore` | 主题 + iframe 广播 |
+| M0 | generated client、登录/CSRF、租户壳、控制面、错误与 capability 基础设施 |
+| M1 | 仓库向导、服务页、source、job drawer、OpenAPI Viewer/public read |
+| M2 | Layers、编辑/preview、revision timeline、rollback、字段级 GitOps |
+| M3 | AI 冷启动/审批、Track/version picker、lifecycle、diff/snapshot/share、todo、最小 inbox |
+| M4 | GitOps 完整漂移、search/group/dashboard、dbschema/dependency views |
+| M5 | 通用订阅、通知渠道、asyncapi view、运维合规界面 |
 
-其余数据一律走 TanStack Query（key 规范：`[tenant, resource, id, params]`；租户切换时 `queryClient.clear()`）。
-
-### 6.2 API 封装与错误处理
-
-- `useApi()`：ofetch 实例，自动拼 `/api/v1/t/{tenant}` 前缀、CSRF 头；401 → 跳登录；404 统一"不存在或无权限"文案（不区分，配合后端防泄漏口径）。
-- 错误码→交互映射表（集中维护 `errorMap.ts`）：`asset_path_not_found`→CandidateFixCard、`overlay_invalid`→编辑器行标注、`version_not_publishable`→阻塞修订列表弹层、`base_layer_exists`→表单项禁用提示、`quota_exceeded`→配额说明弹层、`branch_not_indexed`→"先同步该分支"引导。
-
-## 7. 工程结构
-
-```
-web/
-  app/
-    layouts/ (default.vue, blank.vue)
-    pages/ (按 §2 路由)
-    views/ (registry.ts + layers/ source/ operations/ items-table/ diff/
-            dep-graph/ dashboard/ collection-table/ changelog/)
-    components/ (§3.2 通用组件)
-    stores/  composables/ (useApi, useTheme, useSse, useWorkerYaml)
-    workers/ (yaml-sourcemap.worker.ts, highlight.worker.ts)
-    locales/ (zh-CN.json, en.json)
-  types/api.d.ts (openapi-typescript 生成)
-```
-
-### 7.1 实施顺序（对齐后端里程碑）
-
-| 阶段 | 交付 |
-| --- | --- |
-| M0 | 布局壳、登录、租户切换、设置页（members/tokens/credentials）、路由守卫、API 层与类型生成流水线 |
-| M1 | 录入仓库向导、仓库详情、服务主页、Viewer Shell + swagger-ui/redoc(iframe)/source/operations/items-table、目录首页 |
-| M2 | layers 视图（含 manual 编辑 + 实时合并预览）、source 层标注、资产源配置 tab |
-| M3 | diff 视图三形态、审批中心、AI 生成入口与空态、任务中心 SSE |
-| M4 | 系统分组、dep-graph、catalog-dashboard、全局搜索 ⌘K、collection-table |
-| M5 | 订阅/通知/待办中心、分享落地页、设置页剩余 tab（kinds/views/notify/audit） |
-
-## 8. 测试与验收
-
-| 场景 | 条件 | 预期 |
-| --- | --- | --- |
-| 租户切换 | 从 A 切到 B | URL 前缀变化、全部列表刷新、无 A 租户残留数据（query 全失效） |
-| URL 还原 | 刷新 diff 页（含 left/right/opts） | 完整还原选择与视图状态 |
-| 大文档 | 5MB openapi 打开 source/operations | 主线程无 >200ms 长任务（Worker 化验证） |
-| 合并预览 | 编辑 overlay 连续输入 | 防抖后仅尾部请求；`overlay_invalid` 标注正确行 |
-| 审批流 | 通过/驳回/驳回缺 comment | 列表联动、badge 更新、缺 comment 阻断提交 |
-| 明文 token | 创建 PAT 后关闭弹层再打开 | 不再可见明文 |
-| iframe 主题 | 切暗色 | swagger-ui/redoc 实时跟随 |
-| 分享链接 | 匿名打开/过期打开 | 只读渲染无操作按钮 / 失效空态 |
-| i18n | 切 en | 无中文残留（CI key 覆盖检查） |
-| 无障碍基线 | 键盘遍历主流程 | 焦点可达、modal 焦点圈闭 |
-
-## 9. 发布与待确认项
-
-- 构建：`nuxt generate`（SPA）产物进后端 `embed`，与后端同版本号发布；无独立回滚（随后端镜像回退）。
-- 浏览器基线:最近两个大版本 Chrome/Edge/Safari/Firefox；不支持 IE。
-
-| 编号 | 级别 | 待确认项 | 未确认影响 |
-| --- | --- | --- | --- |
-| F-C1 | P0 | items-table 列配置的下发格式（随 `GET /views` 的 optionsSchema，需与后端 kind 插件对齐字段） | 阻塞 M1 items-table 通用化 |
-| F-C2 | P1 | dep-graph 超大图（>2000 边）交互策略（聚焦模式默认 or 服务端子图查询） | 影响 M4 大盘性能 |
-| F-C3 | P1 | provenance ptr→YAML 行号映射精度（多行标量/锚点场景） | 层标注可能降级为块级高亮 |
-| F-C4 | P2 | Try it out 的跨域目标服务器代理策略 | v1 仅同源/公网直连，失败给出 CORS 提示 |
-
-## 10. 专业名词表
-
-| 统一名称 | 英文/代码标识 | 一句话口径 |
-| --- | --- | --- |
-| 查看器壳 | Viewer Shell | 资产页核心容器：解析 descriptor → resolve → 挂载视图插件 |
-| 视图插件 | FrontViewPlugin | 前端注册表条目，与后端 ViewDef 按 id 配对 |
-| iframe 桥 | iframe bridge | Shell 与第三方视图 dist 的 postMessage 协议（init/theme/ready/resize） |
-| 层标注 | layer annotation | source 视图按 provenance 给行着层来源色的开关功能 |
-| 候选修正卡 | CandidateFixCard | `asset_path_not_found` 错误的候选文件一键修正组件 |
-| 输入描述符 | input descriptor | 与后端一致；前端负责从 URL 组装并序列化进分享链接 |
-
----
-
-## 附录 A · 类型契约
-
-- **单一来源**：后端 OpenAPI 自描述 → `openapi-typescript` 生成 `types/api.d.ts`；**权威 DTO 定义见后端设计附录 C**，本表只列前端专有类型。CI 步骤 `pnpm gen:api` + git diff 非空即失败（防契约漂移）。
-- 前端专有类型：
-
-```ts
-// 视图插件运行时（§5.2 的完整版）
-interface ViewProps {
-  docs?: DocRefDTO[]
-  itemQuery?: { rows: AssetItemDTO[]; total: number; fetchMore: () => Promise<void> }
-  descriptor: InputDescriptor
-  options: Record<string, unknown>
-  theme: 'light' | 'dark'
-}
-type ViewEmits = {
-  'update:options': [Record<string, unknown>]
-  'navigate': [deepLink: string]          // 站内路由字符串，Shell 负责 router.push
-}
-// iframe 桥消息（判别联合）
-type BridgeMsg =
-  | { type:'init'; docUrl:string; theme:string; options:object }
-  | { type:'theme'; theme:string }
-  | { type:'ready' } | { type:'resize'; height:number }
-// URL 中的文档选择器字符串形态（见附录 B）
-type DocSelStr = `v:${string}` | `b:${string}` | `u:${string}`
-```
-
-## 附录 B · URL 序列化算法（可直接编码）
-
-### B.1 Viewer Shell 路由 query 规范
-
-路径：`/t/{t}/services/{slug}/assets/{kind}/{name}`
-
-| query 参数 | 取值 | 缺省 |
-| --- | --- | --- |
-| `view` | ViewDef.id | 用户偏好 → 服务默认 → kind 首个 enabled 视图 |
-| `doc` | DocSelStr：`v:<versionId>` / `b:<branch>`（branch 值 `encodeURIComponent`） | `v:<currentVersionId>`，无 current 则 `v:<latestVersionId>` |
-| `left` / `right` | DocSelStr（含 `u:<uploadRef>`），仅 versions 类视图 | left=current，right 空时视图内提示选择 |
-| `opts` | `base64url( JSON.stringify(options, sortedKeys) )` | 无（视图默认值） |
-| `item` | 条目定位 `encodeURIComponent(itemKey)`（搜索深链用） | 无 |
-
-### B.2 descriptor 组装算法（伪代码，实现于 `composables/useDescriptor.ts`）
-
-```
-function buildDescriptor(route, viewDef): InputDescriptor
-  switch viewDef.input.mode:
-    'single'     -> { mode:'single', assetId, doc: parseSel(route.query.doc ?? defaultDoc) }
-    'versions'   -> { mode:'versions', assetId,
-                      docs: [parseSel(left ?? defaultDoc), ...(right ? [parseSel(right)] : [])] }
-    'collection' -> 从 DocSelectorModal 状态取（URL 形态: docs=<assetId>.<DocSelStr>,<...> 逗号分隔）
-    'scope'      -> 由页面上下文注入（分组页: {mode:'scope',scope:'system_group',systemGroupId,kinds}）
-  parseSel('v:x') = {versionId:x}; parseSel('b:x') = {assetId, branch:decodeURIComponent(x)}
-  parseSel('u:x') = {uploadRef:x}
-```
-
-规则：
-1. **序列化确定性**：`opts` 与 descriptor JSON 一律 key 排序后 stringify（分享链接与 query cache key 稳定的前提）。
-2. **URL 是唯一状态源**：视图内改 options → `emit('update:options')` → Shell `router.replace` 更新 `opts` → watch 触发（同值跳过，防循环）。
-3. **分享链接**：`POST /share-links` 的 body = 当前 `{descriptor, viewId, options}` 原样；不含任何本地状态。
-4. 非法 query（解析失败/`input_spec_mismatch`）：回退该视图缺省 descriptor，`router.replace` 清洗 URL，toast 提示一次。
-
-## 附录 C · 错误码 → UI 行为映射全表
-
-> 与后端附录 B.2 注册表一一对应；集中实现于 `utils/errorMap.ts`，未映射 code 走兜底。`文案 key` 指 i18n key（zh/en 双语必备）。
-
-| code | UI 行为 | 文案 key |
-| --- | --- | --- |
-| `unauthorized` | 清 session store → 跳 `/login?redirect=<当前>` | `err.unauthorized` |
-| `not_found` | 页面级：404 空态页；操作级：toast"不存在或无权限访问" | `err.notFound` |
-| `validation_error` | 表单：details.fields 按 path 定位到字段下方红字；非表单 toast | `err.validation` |
-| `asset_path_not_found` | 资产源行内嵌 `CandidateFixCard`（details.candidates）| `err.pathNotFound` |
-| `overlay_invalid` | YamlEditor 按 details.errors[].line/col 打行级标注 + gutter 图标 | `err.overlayInvalid` |
-| `input_spec_mismatch` | Shell 回退默认视图 + toast（附录 B.2 规则 4） | `err.inputSpec` |
-| `branch_not_indexed` | VersionPicker 该分支项置灰 + 内联按钮 [先同步该分支]（调 sync） | `err.branchNotIndexed` |
-| `nesting_too_deep` | 分组表单 parent 字段错误提示 | `err.nestingTooDeep` |
-| `ai_command_missing` | 弹层引导：跳转租户设置 ai 命令配置项 | `err.aiCommandMissing` |
-| `version_not_publishable` | 弹层列出 details.blockingRevisions，每行 [去审批] 深链审批抽屉 | `err.notPublishable` |
-| `base_layer_exists` | 新增源表单 role 字段禁用 base 选项 + 提示既有层链接 | `err.baseExists` |
-| `quota_exceeded` | 弹层展示 details.{used,limit} + "联系租户管理员" | `err.quota` |
-| `last_admin` | toast，阻断操作 | `err.lastAdmin` |
-| `credential_in_use` | 弹层列 details.repositories + [强制解绑并删除]（二次确认后 `?force=true`） | `err.credInUse` |
-| `conflict` | toast"数据已被他人修改，请刷新重试" + 该资源 query invalidate | `err.conflict` |
-| `rate_limited` | toast 带 details.retryAfterSec 倒计时；期间禁用触发按钮 | `err.rateLimited` |
-| `payload_too_large` | 编辑器/上传处提示 limitBytes 换算的可读大小 | `err.tooLarge` |
-| `internal_error` | toast + traceId 可复制（"反馈时请附带"） | `err.internal` |
-| 网络层失败 | 自动重试 GET ×2（指数退避）；mutation 不自动重试，给 [重试] 按钮 | `err.network` |
-
-## 附录 D · 页面数据契约总表
-
-> 每页一行：TanStack Query key（首元素恒为 tenantSlug，表内省略）→ 端点 → DTO。`失效联动` = 该页 mutation 成功后需 invalidate 的 key 前缀。
-
-| 页面 | query key | 端点 → DTO | 失效联动 |
-| --- | --- | --- | --- |
-| 目录首页 | `['services', params]`、`['dashboard','tenant']` | `GET /services` → Page\<ServiceDTO>；`POST /views/resolve`(scope) | star/订阅 → `['services']` |
-| 搜索 ⌘K | `['search', q, facets]` | `GET /search` → SearchResultDTO[] | —（只读，300ms 防抖 + 上次结果 keepPreviousData） |
-| 仓库列表/详情 | `['repos']`、`['repo', id]`、`['repo', id, 'jobs']` | `GET /repositories(/{id})`、`GET /jobs?repositoryId=` | sync/discover/patch → `['repo', id]` 全前缀 |
-| 录入向导 | `['credentials']`、`['repo', id, 'candidates']` | 对应 GET | accept/dismiss → candidates；import-config → `['repo',id]`+`['services']` |
-| 服务主页 | `['service', slug]`、`['service', slug, 'sources']`、`['asset', id, 'versions']` | `GET /services/{slug}`、`GET .../sources`、`GET /assets/{id}/versions` | 源 CRUD → sources+service；publish → versions+service |
-| Viewer Shell | `['views']`、`['resolve', viewId, descriptorHash]`、`['asset', id]` | `GET /views`、`POST /views/resolve`（descriptor 排序序列化后 hash 作 key） | 层操作/审批 → `['asset',id]` 与 `['resolve']` 全前缀 |
-| layers 视图 | `['layer', id, 'revisions']` + Shell 的 asset key | `GET /layers/{id}/revisions` | 修订提交/回滚/启停 → asset+resolve+revisions |
-| 编辑器预览 | 不进 query cache | `POST /assets/preview-merge`（800ms 防抖，AbortController 取消前序） | — |
-| diff 视图 | `['diff', leftSel, rightSel, ruleSetId]` | `POST /diff` → DiffResponse | 保存快照 → 无（快照独立 key） |
-| 审批中心 | `['reviews', filters]`、badge: `['reviews','count']` | `GET /layers/.../revisions?status=pending_review`（聚合端点或列表参数，随后端定）| approve/reject → reviews+badge+对应 asset |
-| 待办中心 | `['todos', status]` | `GET /breaking-todos` | ack → todos |
-| 分组详情 | `['group', slug]`、`['resolve','dep-graph',groupId]` | `GET /system-groups/{id}`、`POST /views/resolve`(scope) | 成员增删 → 两者 |
-| 任务中心 | `['jobs', filters]`；详情日志走 `useSse(jobId)` 不进 cache | `GET /jobs`、SSE `/jobs/{id}/logs` | cancel → `['jobs']` |
-| 通知 | `['notifications', unread]`、badge 60s refetchInterval | `GET /notifications` | read → 两者 |
-| 设置各 tab | `['members']`/`['tokens']`/`['credentials']`/`['settings']`/`['viewdefs']`/`['audit',filters]` | 对应 GET | 各自 CRUD → 自身 key |
-| 分享落地 | `['shared', token]` | `GET /shared/{token}` | — |
-
-## 附录 E · 表单校验规则明细
-
-> 前端校验仅为体验（即时反馈），**后端为权威**；规则与后端 422 的 details.fields 对齐（path 一致才能行内定位）。实现：Naive UI form rules + zod schema 复用。
-
-### E.1 仓库表单
-
-| 字段 | 规则 |
-| --- | --- |
-| url | 必填；正则二选一：`^git@[\w.-]+:[\w./-]+\.git$` 或 `^https?://[\w.-]+/[\w./-]+(\.git)?$`；不匹配提示"支持 SSH 或 HTTPS 格式" |
-| credentialId | url 为 `git@`（SSH）时必选 ssh_key 类凭证；https 可选 http_token 或 none（联动过滤下拉项） |
-| defaultBranch | 必填；`^[\w./-]{1,255}$`，禁 `..`、首尾 `/` |
-| syncCron | 可空；5 段 cron 语法校验（cron-parser），非法即时红字 |
-| fetchConfig.depth | shallow=true 时必填，1–1000 整数 |
-| branchPolicy.track | 每项非空，glob 字符集 `[\w./*-]` |
-
-### E.2 凭证表单（kind 联动）
-
-| 字段 | 规则 |
-| --- | --- |
-| name | 必填 1–64 字符；租户内唯一（失焦异步校验，409 conflict 映射） |
-| kind | 必填三选一；切换时清空另一分支字段 |
-| sshKey.privateKeyPem | kind=ssh_key 必填；须含 `BEGIN ... PRIVATE KEY` 头，否则"不是有效的 PEM 私钥" |
-| sshKey.passphrase | 可空；填写后二次输入确认 |
-| httpToken.username / token | kind=http_token 均必填；token ≥ 8 字符 |
-| sharedScope | 默认 private；改 tenant 时提示"租户内所有 maintainer 可用" |
-
-### E.3 资产源表单（mode/role 联动，核心）
-
-| 字段 | 规则 |
-| --- | --- |
-| assetKind | 必填；下拉 = 平台 kinds − 租户 disabledKinds |
-| assetName | 可空（提示"留空将从路径推导"）；填写时 `^[a-z0-9][a-z0-9-]{0,63}$` |
-| layerRole | 必填；该资产已有 base 时 base 选项禁用（`base_layer_exists` 预防） |
-| layerOrigin | role=base 且 mode=builtin 时锁定 repo；mode=ai 锁定 ai_generated；mode=push 默认 third_party |
-| mode | 必填；**联动必填**：builtin⇒path；command/ai⇒command；manual/push⇒path 与 command 均隐藏 |
-| path | builtin 必填；glob 语法预检（括号/花括号配对）；提交后若 `asset_path_not_found` 走候选修正卡 |
-| command | command/ai 必填；≤ 512 字符；提示"将在服务根目录快照内执行" |
-| ord | overlay 显示，0–99 整数；同资产重复值提交时按 conflict 映射提示 |
-| timeoutSec | 10–3600；mode=ai 默认 600，其它默认 120 |
-
-### E.4 PAT 表单
-
-| 字段 | 规则 |
-| --- | --- |
-| name | 必填 1–64 |
-| scopes | 至少选 1 项（checkbox 组） |
-| expiresAt | 单选：30/90/180 天/自定义日期（≤ 2 年）/永不（需二次确认"安全风险"提示） |
-
-### E.5 overlay 编辑器（保存前本地预检）
-
-| 检查 | 规则 |
-| --- | --- |
-| 大小 | ≤ 1MB（与 `REVISION_MAX_BYTES` 一致），超限禁用保存按钮并提示 |
-| YAML 语法 | js-yaml 解析（Worker 中），语法错误行内标注、禁用保存 |
-| 方言头 | 须含 `overlay: "1.0.0"` 或 `overlay: platform/v1`；platform/v1 须含 `target_kind` 且等于当前资产 kind（本地即校验，减少一轮 422） |
-| 服务端回执 | `overlay_invalid` 的 details.errors 逐条映射到编辑器行（附录 C） |
-
-### E.6 其它表单速览
-
-| 表单 | 关键规则 |
-| --- | --- |
-| 成员邀请 | userId 必填（搜索选择）；role 必填；重复邀请按 conflict 提示 |
-| 系统分组 | slug `^[a-z0-9-]{1,64}$`；parentId 选择时过滤掉已有 parent 的分组（前端预防 nesting_too_deep） |
-| 分享链接 | expiresIn 单选：1h/24h/7d/30d；生成后 URL 只读框 + 复制按钮 |
-| 驳回意见 | comment 必填 1–1000 字符（阻断提交） |
-| breaking 确认 | comment 可空 ≤ 1000 |
-| 服务设置 | slug 只读（创建后不可改）；visibility 改 public 时二次确认"匿名可见" |
-| 租户设置 | aiTrustMode 开启时二次确认"AI/第三方修订将跳过审批"；webhook URL 必须 `https?://` |
-
-
-
-
+完成定义不是页面存在，而是对应 `acceptance.yaml` 的用户故事、错误路径和权限反例通过，且生成代码无漂移。

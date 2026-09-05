@@ -1,0 +1,7 @@
+.vfox/
+web/node_modules/
+web/.nuxt/
+web/.output/
+web/dist/
+bin/
+*.log

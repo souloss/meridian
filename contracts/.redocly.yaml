@@ -1,0 +1,8 @@
+extends:
+  - recommended
+
+rules:
+  # Operation summaries and tag prose are editorial metadata; operationId,
+  # schemas, security, and response contracts remain mandatory.
+  operation-summary: off
+  tag-description: off

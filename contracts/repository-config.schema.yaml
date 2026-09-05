@@ -1,0 +1,116 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://meridian.local/contracts/repository-config/v1
+title: Meridian repository configuration
+x-format-semantics:
+  repository-relative-path: normalized-slash-path-starting-at-repository-root-no-leading-slash-no-dotdot-no-nul
+  repository-service-root: exact-dot-for-repository-root-or-normalized-nonempty-repository-relative-path-with-no-dot-segments
+  repository-relative-glob: repository-relative-path-with-only-star-double-star-question-and-brace-alternation-glob-syntax
+  git-ref-glob: full-ref-name-glob-with-star-and-double-star-no-negation
+x-invariants:
+  - service-name-is-the-service-slug-and-is-unique-in-the-file
+  - service-root-is-unique-in-the-file
+  - asset-kind-plus-explicit-name-is-unique-inside-a-service
+  - manual-source-must-reference-an-explicit-existing-asset-name
+  - rendered-asset-names-are-normalized-by-domain-sourceExpansion-and-collisions-fail-the-preview
+type: object
+additionalProperties: false
+required: [version, services]
+properties:
+  version: {const: 1}
+  services:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [name, root, assets]
+      properties:
+        name: {type: string, pattern: '^[a-z0-9][a-z0-9-]{0,63}$'}
+        displayName: {type: string, minLength: 1, maxLength: 128}
+        root: {type: string, minLength: 1, maxLength: 512, format: repository-service-root, description: Exact '.' denotes the repository root and is normalized to the API/database empty rootDir.}
+        language: {type: string}
+        framework: {type: string}
+        assets:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [kind]
+            anyOf:
+              - required: [base]
+              - required: [overlays]
+            properties:
+              kind: {type: string, minLength: 1}
+              name: {type: string, pattern: '^[a-z0-9][a-z0-9-]{0,63}$'}
+              namingTemplate:
+                type: string
+                maxLength: 128
+                pattern: '^(?:[a-z0-9-]|\{file_stem\}|\{parent_dir\})+$'
+                default: '{file_stem}'
+              base: {$ref: '#/$defs/source'}
+              overlays:
+                type: array
+                minItems: 1
+                items: {$ref: '#/$defs/source'}
+            allOf:
+              - if:
+                  properties:
+                    base:
+                      properties: {mode: {const: manual}}
+                      required: [mode]
+                  required: [base]
+                then: {required: [name]}
+              - if:
+                  properties:
+                    overlays:
+                      contains:
+                        properties: {mode: {const: manual}}
+                        required: [mode]
+                  required: [overlays]
+                then: {required: [name]}
+$defs:
+  source:
+    type: object
+    additionalProperties: false
+    required: [mode]
+    properties:
+      mode: {type: string, enum: [builtin, command, push, manual, ai]}
+      origin: {type: string, enum: [repo, third_party, manual, ai_generated]}
+      path: {type: string, minLength: 1, maxLength: 512, format: repository-relative-glob}
+      producerProfile: {type: string, pattern: '^[a-z0-9][a-z0-9-]{0,63}$'}
+      order: {type: integer, minimum: 0, maximum: 999, default: 0}
+      timeoutSec:
+        type: integer
+        minimum: 10
+        maximum: 3600
+        description: Omitted values use the source-mode default declared in domain.yaml sourceCompatibility.createDefaults.timeoutSecByMode.
+        x-default-by-mode: {builtin: 120, command: 120, push: 120, manual: 120, ai: 600}
+      branchPatterns:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items: {type: string, minLength: 1, maxLength: 255, format: git-ref-glob}
+      enabled: {type: boolean, default: true}
+    allOf:
+      - if: {properties: {mode: {const: builtin}}, required: [mode]}
+        then:
+          required: [path]
+          properties: {origin: {const: repo}}
+          not: {required: [producerProfile]}
+      - if: {properties: {mode: {const: command}}, required: [mode]}
+        then:
+          required: [producerProfile]
+          properties: {origin: {const: repo}}
+          not: {required: [path]}
+      - if: {properties: {mode: {const: push}}, required: [mode]}
+        then:
+          properties: {origin: {const: third_party}}
+          not: {anyOf: [{required: [path]}, {required: [producerProfile]}]}
+      - if: {properties: {mode: {const: manual}}, required: [mode]}
+        then:
+          properties: {origin: {const: manual}}
+          not: {anyOf: [{required: [path]}, {required: [producerProfile]}]}
+      - if: {properties: {mode: {const: ai}}, required: [mode]}
+        then:
+          required: [producerProfile]
+          properties: {origin: {const: ai_generated}}
+          not: {required: [path]}

@@ -1,0 +1,182 @@
+asyncapi: 3.0.0
+info:
+  title: Meridian Domain Events
+  version: 1.0.0
+  description: Authoritative event and outbound webhook contract.
+defaultContentType: application/json
+channels:
+  domainEvents:
+    address: meridian.domain-events
+    messages:
+      versionPublished: {$ref: '#/components/messages/versionPublished'}
+      versionBreaking: {$ref: '#/components/messages/versionBreaking'}
+      collectFailed: {$ref: '#/components/messages/collectFailed'}
+      serviceDeprecated: {$ref: '#/components/messages/serviceDeprecated'}
+      aiLayerGenerated: {$ref: '#/components/messages/aiLayerGenerated'}
+      layerApproved: {$ref: '#/components/messages/layerApproved'}
+      layerRejected: {$ref: '#/components/messages/layerRejected'}
+operations:
+  publishDomainEvents:
+    action: send
+    channel: {$ref: '#/channels/domainEvents'}
+  consumeDomainEvents:
+    action: receive
+    channel: {$ref: '#/channels/domainEvents'}
+components:
+  messages:
+    versionPublished:
+      name: version.published
+      payload: {$ref: '#/components/schemas/VersionPublishedEvent'}
+    versionBreaking:
+      name: version.breaking
+      payload: {$ref: '#/components/schemas/VersionBreakingEvent'}
+    collectFailed:
+      name: collect.failed
+      payload: {$ref: '#/components/schemas/CollectFailedEvent'}
+    serviceDeprecated:
+      name: service.deprecated
+      payload: {$ref: '#/components/schemas/ServiceDeprecatedEvent'}
+    aiLayerGenerated:
+      name: ai_layer.generated
+      payload: {$ref: '#/components/schemas/AiLayerGeneratedEvent'}
+    layerApproved:
+      name: layer.approved
+      payload: {$ref: '#/components/schemas/LayerApprovedEvent'}
+    layerRejected:
+      name: layer.rejected
+      payload: {$ref: '#/components/schemas/LayerRejectedEvent'}
+  schemas:
+    EventEnvelope:
+      type: object
+      additionalProperties: false
+      required: [eventId, eventType, occurredAt, tenantSlug, aggregateType, aggregateId, aggregateVersion, payload]
+      properties:
+        eventId: {type: string, format: uuid}
+        eventType: {type: string}
+        occurredAt: {type: string, format: date-time}
+        tenantSlug: {type: string}
+        aggregateType: {type: string}
+        aggregateId: {type: string, format: uuid}
+        aggregateVersion: {type: integer, minimum: 1}
+        payload: {type: object}
+    VersionPublishedEvent:
+      allOf:
+        - {$ref: '#/components/schemas/EventEnvelope'}
+        - {type: object, properties: {eventType: {const: version.published}, aggregateType: {const: asset_version}, payload: {$ref: '#/components/schemas/VersionPublishedPayload'}}}
+    VersionBreakingEvent:
+      allOf:
+        - {$ref: '#/components/schemas/EventEnvelope'}
+        - {type: object, properties: {eventType: {const: version.breaking}, aggregateType: {const: asset_version}, payload: {$ref: '#/components/schemas/VersionBreakingPayload'}}}
+    CollectFailedEvent:
+      allOf:
+        - {$ref: '#/components/schemas/EventEnvelope'}
+        - {type: object, properties: {eventType: {const: collect.failed}, aggregateType: {const: job}, payload: {$ref: '#/components/schemas/CollectFailedPayload'}}}
+    ServiceDeprecatedEvent:
+      allOf:
+        - {$ref: '#/components/schemas/EventEnvelope'}
+        - {type: object, properties: {eventType: {const: service.deprecated}, aggregateType: {const: service}, payload: {$ref: '#/components/schemas/ServiceDeprecatedPayload'}}}
+    AiLayerGeneratedEvent:
+      allOf:
+        - {$ref: '#/components/schemas/EventEnvelope'}
+        - {type: object, properties: {eventType: {const: ai_layer.generated}, aggregateType: {const: layer_revision}, payload: {$ref: '#/components/schemas/LayerRevisionPayload'}}}
+    LayerApprovedEvent:
+      allOf:
+        - {$ref: '#/components/schemas/EventEnvelope'}
+        - {type: object, properties: {eventType: {const: layer.approved}, aggregateType: {const: layer_revision}, payload: {$ref: '#/components/schemas/ReviewedLayerRevisionPayload'}}}
+    LayerRejectedEvent:
+      allOf:
+        - {$ref: '#/components/schemas/EventEnvelope'}
+        - {type: object, properties: {eventType: {const: layer.rejected}, aggregateType: {const: layer_revision}, payload: {$ref: '#/components/schemas/ReviewedLayerRevisionPayload'}}}
+    VersionPublishedPayload:
+      type: object
+      additionalProperties: false
+      required: [serviceSlug, assetId, assetKind, assetName, assetVersionId, version, refType, refName]
+      properties:
+        serviceSlug: {type: string}
+        assetId: {type: string, format: uuid}
+        assetKind: {type: string}
+        assetName: {type: string}
+        assetVersionId: {type: string, format: uuid}
+        version: {type: string}
+        refType: {type: string, enum: [branch, tag]}
+        refName: {type: string}
+    VersionBreakingPayload:
+      type: object
+      additionalProperties: false
+      required: [serviceSlug, assetId, assetKind, assetName, assetVersionId, version, refType, refName, diffSnapshotId, diffSummary]
+      properties:
+        serviceSlug: {type: string}
+        assetId: {type: string, format: uuid}
+        assetKind: {type: string}
+        assetName: {type: string}
+        assetVersionId: {type: string, format: uuid}
+        version: {type: string}
+        refType: {type: string, enum: [branch, tag]}
+        refName: {type: string}
+        diffSnapshotId: {type: string, format: uuid}
+        diffSummary: {$ref: '#/components/schemas/DiffSummary'}
+    CollectFailedPayload:
+      type: object
+      additionalProperties: false
+      required: [repositoryId, jobId, stage, errorCode]
+      properties:
+        repositoryId: {type: string, format: uuid}
+        jobId: {type: string, format: uuid}
+        stage: {type: string, enum: [resolve, discover, extract, merge, normalize, index]}
+        errorCode: {type: string}
+    ServiceDeprecatedPayload:
+      type: object
+      additionalProperties: false
+      required: [serviceId, serviceSlug]
+      properties:
+        serviceId: {type: string, format: uuid}
+        serviceSlug: {type: string}
+    LayerRevisionPayload:
+      type: object
+      additionalProperties: false
+      required: [serviceSlug, assetId, layerId, revisionId]
+      properties:
+        serviceSlug: {type: string}
+        assetId: {type: string, format: uuid}
+        layerId: {type: string, format: uuid}
+        revisionId: {type: string, format: uuid}
+    ReviewedLayerRevisionPayload:
+      type: object
+      additionalProperties: false
+      required: [serviceSlug, assetId, layerId, revisionId, reviewerId]
+      properties:
+        serviceSlug: {type: string}
+        assetId: {type: string, format: uuid}
+        layerId: {type: string, format: uuid}
+        revisionId: {type: string, format: uuid}
+        reviewerId: {type: string, format: uuid}
+    DiffSummary:
+      type: object
+      additionalProperties: false
+      required: [added, removed, modified, breaking, risky, nonBreaking, informational]
+      properties:
+        added: {type: integer, minimum: 0}
+        removed: {type: integer, minimum: 0}
+        modified: {type: integer, minimum: 0}
+        breaking: {type: integer, minimum: 0}
+        risky: {type: integer, minimum: 0}
+        nonBreaking: {type: integer, minimum: 0}
+        informational: {type: integer, minimum: 0}
+x-webhook:
+  method: POST
+  contentType: application/json
+  body: EventEnvelope
+  signature:
+    header: X-Meridian-Signature-256
+    algorithm: hmac-sha256
+    valueFormat: sha256=<lowercase-hex>
+    signedBytes: raw-request-body
+  delivery:
+    semantics: at-least-once
+    receiverDeduplicationKey: eventId
+    attempts: 6
+    backoffSeconds: [30, 120, 600, 1800, 7200]
+    successStatuses: [200, 201, 202, 204]
+  notificationPolicy:
+    mergeDifferentEventTypes: false
+    versionWithBreakingProduces: [version.published, version.breaking]

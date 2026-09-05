@@ -1,0 +1,136 @@
+contractVersion: 1.0.0
+status: frozen
+schemaDialect: https://json-schema.org/draft/2020-12/schema
+authority:
+  rule: each-contract-owns-its-declared-scope-and-contract-yaml-overrides-narrative-design
+  conflictBehavior: fail-validation-no-implicit-precedence
+  ownership:
+    manifest.yaml: development-toolchain-version-ranges-code-generation-and-build-gates
+    openapi.yaml: http-transport-security-operation-and-wire-schema
+    domain.yaml: domain-enum-state-permission-default-limit-and-behavior
+    storage.yaml: relational-schema-key-index-and-transaction-boundary
+    kinds.yaml: asset-kind-plugin-and-content-schema
+    views.yaml: built-in-view-registry-and-input-contract
+    events.yaml: event-envelope-payload-signature-and-delivery
+    acceptance.yaml: fixture-story-smoke-and-assertion-mapping
+    cli.yaml: meridian-cli-flags-selector-api-mapping-output-and-exit-codes
+    repository-config.schema.yaml: repository-file-syntax
+    .redocly.yaml: openapi-structural-validation-rule-configuration
+  projections:
+    openapiDomainEnums: must-exactly-match-domain.yaml
+    openapiViewSchemas: must-accept-every-built-in-view-from-views.yaml
+    storageDomainStates: must-exactly-match-domain.yaml
+  roots:
+    api: ./openapi.yaml
+    domain: ./domain.yaml
+    views: ./views.yaml
+    events: ./events.yaml
+    acceptance: ./acceptance.yaml
+    cli: ./cli.yaml
+    kinds: ./kinds.yaml
+    repositoryConfig: ./repository-config.schema.yaml
+    storage: ./storage.yaml
+compatibility:
+  api:
+    breakingChange: increment-api-major-and-serve-previous-major-for-one-release-cycle
+    additiveResponseField: compatible
+  domain:
+    enumAddition: breaking-unless-consumers-declare-unknown-value-handling
+    stateTransitionChange: breaking
+  events:
+    requiredFieldAddition: breaking
+    optionalFieldAddition: compatible
+generatedArtifacts:
+  goAPI: internal/generated/api
+  typescriptClient: web/app/api/generated
+  typescriptMocks: web/app/api/generated/mocks
+  frontendStatic: web/.output/public
+  openapiBundle: dist/contracts/openapi.yaml
+toolchain:
+  decisionRecord: ../docs/05_technology-stack-decision.md
+  versionPolicy:
+    baseline: minor-ranges-below-are-frozen
+    lockfiles: exact-direct-and-transitive-versions
+    patchUpgrade: allowed-only-after-contract-unit-e2e-and-bundle-gates-pass
+    minorOrMajorUpgrade: requires-technology-decision-record-update
+  go: '>=1.27.1,<1.28.0'
+  node: '>=24.20.0,<25.0.0'
+  pnpm: '>=11.0.0,<12.0.0'
+  backend:
+    architecture: modular-monolith-single-static-binary
+    cli: {module: github.com/spf13/cobra, minor: '1.10'}
+    router: {module: github.com/go-chi/chi/v5, major: 5}
+    databaseDriver: {module: github.com/jackc/pgx/v5, major: 5}
+    queryGenerator: {module: github.com/sqlc-dev/sqlc, major: 1}
+    queue: {module: github.com/riverqueue/river, minor: '0.33'}
+    migrations: {module: github.com/pressly/goose/v3, major: 3, source: embedded-sql}
+    assetParser: {module: github.com/pb33f/libopenapi, major: 0}
+    jsonPatch: {module: github.com/evanphx/json-patch/v5, major: 5}
+    logging: log/slog
+    metrics: github.com/prometheus/client_golang
+  frontend:
+    rendering: spa
+    framework: {package: nuxt, version: '>=4.5.0,<5.0.0'}
+    viewRuntime: {package: vue, version: '>=3.5.0,<4.0.0'}
+    language: {package: typescript, version: '>=5.9.0,<6.0.0'}
+    ui: {package: '@nuxt/ui', version: '>=4.11.0,<5.0.0'}
+    styling: {package: tailwindcss, version: '>=4.1.0,<5.0.0'}
+    serverState: {package: '@tanstack/vue-query', version: '>=5.0.0,<6.0.0'}
+    clientState: {package: pinia, version: '>=3.0.0,<4.0.0'}
+    schemaValidation: {package: ajv, version: '>=8.0.0,<9.0.0', dialect: draft-2020-12}
+    forms: {package: zod, version: '>=4.0.0,<5.0.0'}
+    editor: {family: codemirror, major: 6, diffPackage: '@codemirror/merge'}
+    dependencyGraph: {package: cytoscape, version: '>=3.34.0,<4.0.0'}
+    localization: {package: '@nuxtjs/i18n', version: '>=10.6.0,<11.0.0'}
+    icons: {packages: ['@nuxt/icon', '@iconify-json/lucide'], runtimeNetwork: forbidden}
+  openapiGeneration:
+    go:
+      generator: github.com/oapi-codegen/oapi-codegen/v2
+      version: '>=2.8.0,<3.0.0'
+      targets: [models, chi-server, strict-server, client, embedded-spec]
+      requestValidation: github.com/oapi-codegen/nethttp-middleware
+    typescript:
+      generator: orval
+      version: '>=8.23.0,<9.0.0'
+      client: vue-query
+      httpClient: fetch
+      outputMode: tags-split
+      mocks: msw
+      customFetcherScope: base-url-cookie-csrf-error-request-id-only
+  openapiLint:
+    tool: redocly-cli
+    version: '>=2.51.1,<3.0.0'
+    config: ./.redocly.yaml
+  dependencyPinning:
+    go: go.mod-and-go.sum
+    node: package.json-and-pnpm-lock.yaml
+    toolVersions: .tool-versions-or-equivalent-checked-in
+  ciCommands:
+    validateContracts: make contracts-validate
+    generateContracts: make contracts-generate
+    assertGeneratedClean: make contracts-generate-then-git-diff-exit-code
+validation:
+  unresolvedDecisionsAllowed: false
+  unresolvedDecisions: []
+  requiredChecks:
+    - parse-all-yaml
+    - validate-openapi-3.1
+    - validate-custom-schema-formats
+    - resolve-all-local-references
+    - validate-view-registry
+    - validate-domain-cross-references
+    - validate-cross-contract-projections
+    - validate-permission-catalog-coverage
+    - validate-storage-field-type-and-index-coverage
+    - validate-acceptance-operation-ids
+    - generate-go-and-typescript-and-require-clean-diff
+    - validate-toolchain-version-ranges
+    - reject-nuxt-server-runtime-and-runtime-cdn-dependencies
+    - reject-handwritten-dto-contracts-in-narrative-docs
+milestones:
+  M0: foundation
+  M1: asset-mainline
+  M2: layers-and-overlay
+  M3: ai-diff-and-gates
+  M4: multi-kind-search-and-global-views
+  M5: collaboration-and-open-integration

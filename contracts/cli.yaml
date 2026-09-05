@@ -1,0 +1,182 @@
+schemaVersion: 1
+contractId: meridian-cli-v1
+status: frozen
+binary: meridian
+authority: command-flags-selector-grammar-api-mapping-output-and-exit-codes
+
+global:
+  server:
+    flag: --server
+    environment: MERIDIAN_SERVER
+    default: http://localhost:8080
+  tenant:
+    flag: --tenant
+    environment: MERIDIAN_TENANT
+    requiredForTenantCommands: true
+  authentication:
+    precedence: [token-file, environment]
+    tokenFileFlag: --token-file
+    tokenEnvironment: MERIDIAN_TOKEN
+    rawTokenFlag: forbidden
+    acceptedTokenPrefix: pat_
+  output:
+    flag: --output
+    values: [json, table]
+    defaultWhenTty: table
+    defaultWhenNotTty: json
+    stdout: result-only
+    stderr: diagnostics-only
+  jobWaiting:
+    flag: --wait
+    default: true
+    timeoutFlag: --wait-timeout
+    timeoutDefaultSeconds: 600
+    pollIntervalSeconds: 1
+    interruptBehavior: exit-130-without-cancelling-server-job
+    appliesTo: [push, sync, produce, ai-gen]
+    jobLookupOperationId: getJob
+    acceptedJobIdFields: [jobId]
+    terminalSuccessStatuses: [succeeded, succeeded_with_warnings]
+    terminalFailureStatuses: [failed, cancelled, outcome_unknown]
+    waitFalseOutput: print-initial-operation-response
+    waitTrueOutput: print-terminal-job
+  idempotency:
+    flag: --idempotency-key
+    environmentFallback: MERIDIAN_IDEMPOTENCY_KEY
+    requiredOperationFallback: generate-random-uuid-v4-and-print-to-stderr
+    retryGuidance: ci-retries-must-reuse-the-same-key
+
+selectorGrammar:
+  version:
+    syntax: 'version:<version-uuid>'
+    mapsTo: {type: version, versionId: '<version-uuid>'}
+  ref:
+    syntax: 'ref:<asset-uuid>:<branch|tag>:<ref-name>'
+    mapsTo: {type: ref, assetId: '<asset-uuid>', refType: '<branch|tag>', ref: '<ref-name>'}
+  file:
+    syntax: 'file:<local-path>'
+    preprocessing: call-createDiffUpload-and-map-returned-id-to-upload-selector
+    requiredCompanionFlag: --kind
+    mapsTo: {type: upload, uploadId: '<created-upload-uuid>'}
+  escaping: ref-name-must-match-openapi-RefName-and-therefore-cannot-contain-colon
+
+commands:
+  push:
+    milestone: M3
+    operationId: pushAssetRevision
+    requiredPatScope: asset:push
+    requiredFlags: [--service, --kind, --name, --ref, --source-system, --file]
+    flags:
+      --service: {mapsToPath: serviceSlug}
+      --kind: {mapsToBody: kind}
+      --name: {mapsToBody: name}
+      --ref-type: {mapsToBody: refType, values: [branch, tag], default: branch}
+      --ref: {mapsToBody: ref}
+      --source-system: {mapsToBody: sourceSystem}
+      --file: {mapsToBody: content, read: utf8}
+      --content-type: {mapsToBody: contentType, values: [yaml, json], default: infer-yaml-yml-json-extension-else-required}
+      --role: {mapsToBody: role, values: [base, overlay], default: base}
+      --dialect: {mapsToBody: dialect, nullable: true}
+      --source-commit: {mapsToBody: sourceCommit, environmentFallback: CI_COMMIT_SHA, nullable: true}
+      --create-if-missing: {mapsToBody: createIfMissing, type: boolean, default: false}
+      --idempotency-key: {mapsToHeader: Idempotency-Key, environmentFallback: MERIDIAN_IDEMPOTENCY_KEY}
+  diff:
+    milestone: M3
+    operationIds: [createDiffUpload, runDiff]
+    requiredPatScope: asset:read
+    requiredFlags: [--left, --right]
+    flags:
+      --left: {mapsToBody: left, grammar: selectorGrammar}
+      --right: {mapsToBody: right, grammar: selectorGrammar}
+      --kind: {mapsToUpload: kind, requiredWhenAnySelectorIsFile: true}
+      --rule-set-id: {mapsToBody: ruleSetId, nullable: true}
+      --persist: {mapsToBody: persist, type: boolean, default: true}
+      --fail-on: {values: [none, breaking, risky], default: none}
+    threshold:
+      none: []
+      breaking: [breaking]
+      risky: [breaking, risky]
+    result: print-DiffResult-in-selected-output-format
+  list:
+    milestone: M1
+    subcommands:
+      services:
+        operationId: listServices
+        requiredFlags: []
+        flags:
+          --page: {mapsToQuery: page, type: integer, default: 1}
+          --page-size: {mapsToQuery: pageSize, type: integer, default: 20}
+          --query: {mapsToQuery: q, nullable: true}
+      assets:
+        operationId: getService
+        requiredFlags: [--service]
+        flags: {--service: {mapsToPath: serviceSlug}}
+        resultField: assets
+      versions:
+        operationId: listAssetVersions
+        requiredFlags: [--asset]
+        flags:
+          --asset: {mapsToPath: assetId}
+          --ref-type: {mapsToQuery: refType, values: [branch, tag], default: branch}
+          --ref: {mapsToQuery: ref, nullable: true, default: repository-default-branch}
+          --page: {mapsToQuery: page, type: integer, default: 1}
+          --page-size: {mapsToQuery: pageSize, type: integer, default: 20}
+  sync:
+    milestone: M1
+    operationId: syncRepository
+    requiredPatScope: job:run
+    requiredFlags: [--repository]
+    flags:
+      --repository: {mapsToPath: repositoryId}
+      --ref-type: {mapsToBody: refType, values: [branch, tag], default: branch}
+      --ref: {mapsToBody: ref, nullable: true, default: repository-default-branch}
+      --force: {mapsToBody: force, type: boolean, default: false}
+      --idempotency-key: {mapsToHeader: Idempotency-Key, environmentFallback: MERIDIAN_IDEMPOTENCY_KEY}
+  produce:
+    milestone: M1
+    operationId: produceSource
+    requiredPatScope: job:run
+    requiredFlags: [--source]
+    flags:
+      --source: {mapsToPath: sourceId}
+      --ref-type: {mapsToBody: refType, values: [branch, tag], default: branch}
+      --ref: {mapsToBody: ref, nullable: true, default: repository-default-branch}
+      --force: {mapsToBody: force, type: boolean, default: false}
+      --idempotency-key: {mapsToHeader: Idempotency-Key, environmentFallback: MERIDIAN_IDEMPOTENCY_KEY}
+  ai-gen:
+    milestone: M3
+    operations:
+      missingAsset: {operationId: generateMissingAssetWithAi, selector: --service-plus---kind-plus---name}
+      existingAsset: {operationId: generateAssetWithAi, selector: --asset}
+    mutualExclusion: exactly-one-of---service-or---asset
+    requiredFlags: [--producer-profile]
+    conditionalRequirements:
+      --service: [--kind, --name]
+      --asset: []
+    flags:
+      --service: {mapsToPathWhen: missingAsset.serviceSlug}
+      --asset: {mapsToPathWhen: existingAsset.assetId}
+      --kind: {mapsToBodyWhen: missingAsset.kind}
+      --name: {mapsToBodyWhen: missingAsset.name}
+      --producer-profile: {mapsToBody: producerProfileId}
+      --source: {mapsToBodyWhen: existingAsset.sourceId, nullable: true}
+      --ref-type: {mapsToBody: refType, values: [branch, tag], default: branch}
+      --ref: {mapsToBody: ref, nullable: true, default: repository-default-branch}
+      --hint: {mapsToBody: hint, nullable: true, maxChars: 500}
+      --idempotency-key: {mapsToHeader: Idempotency-Key, environmentFallback: MERIDIAN_IDEMPOTENCY_KEY}
+
+exitCodes:
+  0: command-succeeded-and-diff-threshold-not-met
+  2: local-usage-input-or-contract-validation-error
+  3: diff-fail-on-threshold-met
+  4: http-401-unauthenticated
+  5: http-404-not-found-or-not-authorized
+  6: http-409-or-412-conflict
+  7: network-http-5xx-or-terminal-server-job-failure
+  8: client-wait-timeout-server-job-left-running
+  130: interrupted-server-job-left-running
+
+security:
+  secretRedaction: authorization-token-and-secret-fields-never-printed
+  tls: https-required-except-loopback-local-development
+  serverErrors: print-code-message-requestId-and-field-details-without-stack-trace

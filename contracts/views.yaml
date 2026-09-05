@@ -1,0 +1,226 @@
+schemaVersion: 1
+contractId: meridian-built-in-views-v1
+status: frozen
+authority: >-
+  This file is the only authoritative registry for built-in view identifiers,
+  input constraints, mount targets, default options, and table columns.
+
+runtime:
+  componentRegistryKey: component
+  iframeEntrypointKey: entrypoint
+  externalUrlKey: externalUrl
+  optionsValidation: json-schema-draft-2020-12
+  unavailableFrontendComponent: hide-and-report-contract-drift
+  iframe:
+    sandbox: allow-scripts allow-forms
+    sameOriginCredentialAccess: false
+    originModel: opaque-because-allow-same-origin-is-absent
+    bootstrap:
+      transport: window-postMessage-with-transferred-MessagePort
+      targetOrigin: '*'
+      payload: [type, oneTimeNonce]
+      acceptance: frame-must-echo-oneTimeNonce-on-transferred-port
+    steadyStateTransport: transferred-MessagePort-only
+    ignoreWindowMessagesAfterBootstrap: true
+    messages:
+      shellToFrame:
+        init: [documentText, mediaType, theme, options]
+        theme: [theme]
+        tryResponse: [requestId, status, headers, body]
+      frameToShell:
+        ready: []
+        resize: [height]
+        tryRequest: [requestId, url, method, headers, body]
+    resizeBoundsPx: {min: 240, max: 4000}
+    documentDelivery: parent-fetches-signed-artifact-and-transfers-text-over-port
+    frameConnectSrc: none
+
+views:
+  - id: swagger-ui
+    nameKey: view.swaggerUi
+    milestone: M1
+    mount: iframe
+    entrypoint: /viewer-assets/swagger-ui/index.html
+    input: {mode: single, kinds: [openapi]}
+    defaultOptions: {tryItOut: false}
+    optionsSchema:
+      type: object
+      additionalProperties: false
+      properties:
+        tryItOut: {type: boolean, default: false}
+
+  - id: redoc
+    nameKey: view.redoc
+    milestone: M1
+    mount: iframe
+    entrypoint: /viewer-assets/redoc/index.html
+    input: {mode: single, kinds: [openapi]}
+    defaultOptions: {}
+    optionsSchema: {type: object, additionalProperties: false}
+
+  - id: source
+    nameKey: view.source
+    milestone: M1
+    mount: component
+    component: SourceView
+    input: {mode: single, kinds: '*'}
+    defaultOptions: {layerAnnotations: false}
+    optionsSchema:
+      type: object
+      additionalProperties: false
+      properties:
+        layerAnnotations: {type: boolean, default: false}
+
+  - id: layers
+    nameKey: view.layers
+    milestone: M2
+    mount: component
+    component: LayersView
+    input: {mode: single, kinds: '*'}
+    defaultOptions: {previewMode: split}
+    optionsSchema:
+      type: object
+      additionalProperties: false
+      properties:
+        previewMode: {type: string, enum: [split, merged], default: split}
+
+  - id: operations
+    nameKey: view.operations
+    milestone: M1
+    mount: component
+    component: ItemsTableView
+    input: {mode: single, kinds: [openapi]}
+    itemTypes: [operation]
+    columns:
+      - {key: method, labelKey: item.method, type: method}
+      - {key: path, labelKey: item.path, type: text}
+      - {key: summary, labelKey: item.summary, type: text}
+      - {key: tags, labelKey: item.tags, type: tags}
+      - {key: deprecated, labelKey: item.deprecated, type: boolean}
+    defaultOptions: {pageSize: 50}
+    optionsSchema:
+      type: object
+      additionalProperties: false
+      properties:
+        pageSize: {type: integer, enum: [20, 50, 100], default: 50}
+
+  - id: items-table
+    nameKey: view.itemsTable
+    milestone: M1
+    mount: component
+    component: ItemsTableView
+    input: {mode: single, kinds: '*'}
+    columnsSource: asset-kind-item-schema
+    fallbackColumns:
+      - {key: itemType, labelKey: item.type, type: text}
+      - {key: key, labelKey: item.key, type: text}
+      - {key: display, labelKey: item.details, type: json}
+    defaultOptions: {pageSize: 50}
+    optionsSchema:
+      type: object
+      additionalProperties: false
+      properties:
+        pageSize: {type: integer, enum: [20, 50, 100], default: 50}
+
+  - id: diff
+    nameKey: view.diff
+    milestone: M3
+    mount: component
+    component: DiffView
+    input: {mode: versions, kinds: '*', minDocs: 2, maxDocs: 2, sameKind: true}
+    defaultOptions: {presentation: tree, levels: [breaking, risky, non_breaking]}
+    optionsSchema:
+      type: object
+      additionalProperties: false
+      properties:
+        presentation: {type: string, enum: [tree, side_by_side, list], default: tree}
+        levels:
+          type: array
+          uniqueItems: true
+          items: {type: string, enum: [breaking, risky, non_breaking, informational]}
+
+  - id: changelog
+    nameKey: view.changelog
+    milestone: M4
+    mount: component
+    component: ChangelogView
+    input: {mode: versions, kinds: '*', minDocs: 2, maxDocs: 50, sameKind: true, sameAsset: true}
+    defaultOptions: {}
+    optionsSchema: {type: object, additionalProperties: false}
+
+  - id: collection-table
+    nameKey: view.collectionTable
+    milestone: M4
+    mount: component
+    component: CollectionTableView
+    input: {mode: collection, kinds: '*', minDocs: 1, maxDocs: 50, sameKind: true}
+    defaultOptions: {pageSize: 50}
+    optionsSchema:
+      type: object
+      additionalProperties: false
+      properties:
+        pageSize: {type: integer, enum: [20, 50, 100], default: 50}
+
+  - id: dep-graph
+    nameKey: view.dependencyGraph
+    milestone: M4
+    mount: component
+    component: DependencyGraphView
+    input: {mode: scope, scopes: [system_group, tenant], kinds: [dependency]}
+    query:
+      defaultNodeLimit: 500
+      defaultEdgeLimit: 2000
+      hardEdgeLimit: 5000
+      overDefaultBehavior: server-neighborhood-query
+    defaultOptions: {layout: hierarchical, focusDepth: 1}
+    optionsSchema:
+      type: object
+      additionalProperties: false
+      properties:
+        layout: {type: string, enum: [hierarchical, force], default: hierarchical}
+        focusServiceId: {type: [string, 'null'], format: uuid}
+        focusDepth: {type: integer, minimum: 1, maximum: 3, default: 1}
+
+  - id: catalog-dashboard
+    nameKey: view.catalogDashboard
+    milestone: M4
+    mount: component
+    component: CatalogDashboardView
+    input: {mode: scope, scopes: [service, system_group, tenant], kinds: '*'}
+    defaultOptions: {}
+    optionsSchema: {type: object, additionalProperties: false}
+
+assetKindItemSchemas:
+  openapi:
+    operation:
+      requiredDisplayFields: [method, path, summary, tags, deprecated]
+      columns:
+        - {key: method, labelKey: item.method, type: method}
+        - {key: path, labelKey: item.path, type: text}
+        - {key: summary, labelKey: item.summary, type: text}
+        - {key: tags, labelKey: item.tags, type: tags}
+        - {key: deprecated, labelKey: item.deprecated, type: boolean}
+  dbschema:
+    table:
+      requiredDisplayFields: [name, description, columnCount]
+      columns:
+        - {key: name, labelKey: item.tableName, type: text}
+        - {key: description, labelKey: item.description, type: text}
+        - {key: columnCount, labelKey: item.columnCount, type: number}
+    column:
+      requiredDisplayFields: [table, name, dataType, nullable, description]
+      columns:
+        - {key: table, labelKey: item.tableName, type: text}
+        - {key: name, labelKey: item.columnName, type: text}
+        - {key: dataType, labelKey: item.dataType, type: text}
+        - {key: nullable, labelKey: item.nullable, type: boolean}
+        - {key: description, labelKey: item.description, type: text}
+  dependency:
+    edge:
+      requiredDisplayFields: [fromServiceId, toServiceId, external, protocol, middleware]
+      columns:
+        - {key: fromServiceId, labelKey: item.fromService, type: service_ref}
+        - {key: toServiceId, labelKey: item.toService, type: service_ref}
+        - {key: external, labelKey: item.external, type: text}
+        - {key: protocol, labelKey: item.protocol, type: text}
+        - {key: middleware, labelKey: item.middleware, type: text}

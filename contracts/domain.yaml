@@ -1,0 +1,1295 @@
+schemaVersion: 1
+contractId: meridian-domain-v1
+status: frozen
+authority:
+  businessRequirements: ../01_requirement-specification.md
+  acceptance: ../04_user-story-smoke-test-plan.md
+  transportAndDtos: ./openapi.yaml
+  builtInViews: ./views.yaml
+  ownership: domain-enum-state-permission-default-limit-and-behavior
+  rule: >-
+    Generated code and tests MUST fail when this semantic source disagrees with a
+    wire or storage projection. Narrative text may explain it but cannot override it.
+
+releaseScope:
+  mvp: [M0, M1, M2, M3]
+  v1Ga: [M0, M1, M2, M3, M4, M5]
+  excludedFromV1:
+    - config-asset-kind
+    - deployment-asset-kind
+    - markdown-doc-asset-kind
+    - erd-view
+    - rapidoc-view
+    - mock-view
+    - embed-snippet-view
+    - grpc-asset-kind-plugins
+    - sdk-generation
+    - ci-result-callback
+    - layer-aware-diff-grouping
+
+wire:
+  jsonNaming: camelCase
+  enumNaming: snake_case
+  idFormat: uuid-v7
+  timestampFormat: RFC3339-UTC
+  unknownRequestFields: reject
+  customFormats:
+    git-remote-url: https-or-ssh-uri-or-scp-like-user-at-host-colon-path-no-password-component
+    git-ref-name: git-check-ref-format-compatible-subset-no-wildcards-no-leading-or-trailing-slash-no-dotdot-no-double-slash-no-at-brace-no-lock-suffix
+    git-ref-glob: git-ref-name-components-plus-star-double-star-and-question-no-negation
+    repository-relative-path: normalized-slash-path-no-leading-slash-no-dotdot-no-nul
+    repository-service-root: exact-dot-sentinel-or-repository-relative-path-with-no-dot-segments
+    repository-relative-glob: repository-relative-path-plus-star-double-star-question-and-brace-alternation
+    gitignore-pattern: gitignore-syntax-relative-to-service-root
+    cron-5-field: robfig-cron-v3-parser-with-minute-hour-day-of-month-month-day-of-week-and-no-descriptors-or-seconds
+    repository-url: normalize-scheme-host-port-path-and-strip-credentials-before-uniqueness
+  pagination:
+    pageDefault: 1
+    pageSizeDefault: 20
+    pageSizeMax: 100
+    outOfRangePageSize: clamp
+    sortQuery: sort
+    sortSyntax: field-for-ascending-minus-field-for-descending
+  limits:
+    manualOrPushRevisionBytes: 1048576
+    producerArtifactBytes: 10485760
+    previewOverrideBytes: 1048576
+    uploadBytes: 10485760
+    shareExpiresMinSeconds: 300
+    shareExpiresMaxSeconds: 2592000
+    aiHintChars: 500
+    reviewCommentChars: 2000
+    todoCommentChars: 2000
+  rateLimits:
+    loginPerMinutePerIp: 10
+    authenticatedReadsPerMinutePerSubject: 600
+    authenticatedWritesPerMinutePerSubject: 60
+  idempotency:
+    header: Idempotency-Key
+    format: uuid
+    retentionHours: 24
+    requiredCategories:
+      - asset-push
+      - repository-sync
+      - repository-discover
+      - ai-generation
+      - revision-submit
+      - version-publish
+      - revision-review
+    requiredOperationIds:
+      - rotateGlobalCredential
+      - rotateCredential
+      - syncRepository
+      - discoverRepository
+      - acceptDiscoveryCandidates
+      - previewRepositoryConfigImport
+      - applyRepositoryConfigImport
+      - rotateNotificationChannelSecret
+      - resolveServiceDrift
+      - produceSource
+      - generateMissingAssetWithAi
+      - publishAssetVersion
+      - deprecateAssetVersion
+      - retireAssetVersion
+      - generateAssetWithAi
+      - pushAssetRevision
+      - createLayerRevision
+      - rollbackLayer
+      - approveLayerRevision
+      - rejectLayerRevision
+      - retryJob
+      - createTenantExport
+    requiredOperationRule: every-listed-operation-declares-x-idempotency-mode-required-and-accepts-uuid-idempotency-key
+    optionalModeBehavior: when-header-is-present-use-the-identical-record-digest-lock-and-replay-protocol; when-omitted-run-once-without-a-record
+    replay: return-original-status-and-JSON-body-value; emit-a-new-request-id-and-reconstruct-ETag-from-body-etag-when-present
+    persistenceByOperationScope:
+      tenant: idempotency_records
+      identityOrPlatform: global_idempotency_records
+    replayIdentity:
+      tenant: [tenantId, principalType, principalId, operationId, idempotencyKey]
+      identityOrPlatform: [contextType, principalType, principalId, operationId, idempotencyKey]
+    requestDigest:
+      algorithm: SHA-256
+      canonicalization: RFC8785-JCS
+      canonicalObject:
+        operationId: exact-openapi-operation-id
+        pathParameters: router-decoded-and-schema-normalized-object-with-keys-sorted-by-JCS
+        query: percent-decoded-list-of-name-value-pairs-sorted-by-name-then-value-with-duplicates-preserved
+        semanticHeaders: lower-case-map-containing-if-match-when-present
+        body: parsed-json-value-or-null-when-no-body
+      excludedHeaders: [authorization, cookie, x-csrf-token, x-request-id, idempotency-key, content-length]
+      storageEncoding: 32-raw-bytes-in-request_hash-bytea
+      diagnosticEncoding: lowercase-hex
+    concurrentFirstRequest:
+      lock: PostgreSQL-transaction-advisory-lock-derived-from-replay-identity
+      sideEffectsAndCompletedResponse: one-database-transaction
+      maximumHandlerTransactionSeconds: 30
+      sameHashLoser: wait-for-winner-then-replay-exact-status-and-body
+      differentHashLoser: wait-for-winner-then-return-409-idempotency_conflict
+      winnerRollbackOrDisconnectBeforeCommit: waiter-acquires-lock-and-becomes-winner
+      longRunningWork: enqueue-only-inside-handler-transaction-and-execute-after-commit
+    requestHashMismatch: 409-idempotency_conflict
+
+optimisticConcurrency:
+  token: opaque-http-etag-including-quotes
+  bodyField: etag
+  responseHeader: ETag
+  requestHeader: If-Match
+  rules:
+    - every-response-body-for-an-if-match-protected-resource-includes-etag
+    - collection-items-carry-their-own-resource-etag
+    - response-etag-header-equals-body-etag
+    - clients-echo-the-token-byte-for-byte-and-never-derive-it-from-updatedAt-or-revision
+    - a-stale-or-missing-token-on-a-protected-operation-returns-412-precondition_failed
+  resourceTokenSource:
+    platformSettings: platform_settings.revision
+    userPreferences: user_preferences.revision
+    assetKind: tenant_kind_overrides.revision
+    assetVersion: asset_versions.revision
+    aggregateCollections: parent-resource-revision
+  rowExistence:
+    - platform-settings-singleton-is-seeded-by-migration
+    - user-preferences-is-created-with-the-user
+    - tenant-kind-overrides-are-created-for-every-tenant-kind-pair
+
+platformDefaults:
+  semantics: copy-on-tenant-create-not-live-inheritance
+  copiedAtomically:
+    - defaultQuota-to-tenant-quota
+    - defaultTenantSettings-to-tenant-settings
+    - defaultViewOverrides-to-tenant-view-overrides
+    - defaultNotificationChannels-to-tenant-notification-channels
+  existingTenantEffect: none
+  notificationTemplateRestriction: in_app-only-with-no-endpoint-or-secret
+  tenantWebhookAndEmailConfiguration: tenant-notification-channel-api-with-encrypted-config
+
+repository:
+  remoteUrl:
+    canonicalization:
+      - lowercase-scheme-and-host
+      - remove-default-https-or-ssh-port
+      - remove-trailing-slash
+      - preserve-path-case
+      - reject-userinfo-password-and-fragment
+    uniqueness: [tenant_id, canonical_url, default_branch]
+  workspace:
+    rootConfiguration: MERIDIAN_WORKSPACE_ROOT
+    rootRequirement: absolute-path-on-persistent-or-rebuildable-volume
+    checkoutLayout: '{root}/{tenantId}/{repositoryId}/{jobId}'
+    cleanup: remove-after-job-unless-retained-for-failure-diagnostics
+  discovery:
+    markerFiles: [go.mod, pom.xml, build.gradle, build.gradle.kts, package.json, pyproject.toml, Cargo.toml]
+    markerDirectories: [proto]
+    candidateKey: [repositoryId, commit, rootDir]
+    rootNormalization: repository-relative-path-with-empty-root-allowed
+    serviceCreatePathMapping: null-or-omitted-request-path-is-stored-as-empty-root-dir
+    ordering: rootDir-ascending-bytewise
+    repeatedCandidateBehavior: update-existing-candidate-and-reset-status-to-pending-only-if-commit-changed
+  recentServices:
+    table: recent_services
+    readOperation: listRecentServices
+    ordering: viewed_at-descending-then-service-id-ascending
+    retention: one-row-per-user-service-updated-on-successful-service-detail-read
+
+authentication:
+  password:
+    algorithm: argon2id
+    parameters: {memoryKiB: 65536, iterations: 3, parallelism: 1, saltBytes: 16, hashBytes: 32}
+    storedFormat: PHC-string
+    verification: constant-time-library-verifier
+  tokenDigest:
+    algorithm: hmac-sha256
+    secretConfiguration: MERIDIAN_TOKEN_PEPPER
+    comparison: constant-time
+    submittedTokenLogging: forbidden
+  browser:
+    cookieName: meridian_session
+    tokenFormat: ses_-plus-base64url-32-random-bytes
+    storage: hmac-digest-only
+    httpOnly: true
+    secureOutsideLocalDevelopment: true
+    sameSite: Lax
+    sessionTtlHours: 72
+    csrf:
+      header: X-CSRF-Token
+      tokenFormat: base64url-32-random-bytes
+      storage: hmac-digest-only
+      deliveredBy:
+        - login-response-field: csrfToken
+        - endpoint: GET /api/v1/auth/csrf
+      requiredFor: browser-non-safe-methods
+  pat:
+    header: Authorization
+    scheme: Bearer
+    tokenPrefix: pat_
+    scope: tenant-only-in-v1
+    platformBotTokens: excluded-from-v1
+    platformOperations: authenticated-token-can-never-satisfy-platform-permissions-and-is-denied
+    tokenFormat: pat_-plus-base64url-32-random-bytes
+    randomSource: cryptographic-random
+    storage: hmac-digest-only
+    csrfRequired: false
+    invalidOrExpiredHttpStatus: 401
+  platformAdminTenantAccess: >-
+    Platform administrator status grants platform metadata administration only.
+    Tenant business data is available only when the same user is also an active
+    member of that tenant, using that tenant membership's permissions.
+  platformJobMetadata:
+    allowed: [jobId, tenantSlug, type, trigger, status, stage, scopeType, scopeId, createdAt, startedAt, finishedAt]
+    scopeIdRule: expose-only-for-tenant-or-repository-scope-otherwise-null
+    forbiddenWithoutTenantMembership: [refName, input, result, attempts, errorMessage, logs, asset-or-version-identifiers]
+  tenantDisabledBehavior:
+    loginAllowed: true
+    disabledTenantExcludedFromMe: true
+    tenantBusinessAccess: not_found
+  bootstrap:
+    command: meridian admin create
+    requiredArguments: [username]
+    passwordInput: stdin-or-password-file
+    behavior: create-or-promote-platform-admin
+
+gitWebhook:
+  providerContract: meridian-generic-push-v1
+  scmProviderAdapters: outside-http-contract
+  signature:
+    header: X-Meridian-Signature-256
+    algorithm: hmac-sha256
+    signedBytes: raw-request-body
+    comparison: constant-time
+  deliveryIdHeader: X-Meridian-Delivery
+  eventHeader: {name: X-Meridian-Event, value: push}
+  deliveryDeduplicationHours: 24
+  maximumBodyBytes: 1048576
+  deletedRefBehavior: mark-track-inactive-and-preserve-history
+
+knownHosts:
+  keyIdentity:
+    host: normalized-lowercase-dns-name-or-ip-without-brackets
+    port: integer-1-to-65535-default-22
+    keyType: SSH-public-key-algorithm-name-from-host-key
+    publicKey: RFC4253-public-key-blob-in-OpenSSH-authorized-key-base64-form
+    fingerprint: SHA256-base64-of-RFC4253-public-key-blob-with-SHA256-prefix
+    supportedKeyTypes: [ssh-ed25519, ssh-rsa]
+  manualCreate:
+    acceptedInput: [host, port, publicKey]
+    serverDerivation:
+      - strict-base64-decode-public-key
+      - parse-first-RFC4253-length-prefixed-string-as-key-type
+      - require-key-type-in-supported-key-types
+      - fully-parse-the-key-type-specific-RFC4253-structure-and-require-no-trailing-bytes
+      - compute-SHA256-over-the-complete-decoded-RFC4253-blob
+      - encode-fingerprint-as-SHA256-colon-standard-base64-without-padding
+    clientSuppliedKeyTypeOrFingerprint: rejected-as-unknown-request-fields
+    malformedOrUnsupportedPublicKey: 422-validation_error
+    duplicateNaturalKey: 409-duplicate
+  repositoryPolicy:
+    field: fetchConfig.knownHostPolicy
+    values: [strict, accept_new]
+    default: strict
+    strict: unknown-host-fails-with-host_key-and-returns-candidate
+    accept_new: unknown-host-is-recorded-atomically-before-fetch-and-reused-afterward
+  manualCreateSource: manual
+  storedPublicKey: necessary-for-ssh-verification-not-returned-by-list-endpoint
+  createdBy:
+    manual: authenticated-user-id
+    acceptNew: initiating-user-id-or-null-for-schedule-and-system-jobs
+
+credentials:
+  tenantListing: tenant-owned-readable-plus-all-global
+  repositorySelector:
+    field: credentialId
+    nullMeaning: public-repository
+    lookup: tenant-credential-first-then-global-credential
+    collisionPolicy: uuid-identifiers-are-globally-unique
+  globalCredentialOwnership: platform-admin-only
+  globalRotationResponseMetadata:
+    allowedWithoutTenantMembership: [tenantSlug, repositoryId, jobId, deduplicated]
+    forbidden: [repositoryName, repositoryUrl, refName, jobInput, jobResult, jobLogs]
+  secretReadback: forbidden
+  generatedPatReadback: create-response-only
+  forcedDelete:
+    effect: atomically-set-referencing-repositories-credential-null
+    followUp: mark-repositories-auth-required-and-enqueue-health-check
+  rotation:
+    credentialKindMustMatchExisting: true
+    kindMismatch: 422-validation_error
+    secretReadback: forbidden
+    requiredHeaders: [If-Match, Idempotency-Key]
+    resyncRepositories:
+      requestField: resyncRepositories
+      default: false
+      omittedBehavior: exactly-false
+      whenTrue: atomically-update-secret-then-enqueue-default-branch-sync-for-each-non-deleted-referencing-repository
+      whenFalse: update-secret-without-enqueueing-sync
+      enqueueTrigger: credential-rotated
+      response: updated-credential-plus-one-credential-sync-job-per-non-deleted-referencing-repository
+      responseJobFields: [tenantSlug, repositoryId, jobId, deduplicated]
+      responseOrdering: tenant-slug-ascending-then-repository-id-ascending
+      responseEtagEqualsCredentialEtag: true
+      idempotency: same-rotate-request-replays-original-credential-and-sync-jobs
+    fingerprint:
+      ssh_key:
+        input: RFC4253-public-key-blob-derived-from-the-private-key
+        algorithm: SHA-256
+        encoding: SHA256-colon-standard-base64-without-padding
+      http_token:
+        keyConfiguration: CREDENTIAL_FINGERPRINT_KEY
+        keyRequirement: exactly-32-random-bytes-base64url-encoded-and-stable-across-master-key-rotation
+        input: uint32be-username-byte-length-plus-utf8-username-plus-utf8-token
+        algorithm: HMAC-SHA-256
+        encoding: HMAC-SHA256-colon-base64url-without-padding
+      sameFingerprintRotation: 422-validation_error
+      loggingAndAudit: fingerprint-only-never-secret-or-hmac-key
+  encryption:
+    algorithm: AES-256-GCM
+    activeMasterKeyConfiguration: MASTER_KEY
+    activeMasterKeyVersionConfiguration: MASTER_KEY_VERSION
+    previousMasterKeysFileConfiguration: MASTER_KEY_PREVIOUS_FILE
+    keyEncoding: base64-of-exactly-32-bytes
+    previousKeysFileFormat: json-object-mapping-positive-integer-version-strings-to-base64-keys
+    derivation:
+      algorithm: HKDF-SHA256
+      salt: tenant-id-or-global-plus-credential-id-as-utf8
+      info: meridian-credential-v1
+      outputBytes: 32
+    nonce: 12-cryptographically-random-bytes-per-encryption
+    aad: canonical-utf8-of-scope-id-credential-id-kind-and-key-version
+    storedFields: [ciphertext-with-authentication-tag, nonce, key_version]
+    keyRotation:
+      versionRule: MASTER_KEY_VERSION-must-be-greater-than-every-version-in-MASTER_KEY_PREVIOUS_FILE
+      rewrite: decrypt-with-row-key-version-and-reencrypt-with-active-key
+      removalGuard: old-key-cannot-be-removed-until-no-row-references-its-version
+
+notificationChannels:
+  secretLifecycle:
+    createOrRotateOnly: true
+    rotateOperation: rotateNotificationChannelSecret
+    rotateRequires: [If-Match, Idempotency-Key]
+    secretReadback: forbidden
+    inAppSecretForbidden: true
+    rotationAllowedKinds: [webhook]
+    rotationOnOtherKind: invalid_state
+  kindRules:
+    in_app: {endpoint: forbidden, secret: forbidden}
+    webhook: {endpoint: required-absolute-uri-https-outside-local-development, secret: required-on-create-minimum-32-characters}
+    email: {endpoint: required-rfc5321-mailbox, secret: forbidden, transport: deployment-managed-smtp}
+
+sse:
+  jobLogs:
+    endpoint: GET-/api/v1/t/{tenantSlug}/jobs/{jobId}/logs
+    contentType: text/event-stream
+    events: [log, state]
+    replayCursor: persisted-job-stage-log-sequence-from-Last-Event-ID
+    initialState: send-current-job-state-before-new-log-events
+    ordering: sequence-ascending-with-state-snapshots-after-each-material-status-change
+    heartbeatSeconds: 15
+    terminalStatuses: [succeeded, succeeded_with_warnings, failed, outcome_unknown, cancelled]
+    terminalBehavior: emit-final-state-then-close
+    reconnect: client-reconnects-with-last-event-id; state-snapshot-makes-gaps-safe
+
+authorization:
+  permissionCatalog:
+    platform:
+      - platform:audit:read
+      - platform:credential:manage
+      - platform:job:read
+      - platform:producer:manage
+      - platform:settings:manage
+      - platform:tenant:delete
+      - platform:tenant:manage
+      - platform:user:manage
+    tenant:
+      - asset:publish
+      - asset:push
+      - asset:read
+      - assetkind:manage
+      - credential:manage
+      - credential:read
+      - job:read
+      - job:run
+      - layer:approve
+      - layer:edit
+      - layer:read
+      - repository:read
+      - repository:sync
+      - repository:write
+      - service:create
+      - service:manage_members
+      - service:read
+      - service:write
+      - subscription:manage_self
+      - systemgroup:manage
+      - tenant:audit:read
+      - tenant:member:manage
+      - tenant:member:read
+      - tenant:member:write
+      - tenant:settings:manage
+      - tenant:settings:read
+      - tenant:settings:write
+      - todo:read_self
+      - token:manage
+  platformRole:
+    platform_admin:
+      permissions: ['platform:*']
+  resolution:
+    - platform-scope-is-independent-from-tenant-scope
+    - tenant-admin-grants-all-tenant-permissions
+    - tenant-role-grants-are-unioned-with-service-grants
+    - explicit-service-grants-may-add-permissions
+    - no-grant-may-cross-a-tenant-boundary
+  tenantRoles:
+    tenant_admin:
+      permissions: ['*']
+    maintainer:
+      permissions:
+        - repository:read
+        - repository:write
+        - repository:sync
+        - service:read
+        - service:write
+        - service:create
+        - asset:read
+        - asset:publish
+        - layer:read
+        - layer:edit
+        - job:read
+        - job:run
+        - subscription:manage_self
+        - todo:read_self
+    viewer:
+      permissions:
+        - repository:read
+        - service:read
+        - asset:read
+        - layer:read
+        - subscription:manage_self
+        - todo:read_self
+  serviceRoles:
+    owner:
+      permissions:
+        - service:read
+        - service:write
+        - service:manage_members
+        - asset:read
+        - asset:publish
+        - layer:read
+        - layer:edit
+        - layer:approve
+    maintainer:
+      permissions:
+        - service:read
+        - service:write
+        - asset:read
+        - asset:publish
+        - layer:read
+        - layer:edit
+    viewer:
+      permissions: [service:read, asset:read, layer:read]
+  explicitServicePermissions:
+    allowed: [layer:edit, layer:approve, asset:publish]
+    storage: service_grants.permissions
+  patScopes:
+    asset:read: [service:read, asset:read, layer:read]
+    asset:push: [asset:push]
+    job:run: [repository:sync, job:run, job:read]
+  unauthorizedResourceBehavior:
+    authenticated: {httpStatus: 404, errorCode: not_found}
+    unauthenticated: {httpStatus: 401, errorCode: unauthenticated}
+
+visibility:
+  private:
+    anonymous: deny
+    tenantMember: require-service-read-grant
+  internal:
+    anonymous: deny
+    tenantMember: allow-read
+  public:
+    anonymous:
+      serviceLifecycleAllowed: [published, deprecated]
+      allow:
+        - service-metadata
+        - asset-metadata
+        - current-published-version
+        - single-document-public-views
+      deny:
+        - draft-or-non-current-versions
+        - source-layers
+        - provenance
+        - downloads
+        - search
+        - mutations
+    tenantMember: allow-read
+
+enums:
+  lifecycle: [draft, published, deprecated, retired]
+  reviewStatus: [not_required, pending_review, approved, rejected, superseded]
+  layerRole: [base, overlay]
+  layerOrigin: [repo, third_party, manual, ai_generated]
+  sourceMode: [builtin, command, push, manual, ai]
+  sourceConfigOrigin: [db_manual, repo_file, repo_bootstrap]
+  jobStatus: [pending, running, succeeded, succeeded_with_warnings, failed, outcome_unknown, cancelled]
+  jobTrigger: [manual, schedule, webhook, api, cli, system, retry]
+  pipelineStage: [resolve, discover, extract, merge, normalize, index]
+  serviceVisibility: [private, internal, public]
+  externalRevisionTrustMode: [review_required, trust_ai, trust_ai_and_third_party]
+  domainEventType: [version.published, version.breaking, collect.failed, service.deprecated, ai_layer.generated, layer.approved, layer.rejected]
+  subscriptionScopeType: [tenant, service, asset, system_group, asset_kind]
+
+stateMachines:
+  lifecycle:
+    initial: draft
+    transitions:
+      draft: [published]
+      published: [deprecated]
+      deprecated: [retired]
+      retired: []
+  revisionReview:
+    initialByOrigin:
+      repo: not_required
+      manual: not_required
+      ai_generated: pending_review
+      third_party: pending_review
+    trustModeInitialStatus: approved
+    transitions:
+      pending_review: [approved, rejected, superseded]
+      not_required: []
+      approved: []
+      rejected: []
+      superseded: []
+    supersedeActor: system-only
+    immutableFields:
+      - content_hash
+      - content_ref
+      - dialect
+      - source_branch
+      - git_commit
+      - created_by
+      - ai_meta
+  job:
+    transitions:
+      pending: [running, cancelled]
+      running: [succeeded, succeeded_with_warnings, failed, outcome_unknown, cancelled]
+      succeeded: []
+      succeeded_with_warnings: []
+      failed: []
+      outcome_unknown: []
+      cancelled: []
+
+serviceLifecycle:
+  aggregate: service
+  initial: draft
+  transitionOperation: updateService
+  sameStatePatch: idempotent-no-transition-event
+  transitionRules:
+    draftToPublished:
+      publicEligibilityBeginsWhenVisibilityPublic: true
+    publishedToDeprecated:
+      appendOutboxEvent: service.deprecated
+      eventCardinality: exactly-once-per-aggregate-version
+    deprecatedToRetired:
+      publicEligibilityEnds: true
+      cancelPendingServiceWork: true
+      runningWorkCommitFence: reject-new-revision-version-or-index-writes-after-retirement
+  collectionEligibility: [draft, published, deprecated]
+  retired:
+    allowed:
+      - authenticated-historical-read-subject-to-normal-authorization
+      - service-soft-delete
+      - self-service-notification-and-todo-actions
+    rejectedWith409InvalidState:
+      - repository-sync-materialization-for-this-service
+      - source-create-update-delete-or-produce
+      - layer-create-update-delete-reorder-review-or-rollback
+      - asset-version-create-publish-deprecate-or-retire
+      - service-metadata-or-access-update
+    repositoryWideJobBehavior: skip-retired-services-and-continue-eligible-services
+  publicReadGate:
+    requiredVisibility: public
+    allowedLifecycle: [published, deprecated]
+    otherwise: 404-not_found
+  persistence:
+    serviceStateColumn: services.lifecycle
+    serviceTransitionsNeverMutateAssetVersionLifecycle: true
+  deletion:
+    operation: deleteService
+    response: 204-no-content
+    slugAndRepositoryRootReuse: forbidden-while-soft-deleted-row-is-retained
+    transaction:
+      - lock-service-and-validate-if-match
+      - set-service-deleted-at-and-increment-revision
+      - set-source-specs-disabled-deleted-at-and-increment-revision
+      - mark-source-bindings-stale-without-deleting-resolved-path-or-history
+      - set-layers-disabled-deleted-at-and-increment-revision
+      - set-assets-deleted-at-and-increment-revision
+      - mark-asset-ref-tracks-inactive-and-increment-desired-generation
+      - delete-service-grants-stars-recents-tags-and-system-group-memberships
+      - soft-delete-service-comments
+      - disable-subscriptions-targeting-the-service-or-its-assets
+      - cancel-pending-service-and-asset-scoped-jobs
+      - append-audit-row
+    runningWorkCommitFence: service-deleted-at-must-still-be-null-before-any-revision-version-or-index-commit
+    repositoryWideJobBehavior: skip-deleted-service-and-continue-other-services
+    historicalRowsRetained: [layer_revisions, layer_heads, asset_versions, asset_items, diff_snapshots, notifications, todos, blobs]
+    externalReadAfterDelete: always-404-including-historical-version-and-public-routes
+    physicalPurge: outside-v1-use-tenant-deletion-for-hard-removal
+
+layerHeads:
+  purpose: separate-latest-candidate-from-effective-content
+  table: layer_heads
+  key: [tenant_id, layer_id, scope_type, scope_key]
+  scope:
+    exact: {scopeType: ref, scopeKey: '<refType>:<refName>'}
+    global: {scopeType: global, scopeKey: '*'}
+  fields:
+    latestRevisionId: newest-submitted-revision-in-that-scope
+    effectiveRevisionId: newest-not-required-or-approved-revision-in-that-scope
+    candidateRevisionId: current-pending-review-revision-or-null
+    generation: monotonic-change-counter
+  candidateLimit: 1
+  candidateReplacement: mark-old-candidate-superseded
+  revisionSubmission:
+    sameAsEffective: unchanged
+    sameAsCandidate: unchanged
+    sameAsHistoricalOrRejected: create-new-revision-event-reusing-blob
+    idempotencyKeyUnique: [layer_id, scope_type, scope_key, producer_run_id]
+  selectionForMerge:
+    - use-exact-branch-head-when-present
+    - otherwise-use-global-head
+  globalChangeFanout: all-active-tracks-that-inherit-the-global-head
+  submission:
+    notRequiredOrTrustedApproved: update-both-latest-and-effective
+    pendingReview: update-latest-and-candidate-only
+  approvalTransaction:
+    - lock-layer-head
+    - require-revision-is-current-candidate
+    - set-review-status-approved
+    - set-effective-to-approved-revision
+    - clear-candidate
+    - increment-generation
+    - enqueue-merge
+  rejectionTransaction:
+    - lock-layer-head
+    - require-revision-is-current-candidate
+    - set-review-status-rejected
+    - clear-candidate
+    - keep-effective-unchanged
+  rollback:
+    allowedReviewStatuses: [not_required, approved]
+    effect: move-effective-only-and-enqueue-merge
+  deletion:
+    softDeleteLayer: true
+    setDeletedAtOnLayer: true
+    revisionReviewStatusIsNeverChangedForArchival: true
+
+assetRefTracks:
+  table: asset_ref_tracks
+  key: [tenant_id, asset_id, ref_type, ref_name]
+  refTypes: [branch, tag]
+  fields:
+    latestVersionId: nullable
+    currentVersionId: nullable
+    health: [ok, stale, invalid]
+    desiredGeneration: integer
+    processedGeneration: integer
+    active: boolean
+  defaultBranch: repository.default_branch
+  repoAndCommandRevisionScope: exact-branch
+  manualAndPushRevisionDefaultScope: '*'
+  aiRevisionScope: requested-branch
+  assetDetailRefQueryDefault: repository.default_branch
+  deletedGitRefBehavior: preserve-track-history-and-mark-inactive
+  assetResponseProjection:
+    lifecycle: current-version-lifecycle-else-latest-version-lifecycle-else-draft
+    qualityScore: latest-version-quality-score-else-null
+    persistence: never-store-asset-level-lifecycle-or-quality
+  versionUniqueness:
+    label: [track_id, version]
+    sequence: [track_id, sequence_no]
+    jobRetry: [merge_request_id]
+  refLatestResolution: asset_ref_tracks.latest_version_id
+  refCurrentResolution: asset_ref_tracks.current_version_id
+
+versions:
+  creationRequiresEffectiveBase: true
+  emptySkeletonUseOnly: [ai-input, merge-preview]
+  emptySkeletonMustNotCreateVersion: true
+  immutableAfterCreationExcept: [version-label-before-first-publish, lifecycle-status]
+  initialVersion: 1.0.0
+  sequenceScope: asset-ref-track
+  comparisonBase:
+    trackHasPreviousVersion: previous-latest-version-in-same-track
+    firstVersionOnDefaultBranch: none
+    firstVersionOnNonDefaultBranch: default-branch-current-else-latest-at-sync-start
+    persistenceField: baseline_version_id
+  automaticIncrement:
+    breaking: major
+    nonBreakingAddition: minor
+    allOtherInputChanges: patch
+  noNewVersionWhen:
+    - build-fingerprint-equals-current-latest-version-build-fingerprint
+  buildFingerprintFields:
+    - ordered-layer-revision-manifest
+    - merge-engine-version
+    - overlay-dialect-compiler-version
+    - normalizer-version
+    - kind-plugin-version
+    - overlay-target-miss-mode
+  historicalHashReuse: create-new-version
+  manualVersion:
+    allowedOnlyOnFirstPublish: true
+    mustBeGreaterThanEveryExistingTrackVersion: true
+  latestDefinition: newest-created-version-in-track
+  currentDefinition: selected-published-version-in-track
+  publish:
+    concurrency:
+      requestHeader: If-Match
+      token: asset_versions.revision-as-opaque-etag
+      staleOrMissing: 412-precondition_failed
+      success: increment-version-revision-and-return-body-and-header-etag
+    preconditions:
+      - version-status-is-draft-or-already-published
+      - every-manifest-revision-is-not-required-or-approved
+      - no-enabled-applicable-layer-head-has-a-candidate-revision
+      - requested-version-label-is-unique-in-selected-track
+    idempotentWhenAlreadyPublished: true
+    previousPublishedVersionsRemainPublished: true
+    effect: move-current-track-head-to-this-version
+  autoPublish:
+    setting: tenant.autoPublish
+    default: false
+    eligibleOnlyWhen:
+      - new-version-index-complete
+      - effective-manifest-has-no-pending-review
+      - base-origin-is-repo
+      - no-ai-generated-effective-layer
+      - no-enabled-applicable-candidate
+    effect: invoke-publish-preconditions-in-same-application-transaction
+  deprecate:
+    concurrency: same-as-publish
+    effect: fallback-current-to-most-recent-still-published-version
+  retire:
+    concurrency: same-as-publish
+    effect: fallback-current-to-most-recent-still-published-version
+  automaticDiff:
+    left: persisted-baseline-version-id
+    right: newly-created-version
+    todoCreatedWhen: summary.breaking-greater-than-zero
+
+merge:
+  engineVersion: 1
+  baseSkeletons:
+    openapi:
+      openapi: 3.1.0
+      info: {title: Untitled API, version: 0.0.0}
+      paths: {}
+  overlayOrder:
+    primary: ord-ascending
+    tieBehavior: reject-duplicate-order
+  targetMissDefault: lenient
+  targetMissModes: [lenient, strict]
+  jsonPathSubset:
+    child: true
+    recursiveDescent: false
+    arrayIndex: true
+    wildcard: true
+    equalityFilter: true
+    scriptExpression: false
+    wildcardWriteOrder: document-order
+    arrayDeletionOrder: reverse-document-order
+  canonicalization: RFC8785-JCS
+  provenance:
+    key: json-pointer
+    value: last-writing-layer-and-revision
+    baseOwnsUnmodifiedPointers: true
+  manifestSelection: effective-revisions-only
+
+sourceCompatibility:
+  allowed:
+    - {role: base, origin: repo, mode: builtin, approval: not_required}
+    - {role: base, origin: repo, mode: command, approval: not_required}
+    - {role: base, origin: third_party, mode: push, approval: review}
+    - {role: base, origin: manual, mode: manual, approval: not_required}
+    - {role: base, origin: ai_generated, mode: ai, approval: review}
+    - {role: overlay, origin: repo, mode: builtin, approval: not_required}
+    - {role: overlay, origin: repo, mode: command, approval: not_required}
+    - {role: overlay, origin: third_party, mode: push, approval: review}
+    - {role: overlay, origin: manual, mode: manual, approval: not_required}
+    - {role: overlay, origin: ai_generated, mode: ai, approval: review}
+  modeFields:
+    builtin:
+      fixed: {origin: repo}
+      required: [path]
+      forbidden: [producerProfileId]
+    command:
+      fixed: {origin: repo}
+      required: [producerProfileId]
+      forbidden: [path]
+    push:
+      fixed: {origin: third_party}
+      required: []
+      forbidden: [path, producerProfileId]
+    manual:
+      fixed: {origin: manual}
+      required: []
+      forbidden: [path, producerProfileId]
+      apiCreateRequires: [targetAssetId]
+      repositoryConfigRequires: asset-entry-identity
+    ai:
+      fixed: {origin: ai_generated}
+      required: [producerProfileId]
+      forbidden: [path]
+  roleFields:
+    base: {ord: 0}
+    overlay: {ordMinimum: 0, ordUniqueWithinAsset: true}
+  createDefaults:
+    assetNameTemplate: '{file_stem}'
+    ord: 0
+    timeoutSecByMode: {builtin: 120, command: 120, push: 120, manual: 120, ai: 600}
+    branchPatterns: ['**']
+    enabled: true
+  patchValidation: validate-the-complete-merged-source-spec-not-the-partial-patch-document
+  producerTimeout:
+    effectiveSeconds: minimum-of-source-spec-timeout-and-producer-profile-timeout
+  aiRole:
+    assetHasEffectiveBase: overlay
+    assetHasNoEffectiveBase: base
+  trustSetting:
+    review_required: [ai_generated-pending, third_party-pending]
+    trust_ai: [ai_generated-approved, third_party-pending]
+    trust_ai_and_third_party: [ai_generated-approved, third_party-approved]
+  pushIdentity:
+    stableSourceKey: [tenantId, serviceSlug, kind, assetName, sourceSystem]
+    operationReplayKey: [principalId, operationId, idempotencyKey]
+    createIfMissingDefault: false
+    roleDefault: base
+  baseReplacement:
+    implicitReplacement: forbidden
+    allowedReplacement: repo-base-replaces-existing-ai-generated-base
+    requestFlag: replaceAiBase
+    configImportFlag: replaceAiBases
+    transaction:
+      - lock-asset-and-existing-base
+      - require-new-origin-repo-and-role-base
+      - require-old-origin-ai_generated-and-role-base
+      - soft-delete-old-source-and-layer-with-history-retained
+      - create-repository-base-source-and-layer
+      - increment-all-affected-track-generations
+    failureWithoutFlag: base_layer_exists
+
+  sourceExpansion:
+  configuredEntity: source_specs
+  materializedEntity: source_bindings
+  relation: one-source-spec-to-many-source-bindings
+  sourceSpecFields:
+    - service_id
+    - kind
+    - asset_name_template
+    - role
+    - origin
+    - mode
+    - path
+    - producer_profile_id
+    - ord
+    - timeout_sec
+    - branch_patterns
+    - enabled
+  sourceBindingFields:
+    - source_spec_id
+    - scope_type
+    - scope_key
+    - expansion_key
+    - resolved_path
+    - asset_id
+    - layer_id
+  expansion:
+    triggerOperations: [syncRepository, produceSource]
+    createSourceSpecBehavior:
+      nonManual: persist-configuration-only-and-return-bindings-count-zero
+      manual:
+        requestRequires: targetAssetId
+        transaction:
+          - lock-target-asset-and-validate-tenant-service-kind
+          - create-source-spec
+          - create-one-global-binding-with-expansion-key-manual
+          - create-one-layer-linked-to-source-spec-and-binding
+          - return-initial-layer-id
+        responseInitialLayerId: required
+        noAsyncMaterialization: true
+    jobInput: resolve-ref-and-commit-once-at-enqueue-and-persist-them
+    stableKey: [sourceSpecId, scopeType, scopeKey, expansionKey]
+    exactRefScope: {scopeType: ref, scopeKey: '<refType>:<refName>'}
+    globalScope: {scopeType: global, scopeKey: '*'}
+    expansionKeyForRepositoryArtifact: normalized-repository-relative-path
+    expansionKeyForProducerArtifact: normalized-completion-manifest-relative-path
+    atomicCommit: upsert-all-bindings-for-the-resolved-scope-then-mark-only-unseen-bindings-in-that-scope-stale
+    bindingsCountProjection: count-active-bindings-across-all-scopes
+    defaultNameTemplate: '{file_stem}'
+    omittedNameTemplateBehavior: use-default-name-template
+    allowedNameTemplateTokens: ['{file_stem}', '{parent_dir}']
+    renderedNameNormalization:
+      - unicode-normalize-nfkc
+      - lowercase
+      - replace-each-maximal-non-ascii-alphanumeric-run-with-hyphen
+      - trim-leading-and-trailing-hyphens
+      - require-asset-name-schema-after-normalization
+    nameCollision: validation_error
+    disappearedFile: retain-last-non-null-resolved-path-and-mark-materialization-stale-without-deleting-history
+    nullResolvedPath: allowed-only-when-the-source-mode-has-no-repository-file-path
+    renamedFile: new-materialization-and-stale-old-materialization
+
+systemGroups:
+  maximumDepth: 1
+  rootParentId: null
+  parentRules:
+    - parent-must-be-in-the-same-tenant
+    - parent-must-be-null-for-root-group
+    - parent-must-be-non-null-for-second-level-group
+    - self-parent-and-any-cycle-rejected-with-nesting_too_deep
+  deleteBehavior: detach-children-to-root-and-remove-memberships-without-deleting-services
+
+configAuthority:
+  authoritativeStore: database
+  repositoryFile: .asset-platform.yaml
+  schema: ./repository-config.schema.yaml
+  policies:
+    ignore: never-read-automatically
+    import_once: read-only-on-explicit-import
+    sync: compare-every-repository-sync
+  fieldSourceTable: config_field_sources
+  fieldSourceKey: [tenant_id, resource_type, resource_id, field_path]
+  producerProfileReference:
+    repositoryField: producerProfile
+    repositoryValue: globally-unique-profile-name
+    importResolution: resolve-enabled-profile-name-to-producer-profile-id
+    unresolvedBehavior: validation-error-in-preview-and-no-apply
+  serviceRoot:
+    repositoryFileRootSentinel: '.'
+    databaseAndApiRootRepresentation: empty-string
+    importNormalization: exact-dot-to-empty-string-before-preview-diff-and-uniqueness-check
+    otherDotSegments: forbidden
+  manualEditEffect: set-source-db_manual
+  syncOverwriteRule: only-repo_file-or-repo_bootstrap-fields
+  drift:
+    ignore: retain-diff-and-mark-ignored-until-repository-value-changes
+    takeFile: write-value-and-set-source-repo_file
+    keepDb: keep-value-and-set-source-db_manual
+
+producers:
+  profiles:
+    ownership: platform-admin
+    tenantMaySelectEnabledProfile: true
+    tenantMaySubmitRawCommand: false
+    kinds: [command, ai]
+    timeoutSecondsByKind: {command: 300, ai: 600}
+    timeoutMinimumSeconds: 10
+    aiSelection: request-producerProfileId-then-tenant-defaultAiProducerProfileId-else-validation-error
+  runner:
+    implementation: bubblewrap
+    missingDependencyBehavior: profile-unavailable
+    sourceMount: read-only
+    outputMount: write-only-dedicated-directory
+    workingDirectory: service-root
+    networkDefault: none
+    commandSpec:
+      executable: absolute-path-from-platform-profile
+      args: explicit-array-no-shell-expansion
+      envAllowlist: explicit-array
+      timeoutSec: bounded-by-profile
+      network: [none, inherit]
+    contextEnvironment:
+      - ASSET_KIND
+      - ASSET_NAME
+      - SERVICE_ROOT
+      - OUTPUT_DIR
+      - BASE_DOC_PATH
+      - SOURCE_BRANCH
+      - AI_HINT
+    hostEnvironment:
+      valuesSource: startup-environment-or-secret-file
+      deploymentAllowlistConfig: PRODUCER_ENV_ALLOWLIST
+      deploymentAllowlistDefault: []
+      profileEnvAllowlistMustBeSubset: true
+      injection: only-profile-requested-names-plus-context-environment
+      valuesInApiDatabaseAuditOrLogs: forbidden
+    limits:
+      pids: 128
+      memoryMiB: 1024
+      cpuSeconds: 600
+    success:
+      exitCode: 0
+      manifestFile: $OUTPUT_DIR/manifest.yaml
+      manifestSchema:
+        files:
+          type: array
+          minItems: 1
+          itemRequired: [path, kind, role, contentType]
+  unknownOutcome:
+    inspectManifestBeforeRetry: true
+    validCompleteManifest: ingest-without-command-replay
+    missingOrInvalidManifestWhenReplaySafe: fail-current-attempt-and-retry-job
+    missingOrInvalidManifestWhenReplayUnsafe: outcome_unknown
+    commandReplayRequiresFreshEmptyOutputDirectory: true
+  deletion:
+    storage: soft-delete
+    referencedWithoutForce: invalid_state
+    referencedWithForce:
+      - disable-profile
+      - disable-dependent-source-specs
+      - set-dependent-source-last-error-to-producer_profile_unavailable
+      - preserve-existing-revisions-and-versions
+
+runtimeConfiguration:
+  precedence: [startup-flags, environment, config-file, compiled-defaults]
+  databaseOverrides: explicit-dynamic-allowlist-only
+  immutableAtRuntime: [database-connection, master-key, credential-fingerprint-key, listen-address, sandbox-boundaries]
+  secretInputs: [secret-file, environment]
+  credentialFingerprintKeyStartupValidation: decode-base64url-to-exactly-32-bytes-or-refuse-startup
+
+viewerRuntime:
+  iframeSandbox: allow-scripts-allow-forms
+  allowSameOrigin: false
+  sessionTokenToFrame: forbidden
+  frameChannel: one-time-nonce-plus-transferred-message-port
+  documentDelivery: parent-fetches-signed-artifact-and-transfers-content-no-url-to-frame
+  tryItOut:
+    defaultEnabled: false
+    transport: parent-window-browser-fetch-via-message-port-no-platform-proxy
+    allowedSchemes: [https, http-for-local-development]
+    targetOriginPolicy: tenant-allowlist-and-explicit-user-confirmation
+    fetchCredentials: omit
+    forwardedRequestHeadersAllowlist: [accept, content-type, authorization]
+    forbiddenForwardedHeaders: [cookie, set-cookie, proxy-authorization]
+    responseHeaderAllowlist: [content-type, content-length, etag, location]
+    targetCorsRequired: true
+  inputResolution:
+    single: exactly-one-input-and-no-scope
+    versions: inputs-between-view-minDocs-and-maxDocs-and-no-scope
+    collection: inputs-between-view-minDocs-and-maxDocs-and-no-scope
+    scope: zero-inputs-and-exactly-one-scope
+    kindsWildcard: any-enabled-kind-visible-to-the-caller
+    sameKind: all-resolved-input-versions-have-the-same-asset-kind
+    sameAsset: all-resolved-input-versions-have-the-same-asset-id
+    tenantScopeId: must-be-null
+    serviceOrSystemGroupScopeId: must-be-non-null
+    refSelectors: resolve-once-to-an-immutable-version-before-view-execution
+
+sharing:
+  supportedResources: [view, diff_snapshot]
+  creation:
+    view: POST-/api/v1/t/{tenantSlug}/share-links
+    diffSnapshot: POST-/api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links
+  freezeAtCreation:
+    refSelectors: resolve-to-version-id
+    scopeSelectors: snapshot-membership-and-resolved-version-ids
+    viewOptions: canonical-copy
+    artifacts: immutable-allowlist
+  token:
+    format: base64url-canonical-json-dot-base64url-hmac-sha256
+    signingKeyConfiguration: MERIDIAN_SHARE_SIGNING_KEY
+    payload: [version, keyId, shareLinkId, expiresAt]
+    signatureVerification: before-database-lookup-and-constant-time
+    storage: hash-only
+    plaintextReadback: create-response-only
+    authorization: anonymous-read-only-for-frozen-descriptor
+    expiryBehavior: not_found
+    revocationBehavior: not_found
+  resourceEscalation: forbidden
+
+diffResolution:
+  requestSelectors: [version, ref, upload]
+  responseSelectors: immutable-resolved-document-ref
+  refResolution: resolve-once-to-version-id-before-diff
+  uploadResolution: bind-content-hash-and-artifact-before-diff
+  snapshotPersistence: store-resolved-selectors-and-artifacts-never-latest-alias
+  persistResult: persist-true-returns-non-null-snapshotId-persist-false-returns-null
+
+jobs:
+  scopeTypes: [tenant, repository, service, source, track, version, asset, diff, system]
+  scopeIdRules:
+    tenant: tenant-id
+    repository: repository-id
+    service: service-id
+    source: source-spec-id
+    track: asset-ref-track-id
+    version: asset-version-id
+    asset: asset-id
+    diff: diff-request-id-or-snapshot-id
+    system: null
+  refRules: refType-and-ref-are-required-only-for-ref-scoped-jobs-and-null-otherwise
+  scheduler:
+    cronFieldCount: 5
+    cronDialect: standard-minute-hour-day-of-month-month-day-of-week
+    parser: robfig-cron-v3-with-Minute-Hour-Dom-Month-Dow-options-only
+    timezone: UTC
+    disabledWhenRepositoryDeletedOrTenantDisabled: true
+    overlapPolicy: coalesce-to-existing-repository-ref-job
+    misfirePolicy: enqueue-once-after-recovery
+  types:
+    tenant.delete: {scopeType: tenant, uniqueKey: 'tenant-delete:{tenantId}'}
+    repo.sync: {scopeType: repository, refRequired: true, uniqueKey: 'repo:{repositoryId}:{refType}:{refName}'}
+    repo.discover: {scopeType: repository, uniqueKey: 'discover:{repositoryId}:{commit}'}
+    asset.produce: {scopeType: source, refRequired: true, uniqueKey: 'produce:{sourceId}:{refType}:{refName}:{commit}'}
+    asset.merge: {scopeType: track, uniqueKey: 'merge:{trackId}'}
+    asset.index: {scopeType: version, uniqueKey: 'index:{assetVersionId}'}
+    asset.ai_generate: {scopeType: service, refRequired: true, uniqueKey: 'ai:{serviceId}:{kind}:{assetName}:{refType}:{refName}:{requestId}'}
+    asset.reindex: {scopeType: asset, uniqueKey: 'reindex:{assetId}:{extractorVersion}'}
+    diff.run: {scopeType: diff, uniqueKey: 'diff:{leftDigest}:{rightDigest}:{ruleSetId}'}
+    outbox.dispatch: {scopeType: system, uniqueKey: null}
+    workspace.gc: {scopeType: system, uniqueKey: singleton}
+    blob.gc: {scopeType: system, uniqueKey: singleton}
+    retention.cleanup: {scopeType: system, uniqueKey: singleton}
+  coalescing:
+    whilePending: return-existing-job
+    whileRunning: set-dirty-flag
+    onCompletionWithDirtyFlag: enqueue-one-successor-with-latest-input
+    dirtyGenerationStorage: asset_ref_tracks.desired_generation-and-processed_generation
+  workspaceLock:
+    key: repository-id
+    scope: all-branches-and-all-repository-jobs
+    behavior: serialize-workspace-mutations
+  cancellation:
+    pending: cancel-without-side-effects
+    running: signal-process-group-and-stop-at-next-stage-boundary
+    committedStageOutputs: retained
+    partialDatabaseTransaction: rollback
+  manualRetry:
+    allowedSourceStates: [failed, cancelled]
+    forbiddenSourceStates: [pending, running, succeeded, succeeded_with_warnings, outcome_unknown]
+    behavior: create-new-job-with-trigger-retry-and-retryOfJobId
+    input: immutable-copy-of-source-job-input
+    outcomeUnknownReason: requires-external-reconciliation-and-must-not-be-replayed-by-retry-endpoint
+  aggregateOutcome:
+    allRequiredStagesSucceeded: succeeded
+    optionalOrIndependentSourceFailed: succeeded_with_warnings
+    unsafeExternalActionHasUnknownOutcome: outcome_unknown
+
+health:
+  sourceFailure:
+    firstFailure: record-last-error-and-mark-required-source-stale
+    threeConsecutiveFailures: emit-operator-alert
+    nextSuccess: clear-error-and-failure-streak
+  assetHealth:
+    invalid: no-valid-version-exists-and-latest-normalization-failed
+    stale: any-required-source-is-stale
+    ok: has-valid-latest-version-and-no-required-source-is-stale
+  historicalVersionAvailability: unaffected-by-source-health
+
+events:
+  payloadContract: ./events.yaml
+  delivery: transactional-outbox
+  duplicateKey: [event_type, aggregate_id, aggregate_version]
+  registered:
+    - version.published
+    - version.breaking
+    - collect.failed
+    - service.deprecated
+    - ai_layer.generated
+    - layer.approved
+    - layer.rejected
+  notificationPolicy:
+    oneNotificationPerEvent: true
+    noCrossEventMerging: true
+  subscriptions:
+    owner: authenticated-user-only
+    upsertIdentity: [tenant_id, user_id, scope_type, scope_id]
+    putBehavior: create-or-replace-event-channel-and-enabled-fields-at-natural-identity
+    targetStorageMapping: {scopeType: target_type, scopeId: target_id}
+    targets:
+      tenant: {scopeId: null}
+      service: {scopeId: uuid-visible-service}
+      asset: {scopeId: uuid-visible-asset}
+      system_group: {scopeId: uuid-visible-system-group}
+      asset_kind: {scopeId: enabled-kind-id}
+    eventTypes: exact-subset-of-enums.domainEventType
+    channels: at-least-one-enabled-visible-notification-channel
+    disabledEffect: keep-row-and-ignore-only-future-events
+  breakingTodos:
+    assignees: all-active-user-owners
+    teamOwnerExpansion: active-team-members
+    fallbackAssignees: tenant-admins
+    uniqueness: [asset_version_id, assignee_id]
+
+storage:
+  blobStore:
+    mvpDriver: filesystem-content-addressed
+    rootConfiguration: MERIDIAN_BLOB_ROOT
+    rootRequirement: absolute-path-on-a-persistent-volume
+    storageKeyFormat: 'sha256/{digest[0:2]}/{digest[2:4]}/{lowercase-hex-sha256}'
+    writeProtocol:
+      - hash-while-streaming-to-a-same-filesystem-temporary-file
+      - fsync-file
+      - atomic-rename-to-storage-key
+      - when-target-exists-verify-size-and-digest-then-discard-temporary-file
+    pathSafety: derive-path-only-from-a-validated-64-character-lowercase-hex-digest
+    applicationSupport: single-application-instance-in-v1
+    contentDelivery:
+      endpoint: GET /api/v1/content/{token}
+      tokenFormat: base64url-json-dot-base64url-hmac-sha256
+      signingKeyConfiguration: MERIDIAN_CONTENT_SIGNING_KEY
+      payload: [version, keyId, blobDigest, artifactKind, mediaType, disposition, expiresAt, shareLinkId]
+      maximumTtlSeconds: 300
+      shareLinkRule: shareLinkId-is-required-for-share-content-and-must-still-be-active
+      responseHeaders: [Content-Type, Content-Disposition, X-Content-Type-Options]
+    s3CompatibleDriver: outside-v1-scope
+  blobAccounting: unique-bytes-per-tenant
+  workspaceAccounting: included-in-storage-quota
+  referencedRevisionRetention: forever-until-tenant-deletion
+  unreferencedArchivedRevisionRetention: tenant-setting
+  oldAssetVersionRetention: forever-until-tenant-deletion
+  softDeleteRestoreWindowDays: 30
+  tenantDeletion:
+    confirmation: tenant-slug-and-recent-authentication
+    asynchronous: true
+    requestTransaction:
+      - lock-tenant-and-verify-if-match
+      - require-confirmed-slug-and-recent-authentication
+      - set-tenant-status-disabled-and-increment-revision
+      - enqueue-tenant-deletion-job
+      - return-job-id-and-post-update-etag
+    businessAccessAfterAcceptance: not_found
+    job:
+      - delete-tenant-business-rows-and-tenant-blob-references
+      - physically-delete-only-blobs-with-zero-remaining-tenant-references
+      - retain-redacted-tenant-tombstone-and-metadata-only-audit-rows
+    auditMetadataRetainedDays: 365
+    auditContentRestriction: identifiers-actions-timestamps-and-hashes-only-no-business-content-or-secrets
+    tombstoneSlugReuse: forbidden-until-audit-retention-expires
+    finalizationAfterRetention: delete-retained-audit-rows-then-tenant-tombstone
+    businessDataAndUnsharedBlobsDeleted: true
+
+defaults:
+  tenant:
+    externalRevisionTrustMode: review_required
+    autoPublish: false
+    defaultLocale: zh-CN
+    defaultAiProducerProfileId: null
+    maxRepositories: 50
+    maxServices: 200
+    maxStorageBytes: 10737418240
+    maxCollectConcurrency: 4
+    retentionDays:
+      jobLogs: 30
+      archivedRevisions: 90
+  repository:
+    defaultBranch: main
+    branchPolicy:
+      omittedCreateBehavior:
+        branchPatterns: [submitted-defaultBranch-exact-match]
+        tagPatterns: []
+    shallow: true
+    depth: 50
+    submodules: false
+    configSyncPolicy: ignore
+  source:
+    timeoutSecondsByMode: {builtin: 120, command: 120, push: 120, manual: 120, ai: 600}
+    branchPatterns: ['**']
+    overlayMode: lenient
+  qualityScore:
+    algorithm: weighted-deductions-v1
+    base: 100
+    deductions:
+      error: 20
+      warning: 5
+      info: 0
+    floor: 0
+    ceiling: 100

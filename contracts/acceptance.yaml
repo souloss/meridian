@@ -1,0 +1,891 @@
+schemaVersion: 1
+contractId: meridian-acceptance-v1
+status: frozen
+authority: >-
+  This file maps user stories and smoke assertions to stable OpenAPI operationIds
+  and domain invariants. Scenario setup is isolated; no story depends on another
+  story having executed first.
+
+fixtures:
+  profiles:
+    bootstrap-only:
+      users: [padmin]
+      tenants: []
+    standard:
+      tenants: [acme, rival]
+      users: [padmin, alice, bob, carol, eve]
+      repositories: [fixture-repo-a, fixture-repo-b]
+  users:
+    padmin: {platformAdmin: true}
+    alice: {tenant: acme, role: tenant_admin}
+    bob: {tenant: acme, role: maintainer}
+    carol:
+      tenant: acme
+      role: viewer
+      serviceGrants:
+        order-service: {role: viewer, permissions: [layer:approve]}
+        pay-service: {role: viewer, permissions: [layer:approve]}
+    eve: {tenant: rival, role: viewer}
+  repositories:
+    fixture-repo-a:
+      refs:
+        main: {orderOperations: 3, payHasOpenApi: false}
+        release/2.0: {removedOperation: 'DELETE /orders/{id}'}
+    fixture-repo-b:
+      hasRepositoryConfig: true
+  aiProfiles:
+    fake-ai-success: {replaySafe: true, outputOperations: 2}
+    fake-ai-timeout: {replaySafe: true, behavior: timeout-without-completion-manifest}
+    fake-ai-invalid: {replaySafe: true, behavior: invalid-output}
+
+invariants:
+  I-TENANT-ISOLATION: authenticated-cross-tenant-resource-access-is-404
+  I-PENDING-NOT-EFFECTIVE: pending-or-rejected-revision-is-never-effective-or-in-a-version-manifest
+  I-PUBLISH-NO-CANDIDATE: enabled-applicable-layer-candidate-blocks-publish
+  I-MERGE-DETERMINISTIC: same-input-fingerprint-produces-same-output-hash
+  I-IMMEDIATE-NOOP: input-fingerprint-equal-to-track-latest-does-not-create-a-version
+  I-HISTORICAL-RETURN-VERSIONED: returning-to-a-historical-input-creates-a-new-version
+  I-REPO-MUTEX: repository-workspace-mutations-never-overlap
+  I-MERGE-DIRTY-REQUEUE: a-change-during-running-merge-is-processed-by-one-successor
+  I-SHARE-NO-ESCALATION: share-token-only-reads-frozen-allowlisted-artifacts
+  I-SECRET-NO-READBACK: pat-and-credential-secrets-are-never-returned-after-creation
+
+stories:
+  US-01:
+    fixture: bootstrap-only
+    milestone: M0
+    operations: [login, createUser, createTenant, putTenantMemberAsPlatformAdmin, getMe]
+    assertions:
+      - alice-can-enter-acme-as-tenant-admin
+      - platform-admin-without-membership-cannot-read-tenant-business-content
+      - duplicate-tenant-slug-is-409-duplicate
+      - disabled-tenant-is-excluded-from-me-tenants
+  US-02:
+    fixture: standard
+    milestone: M1
+    operations: [createProducerProfile, listAvailableProducerProfiles, checkRepositoryConnection, createRepository, discoverRepository, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings, syncRepository, getService, updateService, deleteService, getPublicService, listRecentServices, getAsset, getAssetVersion, listAssetVersionItems]
+    assertions:
+      - end-to-end-elapsed-seconds-less-than-300
+      - asset-has-one-repo-base-layer
+      - version-layer-manifest-is-read-from-getAssetVersion
+      - immediate-repeat-sync-does-not-create-revision-or-version
+      - missingKinds-includes-openapi-for-pay-service
+      - openapi-operation-count-is-3
+      - tenant-can-select-only-enabled-and-available-producer-profiles
+      - successful-service-detail-read-upserts-user-service-recent-and-orders-it-deterministically
+      - service-lifecycle-gates-public-read-content-mutations-and-deprecation-event
+      - service-delete-cascades-logical-state-and-fences-work-while-retaining-internal-history
+  US-03:
+    fixture: standard
+    milestone: M1
+    operations: [updateSourceSpec, syncRepository]
+    assertions:
+      - asset-path-not-found-has-stably-sorted-candidates
+      - first-failure-marks-required-source-and-asset-stale
+      - last-valid-current-version-remains-readable
+      - successful-rerun-clears-error-and-stale
+  US-04:
+    fixture: standard
+    milestone: M2
+    operations: [createSourceSpec, previewMerge, createLayerRevision, getAssetVersionProvenance, reorderAssetLayers, rollbackLayer]
+    invariants: [I-MERGE-DETERMINISTIC, I-HISTORICAL-RETURN-VERSIONED]
+    assertions:
+      - base-revision-is-unchanged
+      - invalid-overlay-is-not-persisted
+      - rollback-does-not-create-a-revision
+      - rollback-creates-a-new-version-even-when-output-hash-existed-historically
+  US-05:
+    fixture: standard
+    milestone: M3
+    operations: [listAvailableProducerProfiles, generateMissingAssetWithAi, getReviewContext, approveLayerRevision, publishAssetVersion, rejectLayerRevision, createSourceSpec]
+    invariants: [I-PENDING-NOT-EFFECTIVE, I-PUBLISH-NO-CANDIDATE]
+    assertions:
+      - no-version-exists-before-first-base-approval
+      - approval-returns-merge-job-id
+      - same-effective-or-candidate-output-is-unchanged
+      - same-content-after-rejection-may-create-a-new-review-attempt
+      - trust-mode-skips-review-but-never-auto-publishes-ai-content
+      - repository-base-takeover-requires-explicit-flag-and-atomically-archives-ai-base
+  US-06:
+    fixture: standard
+    milestone: M3
+    operations: [syncRepository, runDiff, createDiffSnapshotShareLink, getSharedView, acknowledgeBreakingTodo]
+    invariants: [I-SHARE-NO-ESCALATION]
+    assertions:
+      - first-release-track-diff-baseline-is-default-current-else-latest
+      - release-diff-has-one-breaking-removed-operation
+      - snapshot-share-is-frozen-and-read-only
+      - one-todo-per-expanded-owner-user
+  US-07:
+    fixture: standard
+    milestone: M2
+    operations: [previewRepositoryConfigImport, applyRepositoryConfigImport, resolveServiceDrift]
+    assertions:
+      - preview-and-apply-use-the-same-commit-and-config-digest
+      - repository-sync-never-overwrites-db-manual-fields
+      - ignored-file-digest-is-shown-again-only-after-file-content-changes
+      - repository-root-dot-normalizes-to-empty-service-root-without-drift
+  US-08:
+    fixture: standard
+    milestone: M4
+    setup:
+      - ensure-order-and-pay-have-approved-published-openapi-assets
+      - push-and-approve-the-dependency-revision
+    operations: [createSystemGroup, putSystemGroupMembers, search, resolveView]
+    assertions:
+      - search-deep-link-fixes-asset-version-and-item-key
+      - graph-is-tenant-and-group-scoped
+      - openapi-coverage-is-2-of-2
+  US-09:
+    fixture: standard
+    milestone: M3
+    operations: [pushAssetRevision, runDiff]
+    assertions:
+      - insufficient-pat-scope-is-404
+      - create-if-missing-false-is-404
+      - third-party-revision-is-pending-until-approved
+      - fail-on-breaking-exit-code-is-3
+      - fail-on-risky-matches-risky-and-breaking
+  US-10:
+    fixture: standard
+    milestone: M5
+    operations: [putSubscription, markNotificationRead, testNotificationChannel, rotateNotificationChannelSecret]
+    assertions:
+      - subscription-upsert-is-idempotent
+      - version-published-and-version-breaking-are-two-events-and-two-notifications
+      - webhook-retry-preserves-event-id
+      - cancelling-a-subscription-only-affects-future-events
+  US-11:
+    fixture: standard
+    milestone: M0
+    operations: [createCredential, testCredential, rotateCredential, createGlobalCredential, listCredentials, rotateGlobalCredential, deleteGlobalCredential, createKnownHost, listKnownHosts, checkRepositoryConnection, getPlatformJob]
+    invariants: [I-TENANT-ISOLATION, I-SHARE-NO-ESCALATION, I-SECRET-NO-READBACK]
+    assertions:
+      - cross-tenant-and-missing-resources-both-return-404-after-ignoring-request-id
+      - viewer-business-mutations-return-404
+      - revoked-pat-returns-401-unauthenticated
+      - global-credential-is-tenant-selectable-but-managed-only-by-platform-admin
+      - forced-global-credential-delete-unbinds-repositories-and-marks-auth-required
+      - credential-fingerprints-are-server-derived-stable-and-non-secret
+      - known-host-key-type-and-fingerprint-are-derived-from-public-key
+  US-12:
+    fixture: standard
+    milestone: M3
+    coverageMilestones: [M1, M3]
+    operations: [syncRepository, generateMissingAssetWithAi, retryJob]
+    invariants: [I-REPO-MUTEX, I-MERGE-DIRTY-REQUEUE]
+    assertions:
+      - source-failure-is-structured-and-keeps-last-effective-content
+      - timeout-without-completion-marker-does-not-create-a-revision
+      - running-duplicate-sets-dirty-and-one-successor-processes-latest-generation
+      - worker-recovery-does-not-duplicate-a-merge-request-version
+      - concurrent-first-idempotent-requests-have-one-winner-and-an-exact-replay
+
+smokeSuite:
+  maximumMinutes: 15
+  cases:
+    SMK-001:
+      milestone: M0
+      story: US-01
+      assertion: health-migrate-down-up
+      expected:
+        operations:
+          - {operationId: healthz, httpStatus: 200, body: {status: ok}}
+          - {operationId: readyz, httpStatus: 200, body: {status: ok}}
+        migration:
+          sequence: [operator-up, operator-down, operator-up]
+          finalSchema: equivalent-to-initial-up
+          startupDown: forbidden
+          readinessDuringMigration: false
+    SMK-002:
+      milestone: M0
+      story: US-01
+      assertion: login-and-tenant-switch
+      expected:
+        bootstrap:
+          - {operationId: createUser, httpStatus: 201, createdUser: alice}
+          - {operationId: createTenant, httpStatus: 201, createdTenant: acme}
+          - {operationId: createTenant, httpStatus: 409, errorCode: duplicate}
+        operations:
+          - operationId: login
+            httpStatus: 200
+            response:
+              me: {user: alice, tenantsContains: [{slug: acme, role: tenant_admin}]}
+              csrfToken: present
+          - operationId: getMe
+            httpStatus: 200
+            response: {tenantsContains: [acme], disabledTenantsExcluded: true}
+        platformScope:
+          platformAdminWithoutTenantMembership: {tenantBusinessReadHttpStatus: 404, errorCode: not_found}
+        uiState:
+          tenantRoute: /t/acme
+          tenantScopedCache: cleared-before-first-acme-read
+          staleRivalDataVisible: false
+    SMK-003:
+      milestone: M0
+      story: US-11
+      assertion: generated-isolation-matrix
+      expected:
+        matrix:
+          crossTenantResourceId: {httpStatus: 404, errorCode: not_found}
+          nonexistentResourceId: {httpStatus: 404, errorCode: not_found}
+          unauthenticated: {httpStatus: 401, errorCode: unauthenticated}
+          appliesTo: every-tenant-scoped-operation-with-resource-id
+        responseComparison:
+          crossTenantAndMissing: equal-after-removing-requestId
+          leakedTenantFields: false
+        authorization:
+          viewerBusinessMutation: {httpStatus: 404, errorCode: not_found}
+    SMK-004:
+      milestone: M0
+      story: US-11
+      assertion: pat-lifecycle-revoked-is-401
+      expected:
+        operations:
+          - {operationId: createToken, httpStatus: 201, response: {token: create-only, prefix: pat_}}
+          - {operationId: revokeToken, httpStatus: 204}
+        revokedTokenRequest: {httpStatus: 401, errorCode: unauthenticated}
+        secretReadback:
+          tokenInCreateResponseOnly: true
+          tokenInListOrGetResponses: false
+    SMK-005:
+      milestone: M0
+      story: US-11
+      assertion: encrypted-credential-and-connection-check
+      expected:
+        operations:
+          - {operationId: createCredential, httpStatus: 201, response: {secretFields: absent, fingerprint: present}}
+          - {operationId: testCredential, httpStatus: 200, response: {ok: true, errorClass: null}}
+          - {operationId: rotateCredential, httpStatus: 200, request: {resyncRepositories: true}, response: {credentialSecretFields: absent, syncJobsCountEqualsNonDeletedReferencingRepositories: true, responseEtagEqualsCredentialEtag: true}}
+        persistence:
+          encryptedAtRest: true
+          credentialListAndDetailContainSecret: false
+        fingerprints:
+          ssh: OpenSSH-SHA256-over-derived-RFC4253-public-key-blob
+          httpToken: HMAC-SHA256-over-length-prefixed-username-and-token
+          sameSecretRotation: {httpStatus: 422, errorCode: validation_error}
+    SMK-006:
+      milestone: M1
+      story: US-02
+      assertion: golden-path
+      expected:
+        timing: {elapsedSecondsLessThan: 300}
+        operations:
+          - {operationId: checkRepositoryConnection, httpStatus: 200, response: {ok: true, errorClass: null}}
+          - {operationId: createRepository, httpStatus: 201}
+          - {operationId: discoverRepository, httpStatus: 202, response: {jobId: present}}
+          - {operationId: acceptDiscoveryCandidates, httpStatus: 200, response: {itemsContainServiceSlugs: [order-service, pay-service]}}
+          - {operationId: createSourceSpec, httpStatus: 201, response: {role: base, origin: repo, mode: builtin}}
+          - {operationId: syncRepository, httpStatus: 202, response: {jobId: present}}
+          - {operationId: getService, httpStatus: 200}
+          - {operationId: listRecentServices, httpStatus: 200}
+          - {operationId: getAsset, httpStatus: 200}
+          - {operationId: getAssetVersion, httpStatus: 200}
+          - {operationId: listAssetVersionItems, httpStatus: 200}
+        syncJob:
+          terminalStatus: succeeded
+          requiredStages: [resolve, discover, extract, merge, normalize, index]
+          eachRequiredStage: succeeded
+        assets:
+          order-service:
+            activeBaseLayers: 1
+            versionLifecycle: draft
+            layerManifest: [{origin: repo, role: base, reviewStatus: not_required, scopeType: ref, scopeKey: 'branch:main'}]
+            operationItems: {total: 3, itemType: operation}
+          pay-service:
+            missingKindsIncludes: [openapi]
+        recentServices:
+          identity: [userId, serviceId]
+          retention: one-row-per-user-service-updated-on-successful-service-detail-read
+          successfulDetailReadUpsertsOneRow: true
+          failedOrUnauthorizedDetailReadChangesRecency: false
+          repeatedReadChangesRowCount: false
+          ordering: viewed_at-descending-then-service-id-ascending
+    SMK-007:
+      milestone: M1
+      story: US-02
+      assertion: immediate-input-noop
+      expected:
+        procedure:
+          before: capture-track-latest-id-inputFingerprint-layerRevisionCount-versionCount
+          action: repeat-identical-sync-on-same-ref
+          after: compare-with-before
+        state:
+          newLayerRevision: false
+          newAssetVersion: false
+          trackLatestIdUnchanged: true
+          inputFingerprintUnchanged: true
+          jobMayBeSucceeded: true
+    SMK-008:
+      milestone: M1
+      story: US-03
+      assertion: path-self-healing
+      expected:
+        failure:
+          - {operationId: updateSourceSpec, httpStatus: 200}
+          - {operationId: syncRepository, httpStatus: 202}
+          - {sourceErrorCode: asset_path_not_found, candidates: sorted-ascending-by-path}
+          - {requiredSourceState: stale, assetHealthState: stale}
+          - {lastValidCurrentVersionReadable: true}
+        recovery:
+          action: restore-valid-path-and-sync
+          sourceError: null
+          sourceState: active
+          assetHealthState: healthy
+          currentVersionRemainsReadable: true
+    SMK-009:
+      milestone: M1
+      story: US-02
+      assertion: glob-definition-materializes-three-bindings
+      expected:
+        setup: {fixtureGlobMatchesThreeFilesOnMain: true, assetNameTemplate: '{parent_dir}'}
+        operations:
+          - {operationId: createSourceSpec, httpStatus: 201, response: {assetNameTemplate: '{parent_dir}', bindingsCount: 0}}
+          - {operationId: syncRepository, request: {refType: branch, ref: main}, httpStatus: 202, response: {jobId: present}}
+          - {waitForJob: {terminalStatus: succeeded, resolvedRef: 'branch:main', resolvedCommit: fixture-main-commit}}
+          - {operationId: listSourceBindings, httpStatus: 200, response: {itemsLength: 3}}
+        materialization:
+          activeBindingCount: 3
+          eachScope: {scopeType: ref, scopeKey: 'branch:main', lastSeenCommit: fixture-main-commit}
+          distinctExpansionKeys: true
+          distinctAssetsAndLayers: true
+          namesFollowAssetNameTemplate: true
+        repeat:
+          action: repeat-sync-on-branch-main
+          unchangedFilesProduceNoNewBindings: true
+          expansionKeysStable: true
+    SMK-010:
+      milestone: M1
+      story: US-02
+      assertion: descriptor-four-mode-contract
+      expected:
+        valid:
+          single: {operationId: resolveView, httpStatus: 200, responseKind: document}
+          versions: {operationId: resolveView, httpStatus: 200, responseKind: document, sameKind: true, minDocuments: 2, immutableVersionSelectors: true}
+          collection: {operationId: resolveView, httpStatus: 200, responseKind: items, documentCountWithin: [1, configuredMax], sameKind: true}
+          scope: {operationId: resolveView, httpStatus: 200, resolutionTypes: [items, graph, dashboard]}
+        invalid:
+          wrongModeKindOrDocumentCount: {httpStatus: 422, errorCode: input_spec_mismatch, detailsInclude: [expected, got]}
+          branchNotIndexed: {httpStatus: 422, errorCode: branch_not_indexed}
+    SMK-011:
+      milestone: M2
+      story: US-04
+      assertion: overlay-provenance-and-determinism
+      expected:
+        deterministicRuns:
+          runCount: 100
+          sameInputFingerprint: true
+          mergedHashEqualAcrossRuns: true
+        provenance:
+          pointerPointsToLastWritingLayerAndRevision: true
+          duplicateOrderRejected: {httpStatus: 422, errorCode: overlay_invalid}
+          targetMissLenient: {httpStatus: 200, warning: present}
+          targetMissStrict: {httpStatus: 422, errorCode: overlay_invalid}
+        base:
+          unchangedAfterOverlay: true
+          equivalentOpenApiInputsProduceSameCanonicalHash: true
+    SMK-012:
+      milestone: M2
+      story: US-04
+      assertion: overlay-editor-e2e
+      expected:
+        ui:
+          previewDebounceMs: 800
+          previewRequestsPerPause: 1
+          previewResultRendered: true
+        operations:
+          - {operationId: previewMerge, httpStatus: 200, response: {content: present, validation: present, provenance: present}}
+          - {operationId: createSourceSpec, httpStatus: 201, request: {mode: manual, targetAssetId: fixture-asset-id}, response: {initialLayerId: present}}
+          - {operationId: createLayerRevision, httpStatuses: [200, 201], requestUses: response.initialLayerId, response: {revisionId: present}}
+        invalidOverlay:
+          httpStatus: 422
+          errorCode: overlay_invalid
+          errorsInclude: [line, column]
+          coordinatesAreOneBased: true
+          persistedRevision: false
+        savedOverlay:
+          annotationOrigin: manual
+          baseInputFingerprintUnchanged: true
+    SMK-013:
+      milestone: M2
+      story: US-04
+      assertion: rollback-version-plus-one-revision-unchanged
+      expected:
+        operation: {operationId: rollbackLayer, httpStatus: 202, response: {jobId: present}}
+        afterCompletion:
+          newLayerRevision: false
+          effectiveHeadEqualsRequestedHistoricalRevision: true
+          trackVersionCountIncreasesBy: 1
+          latestVersionIsNew: true
+          historicalMergedHashMayEqualNewHash: true
+    SMK-014:
+      milestone: M2
+      story: US-04
+      assertion: invalid-overlay-rejected
+      expected:
+        operation: {operationId: createLayerRevision, httpStatus: 422, errorCode: overlay_invalid}
+        response:
+          detailsErrorsNonEmpty: true
+          errorsInclude: [line, column]
+        persistence:
+          revisionCountUnchanged: true
+          effectiveHeadUnchanged: true
+    SMK-015:
+      milestone: M3
+      story: US-05
+      assertion: ai-cold-start
+      expected:
+        generation:
+          operationId: generateMissingAssetWithAi
+          httpStatus: 202
+          response: {jobId: present, deduplicated: boolean}
+        beforeApproval:
+          versionExists: false
+          aiRevisionStatus: pending_review
+          aiRevisionIsEffective: false
+          aiRevisionInVersionManifest: false
+          reviewContextHasEmptySkeleton: true
+        approval:
+          operationId: approveLayerRevision
+          httpStatus: 200
+          response: {revision: {reviewStatus: approved}, effectiveRevisionId: present, mergeJobId: present}
+          mergeTerminalStatus: succeeded
+          versionCreatedAfterMerge: true
+        publish:
+          operationId: publishAssetVersion
+          httpStatus: 200
+          aiVersionAutoPublished: false
+          trustAiMode: review-skipped-but-publish-still-explicit
+        replayAndRejection:
+          sameEffectiveOrCandidateOutputCreatesNoDuplicate: true
+          rejectedRevisionCanBeRetried: true
+          rejectedRevisionCannotBeApproved: {httpStatus: 409, errorCode: invalid_state}
+    SMK-016:
+      milestone: M3
+      story: US-05
+      assertion: candidate-publish-gate
+      expected:
+        blocked:
+          operationId: publishAssetVersion
+          httpStatus: 409
+          errorCode: version_not_publishable
+          detailsInclude: [blockingRevisions, layerId, revisionId, reviewStatus]
+        unblock:
+          action: approve-all-enabled-applicable-candidates-and-complete-merge
+          publishHttpStatus: 200
+          candidateRemainsInManifest: false
+    SMK-017:
+      milestone: M3
+      story: US-12
+      assertion: ai-success-timeout-invalid
+      expected:
+        fake-ai-success:
+          operationId: generateMissingAssetWithAi
+          httpStatus: 202
+          terminalJobStatus: succeeded
+          revisionCreated: true
+          manifestValidated: true
+        fake-ai-timeout:
+          replaySafe: true
+          terminalJobStatus: failed
+          revisionCreated: false
+          completionManifestObserved: false
+          retriesDoNotDuplicateRevision: true
+        fake-ai-invalid:
+          terminalJobStatus: failed
+          failureStage: normalize-or-validate
+          errorCode: validation_error
+          revisionCreated: false
+          partialOutputPersisted: false
+    SMK-018:
+      milestone: M3
+      story: US-06
+      assertion: diff-breaking-and-snapshot-share
+      expected:
+        operations:
+          - {operationId: runDiff, httpStatus: 200, response: {summary: {breaking: 1}}}
+          - {operationId: createDiffSnapshotShareLink, httpStatus: 201, response: {token: present, expiresAt: present}}
+          - {operationId: getSharedView, httpStatus: 200, response: {resourceType: diff_snapshot, resolutionType: DiffSnapshot}}
+        change:
+          level: breaking
+          code: operation-removed
+          summaryContains: 'DELETE /orders/{id}'
+          exactlyOneBreakingChange: true
+        baseline:
+          firstReleaseBranchUsesDefaultCurrentElseLatest: true
+        snapshot:
+          storesResolvedSelectorsAndArtifacts: true
+          laterCurrentVersionCannotChangeSnapshot: true
+    SMK-019:
+      milestone: M3
+      story: US-06
+      assertion: breaking-todo-exactly-once
+      expected:
+        operation: {operationId: listBreakingTodos, httpStatus: 200}
+        creation:
+          oneTodoPerExpandedOwnerUser: true
+          uniquenessKey: assetVersionId-plus-assigneeUserId
+          duplicateIndexOrRetryCreatesNoAdditionalTodo: true
+        acknowledgement:
+          operationId: acknowledgeBreakingTodo
+          httpStatus: 200
+          response: {status: acked, acknowledgedAt: non-null}
+          auditEntryCreated: true
+    SMK-020:
+      milestone: M3
+      story: US-09
+      assertion: cli-exit-codes
+      expected:
+        thresholds:
+          failOnNoneWithNoThreshold: 0
+          failOnBreakingWithBreakingChange: 3
+          failOnRiskyWithRiskyOrBreakingChange: 3
+        errors:
+          localUsageOrValidation: 2
+          http401: 4
+          http404OrNotAuthorized: 5
+          http409Or412: 6
+          network5xxOrTerminalJobFailure: 7
+          clientWaitTimeout: 8
+          interruptLeavesServerJobRunning: 130
+        stdout: result-only
+        stderr: diagnostics-only
+    SMK-021:
+      milestone: M3
+      story: US-09
+      assertion: push-review-path
+      expected:
+        push:
+          operationId: pushAssetRevision
+          httpStatuses: [200, 201]
+          response: {revisionId: present, jobId: present}
+          requiredHeader: Idempotency-Key
+          requiredScope: asset:push
+        authorization:
+          insufficientScope: {httpStatus: 404, errorCode: not_found}
+          missingAssetCreateIfMissingFalse: {httpStatus: 404, errorCode: not_found}
+        review:
+          thirdPartyRevisionStatus: pending_review
+          effectiveBeforeApproval: false
+          effectiveAfterApprovalAndMerge: true
+    SMK-022:
+      milestone: M4
+      story: US-08
+      assertion: dbschema-generic-kind-path
+      expected:
+        push:
+          kind: dbschema
+          contentSchema: meridian-dbschema-1
+          accepted: true
+        lifecycle:
+          revisionApprovalRequired: true
+          versionPublishableAfterApproval: true
+        items:
+          listAssetVersionItemsHttpStatus: 200
+          containsItemTypes: [table, column]
+          itemKeysStable: true
+        genericViewsAndDiff: available-for-dbschema
+    SMK-023:
+      milestone: M4
+      story: US-08
+      assertion: group-dependency-graph
+      expected:
+        operations:
+          - {operationId: createSystemGroup, httpStatus: 201}
+          - {operationId: putSystemGroupMembers, httpStatus: 200}
+          - {operationId: resolveView, httpStatus: 200, response: {kind: dep_graph}}
+        graph:
+          tenantScope: acme
+          groupScope: fixture-group
+          nodes: [order-service, pay-service]
+          edges: [{from: order-service, to: pay-service}]
+          truncated: false
+          deepLinksResolveToPublishedVersions: true
+          coverage: {openapi: {coveredServices: 2, totalServices: 2}}
+    SMK-024:
+      milestone: M4
+      story: US-08
+      assertion: search-facets-and-isolation
+      expected:
+        acme:
+          operationId: search
+          httpStatus: 200
+          query: orders
+          filters: {kinds: [openapi], hasAiLayer: true, hasBreakingChanges: false}
+          hit: {type: item, itemType: operation, deepLinkFields: [assetId, versionId, itemKey], highlights: non-empty}
+          facetsPresent: true
+        rival:
+          httpStatus: 200
+          items: []
+          total: 0
+          acmeDataVisible: false
+    SMK-025:
+      milestone: M5
+      story: US-10
+      assertion: notification-retry
+      expected:
+        subscription:
+          operationId: putSubscription
+          httpStatus: 200
+          repeatedSameIdentityReturnsSameSubscription: true
+        events:
+          versionPublishedAndVersionBreakingRemainSeparate: true
+          notificationCount: 2
+          eventIdsDistinct: true
+        cancellation:
+          operationId: putSubscription
+          disableStatus: 200
+          existingNotificationsRetained: true
+          futureMatchingEventsCreateNoNotification: true
+        webhook:
+          operationId: testNotificationChannel
+          httpStatus: 202
+          firstAttemptStatus: 500
+          eventualSuccessStatuses: [200, 201, 202, 204]
+          maxAttempts: 6
+          eventIdConstantAcrossAttempts: true
+          logicalEventDeliveredOnce: true
+        read:
+          operationId: markNotificationRead
+          httpStatus: 204
+          unreadCountDecrements: true
+    SMK-026:
+      milestone: M3
+      story: US-06
+      assertion: snapshot-share-security
+      expected:
+        operations:
+          - {operationId: createDiffSnapshotShareLink, httpStatus: 201, response: {resourceType: diff_snapshot, token: present}}
+          - {operationId: getSharedView, httpStatus: 200, response: {resourceType: diff_snapshot}}
+        security:
+          anonymousReadAllowed: true
+          allowlistAndSelectorsFrozen: true
+          unrelatedVersionOrArtifactAccessible: false
+          expiredToken: {httpStatus: 404, errorCode: not_found}
+          revokedToken: {httpStatus: 404, errorCode: not_found}
+          invariant: I-SHARE-NO-ESCALATION
+    SMK-027:
+      milestone: M1
+      story: US-12
+      assertion: repository-mutex-and-dirty-successor
+      expected:
+        duplicateRequests:
+          operationId: syncRepository
+          requestCount: 5
+          sameRepositoryAndRef: true
+          sameIdempotencyKey: true
+          returnedJobIds: one
+          deduplicatedFlagForDuplicates: true
+        runningChange:
+          dirtySetOnRunningJob: true
+          successorCountAfterCompletion: 1
+          successorUsesLatestInputGeneration: true
+        mutex:
+          repositoryWorkspaceMutationsOverlap: false
+          duplicateVersionCreated: false
+          recovery:
+            crashedWorkerRecovery: one-merge-request-resumed-or-requeued
+            duplicateMergeRequestVersion: false
+          invariant: I-REPO-MUTEX
+          dirtyInvariant: I-MERGE-DIRTY-REQUEUE
+    SMK-028:
+      milestone: M2
+      story: US-07
+      assertion: field-level-gitops-drift
+      expected:
+        preview:
+          operationId: previewRepositoryConfigImport
+          httpStatus: 201
+          response: {previewId: present, commit: present, configDigest: present}
+        apply:
+          operationId: applyRepositoryConfigImport
+          httpStatus: 200
+          sameCommitAndConfigDigestAsPreview: true
+        authority:
+          repoFileFieldsUpdated: true
+          dbManualFieldsOverwritten: false
+        drift:
+          changedFileProducesDrift: true
+          ignore: {digestPersisted: true, shownAgainOnlyWhenDigestChanges: true}
+          takeFile: {repoFieldBecomesAuthoritative: true}
+          keepDb: {dbManualFieldPreserved: true}
+    SMK-029:
+      milestone: M0
+      story: US-02
+      assertion: quota-error
+      expected:
+        operation: {operationId: createRepository, httpStatus: 409, errorCode: quota_exceeded}
+        details: {quota: present, current: present, limit: present}
+        persistence: repositoryCountUnchangedAfterRejectedCreate
+    SMK-030:
+      milestone: M5
+      story: US-02
+      assertion: experience-image-under-five-minutes
+      expected:
+        timing: {startupToFirstDocumentBrowseSecondsLessThan: 300}
+        readiness:
+          - {operationId: healthz, httpStatus: 200, body: {status: ok}}
+          - {operationId: readyz, httpStatus: 200, body: {status: ok}}
+        smokeFlow:
+          demoTenantLogin: succeeds
+          serviceBrowse: succeeds
+          firstDocumentView: succeeds
+          firstDocumentIsCurrentPublishedVersion: true
+    SMK-031:
+      milestone: M0
+      story: US-11
+      assertion: global-credential-lifecycle-and-no-readback
+      expected:
+        lifecycle:
+          - {operationId: createGlobalCredential, httpStatus: 201, response: {secretFields: create-only, fingerprint: present}}
+          - {operationId: listCredentials, httpStatus: 200, response: {globalCredentialSelectableByTenant: true, secretFields: absent}}
+          - {operationId: rotateGlobalCredential, httpStatus: 200, request: {resyncRepositories: true}, response: {credentialFingerprintChanged: true, credentialSecretFields: absent, syncJobsCountEqualsNonDeletedReferencingRepositories: true, responseEtagEqualsCredentialEtag: true}}
+          - {operationId: deleteGlobalCredential, httpStatus: 204, request: {force: true}}
+        afterDelete:
+          boundRepositoryCredentialId: null
+          repositoryHealth: auth-required
+          healthErrorClass: auth
+          oldSecretReadback: false
+        permissions:
+          globalCreateRotateDelete: platform-admin-only
+          tenantSelection: allowed
+        syncJobMapping:
+          itemFields: [tenantSlug, repositoryId, jobId, deduplicated]
+          ordering: tenantSlug-ascending-then-repositoryId-ascending
+          eachNonDeletedReferencingRepositoryAppearsExactlyOnce: true
+          tracking: {operationId: getPlatformJob, responseContainsOnlyRedactedPlatformJobMetadata: true}
+    SMK-032:
+      milestone: M1
+      story: US-02
+      assertion: controlled-producer-profile-selection
+      expected:
+        operation: {operationId: listAvailableProducerProfiles, httpStatus: 200}
+        selection:
+          returnedProfiles: enabled-and-available-for-requested-kind-only
+          rawCommandSubmission: rejected
+          selectedSourceStoresProducerProfileId: true
+          disabledOrUnavailable: {httpStatus: 422, errorCode: producer_profile_unavailable}
+    SMK-033:
+      milestone: M3
+      story: US-05
+      assertion: repository-base-replaces-ai-base-without-dual-base
+      expected:
+        withoutFlag:
+          operationId: createSourceSpec
+          httpStatus: 409
+          errorCode: base_layer_exists
+        withFlag:
+          operationId: createSourceSpec
+          request: {role: base, origin: repo, replaceAiBase: true}
+          httpStatus: 201
+          oldAiBase: archived-and-unbound
+          oldAiRevisionsAndHistory: retained
+          activeBaseLayerCount: 1
+          trackGenerationIncrementsBy: 1
+          dualBaseContent: false
+    SMK-034:
+      milestone: M1
+      story: US-02
+      assertion: service-lifecycle-is-executable-and-independent-from-version-lifecycle
+      expected:
+        setup:
+          serviceLifecycle: draft
+          serviceVisibility: internal
+          assetVersionLifecycle: draft
+        transitions:
+          - {operationId: updateService, request: {visibility: public}, httpStatus: 200, response: {lifecycle: draft}}
+          - {operationId: getPublicService, httpStatus: 404, errorCode: not_found}
+          - {operationId: updateService, request: {lifecycle: published}, httpStatus: 200, response: {lifecycle: published}}
+          - {operationId: getPublicService, httpStatus: 200}
+          - {operationId: updateService, request: {lifecycle: deprecated}, httpStatus: 200, response: {lifecycle: deprecated}}
+          - {operationId: getPublicService, httpStatus: 200}
+          - {operationId: updateService, request: {lifecycle: retired}, httpStatus: 200, response: {lifecycle: retired}}
+          - {operationId: getPublicService, httpStatus: 404, errorCode: not_found}
+          - {operationId: updateService, request: {lifecycle: published}, httpStatus: 409, errorCode: invalid_state}
+          - {operationId: createSourceSpec, httpStatus: 409, errorCode: invalid_state}
+        concurrency:
+          pendingServiceJobsAfterRetire: cancelled
+          runningServiceJobCommitAfterRetire: fenced-without-revision-version-or-index-write
+          repositoryJobContinuesOtherEligibleServices: true
+        event:
+          type: service.deprecated
+          producedOnlyBy: published-to-deprecated
+          count: 1
+          committedWithServiceStateAndAudit: true
+        independence:
+          assetVersionLifecycleAfterServiceTransitions: draft
+    SMK-035:
+      milestone: M0
+      story: US-11
+      assertion: known-host-public-key-is-the-only-client-asserted-key-material
+      expected:
+        valid:
+          operationId: createKnownHost
+          requestFields: [host, port, publicKey]
+          httpStatus: 201
+          response:
+            keyType: parsed-from-first-RFC4253-string
+            fingerprint: SHA256-over-complete-decoded-blob
+            source: manual
+        forgedDerivedFields:
+          requestIncludes: [keyType, fingerprint]
+          httpStatus: 422
+          errorCode: validation_error
+        malformedOrUnsupportedPublicKey: {httpStatus: 422, errorCode: validation_error}
+        exactDuplicate: {httpStatus: 409, errorCode: duplicate}
+        connectionCandidateUsesSameDerivation: true
+    SMK-036:
+      milestone: M1
+      story: US-12
+      assertion: required-idempotency-request-digest-and-first-arrival-concurrency
+      expected:
+        operationId: syncRepository
+        concurrentSameKeyAndCanonicalRequest:
+          committedSideEffectCount: 1
+          responseStatusAndJsonValueEqual: true
+          replayRequestIdIsNew: true
+          replayEtagHeaderEqualsStoredBodyEtagWhenPresent: true
+          jobIdEqual: true
+        sameKeyDifferentCanonicalBody:
+          httpStatus: 409
+          errorCode: idempotency_conflict
+        canonicalization:
+          algorithm: SHA-256-over-RFC8785-JCS
+          includes: [operationId, pathParameters, sortedQueryPairs, ifMatchWhenPresent, parsedJsonBody]
+          excludes: [authorization, cookie, csrf, requestId, idempotencyKey]
+    SMK-037:
+      milestone: M1
+      story: US-02
+      assertion: service-soft-delete-cascade-history-and-running-work-fence
+      expected:
+        operation: {operationId: deleteService, httpStatus: 204, requestHeader: If-Match}
+        logicalState:
+          serviceSourceLayerAssetDeletedAt: set
+          sourceBindings: stale-with-last-resolved-path-retained
+          tracks: {active: false, desiredGenerationIncremented: true}
+          removedRelations: [serviceGrants, stars, recents, tags, systemGroupMemberships]
+          comments: soft-deleted
+          subscriptions: disabled
+        jobs:
+          pendingServiceOrAssetScoped: cancelled
+          runningCommit: fenced-without-revision-version-or-index-write
+          repositoryWideJobContinuesOtherServices: true
+        retainedInternalRows: [layerRevisions, layerHeads, assetVersions, assetItems, diffs, notifications, todos, blobs]
+        externalReadsAfterDelete:
+          operations: [getService, getAssetVersion, getPublicService]
+          each: {httpStatus: 404, errorCode: not_found}
+    SMK-038:
+      milestone: M2
+      story: US-07
+      assertion: repository-config-root-dot-normalizes-before-preview-and-apply
+      expected:
+        config: {serviceRoot: '.'}
+        preview:
+          operationId: previewRepositoryConfigImport
+          httpStatus: 201
+          normalizedRootDir: ''
+        apply:
+          operationId: applyRepositoryConfigImport
+          httpStatus: 200
+          serviceRootDir: ''
+        nextSyncDriftForRoot: false

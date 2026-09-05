@@ -1,0 +1,734 @@
+schemaVersion: 1
+contractId: meridian-postgresql-storage-v1
+status: frozen
+database:
+  engine: PostgreSQL
+  minimumVersion: 16
+  extensions: [pg_trgm, btree_gin]
+  migrationTool: goose-v3-embedded-sql
+  migrationPolicy:
+    startup: auto-up-before-http-readiness-and-worker-start
+    failure: abort-process-and-keep-readiness-false
+    lock: one-session-level-postgresql-advisory-lock-for-river-and-application-migrations
+    order: [river-to-pinned-target-version, application-schema]
+    applicationTransaction: one-transaction-per-migration-by-default
+    nonTransactionalMigration: requires-explicit-no-transaction-annotation-and-decision-record
+    startupDown: forbidden
+    operatorDown: explicit-migrate-command-with-step-count
+    riverTarget: exact-version-recorded-with-application-release
+  identifiers: uuid-v7
+  timestamps:
+    type: timestamptz
+    timezone: UTC
+    declarationRule: only-columns-listed-in-each-table-fields-exist
+  tenantRule: >-
+    Every tenant-owned primary or unique key includes tenant_id either directly
+    or through a database-enforced composite foreign key, except an explicitly
+    declared globalUnique key used for token lookup. Repository methods require
+    tenant_id as their first argument.
+  globalUniqueExceptions: [api_tokens.token_hash, share_links.token_hash]
+
+ddlConventions:
+  fieldCoverage: every-field-must-resolve-exactly-one-sql-type
+  enumStorage: text-with-check-generated-from-domain.yaml
+  unknownFieldBehavior: fail-contract-validation
+  sqlTypeResolutionOrder: [tableColumnOverrides, exactColumnTypes, suffixTypes]
+  fallback: forbidden
+  tableColumnOverrides:
+    platform_settings.id: text
+    asset_kinds.id: text
+    tenant_kind_overrides.kind_id: text
+    source_specs.kind: text
+    assets.kind: text
+    asset_items.kind: text
+    view_overrides.view_id: text
+    idempotency_records.operation_id: text
+    idempotency_records.response_status: integer
+    global_idempotency_records.operation_id: text
+    global_idempotency_records.response_status: integer
+    known_hosts.port: integer
+    producer_profiles.supported_kinds: 'text[]'
+    producer_profiles.args: 'jsonb'
+    producer_profiles.env_allowlist: 'text[]'
+    source_specs.branch_patterns: 'text[]'
+    layers.branch_patterns: 'text[]'
+    api_tokens.scopes: 'text[]'
+    service_grants.permissions: 'text[]'
+    subscriptions.events: 'text[]'
+    subscriptions.target_id: text
+    diff_rule_sets.version: integer
+  exactColumnTypes:
+    id: uuid
+    tenant_id: uuid
+    parent_id: uuid
+    user_id: uuid
+    team_id: uuid
+    credential_id: uuid
+    global_credential_id: uuid
+    repository_id: uuid
+    service_id: uuid
+    tag_id: uuid
+    source_spec_id: uuid
+    asset_id: uuid
+    layer_id: uuid
+    revision_id: uuid
+    latest_revision_id: uuid
+    effective_revision_id: uuid
+    candidate_revision_id: uuid
+    producer_profile_id: uuid
+    producer_run_id: uuid
+    track_id: uuid
+    latest_version_id: uuid
+    current_version_id: uuid
+    asset_version_id: uuid
+    baseline_version_id: uuid
+    retry_of_job_id: uuid
+    merge_request_id: uuid
+    rule_set_id: uuid
+    group_id: uuid
+    channel_id: uuid
+    subscription_id: uuid
+    event_id: uuid
+    creator_id: uuid
+    created_by: uuid
+    author_id: uuid
+    requested_by: uuid
+    assignee_id: uuid
+    actor_id: uuid
+    target_id: uuid
+    principal_id: uuid
+    aggregate_id: uuid
+    resource_id: uuid
+    job_id: uuid
+    idempotency_key: uuid
+    river_job_id: bigint
+    active_generation: bigint
+    generation: bigint
+    desired_generation: bigint
+    processed_generation: bigint
+    sequence: bigint
+    sequence_no: bigint
+    revision: bigint
+    aggregate_version: bigint
+    attempt: integer
+    max_attempts: integer
+    retry_count: integer
+    failure_streak: integer
+    ord: integer
+    timeout_sec: integer
+    memory_mib: integer
+    cpu_seconds: integer
+    pids: integer
+    key_version: integer
+    quality_score: integer
+    fingerprint: text
+    config_digest: text
+    repository_value_digest: text
+    ignored_digest: text
+    content_hash: text
+    merged_hash: text
+    input_fingerprint: text
+    token_hash: bytea
+    csrf_hash: bytea
+    request_hash: bytea
+    password_hash: text
+    webhook_secret_hash: bytea
+    ciphertext: bytea
+    nonce: bytea
+    public_key: bytea
+    is_platform_admin: boolean
+    shallow: boolean
+    enabled: boolean
+    active: boolean
+    dirty: boolean
+    replay_safe: boolean
+    index_complete: boolean
+    quota: jsonb
+    settings: jsonb
+    default_views: jsonb
+    branch_policy: jsonb
+    fetch_config: jsonb
+    health: jsonb
+    owners: jsonb
+    detected: jsonb
+    preview: jsonb
+    ai_meta: jsonb
+    review: jsonb
+    layer_manifest: jsonb
+    diff_summary: jsonb
+    labels: jsonb
+    display: jsonb
+    search_raw: jsonb
+    provenance: jsonb
+    default_options: jsonb
+    rules: jsonb
+    left_selector: jsonb
+    right_selector: jsonb
+    summary: jsonb
+    descriptor: jsonb
+    options: jsonb
+    artifact_allowlist: jsonb
+    error: jsonb
+    input: jsonb
+    result: jsonb
+    encrypted_config: bytea
+    blob_digest: text
+    ref_count: bigint
+    payload: jsonb
+    body_args: jsonb
+    detail: jsonb
+    response_body: jsonb
+    storage_key: text
+    media_type: text
+    kind: text
+    content_type: text
+    slug: text
+    display_name: text
+    status: text
+    username: text
+    email: text
+    role: text
+    name: text
+    principal_type: text
+    context_type: text
+    locale: text
+    theme: text
+    shared_scope: text
+    host: text
+    key_type: text
+    source: text
+    url: text
+    canonical_url: text
+    default_branch: text
+    sync_cron: text
+    note: text
+    description: text
+    root_dir: text
+    language: text
+    framework: text
+    lifecycle: text
+    visibility: text
+    config_sync_policy: text
+    body: text
+    color: text
+    commit_sha: text
+    resource_type: text
+    field_path: text
+    contract_version: text
+    plugin_version: text
+    executable: text
+    network: text
+    dependency_status: text
+    unavailable_reason: text
+    asset_name_template: text
+    origin: text
+    mode: text
+    path: text
+    config_origin: text
+    last_error: text
+    expansion_key: text
+    resolved_path: text
+    source_system: text
+    state: text
+    last_seen_commit: text
+    dialect: text
+    scope_type: text
+    scope_key: text
+    content_ref: text
+    source_branch: text
+    review_status: text
+    review_comment: text
+    git_commit: text
+    ref_type: text
+    ref_name: text
+    scope_id: uuid
+    version: text
+    merge_engine_version: text
+    overlay_compiler_version: text
+    overlay_mode: text
+    normalizer_version: text
+    kind_plugin_version: text
+    merged_ref: text
+    normalized_ref: text
+    bundled_ref: text
+    provenance_ref: text
+    source_commit: text
+    item_type: text
+    key: text
+    search_text: text
+    search_vector: tsvector
+    left_artifact_ref: text
+    right_artifact_ref: text
+    result_ref: text
+    view_id: text
+    type: text
+    trigger: text
+    stage: text
+    dedupe_key: text
+    level: text
+    message: text
+    target_type: text
+    event_type: text
+    title_key: text
+    link: text
+    comment: text
+    actor_type: text
+    action: text
+    ip: inet
+    request_id: uuid
+    artifact_ref: text
+  suffixTypes:
+    _at: timestamptz
+    _bytes: bigint
+  nullabilityDefault: not-null
+  nullableColumns:
+    users: [email]
+    sessions: [revoked_at, last_seen_at]
+    api_tokens: [expires_at, last_used_at, revoked_at]
+    credentials: [last_used_at]
+    global_credentials: [last_used_at]
+    known_hosts: [created_by]
+    repositories: [credential_id, global_credential_id, sync_cron, note, webhook_secret_hash, deleted_at]
+    services: [description, language, framework, deleted_at]
+    service_comments: [deleted_at]
+    tag_definitions: [color, description]
+    config_import_previews: [applied_at]
+    config_field_sources: [repository_value_digest, ignored_digest]
+    producer_profiles: [unavailable_reason, deleted_at]
+    assets: [deleted_at]
+    source_specs: [path, producer_profile_id, last_error, deleted_at]
+    subscriptions: [target_id]
+    source_bindings: [resolved_path, source_system, last_seen_commit]
+    layers: [source_spec_id, dialect, deleted_at]
+    layer_revisions: [dialect, source_branch, review_comment, git_commit, created_by, producer_run_id, ai_meta, review]
+    layer_heads: [latest_revision_id, effective_revision_id, candidate_revision_id]
+    asset_ref_tracks: [latest_version_id, current_version_id]
+    asset_versions: [revision, source_commit, baseline_version_id, diff_summary]
+    system_groups: [parent_id, description]
+    share_links: [resource_id, view_id, revoked_at]
+    jobs: [river_job_id, retry_of_job_id, scope_id, ref_type, ref_name, next_attempt_at, result, error, started_at, finished_at]
+    job_stage_logs: [stage]
+    notifications: [read_at]
+    breaking_todos: [acked_at, comment]
+    audit_logs: [tenant_id, actor_id]
+    tenant_exports: [artifact_ref, expires_at, error]
+  defaults:
+    id: application-generated-uuid-v7
+    created_at: transaction_timestamp
+    updated_at: transaction_timestamp
+    revision: 1
+    enabled: true
+    active: true
+    dirty: false
+    replay_safe: false
+    index_complete: false
+    failure_streak: 0
+    attempt: 0
+    retry_count: 0
+    ref_count: 0
+  updateRules:
+    updated_at: set-by-repository-on-every-update
+    revision: increment-by-one-under-optimistic-lock
+  exclusiveColumns:
+    repositories: exactly-one-or-neither-of-credential_id-global_credential_id
+  referencePolicy:
+    tenantOwned: composite-foreign-key-tenant_id-plus-resource-id
+    global: ordinary-foreign-key
+    polymorphicColumns: [principal_id, target_id, aggregate_id, scope_id, resource_id]
+    polymorphicEnforcement: application-validation-plus-domain-check
+    referencesByColumn:
+      tenant_id: tenants.id
+      user_id: users.id
+      author_id: users.id
+      created_by: users.id
+      requested_by: users.id
+      assignee_id: users.id
+      team_id: teams.id
+      credential_id: credentials.id
+      global_credential_id: global_credentials.id
+      repository_id: repositories.id
+      service_id: services.id
+      tag_id: tag_definitions.id
+      producer_profile_id: producer_profiles.id
+      source_spec_id: source_specs.id
+      asset_id: assets.id
+      layer_id: layers.id
+      latest_revision_id: layer_revisions.id
+      effective_revision_id: layer_revisions.id
+      candidate_revision_id: layer_revisions.id
+      track_id: asset_ref_tracks.id
+      latest_version_id: asset_versions.id
+      current_version_id: asset_versions.id
+      asset_version_id: asset_versions.id
+      baseline_version_id: asset_versions.id
+      rule_set_id: diff_rule_sets.id
+      group_id: system_groups.id
+      parent_id: system_groups.id
+      channel_id: notification_channels.id
+      subscription_id: subscriptions.id
+      blob_digest: blobs.blob_digest
+      retry_of_job_id: jobs.id
+      job_id: jobs.id
+      creator_id: users.id
+    artifactReferenceColumns:
+      target: blobs.storage_key
+      columns: [content_ref, merged_ref, normalized_ref, bundled_ref, provenance_ref, left_artifact_ref, right_artifact_ref, result_ref, artifact_ref]
+    noForeignKeyColumns: [river_job_id, event_id, producer_run_id, merge_request_id]
+
+tables:
+  platform_settings:
+    tenantScoped: false
+    primaryKey: [id]
+    fields: [id, settings, revision, created_at, updated_at]
+    checks: [id-equals-default]
+    seed: migration-inserts-exactly-one-default-row
+  blobs:
+    tenantScoped: false
+    primaryKey: [blob_digest]
+    unique: [[storage_key]]
+    fields: [blob_digest, storage_key, size_bytes, media_type, created_at]
+    mutation: immutable
+  tenant_blob_refs:
+    tenantScoped: true
+    primaryKey: [tenant_id, blob_digest]
+    fields: [tenant_id, blob_digest, ref_count, last_referenced_at]
+    checks: [ref_count-greater-than-or-equal-to-zero]
+  uploads:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    fields: [tenant_id, id, blob_digest, kind, content_type, size_bytes, expires_at, created_by, created_at]
+    indexes: [[tenant_id, expires_at]]
+
+  tenants:
+    tenantScoped: false
+    primaryKey: [id]
+    unique: [[slug]]
+    fields: [id, slug, display_name, status, quota, settings, revision, created_at, updated_at]
+  users:
+    tenantScoped: false
+    primaryKey: [id]
+    unique: [[username], [email]]
+    fields: [id, username, password_hash, display_name, email, status, is_platform_admin, revision, created_at, updated_at]
+  sessions:
+    tenantScoped: false
+    primaryKey: [id]
+    fields: [id, user_id, token_hash, csrf_hash, expires_at, revoked_at, last_seen_at, created_at, updated_at]
+    indexes: [[user_id, expires_at], [expires_at]]
+  tenant_members:
+    tenantScoped: true
+    primaryKey: [tenant_id, user_id]
+    fields: [tenant_id, user_id, role, created_at, updated_at]
+  teams:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, slug]]
+    fields: [tenant_id, id, slug, display_name, revision, created_at, updated_at]
+  team_members:
+    tenantScoped: true
+    primaryKey: [tenant_id, team_id, user_id]
+    fields: [tenant_id, team_id, user_id, created_at]
+  api_tokens:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, token_hash]]
+    globalUnique: [[token_hash]]
+    fields: [tenant_id, id, user_id, name, token_hash, scopes, expires_at, last_used_at, revoked_at, created_at, updated_at]
+  idempotency_records:
+    tenantScoped: true
+    primaryKey: [tenant_id, principal_type, principal_id, operation_id, idempotency_key]
+    fields: [tenant_id, principal_type, principal_id, operation_id, idempotency_key, request_hash, response_status, response_body, expires_at, created_at]
+  global_idempotency_records:
+    tenantScoped: false
+    primaryKey: [context_type, principal_type, principal_id, operation_id, idempotency_key]
+    fields: [context_type, principal_type, principal_id, operation_id, idempotency_key, request_hash, response_status, response_body, expires_at, created_at]
+    checks: [context_type-in-identity-platform]
+  user_preferences:
+    tenantScoped: false
+    primaryKey: [user_id]
+    fields: [user_id, locale, theme, default_views, revision, created_at, updated_at]
+    seed: create-in-same-transaction-as-user
+
+  credentials:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, name]]
+    fields: [tenant_id, id, name, kind, ciphertext, nonce, key_version, fingerprint, shared_scope, created_by, last_used_at, revision, created_at, updated_at]
+    checks:
+      - kind-in-ssh_key-http_token
+  credential_team_shares:
+    tenantScoped: true
+    primaryKey: [tenant_id, credential_id, team_id]
+    fields: [tenant_id, credential_id, team_id, created_at]
+  global_credentials:
+    tenantScoped: false
+    primaryKey: [id]
+    unique: [[name]]
+    fields: [id, name, kind, ciphertext, nonce, key_version, fingerprint, created_by, last_used_at, revision, created_at, updated_at]
+  known_hosts:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, host, port, key_type, fingerprint]]
+    fields: [tenant_id, id, host, port, key_type, public_key, fingerprint, source, created_by, created_at, updated_at]
+
+  repositories:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, canonical_url, default_branch]]
+    fields: [tenant_id, id, url, canonical_url, credential_id, global_credential_id, default_branch, branch_policy, fetch_config, sync_cron, note, webhook_secret_hash, health, revision, deleted_at, created_at, updated_at]
+  services:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, slug], [tenant_id, repository_id, root_dir]]
+    fields: [tenant_id, id, repository_id, slug, display_name, description, root_dir, language, framework, owners, lifecycle, visibility, config_sync_policy, revision, deleted_at, created_at, updated_at]
+  service_grants:
+    tenantScoped: true
+    primaryKey: [tenant_id, service_id, principal_type, principal_id]
+    fields: [tenant_id, service_id, principal_type, principal_id, role, permissions, created_at, updated_at]
+  service_stars:
+    tenantScoped: true
+    primaryKey: [tenant_id, service_id, user_id]
+    fields: [tenant_id, service_id, user_id, created_at]
+  recent_services:
+    tenantScoped: true
+    primaryKey: [tenant_id, user_id, service_id]
+    fields: [tenant_id, user_id, service_id, viewed_at]
+  service_comments:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    fields: [tenant_id, id, service_id, author_id, body, revision, deleted_at, created_at, updated_at]
+  tag_definitions:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, name]]
+    fields: [tenant_id, id, name, color, description, revision, created_at, updated_at]
+  service_tags:
+    tenantScoped: true
+    primaryKey: [tenant_id, service_id, tag_id]
+    fields: [tenant_id, service_id, tag_id, created_at]
+  discovery_candidates:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, repository_id, commit_sha, root_dir]]
+    fields: [tenant_id, id, repository_id, commit_sha, root_dir, detected, status, created_at, updated_at]
+  config_import_previews:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    fields: [tenant_id, id, repository_id, commit_sha, config_digest, preview, expires_at, applied_at, created_by, created_at]
+  config_field_sources:
+    tenantScoped: true
+    primaryKey: [tenant_id, resource_type, resource_id, field_path]
+    fields: [tenant_id, resource_type, resource_id, field_path, source, repository_value_digest, ignored_digest, updated_at]
+
+  asset_kinds:
+    tenantScoped: false
+    primaryKey: [id]
+    fields: [id, contract_version, enabled, plugin_version, created_at, updated_at]
+  producer_profiles:
+    tenantScoped: false
+    primaryKey: [id]
+    unique: [[name]]
+    fields: [id, name, kind, executable, args, env_allowlist, supported_kinds, replay_safe, network, timeout_sec, memory_mib, cpu_seconds, pids, enabled, dependency_status, unavailable_reason, revision, deleted_at, created_at, updated_at]
+    checks:
+      - kind-in-command-ai
+      - executable-is-absolute
+      - network-in-none-inherit
+  tenant_kind_overrides:
+    tenantScoped: true
+    primaryKey: [tenant_id, kind_id]
+    fields: [tenant_id, kind_id, enabled, revision, created_at, updated_at]
+    seed: create-for-every-tenant-kind-pair-and-backfill-when-a-new-kind-is-registered
+  assets:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, service_id, kind, name]]
+    fields: [tenant_id, id, service_id, kind, name, revision, deleted_at, created_at, updated_at]
+  source_specs:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    fields: [tenant_id, id, service_id, kind, asset_name_template, role, origin, mode, path, producer_profile_id, ord, timeout_sec, branch_patterns, enabled, config_origin, last_error, failure_streak, revision, deleted_at, created_at, updated_at]
+  source_bindings:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, source_spec_id, scope_type, scope_key, expansion_key]]
+    uniquePartial:
+      - columns: [tenant_id, asset_id, source_system]
+        where: source_system-is-not-null
+    fields: [tenant_id, id, source_spec_id, scope_type, scope_key, expansion_key, resolved_path, source_system, asset_id, layer_id, state, last_seen_commit, created_at, updated_at]
+  layers:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    uniquePartial:
+      - columns: [tenant_id, asset_id]
+        where: role-equals-base-and-deleted_at-is-null
+      - columns: [tenant_id, asset_id, ord]
+        where: role-equals-overlay-and-deleted_at-is-null
+    fields: [tenant_id, id, asset_id, source_spec_id, role, origin, ord, dialect, enabled, branch_patterns, display_name, revision, deleted_at, created_at, updated_at]
+  layer_revisions:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, layer_id, scope_type, scope_key, producer_run_id]]
+    fields: [tenant_id, id, layer_id, scope_type, scope_key, content_hash, content_ref, content_type, dialect, source_branch, review_status, review_comment, git_commit, created_by, producer_run_id, ai_meta, review, created_at]
+    indexes: [[tenant_id, layer_id, created_at], [tenant_id, review_status]]
+  layer_heads:
+    tenantScoped: true
+    primaryKey: [tenant_id, layer_id, scope_type, scope_key]
+    fields: [tenant_id, layer_id, scope_type, scope_key, latest_revision_id, effective_revision_id, candidate_revision_id, generation, updated_at]
+  asset_ref_tracks:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, asset_id, ref_type, ref_name]]
+    fields: [tenant_id, id, asset_id, ref_type, ref_name, latest_version_id, current_version_id, health, desired_generation, processed_generation, active, created_at, updated_at]
+  asset_versions:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, track_id, sequence_no], [tenant_id, track_id, version], [tenant_id, merge_request_id]]
+    fields: [tenant_id, id, asset_id, track_id, sequence_no, version, lifecycle, revision, quality_score, merge_request_id, input_fingerprint, merge_engine_version, overlay_compiler_version, overlay_mode, normalizer_version, kind_plugin_version, layer_manifest, merged_hash, merged_ref, normalized_ref, bundled_ref, provenance_ref, source_commit, baseline_version_id, diff_summary, labels, index_complete, created_at, updated_at]
+    indexes: [[tenant_id, asset_id, created_at], [tenant_id, merged_hash]]
+  asset_items:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, asset_version_id, item_type, key]]
+    fields: [tenant_id, id, asset_version_id, asset_id, service_id, kind, item_type, key, display, search_text, search_vector, search_raw, provenance, created_at]
+    indexes:
+      - [tenant_id, asset_version_id, item_type]
+      - [tenant_id, service_id, kind]
+    expressionIndexes:
+      - {using: gin, expressions: [tenant_id, search_vector]}
+      - {using: gin, expressions: [tenant_id, 'search_text gin_trgm_ops']}
+      - {using: gin, expressions: [tenant_id, 'search_raw jsonb_path_ops']}
+
+  system_groups:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, slug]]
+    fields: [tenant_id, id, parent_id, slug, display_name, description, revision, created_at, updated_at]
+  system_group_members:
+    tenantScoped: true
+    primaryKey: [tenant_id, group_id, service_id]
+    fields: [tenant_id, group_id, service_id, created_at]
+  view_overrides:
+    tenantScoped: true
+    primaryKey: [tenant_id, view_id]
+    fields: [tenant_id, view_id, enabled, ord, default_options, revision, updated_at]
+  diff_rule_sets:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, kind, name, version]]
+    fields: [tenant_id, id, kind, name, version, rules, enabled, revision, created_at, updated_at]
+  diff_snapshots:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    fields: [tenant_id, id, left_selector, right_selector, left_artifact_ref, right_artifact_ref, rule_set_id, result_ref, summary, created_by, created_at]
+  share_links:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, token_hash]]
+    globalUnique: [[token_hash]]
+    fields: [tenant_id, id, token_hash, creator_id, resource_type, resource_id, descriptor, view_id, options, artifact_allowlist, expires_at, revoked_at, created_at]
+    nullability:
+      resource_id: nullable-only-for-view
+    checks:
+      - view-descriptor-resolves-all-inputs-to-version-ids
+      - scope-membership-and-options-are-frozen-at-creation
+      - artifact-allowlist-is-immutable
+
+  jobs:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, dedupe_key, active_generation]]
+    fields: [tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at]
+    indexes: [[tenant_id, status, created_at], [tenant_id, scope_type, scope_id, created_at]]
+  job_stage_logs:
+    tenantScoped: true
+    primaryKey: [tenant_id, job_id, sequence]
+    fields: [tenant_id, job_id, sequence, stage, level, message, occurred_at]
+  subscriptions:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    uniqueNullsNotDistinct: [[tenant_id, user_id, target_type, target_id]]
+    migration: CREATE UNIQUE INDEX subscriptions_identity_uq ON subscriptions (tenant_id, user_id, target_type, target_id) NULLS NOT DISTINCT
+    fields: [tenant_id, id, user_id, target_type, target_id, events, enabled, created_at, updated_at]
+  subscription_channels:
+    tenantScoped: true
+    primaryKey: [tenant_id, subscription_id, channel_id]
+    fields: [tenant_id, subscription_id, channel_id]
+  notification_channels:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    fields: [tenant_id, id, type, name, encrypted_config, enabled, revision, created_at, updated_at]
+  notify_outbox:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, event_id, channel_id]]
+    fields: [tenant_id, id, event_id, event_type, aggregate_id, aggregate_version, payload, channel_id, status, retry_count, next_attempt_at, last_error, created_at, updated_at]
+  notifications:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, user_id, event_id]]
+    fields: [tenant_id, id, user_id, event_id, event_type, title_key, body_args, link, read_at, created_at]
+    indexes: [[tenant_id, user_id, read_at, created_at]]
+  breaking_todos:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    unique: [[tenant_id, asset_version_id, assignee_id]]
+    fields: [tenant_id, id, asset_version_id, assignee_id, status, acked_at, comment, created_at, updated_at]
+  audit_logs:
+    tenantScoped: conditional
+    primaryKey: [id]
+    fields: [id, tenant_id, actor_id, actor_type, action, target_type, target_id, detail, ip, request_id, created_at]
+    mutation: append-only
+    indexes: [[tenant_id, created_at], [actor_id, created_at], [target_type, target_id, created_at]]
+  tenant_exports:
+    tenantScoped: true
+    primaryKey: [tenant_id, id]
+    fields: [tenant_id, id, requested_by, status, artifact_ref, expires_at, error, created_at, updated_at]
+
+foreignKeyPolicy:
+  tenantOwnedReferences: composite-tenant-id-and-id
+  historicalFacts: restrict-delete
+  mutableConfiguration: soft-delete
+  derivedRows: cascade-only-inside-explicit-tenant-deletion-job
+  cyclicHeadReferences: deferrable-initially-deferred
+
+transactionBoundaries:
+  deleteService:
+    - lock-service-and-validate-if-match
+    - soft-delete-service-sources-layers-assets-and-comments
+    - stale-bindings-and-deactivate-tracks-with-generation-increment
+    - delete-service-access-stars-recents-tags-and-group-memberships
+    - disable-service-and-descendant-asset-subscriptions
+    - cancel-pending-service-and-asset-scoped-jobs
+    - append-audit-row
+  transitionServiceLifecycle:
+    - lock-service-and-validate-if-match
+    - validate-forward-only-lifecycle-transition
+    - update-service-lifecycle-and-revision
+    - when-published-to-deprecated-append-one-service-deprecated-outbox-event
+    - when-deprecated-to-retired-cancel-pending-service-scoped-jobs
+    - append-audit-row
+  commitServiceWork:
+    - lock-service-and-require-lifecycle-in-draft-published-deprecated
+    - persist-new-revisions-versions-or-index-rows
+    - reject-whole-commit-with-invalid-state-when-retired
+  approveRevision:
+    - lock-layer-head
+    - update-review-and-effective-head
+    - increment-track-desired-generation
+    - enqueue-merge-job
+  indexVersion:
+    - insert-or-complete-asset-version
+    - replace-asset-items
+    - move-track-latest-head
+    - create-diff-snapshot-and-breaking-todos
+    - append-outbox-events
+  publishVersion:
+    - lock-track-and-layer-heads
+    - recheck-publish-guards
+    - set-version-published
+    - increment-version-revision-under-if-match
+    - move-track-current-head
+    - append-audit-and-outbox
+  putSubscription:
+    - validate-scope-target-and-visible-enabled-channels
+    - insert-or-update-subscription-by-null-aware-natural-identity
+    - replace-subscription-channel-rows
