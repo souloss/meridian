@@ -10,6 +10,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 	"uuid"
@@ -17,6 +18,7 @@ import (
 	generated "github.com/meridian-labs/meridian/internal/generated/repository"
 	"github.com/meridian-labs/meridian/internal/repository"
 	"github.com/meridian-labs/meridian/internal/service"
+	"github.com/meridian-labs/meridian/internal/storage"
 	"github.com/meridian-labs/meridian/internal/task"
 	"github.com/riverqueue/river"
 )
@@ -76,6 +78,87 @@ func TestGeneratedRepositoryUsesStandardUUIDAndTransaction(t *testing.T) {
 	}
 	if count != 0 {
 		t.Fatalf("rolled-back user count = %d, want 0", count)
+	}
+}
+
+func TestBlobReferenceRegistryEnforcesUniqueByteQuota(t *testing.T) {
+	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("MERIDIAN_TEST_DATABASE_URL is not set")
+	}
+	db, err := Open(t.Context(), databaseURL, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatalf("open database: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("close database: %v", err)
+		}
+	})
+	if err := db.MigrateUp(t.Context()); err != nil {
+		t.Fatalf("migrate database: %v", err)
+	}
+	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE users, tenants CASCADE`); err != nil {
+		t.Fatalf("reset blob fixtures: %v", err)
+	}
+	local, err := storage.NewLocalStore(filepath.Join(t.TempDir(), "blobs"))
+	if err != nil {
+		t.Fatalf("construct local blob store: %v", err)
+	}
+	content := []byte("tenant unique bytes")
+	blob, err := local.Put(t.Context(), bytes.NewReader(content))
+	if err != nil {
+		t.Fatalf("write local blob: %v", err)
+	}
+	tenantID, secondTenantID := uuid.NewV7(), uuid.NewV7()
+	if _, err := db.Pool.Exec(t.Context(), `
+		INSERT INTO tenants (id, slug, display_name, quota, settings)
+		VALUES
+		  ($1, 'blob-acme', 'Blob Acme', jsonb_build_object('maxStorageBytes', $3::bigint), '{}'::jsonb),
+		  ($2, 'blob-rival', 'Blob Rival', jsonb_build_object('maxStorageBytes', $3::bigint), '{}'::jsonb)
+	`, tenantID, secondTenantID, blob.Size); err != nil {
+		t.Fatalf("create blob tenants: %v", err)
+	}
+	registry := repository.NewRepositoryStore(db.Pool)
+	now := time.Now().UTC()
+	if err := registry.AddBlobReference(t.Context(), tenantID, blob, "application/json", now); err != nil {
+		t.Fatalf("register first tenant blob reference: %v", err)
+	}
+	if err := registry.AddBlobReference(t.Context(), tenantID, blob, "application/json", now.Add(time.Second)); err != nil {
+		t.Fatalf("register duplicate tenant blob reference: %v", err)
+	}
+	if err := registry.AddBlobReference(t.Context(), secondTenantID, blob, "application/json", now); err != nil {
+		t.Fatalf("reuse global blob for second tenant: %v", err)
+	}
+	var blobCount, tenantReferenceCount int
+	var firstRefCount int64
+	if err := db.Pool.QueryRow(t.Context(), `SELECT count(*) FROM blobs`).Scan(&blobCount); err != nil {
+		t.Fatalf("count global blobs: %v", err)
+	}
+	if err := db.Pool.QueryRow(t.Context(), `SELECT count(*) FROM tenant_blob_refs WHERE blob_digest = $1`, blob.Digest).Scan(&tenantReferenceCount); err != nil {
+		t.Fatalf("count tenant blob references: %v", err)
+	}
+	if err := db.Pool.QueryRow(t.Context(), `SELECT ref_count FROM tenant_blob_refs WHERE tenant_id = $1 AND blob_digest = $2`, tenantID, blob.Digest).Scan(&firstRefCount); err != nil {
+		t.Fatalf("read first tenant reference count: %v", err)
+	}
+	if blobCount != 1 || tenantReferenceCount != 2 || firstRefCount != 2 {
+		t.Fatalf("blob/reference counts = %d/%d/%d, want 1/2/2", blobCount, tenantReferenceCount, firstRefCount)
+	}
+	if err := registry.AddBlobReference(t.Context(), secondTenantID, blob, "text/plain", now); !errors.Is(err, storage.ErrBlobMetadataConflict) {
+		t.Fatalf("conflicting blob metadata error = %v, want ErrBlobMetadataConflict", err)
+	}
+	additional, err := local.Put(t.Context(), bytes.NewReader([]byte("x")))
+	if err != nil {
+		t.Fatalf("write additional local blob: %v", err)
+	}
+	if err := registry.AddBlobReference(t.Context(), tenantID, additional, "text/plain", now); !errors.Is(err, service.ErrQuotaExceeded) {
+		t.Fatalf("over-quota blob reference error = %v, want ErrQuotaExceeded", err)
+	}
+	if err := db.Pool.QueryRow(t.Context(), `SELECT count(*) FROM blobs`).Scan(&blobCount); err != nil {
+		t.Fatalf("count blobs after rejected reference: %v", err)
+	}
+	if blobCount != 1 {
+		t.Fatalf("blob metadata count after quota rejection = %d, want 1", blobCount)
 	}
 }
 

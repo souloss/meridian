@@ -14,6 +14,9 @@ import (
 type Querier interface {
 	// AddCredentialTeamShare grants one same-tenant team visibility entry.
 	AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error
+	// AddTenantBlobReference creates or increments one tenant reference after the
+	// caller has serialized and validated unique-byte quota accounting.
+	AddTenantBlobReference(ctx context.Context, arg AddTenantBlobReferenceParams) (TenantBlobRef, error)
 	// AppendJobFailureAudit records one append-only, redacted system fact in the
 	// same transaction as the job terminal state and its outbound event rows.
 	AppendJobFailureAudit(ctx context.Context, arg AppendJobFailureAuditParams) (AuditLog, error)
@@ -51,8 +54,14 @@ type Querier interface {
 	CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error)
 	// CountTenantCredentials counts visible tenant-owned and global credentials for one tenant member.
 	CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error)
+	// CountTenantUniqueBlobBytes sums each positively referenced global blob once
+	// so repeated revisions of identical content do not consume quota again.
+	CountTenantUniqueBlobBytes(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
 	CreateAPIToken(ctx context.Context, arg CreateAPITokenParams) (ApiToken, error)
+	// CreateBlobMetadata inserts immutable content-addressed metadata and returns
+	// no row when another tenant or request already registered the same digest.
+	CreateBlobMetadata(ctx context.Context, arg CreateBlobMetadataParams) (Blob, error)
 	// CreateCredential inserts one tenant-owned encrypted credential and returns metadata plus ciphertext.
 	// Secret plaintext is never accepted by SQL; the service supplies the encrypted projection only.
 	CreateCredential(ctx context.Context, arg CreateCredentialParams) (Credential, error)
@@ -104,6 +113,8 @@ type Querier interface {
 	GetActiveTenantBySlug(ctx context.Context, slug string) (Tenant, error)
 	// GetActiveTenantMembership returns one active tenant membership without revealing disabled tenant records.
 	GetActiveTenantMembership(ctx context.Context, arg GetActiveTenantMembershipParams) (GetActiveTenantMembershipRow, error)
+	// GetBlobMetadata returns immutable metadata for validating a reused digest.
+	GetBlobMetadata(ctx context.Context, blobDigest string) (Blob, error)
 	// GetCredentialRotationIdempotency returns a retained tenant rotation replay record, including its expiry.
 	GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error)
 	// GetGlobalCredential returns one platform-owned credential.
@@ -119,6 +130,8 @@ type Querier interface {
 	GetRepository(ctx context.Context, arg GetRepositoryParams) (Repository, error)
 	// GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
 	GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error)
+	// GetTenantBlobReference returns the current count after the caller locks the tenant quota row.
+	GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error)
 	// GetTenantBySlug returns a tenant in any lifecycle state for platform administration.
 	GetTenantBySlug(ctx context.Context, slug string) (Tenant, error)
 	// GetTenantCredential returns one visible tenant credential and its team-share identifiers.
@@ -179,6 +192,9 @@ type Querier interface {
 	// LockRepositoryQuota serializes repository creation against the tenant's repository quota.
 	// The repository adapter holds this row lock while counting and inserting, so concurrent creates cannot oversubscribe a quota.
 	LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
+	// LockTenantStorageQuota serializes all tenant blob-reference accounting and
+	// returns the frozen unique-byte quota copied into the tenant snapshot.
+	LockTenantStorageQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// MarkOutboxDelivered completes only the exact active lease so a stale worker
 	// cannot overwrite a delivery reclaimed by a newer dispatcher.
 	MarkOutboxDelivered(ctx context.Context, arg MarkOutboxDeliveredParams) (int64, error)
