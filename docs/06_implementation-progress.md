@@ -3,8 +3,8 @@
 > 最后核对：2026-09-05
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`ea589ad feat: add tenant job control plane`
-> 当前开发切片：M0 Nuxt 控制面（开发中）
+> 最新稳定提交：`f3b20fe feat: add nuxt tenant control plane`
+> 当前开发切片：M0 Acceptance/Smoke 与 executable spikes
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -54,8 +54,8 @@
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
 | Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
 | 本地 SHA-256 CAS Blob 驱动 | 已完成 | 流式摘要、排他原子发布、去重、损坏检测、短时内容能力、租户唯一字节配额和真实 PG 覆盖均已通过；内容 HTTP endpoint 按契约在 M1 资产消费者接入 | `6c79863` |
-| M0 Nuxt 控制面 | 开发中 | 当前开始实现登录、租户壳、凭据/仓库/Job 页面、桌面/移动导航和认证守卫；E2E、axe 与静态产物门禁待本切片完成后执行 | `b29514f`、当前工作区 |
-| M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；CodeMirror 大文件、Table/Cytoscape 性能、桌面/移动端 Playwright 与 axe 尚未放行 | [`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
+| M0 Nuxt 控制面 | 部分完成 | 登录、租户壳、认证/租户守卫、仓库/凭据/Job 查询、Job 取消/重试/SSE、桌面/移动导航已实现；创建仓库/凭据表单、平台级管理视图和完整 Smoke fixture 仍未闭环 | `f3b20fe` |
+| M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；Nuxt 类型检查、静态生成、桌面/移动 Playwright 与 axe 已通过；CodeMirror 大文件、Table/Cytoscape 性能 spike 尚未放行 | `f3b20fe`、[`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
 
 ## M0 验收矩阵
 
@@ -74,7 +74,7 @@
 
 ## 当前工作区快照
 
-最后稳定基线是 `ea589ad`。该提交完成时，Go 单测、竞态测试、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
+最后稳定基线是 `f3b20fe`。该提交完成时，Go 单测、竞态测试、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
 
 2026-09-05 核对时，仓库、平台 Job、River Worker、审计查询、M0 Outbox 与本地 CAS Blob 基础切片已通过门禁，包含：
 
@@ -101,13 +101,16 @@
 - 手工重试在同一事务内锁定幂等键、源 Job 和最新 generation，复制不可变 input，创建 `trigger=retry`、`retryOfJobId` 和新 River Job；相同 key/hash 精确重放，不同 hash 返回幂等冲突，存在等价 pending/running generation 返回状态冲突。M0 当前仅允许 `repo.sync`，因为其它 Job 类型尚未有可安全重建的 Worker 参数契约。
 - Job SSE 首先发送当前 state，随后按持久化 sequence 重放日志；`Last-Event-ID` 只接受非负十进制序列，15 秒心跳使用注释帧，响应禁止缓存和代理缓冲，终态发送最终 state 后关闭。
 - 迁移 `00004_job_stage_attempt.sql` 为阶段日志增加一基 attempt，并由 DDL 注释审计覆盖所有 Goose `Up` 迁移（含 `ADD COLUMN`）。
+- Nuxt 控制面已接入生成的 API 客户端和 Vue Query：登录/退出、CSRF 会话缓存、租户路由隔离、仓库/凭据只读目录、Job 列表/详情/筛选/取消/重试/SSE 实时状态，以及响应式桌面侧栏和移动抽屉。
+- 前端验证已通过 `vfox exec nodejs@24.20.0 -- pnpm --dir web typecheck`、`pnpm generate`、`pnpm check:generated-docs`；Playwright CI 矩阵为 6 项（5 passed、1 个桌面移动抽屉用例按视口跳过），每个执行项目的 axe 违规均为 0；1440px Dashboard 与 393px Jobs 抽屉截图无横向溢出。
+- 当前前端边界是创建仓库/凭据按钮保持禁用，避免在后端对应写入契约和完整表单校验尚未落地时制造假成功；这些能力进入后续 M0 切片。
 
 本阶段提交前已通过 `go1.27.1` 的 `go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
 
 ## 下一步顺序
 
-1. 完成 M0 Nuxt 控制面并通过前端类型、静态生成、桌面/移动视口和 axe 门禁。
-2. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
+1. 补齐 M0 Nuxt 创建仓库/凭据表单及平台级控制面缺口，并为写入路径增加契约/负向 E2E。
+2. 完成 CodeMirror 大文件、Table/Cytoscape 性能等剩余 executable spikes。
 3. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
 
 ## 更新流程
