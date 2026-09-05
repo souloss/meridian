@@ -7,7 +7,12 @@
  */
 import type { RepositoryErrorClass } from './repositoryErrorClass.ts';
 
+/**
+ * represents repository error data exchanged through the Meridian API.
+ */
 export interface RepositoryError {
+  /** specifies the class associated with this repository error. */
   class: RepositoryErrorClass;
+  /** specifies the message associated with this repository error. */
   message: string;
 }

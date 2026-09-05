@@ -7,7 +7,12 @@
  */
 import type { ViewOverrideValueDefaultOptions } from './viewOverrideValueDefaultOptions.ts';
 
+/**
+ * represents view override value data exchanged through the Meridian API.
+ */
 export interface ViewOverrideValue {
+  /** indicates whether enabled applies to this view override value. */
   enabled?: boolean;
+  /** specifies the default options associated with this view override value. */
   defaultOptions?: ViewOverrideValueDefaultOptions;
 }

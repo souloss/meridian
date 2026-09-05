@@ -7,4 +7,5 @@
  */
 import type { KindId } from './kindId.ts';
 
+/** KindFilterParameter is generated from the Meridian OpenAPI contract for kind filter parameter. */
 export type KindFilterParameter = KindId;

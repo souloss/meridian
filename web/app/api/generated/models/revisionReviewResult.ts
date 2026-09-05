@@ -8,10 +8,18 @@
 import type { LayerRevision } from './layerRevision.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * reports the result of the corresponding Meridian operation.
+ */
 export interface RevisionReviewResult {
+  /** is the monotonic optimistic-concurrency version of this resource. */
   revision: LayerRevision;
+  /** specifies the effective revision id associated with this revision review result. */
   effectiveRevisionId: Uuid | null;
+  /** specifies the merge job id associated with this revision review result. */
   mergeJobId: Uuid | null;
+  /** contains the ordered superseded revision ids associated with this revision review result. */
   supersededRevisionIds: Uuid[];
+  /** indicates whether deduplicated applies to this revision review result. */
   deduplicated: boolean;
 }

@@ -8,6 +8,10 @@
 import type { Member } from './member.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of member records.
+ */
 export type MemberPage = PageInfo & {
+  /** contains the ordered items associated with this member page. */
   items: Member[];
 };

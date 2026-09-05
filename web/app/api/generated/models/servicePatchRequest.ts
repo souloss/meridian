@@ -10,19 +10,28 @@ import type { OwnerRefs } from './ownerRefs.ts';
 import type { ServiceVisibility } from './serviceVisibility.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ServicePatchRequest {
   /**
+     * specifies the display name associated with this service patch request.
      * @minLength 1
      * @maxLength 128
      */
   displayName?: string;
   /**
+     * specifies the description associated with this service patch request.
      * @maxLength 2000
      * @nullable
      */
   description?: string | null;
+  /** contains the service visibility associated with this service patch request. */
   visibility?: ServiceVisibility;
+  /** contains the lifecycle associated with this service patch request. */
   lifecycle?: Lifecycle;
+  /** contains the owner refs associated with this service patch request. */
   owners?: OwnerRefs;
+  /** contains the ordered tag ids associated with this service patch request. */
   tagIds?: Uuid[];
 }

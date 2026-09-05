@@ -7,9 +7,16 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents ai generation accepted data exchanged through the Meridian API.
+ */
 export interface AiGenerationAccepted {
+  /** identifies the asset associated with this resource. */
   assetId: Uuid;
+  /** identifies the source associated with this resource. */
   sourceId: Uuid;
+  /** identifies the asynchronous job associated with this resource. */
   jobId: Uuid;
+  /** indicates whether deduplicated applies to this ai generation accepted. */
   deduplicated: boolean;
 }

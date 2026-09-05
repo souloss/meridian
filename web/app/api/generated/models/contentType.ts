@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported content type value.
+ */
 export type ContentType = typeof ContentType[keyof typeof ContentType];
 
 
+/** ContentType is generated from the Meridian OpenAPI contract for content type. */
 export const ContentType = {
   yaml: 'yaml',
   json: 'json',

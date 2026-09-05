@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface NotificationChannelRotateRequest {
   /**
+     * is write-only secret material and must never be returned by the API.
      * @minLength 32
      * @maxLength 4096
      */

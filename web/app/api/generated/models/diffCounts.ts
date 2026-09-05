@@ -6,19 +6,43 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * represents diff counts data exchanged through the Meridian API.
+ */
 export interface DiffCounts {
-  /** @minimum 0 */
+  /**
+     * specifies the added associated with this diff counts.
+     * @minimum 0
+     */
   added: number;
-  /** @minimum 0 */
+  /**
+     * specifies the removed associated with this diff counts.
+     * @minimum 0
+     */
   removed: number;
-  /** @minimum 0 */
+  /**
+     * specifies the modified associated with this diff counts.
+     * @minimum 0
+     */
   modified: number;
-  /** @minimum 0 */
+  /**
+     * specifies the breaking associated with this diff counts.
+     * @minimum 0
+     */
   breaking: number;
-  /** @minimum 0 */
+  /**
+     * specifies the risky associated with this diff counts.
+     * @minimum 0
+     */
   risky: number;
-  /** @minimum 0 */
+  /**
+     * specifies the non breaking associated with this diff counts.
+     * @minimum 0
+     */
   nonBreaking: number;
-  /** @minimum 0 */
+  /**
+     * specifies the informational associated with this diff counts.
+     * @minimum 0
+     */
   informational: number;
 }

@@ -7,4 +7,5 @@
  */
 import type { DiffCreateRequest } from './diffCreateRequest.ts';
 
+/** DiffCreateBody is the request body type for its generated OpenAPI operation. */
 export type DiffCreateBody = DiffCreateRequest;

@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the labels associated with this version publish request.
+ */
 export type VersionPublishRequestLabels = {[key: string]: string};

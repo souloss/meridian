@@ -7,6 +7,10 @@
  */
 import type { AssetKind } from './assetKind.ts';
 
+/**
+ * contains an ordered collection of asset kind values.
+ */
 export interface AssetKindList {
+  /** contains the ordered items associated with this asset kind list. */
   items: AssetKind[];
 }

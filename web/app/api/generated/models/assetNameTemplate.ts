@@ -7,6 +7,7 @@
  */
 
 /**
+ * represents asset name template data exchanged through the Meridian API.
  * @maxLength 128
  * @pattern ^(?:[a-z0-9-]|\{file_stem\}|\{parent_dir\})+$
  */

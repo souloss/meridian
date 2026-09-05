@@ -7,4 +7,5 @@
  */
 import type { LayerRevisionCreateRequest } from './layerRevisionCreateRequest.ts';
 
+/** LayerRevisionCreateBody is the request body type for its generated OpenAPI operation. */
 export type LayerRevisionCreateBody = LayerRevisionCreateRequest;

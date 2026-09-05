@@ -9,9 +9,16 @@ import type { DiffResult } from './diffResult.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents diff snapshot data exchanged through the Meridian API.
+ */
 export interface DiffSnapshot {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the diff result associated with this diff snapshot. */
   result: DiffResult;
+  /** contains the uuid associated with this diff snapshot. */
   createdBy: Uuid;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
 }

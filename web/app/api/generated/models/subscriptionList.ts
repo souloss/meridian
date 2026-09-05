@@ -7,6 +7,10 @@
  */
 import type { Subscription } from './subscription.ts';
 
+/**
+ * contains an ordered collection of subscription values.
+ */
 export interface SubscriptionList {
+  /** contains the ordered items associated with this subscription list. */
   items: Subscription[];
 }

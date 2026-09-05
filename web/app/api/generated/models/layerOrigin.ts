@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported layer origin value.
+ */
 export type LayerOrigin = typeof LayerOrigin[keyof typeof LayerOrigin];
 
 
+/** LayerOrigin is generated from the Meridian OpenAPI contract for layer origin. */
 export const LayerOrigin = {
   repo: 'repo',
   third_party: 'third_party',

@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the highlights associated with this search hit.
+ */
 export type SearchHitHighlights = {[key: string]: string[]};

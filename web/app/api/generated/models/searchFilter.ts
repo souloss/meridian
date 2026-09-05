@@ -9,20 +9,34 @@ import type { KindId } from './kindId.ts';
 import type { Lifecycle } from './lifecycle.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines supported filters for selecting search records.
+ */
 export interface SearchFilter {
+  /** contains the ordered repository ids associated with this search filter. */
   repositoryIds?: Uuid[];
+  /** contains the ordered service ids associated with this search filter. */
   serviceIds?: Uuid[];
+  /** contains the ordered team ids associated with this search filter. */
   teamIds?: Uuid[];
+  /** contains the ordered group ids associated with this search filter. */
   groupIds?: Uuid[];
+  /** contains the ordered kinds associated with this search filter. */
   kinds?: KindId[];
+  /** contains the ordered lifecycles associated with this search filter. */
   lifecycles?: Lifecycle[];
+  /** contains the ordered tag ids associated with this search filter. */
   tagIds?: Uuid[];
   /**
+     * contains the ordered languages associated with this search filter.
      * @items.minLength 1
      * @items.maxLength 64
      */
   languages?: string[];
+  /** contains the ordered item types associated with this search filter. */
   itemTypes?: string[];
+  /** indicates whether ai layer applies to this search filter. */
   hasAiLayer?: boolean;
+  /** indicates whether breaking changes applies to this search filter. */
   hasBreakingChanges?: boolean;
 }

@@ -9,6 +9,7 @@
 export type ServiceGrantPermissionsItem = typeof ServiceGrantPermissionsItem[keyof typeof ServiceGrantPermissionsItem];
 
 
+/** ServiceGrantPermissionsItem is generated from the Meridian OpenAPI contract for service grant permissions item. */
 export const ServiceGrantPermissionsItem = {
   'layer:edit': 'layer:edit',
   'layer:approve': 'layer:approve',

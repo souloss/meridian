@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported config source value.
+ */
 export type ConfigSource = typeof ConfigSource[keyof typeof ConfigSource];
 
 
+/** ConfigSource is generated from the Meridian OpenAPI contract for config source. */
 export const ConfigSource = {
   db_manual: 'db_manual',
   repo_file: 'repo_file',

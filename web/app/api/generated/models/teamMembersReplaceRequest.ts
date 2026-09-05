@@ -7,6 +7,10 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface TeamMembersReplaceRequest {
+  /** contains the ordered user ids associated with this team members replace request. */
   userIds: Uuid[];
 }

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the class associated with this repository error.
+ */
 export type RepositoryErrorClass = typeof RepositoryErrorClass[keyof typeof RepositoryErrorClass];
 
 
+/** RepositoryErrorClass is generated from the Meridian OpenAPI contract for repository error class. */
 export const RepositoryErrorClass = {
   dns: 'dns',
   auth: 'auth',

@@ -8,8 +8,14 @@
 import type { ContentType } from './contentType.ts';
 import type { KindId } from './kindId.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface UploadRequest {
+  /** specifies the file associated with this upload request. */
   file: Blob;
+  /** contains the kind id associated with this upload request. */
   kind: KindId;
+  /** contains the content type associated with this upload request. */
   contentType: ContentType;
 }

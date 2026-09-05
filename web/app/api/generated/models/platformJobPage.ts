@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { PlatformJob } from './platformJob.ts';
 
+/**
+ * contains one paginated page of platform job records.
+ */
 export type PlatformJobPage = PageInfo & {
+  /** contains the ordered items associated with this platform job page. */
   items: PlatformJob[];
 };

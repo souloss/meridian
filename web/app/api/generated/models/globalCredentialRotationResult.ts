@@ -9,8 +9,14 @@ import type { CredentialSyncJob } from './credentialSyncJob.ts';
 import type { ETag } from './eTag.ts';
 import type { GlobalCredential } from './globalCredential.ts';
 
+/**
+ * reports the result of the corresponding Meridian operation.
+ */
 export interface GlobalCredentialRotationResult {
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the global credential associated with this global credential rotation result. */
   credential: GlobalCredential;
+  /** contains the ordered sync jobs associated with this global credential rotation result. */
   syncJobs: CredentialSyncJob[];
 }

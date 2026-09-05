@@ -7,7 +7,12 @@
  */
 import type { Slug } from './slug.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface TenantDeleteRequest {
+  /** contains the slug associated with this tenant delete request. */
   confirmationSlug: Slug;
+  /** specifies the current password associated with this tenant delete request. */
   currentPassword: string;
 }

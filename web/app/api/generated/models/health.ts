@@ -7,6 +7,10 @@
  */
 import type { HealthStatus } from './healthStatus.ts';
 
+/**
+ * reports successful liveness or readiness evaluation.
+ */
 export interface Health {
+  /** is ok when the requested health check succeeds. */
   status: HealthStatus;
 }

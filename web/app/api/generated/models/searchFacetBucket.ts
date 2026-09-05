@@ -6,8 +6,15 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * represents search facet bucket data exchanged through the Meridian API.
+ */
 export interface SearchFacetBucket {
+  /** specifies the value associated with this search facet bucket. */
   value: string;
-  /** @minimum 0 */
+  /**
+     * specifies the count associated with this search facet bucket.
+     * @minimum 0
+     */
   count: number;
 }

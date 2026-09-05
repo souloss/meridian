@@ -9,9 +9,16 @@ import type { RefName } from './refName.ts';
 import type { RefType } from './refType.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * identifies the ref selected by a request.
+ */
 export interface RefSelector {
+  /** specifies the type associated with this ref selector. */
   type: 'ref';
+  /** identifies the asset associated with this resource. */
   assetId: Uuid;
+  /** contains the ref type associated with this ref selector. */
   refType: RefType;
+  /** contains the ref name associated with this ref selector. */
   ref: RefName;
 }

@@ -7,4 +7,5 @@
  */
 import type { SearchFilter } from './searchFilter.ts';
 
+/** SearchFacetsParameter is generated from the Meridian OpenAPI contract for search facets parameter. */
 export type SearchFacetsParameter = SearchFilter;

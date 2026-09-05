@@ -9,9 +9,16 @@ import type { ETag } from './eTag.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { ViewOverrideValue } from './viewOverrideValue.ts';
 
+/**
+ * represents view override data exchanged through the Meridian API.
+ */
 export interface ViewOverride {
+  /** specifies the view id associated with this view override. */
   viewId: string;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the view override value associated with this view override. */
   override: ViewOverrideValue;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

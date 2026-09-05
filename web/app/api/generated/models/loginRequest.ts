@@ -6,13 +6,18 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * contains local credentials used to create a browser session.
+ */
 export interface LoginRequest {
   /**
+     * specifies the username associated with this login request.
      * @minLength 1
      * @maxLength 128
      */
   username: string;
   /**
+     * is the write-only plaintext password supplied for authentication.
      * @minLength 1
      * @maxLength 1024
      */

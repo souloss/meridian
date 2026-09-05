@@ -7,4 +7,5 @@
  */
 import type { MergePreviewRequest } from './mergePreviewRequest.ts';
 
+/** MergePreviewBody is the request body type for its generated OpenAPI operation. */
 export type MergePreviewBody = MergePreviewRequest;

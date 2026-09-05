@@ -7,4 +7,5 @@
  */
 import type { AssetAiGenerateRequest } from './assetAiGenerateRequest.ts';
 
+/** AssetAiGenerateBody is the request body type for its generated OpenAPI operation. */
 export type AssetAiGenerateBody = AssetAiGenerateRequest;

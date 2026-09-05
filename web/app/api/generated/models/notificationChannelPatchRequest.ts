@@ -6,14 +6,20 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface NotificationChannelPatchRequest {
   /**
+     * specifies the name associated with this notification channel patch request.
      * @minLength 1
      * @maxLength 64
      */
   name?: string;
+  /** indicates whether enabled applies to this notification channel patch request. */
   enabled?: boolean;
   /**
+     * specifies the endpoint associated with this notification channel patch request.
      * @maxLength 2048
      * @nullable
      */

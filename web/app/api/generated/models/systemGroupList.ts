@@ -7,6 +7,10 @@
  */
 import type { SystemGroup } from './systemGroup.ts';
 
+/**
+ * contains an ordered collection of system group values.
+ */
 export interface SystemGroupList {
+  /** contains the ordered items associated with this system group list. */
   items: SystemGroup[];
 }

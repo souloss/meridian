@@ -10,10 +10,18 @@ import type { LayerOrigin } from './layerOrigin.ts';
 import type { RevisionStatus } from './revisionStatus.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines supported filters for selecting review records.
+ */
 export interface ReviewFilter {
+  /** is the current lifecycle or processing state. */
   status?: RevisionStatus[];
+  /** identifies the service associated with this resource. */
   serviceId?: Uuid;
+  /** contains the kind id associated with this review filter. */
   kind?: KindId;
+  /** contains the layer origin associated with this review filter. */
   origin?: LayerOrigin;
+  /** contains the uuid associated with this review filter. */
   authorId?: Uuid;
 }

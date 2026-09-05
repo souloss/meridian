@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { Tenant } from './tenant.ts';
 
+/**
+ * contains one paginated page of tenant records.
+ */
 export type TenantPage = PageInfo & {
+  /** contains the ordered items associated with this tenant page. */
   items: Tenant[];
 };

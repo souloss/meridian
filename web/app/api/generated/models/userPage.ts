@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { User } from './user.ts';
 
+/**
+ * contains one paginated page of user records.
+ */
 export type UserPage = PageInfo & {
+  /** contains the ordered items associated with this user page. */
   items: User[];
 };

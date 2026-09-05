@@ -9,15 +9,21 @@ import type { PageParameter } from './pageParameter.ts';
 import type { PageSizeParameter } from './pageSizeParameter.ts';
 import type { UnreadFilterParameter } from './unreadFilterParameter.ts';
 
+/** ListNotificationsParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListNotificationsParams = {
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */
 pageSize?: PageSizeParameter;
+/**
+ * identifies or filters the unread value in the query.
+ */
 unread?: UnreadFilterParameter;
 };

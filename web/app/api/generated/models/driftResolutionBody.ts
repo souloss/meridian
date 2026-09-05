@@ -7,4 +7,5 @@
  */
 import type { DriftResolutionRequest } from './driftResolutionRequest.ts';
 
+/** DriftResolutionBody is the request body type for its generated OpenAPI operation. */
 export type DriftResolutionBody = DriftResolutionRequest;

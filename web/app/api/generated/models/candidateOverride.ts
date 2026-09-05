@@ -9,13 +9,20 @@ import type { ServiceVisibility } from './serviceVisibility.ts';
 import type { Slug } from './slug.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents candidate override data exchanged through the Meridian API.
+ */
 export interface CandidateOverride {
+  /** contains the uuid associated with this candidate override. */
   candidateId: Uuid;
+  /** contains the slug associated with this candidate override. */
   slug?: Slug;
   /**
+     * specifies the display name associated with this candidate override.
      * @minLength 1
      * @maxLength 128
      */
   displayName?: string;
+  /** contains the service visibility associated with this candidate override. */
   visibility?: ServiceVisibility;
 }

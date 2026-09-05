@@ -9,9 +9,16 @@ import type { JobScopeType } from './jobScopeType.ts';
 import type { JobStatus } from './jobStatus.ts';
 import type { JobType } from './jobType.ts';
 
+/**
+ * defines supported filters for selecting job records.
+ */
 export interface JobFilter {
+  /** contains the ordered types associated with this job filter. */
   types?: JobType[];
+  /** contains the ordered statuses associated with this job filter. */
   statuses?: JobStatus[];
+  /** contains the job scope type associated with this job filter. */
   scopeType?: JobScopeType;
+  /** specifies the scope id associated with this job filter. */
   scopeId?: string;
 }

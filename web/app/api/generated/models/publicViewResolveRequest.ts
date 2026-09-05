@@ -10,9 +10,16 @@ import type { KindId } from './kindId.ts';
 import type { PublicViewResolveRequestOptions } from './publicViewResolveRequestOptions.ts';
 import type { PublicViewResolveRequestViewId } from './publicViewResolveRequestViewId.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface PublicViewResolveRequest {
+  /** specifies the view id associated with this public view resolve request. */
   viewId: PublicViewResolveRequestViewId;
+  /** contains the kind id associated with this public view resolve request. */
   kind: KindId;
+  /** contains the asset name associated with this public view resolve request. */
   assetName: AssetName;
+  /** specifies the options associated with this public view resolve request. */
   options?: PublicViewResolveRequestOptions;
 }

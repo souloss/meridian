@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the source associated with this known host.
+ */
 export type KnownHostSource = typeof KnownHostSource[keyof typeof KnownHostSource];
 
 
+/** KnownHostSource is generated from the Meridian OpenAPI contract for known host source. */
 export const KnownHostSource = {
   manual: 'manual',
   accept_new: 'accept_new',

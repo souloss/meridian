@@ -20,10 +20,11 @@
 
 1. 先改拥有该语义的 YAML，再更新其它投影；
 2. OpenAPI 生成 Go server/client 与 TypeScript client，生成目录见 manifest；
-3. OpenAPI 结构校验使用同目录 `.redocly.yaml`，摘要和标签文案是编辑元数据，不能替代 operationId、schema、鉴权和响应校验；
-4. 领域枚举在 OpenAPI、数据库和测试中的投影必须与 `domain.yaml` 一致；
-5. `$ref`、operationId、view/kind/event/acceptance 交叉引用必须由 CI 校验；
-6. 冲突是构建错误，不通过覆盖顺序解决；
-7. Markdown 只解释业务和实现，不成为第二份契约。
+3. 所有 operation、schema、字段和参数必须在 OpenAPI 写清 `description`；Go/TypeScript 生成器会传播这些语义，并为纯传输胶水补充稳定的 GoDoc/JSDoc，禁止手改生成文件；
+4. OpenAPI 结构校验使用同目录 `.redocly.yaml`，摘要和标签文案是编辑元数据，不能替代 operationId、schema、鉴权和响应校验；
+5. 领域枚举在 OpenAPI、数据库和测试中的投影必须与 `domain.yaml` 一致；
+6. `$ref`、operationId、view/kind/event/acceptance 交叉引用必须由 CI 校验；
+7. 冲突是构建错误，不通过覆盖顺序解决；
+8. Markdown 只解释业务和实现，不成为第二份契约。
 
 `status: frozen` 表示已允许编码，不表示永不变更。破坏性变更按 manifest 的兼容策略升级版本并保留旧 API 一个发布周期。

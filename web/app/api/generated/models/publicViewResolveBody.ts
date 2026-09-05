@@ -7,4 +7,5 @@
  */
 import type { PublicViewResolveRequest } from './publicViewResolveRequest.ts';
 
+/** PublicViewResolveBody is the request body type for its generated OpenAPI operation. */
 export type PublicViewResolveBody = PublicViewResolveRequest;

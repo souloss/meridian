@@ -8,18 +8,24 @@
 import type { KindId } from './kindId.ts';
 import type { ProducerNetworkMode } from './producerNetworkMode.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ProducerProfilePatchRequest {
   /**
+     * specifies the name associated with this producer profile patch request.
      * @minLength 1
      * @maxLength 64
      */
   name?: string;
   /**
+     * specifies the executable associated with this producer profile patch request.
      * @maxLength 512
      * @pattern ^/
      */
   executable?: string;
   /**
+     * contains the ordered args associated with this producer profile patch request.
      * @maxItems 64
      * @items.maxLength 512
      */
@@ -29,29 +35,39 @@ export interface ProducerProfilePatchRequest {
      * @items.pattern ^[A-Z][A-Z0-9_]*$
      */
   envAllowlist?: string[];
-  /** @minItems 1 */
+  /**
+     * contains the ordered supported kinds associated with this producer profile patch request.
+     * @minItems 1
+     */
   supportedKinds?: KindId[];
+  /** indicates whether replay safe applies to this producer profile patch request. */
   replaySafe?: boolean;
+  /** contains the producer network mode associated with this producer profile patch request. */
   network?: ProducerNetworkMode;
   /**
+     * specifies the timeout sec associated with this producer profile patch request.
      * @minimum 10
      * @maximum 3600
      */
   timeoutSec?: number;
   /**
+     * specifies the memory mi b associated with this producer profile patch request.
      * @minimum 64
      * @maximum 16384
      */
   memoryMiB?: number;
   /**
+     * specifies the cpu seconds associated with this producer profile patch request.
      * @minimum 1
      * @maximum 3600
      */
   cpuSeconds?: number;
   /**
+     * specifies the pids associated with this producer profile patch request.
      * @minimum 1
      * @maximum 1024
      */
   pids?: number;
+  /** indicates whether enabled applies to this producer profile patch request. */
   enabled?: boolean;
 }

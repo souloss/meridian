@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the resource type associated with this shared view.
+ */
 export type SharedViewResourceType = typeof SharedViewResourceType[keyof typeof SharedViewResourceType];
 
 
+/** SharedViewResourceType is generated from the Meridian OpenAPI contract for shared view resource type. */
 export const SharedViewResourceType = {
   view: 'view',
   diff_snapshot: 'diff_snapshot',

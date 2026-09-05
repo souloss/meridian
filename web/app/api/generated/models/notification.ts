@@ -9,13 +9,25 @@ import type { DomainEventType } from './domainEventType.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents notification data exchanged through the Meridian API.
+ */
 export interface Notification {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the domain event type associated with this notification. */
   eventType: DomainEventType;
+  /** specifies the title associated with this notification. */
   title: string;
+  /** specifies the body associated with this notification. */
   body: string;
-  /** @nullable */
+  /**
+     * specifies the resource url associated with this notification.
+     * @nullable
+     */
   resourceUrl: string | null;
+  /** specifies the read at associated with this notification. */
   readAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
 }

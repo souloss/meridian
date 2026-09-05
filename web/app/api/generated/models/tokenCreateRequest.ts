@@ -8,13 +8,21 @@
 import type { Timestamp } from './timestamp.ts';
 import type { TokenScope } from './tokenScope.ts';
 
+/**
+ * defines the name, least-privilege scopes, and optional expiry of a new PAT.
+ */
 export interface TokenCreateRequest {
   /**
+     * specifies the name associated with this token create request.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
-  /** @minItems 1 */
+  /**
+     * contains the ordered scopes associated with this token create request.
+     * @minItems 1
+     */
   scopes: TokenScope[];
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt?: Timestamp | null;
 }

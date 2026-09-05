@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the shared scope associated with this credential patch request.
+ */
 export type CredentialPatchRequestSharedScope = typeof CredentialPatchRequestSharedScope[keyof typeof CredentialPatchRequestSharedScope];
 
 
+/** CredentialPatchRequestSharedScope is generated from the Meridian OpenAPI contract for credential patch request shared scope. */
 export const CredentialPatchRequestSharedScope = {
   private: 'private',
   team: 'team',

@@ -9,19 +9,34 @@ import type { Timestamp } from './timestamp.ts';
 import type { TokenScope } from './tokenScope.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * returns PAT metadata plus the bearer token exactly once at creation time.
+ */
 export interface TokenCreated {
+  /** uniquely identifies this resource. */
   id: Uuid;
   /**
+     * specifies the name associated with this token created.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
-  /** @minItems 1 */
+  /**
+     * contains the ordered scopes associated with this token created.
+     * @minItems 1
+     */
   scopes: TokenScope[];
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp | null;
+  /** specifies the last used at associated with this token created. */
   lastUsedAt: Timestamp | null;
+  /** specifies the revoked at associated with this token created. */
   revokedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
-  /** @pattern ^pat_ */
+  /**
+     * is secret bearer material and must never be logged or persisted as plaintext.
+     * @pattern ^pat_
+     */
   token: string;
 }

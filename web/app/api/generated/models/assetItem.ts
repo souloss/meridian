@@ -8,9 +8,16 @@
 import type { AssetItemDisplay } from './assetItemDisplay.ts';
 import type { ProvenanceEntry } from './provenanceEntry.ts';
 
+/**
+ * represents asset item data exchanged through the Meridian API.
+ */
 export interface AssetItem {
+  /** specifies the item type associated with this asset item. */
   itemType: string;
+  /** specifies the key associated with this asset item. */
   key: string;
+  /** specifies the display associated with this asset item. */
   display: AssetItemDisplay;
+  /** contains the ordered provenance associated with this asset item. */
   provenance: ProvenanceEntry[];
 }

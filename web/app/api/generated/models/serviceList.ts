@@ -7,6 +7,10 @@
  */
 import type { Service } from './service.ts';
 
+/**
+ * contains an ordered collection of service values.
+ */
 export interface ServiceList {
+  /** contains the ordered items associated with this service list. */
   items: Service[];
 }

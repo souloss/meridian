@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the mode associated with this view input spec.
+ */
 export type ViewInputSpecMode = typeof ViewInputSpecMode[keyof typeof ViewInputSpecMode];
 
 
+/** ViewInputSpecMode is generated from the Meridian OpenAPI contract for view input spec mode. */
 export const ViewInputSpecMode = {
   single: 'single',
   versions: 'versions',

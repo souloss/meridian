@@ -7,4 +7,5 @@
  */
 import type { ConfigImportApplyRequest } from './configImportApplyRequest.ts';
 
+/** ConfigImportApplyBody is the request body type for its generated OpenAPI operation. */
 export type ConfigImportApplyBody = ConfigImportApplyRequest;

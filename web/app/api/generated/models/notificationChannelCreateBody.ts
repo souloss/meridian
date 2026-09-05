@@ -7,4 +7,5 @@
  */
 import type { NotificationChannelCreateRequest } from './notificationChannelCreateRequest.ts';
 
+/** NotificationChannelCreateBody is the request body type for its generated OpenAPI operation. */
 export type NotificationChannelCreateBody = NotificationChannelCreateRequest;

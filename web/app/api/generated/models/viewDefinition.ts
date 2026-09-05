@@ -13,21 +13,41 @@ import type { ViewDefinitionOptionsSchema } from './viewDefinitionOptionsSchema.
 import type { ViewDefinitionQuery } from './viewDefinitionQuery.ts';
 import type { ViewInputSpec } from './viewInputSpec.ts';
 
+/**
+ * represents view definition data exchanged through the Meridian API.
+ */
 export interface ViewDefinition {
+  /** uniquely identifies this resource. */
   id: string;
+  /** specifies the name key associated with this view definition. */
   nameKey: string;
-  /** @pattern ^M[0-9]+$ */
+  /**
+     * specifies the milestone associated with this view definition.
+     * @pattern ^M[0-9]+$
+     */
   milestone: string;
+  /** specifies the mount associated with this view definition. */
   mount: ViewDefinitionMount;
+  /** specifies the component associated with this view definition. */
   component?: string;
+  /** specifies the entrypoint associated with this view definition. */
   entrypoint?: string;
+  /** specifies the external url associated with this view definition. */
   externalUrl?: string;
+  /** contains the view input spec associated with this view definition. */
   input: ViewInputSpec;
+  /** contains the ordered item types associated with this view definition. */
   itemTypes?: string[];
+  /** contains the ordered columns associated with this view definition. */
   columns?: ViewDefinitionColumnsItem[];
+  /** specifies the columns source associated with this view definition. */
   columnsSource?: string;
+  /** contains the ordered fallback columns associated with this view definition. */
   fallbackColumns?: ViewDefinitionFallbackColumnsItem[];
+  /** specifies the query associated with this view definition. */
   query?: ViewDefinitionQuery;
+  /** specifies the default options associated with this view definition. */
   defaultOptions: ViewDefinitionDefaultOptions;
+  /** specifies the options schema associated with this view definition. */
   optionsSchema: ViewDefinitionOptionsSchema;
 }

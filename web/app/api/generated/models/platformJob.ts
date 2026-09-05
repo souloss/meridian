@@ -14,20 +14,33 @@ import type { Slug } from './slug.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents platform job data exchanged through the Meridian API.
+ */
 export interface PlatformJob {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the slug associated with this platform job. */
   tenantSlug: Slug;
+  /** contains the job type associated with this platform job. */
   type: JobType;
+  /** contains the job trigger associated with this platform job. */
   trigger: JobTrigger;
+  /** is the current lifecycle or processing state. */
   status: JobStatus;
+  /** specifies the stage associated with this platform job. */
   stage: PipelineStage | null;
+  /** contains the job scope type associated with this platform job. */
   scopeType: JobScopeType;
   /**
      * Exposed only for tenant or repository scope; null for service, asset, version, layer, and other business scopes.
      * @nullable
      */
   scopeId: string | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when processing began. */
   startedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when processing reached a terminal state. */
   finishedAt: Timestamp | null;
 }

@@ -8,6 +8,10 @@
 import type { LayerRevision } from './layerRevision.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of layer revision records.
+ */
 export type LayerRevisionPage = PageInfo & {
+  /** contains the ordered items associated with this layer revision page. */
   items: LayerRevision[];
 };

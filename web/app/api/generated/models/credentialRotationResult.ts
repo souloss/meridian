@@ -9,8 +9,14 @@ import type { Credential } from './credential.ts';
 import type { CredentialSyncJob } from './credentialSyncJob.ts';
 import type { ETag } from './eTag.ts';
 
+/**
+ * reports the result of the corresponding Meridian operation.
+ */
 export interface CredentialRotationResult {
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the credential associated with this credential rotation result. */
   credential: Credential;
+  /** contains the ordered sync jobs associated with this credential rotation result. */
   syncJobs: CredentialSyncJob[];
 }

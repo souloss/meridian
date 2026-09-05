@@ -7,6 +7,10 @@
  */
 import type { NotificationChannel } from './notificationChannel.ts';
 
+/**
+ * contains an ordered collection of notification channel values.
+ */
 export interface NotificationChannelList {
+  /** contains the ordered items associated with this notification channel list. */
   items: NotificationChannel[];
 }

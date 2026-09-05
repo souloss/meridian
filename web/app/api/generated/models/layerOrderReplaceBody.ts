@@ -7,4 +7,5 @@
  */
 import type { LayerOrderReplaceRequest } from './layerOrderReplaceRequest.ts';
 
+/** LayerOrderReplaceBody is the request body type for its generated OpenAPI operation. */
 export type LayerOrderReplaceBody = LayerOrderReplaceRequest;

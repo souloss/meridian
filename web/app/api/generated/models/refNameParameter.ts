@@ -7,4 +7,5 @@
  */
 import type { RefName } from './refName.ts';
 
+/** RefNameParameter is generated from the Meridian OpenAPI contract for ref name parameter. */
 export type RefNameParameter = RefName;

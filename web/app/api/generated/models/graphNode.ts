@@ -7,8 +7,14 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents graph node data exchanged through the Meridian API.
+ */
 export interface GraphNode {
+  /** uniquely identifies this resource. */
   id: string;
+  /** specifies the label associated with this graph node. */
   label: string;
+  /** identifies the service associated with this resource. */
   serviceId: Uuid;
 }

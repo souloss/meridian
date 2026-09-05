@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies or filters the x meridian delivery value in the header.
+ */
 export type WebhookDeliveryParameter = string;

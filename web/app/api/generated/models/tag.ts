@@ -9,19 +9,28 @@ import type { ETag } from './eTag.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents tag data exchanged through the Meridian API.
+ */
 export interface Tag {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
   /**
+     * specifies the name associated with this tag.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
   /**
+     * specifies the color associated with this tag.
      * @nullable
      * @pattern ^#[0-9A-Fa-f]{6}$
      */
   color: string | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

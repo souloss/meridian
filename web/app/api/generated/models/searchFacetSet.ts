@@ -7,15 +7,28 @@
  */
 import type { SearchFacetBucket } from './searchFacetBucket.ts';
 
+/**
+ * represents search facet set data exchanged through the Meridian API.
+ */
 export interface SearchFacetSet {
+  /** contains the ordered repositories associated with this search facet set. */
   repositories: SearchFacetBucket[];
+  /** contains the ordered teams associated with this search facet set. */
   teams: SearchFacetBucket[];
+  /** contains the ordered groups associated with this search facet set. */
   groups: SearchFacetBucket[];
+  /** contains the ordered kinds associated with this search facet set. */
   kinds: SearchFacetBucket[];
+  /** contains the ordered lifecycles associated with this search facet set. */
   lifecycles: SearchFacetBucket[];
+  /** contains the ordered tags associated with this search facet set. */
   tags: SearchFacetBucket[];
+  /** contains the ordered languages associated with this search facet set. */
   languages: SearchFacetBucket[];
+  /** contains the ordered item types associated with this search facet set. */
   itemTypes: SearchFacetBucket[];
+  /** indicates whether ai layer applies to this search facet set. */
   hasAiLayer: SearchFacetBucket[];
+  /** indicates whether breaking changes applies to this search facet set. */
   hasBreakingChanges: SearchFacetBucket[];
 }

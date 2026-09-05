@@ -7,7 +7,12 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents job accepted data exchanged through the Meridian API.
+ */
 export interface JobAccepted {
+  /** identifies the asynchronous job associated with this resource. */
   jobId: Uuid;
+  /** indicates whether deduplicated applies to this job accepted. */
   deduplicated: boolean;
 }

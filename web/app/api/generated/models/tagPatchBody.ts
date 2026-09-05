@@ -7,4 +7,5 @@
  */
 import type { TagPatchRequest } from './tagPatchRequest.ts';
 
+/** TagPatchBody is the request body type for its generated OpenAPI operation. */
 export type TagPatchBody = TagPatchRequest;

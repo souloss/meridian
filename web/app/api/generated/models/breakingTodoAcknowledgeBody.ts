@@ -7,4 +7,5 @@
  */
 import type { BreakingTodoAcknowledgeRequest } from './breakingTodoAcknowledgeRequest.ts';
 
+/** BreakingTodoAcknowledgeBody is the request body type for its generated OpenAPI operation. */
 export type BreakingTodoAcknowledgeBody = BreakingTodoAcknowledgeRequest;

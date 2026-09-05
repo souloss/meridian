@@ -8,12 +8,18 @@
 import type { Quota } from './quota.ts';
 import type { TenantStatus } from './tenantStatus.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface TenantPatchRequest {
   /**
+     * specifies the display name associated with this tenant patch request.
      * @minLength 1
      * @maxLength 128
      */
   displayName?: string;
+  /** is the current lifecycle or processing state. */
   status?: TenantStatus;
+  /** contains the quota associated with this tenant patch request. */
   quota?: Quota;
 }

@@ -15,12 +15,20 @@ import type { Uuid } from './uuid.ts';
  * Immutable resolution. version requires assetId/versionId and upload requires uploadId; requestedRef fields are informational and never re-resolved.
  */
 export interface ResolvedDocumentRef {
+  /** specifies the source type associated with this resolved document ref. */
   sourceType: ResolvedDocumentRefSourceType;
+  /** contains the kind id associated with this resolved document ref. */
   kind: KindId;
+  /** specifies the content hash associated with this resolved document ref. */
   contentHash: string;
+  /** identifies the asset associated with this resource. */
   assetId: Uuid | null;
+  /** identifies the asset version associated with this resource. */
   versionId: Uuid | null;
+  /** specifies the upload id associated with this resolved document ref. */
   uploadId: Uuid | null;
+  /** specifies the requested ref type associated with this resolved document ref. */
   requestedRefType: RefType | null;
+  /** specifies the requested ref associated with this resolved document ref. */
   requestedRef: RefName | null;
 }

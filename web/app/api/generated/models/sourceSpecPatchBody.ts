@@ -7,4 +7,5 @@
  */
 import type { SourceSpecPatchRequest } from './sourceSpecPatchRequest.ts';
 
+/** SourceSpecPatchBody is the request body type for its generated OpenAPI operation. */
 export type SourceSpecPatchBody = SourceSpecPatchRequest;

@@ -8,6 +8,10 @@
 import type { DiscoveryCandidate } from './discoveryCandidate.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of candidate records.
+ */
 export type CandidatePage = PageInfo & {
+  /** contains the ordered items associated with this candidate page. */
   items: DiscoveryCandidate[];
 };

@@ -10,15 +10,21 @@ import type { PageSizeParameter } from './pageSizeParameter.ts';
 import type { TodoStatus } from './todoStatus.ts';
 import type { TodoStatusFilterParameter } from './todoStatusFilterParameter.ts';
 
+/** ListBreakingTodosParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListBreakingTodosParams = {
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */
 pageSize?: PageSizeParameter;
+/**
+ * identifies one supported todo status value.
+ */
 status?: TodoStatusFilterParameter;
 };

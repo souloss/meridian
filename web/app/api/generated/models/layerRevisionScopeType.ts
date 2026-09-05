@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the scope type associated with this layer revision.
+ */
 export type LayerRevisionScopeType = typeof LayerRevisionScopeType[keyof typeof LayerRevisionScopeType];
 
 
+/** LayerRevisionScopeType is generated from the Meridian OpenAPI contract for layer revision scope type. */
 export const LayerRevisionScopeType = {
   ref: 'ref',
   global: 'global',

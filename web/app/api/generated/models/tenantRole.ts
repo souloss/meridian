@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported tenant role value.
+ */
 export type TenantRole = typeof TenantRole[keyof typeof TenantRole];
 
 
+/** TenantRole is generated from the Meridian OpenAPI contract for tenant role. */
 export const TenantRole = {
   tenant_admin: 'tenant_admin',
   maintainer: 'maintainer',

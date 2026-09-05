@@ -8,11 +8,22 @@
 import type { ErrorCode } from './errorCode.ts';
 import type { ErrorResponseDetails } from './errorResponseDetails.ts';
 
+/**
+ * is the stable machine-readable failure envelope returned by every JSON API error.
+ */
 export interface ErrorResponse {
+  /** identifies the stable error category clients may branch on. */
   code: ErrorCode;
+  /** is a safe human-readable explanation and never contains a stack trace or secret. */
   message: string;
-  /** @nullable */
+  /**
+     * contains error-code-specific structured diagnostics, or null when no detail is available.
+     * @nullable
+     */
   details?: ErrorResponseDetails;
-  /** @minLength 1 */
+  /**
+     * correlates this result with server logs and audit records.
+     * @minLength 1
+     */
   requestId: string;
 }

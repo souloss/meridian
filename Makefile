@@ -53,5 +53,6 @@ contracts-generate-then-git-diff-exit-code: contracts-generate
 
 contracts-validate:
 	vfox exec nodejs@24.20.0 -- pnpm --dir web exec redocly lint --config ../contracts/.redocly.yaml ../contracts/openapi.yaml
+	vfox exec nodejs@24.20.0 -- pnpm --dir web check:generated-docs
 
 contracts-lint: contracts-validate

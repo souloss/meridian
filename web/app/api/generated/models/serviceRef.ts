@@ -8,8 +8,14 @@
 import type { Slug } from './slug.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents service ref data exchanged through the Meridian API.
+ */
 export interface ServiceRef {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the slug associated with this service ref. */
   slug: Slug;
+  /** specifies the display name associated with this service ref. */
   displayName: string;
 }

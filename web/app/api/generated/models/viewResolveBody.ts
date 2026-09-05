@@ -7,4 +7,5 @@
  */
 import type { ViewResolveRequest } from './viewResolveRequest.ts';
 
+/** ViewResolveBody is the request body type for its generated OpenAPI operation. */
 export type ViewResolveBody = ViewResolveRequest;

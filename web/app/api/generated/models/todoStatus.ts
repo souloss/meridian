@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported todo status value.
+ */
 export type TodoStatus = typeof TodoStatus[keyof typeof TodoStatus];
 
 
+/** TodoStatus is generated from the Meridian OpenAPI contract for todo status. */
 export const TodoStatus = {
   open: 'open',
   acked: 'acked',

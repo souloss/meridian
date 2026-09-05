@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the known host policy associated with this fetch config.
+ */
 export type FetchConfigKnownHostPolicy = typeof FetchConfigKnownHostPolicy[keyof typeof FetchConfigKnownHostPolicy];
 
 
+/** FetchConfigKnownHostPolicy is generated from the Meridian OpenAPI contract for fetch config known host policy. */
 export const FetchConfigKnownHostPolicy = {
   strict: 'strict',
   accept_new: 'accept_new',

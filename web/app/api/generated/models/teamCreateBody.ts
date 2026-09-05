@@ -7,4 +7,5 @@
  */
 import type { TeamCreateRequest } from './teamCreateRequest.ts';
 
+/** TeamCreateBody is the request body type for its generated OpenAPI operation. */
 export type TeamCreateBody = TeamCreateRequest;

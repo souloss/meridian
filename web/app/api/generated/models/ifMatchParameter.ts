@@ -7,4 +7,5 @@
  */
 import type { ETag } from './eTag.ts';
 
+/** IfMatchParameter is generated from the Meridian OpenAPI contract for if match parameter. */
 export type IfMatchParameter = ETag;

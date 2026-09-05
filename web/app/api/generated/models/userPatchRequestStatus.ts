@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * is the current lifecycle or processing state.
+ */
 export type UserPatchRequestStatus = typeof UserPatchRequestStatus[keyof typeof UserPatchRequestStatus];
 
 
+/** UserPatchRequestStatus is generated from the Meridian OpenAPI contract for user patch request status. */
 export const UserPatchRequestStatus = {
   active: 'active',
   disabled: 'disabled',

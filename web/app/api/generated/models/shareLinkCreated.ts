@@ -9,15 +9,29 @@ import type { ShareLinkCreatedResourceType } from './shareLinkCreatedResourceTyp
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents share link created data exchanged through the Meridian API.
+ */
 export interface ShareLinkCreated {
+  /** uniquely identifies this resource. */
   id: Uuid;
-  /** @minLength 32 */
+  /**
+     * is secret bearer material and must never be logged or persisted as plaintext.
+     * @minLength 32
+     */
   token: string;
+  /** specifies the resource type associated with this share link created. */
   resourceType: ShareLinkCreatedResourceType;
+  /** specifies the resource id associated with this share link created. */
   resourceId: Uuid | null;
+  /** specifies the descriptor digest associated with this share link created. */
   descriptorDigest: string;
+  /** specifies the url associated with this share link created. */
   url: string;
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp;
+  /** specifies the revoked at associated with this share link created. */
   revokedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
 }

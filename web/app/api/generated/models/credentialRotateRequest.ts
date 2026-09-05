@@ -8,7 +8,11 @@
 import type { HttpSecretInput } from './httpSecretInput.ts';
 import type { SshSecretInput } from './sshSecretInput.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface CredentialRotateRequest {
+  /** is write-only secret material and must never be returned by the API. */
   secret: SshSecretInput | HttpSecretInput;
   /** Omitted means false. When true, enqueue one default-branch sync for every non-deleted repository referencing this credential. */
   resyncRepositories?: boolean;

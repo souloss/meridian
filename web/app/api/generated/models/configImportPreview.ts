@@ -11,13 +11,24 @@ import type { SourceSpec } from './sourceSpec.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents config import preview data exchanged through the Meridian API.
+ */
 export interface ConfigImportPreview {
+  /** contains the uuid associated with this config import preview. */
   previewId: Uuid;
+  /** identifies the repository associated with this resource. */
   repositoryId: Uuid;
+  /** specifies the commit associated with this config import preview. */
   commit: string;
+  /** is the lowercase SHA-256 digest of the normalized configuration. */
   configDigest: string;
+  /** contains the ordered services associated with this config import preview. */
   services: Service[];
+  /** contains the ordered sources associated with this config import preview. */
   sources: SourceSpec[];
+  /** contains the ordered drift associated with this config import preview. */
   drift: ConfigFieldDiff[];
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp;
 }

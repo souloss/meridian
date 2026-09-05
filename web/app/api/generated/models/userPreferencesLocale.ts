@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the locale associated with this user preferences.
+ */
 export type UserPreferencesLocale = typeof UserPreferencesLocale[keyof typeof UserPreferencesLocale];
 
 
+/** UserPreferencesLocale is generated from the Meridian OpenAPI contract for user preferences locale. */
 export const UserPreferencesLocale = {
   'zh-CN': 'zh-CN',
   en: 'en',

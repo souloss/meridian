@@ -12,6 +12,7 @@
 export type KnownHostCandidateKeyType = typeof KnownHostCandidateKeyType[keyof typeof KnownHostCandidateKeyType];
 
 
+/** KnownHostCandidateKeyType is generated from the Meridian OpenAPI contract for known host candidate key type. */
 export const KnownHostCandidateKeyType = {
   'ssh-ed25519': 'ssh-ed25519',
   'ssh-rsa': 'ssh-rsa',

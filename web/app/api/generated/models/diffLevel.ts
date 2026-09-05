@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported diff level value.
+ */
 export type DiffLevel = typeof DiffLevel[keyof typeof DiffLevel];
 
 
+/** DiffLevel is generated from the Meridian OpenAPI contract for diff level. */
 export const DiffLevel = {
   breaking: 'breaking',
   risky: 'risky',

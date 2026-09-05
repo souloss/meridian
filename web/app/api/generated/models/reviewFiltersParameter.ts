@@ -7,4 +7,5 @@
  */
 import type { ReviewFilter } from './reviewFilter.ts';
 
+/** ReviewFiltersParameter is generated from the Meridian OpenAPI contract for review filters parameter. */
 export type ReviewFiltersParameter = ReviewFilter;

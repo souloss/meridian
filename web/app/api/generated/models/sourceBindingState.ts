@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the state associated with this source binding.
+ */
 export type SourceBindingState = typeof SourceBindingState[keyof typeof SourceBindingState];
 
 
+/** SourceBindingState is generated from the Meridian OpenAPI contract for source binding state. */
 export const SourceBindingState = {
   active: 'active',
   stale: 'stale',

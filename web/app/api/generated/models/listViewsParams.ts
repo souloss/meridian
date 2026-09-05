@@ -8,8 +8,10 @@
 import type { KindFilterParameter } from './kindFilterParameter.ts';
 import type { KindId } from './kindId.ts';
 
+/** ListViewsParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListViewsParams = {
 /**
+ * identifies an asset kind registered in contracts/kinds.yaml.
  * @pattern ^[a-z][a-z0-9_]{0,63}$
  */
 kind?: KindFilterParameter;

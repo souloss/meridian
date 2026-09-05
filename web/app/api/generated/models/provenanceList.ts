@@ -7,6 +7,10 @@
  */
 import type { ProvenanceEntry } from './provenanceEntry.ts';
 
+/**
+ * contains an ordered collection of provenance values.
+ */
 export interface ProvenanceList {
+  /** contains the ordered items associated with this provenance list. */
   items: ProvenanceEntry[];
 }

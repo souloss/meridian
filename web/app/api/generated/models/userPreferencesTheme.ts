@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the theme associated with this user preferences.
+ */
 export type UserPreferencesTheme = typeof UserPreferencesTheme[keyof typeof UserPreferencesTheme];
 
 
+/** UserPreferencesTheme is generated from the Meridian OpenAPI contract for user preferences theme. */
 export const UserPreferencesTheme = {
   light: 'light',
   dark: 'dark',

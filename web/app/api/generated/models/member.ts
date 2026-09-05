@@ -9,8 +9,14 @@ import type { TenantRole } from './tenantRole.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { User } from './user.ts';
 
+/**
+ * represents member data exchanged through the Meridian API.
+ */
 export interface Member {
+  /** contains the user associated with this member. */
   user: User;
+  /** contains the tenant role associated with this member. */
   role: TenantRole;
+  /** contains the timestamp associated with this member. */
   joinedAt: Timestamp;
 }

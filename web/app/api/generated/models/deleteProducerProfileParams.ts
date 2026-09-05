@@ -7,6 +7,10 @@
  */
 import type { ForceParameter } from './forceParameter.ts';
 
+/** DeleteProducerProfileParams contains parameters accepted by its generated OpenAPI operation. */
 export type DeleteProducerProfileParams = {
+/**
+ * identifies or filters the force value in the query.
+ */
 force?: ForceParameter;
 };

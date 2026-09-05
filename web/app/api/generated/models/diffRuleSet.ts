@@ -11,14 +11,27 @@ import type { KindId } from './kindId.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents diff rule set data exchanged through the Meridian API.
+ */
 export interface DiffRuleSet {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** specifies the name associated with this diff rule set. */
   name: string;
+  /** contains the kind id associated with this diff rule set. */
   kind: KindId;
-  /** @minimum 1 */
+  /**
+     * specifies the version associated with this diff rule set.
+     * @minimum 1
+     */
   version: number;
+  /** contains the ordered rules associated with this diff rule set. */
   rules: DiffRule[];
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

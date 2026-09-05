@@ -11,10 +11,18 @@ import type { PlatformSettingsDefaultViewOverrides } from './platformSettingsDef
 import type { Quota } from './quota.ts';
 import type { TenantSettingsTemplate } from './tenantSettingsTemplate.ts';
 
+/**
+ * represents platform settings data exchanged through the Meridian API.
+ */
 export interface PlatformSettings {
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the quota associated with this platform settings. */
   defaultQuota: Quota;
+  /** contains the tenant settings template associated with this platform settings. */
   defaultTenantSettings: TenantSettingsTemplate;
+  /** specifies the default view overrides associated with this platform settings. */
   defaultViewOverrides: PlatformSettingsDefaultViewOverrides;
+  /** contains the ordered default notification channels associated with this platform settings. */
   defaultNotificationChannels: DefaultNotificationChannelTemplate[];
 }

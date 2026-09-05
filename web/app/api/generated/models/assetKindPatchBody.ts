@@ -7,4 +7,5 @@
  */
 import type { AssetKindPatchRequest } from './assetKindPatchRequest.ts';
 
+/** AssetKindPatchBody is the request body type for its generated OpenAPI operation. */
 export type AssetKindPatchBody = AssetKindPatchRequest;

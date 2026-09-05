@@ -7,4 +7,5 @@
  */
 import type { SourceSpecCreateRequest } from './sourceSpecCreateRequest.ts';
 
+/** SourceSpecCreateBody is the request body type for its generated OpenAPI operation. */
 export type SourceSpecCreateBody = SourceSpecCreateRequest;

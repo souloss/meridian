@@ -7,4 +7,5 @@
  */
 import type { RepositoryDiscoverRequest } from './repositoryDiscoverRequest.ts';
 
+/** RepositoryDiscoverBody is the request body type for its generated OpenAPI operation. */
 export type RepositoryDiscoverBody = RepositoryDiscoverRequest;

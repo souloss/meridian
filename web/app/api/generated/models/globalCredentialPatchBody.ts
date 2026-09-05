@@ -7,4 +7,5 @@
  */
 import type { GlobalCredentialPatchRequest } from './globalCredentialPatchRequest.ts';
 
+/** GlobalCredentialPatchBody is the request body type for its generated OpenAPI operation. */
 export type GlobalCredentialPatchBody = GlobalCredentialPatchRequest;

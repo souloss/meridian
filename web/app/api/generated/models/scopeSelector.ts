@@ -8,7 +8,11 @@
 import type { ScopeSelectorType } from './scopeSelectorType.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * identifies the scope selected by a request.
+ */
 export interface ScopeSelector {
+  /** specifies the type associated with this scope selector. */
   type: ScopeSelectorType;
   /** Must be null for tenant and non-null for service or system_group. */
   id: Uuid | null;

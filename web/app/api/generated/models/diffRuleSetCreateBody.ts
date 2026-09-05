@@ -7,4 +7,5 @@
  */
 import type { DiffRuleSetCreateRequest } from './diffRuleSetCreateRequest.ts';
 
+/** DiffRuleSetCreateBody is the request body type for its generated OpenAPI operation. */
 export type DiffRuleSetCreateBody = DiffRuleSetCreateRequest;

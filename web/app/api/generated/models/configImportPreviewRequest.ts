@@ -8,7 +8,12 @@
 import type { RefName } from './refName.ts';
 import type { RefType } from './refType.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ConfigImportPreviewRequest {
+  /** contains the ref type associated with this config import preview request. */
   refType?: RefType;
+  /** contains the ref name associated with this config import preview request. */
   ref?: RefName;
 }

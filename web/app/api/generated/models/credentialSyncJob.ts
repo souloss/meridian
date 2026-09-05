@@ -8,9 +8,16 @@
 import type { Slug } from './slug.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents credential sync job data exchanged through the Meridian API.
+ */
 export interface CredentialSyncJob {
+  /** contains the slug associated with this credential sync job. */
   tenantSlug: Slug;
+  /** identifies the repository associated with this resource. */
   repositoryId: Uuid;
+  /** identifies the asynchronous job associated with this resource. */
   jobId: Uuid;
+  /** indicates whether deduplicated applies to this credential sync job. */
   deduplicated: boolean;
 }

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported subscription scope type value.
+ */
 export type SubscriptionScopeType = typeof SubscriptionScopeType[keyof typeof SubscriptionScopeType];
 
 
+/** SubscriptionScopeType is generated from the Meridian OpenAPI contract for subscription scope type. */
 export const SubscriptionScopeType = {
   tenant: 'tenant',
   service: 'service',

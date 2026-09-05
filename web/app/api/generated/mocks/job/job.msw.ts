@@ -37,25 +37,35 @@ import type {
 } from '../../models';
 
 
+/** getListJobsResponseErrorResponseMock provides generated MSW behavior for contract tests. */
 export const getListJobsResponseErrorResponseMock = (overrideResponse: Partial<ErrorResponse> = {}): ErrorResponse => ({...{code: faker.helpers.arrayElement(Object.values(ErrorCode)), message: faker.string.alpha({length: {min: 10, max: 20}}), details: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), undefined]), requestId: faker.string.alpha({length: {min: 1, max: 20}})}, ...overrideResponse});
 
+/** getListJobsResponseMock provides generated MSW behavior for contract tests. */
 export const getListJobsResponseMock = (): JobPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), tenantSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), retryOfJobId: faker.helpers.arrayElement([faker.string.uuid(),null,]), type: faker.helpers.arrayElement(Object.values(JobType)), trigger: faker.helpers.arrayElement(Object.values(JobTrigger)), status: faker.helpers.arrayElement(Object.values(JobStatus)), stage: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PipelineStage)),null,]), scopeType: faker.helpers.arrayElement(Object.values(JobScopeType)), scopeId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), refType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), ref: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,]), result: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), null]), progress: faker.number.int({min: 0, max: 100}), dirty: faker.datatype.boolean(), attempt: faker.number.int({min: 0}), maxAttempts: faker.number.int({min: 1}), nextAttemptAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), attempts: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({stage: faker.helpers.arrayElement(Object.values(PipelineStage)), attempt: faker.number.int({min: 1}), status: faker.helpers.arrayElement(Object.values(JobStatus)), startedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), error: faker.helpers.arrayElement([{...getListJobsResponseErrorResponseMock()},null,])})), error: faker.helpers.arrayElement([{...getListJobsResponseErrorResponseMock()},null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', startedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}})))}))},})
 
+/** getGetJobResponseErrorResponseMock provides generated MSW behavior for contract tests. */
 export const getGetJobResponseErrorResponseMock = (overrideResponse: Partial<ErrorResponse> = {}): ErrorResponse => ({...{code: faker.helpers.arrayElement(Object.values(ErrorCode)), message: faker.string.alpha({length: {min: 10, max: 20}}), details: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), undefined]), requestId: faker.string.alpha({length: {min: 1, max: 20}})}, ...overrideResponse});
 
+/** getGetJobResponseMock provides generated MSW behavior for contract tests. */
 export const getGetJobResponseMock = (overrideResponse: Partial<Extract<JobResponse, object>> = {}): JobResponse => ({id: faker.string.uuid(), tenantSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), retryOfJobId: faker.helpers.arrayElement([faker.string.uuid(),null,]), type: faker.helpers.arrayElement(Object.values(JobType)), trigger: faker.helpers.arrayElement(Object.values(JobTrigger)), status: faker.helpers.arrayElement(Object.values(JobStatus)), stage: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PipelineStage)),null,]), scopeType: faker.helpers.arrayElement(Object.values(JobScopeType)), scopeId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), refType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), ref: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,]), result: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), null]), progress: faker.number.int({min: 0, max: 100}), dirty: faker.datatype.boolean(), attempt: faker.number.int({min: 0}), maxAttempts: faker.number.int({min: 1}), nextAttemptAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), attempts: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({stage: faker.helpers.arrayElement(Object.values(PipelineStage)), attempt: faker.number.int({min: 1}), status: faker.helpers.arrayElement(Object.values(JobStatus)), startedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), error: faker.helpers.arrayElement([{...getGetJobResponseErrorResponseMock()},null,])})), error: faker.helpers.arrayElement([{...getGetJobResponseErrorResponseMock()},null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', startedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
+/** getStreamJobLogsResponseJobLogEventMock provides generated MSW behavior for contract tests. */
 export const getStreamJobLogsResponseJobLogEventMock = (overrideResponse: Partial<JobLogEvent> = {}): JobLogEvent => ({...{event: "log", id: faker.string.alpha({length: {min: 10, max: 20}}), at: faker.date.past().toISOString().slice(0, 19) + 'Z', message: faker.string.alpha({length: {min: 10, max: 20}}), stage: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PipelineStage)),null,]), undefined])}, ...overrideResponse});
 
+/** getStreamJobLogsResponseJobStateEventMock provides generated MSW behavior for contract tests. */
 export const getStreamJobLogsResponseJobStateEventMock = (overrideResponse: Partial<JobStateEvent> = {}): JobStateEvent => ({...{event: "state", id: faker.string.alpha({length: {min: 10, max: 20}}), at: faker.date.past().toISOString().slice(0, 19) + 'Z', status: faker.helpers.arrayElement(Object.values(JobStatus)), progress: faker.number.int({min: 0, max: 100})}, ...overrideResponse});
 
+/** getStreamJobLogsResponseMock provides generated MSW behavior for contract tests. */
 export const getStreamJobLogsResponseMock = (): JobSseEvent => (faker.helpers.arrayElement([{...getStreamJobLogsResponseJobLogEventMock()},{...getStreamJobLogsResponseJobStateEventMock()},]))
 
+/** getCancelJobResponseMock provides generated MSW behavior for contract tests. */
 export const getCancelJobResponseMock = (overrideResponse: Partial<Extract<JobAcceptedResponse, object>> = {}): JobAcceptedResponse => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
+/** getRetryJobResponseMock provides generated MSW behavior for contract tests. */
 export const getRetryJobResponseMock = (overrideResponse: Partial<Extract<JobAcceptedResponse, object>> = {}): JobAcceptedResponse => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
 
+/** getListJobsMockHandler provides generated MSW behavior for contract tests. */
 export const getListJobsMockHandler = (overrideResponse?: JobPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<JobPageResponse> | JobPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/jobs', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -68,6 +78,7 @@ export const getListJobsMockHandler = (overrideResponse?: JobPageResponse | ((in
   }, options)
 }
 
+/** getGetJobMockHandler provides generated MSW behavior for contract tests. */
 export const getGetJobMockHandler = (overrideResponse?: JobResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<JobResponse> | JobResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/jobs/:jobId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -80,6 +91,7 @@ export const getGetJobMockHandler = (overrideResponse?: JobResponse | ((info: Pa
   }, options)
 }
 
+/** getStreamJobLogsMockHandler provides generated MSW behavior for contract tests. */
 export const getStreamJobLogsMockHandler = (overrideResponse?: JobSseEvent | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<JobSseEvent> | JobSseEvent), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/jobs/:jobId/logs', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -92,6 +104,7 @@ export const getStreamJobLogsMockHandler = (overrideResponse?: JobSseEvent | ((i
   }, options)
 }
 
+/** getCancelJobMockHandler provides generated MSW behavior for contract tests. */
 export const getCancelJobMockHandler = (overrideResponse?: JobAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAcceptedResponse> | JobAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/jobs/:jobId\\:cancel', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -104,6 +117,7 @@ export const getCancelJobMockHandler = (overrideResponse?: JobAcceptedResponse |
   }, options)
 }
 
+/** getRetryJobMockHandler provides generated MSW behavior for contract tests. */
 export const getRetryJobMockHandler = (overrideResponse?: JobAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAcceptedResponse> | JobAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/jobs/:jobId\\:retry', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -115,6 +129,7 @@ export const getRetryJobMockHandler = (overrideResponse?: JobAcceptedResponse | 
       })
   }, options)
 }
+/** getJobMock provides generated MSW behavior for contract tests. */
 export const getJobMock = () => [
   getListJobsMockHandler(),
   getGetJobMockHandler(),

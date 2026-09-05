@@ -7,4 +7,5 @@
  */
 import type { DiffSnapshotShareRequest } from './diffSnapshotShareRequest.ts';
 
+/** DiffSnapshotShareBody is the request body type for its generated OpenAPI operation. */
 export type DiffSnapshotShareBody = DiffSnapshotShareRequest;

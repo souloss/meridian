@@ -7,4 +7,5 @@
  */
 import type { RevisionApproveRequest } from './revisionApproveRequest.ts';
 
+/** RevisionApproveBody is the request body type for its generated OpenAPI operation. */
 export type RevisionApproveBody = RevisionApproveRequest;

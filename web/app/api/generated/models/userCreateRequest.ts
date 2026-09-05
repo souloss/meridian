@@ -6,20 +6,29 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface UserCreateRequest {
   /**
+     * specifies the username associated with this user create request.
      * @minLength 1
      * @maxLength 128
      */
   username: string;
   /**
+     * specifies the display name associated with this user create request.
      * @minLength 1
      * @maxLength 128
      */
   displayName: string;
-  /** @nullable */
+  /**
+     * specifies the email associated with this user create request.
+     * @nullable
+     */
   email?: string | null;
   /**
+     * is the write-only plaintext password supplied for authentication.
      * @minLength 12
      * @maxLength 1024
      */

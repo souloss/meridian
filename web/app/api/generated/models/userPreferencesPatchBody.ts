@@ -7,4 +7,5 @@
  */
 import type { UserPreferencesPatchRequest } from './userPreferencesPatchRequest.ts';
 
+/** UserPreferencesPatchBody is the request body type for its generated OpenAPI operation. */
 export type UserPreferencesPatchBody = UserPreferencesPatchRequest;

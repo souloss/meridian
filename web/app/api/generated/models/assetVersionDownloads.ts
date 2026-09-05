@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the downloads associated with this asset version.
+ */
 export type AssetVersionDownloads = {[key: string]: string};

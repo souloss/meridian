@@ -7,13 +7,20 @@
  */
 import type { Slug } from './slug.ts';
 
+/**
+ * represents default notification channel template data exchanged through the Meridian API.
+ */
 export interface DefaultNotificationChannelTemplate {
+  /** contains the slug associated with this default notification channel template. */
   key: Slug;
   /**
+     * specifies the name associated with this default notification channel template.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** specifies the kind associated with this default notification channel template. */
   kind: 'in_app';
+  /** indicates whether enabled applies to this default notification channel template. */
   enabled: boolean;
 }

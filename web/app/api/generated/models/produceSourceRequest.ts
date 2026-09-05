@@ -8,8 +8,14 @@
 import type { RefName } from './refName.ts';
 import type { RefType } from './refType.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ProduceSourceRequest {
+  /** contains the ref type associated with this produce source request. */
   refType?: RefType;
+  /** contains the ref name associated with this produce source request. */
   ref?: RefName;
+  /** indicates whether force applies to this produce source request. */
   force?: boolean;
 }

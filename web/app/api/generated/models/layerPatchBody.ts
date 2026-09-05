@@ -7,4 +7,5 @@
  */
 import type { LayerPatchRequest } from './layerPatchRequest.ts';
 
+/** LayerPatchBody is the request body type for its generated OpenAPI operation. */
 export type LayerPatchBody = LayerPatchRequest;

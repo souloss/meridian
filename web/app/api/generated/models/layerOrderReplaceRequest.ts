@@ -7,7 +7,13 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface LayerOrderReplaceRequest {
-  /** @minItems 1 */
+  /**
+     * contains the ordered layer ids associated with this layer order replace request.
+     * @minItems 1
+     */
   layerIds: Uuid[];
 }

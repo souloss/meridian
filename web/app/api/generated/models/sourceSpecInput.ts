@@ -13,19 +13,32 @@ import type { RefGlob } from './refGlob.ts';
 import type { SourceMode } from './sourceMode.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents source spec input data exchanged through the Meridian API.
+ */
 export type SourceSpecInput = unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown & ({
+  /** contains the kind id associated with this source spec input. */
   kind: KindId;
+  /** specifies the asset name template associated with this source spec input. */
   assetNameTemplate?: AssetNameTemplate;
+  /** contains the layer role associated with this source spec input. */
   role: LayerRole;
+  /** contains the layer origin associated with this source spec input. */
   origin: LayerOrigin;
+  /** contains the source mode associated with this source spec input. */
   mode: SourceMode;
   /**
+     * specifies the path associated with this source spec input.
      * @maxLength 512
      * @nullable
      */
   path?: string | null;
+  /** specifies the producer profile id associated with this source spec input. */
   producerProfileId?: Uuid | null;
-  /** @minimum 0 */
+  /**
+     * specifies the ord associated with this source spec input.
+     * @minimum 0
+     */
   ord?: number;
   /**
      * Omitted values use the mode default in domain.yaml.
@@ -33,8 +46,12 @@ export type SourceSpecInput = unknown & unknown & unknown & unknown & unknown & 
      * @maximum 3600
      */
   timeoutSec?: number;
-  /** @minItems 1 */
+  /**
+     * contains the ordered branch patterns associated with this source spec input.
+     * @minItems 1
+     */
   branchPatterns?: RefGlob[];
+  /** indicates whether enabled applies to this source spec input. */
   enabled?: boolean;
   /** On create only, explicitly archives an existing AI-generated base and its source in the same transaction before creating this repository base. Invalid for other replacements. */
   replaceAiBase?: boolean;

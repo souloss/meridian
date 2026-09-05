@@ -7,8 +7,15 @@
  */
 import type { Me } from './me.ts';
 
+/**
+ * returns the authenticated principal and the initial session-bound CSRF token.
+ */
 export interface LoginResult {
+  /** contains the authenticated user, memberships, and platform role. */
   me: Me;
-  /** @minLength 32 */
+  /**
+     * binds a state-changing browser request to the current session.
+     * @minLength 32
+     */
   csrfToken: string;
 }

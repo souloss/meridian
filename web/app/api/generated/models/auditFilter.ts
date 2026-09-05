@@ -8,11 +8,20 @@
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines supported filters for selecting audit records.
+ */
 export interface AuditFilter {
+  /** contains the uuid associated with this audit filter. */
   actorId?: Uuid;
+  /** contains the ordered actions associated with this audit filter. */
   actions?: string[];
+  /** specifies the resource type associated with this audit filter. */
   resourceType?: string;
+  /** specifies the resource id associated with this audit filter. */
   resourceId?: string;
+  /** contains the timestamp associated with this audit filter. */
   from?: Timestamp;
+  /** contains the timestamp associated with this audit filter. */
   to?: Timestamp;
 }

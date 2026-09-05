@@ -7,4 +7,5 @@
  */
 import type { KnownHostCreateRequest } from './knownHostCreateRequest.ts';
 
+/** KnownHostCreateBody is the request body type for its generated OpenAPI operation. */
 export type KnownHostCreateBody = KnownHostCreateRequest;

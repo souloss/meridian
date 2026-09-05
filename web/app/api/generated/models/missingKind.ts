@@ -7,8 +7,14 @@
  */
 import type { KindId } from './kindId.ts';
 
+/**
+ * represents missing kind data exchanged through the Meridian API.
+ */
 export interface MissingKind {
+  /** contains the kind id associated with this missing kind. */
   kind: KindId;
+  /** indicates whether configure applies to this missing kind. */
   canConfigure: boolean;
+  /** indicates whether generate with ai applies to this missing kind. */
   canGenerateWithAi: boolean;
 }

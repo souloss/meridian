@@ -12,13 +12,22 @@ import type { ResolvedDocumentRef } from './resolvedDocumentRef.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * reports the result of the corresponding Meridian operation.
+ */
 export interface DiffResult {
+  /** contains the kind id associated with this diff result. */
   kind: KindId;
+  /** contains the resolved document ref associated with this diff result. */
   left: ResolvedDocumentRef;
+  /** contains the resolved document ref associated with this diff result. */
   right: ResolvedDocumentRef;
   /** Non-null exactly when DiffCreateRequest.persist is true. */
   snapshotId: Uuid | null;
+  /** contains the diff counts associated with this diff result. */
   summary: DiffCounts;
+  /** contains the ordered changes associated with this diff result. */
   changes: DiffChange[];
+  /** contains the timestamp associated with this diff result. */
   generatedAt: Timestamp;
 }

@@ -7,4 +7,5 @@
  */
 import type { RepositoryCreateRequest } from './repositoryCreateRequest.ts';
 
+/** RepositoryCreateBody is the request body type for its generated OpenAPI operation. */
 export type RepositoryCreateBody = RepositoryCreateRequest;

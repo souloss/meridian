@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the theme associated with this user preferences patch request.
+ */
 export type UserPreferencesPatchRequestTheme = typeof UserPreferencesPatchRequestTheme[keyof typeof UserPreferencesPatchRequestTheme];
 
 
+/** UserPreferencesPatchRequestTheme is generated from the Meridian OpenAPI contract for user preferences patch request theme. */
 export const UserPreferencesPatchRequestTheme = {
   light: 'light',
   dark: 'dark',

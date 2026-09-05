@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported layer role value.
+ */
 export type LayerRole = typeof LayerRole[keyof typeof LayerRole];
 
 
+/** LayerRole is generated from the Meridian OpenAPI contract for layer role. */
 export const LayerRole = {
   base: 'base',
   overlay: 'overlay',

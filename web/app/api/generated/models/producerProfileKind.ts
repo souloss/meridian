@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported producer profile kind value.
+ */
 export type ProducerProfileKind = typeof ProducerProfileKind[keyof typeof ProducerProfileKind];
 
 
+/** ProducerProfileKind is generated from the Meridian OpenAPI contract for producer profile kind. */
 export const ProducerProfileKind = {
   command: 'command',
   ai: 'ai',

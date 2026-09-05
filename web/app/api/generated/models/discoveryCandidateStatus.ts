@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * is the current lifecycle or processing state.
+ */
 export type DiscoveryCandidateStatus = typeof DiscoveryCandidateStatus[keyof typeof DiscoveryCandidateStatus];
 
 
+/** DiscoveryCandidateStatus is generated from the Meridian OpenAPI contract for discovery candidate status. */
 export const DiscoveryCandidateStatus = {
   pending: 'pending',
   accepted: 'accepted',

@@ -7,4 +7,5 @@
  */
 import type { PlatformAuditFilter } from './platformAuditFilter.ts';
 
+/** PlatformAuditFiltersParameter is generated from the Meridian OpenAPI contract for platform audit filters parameter. */
 export type PlatformAuditFiltersParameter = PlatformAuditFilter;

@@ -7,4 +7,5 @@
  */
 import type { LayerRollbackRequest } from './layerRollbackRequest.ts';
 
+/** LayerRollbackBody is the request body type for its generated OpenAPI operation. */
 export type LayerRollbackBody = LayerRollbackRequest;

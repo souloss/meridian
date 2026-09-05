@@ -8,6 +8,10 @@
 import type { KnownHost } from './knownHost.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of known host records.
+ */
 export type KnownHostPage = PageInfo & {
+  /** contains the ordered items associated with this known host page. */
   items: KnownHost[];
 };

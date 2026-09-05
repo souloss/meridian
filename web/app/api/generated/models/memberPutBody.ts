@@ -7,4 +7,5 @@
  */
 import type { MemberPutRequest } from './memberPutRequest.ts';
 
+/** MemberPutBody is the request body type for its generated OpenAPI operation. */
 export type MemberPutBody = MemberPutRequest;

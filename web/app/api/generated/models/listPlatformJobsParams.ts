@@ -10,15 +10,21 @@ import type { PageSizeParameter } from './pageSizeParameter.ts';
 import type { PlatformJobFilter } from './platformJobFilter.ts';
 import type { PlatformJobFiltersParameter } from './platformJobFiltersParameter.ts';
 
+/** ListPlatformJobsParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListPlatformJobsParams = {
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */
 pageSize?: PageSizeParameter;
+/**
+ * defines supported filters for selecting platform job records.
+ */
 filter?: PlatformJobFiltersParameter;
 };

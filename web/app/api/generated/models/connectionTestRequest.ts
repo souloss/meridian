@@ -7,6 +7,10 @@
  */
 import type { GitRemoteUrl } from './gitRemoteUrl.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ConnectionTestRequest {
+  /** contains the git remote url associated with this connection test request. */
   repositoryUrl: GitRemoteUrl;
 }

@@ -7,4 +7,5 @@
  */
 import type { CommentCreateRequest } from './commentCreateRequest.ts';
 
+/** CommentCreateBody is the request body type for its generated OpenAPI operation. */
 export type CommentCreateBody = CommentCreateRequest;

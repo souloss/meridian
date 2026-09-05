@@ -8,6 +8,10 @@
 import type { Credential } from './credential.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of credential records.
+ */
 export type CredentialPage = PageInfo & {
+  /** contains the ordered items associated with this credential page. */
   items: Credential[];
 };

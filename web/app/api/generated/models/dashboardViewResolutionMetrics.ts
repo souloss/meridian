@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the metrics associated with this dashboard view resolution.
+ */
 export type DashboardViewResolutionMetrics = { [key: string]: unknown };

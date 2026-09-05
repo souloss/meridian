@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { ShareLink } from './shareLink.ts';
 
+/**
+ * contains one paginated page of share link records.
+ */
 export type ShareLinkPage = PageInfo & {
+  /** contains the ordered items associated with this share link page. */
   items: ShareLink[];
 };

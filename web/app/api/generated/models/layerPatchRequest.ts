@@ -7,9 +7,17 @@
  */
 import type { LayerRole } from './layerRole.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface LayerPatchRequest {
+  /** contains the layer role associated with this layer patch request. */
   role?: LayerRole;
-  /** @nullable */
+  /**
+     * specifies the dialect associated with this layer patch request.
+     * @nullable
+     */
   dialect?: string | null;
+  /** indicates whether enabled applies to this layer patch request. */
   enabled?: boolean;
 }

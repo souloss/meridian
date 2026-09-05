@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the severity associated with this validation issue.
+ */
 export type ValidationIssueSeverity = typeof ValidationIssueSeverity[keyof typeof ValidationIssueSeverity];
 
 
+/** ValidationIssueSeverity is generated from the Meridian OpenAPI contract for validation issue severity. */
 export const ValidationIssueSeverity = {
   error: 'error',
   warning: 'warning',

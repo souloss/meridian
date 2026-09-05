@@ -7,4 +7,5 @@
  */
 import type { TenantCreateRequest } from './tenantCreateRequest.ts';
 
+/** TenantCreateBody is the request body type for its generated OpenAPI operation. */
 export type TenantCreateBody = TenantCreateRequest;

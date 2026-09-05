@@ -7,9 +7,16 @@
  */
 import type { ConfigSource } from './configSource.ts';
 
+/**
+ * represents config field diff data exchanged through the Meridian API.
+ */
 export interface ConfigFieldDiff {
+  /** specifies the pointer associated with this config field diff. */
   pointer: string;
+  /** specifies the database value associated with this config field diff. */
   databaseValue: unknown;
+  /** specifies the file value associated with this config field diff. */
   fileValue: unknown;
+  /** contains the config source associated with this config field diff. */
   source: ConfigSource;
 }

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the health associated with this asset summary.
+ */
 export type AssetSummaryHealth = typeof AssetSummaryHealth[keyof typeof AssetSummaryHealth];
 
 
+/** AssetSummaryHealth is generated from the Meridian OpenAPI contract for asset summary health. */
 export const AssetSummaryHealth = {
   ok: 'ok',
   stale: 'stale',

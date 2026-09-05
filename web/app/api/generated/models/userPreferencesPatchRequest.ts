@@ -9,8 +9,14 @@ import type { UserPreferencesPatchRequestDefaultViews } from './userPreferencesP
 import type { UserPreferencesPatchRequestLocale } from './userPreferencesPatchRequestLocale.ts';
 import type { UserPreferencesPatchRequestTheme } from './userPreferencesPatchRequestTheme.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface UserPreferencesPatchRequest {
+  /** specifies the locale associated with this user preferences patch request. */
   locale?: UserPreferencesPatchRequestLocale;
+  /** specifies the theme associated with this user preferences patch request. */
   theme?: UserPreferencesPatchRequestTheme;
+  /** specifies the default views associated with this user preferences patch request. */
   defaultViews?: UserPreferencesPatchRequestDefaultViews;
 }

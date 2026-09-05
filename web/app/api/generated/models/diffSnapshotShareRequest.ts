@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface DiffSnapshotShareRequest {
   /**
+     * specifies the expires in seconds associated with this diff snapshot share request.
      * @minimum 300
      * @maximum 2592000
      */

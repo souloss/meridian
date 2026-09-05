@@ -7,9 +7,17 @@
  */
 import type { FieldSource } from './fieldSource.ts';
 
+/**
+ * represents drift info data exchanged through the Meridian API.
+ */
 export interface DriftInfo {
+  /** indicates whether drift applies to this drift info. */
   hasDrift: boolean;
+  /** contains the ordered fields associated with this drift info. */
   fields: FieldSource[];
-  /** @nullable */
+  /**
+     * specifies the file commit associated with this drift info.
+     * @nullable
+     */
   fileCommit: string | null;
 }

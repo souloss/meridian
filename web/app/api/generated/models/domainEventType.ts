@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported domain event type value.
+ */
 export type DomainEventType = typeof DomainEventType[keyof typeof DomainEventType];
 
 
+/** DomainEventType is generated from the Meridian OpenAPI contract for domain event type. */
 export const DomainEventType = {
   versionpublished: 'version.published',
   versionbreaking: 'version.breaking',

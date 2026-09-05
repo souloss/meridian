@@ -9,11 +9,21 @@ import type { ContentType } from './contentType.ts';
 import type { ProvenanceEntry } from './provenanceEntry.ts';
 import type { ValidationIssue } from './validationIssue.ts';
 
+/**
+ * represents merge preview data exchanged through the Meridian API.
+ */
 export interface MergePreview {
+  /** specifies the input fingerprint associated with this merge preview. */
   inputFingerprint: string;
-  /** @maxLength 1048576 */
+  /**
+     * specifies the content associated with this merge preview.
+     * @maxLength 1048576
+     */
   content: string;
+  /** contains the content type associated with this merge preview. */
   contentType: ContentType;
+  /** contains the ordered validation associated with this merge preview. */
   validation: ValidationIssue[];
+  /** contains the ordered provenance associated with this merge preview. */
   provenance: ProvenanceEntry[];
 }

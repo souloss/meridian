@@ -9,24 +9,37 @@ import type { HttpSecretInput } from './httpSecretInput.ts';
 import type { SshSecretInput } from './sshSecretInput.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * supplies exactly one SSH or HTTP secret and its authorized sharing scope.
+ */
 export type CredentialCreateRequest = {
   /**
+     * specifies the name associated with this credential create request.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** specifies the kind associated with this credential create request. */
   kind: 'ssh_key';
+  /** contains the ssh secret input associated with this credential create request. */
   sshKey: SshSecretInput;
+  /** specifies the shared scope associated with this credential create request. */
   sharedScope?: 'private' | 'team' | 'tenant';
+  /** contains the ordered team ids associated with this credential create request. */
   teamIds?: Uuid[];
 } | {
   /**
+     * specifies the name associated with this credential create request.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** specifies the kind associated with this credential create request. */
   kind: 'http_token';
+  /** contains the http secret input associated with this credential create request. */
   httpToken: HttpSecretInput;
+  /** specifies the shared scope associated with this credential create request. */
   sharedScope?: 'private' | 'team' | 'tenant';
+  /** contains the ordered team ids associated with this credential create request. */
   teamIds?: Uuid[];
 };

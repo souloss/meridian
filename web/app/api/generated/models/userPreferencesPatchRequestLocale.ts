@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the locale associated with this user preferences patch request.
+ */
 export type UserPreferencesPatchRequestLocale = typeof UserPreferencesPatchRequestLocale[keyof typeof UserPreferencesPatchRequestLocale];
 
 
+/** UserPreferencesPatchRequestLocale is generated from the Meridian OpenAPI contract for user preferences patch request locale. */
 export const UserPreferencesPatchRequestLocale = {
   'zh-CN': 'zh-CN',
   en: 'en',

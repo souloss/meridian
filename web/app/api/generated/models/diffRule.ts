@@ -7,8 +7,14 @@
  */
 import type { DiffLevel } from './diffLevel.ts';
 
+/**
+ * represents diff rule data exchanged through the Meridian API.
+ */
 export interface DiffRule {
+  /** specifies the code associated with this diff rule. */
   code: string;
+  /** contains the diff level associated with this diff rule. */
   level: DiffLevel;
+  /** indicates whether enabled applies to this diff rule. */
   enabled: boolean;
 }

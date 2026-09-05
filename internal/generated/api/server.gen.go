@@ -20,1382 +20,1727 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// ListPlatformAuditLogs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/audit-logs)
 	ListPlatformAuditLogs(w http.ResponseWriter, r *http.Request, params ListPlatformAuditLogsParams)
 
+	// ListGlobalCredentials handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/global-credentials)
 	ListGlobalCredentials(w http.ResponseWriter, r *http.Request, params ListGlobalCredentialsParams)
 
+	// CreateGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/global-credentials)
 	CreateGlobalCredential(w http.ResponseWriter, r *http.Request)
 
+	// DeleteGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/admin/global-credentials/{credentialId})
 	DeleteGlobalCredential(w http.ResponseWriter, r *http.Request, credentialId CredentialId, params DeleteGlobalCredentialParams)
 
+	// UpdateGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/global-credentials/{credentialId})
 	UpdateGlobalCredential(w http.ResponseWriter, r *http.Request, credentialId CredentialId, params UpdateGlobalCredentialParams)
 
+	// RotateGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/global-credentials/{credentialId}:rotate)
 	RotateGlobalCredential(w http.ResponseWriter, r *http.Request, credentialId CredentialId, params RotateGlobalCredentialParams)
 
+	// TestGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/global-credentials/{credentialId}:test)
 	TestGlobalCredential(w http.ResponseWriter, r *http.Request, credentialId CredentialId)
 
+	// ListPlatformJobs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/jobs)
 	ListPlatformJobs(w http.ResponseWriter, r *http.Request, params ListPlatformJobsParams)
 
+	// GetPlatformJob handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/jobs/{jobId})
 	GetPlatformJob(w http.ResponseWriter, r *http.Request, jobId JobId)
 
+	// ListProducerProfiles handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/producer-profiles)
 	ListProducerProfiles(w http.ResponseWriter, r *http.Request, params ListProducerProfilesParams)
 
+	// CreateProducerProfile handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/producer-profiles)
 	CreateProducerProfile(w http.ResponseWriter, r *http.Request)
 
+	// DeleteProducerProfile handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/admin/producer-profiles/{producerProfileId})
 	DeleteProducerProfile(w http.ResponseWriter, r *http.Request, producerProfileId ProducerProfileId, params DeleteProducerProfileParams)
 
+	// GetProducerProfile handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/producer-profiles/{producerProfileId})
 	GetProducerProfile(w http.ResponseWriter, r *http.Request, producerProfileId ProducerProfileId)
 
+	// UpdateProducerProfile handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/producer-profiles/{producerProfileId})
 	UpdateProducerProfile(w http.ResponseWriter, r *http.Request, producerProfileId ProducerProfileId, params UpdateProducerProfileParams)
 
+	// GetPlatformSettings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/settings)
 	GetPlatformSettings(w http.ResponseWriter, r *http.Request)
 
+	// UpdatePlatformSettings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/settings)
 	UpdatePlatformSettings(w http.ResponseWriter, r *http.Request, params UpdatePlatformSettingsParams)
 
+	// ListTenants handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/tenants)
 	ListTenants(w http.ResponseWriter, r *http.Request, params ListTenantsParams)
 
+	// CreateTenant handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/tenants)
 	CreateTenant(w http.ResponseWriter, r *http.Request)
 
+	// DeleteTenant handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/admin/tenants/{tenantSlug})
 	DeleteTenant(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params DeleteTenantParams)
 
+	// UpdateTenant handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/tenants/{tenantSlug})
 	UpdateTenant(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params UpdateTenantParams)
 
+	// PutTenantMemberAsPlatformAdmin handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId})
 	PutTenantMemberAsPlatformAdmin(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, userId UserId)
 
+	// ListUsers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/users)
 	ListUsers(w http.ResponseWriter, r *http.Request, params ListUsersParams)
 
+	// CreateUser handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/users)
 	CreateUser(w http.ResponseWriter, r *http.Request)
 
+	// UpdateUser handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/users/{userId})
 	UpdateUser(w http.ResponseWriter, r *http.Request, userId UserId, params UpdateUserParams)
 
+	// GetCsrfToken handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/auth/csrf)
 	GetCsrfToken(w http.ResponseWriter, r *http.Request)
 
+	// Login handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/auth/login)
 	Login(w http.ResponseWriter, r *http.Request)
 
+	// Logout handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/auth/logout)
 	Logout(w http.ResponseWriter, r *http.Request)
 
+	// GetMe handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/auth/me)
 	GetMe(w http.ResponseWriter, r *http.Request)
 
+	// GetMyPreferences handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/auth/me/preferences)
 	GetMyPreferences(w http.ResponseWriter, r *http.Request)
 
+	// UpdateMyPreferences handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/auth/me/preferences)
 	UpdateMyPreferences(w http.ResponseWriter, r *http.Request, params UpdateMyPreferencesParams)
 
+	// DownloadSignedContent handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/content/{token})
 	DownloadSignedContent(w http.ResponseWriter, r *http.Request, token ContentToken)
 
+	// GetOpenApiContract handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/openapi.yaml)
 	GetOpenApiContract(w http.ResponseWriter, r *http.Request)
 
+	// GetPublicService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug})
 	GetPublicService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// GetPublicAsset handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug}/assets/{kindId}/{assetName})
 	GetPublicAsset(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, kindId KindId, assetName AssetName)
 
+	// ResolvePublicView handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/public/t/{tenantSlug}/views:resolve)
 	ResolvePublicView(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// GetSharedView handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/shared/{shareToken})
 	GetSharedView(w http.ResponseWriter, r *http.Request, shareToken ShareToken)
 
+	// ListAssetKinds handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/asset-kinds)
 	ListAssetKinds(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// UpdateAssetKindState handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId})
 	UpdateAssetKindState(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, kindId KindId, params UpdateAssetKindStateParams)
 
+	// GetAssetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId})
 	GetAssetVersion(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId)
 
+	// ListAssetVersionItems handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/items)
 	ListAssetVersionItems(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId, params ListAssetVersionItemsParams)
 
+	// GetAssetVersionProvenance handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/provenance)
 	GetAssetVersionProvenance(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId)
 
+	// DeprecateAssetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:deprecate)
 	DeprecateAssetVersion(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId, params DeprecateAssetVersionParams)
 
+	// PublishAssetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish)
 	PublishAssetVersion(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId, params PublishAssetVersionParams)
 
+	// RetireAssetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:retire)
 	RetireAssetVersion(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId, params RetireAssetVersionParams)
 
+	// GetAsset handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/assets/{assetId})
 	GetAsset(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params GetAssetParams)
 
+	// ReorderAssetLayers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order)
 	ReorderAssetLayers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params ReorderAssetLayersParams)
 
+	// ListAssetVersions handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/assets/{assetId}/versions)
 	ListAssetVersions(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params ListAssetVersionsParams)
 
+	// GenerateAssetWithAi handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate)
 	GenerateAssetWithAi(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params GenerateAssetWithAiParams)
 
+	// PreviewMerge handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/assets:preview-merge)
 	PreviewMerge(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// PushAssetRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/assets:push)
 	PushAssetRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params PushAssetRevisionParams)
 
+	// ListAuditLogs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/audit-logs)
 	ListAuditLogs(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListAuditLogsParams)
 
+	// ListBreakingTodos handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/breaking-todos)
 	ListBreakingTodos(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListBreakingTodosParams)
 
+	// AcknowledgeBreakingTodo handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack)
 	AcknowledgeBreakingTodo(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, todoId TodoId)
 
+	// ListCredentials handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/credentials)
 	ListCredentials(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListCredentialsParams)
 
+	// CreateCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/credentials)
 	CreateCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// DeleteCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/credentials/{credentialId})
 	DeleteCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, credentialId CredentialId, params DeleteCredentialParams)
 
+	// UpdateCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId})
 	UpdateCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, credentialId CredentialId, params UpdateCredentialParams)
 
+	// RotateCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate)
 	RotateCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, credentialId CredentialId, params RotateCredentialParams)
 
+	// TestCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test)
 	TestCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, credentialId CredentialId)
 
+	// RunDiff handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/diff)
 	RunDiff(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// ListDiffRuleSets handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/diff-rule-sets)
 	ListDiffRuleSets(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// CreateDiffRuleSet handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/diff-rule-sets)
 	CreateDiffRuleSet(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// DeleteDiffRuleSet handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId})
 	DeleteDiffRuleSet(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, ruleSetId RuleSetId, params DeleteDiffRuleSetParams)
 
+	// UpdateDiffRuleSet handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId})
 	UpdateDiffRuleSet(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, ruleSetId RuleSetId, params UpdateDiffRuleSetParams)
 
+	// ListDiffSnapshots handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/diff-snapshots)
 	ListDiffSnapshots(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListDiffSnapshotsParams)
 
+	// DeleteDiffSnapshot handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId})
 	DeleteDiffSnapshot(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, snapshotId SnapshotId)
 
+	// GetDiffSnapshot handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId})
 	GetDiffSnapshot(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, snapshotId SnapshotId)
 
+	// ExportDiffSnapshot handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/export)
 	ExportDiffSnapshot(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, snapshotId SnapshotId, params ExportDiffSnapshotParams)
 
+	// CreateDiffSnapshotShareLink handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links)
 	CreateDiffSnapshotShareLink(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, snapshotId SnapshotId)
 
+	// SearchTenantUsers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/directory/users)
 	SearchTenantUsers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params SearchTenantUsersParams)
 
+	// CreateTenantExport handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/exports)
 	CreateTenantExport(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params CreateTenantExportParams)
 
+	// ListJobs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/jobs)
 	ListJobs(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListJobsParams)
 
+	// GetJob handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/jobs/{jobId})
 	GetJob(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, jobId JobId)
 
+	// StreamJobLogs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/jobs/{jobId}/logs)
 	StreamJobLogs(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, jobId JobId, params StreamJobLogsParams)
 
+	// CancelJob handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/jobs/{jobId}:cancel)
 	CancelJob(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, jobId JobId)
 
+	// RetryJob handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/jobs/{jobId}:retry)
 	RetryJob(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, jobId JobId, params RetryJobParams)
 
+	// ListKnownHosts handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/known-hosts)
 	ListKnownHosts(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListKnownHostsParams)
 
+	// CreateKnownHost handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/known-hosts)
 	CreateKnownHost(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// GetLayerRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId})
 	GetLayerRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, revisionId RevisionId)
 
+	// GetReviewContext handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}/review-context)
 	GetReviewContext(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, revisionId RevisionId)
 
+	// ApproveLayerRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve)
 	ApproveLayerRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, revisionId RevisionId, params ApproveLayerRevisionParams)
 
+	// RejectLayerRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject)
 	RejectLayerRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, revisionId RevisionId, params RejectLayerRevisionParams)
 
+	// GetLayer handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/layers/{layerId})
 	GetLayer(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params GetLayerParams)
 
+	// UpdateLayer handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/layers/{layerId})
 	UpdateLayer(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params UpdateLayerParams)
 
+	// ListLayerRevisions handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/layers/{layerId}/revisions)
 	ListLayerRevisions(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params ListLayerRevisionsParams)
 
+	// CreateLayerRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions)
 	CreateLayerRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params CreateLayerRevisionParams)
 
+	// RollbackLayer handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback)
 	RollbackLayer(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params RollbackLayerParams)
 
+	// ListTenantMembers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/members)
 	ListTenantMembers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListTenantMembersParams)
 
+	// DeleteTenantMember handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/members/{userId})
 	DeleteTenantMember(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, userId UserId)
 
+	// PutTenantMember handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/members/{userId})
 	PutTenantMember(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, userId UserId)
 
+	// ListNotificationChannels handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/notification-channels)
 	ListNotificationChannels(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// CreateNotificationChannel handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notification-channels)
 	CreateNotificationChannel(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// DeleteNotificationChannel handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/notification-channels/{channelId})
 	DeleteNotificationChannel(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, channelId ChannelId, params DeleteNotificationChannelParams)
 
+	// UpdateNotificationChannel handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId})
 	UpdateNotificationChannel(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, channelId ChannelId, params UpdateNotificationChannelParams)
 
+	// RotateNotificationChannelSecret handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate)
 	RotateNotificationChannelSecret(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, channelId ChannelId, params RotateNotificationChannelSecretParams)
 
+	// TestNotificationChannel handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:test)
 	TestNotificationChannel(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, channelId ChannelId)
 
+	// ListNotifications handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/notifications)
 	ListNotifications(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListNotificationsParams)
 
+	// MarkNotificationRead handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notifications/{notificationId}:read)
 	MarkNotificationRead(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, notificationId NotificationId)
 
+	// MarkAllNotificationsRead handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notifications:read-all)
 	MarkAllNotificationsRead(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// ListAvailableProducerProfiles handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/producer-profiles)
 	ListAvailableProducerProfiles(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// ListRepositories handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/repositories)
 	ListRepositories(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListRepositoriesParams)
 
+	// CreateRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories)
 	CreateRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// DeleteRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 	DeleteRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params DeleteRepositoryParams)
 
+	// GetRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 	GetRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId)
 
+	// UpdateRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 	UpdateRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params UpdateRepositoryParams)
 
+	// ListDiscoveryCandidates handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates)
 	ListDiscoveryCandidates(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params ListDiscoveryCandidatesParams)
 
+	// DismissDiscoveryCandidate handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates/{candidateId}:dismiss)
 	DismissDiscoveryCandidate(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, candidateId CandidateId)
 
+	// AcceptDiscoveryCandidates handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept)
 	AcceptDiscoveryCandidates(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params AcceptDiscoveryCandidatesParams)
 
+	// PreviewRepositoryConfigImport handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports)
 	PreviewRepositoryConfigImport(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params PreviewRepositoryConfigImportParams)
 
+	// ApplyRepositoryConfigImport handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply)
 	ApplyRepositoryConfigImport(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params ApplyRepositoryConfigImportParams)
 
+	// CreateServiceInRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services)
 	CreateServiceInRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId)
 
+	// DiscoverRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover)
 	DiscoverRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params DiscoverRepositoryParams)
 
+	// SyncRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync)
 	SyncRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params SyncRepositoryParams)
 
+	// CheckRepositoryConnection handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories:check-connection)
 	CheckRepositoryConnection(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// ListReviews handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/reviews)
 	ListReviews(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListReviewsParams)
 
+	// Search handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/search)
 	Search(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params SearchParams)
 
+	// ListServices handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services)
 	ListServices(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListServicesParams)
 
+	// DeleteService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/services/{serviceSlug})
 	DeleteService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params DeleteServiceParams)
 
+	// GetService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services/{serviceSlug})
 	GetService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// UpdateService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug})
 	UpdateService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params UpdateServiceParams)
 
+	// GetServiceAccess handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/access)
 	GetServiceAccess(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// PutServiceAccess handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access)
 	PutServiceAccess(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// GenerateMissingAssetWithAi handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate)
 	GenerateMissingAssetWithAi(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params GenerateMissingAssetWithAiParams)
 
+	// ListServiceComments handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments)
 	ListServiceComments(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params ListServiceCommentsParams)
 
+	// CreateServiceComment handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments)
 	CreateServiceComment(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// ListSourceSpecs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources)
 	ListSourceSpecs(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// CreateSourceSpec handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources)
 	CreateSourceSpec(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// ResolveServiceDrift handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift)
 	ResolveServiceDrift(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params ResolveServiceDriftParams)
 
+	// StarService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:star)
 	StarService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// UnstarService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:unstar)
 	UnstarService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug)
 
+	// ListRecentServices handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services:recent)
 	ListRecentServices(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListRecentServicesParams)
 
+	// GetTenantSettings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/settings)
 	GetTenantSettings(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// UpdateTenantSettings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/settings)
 	UpdateTenantSettings(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params UpdateTenantSettingsParams)
 
+	// ListShareLinks handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/share-links)
 	ListShareLinks(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListShareLinksParams)
 
+	// CreateShareLink handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/share-links)
 	CreateShareLink(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// RevokeShareLink handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/share-links/{shareLinkId})
 	RevokeShareLink(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, shareLinkId ShareLinkId)
 
+	// DeleteSourceSpec handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/sources/{sourceId})
 	DeleteSourceSpec(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, sourceId SourceId, params DeleteSourceSpecParams)
 
+	// UpdateSourceSpec handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/sources/{sourceId})
 	UpdateSourceSpec(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, sourceId SourceId, params UpdateSourceSpecParams)
 
+	// ListSourceBindings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/sources/{sourceId}/bindings)
 	ListSourceBindings(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, sourceId SourceId)
 
+	// ProduceSource handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce)
 	ProduceSource(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, sourceId SourceId, params ProduceSourceParams)
 
+	// ListSubscriptions handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/subscriptions)
 	ListSubscriptions(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// PutSubscription handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/subscriptions)
 	PutSubscription(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// ListSystemGroups handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/system-groups)
 	ListSystemGroups(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// CreateSystemGroup handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/system-groups)
 	CreateSystemGroup(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// DeleteSystemGroup handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/system-groups/{groupId})
 	DeleteSystemGroup(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, groupId GroupId, params DeleteSystemGroupParams)
 
+	// GetSystemGroup handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/system-groups/{groupId})
 	GetSystemGroup(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, groupId GroupId)
 
+	// UpdateSystemGroup handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId})
 	UpdateSystemGroup(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, groupId GroupId, params UpdateSystemGroupParams)
 
+	// PutSystemGroupMembers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members)
 	PutSystemGroupMembers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, groupId GroupId, params PutSystemGroupMembersParams)
 
+	// ListTags handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/tags)
 	ListTags(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// CreateTag handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/tags)
 	CreateTag(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// DeleteTag handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/tags/{tagId})
 	DeleteTag(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, tagId TagId, params DeleteTagParams)
 
+	// UpdateTag handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/tags/{tagId})
 	UpdateTag(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, tagId TagId, params UpdateTagParams)
 
+	// ListTeams handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/teams)
 	ListTeams(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListTeamsParams)
 
+	// CreateTeam handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/teams)
 	CreateTeam(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// DeleteTeam handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/teams/{teamId})
 	DeleteTeam(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, teamId TeamId, params DeleteTeamParams)
 
+	// GetTeam handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/teams/{teamId})
 	GetTeam(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, teamId TeamId)
 
+	// UpdateTeam handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/teams/{teamId})
 	UpdateTeam(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, teamId TeamId, params UpdateTeamParams)
 
+	// ReplaceTeamMembers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members)
 	ReplaceTeamMembers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, teamId TeamId, params ReplaceTeamMembersParams)
 
+	// ListTokens handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/tokens)
 	ListTokens(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListTokensParams)
 
+	// CreateToken handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/tokens)
 	CreateToken(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// RevokeToken handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/tokens/{tokenId})
 	RevokeToken(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, tokenId TokenId)
 
+	// CreateDiffUpload handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/uploads)
 	CreateDiffUpload(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// ListViewOverrides handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/view-overrides)
 	ListViewOverrides(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// DeleteViewOverride handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/view-overrides/{viewId})
 	DeleteViewOverride(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, viewId ViewId, params DeleteViewOverrideParams)
 
+	// PutViewOverride handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId})
 	PutViewOverride(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, viewId ViewId, params PutViewOverrideParams)
 
+	// ListViews handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/views)
 	ListViews(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListViewsParams)
 
+	// ResolveView handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/views:resolve)
 	ResolveView(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
 
+	// GetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/version)
 	GetVersion(w http.ResponseWriter, r *http.Request)
 
+	// ReceiveGitWebhook handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/webhooks/git/{repositoryId})
 	ReceiveGitWebhook(w http.ResponseWriter, r *http.Request, repositoryId RepositoryId, params ReceiveGitWebhookParams)
 
+	// Healthz handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /healthz)
 	Healthz(w http.ResponseWriter, r *http.Request)
 
+	// Metrics handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /metrics)
 	Metrics(w http.ResponseWriter, r *http.Request)
 
+	// Readyz handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /readyz)
 	Readyz(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
+// Unimplemented is generated transport code derived from the Meridian OpenAPI contract.
 type Unimplemented struct{}
 
+// ListPlatformAuditLogs implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/audit-logs)
 func (_ Unimplemented) ListPlatformAuditLogs(w http.ResponseWriter, r *http.Request, params ListPlatformAuditLogsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListGlobalCredentials implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/global-credentials)
 func (_ Unimplemented) ListGlobalCredentials(w http.ResponseWriter, r *http.Request, params ListGlobalCredentialsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateGlobalCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/admin/global-credentials)
 func (_ Unimplemented) CreateGlobalCredential(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteGlobalCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/admin/global-credentials/{credentialId})
 func (_ Unimplemented) DeleteGlobalCredential(w http.ResponseWriter, r *http.Request, credentialId CredentialId, params DeleteGlobalCredentialParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateGlobalCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/admin/global-credentials/{credentialId})
 func (_ Unimplemented) UpdateGlobalCredential(w http.ResponseWriter, r *http.Request, credentialId CredentialId, params UpdateGlobalCredentialParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RotateGlobalCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/admin/global-credentials/{credentialId}:rotate)
 func (_ Unimplemented) RotateGlobalCredential(w http.ResponseWriter, r *http.Request, credentialId CredentialId, params RotateGlobalCredentialParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// TestGlobalCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/admin/global-credentials/{credentialId}:test)
 func (_ Unimplemented) TestGlobalCredential(w http.ResponseWriter, r *http.Request, credentialId CredentialId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListPlatformJobs implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/jobs)
 func (_ Unimplemented) ListPlatformJobs(w http.ResponseWriter, r *http.Request, params ListPlatformJobsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetPlatformJob implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/jobs/{jobId})
 func (_ Unimplemented) GetPlatformJob(w http.ResponseWriter, r *http.Request, jobId JobId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListProducerProfiles implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/producer-profiles)
 func (_ Unimplemented) ListProducerProfiles(w http.ResponseWriter, r *http.Request, params ListProducerProfilesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateProducerProfile implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/admin/producer-profiles)
 func (_ Unimplemented) CreateProducerProfile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteProducerProfile implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/admin/producer-profiles/{producerProfileId})
 func (_ Unimplemented) DeleteProducerProfile(w http.ResponseWriter, r *http.Request, producerProfileId ProducerProfileId, params DeleteProducerProfileParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetProducerProfile implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/producer-profiles/{producerProfileId})
 func (_ Unimplemented) GetProducerProfile(w http.ResponseWriter, r *http.Request, producerProfileId ProducerProfileId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateProducerProfile implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/admin/producer-profiles/{producerProfileId})
 func (_ Unimplemented) UpdateProducerProfile(w http.ResponseWriter, r *http.Request, producerProfileId ProducerProfileId, params UpdateProducerProfileParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetPlatformSettings implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/settings)
 func (_ Unimplemented) GetPlatformSettings(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdatePlatformSettings implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/admin/settings)
 func (_ Unimplemented) UpdatePlatformSettings(w http.ResponseWriter, r *http.Request, params UpdatePlatformSettingsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListTenants implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/tenants)
 func (_ Unimplemented) ListTenants(w http.ResponseWriter, r *http.Request, params ListTenantsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateTenant implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/admin/tenants)
 func (_ Unimplemented) CreateTenant(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteTenant implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/admin/tenants/{tenantSlug})
 func (_ Unimplemented) DeleteTenant(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params DeleteTenantParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateTenant implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/admin/tenants/{tenantSlug})
 func (_ Unimplemented) UpdateTenant(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params UpdateTenantParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PutTenantMemberAsPlatformAdmin implements generated transport behavior for the Meridian OpenAPI contract.
 // (PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId})
 func (_ Unimplemented) PutTenantMemberAsPlatformAdmin(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, userId UserId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListUsers implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/admin/users)
 func (_ Unimplemented) ListUsers(w http.ResponseWriter, r *http.Request, params ListUsersParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateUser implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/admin/users)
 func (_ Unimplemented) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateUser implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/admin/users/{userId})
 func (_ Unimplemented) UpdateUser(w http.ResponseWriter, r *http.Request, userId UserId, params UpdateUserParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetCsrfToken implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/auth/csrf)
 func (_ Unimplemented) GetCsrfToken(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Login implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/auth/login)
 func (_ Unimplemented) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Logout implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/auth/logout)
 func (_ Unimplemented) Logout(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetMe implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/auth/me)
 func (_ Unimplemented) GetMe(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetMyPreferences implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/auth/me/preferences)
 func (_ Unimplemented) GetMyPreferences(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateMyPreferences implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/auth/me/preferences)
 func (_ Unimplemented) UpdateMyPreferences(w http.ResponseWriter, r *http.Request, params UpdateMyPreferencesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DownloadSignedContent implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/content/{token})
 func (_ Unimplemented) DownloadSignedContent(w http.ResponseWriter, r *http.Request, token ContentToken) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetOpenApiContract implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/openapi.yaml)
 func (_ Unimplemented) GetOpenApiContract(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetPublicService implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug})
 func (_ Unimplemented) GetPublicService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetPublicAsset implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug}/assets/{kindId}/{assetName})
 func (_ Unimplemented) GetPublicAsset(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, kindId KindId, assetName AssetName) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ResolvePublicView implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/public/t/{tenantSlug}/views:resolve)
 func (_ Unimplemented) ResolvePublicView(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetSharedView implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/shared/{shareToken})
 func (_ Unimplemented) GetSharedView(w http.ResponseWriter, r *http.Request, shareToken ShareToken) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListAssetKinds implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/asset-kinds)
 func (_ Unimplemented) ListAssetKinds(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateAssetKindState implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId})
 func (_ Unimplemented) UpdateAssetKindState(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, kindId KindId, params UpdateAssetKindStateParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetAssetVersion implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId})
 func (_ Unimplemented) GetAssetVersion(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListAssetVersionItems implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/items)
 func (_ Unimplemented) ListAssetVersionItems(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId, params ListAssetVersionItemsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetAssetVersionProvenance implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/provenance)
 func (_ Unimplemented) GetAssetVersionProvenance(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeprecateAssetVersion implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:deprecate)
 func (_ Unimplemented) DeprecateAssetVersion(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId, params DeprecateAssetVersionParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PublishAssetVersion implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish)
 func (_ Unimplemented) PublishAssetVersion(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId, params PublishAssetVersionParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RetireAssetVersion implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:retire)
 func (_ Unimplemented) RetireAssetVersion(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, versionId VersionId, params RetireAssetVersionParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetAsset implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/assets/{assetId})
 func (_ Unimplemented) GetAsset(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params GetAssetParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ReorderAssetLayers implements generated transport behavior for the Meridian OpenAPI contract.
 // (PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order)
 func (_ Unimplemented) ReorderAssetLayers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params ReorderAssetLayersParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListAssetVersions implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/assets/{assetId}/versions)
 func (_ Unimplemented) ListAssetVersions(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params ListAssetVersionsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GenerateAssetWithAi implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate)
 func (_ Unimplemented) GenerateAssetWithAi(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params GenerateAssetWithAiParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PreviewMerge implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/assets:preview-merge)
 func (_ Unimplemented) PreviewMerge(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PushAssetRevision implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/assets:push)
 func (_ Unimplemented) PushAssetRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params PushAssetRevisionParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListAuditLogs implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/audit-logs)
 func (_ Unimplemented) ListAuditLogs(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListAuditLogsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListBreakingTodos implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/breaking-todos)
 func (_ Unimplemented) ListBreakingTodos(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListBreakingTodosParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// AcknowledgeBreakingTodo implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack)
 func (_ Unimplemented) AcknowledgeBreakingTodo(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, todoId TodoId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListCredentials implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/credentials)
 func (_ Unimplemented) ListCredentials(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListCredentialsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/credentials)
 func (_ Unimplemented) CreateCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/credentials/{credentialId})
 func (_ Unimplemented) DeleteCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, credentialId CredentialId, params DeleteCredentialParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId})
 func (_ Unimplemented) UpdateCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, credentialId CredentialId, params UpdateCredentialParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RotateCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate)
 func (_ Unimplemented) RotateCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, credentialId CredentialId, params RotateCredentialParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// TestCredential implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test)
 func (_ Unimplemented) TestCredential(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, credentialId CredentialId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RunDiff implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/diff)
 func (_ Unimplemented) RunDiff(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListDiffRuleSets implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/diff-rule-sets)
 func (_ Unimplemented) ListDiffRuleSets(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateDiffRuleSet implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/diff-rule-sets)
 func (_ Unimplemented) CreateDiffRuleSet(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteDiffRuleSet implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId})
 func (_ Unimplemented) DeleteDiffRuleSet(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, ruleSetId RuleSetId, params DeleteDiffRuleSetParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateDiffRuleSet implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId})
 func (_ Unimplemented) UpdateDiffRuleSet(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, ruleSetId RuleSetId, params UpdateDiffRuleSetParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListDiffSnapshots implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/diff-snapshots)
 func (_ Unimplemented) ListDiffSnapshots(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListDiffSnapshotsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteDiffSnapshot implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId})
 func (_ Unimplemented) DeleteDiffSnapshot(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, snapshotId SnapshotId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetDiffSnapshot implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId})
 func (_ Unimplemented) GetDiffSnapshot(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, snapshotId SnapshotId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ExportDiffSnapshot implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/export)
 func (_ Unimplemented) ExportDiffSnapshot(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, snapshotId SnapshotId, params ExportDiffSnapshotParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateDiffSnapshotShareLink implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links)
 func (_ Unimplemented) CreateDiffSnapshotShareLink(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, snapshotId SnapshotId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// SearchTenantUsers implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/directory/users)
 func (_ Unimplemented) SearchTenantUsers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params SearchTenantUsersParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateTenantExport implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/exports)
 func (_ Unimplemented) CreateTenantExport(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params CreateTenantExportParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListJobs implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/jobs)
 func (_ Unimplemented) ListJobs(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListJobsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetJob implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/jobs/{jobId})
 func (_ Unimplemented) GetJob(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, jobId JobId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// StreamJobLogs implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/jobs/{jobId}/logs)
 func (_ Unimplemented) StreamJobLogs(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, jobId JobId, params StreamJobLogsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CancelJob implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/jobs/{jobId}:cancel)
 func (_ Unimplemented) CancelJob(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, jobId JobId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RetryJob implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/jobs/{jobId}:retry)
 func (_ Unimplemented) RetryJob(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, jobId JobId, params RetryJobParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListKnownHosts implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/known-hosts)
 func (_ Unimplemented) ListKnownHosts(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListKnownHostsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateKnownHost implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/known-hosts)
 func (_ Unimplemented) CreateKnownHost(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetLayerRevision implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId})
 func (_ Unimplemented) GetLayerRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, revisionId RevisionId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetReviewContext implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}/review-context)
 func (_ Unimplemented) GetReviewContext(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, revisionId RevisionId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ApproveLayerRevision implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve)
 func (_ Unimplemented) ApproveLayerRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, revisionId RevisionId, params ApproveLayerRevisionParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RejectLayerRevision implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject)
 func (_ Unimplemented) RejectLayerRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, revisionId RevisionId, params RejectLayerRevisionParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetLayer implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/layers/{layerId})
 func (_ Unimplemented) GetLayer(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params GetLayerParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateLayer implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/layers/{layerId})
 func (_ Unimplemented) UpdateLayer(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params UpdateLayerParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListLayerRevisions implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/layers/{layerId}/revisions)
 func (_ Unimplemented) ListLayerRevisions(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params ListLayerRevisionsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateLayerRevision implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions)
 func (_ Unimplemented) CreateLayerRevision(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params CreateLayerRevisionParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RollbackLayer implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback)
 func (_ Unimplemented) RollbackLayer(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, layerId LayerId, params RollbackLayerParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListTenantMembers implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/members)
 func (_ Unimplemented) ListTenantMembers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListTenantMembersParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteTenantMember implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/members/{userId})
 func (_ Unimplemented) DeleteTenantMember(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, userId UserId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PutTenantMember implements generated transport behavior for the Meridian OpenAPI contract.
 // (PUT /api/v1/t/{tenantSlug}/members/{userId})
 func (_ Unimplemented) PutTenantMember(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, userId UserId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListNotificationChannels implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/notification-channels)
 func (_ Unimplemented) ListNotificationChannels(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateNotificationChannel implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/notification-channels)
 func (_ Unimplemented) CreateNotificationChannel(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteNotificationChannel implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/notification-channels/{channelId})
 func (_ Unimplemented) DeleteNotificationChannel(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, channelId ChannelId, params DeleteNotificationChannelParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateNotificationChannel implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId})
 func (_ Unimplemented) UpdateNotificationChannel(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, channelId ChannelId, params UpdateNotificationChannelParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RotateNotificationChannelSecret implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate)
 func (_ Unimplemented) RotateNotificationChannelSecret(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, channelId ChannelId, params RotateNotificationChannelSecretParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// TestNotificationChannel implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:test)
 func (_ Unimplemented) TestNotificationChannel(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, channelId ChannelId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListNotifications implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/notifications)
 func (_ Unimplemented) ListNotifications(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListNotificationsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// MarkNotificationRead implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/notifications/{notificationId}:read)
 func (_ Unimplemented) MarkNotificationRead(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, notificationId NotificationId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// MarkAllNotificationsRead implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/notifications:read-all)
 func (_ Unimplemented) MarkAllNotificationsRead(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListAvailableProducerProfiles implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/producer-profiles)
 func (_ Unimplemented) ListAvailableProducerProfiles(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListRepositories implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/repositories)
 func (_ Unimplemented) ListRepositories(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListRepositoriesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateRepository implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories)
 func (_ Unimplemented) CreateRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteRepository implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 func (_ Unimplemented) DeleteRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params DeleteRepositoryParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetRepository implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 func (_ Unimplemented) GetRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateRepository implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 func (_ Unimplemented) UpdateRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params UpdateRepositoryParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListDiscoveryCandidates implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates)
 func (_ Unimplemented) ListDiscoveryCandidates(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params ListDiscoveryCandidatesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DismissDiscoveryCandidate implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates/{candidateId}:dismiss)
 func (_ Unimplemented) DismissDiscoveryCandidate(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, candidateId CandidateId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// AcceptDiscoveryCandidates implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept)
 func (_ Unimplemented) AcceptDiscoveryCandidates(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params AcceptDiscoveryCandidatesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PreviewRepositoryConfigImport implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports)
 func (_ Unimplemented) PreviewRepositoryConfigImport(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params PreviewRepositoryConfigImportParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ApplyRepositoryConfigImport implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply)
 func (_ Unimplemented) ApplyRepositoryConfigImport(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params ApplyRepositoryConfigImportParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateServiceInRepository implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services)
 func (_ Unimplemented) CreateServiceInRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DiscoverRepository implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover)
 func (_ Unimplemented) DiscoverRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params DiscoverRepositoryParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// SyncRepository implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync)
 func (_ Unimplemented) SyncRepository(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, repositoryId RepositoryId, params SyncRepositoryParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CheckRepositoryConnection implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/repositories:check-connection)
 func (_ Unimplemented) CheckRepositoryConnection(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListReviews implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/reviews)
 func (_ Unimplemented) ListReviews(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListReviewsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Search implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/search)
 func (_ Unimplemented) Search(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params SearchParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListServices implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/services)
 func (_ Unimplemented) ListServices(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListServicesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteService implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/services/{serviceSlug})
 func (_ Unimplemented) DeleteService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params DeleteServiceParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetService implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/services/{serviceSlug})
 func (_ Unimplemented) GetService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateService implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug})
 func (_ Unimplemented) UpdateService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params UpdateServiceParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetServiceAccess implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/access)
 func (_ Unimplemented) GetServiceAccess(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PutServiceAccess implements generated transport behavior for the Meridian OpenAPI contract.
 // (PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access)
 func (_ Unimplemented) PutServiceAccess(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GenerateMissingAssetWithAi implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate)
 func (_ Unimplemented) GenerateMissingAssetWithAi(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params GenerateMissingAssetWithAiParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListServiceComments implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments)
 func (_ Unimplemented) ListServiceComments(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params ListServiceCommentsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateServiceComment implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments)
 func (_ Unimplemented) CreateServiceComment(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListSourceSpecs implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources)
 func (_ Unimplemented) ListSourceSpecs(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateSourceSpec implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources)
 func (_ Unimplemented) CreateSourceSpec(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ResolveServiceDrift implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift)
 func (_ Unimplemented) ResolveServiceDrift(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug, params ResolveServiceDriftParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// StarService implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:star)
 func (_ Unimplemented) StarService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UnstarService implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:unstar)
 func (_ Unimplemented) UnstarService(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, serviceSlug ServiceSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListRecentServices implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/services:recent)
 func (_ Unimplemented) ListRecentServices(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListRecentServicesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetTenantSettings implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/settings)
 func (_ Unimplemented) GetTenantSettings(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateTenantSettings implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/settings)
 func (_ Unimplemented) UpdateTenantSettings(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params UpdateTenantSettingsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListShareLinks implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/share-links)
 func (_ Unimplemented) ListShareLinks(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListShareLinksParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateShareLink implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/share-links)
 func (_ Unimplemented) CreateShareLink(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RevokeShareLink implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/share-links/{shareLinkId})
 func (_ Unimplemented) RevokeShareLink(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, shareLinkId ShareLinkId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteSourceSpec implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/sources/{sourceId})
 func (_ Unimplemented) DeleteSourceSpec(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, sourceId SourceId, params DeleteSourceSpecParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateSourceSpec implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/sources/{sourceId})
 func (_ Unimplemented) UpdateSourceSpec(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, sourceId SourceId, params UpdateSourceSpecParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListSourceBindings implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/sources/{sourceId}/bindings)
 func (_ Unimplemented) ListSourceBindings(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, sourceId SourceId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ProduceSource implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce)
 func (_ Unimplemented) ProduceSource(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, sourceId SourceId, params ProduceSourceParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListSubscriptions implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/subscriptions)
 func (_ Unimplemented) ListSubscriptions(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PutSubscription implements generated transport behavior for the Meridian OpenAPI contract.
 // (PUT /api/v1/t/{tenantSlug}/subscriptions)
 func (_ Unimplemented) PutSubscription(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListSystemGroups implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/system-groups)
 func (_ Unimplemented) ListSystemGroups(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateSystemGroup implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/system-groups)
 func (_ Unimplemented) CreateSystemGroup(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteSystemGroup implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/system-groups/{groupId})
 func (_ Unimplemented) DeleteSystemGroup(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, groupId GroupId, params DeleteSystemGroupParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetSystemGroup implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/system-groups/{groupId})
 func (_ Unimplemented) GetSystemGroup(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, groupId GroupId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateSystemGroup implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId})
 func (_ Unimplemented) UpdateSystemGroup(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, groupId GroupId, params UpdateSystemGroupParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PutSystemGroupMembers implements generated transport behavior for the Meridian OpenAPI contract.
 // (PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members)
 func (_ Unimplemented) PutSystemGroupMembers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, groupId GroupId, params PutSystemGroupMembersParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListTags implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/tags)
 func (_ Unimplemented) ListTags(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateTag implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/tags)
 func (_ Unimplemented) CreateTag(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteTag implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/tags/{tagId})
 func (_ Unimplemented) DeleteTag(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, tagId TagId, params DeleteTagParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateTag implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/tags/{tagId})
 func (_ Unimplemented) UpdateTag(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, tagId TagId, params UpdateTagParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListTeams implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/teams)
 func (_ Unimplemented) ListTeams(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListTeamsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateTeam implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/teams)
 func (_ Unimplemented) CreateTeam(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteTeam implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/teams/{teamId})
 func (_ Unimplemented) DeleteTeam(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, teamId TeamId, params DeleteTeamParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetTeam implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/teams/{teamId})
 func (_ Unimplemented) GetTeam(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, teamId TeamId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// UpdateTeam implements generated transport behavior for the Meridian OpenAPI contract.
 // (PATCH /api/v1/t/{tenantSlug}/teams/{teamId})
 func (_ Unimplemented) UpdateTeam(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, teamId TeamId, params UpdateTeamParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ReplaceTeamMembers implements generated transport behavior for the Meridian OpenAPI contract.
 // (PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members)
 func (_ Unimplemented) ReplaceTeamMembers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, teamId TeamId, params ReplaceTeamMembersParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListTokens implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/tokens)
 func (_ Unimplemented) ListTokens(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListTokensParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateToken implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/tokens)
 func (_ Unimplemented) CreateToken(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// RevokeToken implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/tokens/{tokenId})
 func (_ Unimplemented) RevokeToken(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, tokenId TokenId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateDiffUpload implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/uploads)
 func (_ Unimplemented) CreateDiffUpload(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListViewOverrides implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/view-overrides)
 func (_ Unimplemented) ListViewOverrides(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteViewOverride implements generated transport behavior for the Meridian OpenAPI contract.
 // (DELETE /api/v1/t/{tenantSlug}/view-overrides/{viewId})
 func (_ Unimplemented) DeleteViewOverride(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, viewId ViewId, params DeleteViewOverrideParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// PutViewOverride implements generated transport behavior for the Meridian OpenAPI contract.
 // (PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId})
 func (_ Unimplemented) PutViewOverride(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, viewId ViewId, params PutViewOverrideParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListViews implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/t/{tenantSlug}/views)
 func (_ Unimplemented) ListViews(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListViewsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ResolveView implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/t/{tenantSlug}/views:resolve)
 func (_ Unimplemented) ResolveView(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetVersion implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /api/v1/version)
 func (_ Unimplemented) GetVersion(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ReceiveGitWebhook implements generated transport behavior for the Meridian OpenAPI contract.
 // (POST /api/v1/webhooks/git/{repositoryId})
 func (_ Unimplemented) ReceiveGitWebhook(w http.ResponseWriter, r *http.Request, repositoryId RepositoryId, params ReceiveGitWebhookParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Healthz implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /healthz)
 func (_ Unimplemented) Healthz(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Metrics implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /metrics)
 func (_ Unimplemented) Metrics(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Readyz implements generated transport behavior for the Meridian OpenAPI contract.
 // (GET /readyz)
 func (_ Unimplemented) Readyz(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
@@ -1403,11 +1748,15 @@ func (_ Unimplemented) Readyz(w http.ResponseWriter, r *http.Request) {
 
 // ServerInterfaceWrapper converts contexts to parameters.
 type ServerInterfaceWrapper struct {
-	Handler            ServerInterface
+	// Handler carries the generated handler value for ServerInterfaceWrapper.
+	Handler ServerInterface
+	// HandlerMiddlewares carries the generated handler middlewares value for ServerInterfaceWrapper.
 	HandlerMiddlewares []MiddlewareFunc
-	ErrorHandlerFunc   func(w http.ResponseWriter, r *http.Request, err error)
+	// ErrorHandlerFunc carries the generated error handler func value for ServerInterfaceWrapper.
+	ErrorHandlerFunc func(w http.ResponseWriter, r *http.Request, err error)
 }
 
+// MiddlewareFunc is generated transport code derived from the Meridian OpenAPI contract.
 type MiddlewareFunc func(http.Handler) http.Handler
 
 // ListPlatformAuditLogs operation middleware
@@ -9573,71 +9922,98 @@ func (siw *ServerInterfaceWrapper) Readyz(w http.ResponseWriter, r *http.Request
 	handler.ServeHTTP(w, r)
 }
 
+// UnescapedCookieParamError is generated transport code derived from the Meridian OpenAPI contract.
 type UnescapedCookieParamError struct {
+	// ParamName carries the generated param name value for UnescapedCookieParamError.
 	ParamName string
-	Err       error
+	// Err carries the generated err value for UnescapedCookieParamError.
+	Err error
 }
 
+// Error implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *UnescapedCookieParamError) Error() string {
 	return fmt.Sprintf("error unescaping cookie parameter '%s'", e.ParamName)
 }
 
+// Unwrap implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *UnescapedCookieParamError) Unwrap() error {
 	return e.Err
 }
 
+// UnmarshalingParamError is generated transport code derived from the Meridian OpenAPI contract.
 type UnmarshalingParamError struct {
+	// ParamName carries the generated param name value for UnmarshalingParamError.
 	ParamName string
-	Err       error
+	// Err carries the generated err value for UnmarshalingParamError.
+	Err error
 }
 
+// Error implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *UnmarshalingParamError) Error() string {
 	return fmt.Sprintf("Error unmarshaling parameter %s as JSON: %s", e.ParamName, e.Err.Error())
 }
 
+// Unwrap implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *UnmarshalingParamError) Unwrap() error {
 	return e.Err
 }
 
+// RequiredParamError is generated transport code derived from the Meridian OpenAPI contract.
 type RequiredParamError struct {
+	// ParamName carries the generated param name value for RequiredParamError.
 	ParamName string
 }
 
+// Error implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *RequiredParamError) Error() string {
 	return fmt.Sprintf("Query argument %s is required, but not found", e.ParamName)
 }
 
+// RequiredHeaderError is generated transport code derived from the Meridian OpenAPI contract.
 type RequiredHeaderError struct {
+	// ParamName carries the generated param name value for RequiredHeaderError.
 	ParamName string
-	Err       error
+	// Err carries the generated err value for RequiredHeaderError.
+	Err error
 }
 
+// Error implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *RequiredHeaderError) Error() string {
 	return fmt.Sprintf("Header parameter %s is required, but not found", e.ParamName)
 }
 
+// Unwrap implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *RequiredHeaderError) Unwrap() error {
 	return e.Err
 }
 
+// InvalidParamFormatError is generated transport code derived from the Meridian OpenAPI contract.
 type InvalidParamFormatError struct {
+	// ParamName carries the generated param name value for InvalidParamFormatError.
 	ParamName string
-	Err       error
+	// Err carries the generated err value for InvalidParamFormatError.
+	Err error
 }
 
+// Error implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *InvalidParamFormatError) Error() string {
 	return fmt.Sprintf("Invalid format for parameter %s: %s", e.ParamName, e.Err.Error())
 }
 
+// Unwrap implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *InvalidParamFormatError) Unwrap() error {
 	return e.Err
 }
 
+// TooManyValuesForParamError is generated transport code derived from the Meridian OpenAPI contract.
 type TooManyValuesForParamError struct {
+	// ParamName carries the generated param name value for TooManyValuesForParamError.
 	ParamName string
-	Count     int
+	// Count carries the generated count value for TooManyValuesForParamError.
+	Count int
 }
 
+// Error implements generated transport behavior for the Meridian OpenAPI contract.
 func (e *TooManyValuesForParamError) Error() string {
 	return fmt.Sprintf("Expected one value for %s, got %d", e.ParamName, e.Count)
 }
@@ -9647,10 +10023,15 @@ func Handler(si ServerInterface) http.Handler {
 	return HandlerWithOptions(si, ChiServerOptions{})
 }
 
+// ChiServerOptions is generated transport code derived from the Meridian OpenAPI contract.
 type ChiServerOptions struct {
-	BaseURL          string
-	BaseRouter       chi.Router
-	Middlewares      []MiddlewareFunc
+	// BaseURL carries the generated base u r l value for ChiServerOptions.
+	BaseURL string
+	// BaseRouter carries the generated base router value for ChiServerOptions.
+	BaseRouter chi.Router
+	// Middlewares carries the generated middlewares value for ChiServerOptions.
+	Middlewares []MiddlewareFunc
+	// ErrorHandlerFunc carries the generated error handler func value for ChiServerOptions.
 	ErrorHandlerFunc func(w http.ResponseWriter, r *http.Request, err error)
 }
 
@@ -9661,6 +10042,7 @@ func HandlerFromMux(si ServerInterface, r chi.Router) http.Handler {
 	})
 }
 
+// HandlerFromMuxWithBaseURL implements generated transport behavior for the Meridian OpenAPI contract.
 func HandlerFromMuxWithBaseURL(si ServerInterface, r chi.Router, baseURL string) http.Handler {
 	return HandlerWithOptions(si, ChiServerOptions{
 		BaseURL:    baseURL,
@@ -10206,552 +10588,889 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	return r
 }
 
+// AiGenerationAcceptedJSONResponse contains the raw HTTP response and any decoded response body.
 type AiGenerationAcceptedJSONResponse AiGenerationAccepted
 
+// ArtifactLinkJSONResponse contains the raw HTTP response and any decoded response body.
 type ArtifactLinkJSONResponse ArtifactLink
 
+// AssetResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type AssetResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// AssetJSONResponse contains the raw HTTP response and any decoded response body.
 type AssetJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body Asset
 
+	// Headers contains the headers declared for this response.
 	Headers AssetResponseHeaders
 }
 
+// AssetItemPageJSONResponse contains the raw HTTP response and any decoded response body.
 type AssetItemPageJSONResponse AssetItemPage
 
+// AssetKindResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type AssetKindResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// AssetKindJSONResponse contains the raw HTTP response and any decoded response body.
 type AssetKindJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body AssetKind
 
+	// Headers contains the headers declared for this response.
 	Headers AssetKindResponseHeaders
 }
 
+// AssetKindListJSONResponse contains the raw HTTP response and any decoded response body.
 type AssetKindListJSONResponse AssetKindList
 
+// AssetPushResultJSONResponse contains the raw HTTP response and any decoded response body.
 type AssetPushResultJSONResponse AssetPushResult
 
+// AssetVersionResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type AssetVersionResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// AssetVersionJSONResponse contains the raw HTTP response and any decoded response body.
 type AssetVersionJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body AssetVersion
 
+	// Headers contains the headers declared for this response.
 	Headers AssetVersionResponseHeaders
 }
 
+// AssetVersionPageJSONResponse contains the raw HTTP response and any decoded response body.
 type AssetVersionPageJSONResponse AssetVersionPage
 
+// AuditLogPageJSONResponse contains the raw HTTP response and any decoded response body.
 type AuditLogPageJSONResponse AuditLogPage
 
+// BreakingTodoJSONResponse contains the raw HTTP response and any decoded response body.
 type BreakingTodoJSONResponse BreakingTodo
 
+// BreakingTodoPageJSONResponse contains the raw HTTP response and any decoded response body.
 type BreakingTodoPageJSONResponse BreakingTodoPage
 
+// CandidateJSONResponse contains the raw HTTP response and any decoded response body.
 type CandidateJSONResponse DiscoveryCandidate
 
+// CandidatePageJSONResponse contains the raw HTTP response and any decoded response body.
 type CandidatePageJSONResponse CandidatePage
 
+// CommentJSONResponse contains the raw HTTP response and any decoded response body.
 type CommentJSONResponse Comment
 
+// CommentPageJSONResponse contains the raw HTTP response and any decoded response body.
 type CommentPageJSONResponse CommentPage
 
+// ConfigImportPreviewJSONResponse contains the raw HTTP response and any decoded response body.
 type ConfigImportPreviewJSONResponse ConfigImportPreview
 
+// ConfigImportResultJSONResponse contains the raw HTTP response and any decoded response body.
 type ConfigImportResultJSONResponse ConfigImportResult
 
+// ConflictResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ConflictResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// ConflictJSONResponse contains the raw HTTP response and any decoded response body.
 type ConflictJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers ConflictResponseHeaders
 }
 
+// ConnectionTestJSONResponse contains the raw HTTP response and any decoded response body.
 type ConnectionTestJSONResponse ConnectionTest
 
+// ContentTooLargeResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ContentTooLargeResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// ContentTooLargeJSONResponse contains the raw HTTP response and any decoded response body.
 type ContentTooLargeJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers ContentTooLargeResponseHeaders
 }
 
+// CredentialResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type CredentialResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// CredentialJSONResponse contains the raw HTTP response and any decoded response body.
 type CredentialJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body Credential
 
+	// Headers contains the headers declared for this response.
 	Headers CredentialResponseHeaders
 }
 
+// CredentialInUseResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type CredentialInUseResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// CredentialInUseJSONResponse contains the raw HTTP response and any decoded response body.
 type CredentialInUseJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers CredentialInUseResponseHeaders
 }
 
+// CredentialPageJSONResponse contains the raw HTTP response and any decoded response body.
 type CredentialPageJSONResponse CredentialPage
 
+// CredentialRotationResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type CredentialRotationResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// CredentialRotationJSONResponse contains the raw HTTP response and any decoded response body.
 type CredentialRotationJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body CredentialRotationResult
 
+	// Headers contains the headers declared for this response.
 	Headers CredentialRotationResponseHeaders
 }
 
+// DiffResultJSONResponse contains the raw HTTP response and any decoded response body.
 type DiffResultJSONResponse DiffResult
 
+// DiffRuleSetResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type DiffRuleSetResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// DiffRuleSetJSONResponse contains the raw HTTP response and any decoded response body.
 type DiffRuleSetJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body DiffRuleSet
 
+	// Headers contains the headers declared for this response.
 	Headers DiffRuleSetResponseHeaders
 }
 
+// DiffRuleSetListJSONResponse contains the raw HTTP response and any decoded response body.
 type DiffRuleSetListJSONResponse DiffRuleSetList
 
+// DiffSnapshotJSONResponse contains the raw HTTP response and any decoded response body.
 type DiffSnapshotJSONResponse DiffSnapshot
 
+// DiffSnapshotPageJSONResponse contains the raw HTTP response and any decoded response body.
 type DiffSnapshotPageJSONResponse DiffSnapshotPage
 
+// DuplicateResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type DuplicateResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// DuplicateJSONResponse contains the raw HTTP response and any decoded response body.
 type DuplicateJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers DuplicateResponseHeaders
 }
 
+// GlobalCredentialResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type GlobalCredentialResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// GlobalCredentialJSONResponse contains the raw HTTP response and any decoded response body.
 type GlobalCredentialJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body GlobalCredential
 
+	// Headers contains the headers declared for this response.
 	Headers GlobalCredentialResponseHeaders
 }
 
+// GlobalCredentialPageJSONResponse contains the raw HTTP response and any decoded response body.
 type GlobalCredentialPageJSONResponse GlobalCredentialPage
 
+// GlobalCredentialRotationResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type GlobalCredentialRotationResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// GlobalCredentialRotationJSONResponse contains the raw HTTP response and any decoded response body.
 type GlobalCredentialRotationJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body GlobalCredentialRotationResult
 
+	// Headers contains the headers declared for this response.
 	Headers GlobalCredentialRotationResponseHeaders
 }
 
+// HealthJSONResponse contains the raw HTTP response and any decoded response body.
 type HealthJSONResponse Health
 
+// InputSpecMismatchResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type InputSpecMismatchResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// InputSpecMismatchJSONResponse contains the raw HTTP response and any decoded response body.
 type InputSpecMismatchJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers InputSpecMismatchResponseHeaders
 }
 
+// InternalErrorResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type InternalErrorResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// InternalErrorJSONResponse contains the raw HTTP response and any decoded response body.
 type InternalErrorJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers InternalErrorResponseHeaders
 }
 
+// InvalidStateResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type InvalidStateResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// InvalidStateJSONResponse contains the raw HTTP response and any decoded response body.
 type InvalidStateJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers InvalidStateResponseHeaders
 }
 
+// JobJSONResponse contains the raw HTTP response and any decoded response body.
 type JobJSONResponse Job
 
+// JobAcceptedJSONResponse contains the raw HTTP response and any decoded response body.
 type JobAcceptedJSONResponse JobAccepted
 
+// JobNotCancellableResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type JobNotCancellableResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// JobNotCancellableJSONResponse contains the raw HTTP response and any decoded response body.
 type JobNotCancellableJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers JobNotCancellableResponseHeaders
 }
 
+// JobPageJSONResponse contains the raw HTTP response and any decoded response body.
 type JobPageJSONResponse JobPage
 
+// KnownHostJSONResponse contains the raw HTTP response and any decoded response body.
 type KnownHostJSONResponse KnownHost
 
+// KnownHostPageJSONResponse contains the raw HTTP response and any decoded response body.
 type KnownHostPageJSONResponse KnownHostPage
 
+// LastAdminResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type LastAdminResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// LastAdminJSONResponse contains the raw HTTP response and any decoded response body.
 type LastAdminJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers LastAdminResponseHeaders
 }
 
+// LayerResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type LayerResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// LayerJSONResponse contains the raw HTTP response and any decoded response body.
 type LayerJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body Layer
 
+	// Headers contains the headers declared for this response.
 	Headers LayerResponseHeaders
 }
 
+// LayerListResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type LayerListResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// LayerListJSONResponse contains the raw HTTP response and any decoded response body.
 type LayerListJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body LayerList
 
+	// Headers contains the headers declared for this response.
 	Headers LayerListResponseHeaders
 }
 
+// LayerRevisionJSONResponse contains the raw HTTP response and any decoded response body.
 type LayerRevisionJSONResponse LayerRevision
 
+// LayerRevisionPageJSONResponse contains the raw HTTP response and any decoded response body.
 type LayerRevisionPageJSONResponse LayerRevisionPage
 
+// LayerRevisionSubmissionJSONResponse contains the raw HTTP response and any decoded response body.
 type LayerRevisionSubmissionJSONResponse LayerRevisionSubmission
 
+// MemberJSONResponse contains the raw HTTP response and any decoded response body.
 type MemberJSONResponse Member
 
+// MemberPageJSONResponse contains the raw HTTP response and any decoded response body.
 type MemberPageJSONResponse MemberPage
 
+// MergePreviewJSONResponse contains the raw HTTP response and any decoded response body.
 type MergePreviewJSONResponse MergePreview
 
+// NestingTooDeepResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type NestingTooDeepResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// NestingTooDeepJSONResponse contains the raw HTTP response and any decoded response body.
 type NestingTooDeepJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers NestingTooDeepResponseHeaders
 }
 
+// NotFoundResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type NotFoundResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// NotFoundJSONResponse contains the raw HTTP response and any decoded response body.
 type NotFoundJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers NotFoundResponseHeaders
 }
 
+// NotificationChannelResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type NotificationChannelResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// NotificationChannelJSONResponse contains the raw HTTP response and any decoded response body.
 type NotificationChannelJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body NotificationChannel
 
+	// Headers contains the headers declared for this response.
 	Headers NotificationChannelResponseHeaders
 }
 
+// NotificationChannelListJSONResponse contains the raw HTTP response and any decoded response body.
 type NotificationChannelListJSONResponse NotificationChannelList
 
+// NotificationPageJSONResponse contains the raw HTTP response and any decoded response body.
 type NotificationPageJSONResponse NotificationPage
 
+// OverlayInvalidResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type OverlayInvalidResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// OverlayInvalidJSONResponse contains the raw HTTP response and any decoded response body.
 type OverlayInvalidJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers OverlayInvalidResponseHeaders
 }
 
+// PlatformJobJSONResponse contains the raw HTTP response and any decoded response body.
 type PlatformJobJSONResponse PlatformJob
 
+// PlatformJobPageJSONResponse contains the raw HTTP response and any decoded response body.
 type PlatformJobPageJSONResponse PlatformJobPage
 
+// PlatformSettingsResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type PlatformSettingsResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// PlatformSettingsJSONResponse contains the raw HTTP response and any decoded response body.
 type PlatformSettingsJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body PlatformSettings
 
+	// Headers contains the headers declared for this response.
 	Headers PlatformSettingsResponseHeaders
 }
 
+// PreconditionFailedResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type PreconditionFailedResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// PreconditionFailedJSONResponse contains the raw HTTP response and any decoded response body.
 type PreconditionFailedJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers PreconditionFailedResponseHeaders
 }
 
+// ProducerProfileResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ProducerProfileResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// ProducerProfileJSONResponse contains the raw HTTP response and any decoded response body.
 type ProducerProfileJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ProducerProfile
 
+	// Headers contains the headers declared for this response.
 	Headers ProducerProfileResponseHeaders
 }
 
+// ProducerProfileOptionListJSONResponse contains the raw HTTP response and any decoded response body.
 type ProducerProfileOptionListJSONResponse ProducerProfileOptionList
 
+// ProducerProfilePageJSONResponse contains the raw HTTP response and any decoded response body.
 type ProducerProfilePageJSONResponse ProducerProfilePage
 
+// ProducerProfileUnavailableResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ProducerProfileUnavailableResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// ProducerProfileUnavailableJSONResponse contains the raw HTTP response and any decoded response body.
 type ProducerProfileUnavailableJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers ProducerProfileUnavailableResponseHeaders
 }
 
+// ProvenanceListJSONResponse contains the raw HTTP response and any decoded response body.
 type ProvenanceListJSONResponse ProvenanceList
 
+// PublicAssetJSONResponse contains the raw HTTP response and any decoded response body.
 type PublicAssetJSONResponse PublicAsset
 
+// PublicServiceJSONResponse contains the raw HTTP response and any decoded response body.
 type PublicServiceJSONResponse PublicService
 
+// QuotaExceededResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type QuotaExceededResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// QuotaExceededJSONResponse contains the raw HTTP response and any decoded response body.
 type QuotaExceededJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers QuotaExceededResponseHeaders
 }
 
+// RateLimitedResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type RateLimitedResponseHeaders struct {
+	// RetryAfter carries the generated retry after value for RateLimitedResponseHeaders.
 	RetryAfter int
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// RateLimitedJSONResponse contains the raw HTTP response and any decoded response body.
 type RateLimitedJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers RateLimitedResponseHeaders
 }
 
+// RepositoryResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type RepositoryResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// RepositoryJSONResponse contains the raw HTTP response and any decoded response body.
 type RepositoryJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body Repository
 
+	// Headers contains the headers declared for this response.
 	Headers RepositoryResponseHeaders
 }
 
+// RepositoryPageJSONResponse contains the raw HTTP response and any decoded response body.
 type RepositoryPageJSONResponse RepositoryPage
 
+// ReviewContextJSONResponse contains the raw HTTP response and any decoded response body.
 type ReviewContextJSONResponse ReviewContext
 
+// ReviewPageJSONResponse contains the raw HTTP response and any decoded response body.
 type ReviewPageJSONResponse ReviewPage
 
+// RevisionReviewResultJSONResponse contains the raw HTTP response and any decoded response body.
 type RevisionReviewResultJSONResponse RevisionReviewResult
 
+// SearchResultJSONResponse contains the raw HTTP response and any decoded response body.
 type SearchResultJSONResponse SearchResult
 
+// ServiceResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ServiceResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// ServiceJSONResponse contains the raw HTTP response and any decoded response body.
 type ServiceJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body Service
 
+	// Headers contains the headers declared for this response.
 	Headers ServiceResponseHeaders
 }
 
+// ServiceAccessJSONResponse contains the raw HTTP response and any decoded response body.
 type ServiceAccessJSONResponse ServiceAccess
 
+// ServiceListJSONResponse contains the raw HTTP response and any decoded response body.
 type ServiceListJSONResponse ServiceList
 
+// ServicePageJSONResponse contains the raw HTTP response and any decoded response body.
 type ServicePageJSONResponse ServicePage
 
+// ShareLinkCreatedJSONResponse contains the raw HTTP response and any decoded response body.
 type ShareLinkCreatedJSONResponse ShareLinkCreated
 
+// ShareLinkPageJSONResponse contains the raw HTTP response and any decoded response body.
 type ShareLinkPageJSONResponse ShareLinkPage
 
+// SharedViewJSONResponse contains the raw HTTP response and any decoded response body.
 type SharedViewJSONResponse SharedView
 
+// SourceBindingListJSONResponse contains the raw HTTP response and any decoded response body.
 type SourceBindingListJSONResponse SourceBindingList
 
+// SourceSpecResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type SourceSpecResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// SourceSpecJSONResponse contains the raw HTTP response and any decoded response body.
 type SourceSpecJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body SourceSpec
 
+	// Headers contains the headers declared for this response.
 	Headers SourceSpecResponseHeaders
 }
 
+// SourceSpecListJSONResponse contains the raw HTTP response and any decoded response body.
 type SourceSpecListJSONResponse SourceSpecList
 
+// StarStateJSONResponse contains the raw HTTP response and any decoded response body.
 type StarStateJSONResponse StarState
 
+// SubscriptionJSONResponse contains the raw HTTP response and any decoded response body.
 type SubscriptionJSONResponse Subscription
 
+// SubscriptionListJSONResponse contains the raw HTTP response and any decoded response body.
 type SubscriptionListJSONResponse SubscriptionList
 
+// SystemGroupResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type SystemGroupResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// SystemGroupJSONResponse contains the raw HTTP response and any decoded response body.
 type SystemGroupJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body SystemGroup
 
+	// Headers contains the headers declared for this response.
 	Headers SystemGroupResponseHeaders
 }
 
+// SystemGroupListJSONResponse contains the raw HTTP response and any decoded response body.
 type SystemGroupListJSONResponse SystemGroupList
 
+// TagResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TagResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// TagJSONResponse contains the raw HTTP response and any decoded response body.
 type TagJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body Tag
 
+	// Headers contains the headers declared for this response.
 	Headers TagResponseHeaders
 }
 
+// TagListJSONResponse contains the raw HTTP response and any decoded response body.
 type TagListJSONResponse TagList
 
+// TeamResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TeamResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// TeamJSONResponse contains the raw HTTP response and any decoded response body.
 type TeamJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body Team
 
+	// Headers contains the headers declared for this response.
 	Headers TeamResponseHeaders
 }
 
+// TeamPageJSONResponse contains the raw HTTP response and any decoded response body.
 type TeamPageJSONResponse TeamPage
 
+// TenantResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TenantResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// TenantJSONResponse contains the raw HTTP response and any decoded response body.
 type TenantJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body Tenant
 
+	// Headers contains the headers declared for this response.
 	Headers TenantResponseHeaders
 }
 
+// TenantDeletionAcceptedResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TenantDeletionAcceptedResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// TenantDeletionAcceptedJSONResponse contains the raw HTTP response and any decoded response body.
 type TenantDeletionAcceptedJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body TenantDeletionAccepted
 
+	// Headers contains the headers declared for this response.
 	Headers TenantDeletionAcceptedResponseHeaders
 }
 
+// TenantPageJSONResponse contains the raw HTTP response and any decoded response body.
 type TenantPageJSONResponse TenantPage
 
+// TenantSettingsResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TenantSettingsResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// TenantSettingsJSONResponse contains the raw HTTP response and any decoded response body.
 type TenantSettingsJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body TenantSettings
 
+	// Headers contains the headers declared for this response.
 	Headers TenantSettingsResponseHeaders
 }
 
+// TokenCreatedJSONResponse contains the raw HTTP response and any decoded response body.
 type TokenCreatedJSONResponse TokenCreated
 
+// TokenPageJSONResponse contains the raw HTTP response and any decoded response body.
 type TokenPageJSONResponse TokenPage
 
+// UnauthenticatedResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type UnauthenticatedResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// UnauthenticatedJSONResponse contains the raw HTTP response and any decoded response body.
 type UnauthenticatedJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers UnauthenticatedResponseHeaders
 }
 
+// UploadJSONResponse contains the raw HTTP response and any decoded response body.
 type UploadJSONResponse Upload
 
+// UserResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type UserResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// UserJSONResponse contains the raw HTTP response and any decoded response body.
 type UserJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body User
 
+	// Headers contains the headers declared for this response.
 	Headers UserResponseHeaders
 }
 
+// UserPageJSONResponse contains the raw HTTP response and any decoded response body.
 type UserPageJSONResponse UserPage
 
+// UserPreferencesResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type UserPreferencesResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// UserPreferencesJSONResponse contains the raw HTTP response and any decoded response body.
 type UserPreferencesJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body UserPreferences
 
+	// Headers contains the headers declared for this response.
 	Headers UserPreferencesResponseHeaders
 }
 
+// ValidationErrorResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ValidationErrorResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
+
+// ValidationErrorJSONResponse contains the raw HTTP response and any decoded response body.
 type ValidationErrorJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ErrorResponse
 
+	// Headers contains the headers declared for this response.
 	Headers ValidationErrorResponseHeaders
 }
 
+// ViewListJSONResponse contains the raw HTTP response and any decoded response body.
 type ViewListJSONResponse ViewList
 
+// ViewOverrideResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ViewOverrideResponseHeaders struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
+
+// ViewOverrideJSONResponse contains the raw HTTP response and any decoded response body.
 type ViewOverrideJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body ViewOverride
 
+	// Headers contains the headers declared for this response.
 	Headers ViewOverrideResponseHeaders
 }
 
+// ViewOverrideListJSONResponse contains the raw HTTP response and any decoded response body.
 type ViewOverrideListJSONResponse ViewOverrideList
 
+// ViewResolutionJSONResponse contains the raw HTTP response and any decoded response body.
 type ViewResolutionJSONResponse ViewResolution
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t ViewResolutionJSONResponse) MarshalJSON() ([]byte, error) {
 	return ViewResolution(t).MarshalJSON()
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *ViewResolutionJSONResponse) UnmarshalJSON(b []byte) error {
 	return (*ViewResolution)(t).UnmarshalJSON(b)
 }
 
+// ListPlatformAuditLogsRequestObject contains validated inputs for its OpenAPI operation.
 type ListPlatformAuditLogsRequestObject struct {
+	// Params contains the validated parameters for this request.
 	Params ListPlatformAuditLogsParams
 }
 
+// ListPlatformAuditLogsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListPlatformAuditLogsResponseObject interface {
+	// VisitListPlatformAuditLogsResponse carries the generated visit list platform audit logs response value for ListPlatformAuditLogsResponseObject.
 	VisitListPlatformAuditLogsResponse(w http.ResponseWriter) error
 }
 
+// ListPlatformAuditLogs200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListPlatformAuditLogs200JSONResponse struct{ AuditLogPageJSONResponse }
 
+// VisitListPlatformAuditLogsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListPlatformAuditLogs200JSONResponse) VisitListPlatformAuditLogsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10764,8 +11483,10 @@ func (response ListPlatformAuditLogs200JSONResponse) VisitListPlatformAuditLogsR
 	return err
 }
 
+// ListPlatformAuditLogs404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListPlatformAuditLogs404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListPlatformAuditLogsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListPlatformAuditLogs404JSONResponse) VisitListPlatformAuditLogsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10779,18 +11500,24 @@ func (response ListPlatformAuditLogs404JSONResponse) VisitListPlatformAuditLogsR
 	return err
 }
 
+// ListGlobalCredentialsRequestObject contains validated inputs for its OpenAPI operation.
 type ListGlobalCredentialsRequestObject struct {
+	// Params contains the validated parameters for this request.
 	Params ListGlobalCredentialsParams
 }
 
+// ListGlobalCredentialsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListGlobalCredentialsResponseObject interface {
+	// VisitListGlobalCredentialsResponse carries the generated visit list global credentials response value for ListGlobalCredentialsResponseObject.
 	VisitListGlobalCredentialsResponse(w http.ResponseWriter) error
 }
 
+// ListGlobalCredentials200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListGlobalCredentials200JSONResponse struct {
 	GlobalCredentialPageJSONResponse
 }
 
+// VisitListGlobalCredentialsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListGlobalCredentials200JSONResponse) VisitListGlobalCredentialsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10803,16 +11530,22 @@ func (response ListGlobalCredentials200JSONResponse) VisitListGlobalCredentialsR
 	return err
 }
 
+// CreateGlobalCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type CreateGlobalCredentialRequestObject struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body *CreateGlobalCredentialJSONRequestBody
 }
 
+// CreateGlobalCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateGlobalCredentialResponseObject interface {
+	// VisitCreateGlobalCredentialResponse carries the generated visit create global credential response value for CreateGlobalCredentialResponseObject.
 	VisitCreateGlobalCredentialResponse(w http.ResponseWriter) error
 }
 
+// CreateGlobalCredential201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateGlobalCredential201JSONResponse struct{ GlobalCredentialJSONResponse }
 
+// VisitCreateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateGlobalCredential201JSONResponse) VisitCreateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10826,8 +11559,10 @@ func (response CreateGlobalCredential201JSONResponse) VisitCreateGlobalCredentia
 	return err
 }
 
+// CreateGlobalCredential409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateGlobalCredential409JSONResponse struct{ DuplicateJSONResponse }
 
+// VisitCreateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateGlobalCredential409JSONResponse) VisitCreateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10841,8 +11576,10 @@ func (response CreateGlobalCredential409JSONResponse) VisitCreateGlobalCredentia
 	return err
 }
 
+// CreateGlobalCredential422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateGlobalCredential422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitCreateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateGlobalCredential422JSONResponse) VisitCreateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10856,25 +11593,34 @@ func (response CreateGlobalCredential422JSONResponse) VisitCreateGlobalCredentia
 	return err
 }
 
+// DeleteGlobalCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteGlobalCredentialRequestObject struct {
+	// CredentialId carries the generated credential id value for DeleteGlobalCredentialRequestObject.
 	CredentialId CredentialId `json:"credentialId"`
-	Params       DeleteGlobalCredentialParams
+	// Params contains the validated parameters for this request.
+	Params DeleteGlobalCredentialParams
 }
 
+// DeleteGlobalCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteGlobalCredentialResponseObject interface {
+	// VisitDeleteGlobalCredentialResponse carries the generated visit delete global credential response value for DeleteGlobalCredentialResponseObject.
 	VisitDeleteGlobalCredentialResponse(w http.ResponseWriter) error
 }
 
+// DeleteGlobalCredential204Response contains the raw HTTP response and any decoded response body.
 type DeleteGlobalCredential204Response struct {
 }
 
+// VisitDeleteGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteGlobalCredential204Response) VisitDeleteGlobalCredentialResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteGlobalCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteGlobalCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteGlobalCredential404JSONResponse) VisitDeleteGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10888,8 +11634,10 @@ func (response DeleteGlobalCredential404JSONResponse) VisitDeleteGlobalCredentia
 	return err
 }
 
+// DeleteGlobalCredential409JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteGlobalCredential409JSONResponse struct{ CredentialInUseJSONResponse }
 
+// VisitDeleteGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteGlobalCredential409JSONResponse) VisitDeleteGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10903,8 +11651,10 @@ func (response DeleteGlobalCredential409JSONResponse) VisitDeleteGlobalCredentia
 	return err
 }
 
+// DeleteGlobalCredential412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteGlobalCredential412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteGlobalCredential412JSONResponse) VisitDeleteGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10918,18 +11668,26 @@ func (response DeleteGlobalCredential412JSONResponse) VisitDeleteGlobalCredentia
 	return err
 }
 
+// UpdateGlobalCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateGlobalCredentialRequestObject struct {
+	// CredentialId carries the generated credential id value for UpdateGlobalCredentialRequestObject.
 	CredentialId CredentialId `json:"credentialId"`
-	Params       UpdateGlobalCredentialParams
-	Body         *UpdateGlobalCredentialJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params UpdateGlobalCredentialParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateGlobalCredentialJSONRequestBody
 }
 
+// UpdateGlobalCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateGlobalCredentialResponseObject interface {
+	// VisitUpdateGlobalCredentialResponse carries the generated visit update global credential response value for UpdateGlobalCredentialResponseObject.
 	VisitUpdateGlobalCredentialResponse(w http.ResponseWriter) error
 }
 
+// UpdateGlobalCredential200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateGlobalCredential200JSONResponse struct{ GlobalCredentialJSONResponse }
 
+// VisitUpdateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateGlobalCredential200JSONResponse) VisitUpdateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10943,8 +11701,10 @@ func (response UpdateGlobalCredential200JSONResponse) VisitUpdateGlobalCredentia
 	return err
 }
 
+// UpdateGlobalCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateGlobalCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateGlobalCredential404JSONResponse) VisitUpdateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10958,8 +11718,10 @@ func (response UpdateGlobalCredential404JSONResponse) VisitUpdateGlobalCredentia
 	return err
 }
 
+// UpdateGlobalCredential412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateGlobalCredential412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateGlobalCredential412JSONResponse) VisitUpdateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -10973,20 +11735,28 @@ func (response UpdateGlobalCredential412JSONResponse) VisitUpdateGlobalCredentia
 	return err
 }
 
+// RotateGlobalCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type RotateGlobalCredentialRequestObject struct {
+	// CredentialId carries the generated credential id value for RotateGlobalCredentialRequestObject.
 	CredentialId CredentialId `json:"credentialId"`
-	Params       RotateGlobalCredentialParams
-	Body         *RotateGlobalCredentialJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params RotateGlobalCredentialParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *RotateGlobalCredentialJSONRequestBody
 }
 
+// RotateGlobalCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type RotateGlobalCredentialResponseObject interface {
+	// VisitRotateGlobalCredentialResponse carries the generated visit rotate global credential response value for RotateGlobalCredentialResponseObject.
 	VisitRotateGlobalCredentialResponse(w http.ResponseWriter) error
 }
 
+// RotateGlobalCredential200JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateGlobalCredential200JSONResponse struct {
 	GlobalCredentialRotationJSONResponse
 }
 
+// VisitRotateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateGlobalCredential200JSONResponse) VisitRotateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11000,8 +11770,10 @@ func (response RotateGlobalCredential200JSONResponse) VisitRotateGlobalCredentia
 	return err
 }
 
+// RotateGlobalCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateGlobalCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRotateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateGlobalCredential404JSONResponse) VisitRotateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11015,8 +11787,10 @@ func (response RotateGlobalCredential404JSONResponse) VisitRotateGlobalCredentia
 	return err
 }
 
+// RotateGlobalCredential409JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateGlobalCredential409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitRotateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateGlobalCredential409JSONResponse) VisitRotateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11030,8 +11804,10 @@ func (response RotateGlobalCredential409JSONResponse) VisitRotateGlobalCredentia
 	return err
 }
 
+// RotateGlobalCredential412JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateGlobalCredential412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitRotateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateGlobalCredential412JSONResponse) VisitRotateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11045,8 +11821,10 @@ func (response RotateGlobalCredential412JSONResponse) VisitRotateGlobalCredentia
 	return err
 }
 
+// RotateGlobalCredential422JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateGlobalCredential422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitRotateGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateGlobalCredential422JSONResponse) VisitRotateGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11060,17 +11838,24 @@ func (response RotateGlobalCredential422JSONResponse) VisitRotateGlobalCredentia
 	return err
 }
 
+// TestGlobalCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type TestGlobalCredentialRequestObject struct {
+	// CredentialId carries the generated credential id value for TestGlobalCredentialRequestObject.
 	CredentialId CredentialId `json:"credentialId"`
-	Body         *TestGlobalCredentialJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *TestGlobalCredentialJSONRequestBody
 }
 
+// TestGlobalCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type TestGlobalCredentialResponseObject interface {
+	// VisitTestGlobalCredentialResponse carries the generated visit test global credential response value for TestGlobalCredentialResponseObject.
 	VisitTestGlobalCredentialResponse(w http.ResponseWriter) error
 }
 
+// TestGlobalCredential200JSONResponse contains the raw HTTP response and any decoded response body.
 type TestGlobalCredential200JSONResponse struct{ ConnectionTestJSONResponse }
 
+// VisitTestGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response TestGlobalCredential200JSONResponse) VisitTestGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11083,8 +11868,10 @@ func (response TestGlobalCredential200JSONResponse) VisitTestGlobalCredentialRes
 	return err
 }
 
+// TestGlobalCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type TestGlobalCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitTestGlobalCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response TestGlobalCredential404JSONResponse) VisitTestGlobalCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11098,16 +11885,22 @@ func (response TestGlobalCredential404JSONResponse) VisitTestGlobalCredentialRes
 	return err
 }
 
+// ListPlatformJobsRequestObject contains validated inputs for its OpenAPI operation.
 type ListPlatformJobsRequestObject struct {
+	// Params contains the validated parameters for this request.
 	Params ListPlatformJobsParams
 }
 
+// ListPlatformJobsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListPlatformJobsResponseObject interface {
+	// VisitListPlatformJobsResponse carries the generated visit list platform jobs response value for ListPlatformJobsResponseObject.
 	VisitListPlatformJobsResponse(w http.ResponseWriter) error
 }
 
+// ListPlatformJobs200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListPlatformJobs200JSONResponse struct{ PlatformJobPageJSONResponse }
 
+// VisitListPlatformJobsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListPlatformJobs200JSONResponse) VisitListPlatformJobsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11120,8 +11913,10 @@ func (response ListPlatformJobs200JSONResponse) VisitListPlatformJobsResponse(w 
 	return err
 }
 
+// ListPlatformJobs404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListPlatformJobs404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListPlatformJobsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListPlatformJobs404JSONResponse) VisitListPlatformJobsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11135,16 +11930,22 @@ func (response ListPlatformJobs404JSONResponse) VisitListPlatformJobsResponse(w 
 	return err
 }
 
+// GetPlatformJobRequestObject contains validated inputs for its OpenAPI operation.
 type GetPlatformJobRequestObject struct {
+	// JobId carries the generated job id value for GetPlatformJobRequestObject.
 	JobId JobId `json:"jobId"`
 }
 
+// GetPlatformJobResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetPlatformJobResponseObject interface {
+	// VisitGetPlatformJobResponse carries the generated visit get platform job response value for GetPlatformJobResponseObject.
 	VisitGetPlatformJobResponse(w http.ResponseWriter) error
 }
 
+// GetPlatformJob200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetPlatformJob200JSONResponse struct{ PlatformJobJSONResponse }
 
+// VisitGetPlatformJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetPlatformJob200JSONResponse) VisitGetPlatformJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11157,8 +11958,10 @@ func (response GetPlatformJob200JSONResponse) VisitGetPlatformJobResponse(w http
 	return err
 }
 
+// GetPlatformJob404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetPlatformJob404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetPlatformJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetPlatformJob404JSONResponse) VisitGetPlatformJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11172,18 +11975,24 @@ func (response GetPlatformJob404JSONResponse) VisitGetPlatformJobResponse(w http
 	return err
 }
 
+// ListProducerProfilesRequestObject contains validated inputs for its OpenAPI operation.
 type ListProducerProfilesRequestObject struct {
+	// Params contains the validated parameters for this request.
 	Params ListProducerProfilesParams
 }
 
+// ListProducerProfilesResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListProducerProfilesResponseObject interface {
+	// VisitListProducerProfilesResponse carries the generated visit list producer profiles response value for ListProducerProfilesResponseObject.
 	VisitListProducerProfilesResponse(w http.ResponseWriter) error
 }
 
+// ListProducerProfiles200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListProducerProfiles200JSONResponse struct {
 	ProducerProfilePageJSONResponse
 }
 
+// VisitListProducerProfilesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListProducerProfiles200JSONResponse) VisitListProducerProfilesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11196,16 +12005,22 @@ func (response ListProducerProfiles200JSONResponse) VisitListProducerProfilesRes
 	return err
 }
 
+// CreateProducerProfileRequestObject contains validated inputs for its OpenAPI operation.
 type CreateProducerProfileRequestObject struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body *CreateProducerProfileJSONRequestBody
 }
 
+// CreateProducerProfileResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateProducerProfileResponseObject interface {
+	// VisitCreateProducerProfileResponse carries the generated visit create producer profile response value for CreateProducerProfileResponseObject.
 	VisitCreateProducerProfileResponse(w http.ResponseWriter) error
 }
 
+// CreateProducerProfile201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateProducerProfile201JSONResponse struct{ ProducerProfileJSONResponse }
 
+// VisitCreateProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateProducerProfile201JSONResponse) VisitCreateProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11219,8 +12034,10 @@ func (response CreateProducerProfile201JSONResponse) VisitCreateProducerProfileR
 	return err
 }
 
+// CreateProducerProfile409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateProducerProfile409JSONResponse struct{ DuplicateJSONResponse }
 
+// VisitCreateProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateProducerProfile409JSONResponse) VisitCreateProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11234,8 +12051,10 @@ func (response CreateProducerProfile409JSONResponse) VisitCreateProducerProfileR
 	return err
 }
 
+// CreateProducerProfile422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateProducerProfile422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitCreateProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateProducerProfile422JSONResponse) VisitCreateProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11249,25 +12068,34 @@ func (response CreateProducerProfile422JSONResponse) VisitCreateProducerProfileR
 	return err
 }
 
+// DeleteProducerProfileRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteProducerProfileRequestObject struct {
+	// ProducerProfileId carries the generated producer profile id value for DeleteProducerProfileRequestObject.
 	ProducerProfileId ProducerProfileId `json:"producerProfileId"`
-	Params            DeleteProducerProfileParams
+	// Params contains the validated parameters for this request.
+	Params DeleteProducerProfileParams
 }
 
+// DeleteProducerProfileResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteProducerProfileResponseObject interface {
+	// VisitDeleteProducerProfileResponse carries the generated visit delete producer profile response value for DeleteProducerProfileResponseObject.
 	VisitDeleteProducerProfileResponse(w http.ResponseWriter) error
 }
 
+// DeleteProducerProfile204Response contains the raw HTTP response and any decoded response body.
 type DeleteProducerProfile204Response struct {
 }
 
+// VisitDeleteProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteProducerProfile204Response) VisitDeleteProducerProfileResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteProducerProfile404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteProducerProfile404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteProducerProfile404JSONResponse) VisitDeleteProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11281,8 +12109,10 @@ func (response DeleteProducerProfile404JSONResponse) VisitDeleteProducerProfileR
 	return err
 }
 
+// DeleteProducerProfile409JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteProducerProfile409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitDeleteProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteProducerProfile409JSONResponse) VisitDeleteProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11296,8 +12126,10 @@ func (response DeleteProducerProfile409JSONResponse) VisitDeleteProducerProfileR
 	return err
 }
 
+// DeleteProducerProfile412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteProducerProfile412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteProducerProfile412JSONResponse) VisitDeleteProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11311,16 +12143,22 @@ func (response DeleteProducerProfile412JSONResponse) VisitDeleteProducerProfileR
 	return err
 }
 
+// GetProducerProfileRequestObject contains validated inputs for its OpenAPI operation.
 type GetProducerProfileRequestObject struct {
+	// ProducerProfileId carries the generated producer profile id value for GetProducerProfileRequestObject.
 	ProducerProfileId ProducerProfileId `json:"producerProfileId"`
 }
 
+// GetProducerProfileResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetProducerProfileResponseObject interface {
+	// VisitGetProducerProfileResponse carries the generated visit get producer profile response value for GetProducerProfileResponseObject.
 	VisitGetProducerProfileResponse(w http.ResponseWriter) error
 }
 
+// GetProducerProfile200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetProducerProfile200JSONResponse struct{ ProducerProfileJSONResponse }
 
+// VisitGetProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetProducerProfile200JSONResponse) VisitGetProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11334,8 +12172,10 @@ func (response GetProducerProfile200JSONResponse) VisitGetProducerProfileRespons
 	return err
 }
 
+// GetProducerProfile404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetProducerProfile404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetProducerProfile404JSONResponse) VisitGetProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11349,18 +12189,26 @@ func (response GetProducerProfile404JSONResponse) VisitGetProducerProfileRespons
 	return err
 }
 
+// UpdateProducerProfileRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateProducerProfileRequestObject struct {
+	// ProducerProfileId carries the generated producer profile id value for UpdateProducerProfileRequestObject.
 	ProducerProfileId ProducerProfileId `json:"producerProfileId"`
-	Params            UpdateProducerProfileParams
-	Body              *UpdateProducerProfileJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params UpdateProducerProfileParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateProducerProfileJSONRequestBody
 }
 
+// UpdateProducerProfileResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateProducerProfileResponseObject interface {
+	// VisitUpdateProducerProfileResponse carries the generated visit update producer profile response value for UpdateProducerProfileResponseObject.
 	VisitUpdateProducerProfileResponse(w http.ResponseWriter) error
 }
 
+// UpdateProducerProfile200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateProducerProfile200JSONResponse struct{ ProducerProfileJSONResponse }
 
+// VisitUpdateProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateProducerProfile200JSONResponse) VisitUpdateProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11374,8 +12222,10 @@ func (response UpdateProducerProfile200JSONResponse) VisitUpdateProducerProfileR
 	return err
 }
 
+// UpdateProducerProfile404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateProducerProfile404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateProducerProfile404JSONResponse) VisitUpdateProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11389,8 +12239,10 @@ func (response UpdateProducerProfile404JSONResponse) VisitUpdateProducerProfileR
 	return err
 }
 
+// UpdateProducerProfile412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateProducerProfile412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateProducerProfileResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateProducerProfile412JSONResponse) VisitUpdateProducerProfileResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11404,15 +12256,20 @@ func (response UpdateProducerProfile412JSONResponse) VisitUpdateProducerProfileR
 	return err
 }
 
+// GetPlatformSettingsRequestObject contains validated inputs for its OpenAPI operation.
 type GetPlatformSettingsRequestObject struct {
 }
 
+// GetPlatformSettingsResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetPlatformSettingsResponseObject interface {
+	// VisitGetPlatformSettingsResponse carries the generated visit get platform settings response value for GetPlatformSettingsResponseObject.
 	VisitGetPlatformSettingsResponse(w http.ResponseWriter) error
 }
 
+// GetPlatformSettings200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetPlatformSettings200JSONResponse struct{ PlatformSettingsJSONResponse }
 
+// VisitGetPlatformSettingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetPlatformSettings200JSONResponse) VisitGetPlatformSettingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11426,17 +12283,24 @@ func (response GetPlatformSettings200JSONResponse) VisitGetPlatformSettingsRespo
 	return err
 }
 
+// UpdatePlatformSettingsRequestObject contains validated inputs for its OpenAPI operation.
 type UpdatePlatformSettingsRequestObject struct {
+	// Params contains the validated parameters for this request.
 	Params UpdatePlatformSettingsParams
-	Body   *UpdatePlatformSettingsJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdatePlatformSettingsJSONRequestBody
 }
 
+// UpdatePlatformSettingsResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdatePlatformSettingsResponseObject interface {
+	// VisitUpdatePlatformSettingsResponse carries the generated visit update platform settings response value for UpdatePlatformSettingsResponseObject.
 	VisitUpdatePlatformSettingsResponse(w http.ResponseWriter) error
 }
 
+// UpdatePlatformSettings200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdatePlatformSettings200JSONResponse struct{ PlatformSettingsJSONResponse }
 
+// VisitUpdatePlatformSettingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdatePlatformSettings200JSONResponse) VisitUpdatePlatformSettingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11450,8 +12314,10 @@ func (response UpdatePlatformSettings200JSONResponse) VisitUpdatePlatformSetting
 	return err
 }
 
+// UpdatePlatformSettings412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdatePlatformSettings412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdatePlatformSettingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdatePlatformSettings412JSONResponse) VisitUpdatePlatformSettingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11465,16 +12331,22 @@ func (response UpdatePlatformSettings412JSONResponse) VisitUpdatePlatformSetting
 	return err
 }
 
+// ListTenantsRequestObject contains validated inputs for its OpenAPI operation.
 type ListTenantsRequestObject struct {
+	// Params contains the validated parameters for this request.
 	Params ListTenantsParams
 }
 
+// ListTenantsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListTenantsResponseObject interface {
+	// VisitListTenantsResponse carries the generated visit list tenants response value for ListTenantsResponseObject.
 	VisitListTenantsResponse(w http.ResponseWriter) error
 }
 
+// ListTenants200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTenants200JSONResponse struct{ TenantPageJSONResponse }
 
+// VisitListTenantsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTenants200JSONResponse) VisitListTenantsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11487,16 +12359,22 @@ func (response ListTenants200JSONResponse) VisitListTenantsResponse(w http.Respo
 	return err
 }
 
+// CreateTenantRequestObject contains validated inputs for its OpenAPI operation.
 type CreateTenantRequestObject struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body *CreateTenantJSONRequestBody
 }
 
+// CreateTenantResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateTenantResponseObject interface {
+	// VisitCreateTenantResponse carries the generated visit create tenant response value for CreateTenantResponseObject.
 	VisitCreateTenantResponse(w http.ResponseWriter) error
 }
 
+// CreateTenant201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTenant201JSONResponse struct{ TenantJSONResponse }
 
+// VisitCreateTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTenant201JSONResponse) VisitCreateTenantResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11510,8 +12388,10 @@ func (response CreateTenant201JSONResponse) VisitCreateTenantResponse(w http.Res
 	return err
 }
 
+// CreateTenant409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTenant409JSONResponse struct{ DuplicateJSONResponse }
 
+// VisitCreateTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTenant409JSONResponse) VisitCreateTenantResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11525,20 +12405,28 @@ func (response CreateTenant409JSONResponse) VisitCreateTenantResponse(w http.Res
 	return err
 }
 
+// DeleteTenantRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteTenantRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteTenantRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     DeleteTenantParams
-	Body       *DeleteTenantJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params DeleteTenantParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *DeleteTenantJSONRequestBody
 }
 
+// DeleteTenantResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteTenantResponseObject interface {
+	// VisitDeleteTenantResponse carries the generated visit delete tenant response value for DeleteTenantResponseObject.
 	VisitDeleteTenantResponse(w http.ResponseWriter) error
 }
 
+// DeleteTenant202JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTenant202JSONResponse struct {
 	TenantDeletionAcceptedJSONResponse
 }
 
+// VisitDeleteTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTenant202JSONResponse) VisitDeleteTenantResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11552,8 +12440,10 @@ func (response DeleteTenant202JSONResponse) VisitDeleteTenantResponse(w http.Res
 	return err
 }
 
+// DeleteTenant404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTenant404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTenant404JSONResponse) VisitDeleteTenantResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11567,8 +12457,10 @@ func (response DeleteTenant404JSONResponse) VisitDeleteTenantResponse(w http.Res
 	return err
 }
 
+// DeleteTenant412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTenant412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTenant412JSONResponse) VisitDeleteTenantResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11582,18 +12474,26 @@ func (response DeleteTenant412JSONResponse) VisitDeleteTenantResponse(w http.Res
 	return err
 }
 
+// UpdateTenantRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateTenantRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateTenantRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     UpdateTenantParams
-	Body       *UpdateTenantJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params UpdateTenantParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateTenantJSONRequestBody
 }
 
+// UpdateTenantResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateTenantResponseObject interface {
+	// VisitUpdateTenantResponse carries the generated visit update tenant response value for UpdateTenantResponseObject.
 	VisitUpdateTenantResponse(w http.ResponseWriter) error
 }
 
+// UpdateTenant200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTenant200JSONResponse struct{ TenantJSONResponse }
 
+// VisitUpdateTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTenant200JSONResponse) VisitUpdateTenantResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11607,8 +12507,10 @@ func (response UpdateTenant200JSONResponse) VisitUpdateTenantResponse(w http.Res
 	return err
 }
 
+// UpdateTenant404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTenant404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTenant404JSONResponse) VisitUpdateTenantResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11622,8 +12524,10 @@ func (response UpdateTenant404JSONResponse) VisitUpdateTenantResponse(w http.Res
 	return err
 }
 
+// UpdateTenant412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTenant412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTenant412JSONResponse) VisitUpdateTenantResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11637,18 +12541,26 @@ func (response UpdateTenant412JSONResponse) VisitUpdateTenantResponse(w http.Res
 	return err
 }
 
+// PutTenantMemberAsPlatformAdminRequestObject contains validated inputs for its OpenAPI operation.
 type PutTenantMemberAsPlatformAdminRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for PutTenantMemberAsPlatformAdminRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	UserId     UserId     `json:"userId"`
-	Body       *PutTenantMemberAsPlatformAdminJSONRequestBody
+	// UserId carries the generated user id value for PutTenantMemberAsPlatformAdminRequestObject.
+	UserId UserId `json:"userId"`
+	// Body contains the decoded or raw HTTP response body.
+	Body *PutTenantMemberAsPlatformAdminJSONRequestBody
 }
 
+// PutTenantMemberAsPlatformAdminResponseObject is implemented by every declared response for its OpenAPI operation.
 type PutTenantMemberAsPlatformAdminResponseObject interface {
+	// VisitPutTenantMemberAsPlatformAdminResponse carries the generated visit put tenant member as platform admin response value for PutTenantMemberAsPlatformAdminResponseObject.
 	VisitPutTenantMemberAsPlatformAdminResponse(w http.ResponseWriter) error
 }
 
+// PutTenantMemberAsPlatformAdmin200JSONResponse contains the raw HTTP response and any decoded response body.
 type PutTenantMemberAsPlatformAdmin200JSONResponse struct{ MemberJSONResponse }
 
+// VisitPutTenantMemberAsPlatformAdminResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutTenantMemberAsPlatformAdmin200JSONResponse) VisitPutTenantMemberAsPlatformAdminResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11661,8 +12573,10 @@ func (response PutTenantMemberAsPlatformAdmin200JSONResponse) VisitPutTenantMemb
 	return err
 }
 
+// PutTenantMemberAsPlatformAdmin404JSONResponse contains the raw HTTP response and any decoded response body.
 type PutTenantMemberAsPlatformAdmin404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPutTenantMemberAsPlatformAdminResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutTenantMemberAsPlatformAdmin404JSONResponse) VisitPutTenantMemberAsPlatformAdminResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11676,16 +12590,22 @@ func (response PutTenantMemberAsPlatformAdmin404JSONResponse) VisitPutTenantMemb
 	return err
 }
 
+// ListUsersRequestObject contains validated inputs for its OpenAPI operation.
 type ListUsersRequestObject struct {
+	// Params contains the validated parameters for this request.
 	Params ListUsersParams
 }
 
+// ListUsersResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListUsersResponseObject interface {
+	// VisitListUsersResponse carries the generated visit list users response value for ListUsersResponseObject.
 	VisitListUsersResponse(w http.ResponseWriter) error
 }
 
+// ListUsers200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListUsers200JSONResponse struct{ UserPageJSONResponse }
 
+// VisitListUsersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListUsers200JSONResponse) VisitListUsersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11698,8 +12618,10 @@ func (response ListUsers200JSONResponse) VisitListUsersResponse(w http.ResponseW
 	return err
 }
 
+// ListUsers404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListUsers404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListUsersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListUsers404JSONResponse) VisitListUsersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11713,16 +12635,22 @@ func (response ListUsers404JSONResponse) VisitListUsersResponse(w http.ResponseW
 	return err
 }
 
+// CreateUserRequestObject contains validated inputs for its OpenAPI operation.
 type CreateUserRequestObject struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body *CreateUserJSONRequestBody
 }
 
+// CreateUserResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateUserResponseObject interface {
+	// VisitCreateUserResponse carries the generated visit create user response value for CreateUserResponseObject.
 	VisitCreateUserResponse(w http.ResponseWriter) error
 }
 
+// CreateUser201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateUser201JSONResponse struct{ UserJSONResponse }
 
+// VisitCreateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateUser201JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11736,8 +12664,10 @@ func (response CreateUser201JSONResponse) VisitCreateUserResponse(w http.Respons
 	return err
 }
 
+// CreateUser409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateUser409JSONResponse struct{ DuplicateJSONResponse }
 
+// VisitCreateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateUser409JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11751,8 +12681,10 @@ func (response CreateUser409JSONResponse) VisitCreateUserResponse(w http.Respons
 	return err
 }
 
+// CreateUser422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateUser422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitCreateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateUser422JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11766,18 +12698,26 @@ func (response CreateUser422JSONResponse) VisitCreateUserResponse(w http.Respons
 	return err
 }
 
+// UpdateUserRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateUserRequestObject struct {
+	// UserId carries the generated user id value for UpdateUserRequestObject.
 	UserId UserId `json:"userId"`
+	// Params contains the validated parameters for this request.
 	Params UpdateUserParams
-	Body   *UpdateUserJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateUserJSONRequestBody
 }
 
+// UpdateUserResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateUserResponseObject interface {
+	// VisitUpdateUserResponse carries the generated visit update user response value for UpdateUserResponseObject.
 	VisitUpdateUserResponse(w http.ResponseWriter) error
 }
 
+// UpdateUser200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateUser200JSONResponse struct{ UserJSONResponse }
 
+// VisitUpdateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateUser200JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11791,8 +12731,10 @@ func (response UpdateUser200JSONResponse) VisitUpdateUserResponse(w http.Respons
 	return err
 }
 
+// UpdateUser404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateUser404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateUser404JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11806,8 +12748,10 @@ func (response UpdateUser404JSONResponse) VisitUpdateUserResponse(w http.Respons
 	return err
 }
 
+// UpdateUser412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateUser412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateUser412JSONResponse) VisitUpdateUserResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11821,15 +12765,20 @@ func (response UpdateUser412JSONResponse) VisitUpdateUserResponse(w http.Respons
 	return err
 }
 
+// GetCsrfTokenRequestObject contains validated inputs for its OpenAPI operation.
 type GetCsrfTokenRequestObject struct {
 }
 
+// GetCsrfTokenResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetCsrfTokenResponseObject interface {
+	// VisitGetCsrfTokenResponse carries the generated visit get csrf token response value for GetCsrfTokenResponseObject.
 	VisitGetCsrfTokenResponse(w http.ResponseWriter) error
 }
 
+// GetCsrfToken200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetCsrfToken200JSONResponse CsrfToken
 
+// VisitGetCsrfTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetCsrfToken200JSONResponse) VisitGetCsrfTokenResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11842,8 +12791,10 @@ func (response GetCsrfToken200JSONResponse) VisitGetCsrfTokenResponse(w http.Res
 	return err
 }
 
+// GetCsrfToken401JSONResponse contains the raw HTTP response and any decoded response body.
 type GetCsrfToken401JSONResponse struct{ UnauthenticatedJSONResponse }
 
+// VisitGetCsrfTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetCsrfToken401JSONResponse) VisitGetCsrfTokenResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11857,23 +12808,33 @@ func (response GetCsrfToken401JSONResponse) VisitGetCsrfTokenResponse(w http.Res
 	return err
 }
 
+// LoginRequestObject contains validated inputs for its OpenAPI operation.
 type LoginRequestObject struct {
+	// Body contains the decoded or raw HTTP response body.
 	Body *LoginJSONRequestBody
 }
 
+// LoginResponseObject is implemented by every declared response for its OpenAPI operation.
 type LoginResponseObject interface {
+	// VisitLoginResponse carries the generated visit login response value for LoginResponseObject.
 	VisitLoginResponse(w http.ResponseWriter) error
 }
 
+// Login200ResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type Login200ResponseHeaders struct {
+	// SetCookie carries the generated set cookie value for Login200ResponseHeaders.
 	SetCookie string
 }
 
+// Login200JSONResponse contains the raw HTTP response and any decoded response body.
 type Login200JSONResponse struct {
-	Body    LoginResult
+	// Body contains the decoded or raw HTTP response body.
+	Body LoginResult
+	// Headers contains the headers declared for this response.
 	Headers Login200ResponseHeaders
 }
 
+// VisitLoginResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Login200JSONResponse) VisitLoginResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11887,8 +12848,10 @@ func (response Login200JSONResponse) VisitLoginResponse(w http.ResponseWriter) e
 	return err
 }
 
+// Login401JSONResponse contains the raw HTTP response and any decoded response body.
 type Login401JSONResponse struct{ UnauthenticatedJSONResponse }
 
+// VisitLoginResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Login401JSONResponse) VisitLoginResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11902,8 +12865,10 @@ func (response Login401JSONResponse) VisitLoginResponse(w http.ResponseWriter) e
 	return err
 }
 
+// Login429JSONResponse contains the raw HTTP response and any decoded response body.
 type Login429JSONResponse struct{ RateLimitedJSONResponse }
 
+// VisitLoginResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Login429JSONResponse) VisitLoginResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11918,23 +12883,30 @@ func (response Login429JSONResponse) VisitLoginResponse(w http.ResponseWriter) e
 	return err
 }
 
+// LogoutRequestObject contains validated inputs for its OpenAPI operation.
 type LogoutRequestObject struct {
 }
 
+// LogoutResponseObject is implemented by every declared response for its OpenAPI operation.
 type LogoutResponseObject interface {
+	// VisitLogoutResponse carries the generated visit logout response value for LogoutResponseObject.
 	VisitLogoutResponse(w http.ResponseWriter) error
 }
 
+// Logout204Response contains the raw HTTP response and any decoded response body.
 type Logout204Response struct {
 }
 
+// VisitLogoutResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Logout204Response) VisitLogoutResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// Logout401JSONResponse contains the raw HTTP response and any decoded response body.
 type Logout401JSONResponse struct{ UnauthenticatedJSONResponse }
 
+// VisitLogoutResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Logout401JSONResponse) VisitLogoutResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11948,15 +12920,20 @@ func (response Logout401JSONResponse) VisitLogoutResponse(w http.ResponseWriter)
 	return err
 }
 
+// GetMeRequestObject contains validated inputs for its OpenAPI operation.
 type GetMeRequestObject struct {
 }
 
+// GetMeResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetMeResponseObject interface {
+	// VisitGetMeResponse carries the generated visit get me response value for GetMeResponseObject.
 	VisitGetMeResponse(w http.ResponseWriter) error
 }
 
+// GetMe200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetMe200JSONResponse Me
 
+// VisitGetMeResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetMe200JSONResponse) VisitGetMeResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11969,8 +12946,10 @@ func (response GetMe200JSONResponse) VisitGetMeResponse(w http.ResponseWriter) e
 	return err
 }
 
+// GetMe401JSONResponse contains the raw HTTP response and any decoded response body.
 type GetMe401JSONResponse struct{ UnauthenticatedJSONResponse }
 
+// VisitGetMeResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetMe401JSONResponse) VisitGetMeResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -11984,15 +12963,20 @@ func (response GetMe401JSONResponse) VisitGetMeResponse(w http.ResponseWriter) e
 	return err
 }
 
+// GetMyPreferencesRequestObject contains validated inputs for its OpenAPI operation.
 type GetMyPreferencesRequestObject struct {
 }
 
+// GetMyPreferencesResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetMyPreferencesResponseObject interface {
+	// VisitGetMyPreferencesResponse carries the generated visit get my preferences response value for GetMyPreferencesResponseObject.
 	VisitGetMyPreferencesResponse(w http.ResponseWriter) error
 }
 
+// GetMyPreferences200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetMyPreferences200JSONResponse struct{ UserPreferencesJSONResponse }
 
+// VisitGetMyPreferencesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetMyPreferences200JSONResponse) VisitGetMyPreferencesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12006,17 +12990,24 @@ func (response GetMyPreferences200JSONResponse) VisitGetMyPreferencesResponse(w 
 	return err
 }
 
+// UpdateMyPreferencesRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateMyPreferencesRequestObject struct {
+	// Params contains the validated parameters for this request.
 	Params UpdateMyPreferencesParams
-	Body   *UpdateMyPreferencesJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateMyPreferencesJSONRequestBody
 }
 
+// UpdateMyPreferencesResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateMyPreferencesResponseObject interface {
+	// VisitUpdateMyPreferencesResponse carries the generated visit update my preferences response value for UpdateMyPreferencesResponseObject.
 	VisitUpdateMyPreferencesResponse(w http.ResponseWriter) error
 }
 
+// UpdateMyPreferences200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateMyPreferences200JSONResponse struct{ UserPreferencesJSONResponse }
 
+// VisitUpdateMyPreferencesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateMyPreferences200JSONResponse) VisitUpdateMyPreferencesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12030,8 +13021,10 @@ func (response UpdateMyPreferences200JSONResponse) VisitUpdateMyPreferencesRespo
 	return err
 }
 
+// UpdateMyPreferences412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateMyPreferences412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateMyPreferencesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateMyPreferences412JSONResponse) VisitUpdateMyPreferencesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12045,8 +13038,10 @@ func (response UpdateMyPreferences412JSONResponse) VisitUpdateMyPreferencesRespo
 	return err
 }
 
+// UpdateMyPreferences422JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateMyPreferences422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitUpdateMyPreferencesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateMyPreferences422JSONResponse) VisitUpdateMyPreferencesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12060,19 +13055,27 @@ func (response UpdateMyPreferences422JSONResponse) VisitUpdateMyPreferencesRespo
 	return err
 }
 
+// DownloadSignedContentRequestObject contains validated inputs for its OpenAPI operation.
 type DownloadSignedContentRequestObject struct {
+	// Token carries the generated token value for DownloadSignedContentRequestObject.
 	Token ContentToken `json:"token"`
 }
 
+// DownloadSignedContentResponseObject is implemented by every declared response for its OpenAPI operation.
 type DownloadSignedContentResponseObject interface {
+	// VisitDownloadSignedContentResponse carries the generated visit download signed content response value for DownloadSignedContentResponseObject.
 	VisitDownloadSignedContentResponse(w http.ResponseWriter) error
 }
 
+// DownloadSignedContent200ApplicationoctetStreamResponse contains the raw HTTP response and any decoded response body.
 type DownloadSignedContent200ApplicationoctetStreamResponse struct {
-	Body          io.Reader
+	// Body contains the decoded or raw HTTP response body.
+	Body io.Reader
+	// ContentLength is the byte length of an unparsed response body.
 	ContentLength int64
 }
 
+// VisitDownloadSignedContentResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DownloadSignedContent200ApplicationoctetStreamResponse) VisitDownloadSignedContentResponse(w http.ResponseWriter) error {
 
 	w.Header().Set("Content-Type", "application/octet-stream")
@@ -12088,8 +13091,10 @@ func (response DownloadSignedContent200ApplicationoctetStreamResponse) VisitDown
 	return err
 }
 
+// DownloadSignedContent404JSONResponse contains the raw HTTP response and any decoded response body.
 type DownloadSignedContent404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDownloadSignedContentResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DownloadSignedContent404JSONResponse) VisitDownloadSignedContentResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12103,18 +13108,25 @@ func (response DownloadSignedContent404JSONResponse) VisitDownloadSignedContentR
 	return err
 }
 
+// GetOpenApiContractRequestObject contains validated inputs for its OpenAPI operation.
 type GetOpenApiContractRequestObject struct {
 }
 
+// GetOpenApiContractResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetOpenApiContractResponseObject interface {
+	// VisitGetOpenApiContractResponse carries the generated visit get open api contract response value for GetOpenApiContractResponseObject.
 	VisitGetOpenApiContractResponse(w http.ResponseWriter) error
 }
 
+// GetOpenApiContract200ApplicationyamlResponse contains the raw HTTP response and any decoded response body.
 type GetOpenApiContract200ApplicationyamlResponse struct {
-	Body          io.Reader
+	// Body contains the decoded or raw HTTP response body.
+	Body io.Reader
+	// ContentLength is the byte length of an unparsed response body.
 	ContentLength int64
 }
 
+// VisitGetOpenApiContractResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetOpenApiContract200ApplicationyamlResponse) VisitGetOpenApiContractResponse(w http.ResponseWriter) error {
 
 	w.Header().Set("Content-Type", "application/yaml")
@@ -12130,17 +13142,24 @@ func (response GetOpenApiContract200ApplicationyamlResponse) VisitGetOpenApiCont
 	return err
 }
 
+// GetPublicServiceRequestObject contains validated inputs for its OpenAPI operation.
 type GetPublicServiceRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for GetPublicServiceRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for GetPublicServiceRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
 }
 
+// GetPublicServiceResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetPublicServiceResponseObject interface {
+	// VisitGetPublicServiceResponse carries the generated visit get public service response value for GetPublicServiceResponseObject.
 	VisitGetPublicServiceResponse(w http.ResponseWriter) error
 }
 
+// GetPublicService200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetPublicService200JSONResponse struct{ PublicServiceJSONResponse }
 
+// VisitGetPublicServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetPublicService200JSONResponse) VisitGetPublicServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12153,8 +13172,10 @@ func (response GetPublicService200JSONResponse) VisitGetPublicServiceResponse(w 
 	return err
 }
 
+// GetPublicService404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetPublicService404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetPublicServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetPublicService404JSONResponse) VisitGetPublicServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12168,19 +13189,28 @@ func (response GetPublicService404JSONResponse) VisitGetPublicServiceResponse(w 
 	return err
 }
 
+// GetPublicAssetRequestObject contains validated inputs for its OpenAPI operation.
 type GetPublicAssetRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for GetPublicAssetRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for GetPublicAssetRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	KindId      KindId      `json:"kindId"`
-	AssetName   AssetName   `json:"assetName"`
+	// KindId carries the generated kind id value for GetPublicAssetRequestObject.
+	KindId KindId `json:"kindId"`
+	// AssetName carries the generated asset name value for GetPublicAssetRequestObject.
+	AssetName AssetName `json:"assetName"`
 }
 
+// GetPublicAssetResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetPublicAssetResponseObject interface {
+	// VisitGetPublicAssetResponse carries the generated visit get public asset response value for GetPublicAssetResponseObject.
 	VisitGetPublicAssetResponse(w http.ResponseWriter) error
 }
 
+// GetPublicAsset200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetPublicAsset200JSONResponse struct{ PublicAssetJSONResponse }
 
+// VisitGetPublicAssetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetPublicAsset200JSONResponse) VisitGetPublicAssetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12193,8 +13223,10 @@ func (response GetPublicAsset200JSONResponse) VisitGetPublicAssetResponse(w http
 	return err
 }
 
+// GetPublicAsset404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetPublicAsset404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetPublicAssetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetPublicAsset404JSONResponse) VisitGetPublicAssetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12208,17 +13240,24 @@ func (response GetPublicAsset404JSONResponse) VisitGetPublicAssetResponse(w http
 	return err
 }
 
+// ResolvePublicViewRequestObject contains validated inputs for its OpenAPI operation.
 type ResolvePublicViewRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ResolvePublicViewRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *ResolvePublicViewJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *ResolvePublicViewJSONRequestBody
 }
 
+// ResolvePublicViewResponseObject is implemented by every declared response for its OpenAPI operation.
 type ResolvePublicViewResponseObject interface {
+	// VisitResolvePublicViewResponse carries the generated visit resolve public view response value for ResolvePublicViewResponseObject.
 	VisitResolvePublicViewResponse(w http.ResponseWriter) error
 }
 
+// ResolvePublicView200JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolvePublicView200JSONResponse struct{ ViewResolutionJSONResponse }
 
+// VisitResolvePublicViewResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolvePublicView200JSONResponse) VisitResolvePublicViewResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12231,8 +13270,10 @@ func (response ResolvePublicView200JSONResponse) VisitResolvePublicViewResponse(
 	return err
 }
 
+// ResolvePublicView404JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolvePublicView404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitResolvePublicViewResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolvePublicView404JSONResponse) VisitResolvePublicViewResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12246,8 +13287,10 @@ func (response ResolvePublicView404JSONResponse) VisitResolvePublicViewResponse(
 	return err
 }
 
+// ResolvePublicView422JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolvePublicView422JSONResponse struct{ InputSpecMismatchJSONResponse }
 
+// VisitResolvePublicViewResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolvePublicView422JSONResponse) VisitResolvePublicViewResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12261,16 +13304,22 @@ func (response ResolvePublicView422JSONResponse) VisitResolvePublicViewResponse(
 	return err
 }
 
+// GetSharedViewRequestObject contains validated inputs for its OpenAPI operation.
 type GetSharedViewRequestObject struct {
+	// ShareToken carries the generated share token value for GetSharedViewRequestObject.
 	ShareToken ShareToken `json:"shareToken"`
 }
 
+// GetSharedViewResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetSharedViewResponseObject interface {
+	// VisitGetSharedViewResponse carries the generated visit get shared view response value for GetSharedViewResponseObject.
 	VisitGetSharedViewResponse(w http.ResponseWriter) error
 }
 
+// GetSharedView200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetSharedView200JSONResponse struct{ SharedViewJSONResponse }
 
+// VisitGetSharedViewResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetSharedView200JSONResponse) VisitGetSharedViewResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12283,8 +13332,10 @@ func (response GetSharedView200JSONResponse) VisitGetSharedViewResponse(w http.R
 	return err
 }
 
+// GetSharedView404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetSharedView404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetSharedViewResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetSharedView404JSONResponse) VisitGetSharedViewResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12298,16 +13349,22 @@ func (response GetSharedView404JSONResponse) VisitGetSharedViewResponse(w http.R
 	return err
 }
 
+// ListAssetKindsRequestObject contains validated inputs for its OpenAPI operation.
 type ListAssetKindsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListAssetKindsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// ListAssetKindsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListAssetKindsResponseObject interface {
+	// VisitListAssetKindsResponse carries the generated visit list asset kinds response value for ListAssetKindsResponseObject.
 	VisitListAssetKindsResponse(w http.ResponseWriter) error
 }
 
+// ListAssetKinds200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAssetKinds200JSONResponse struct{ AssetKindListJSONResponse }
 
+// VisitListAssetKindsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAssetKinds200JSONResponse) VisitListAssetKindsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12320,8 +13377,10 @@ func (response ListAssetKinds200JSONResponse) VisitListAssetKindsResponse(w http
 	return err
 }
 
+// ListAssetKinds404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAssetKinds404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListAssetKindsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAssetKinds404JSONResponse) VisitListAssetKindsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12335,19 +13394,28 @@ func (response ListAssetKinds404JSONResponse) VisitListAssetKindsResponse(w http
 	return err
 }
 
+// UpdateAssetKindStateRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateAssetKindStateRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateAssetKindStateRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	KindId     KindId     `json:"kindId"`
-	Params     UpdateAssetKindStateParams
-	Body       *UpdateAssetKindStateJSONRequestBody
+	// KindId carries the generated kind id value for UpdateAssetKindStateRequestObject.
+	KindId KindId `json:"kindId"`
+	// Params contains the validated parameters for this request.
+	Params UpdateAssetKindStateParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateAssetKindStateJSONRequestBody
 }
 
+// UpdateAssetKindStateResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateAssetKindStateResponseObject interface {
+	// VisitUpdateAssetKindStateResponse carries the generated visit update asset kind state response value for UpdateAssetKindStateResponseObject.
 	VisitUpdateAssetKindStateResponse(w http.ResponseWriter) error
 }
 
+// UpdateAssetKindState200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateAssetKindState200JSONResponse struct{ AssetKindJSONResponse }
 
+// VisitUpdateAssetKindStateResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateAssetKindState200JSONResponse) VisitUpdateAssetKindStateResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12361,8 +13429,10 @@ func (response UpdateAssetKindState200JSONResponse) VisitUpdateAssetKindStateRes
 	return err
 }
 
+// UpdateAssetKindState404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateAssetKindState404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateAssetKindStateResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateAssetKindState404JSONResponse) VisitUpdateAssetKindStateResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12376,8 +13446,10 @@ func (response UpdateAssetKindState404JSONResponse) VisitUpdateAssetKindStateRes
 	return err
 }
 
+// UpdateAssetKindState412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateAssetKindState412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateAssetKindStateResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateAssetKindState412JSONResponse) VisitUpdateAssetKindStateResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12391,17 +13463,24 @@ func (response UpdateAssetKindState412JSONResponse) VisitUpdateAssetKindStateRes
 	return err
 }
 
+// GetAssetVersionRequestObject contains validated inputs for its OpenAPI operation.
 type GetAssetVersionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetAssetVersionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	VersionId  VersionId  `json:"versionId"`
+	// VersionId carries the generated version id value for GetAssetVersionRequestObject.
+	VersionId VersionId `json:"versionId"`
 }
 
+// GetAssetVersionResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetAssetVersionResponseObject interface {
+	// VisitGetAssetVersionResponse carries the generated visit get asset version response value for GetAssetVersionResponseObject.
 	VisitGetAssetVersionResponse(w http.ResponseWriter) error
 }
 
+// GetAssetVersion200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetAssetVersion200JSONResponse struct{ AssetVersionJSONResponse }
 
+// VisitGetAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetAssetVersion200JSONResponse) VisitGetAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12415,8 +13494,10 @@ func (response GetAssetVersion200JSONResponse) VisitGetAssetVersionResponse(w ht
 	return err
 }
 
+// GetAssetVersion404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetAssetVersion404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetAssetVersion404JSONResponse) VisitGetAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12430,18 +13511,26 @@ func (response GetAssetVersion404JSONResponse) VisitGetAssetVersionResponse(w ht
 	return err
 }
 
+// ListAssetVersionItemsRequestObject contains validated inputs for its OpenAPI operation.
 type ListAssetVersionItemsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListAssetVersionItemsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	VersionId  VersionId  `json:"versionId"`
-	Params     ListAssetVersionItemsParams
+	// VersionId carries the generated version id value for ListAssetVersionItemsRequestObject.
+	VersionId VersionId `json:"versionId"`
+	// Params contains the validated parameters for this request.
+	Params ListAssetVersionItemsParams
 }
 
+// ListAssetVersionItemsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListAssetVersionItemsResponseObject interface {
+	// VisitListAssetVersionItemsResponse carries the generated visit list asset version items response value for ListAssetVersionItemsResponseObject.
 	VisitListAssetVersionItemsResponse(w http.ResponseWriter) error
 }
 
+// ListAssetVersionItems200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAssetVersionItems200JSONResponse struct{ AssetItemPageJSONResponse }
 
+// VisitListAssetVersionItemsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAssetVersionItems200JSONResponse) VisitListAssetVersionItemsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12454,8 +13543,10 @@ func (response ListAssetVersionItems200JSONResponse) VisitListAssetVersionItemsR
 	return err
 }
 
+// ListAssetVersionItems404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAssetVersionItems404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListAssetVersionItemsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAssetVersionItems404JSONResponse) VisitListAssetVersionItemsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12469,17 +13560,24 @@ func (response ListAssetVersionItems404JSONResponse) VisitListAssetVersionItemsR
 	return err
 }
 
+// GetAssetVersionProvenanceRequestObject contains validated inputs for its OpenAPI operation.
 type GetAssetVersionProvenanceRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetAssetVersionProvenanceRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	VersionId  VersionId  `json:"versionId"`
+	// VersionId carries the generated version id value for GetAssetVersionProvenanceRequestObject.
+	VersionId VersionId `json:"versionId"`
 }
 
+// GetAssetVersionProvenanceResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetAssetVersionProvenanceResponseObject interface {
+	// VisitGetAssetVersionProvenanceResponse carries the generated visit get asset version provenance response value for GetAssetVersionProvenanceResponseObject.
 	VisitGetAssetVersionProvenanceResponse(w http.ResponseWriter) error
 }
 
+// GetAssetVersionProvenance200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetAssetVersionProvenance200JSONResponse struct{ ProvenanceListJSONResponse }
 
+// VisitGetAssetVersionProvenanceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetAssetVersionProvenance200JSONResponse) VisitGetAssetVersionProvenanceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12492,8 +13590,10 @@ func (response GetAssetVersionProvenance200JSONResponse) VisitGetAssetVersionPro
 	return err
 }
 
+// GetAssetVersionProvenance404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetAssetVersionProvenance404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetAssetVersionProvenanceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetAssetVersionProvenance404JSONResponse) VisitGetAssetVersionProvenanceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12507,18 +13607,26 @@ func (response GetAssetVersionProvenance404JSONResponse) VisitGetAssetVersionPro
 	return err
 }
 
+// DeprecateAssetVersionRequestObject contains validated inputs for its OpenAPI operation.
 type DeprecateAssetVersionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeprecateAssetVersionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	VersionId  VersionId  `json:"versionId"`
-	Params     DeprecateAssetVersionParams
+	// VersionId carries the generated version id value for DeprecateAssetVersionRequestObject.
+	VersionId VersionId `json:"versionId"`
+	// Params contains the validated parameters for this request.
+	Params DeprecateAssetVersionParams
 }
 
+// DeprecateAssetVersionResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeprecateAssetVersionResponseObject interface {
+	// VisitDeprecateAssetVersionResponse carries the generated visit deprecate asset version response value for DeprecateAssetVersionResponseObject.
 	VisitDeprecateAssetVersionResponse(w http.ResponseWriter) error
 }
 
+// DeprecateAssetVersion200JSONResponse contains the raw HTTP response and any decoded response body.
 type DeprecateAssetVersion200JSONResponse struct{ AssetVersionJSONResponse }
 
+// VisitDeprecateAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeprecateAssetVersion200JSONResponse) VisitDeprecateAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12532,8 +13640,10 @@ func (response DeprecateAssetVersion200JSONResponse) VisitDeprecateAssetVersionR
 	return err
 }
 
+// DeprecateAssetVersion404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeprecateAssetVersion404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeprecateAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeprecateAssetVersion404JSONResponse) VisitDeprecateAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12547,8 +13657,10 @@ func (response DeprecateAssetVersion404JSONResponse) VisitDeprecateAssetVersionR
 	return err
 }
 
+// DeprecateAssetVersion409JSONResponse contains the raw HTTP response and any decoded response body.
 type DeprecateAssetVersion409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitDeprecateAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeprecateAssetVersion409JSONResponse) VisitDeprecateAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12562,8 +13674,10 @@ func (response DeprecateAssetVersion409JSONResponse) VisitDeprecateAssetVersionR
 	return err
 }
 
+// DeprecateAssetVersion412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeprecateAssetVersion412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeprecateAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeprecateAssetVersion412JSONResponse) VisitDeprecateAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12577,19 +13691,28 @@ func (response DeprecateAssetVersion412JSONResponse) VisitDeprecateAssetVersionR
 	return err
 }
 
+// PublishAssetVersionRequestObject contains validated inputs for its OpenAPI operation.
 type PublishAssetVersionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for PublishAssetVersionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	VersionId  VersionId  `json:"versionId"`
-	Params     PublishAssetVersionParams
-	Body       *PublishAssetVersionJSONRequestBody
+	// VersionId carries the generated version id value for PublishAssetVersionRequestObject.
+	VersionId VersionId `json:"versionId"`
+	// Params contains the validated parameters for this request.
+	Params PublishAssetVersionParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *PublishAssetVersionJSONRequestBody
 }
 
+// PublishAssetVersionResponseObject is implemented by every declared response for its OpenAPI operation.
 type PublishAssetVersionResponseObject interface {
+	// VisitPublishAssetVersionResponse carries the generated visit publish asset version response value for PublishAssetVersionResponseObject.
 	VisitPublishAssetVersionResponse(w http.ResponseWriter) error
 }
 
+// PublishAssetVersion200JSONResponse contains the raw HTTP response and any decoded response body.
 type PublishAssetVersion200JSONResponse struct{ AssetVersionJSONResponse }
 
+// VisitPublishAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PublishAssetVersion200JSONResponse) VisitPublishAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12603,8 +13726,10 @@ func (response PublishAssetVersion200JSONResponse) VisitPublishAssetVersionRespo
 	return err
 }
 
+// PublishAssetVersion404JSONResponse contains the raw HTTP response and any decoded response body.
 type PublishAssetVersion404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPublishAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PublishAssetVersion404JSONResponse) VisitPublishAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12618,8 +13743,10 @@ func (response PublishAssetVersion404JSONResponse) VisitPublishAssetVersionRespo
 	return err
 }
 
+// PublishAssetVersion409JSONResponse contains the raw HTTP response and any decoded response body.
 type PublishAssetVersion409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitPublishAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PublishAssetVersion409JSONResponse) VisitPublishAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12633,8 +13760,10 @@ func (response PublishAssetVersion409JSONResponse) VisitPublishAssetVersionRespo
 	return err
 }
 
+// PublishAssetVersion412JSONResponse contains the raw HTTP response and any decoded response body.
 type PublishAssetVersion412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitPublishAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PublishAssetVersion412JSONResponse) VisitPublishAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12648,18 +13777,26 @@ func (response PublishAssetVersion412JSONResponse) VisitPublishAssetVersionRespo
 	return err
 }
 
+// RetireAssetVersionRequestObject contains validated inputs for its OpenAPI operation.
 type RetireAssetVersionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for RetireAssetVersionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	VersionId  VersionId  `json:"versionId"`
-	Params     RetireAssetVersionParams
+	// VersionId carries the generated version id value for RetireAssetVersionRequestObject.
+	VersionId VersionId `json:"versionId"`
+	// Params contains the validated parameters for this request.
+	Params RetireAssetVersionParams
 }
 
+// RetireAssetVersionResponseObject is implemented by every declared response for its OpenAPI operation.
 type RetireAssetVersionResponseObject interface {
+	// VisitRetireAssetVersionResponse carries the generated visit retire asset version response value for RetireAssetVersionResponseObject.
 	VisitRetireAssetVersionResponse(w http.ResponseWriter) error
 }
 
+// RetireAssetVersion200JSONResponse contains the raw HTTP response and any decoded response body.
 type RetireAssetVersion200JSONResponse struct{ AssetVersionJSONResponse }
 
+// VisitRetireAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RetireAssetVersion200JSONResponse) VisitRetireAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12673,8 +13810,10 @@ func (response RetireAssetVersion200JSONResponse) VisitRetireAssetVersionRespons
 	return err
 }
 
+// RetireAssetVersion404JSONResponse contains the raw HTTP response and any decoded response body.
 type RetireAssetVersion404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRetireAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RetireAssetVersion404JSONResponse) VisitRetireAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12688,8 +13827,10 @@ func (response RetireAssetVersion404JSONResponse) VisitRetireAssetVersionRespons
 	return err
 }
 
+// RetireAssetVersion409JSONResponse contains the raw HTTP response and any decoded response body.
 type RetireAssetVersion409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitRetireAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RetireAssetVersion409JSONResponse) VisitRetireAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12703,8 +13844,10 @@ func (response RetireAssetVersion409JSONResponse) VisitRetireAssetVersionRespons
 	return err
 }
 
+// RetireAssetVersion412JSONResponse contains the raw HTTP response and any decoded response body.
 type RetireAssetVersion412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitRetireAssetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RetireAssetVersion412JSONResponse) VisitRetireAssetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12718,18 +13861,26 @@ func (response RetireAssetVersion412JSONResponse) VisitRetireAssetVersionRespons
 	return err
 }
 
+// GetAssetRequestObject contains validated inputs for its OpenAPI operation.
 type GetAssetRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetAssetRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	AssetId    AssetId    `json:"assetId"`
-	Params     GetAssetParams
+	// AssetId carries the generated asset id value for GetAssetRequestObject.
+	AssetId AssetId `json:"assetId"`
+	// Params contains the validated parameters for this request.
+	Params GetAssetParams
 }
 
+// GetAssetResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetAssetResponseObject interface {
+	// VisitGetAssetResponse carries the generated visit get asset response value for GetAssetResponseObject.
 	VisitGetAssetResponse(w http.ResponseWriter) error
 }
 
+// GetAsset200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetAsset200JSONResponse struct{ AssetJSONResponse }
 
+// VisitGetAssetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetAsset200JSONResponse) VisitGetAssetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12743,8 +13894,10 @@ func (response GetAsset200JSONResponse) VisitGetAssetResponse(w http.ResponseWri
 	return err
 }
 
+// GetAsset404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetAsset404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetAssetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetAsset404JSONResponse) VisitGetAssetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12758,19 +13911,28 @@ func (response GetAsset404JSONResponse) VisitGetAssetResponse(w http.ResponseWri
 	return err
 }
 
+// ReorderAssetLayersRequestObject contains validated inputs for its OpenAPI operation.
 type ReorderAssetLayersRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ReorderAssetLayersRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	AssetId    AssetId    `json:"assetId"`
-	Params     ReorderAssetLayersParams
-	Body       *ReorderAssetLayersJSONRequestBody
+	// AssetId carries the generated asset id value for ReorderAssetLayersRequestObject.
+	AssetId AssetId `json:"assetId"`
+	// Params contains the validated parameters for this request.
+	Params ReorderAssetLayersParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *ReorderAssetLayersJSONRequestBody
 }
 
+// ReorderAssetLayersResponseObject is implemented by every declared response for its OpenAPI operation.
 type ReorderAssetLayersResponseObject interface {
+	// VisitReorderAssetLayersResponse carries the generated visit reorder asset layers response value for ReorderAssetLayersResponseObject.
 	VisitReorderAssetLayersResponse(w http.ResponseWriter) error
 }
 
+// ReorderAssetLayers200JSONResponse contains the raw HTTP response and any decoded response body.
 type ReorderAssetLayers200JSONResponse struct{ LayerListJSONResponse }
 
+// VisitReorderAssetLayersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReorderAssetLayers200JSONResponse) VisitReorderAssetLayersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12784,8 +13946,10 @@ func (response ReorderAssetLayers200JSONResponse) VisitReorderAssetLayersRespons
 	return err
 }
 
+// ReorderAssetLayers404JSONResponse contains the raw HTTP response and any decoded response body.
 type ReorderAssetLayers404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitReorderAssetLayersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReorderAssetLayers404JSONResponse) VisitReorderAssetLayersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12799,8 +13963,10 @@ func (response ReorderAssetLayers404JSONResponse) VisitReorderAssetLayersRespons
 	return err
 }
 
+// ReorderAssetLayers409JSONResponse contains the raw HTTP response and any decoded response body.
 type ReorderAssetLayers409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitReorderAssetLayersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReorderAssetLayers409JSONResponse) VisitReorderAssetLayersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12814,8 +13980,10 @@ func (response ReorderAssetLayers409JSONResponse) VisitReorderAssetLayersRespons
 	return err
 }
 
+// ReorderAssetLayers412JSONResponse contains the raw HTTP response and any decoded response body.
 type ReorderAssetLayers412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitReorderAssetLayersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReorderAssetLayers412JSONResponse) VisitReorderAssetLayersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12829,8 +13997,10 @@ func (response ReorderAssetLayers412JSONResponse) VisitReorderAssetLayersRespons
 	return err
 }
 
+// ReorderAssetLayers422JSONResponse contains the raw HTTP response and any decoded response body.
 type ReorderAssetLayers422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitReorderAssetLayersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReorderAssetLayers422JSONResponse) VisitReorderAssetLayersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12844,18 +14014,26 @@ func (response ReorderAssetLayers422JSONResponse) VisitReorderAssetLayersRespons
 	return err
 }
 
+// ListAssetVersionsRequestObject contains validated inputs for its OpenAPI operation.
 type ListAssetVersionsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListAssetVersionsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	AssetId    AssetId    `json:"assetId"`
-	Params     ListAssetVersionsParams
+	// AssetId carries the generated asset id value for ListAssetVersionsRequestObject.
+	AssetId AssetId `json:"assetId"`
+	// Params contains the validated parameters for this request.
+	Params ListAssetVersionsParams
 }
 
+// ListAssetVersionsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListAssetVersionsResponseObject interface {
+	// VisitListAssetVersionsResponse carries the generated visit list asset versions response value for ListAssetVersionsResponseObject.
 	VisitListAssetVersionsResponse(w http.ResponseWriter) error
 }
 
+// ListAssetVersions200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAssetVersions200JSONResponse struct{ AssetVersionPageJSONResponse }
 
+// VisitListAssetVersionsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAssetVersions200JSONResponse) VisitListAssetVersionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12868,8 +14046,10 @@ func (response ListAssetVersions200JSONResponse) VisitListAssetVersionsResponse(
 	return err
 }
 
+// ListAssetVersions404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAssetVersions404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListAssetVersionsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAssetVersions404JSONResponse) VisitListAssetVersionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12883,21 +14063,30 @@ func (response ListAssetVersions404JSONResponse) VisitListAssetVersionsResponse(
 	return err
 }
 
+// GenerateAssetWithAiRequestObject contains validated inputs for its OpenAPI operation.
 type GenerateAssetWithAiRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GenerateAssetWithAiRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	AssetId    AssetId    `json:"assetId"`
-	Params     GenerateAssetWithAiParams
-	Body       *GenerateAssetWithAiJSONRequestBody
+	// AssetId carries the generated asset id value for GenerateAssetWithAiRequestObject.
+	AssetId AssetId `json:"assetId"`
+	// Params contains the validated parameters for this request.
+	Params GenerateAssetWithAiParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *GenerateAssetWithAiJSONRequestBody
 }
 
+// GenerateAssetWithAiResponseObject is implemented by every declared response for its OpenAPI operation.
 type GenerateAssetWithAiResponseObject interface {
+	// VisitGenerateAssetWithAiResponse carries the generated visit generate asset with ai response value for GenerateAssetWithAiResponseObject.
 	VisitGenerateAssetWithAiResponse(w http.ResponseWriter) error
 }
 
+// GenerateAssetWithAi202JSONResponse contains the raw HTTP response and any decoded response body.
 type GenerateAssetWithAi202JSONResponse struct {
 	AiGenerationAcceptedJSONResponse
 }
 
+// VisitGenerateAssetWithAiResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GenerateAssetWithAi202JSONResponse) VisitGenerateAssetWithAiResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12910,8 +14099,10 @@ func (response GenerateAssetWithAi202JSONResponse) VisitGenerateAssetWithAiRespo
 	return err
 }
 
+// GenerateAssetWithAi404JSONResponse contains the raw HTTP response and any decoded response body.
 type GenerateAssetWithAi404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGenerateAssetWithAiResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GenerateAssetWithAi404JSONResponse) VisitGenerateAssetWithAiResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12925,8 +14116,10 @@ func (response GenerateAssetWithAi404JSONResponse) VisitGenerateAssetWithAiRespo
 	return err
 }
 
+// GenerateAssetWithAi409JSONResponse contains the raw HTTP response and any decoded response body.
 type GenerateAssetWithAi409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitGenerateAssetWithAiResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GenerateAssetWithAi409JSONResponse) VisitGenerateAssetWithAiResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12940,10 +14133,12 @@ func (response GenerateAssetWithAi409JSONResponse) VisitGenerateAssetWithAiRespo
 	return err
 }
 
+// GenerateAssetWithAi422JSONResponse contains the raw HTTP response and any decoded response body.
 type GenerateAssetWithAi422JSONResponse struct {
 	ProducerProfileUnavailableJSONResponse
 }
 
+// VisitGenerateAssetWithAiResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GenerateAssetWithAi422JSONResponse) VisitGenerateAssetWithAiResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12957,17 +14152,24 @@ func (response GenerateAssetWithAi422JSONResponse) VisitGenerateAssetWithAiRespo
 	return err
 }
 
+// PreviewMergeRequestObject contains validated inputs for its OpenAPI operation.
 type PreviewMergeRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for PreviewMergeRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *PreviewMergeJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *PreviewMergeJSONRequestBody
 }
 
+// PreviewMergeResponseObject is implemented by every declared response for its OpenAPI operation.
 type PreviewMergeResponseObject interface {
+	// VisitPreviewMergeResponse carries the generated visit preview merge response value for PreviewMergeResponseObject.
 	VisitPreviewMergeResponse(w http.ResponseWriter) error
 }
 
+// PreviewMerge200JSONResponse contains the raw HTTP response and any decoded response body.
 type PreviewMerge200JSONResponse struct{ MergePreviewJSONResponse }
 
+// VisitPreviewMergeResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PreviewMerge200JSONResponse) VisitPreviewMergeResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12980,8 +14182,10 @@ func (response PreviewMerge200JSONResponse) VisitPreviewMergeResponse(w http.Res
 	return err
 }
 
+// PreviewMerge404JSONResponse contains the raw HTTP response and any decoded response body.
 type PreviewMerge404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPreviewMergeResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PreviewMerge404JSONResponse) VisitPreviewMergeResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -12995,8 +14199,10 @@ func (response PreviewMerge404JSONResponse) VisitPreviewMergeResponse(w http.Res
 	return err
 }
 
+// PreviewMerge409JSONResponse contains the raw HTTP response and any decoded response body.
 type PreviewMerge409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitPreviewMergeResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PreviewMerge409JSONResponse) VisitPreviewMergeResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13010,8 +14216,10 @@ func (response PreviewMerge409JSONResponse) VisitPreviewMergeResponse(w http.Res
 	return err
 }
 
+// PreviewMerge413JSONResponse contains the raw HTTP response and any decoded response body.
 type PreviewMerge413JSONResponse struct{ ContentTooLargeJSONResponse }
 
+// VisitPreviewMergeResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PreviewMerge413JSONResponse) VisitPreviewMergeResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13025,8 +14233,10 @@ func (response PreviewMerge413JSONResponse) VisitPreviewMergeResponse(w http.Res
 	return err
 }
 
+// PreviewMerge422JSONResponse contains the raw HTTP response and any decoded response body.
 type PreviewMerge422JSONResponse struct{ OverlayInvalidJSONResponse }
 
+// VisitPreviewMergeResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PreviewMerge422JSONResponse) VisitPreviewMergeResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13040,18 +14250,26 @@ func (response PreviewMerge422JSONResponse) VisitPreviewMergeResponse(w http.Res
 	return err
 }
 
+// PushAssetRevisionRequestObject contains validated inputs for its OpenAPI operation.
 type PushAssetRevisionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for PushAssetRevisionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     PushAssetRevisionParams
-	Body       *PushAssetRevisionJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params PushAssetRevisionParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *PushAssetRevisionJSONRequestBody
 }
 
+// PushAssetRevisionResponseObject is implemented by every declared response for its OpenAPI operation.
 type PushAssetRevisionResponseObject interface {
+	// VisitPushAssetRevisionResponse carries the generated visit push asset revision response value for PushAssetRevisionResponseObject.
 	VisitPushAssetRevisionResponse(w http.ResponseWriter) error
 }
 
+// PushAssetRevision200JSONResponse contains the raw HTTP response and any decoded response body.
 type PushAssetRevision200JSONResponse struct{ AssetPushResultJSONResponse }
 
+// VisitPushAssetRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PushAssetRevision200JSONResponse) VisitPushAssetRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13064,8 +14282,10 @@ func (response PushAssetRevision200JSONResponse) VisitPushAssetRevisionResponse(
 	return err
 }
 
+// PushAssetRevision201JSONResponse contains the raw HTTP response and any decoded response body.
 type PushAssetRevision201JSONResponse AssetPushResult
 
+// VisitPushAssetRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PushAssetRevision201JSONResponse) VisitPushAssetRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13078,8 +14298,10 @@ func (response PushAssetRevision201JSONResponse) VisitPushAssetRevisionResponse(
 	return err
 }
 
+// PushAssetRevision404JSONResponse contains the raw HTTP response and any decoded response body.
 type PushAssetRevision404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPushAssetRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PushAssetRevision404JSONResponse) VisitPushAssetRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13093,8 +14315,10 @@ func (response PushAssetRevision404JSONResponse) VisitPushAssetRevisionResponse(
 	return err
 }
 
+// PushAssetRevision409JSONResponse contains the raw HTTP response and any decoded response body.
 type PushAssetRevision409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitPushAssetRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PushAssetRevision409JSONResponse) VisitPushAssetRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13108,8 +14332,10 @@ func (response PushAssetRevision409JSONResponse) VisitPushAssetRevisionResponse(
 	return err
 }
 
+// PushAssetRevision413JSONResponse contains the raw HTTP response and any decoded response body.
 type PushAssetRevision413JSONResponse struct{ ContentTooLargeJSONResponse }
 
+// VisitPushAssetRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PushAssetRevision413JSONResponse) VisitPushAssetRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13123,8 +14349,10 @@ func (response PushAssetRevision413JSONResponse) VisitPushAssetRevisionResponse(
 	return err
 }
 
+// PushAssetRevision422JSONResponse contains the raw HTTP response and any decoded response body.
 type PushAssetRevision422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitPushAssetRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PushAssetRevision422JSONResponse) VisitPushAssetRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13138,17 +14366,24 @@ func (response PushAssetRevision422JSONResponse) VisitPushAssetRevisionResponse(
 	return err
 }
 
+// ListAuditLogsRequestObject contains validated inputs for its OpenAPI operation.
 type ListAuditLogsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListAuditLogsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListAuditLogsParams
+	// Params contains the validated parameters for this request.
+	Params ListAuditLogsParams
 }
 
+// ListAuditLogsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListAuditLogsResponseObject interface {
+	// VisitListAuditLogsResponse carries the generated visit list audit logs response value for ListAuditLogsResponseObject.
 	VisitListAuditLogsResponse(w http.ResponseWriter) error
 }
 
+// ListAuditLogs200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAuditLogs200JSONResponse struct{ AuditLogPageJSONResponse }
 
+// VisitListAuditLogsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAuditLogs200JSONResponse) VisitListAuditLogsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13161,8 +14396,10 @@ func (response ListAuditLogs200JSONResponse) VisitListAuditLogsResponse(w http.R
 	return err
 }
 
+// ListAuditLogs404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAuditLogs404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListAuditLogsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAuditLogs404JSONResponse) VisitListAuditLogsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13176,17 +14413,24 @@ func (response ListAuditLogs404JSONResponse) VisitListAuditLogsResponse(w http.R
 	return err
 }
 
+// ListBreakingTodosRequestObject contains validated inputs for its OpenAPI operation.
 type ListBreakingTodosRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListBreakingTodosRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListBreakingTodosParams
+	// Params contains the validated parameters for this request.
+	Params ListBreakingTodosParams
 }
 
+// ListBreakingTodosResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListBreakingTodosResponseObject interface {
+	// VisitListBreakingTodosResponse carries the generated visit list breaking todos response value for ListBreakingTodosResponseObject.
 	VisitListBreakingTodosResponse(w http.ResponseWriter) error
 }
 
+// ListBreakingTodos200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListBreakingTodos200JSONResponse struct{ BreakingTodoPageJSONResponse }
 
+// VisitListBreakingTodosResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListBreakingTodos200JSONResponse) VisitListBreakingTodosResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13199,8 +14443,10 @@ func (response ListBreakingTodos200JSONResponse) VisitListBreakingTodosResponse(
 	return err
 }
 
+// ListBreakingTodos404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListBreakingTodos404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListBreakingTodosResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListBreakingTodos404JSONResponse) VisitListBreakingTodosResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13214,18 +14460,26 @@ func (response ListBreakingTodos404JSONResponse) VisitListBreakingTodosResponse(
 	return err
 }
 
+// AcknowledgeBreakingTodoRequestObject contains validated inputs for its OpenAPI operation.
 type AcknowledgeBreakingTodoRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for AcknowledgeBreakingTodoRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	TodoId     TodoId     `json:"todoId"`
-	Body       *AcknowledgeBreakingTodoJSONRequestBody
+	// TodoId carries the generated todo id value for AcknowledgeBreakingTodoRequestObject.
+	TodoId TodoId `json:"todoId"`
+	// Body contains the decoded or raw HTTP response body.
+	Body *AcknowledgeBreakingTodoJSONRequestBody
 }
 
+// AcknowledgeBreakingTodoResponseObject is implemented by every declared response for its OpenAPI operation.
 type AcknowledgeBreakingTodoResponseObject interface {
+	// VisitAcknowledgeBreakingTodoResponse carries the generated visit acknowledge breaking todo response value for AcknowledgeBreakingTodoResponseObject.
 	VisitAcknowledgeBreakingTodoResponse(w http.ResponseWriter) error
 }
 
+// AcknowledgeBreakingTodo200JSONResponse contains the raw HTTP response and any decoded response body.
 type AcknowledgeBreakingTodo200JSONResponse struct{ BreakingTodoJSONResponse }
 
+// VisitAcknowledgeBreakingTodoResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response AcknowledgeBreakingTodo200JSONResponse) VisitAcknowledgeBreakingTodoResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13238,8 +14492,10 @@ func (response AcknowledgeBreakingTodo200JSONResponse) VisitAcknowledgeBreakingT
 	return err
 }
 
+// AcknowledgeBreakingTodo404JSONResponse contains the raw HTTP response and any decoded response body.
 type AcknowledgeBreakingTodo404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitAcknowledgeBreakingTodoResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response AcknowledgeBreakingTodo404JSONResponse) VisitAcknowledgeBreakingTodoResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13253,8 +14509,10 @@ func (response AcknowledgeBreakingTodo404JSONResponse) VisitAcknowledgeBreakingT
 	return err
 }
 
+// AcknowledgeBreakingTodo409JSONResponse contains the raw HTTP response and any decoded response body.
 type AcknowledgeBreakingTodo409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitAcknowledgeBreakingTodoResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response AcknowledgeBreakingTodo409JSONResponse) VisitAcknowledgeBreakingTodoResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13268,17 +14526,24 @@ func (response AcknowledgeBreakingTodo409JSONResponse) VisitAcknowledgeBreakingT
 	return err
 }
 
+// ListCredentialsRequestObject contains validated inputs for its OpenAPI operation.
 type ListCredentialsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListCredentialsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListCredentialsParams
+	// Params contains the validated parameters for this request.
+	Params ListCredentialsParams
 }
 
+// ListCredentialsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListCredentialsResponseObject interface {
+	// VisitListCredentialsResponse carries the generated visit list credentials response value for ListCredentialsResponseObject.
 	VisitListCredentialsResponse(w http.ResponseWriter) error
 }
 
+// ListCredentials200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListCredentials200JSONResponse struct{ CredentialPageJSONResponse }
 
+// VisitListCredentialsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListCredentials200JSONResponse) VisitListCredentialsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13291,8 +14556,10 @@ func (response ListCredentials200JSONResponse) VisitListCredentialsResponse(w ht
 	return err
 }
 
+// ListCredentials404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListCredentials404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListCredentialsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListCredentials404JSONResponse) VisitListCredentialsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13306,17 +14573,24 @@ func (response ListCredentials404JSONResponse) VisitListCredentialsResponse(w ht
 	return err
 }
 
+// CreateCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type CreateCredentialRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateCredentialRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateCredentialJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateCredentialJSONRequestBody
 }
 
+// CreateCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateCredentialResponseObject interface {
+	// VisitCreateCredentialResponse carries the generated visit create credential response value for CreateCredentialResponseObject.
 	VisitCreateCredentialResponse(w http.ResponseWriter) error
 }
 
+// CreateCredential201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateCredential201JSONResponse struct{ CredentialJSONResponse }
 
+// VisitCreateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateCredential201JSONResponse) VisitCreateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13330,8 +14604,10 @@ func (response CreateCredential201JSONResponse) VisitCreateCredentialResponse(w 
 	return err
 }
 
+// CreateCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateCredential404JSONResponse) VisitCreateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13345,8 +14621,10 @@ func (response CreateCredential404JSONResponse) VisitCreateCredentialResponse(w 
 	return err
 }
 
+// CreateCredential422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateCredential422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitCreateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateCredential422JSONResponse) VisitCreateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13360,26 +14638,36 @@ func (response CreateCredential422JSONResponse) VisitCreateCredentialResponse(w 
 	return err
 }
 
+// DeleteCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteCredentialRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for DeleteCredentialRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// CredentialId carries the generated credential id value for DeleteCredentialRequestObject.
 	CredentialId CredentialId `json:"credentialId"`
-	Params       DeleteCredentialParams
+	// Params contains the validated parameters for this request.
+	Params DeleteCredentialParams
 }
 
+// DeleteCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteCredentialResponseObject interface {
+	// VisitDeleteCredentialResponse carries the generated visit delete credential response value for DeleteCredentialResponseObject.
 	VisitDeleteCredentialResponse(w http.ResponseWriter) error
 }
 
+// DeleteCredential204Response contains the raw HTTP response and any decoded response body.
 type DeleteCredential204Response struct {
 }
 
+// VisitDeleteCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteCredential204Response) VisitDeleteCredentialResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteCredential404JSONResponse) VisitDeleteCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13393,8 +14681,10 @@ func (response DeleteCredential404JSONResponse) VisitDeleteCredentialResponse(w 
 	return err
 }
 
+// DeleteCredential409JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteCredential409JSONResponse struct{ CredentialInUseJSONResponse }
 
+// VisitDeleteCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteCredential409JSONResponse) VisitDeleteCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13408,8 +14698,10 @@ func (response DeleteCredential409JSONResponse) VisitDeleteCredentialResponse(w 
 	return err
 }
 
+// DeleteCredential412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteCredential412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteCredential412JSONResponse) VisitDeleteCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13423,19 +14715,28 @@ func (response DeleteCredential412JSONResponse) VisitDeleteCredentialResponse(w 
 	return err
 }
 
+// UpdateCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateCredentialRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for UpdateCredentialRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// CredentialId carries the generated credential id value for UpdateCredentialRequestObject.
 	CredentialId CredentialId `json:"credentialId"`
-	Params       UpdateCredentialParams
-	Body         *UpdateCredentialJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params UpdateCredentialParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateCredentialJSONRequestBody
 }
 
+// UpdateCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateCredentialResponseObject interface {
+	// VisitUpdateCredentialResponse carries the generated visit update credential response value for UpdateCredentialResponseObject.
 	VisitUpdateCredentialResponse(w http.ResponseWriter) error
 }
 
+// UpdateCredential200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateCredential200JSONResponse struct{ CredentialJSONResponse }
 
+// VisitUpdateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateCredential200JSONResponse) VisitUpdateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13449,8 +14750,10 @@ func (response UpdateCredential200JSONResponse) VisitUpdateCredentialResponse(w 
 	return err
 }
 
+// UpdateCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateCredential404JSONResponse) VisitUpdateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13464,8 +14767,10 @@ func (response UpdateCredential404JSONResponse) VisitUpdateCredentialResponse(w 
 	return err
 }
 
+// UpdateCredential412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateCredential412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateCredential412JSONResponse) VisitUpdateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13479,19 +14784,28 @@ func (response UpdateCredential412JSONResponse) VisitUpdateCredentialResponse(w 
 	return err
 }
 
+// RotateCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type RotateCredentialRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for RotateCredentialRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// CredentialId carries the generated credential id value for RotateCredentialRequestObject.
 	CredentialId CredentialId `json:"credentialId"`
-	Params       RotateCredentialParams
-	Body         *RotateCredentialJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params RotateCredentialParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *RotateCredentialJSONRequestBody
 }
 
+// RotateCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type RotateCredentialResponseObject interface {
+	// VisitRotateCredentialResponse carries the generated visit rotate credential response value for RotateCredentialResponseObject.
 	VisitRotateCredentialResponse(w http.ResponseWriter) error
 }
 
+// RotateCredential200JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateCredential200JSONResponse struct{ CredentialRotationJSONResponse }
 
+// VisitRotateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateCredential200JSONResponse) VisitRotateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13505,8 +14819,10 @@ func (response RotateCredential200JSONResponse) VisitRotateCredentialResponse(w 
 	return err
 }
 
+// RotateCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRotateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateCredential404JSONResponse) VisitRotateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13520,8 +14836,10 @@ func (response RotateCredential404JSONResponse) VisitRotateCredentialResponse(w 
 	return err
 }
 
+// RotateCredential409JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateCredential409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitRotateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateCredential409JSONResponse) VisitRotateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13535,8 +14853,10 @@ func (response RotateCredential409JSONResponse) VisitRotateCredentialResponse(w 
 	return err
 }
 
+// RotateCredential412JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateCredential412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitRotateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateCredential412JSONResponse) VisitRotateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13550,8 +14870,10 @@ func (response RotateCredential412JSONResponse) VisitRotateCredentialResponse(w 
 	return err
 }
 
+// RotateCredential422JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateCredential422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitRotateCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateCredential422JSONResponse) VisitRotateCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13565,18 +14887,26 @@ func (response RotateCredential422JSONResponse) VisitRotateCredentialResponse(w 
 	return err
 }
 
+// TestCredentialRequestObject contains validated inputs for its OpenAPI operation.
 type TestCredentialRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for TestCredentialRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// CredentialId carries the generated credential id value for TestCredentialRequestObject.
 	CredentialId CredentialId `json:"credentialId"`
-	Body         *TestCredentialJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *TestCredentialJSONRequestBody
 }
 
+// TestCredentialResponseObject is implemented by every declared response for its OpenAPI operation.
 type TestCredentialResponseObject interface {
+	// VisitTestCredentialResponse carries the generated visit test credential response value for TestCredentialResponseObject.
 	VisitTestCredentialResponse(w http.ResponseWriter) error
 }
 
+// TestCredential200JSONResponse contains the raw HTTP response and any decoded response body.
 type TestCredential200JSONResponse struct{ ConnectionTestJSONResponse }
 
+// VisitTestCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response TestCredential200JSONResponse) VisitTestCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13589,8 +14919,10 @@ func (response TestCredential200JSONResponse) VisitTestCredentialResponse(w http
 	return err
 }
 
+// TestCredential404JSONResponse contains the raw HTTP response and any decoded response body.
 type TestCredential404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitTestCredentialResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response TestCredential404JSONResponse) VisitTestCredentialResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13604,17 +14936,24 @@ func (response TestCredential404JSONResponse) VisitTestCredentialResponse(w http
 	return err
 }
 
+// RunDiffRequestObject contains validated inputs for its OpenAPI operation.
 type RunDiffRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for RunDiffRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *RunDiffJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *RunDiffJSONRequestBody
 }
 
+// RunDiffResponseObject is implemented by every declared response for its OpenAPI operation.
 type RunDiffResponseObject interface {
+	// VisitRunDiffResponse carries the generated visit run diff response value for RunDiffResponseObject.
 	VisitRunDiffResponse(w http.ResponseWriter) error
 }
 
+// RunDiff200JSONResponse contains the raw HTTP response and any decoded response body.
 type RunDiff200JSONResponse struct{ DiffResultJSONResponse }
 
+// VisitRunDiffResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RunDiff200JSONResponse) VisitRunDiffResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13627,8 +14966,10 @@ func (response RunDiff200JSONResponse) VisitRunDiffResponse(w http.ResponseWrite
 	return err
 }
 
+// RunDiff404JSONResponse contains the raw HTTP response and any decoded response body.
 type RunDiff404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRunDiffResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RunDiff404JSONResponse) VisitRunDiffResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13642,8 +14983,10 @@ func (response RunDiff404JSONResponse) VisitRunDiffResponse(w http.ResponseWrite
 	return err
 }
 
+// RunDiff422JSONResponse contains the raw HTTP response and any decoded response body.
 type RunDiff422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitRunDiffResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RunDiff422JSONResponse) VisitRunDiffResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13657,16 +15000,22 @@ func (response RunDiff422JSONResponse) VisitRunDiffResponse(w http.ResponseWrite
 	return err
 }
 
+// ListDiffRuleSetsRequestObject contains validated inputs for its OpenAPI operation.
 type ListDiffRuleSetsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListDiffRuleSetsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// ListDiffRuleSetsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListDiffRuleSetsResponseObject interface {
+	// VisitListDiffRuleSetsResponse carries the generated visit list diff rule sets response value for ListDiffRuleSetsResponseObject.
 	VisitListDiffRuleSetsResponse(w http.ResponseWriter) error
 }
 
+// ListDiffRuleSets200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListDiffRuleSets200JSONResponse struct{ DiffRuleSetListJSONResponse }
 
+// VisitListDiffRuleSetsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListDiffRuleSets200JSONResponse) VisitListDiffRuleSetsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13679,8 +15028,10 @@ func (response ListDiffRuleSets200JSONResponse) VisitListDiffRuleSetsResponse(w 
 	return err
 }
 
+// ListDiffRuleSets404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListDiffRuleSets404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListDiffRuleSetsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListDiffRuleSets404JSONResponse) VisitListDiffRuleSetsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13694,17 +15045,24 @@ func (response ListDiffRuleSets404JSONResponse) VisitListDiffRuleSetsResponse(w 
 	return err
 }
 
+// CreateDiffRuleSetRequestObject contains validated inputs for its OpenAPI operation.
 type CreateDiffRuleSetRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateDiffRuleSetRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateDiffRuleSetJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateDiffRuleSetJSONRequestBody
 }
 
+// CreateDiffRuleSetResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateDiffRuleSetResponseObject interface {
+	// VisitCreateDiffRuleSetResponse carries the generated visit create diff rule set response value for CreateDiffRuleSetResponseObject.
 	VisitCreateDiffRuleSetResponse(w http.ResponseWriter) error
 }
 
+// CreateDiffRuleSet201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffRuleSet201JSONResponse struct{ DiffRuleSetJSONResponse }
 
+// VisitCreateDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffRuleSet201JSONResponse) VisitCreateDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13718,8 +15076,10 @@ func (response CreateDiffRuleSet201JSONResponse) VisitCreateDiffRuleSetResponse(
 	return err
 }
 
+// CreateDiffRuleSet404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffRuleSet404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffRuleSet404JSONResponse) VisitCreateDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13733,8 +15093,10 @@ func (response CreateDiffRuleSet404JSONResponse) VisitCreateDiffRuleSetResponse(
 	return err
 }
 
+// CreateDiffRuleSet409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffRuleSet409JSONResponse struct{ DuplicateJSONResponse }
 
+// VisitCreateDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffRuleSet409JSONResponse) VisitCreateDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13748,26 +15110,36 @@ func (response CreateDiffRuleSet409JSONResponse) VisitCreateDiffRuleSetResponse(
 	return err
 }
 
+// DeleteDiffRuleSetRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteDiffRuleSetRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteDiffRuleSetRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	RuleSetId  RuleSetId  `json:"ruleSetId"`
-	Params     DeleteDiffRuleSetParams
+	// RuleSetId carries the generated rule set id value for DeleteDiffRuleSetRequestObject.
+	RuleSetId RuleSetId `json:"ruleSetId"`
+	// Params contains the validated parameters for this request.
+	Params DeleteDiffRuleSetParams
 }
 
+// DeleteDiffRuleSetResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteDiffRuleSetResponseObject interface {
+	// VisitDeleteDiffRuleSetResponse carries the generated visit delete diff rule set response value for DeleteDiffRuleSetResponseObject.
 	VisitDeleteDiffRuleSetResponse(w http.ResponseWriter) error
 }
 
+// DeleteDiffRuleSet204Response contains the raw HTTP response and any decoded response body.
 type DeleteDiffRuleSet204Response struct {
 }
 
+// VisitDeleteDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteDiffRuleSet204Response) VisitDeleteDiffRuleSetResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteDiffRuleSet404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteDiffRuleSet404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteDiffRuleSet404JSONResponse) VisitDeleteDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13781,8 +15153,10 @@ func (response DeleteDiffRuleSet404JSONResponse) VisitDeleteDiffRuleSetResponse(
 	return err
 }
 
+// DeleteDiffRuleSet409JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteDiffRuleSet409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitDeleteDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteDiffRuleSet409JSONResponse) VisitDeleteDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13796,8 +15170,10 @@ func (response DeleteDiffRuleSet409JSONResponse) VisitDeleteDiffRuleSetResponse(
 	return err
 }
 
+// DeleteDiffRuleSet412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteDiffRuleSet412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteDiffRuleSet412JSONResponse) VisitDeleteDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13811,19 +15187,28 @@ func (response DeleteDiffRuleSet412JSONResponse) VisitDeleteDiffRuleSetResponse(
 	return err
 }
 
+// UpdateDiffRuleSetRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateDiffRuleSetRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateDiffRuleSetRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	RuleSetId  RuleSetId  `json:"ruleSetId"`
-	Params     UpdateDiffRuleSetParams
-	Body       *UpdateDiffRuleSetJSONRequestBody
+	// RuleSetId carries the generated rule set id value for UpdateDiffRuleSetRequestObject.
+	RuleSetId RuleSetId `json:"ruleSetId"`
+	// Params contains the validated parameters for this request.
+	Params UpdateDiffRuleSetParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateDiffRuleSetJSONRequestBody
 }
 
+// UpdateDiffRuleSetResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateDiffRuleSetResponseObject interface {
+	// VisitUpdateDiffRuleSetResponse carries the generated visit update diff rule set response value for UpdateDiffRuleSetResponseObject.
 	VisitUpdateDiffRuleSetResponse(w http.ResponseWriter) error
 }
 
+// UpdateDiffRuleSet200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateDiffRuleSet200JSONResponse struct{ DiffRuleSetJSONResponse }
 
+// VisitUpdateDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateDiffRuleSet200JSONResponse) VisitUpdateDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13837,8 +15222,10 @@ func (response UpdateDiffRuleSet200JSONResponse) VisitUpdateDiffRuleSetResponse(
 	return err
 }
 
+// UpdateDiffRuleSet404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateDiffRuleSet404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateDiffRuleSet404JSONResponse) VisitUpdateDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13852,8 +15239,10 @@ func (response UpdateDiffRuleSet404JSONResponse) VisitUpdateDiffRuleSetResponse(
 	return err
 }
 
+// UpdateDiffRuleSet412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateDiffRuleSet412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateDiffRuleSetResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateDiffRuleSet412JSONResponse) VisitUpdateDiffRuleSetResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13867,17 +15256,24 @@ func (response UpdateDiffRuleSet412JSONResponse) VisitUpdateDiffRuleSetResponse(
 	return err
 }
 
+// ListDiffSnapshotsRequestObject contains validated inputs for its OpenAPI operation.
 type ListDiffSnapshotsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListDiffSnapshotsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListDiffSnapshotsParams
+	// Params contains the validated parameters for this request.
+	Params ListDiffSnapshotsParams
 }
 
+// ListDiffSnapshotsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListDiffSnapshotsResponseObject interface {
+	// VisitListDiffSnapshotsResponse carries the generated visit list diff snapshots response value for ListDiffSnapshotsResponseObject.
 	VisitListDiffSnapshotsResponse(w http.ResponseWriter) error
 }
 
+// ListDiffSnapshots200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListDiffSnapshots200JSONResponse struct{ DiffSnapshotPageJSONResponse }
 
+// VisitListDiffSnapshotsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListDiffSnapshots200JSONResponse) VisitListDiffSnapshotsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13890,8 +15286,10 @@ func (response ListDiffSnapshots200JSONResponse) VisitListDiffSnapshotsResponse(
 	return err
 }
 
+// ListDiffSnapshots404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListDiffSnapshots404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListDiffSnapshotsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListDiffSnapshots404JSONResponse) VisitListDiffSnapshotsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13905,25 +15303,34 @@ func (response ListDiffSnapshots404JSONResponse) VisitListDiffSnapshotsResponse(
 	return err
 }
 
+// DeleteDiffSnapshotRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteDiffSnapshotRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteDiffSnapshotRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	// SnapshotId carries the generated snapshot id value for DeleteDiffSnapshotRequestObject.
 	SnapshotId SnapshotId `json:"snapshotId"`
 }
 
+// DeleteDiffSnapshotResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteDiffSnapshotResponseObject interface {
+	// VisitDeleteDiffSnapshotResponse carries the generated visit delete diff snapshot response value for DeleteDiffSnapshotResponseObject.
 	VisitDeleteDiffSnapshotResponse(w http.ResponseWriter) error
 }
 
+// DeleteDiffSnapshot204Response contains the raw HTTP response and any decoded response body.
 type DeleteDiffSnapshot204Response struct {
 }
 
+// VisitDeleteDiffSnapshotResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteDiffSnapshot204Response) VisitDeleteDiffSnapshotResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteDiffSnapshot404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteDiffSnapshot404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteDiffSnapshotResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteDiffSnapshot404JSONResponse) VisitDeleteDiffSnapshotResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13937,17 +15344,24 @@ func (response DeleteDiffSnapshot404JSONResponse) VisitDeleteDiffSnapshotRespons
 	return err
 }
 
+// GetDiffSnapshotRequestObject contains validated inputs for its OpenAPI operation.
 type GetDiffSnapshotRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetDiffSnapshotRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	// SnapshotId carries the generated snapshot id value for GetDiffSnapshotRequestObject.
 	SnapshotId SnapshotId `json:"snapshotId"`
 }
 
+// GetDiffSnapshotResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetDiffSnapshotResponseObject interface {
+	// VisitGetDiffSnapshotResponse carries the generated visit get diff snapshot response value for GetDiffSnapshotResponseObject.
 	VisitGetDiffSnapshotResponse(w http.ResponseWriter) error
 }
 
+// GetDiffSnapshot200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetDiffSnapshot200JSONResponse struct{ DiffSnapshotJSONResponse }
 
+// VisitGetDiffSnapshotResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetDiffSnapshot200JSONResponse) VisitGetDiffSnapshotResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13960,8 +15374,10 @@ func (response GetDiffSnapshot200JSONResponse) VisitGetDiffSnapshotResponse(w ht
 	return err
 }
 
+// GetDiffSnapshot404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetDiffSnapshot404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetDiffSnapshotResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetDiffSnapshot404JSONResponse) VisitGetDiffSnapshotResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13975,18 +15391,26 @@ func (response GetDiffSnapshot404JSONResponse) VisitGetDiffSnapshotResponse(w ht
 	return err
 }
 
+// ExportDiffSnapshotRequestObject contains validated inputs for its OpenAPI operation.
 type ExportDiffSnapshotRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ExportDiffSnapshotRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	// SnapshotId carries the generated snapshot id value for ExportDiffSnapshotRequestObject.
 	SnapshotId SnapshotId `json:"snapshotId"`
-	Params     ExportDiffSnapshotParams
+	// Params contains the validated parameters for this request.
+	Params ExportDiffSnapshotParams
 }
 
+// ExportDiffSnapshotResponseObject is implemented by every declared response for its OpenAPI operation.
 type ExportDiffSnapshotResponseObject interface {
+	// VisitExportDiffSnapshotResponse carries the generated visit export diff snapshot response value for ExportDiffSnapshotResponseObject.
 	VisitExportDiffSnapshotResponse(w http.ResponseWriter) error
 }
 
+// ExportDiffSnapshot200JSONResponse contains the raw HTTP response and any decoded response body.
 type ExportDiffSnapshot200JSONResponse struct{ ArtifactLinkJSONResponse }
 
+// VisitExportDiffSnapshotResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ExportDiffSnapshot200JSONResponse) VisitExportDiffSnapshotResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -13999,8 +15423,10 @@ func (response ExportDiffSnapshot200JSONResponse) VisitExportDiffSnapshotRespons
 	return err
 }
 
+// ExportDiffSnapshot404JSONResponse contains the raw HTTP response and any decoded response body.
 type ExportDiffSnapshot404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitExportDiffSnapshotResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ExportDiffSnapshot404JSONResponse) VisitExportDiffSnapshotResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14014,18 +15440,26 @@ func (response ExportDiffSnapshot404JSONResponse) VisitExportDiffSnapshotRespons
 	return err
 }
 
+// CreateDiffSnapshotShareLinkRequestObject contains validated inputs for its OpenAPI operation.
 type CreateDiffSnapshotShareLinkRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateDiffSnapshotShareLinkRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	// SnapshotId carries the generated snapshot id value for CreateDiffSnapshotShareLinkRequestObject.
 	SnapshotId SnapshotId `json:"snapshotId"`
-	Body       *CreateDiffSnapshotShareLinkJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateDiffSnapshotShareLinkJSONRequestBody
 }
 
+// CreateDiffSnapshotShareLinkResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateDiffSnapshotShareLinkResponseObject interface {
+	// VisitCreateDiffSnapshotShareLinkResponse carries the generated visit create diff snapshot share link response value for CreateDiffSnapshotShareLinkResponseObject.
 	VisitCreateDiffSnapshotShareLinkResponse(w http.ResponseWriter) error
 }
 
+// CreateDiffSnapshotShareLink201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffSnapshotShareLink201JSONResponse struct{ ShareLinkCreatedJSONResponse }
 
+// VisitCreateDiffSnapshotShareLinkResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffSnapshotShareLink201JSONResponse) VisitCreateDiffSnapshotShareLinkResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14038,8 +15472,10 @@ func (response CreateDiffSnapshotShareLink201JSONResponse) VisitCreateDiffSnapsh
 	return err
 }
 
+// CreateDiffSnapshotShareLink404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffSnapshotShareLink404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateDiffSnapshotShareLinkResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffSnapshotShareLink404JSONResponse) VisitCreateDiffSnapshotShareLinkResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14053,17 +15489,24 @@ func (response CreateDiffSnapshotShareLink404JSONResponse) VisitCreateDiffSnapsh
 	return err
 }
 
+// SearchTenantUsersRequestObject contains validated inputs for its OpenAPI operation.
 type SearchTenantUsersRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for SearchTenantUsersRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     SearchTenantUsersParams
+	// Params contains the validated parameters for this request.
+	Params SearchTenantUsersParams
 }
 
+// SearchTenantUsersResponseObject is implemented by every declared response for its OpenAPI operation.
 type SearchTenantUsersResponseObject interface {
+	// VisitSearchTenantUsersResponse carries the generated visit search tenant users response value for SearchTenantUsersResponseObject.
 	VisitSearchTenantUsersResponse(w http.ResponseWriter) error
 }
 
+// SearchTenantUsers200JSONResponse contains the raw HTTP response and any decoded response body.
 type SearchTenantUsers200JSONResponse struct{ UserPageJSONResponse }
 
+// VisitSearchTenantUsersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response SearchTenantUsers200JSONResponse) VisitSearchTenantUsersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14076,8 +15519,10 @@ func (response SearchTenantUsers200JSONResponse) VisitSearchTenantUsersResponse(
 	return err
 }
 
+// SearchTenantUsers404JSONResponse contains the raw HTTP response and any decoded response body.
 type SearchTenantUsers404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitSearchTenantUsersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response SearchTenantUsers404JSONResponse) VisitSearchTenantUsersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14091,17 +15536,24 @@ func (response SearchTenantUsers404JSONResponse) VisitSearchTenantUsersResponse(
 	return err
 }
 
+// CreateTenantExportRequestObject contains validated inputs for its OpenAPI operation.
 type CreateTenantExportRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateTenantExportRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     CreateTenantExportParams
+	// Params contains the validated parameters for this request.
+	Params CreateTenantExportParams
 }
 
+// CreateTenantExportResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateTenantExportResponseObject interface {
+	// VisitCreateTenantExportResponse carries the generated visit create tenant export response value for CreateTenantExportResponseObject.
 	VisitCreateTenantExportResponse(w http.ResponseWriter) error
 }
 
+// CreateTenantExport202JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTenantExport202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitCreateTenantExportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTenantExport202JSONResponse) VisitCreateTenantExportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14114,8 +15566,10 @@ func (response CreateTenantExport202JSONResponse) VisitCreateTenantExportRespons
 	return err
 }
 
+// CreateTenantExport404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTenantExport404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateTenantExportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTenantExport404JSONResponse) VisitCreateTenantExportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14129,8 +15583,10 @@ func (response CreateTenantExport404JSONResponse) VisitCreateTenantExportRespons
 	return err
 }
 
+// CreateTenantExport409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTenantExport409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitCreateTenantExportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTenantExport409JSONResponse) VisitCreateTenantExportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14144,17 +15600,24 @@ func (response CreateTenantExport409JSONResponse) VisitCreateTenantExportRespons
 	return err
 }
 
+// ListJobsRequestObject contains validated inputs for its OpenAPI operation.
 type ListJobsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListJobsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListJobsParams
+	// Params contains the validated parameters for this request.
+	Params ListJobsParams
 }
 
+// ListJobsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListJobsResponseObject interface {
+	// VisitListJobsResponse carries the generated visit list jobs response value for ListJobsResponseObject.
 	VisitListJobsResponse(w http.ResponseWriter) error
 }
 
+// ListJobs200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListJobs200JSONResponse struct{ JobPageJSONResponse }
 
+// VisitListJobsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListJobs200JSONResponse) VisitListJobsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14167,8 +15630,10 @@ func (response ListJobs200JSONResponse) VisitListJobsResponse(w http.ResponseWri
 	return err
 }
 
+// ListJobs404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListJobs404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListJobsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListJobs404JSONResponse) VisitListJobsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14182,17 +15647,24 @@ func (response ListJobs404JSONResponse) VisitListJobsResponse(w http.ResponseWri
 	return err
 }
 
+// GetJobRequestObject contains validated inputs for its OpenAPI operation.
 type GetJobRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetJobRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	JobId      JobId      `json:"jobId"`
+	// JobId carries the generated job id value for GetJobRequestObject.
+	JobId JobId `json:"jobId"`
 }
 
+// GetJobResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetJobResponseObject interface {
+	// VisitGetJobResponse carries the generated visit get job response value for GetJobResponseObject.
 	VisitGetJobResponse(w http.ResponseWriter) error
 }
 
+// GetJob200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetJob200JSONResponse struct{ JobJSONResponse }
 
+// VisitGetJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetJob200JSONResponse) VisitGetJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14205,8 +15677,10 @@ func (response GetJob200JSONResponse) VisitGetJobResponse(w http.ResponseWriter)
 	return err
 }
 
+// GetJob404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetJob404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetJob404JSONResponse) VisitGetJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14220,21 +15694,31 @@ func (response GetJob404JSONResponse) VisitGetJobResponse(w http.ResponseWriter)
 	return err
 }
 
+// StreamJobLogsRequestObject contains validated inputs for its OpenAPI operation.
 type StreamJobLogsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for StreamJobLogsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	JobId      JobId      `json:"jobId"`
-	Params     StreamJobLogsParams
+	// JobId carries the generated job id value for StreamJobLogsRequestObject.
+	JobId JobId `json:"jobId"`
+	// Params contains the validated parameters for this request.
+	Params StreamJobLogsParams
 }
 
+// StreamJobLogsResponseObject is implemented by every declared response for its OpenAPI operation.
 type StreamJobLogsResponseObject interface {
+	// VisitStreamJobLogsResponse carries the generated visit stream job logs response value for StreamJobLogsResponseObject.
 	VisitStreamJobLogsResponse(w http.ResponseWriter) error
 }
 
+// StreamJobLogs200TexteventStreamResponse contains the raw HTTP response and any decoded response body.
 type StreamJobLogs200TexteventStreamResponse struct {
-	Body          io.Reader
+	// Body contains the decoded or raw HTTP response body.
+	Body io.Reader
+	// ContentLength is the byte length of an unparsed response body.
 	ContentLength int64
 }
 
+// VisitStreamJobLogsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response StreamJobLogs200TexteventStreamResponse) VisitStreamJobLogsResponse(w http.ResponseWriter) error {
 
 	w.Header().Set("Content-Type", "text/event-stream")
@@ -14273,8 +15757,10 @@ func (response StreamJobLogs200TexteventStreamResponse) VisitStreamJobLogsRespon
 	}
 }
 
+// StreamJobLogs404JSONResponse contains the raw HTTP response and any decoded response body.
 type StreamJobLogs404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitStreamJobLogsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response StreamJobLogs404JSONResponse) VisitStreamJobLogsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14288,17 +15774,24 @@ func (response StreamJobLogs404JSONResponse) VisitStreamJobLogsResponse(w http.R
 	return err
 }
 
+// CancelJobRequestObject contains validated inputs for its OpenAPI operation.
 type CancelJobRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CancelJobRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	JobId      JobId      `json:"jobId"`
+	// JobId carries the generated job id value for CancelJobRequestObject.
+	JobId JobId `json:"jobId"`
 }
 
+// CancelJobResponseObject is implemented by every declared response for its OpenAPI operation.
 type CancelJobResponseObject interface {
+	// VisitCancelJobResponse carries the generated visit cancel job response value for CancelJobResponseObject.
 	VisitCancelJobResponse(w http.ResponseWriter) error
 }
 
+// CancelJob202JSONResponse contains the raw HTTP response and any decoded response body.
 type CancelJob202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitCancelJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CancelJob202JSONResponse) VisitCancelJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14311,8 +15804,10 @@ func (response CancelJob202JSONResponse) VisitCancelJobResponse(w http.ResponseW
 	return err
 }
 
+// CancelJob404JSONResponse contains the raw HTTP response and any decoded response body.
 type CancelJob404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCancelJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CancelJob404JSONResponse) VisitCancelJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14326,8 +15821,10 @@ func (response CancelJob404JSONResponse) VisitCancelJobResponse(w http.ResponseW
 	return err
 }
 
+// CancelJob409JSONResponse contains the raw HTTP response and any decoded response body.
 type CancelJob409JSONResponse struct{ JobNotCancellableJSONResponse }
 
+// VisitCancelJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CancelJob409JSONResponse) VisitCancelJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14341,18 +15838,26 @@ func (response CancelJob409JSONResponse) VisitCancelJobResponse(w http.ResponseW
 	return err
 }
 
+// RetryJobRequestObject contains validated inputs for its OpenAPI operation.
 type RetryJobRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for RetryJobRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	JobId      JobId      `json:"jobId"`
-	Params     RetryJobParams
+	// JobId carries the generated job id value for RetryJobRequestObject.
+	JobId JobId `json:"jobId"`
+	// Params contains the validated parameters for this request.
+	Params RetryJobParams
 }
 
+// RetryJobResponseObject is implemented by every declared response for its OpenAPI operation.
 type RetryJobResponseObject interface {
+	// VisitRetryJobResponse carries the generated visit retry job response value for RetryJobResponseObject.
 	VisitRetryJobResponse(w http.ResponseWriter) error
 }
 
+// RetryJob202JSONResponse contains the raw HTTP response and any decoded response body.
 type RetryJob202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitRetryJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RetryJob202JSONResponse) VisitRetryJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14365,8 +15870,10 @@ func (response RetryJob202JSONResponse) VisitRetryJobResponse(w http.ResponseWri
 	return err
 }
 
+// RetryJob404JSONResponse contains the raw HTTP response and any decoded response body.
 type RetryJob404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRetryJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RetryJob404JSONResponse) VisitRetryJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14380,8 +15887,10 @@ func (response RetryJob404JSONResponse) VisitRetryJobResponse(w http.ResponseWri
 	return err
 }
 
+// RetryJob409JSONResponse contains the raw HTTP response and any decoded response body.
 type RetryJob409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitRetryJobResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RetryJob409JSONResponse) VisitRetryJobResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14395,17 +15904,24 @@ func (response RetryJob409JSONResponse) VisitRetryJobResponse(w http.ResponseWri
 	return err
 }
 
+// ListKnownHostsRequestObject contains validated inputs for its OpenAPI operation.
 type ListKnownHostsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListKnownHostsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListKnownHostsParams
+	// Params contains the validated parameters for this request.
+	Params ListKnownHostsParams
 }
 
+// ListKnownHostsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListKnownHostsResponseObject interface {
+	// VisitListKnownHostsResponse carries the generated visit list known hosts response value for ListKnownHostsResponseObject.
 	VisitListKnownHostsResponse(w http.ResponseWriter) error
 }
 
+// ListKnownHosts200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListKnownHosts200JSONResponse struct{ KnownHostPageJSONResponse }
 
+// VisitListKnownHostsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListKnownHosts200JSONResponse) VisitListKnownHostsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14418,8 +15934,10 @@ func (response ListKnownHosts200JSONResponse) VisitListKnownHostsResponse(w http
 	return err
 }
 
+// ListKnownHosts404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListKnownHosts404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListKnownHostsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListKnownHosts404JSONResponse) VisitListKnownHostsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14433,17 +15951,24 @@ func (response ListKnownHosts404JSONResponse) VisitListKnownHostsResponse(w http
 	return err
 }
 
+// CreateKnownHostRequestObject contains validated inputs for its OpenAPI operation.
 type CreateKnownHostRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateKnownHostRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateKnownHostJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateKnownHostJSONRequestBody
 }
 
+// CreateKnownHostResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateKnownHostResponseObject interface {
+	// VisitCreateKnownHostResponse carries the generated visit create known host response value for CreateKnownHostResponseObject.
 	VisitCreateKnownHostResponse(w http.ResponseWriter) error
 }
 
+// CreateKnownHost201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateKnownHost201JSONResponse struct{ KnownHostJSONResponse }
 
+// VisitCreateKnownHostResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateKnownHost201JSONResponse) VisitCreateKnownHostResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14456,8 +15981,10 @@ func (response CreateKnownHost201JSONResponse) VisitCreateKnownHostResponse(w ht
 	return err
 }
 
+// CreateKnownHost404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateKnownHost404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateKnownHostResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateKnownHost404JSONResponse) VisitCreateKnownHostResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14471,8 +15998,10 @@ func (response CreateKnownHost404JSONResponse) VisitCreateKnownHostResponse(w ht
 	return err
 }
 
+// CreateKnownHost409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateKnownHost409JSONResponse struct{ DuplicateJSONResponse }
 
+// VisitCreateKnownHostResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateKnownHost409JSONResponse) VisitCreateKnownHostResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14486,8 +16015,10 @@ func (response CreateKnownHost409JSONResponse) VisitCreateKnownHostResponse(w ht
 	return err
 }
 
+// CreateKnownHost422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateKnownHost422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitCreateKnownHostResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateKnownHost422JSONResponse) VisitCreateKnownHostResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14501,17 +16032,24 @@ func (response CreateKnownHost422JSONResponse) VisitCreateKnownHostResponse(w ht
 	return err
 }
 
+// GetLayerRevisionRequestObject contains validated inputs for its OpenAPI operation.
 type GetLayerRevisionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetLayerRevisionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RevisionId carries the generated revision id value for GetLayerRevisionRequestObject.
 	RevisionId RevisionId `json:"revisionId"`
 }
 
+// GetLayerRevisionResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetLayerRevisionResponseObject interface {
+	// VisitGetLayerRevisionResponse carries the generated visit get layer revision response value for GetLayerRevisionResponseObject.
 	VisitGetLayerRevisionResponse(w http.ResponseWriter) error
 }
 
+// GetLayerRevision200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetLayerRevision200JSONResponse struct{ LayerRevisionJSONResponse }
 
+// VisitGetLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetLayerRevision200JSONResponse) VisitGetLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14524,8 +16062,10 @@ func (response GetLayerRevision200JSONResponse) VisitGetLayerRevisionResponse(w 
 	return err
 }
 
+// GetLayerRevision404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetLayerRevision404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetLayerRevision404JSONResponse) VisitGetLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14539,17 +16079,24 @@ func (response GetLayerRevision404JSONResponse) VisitGetLayerRevisionResponse(w 
 	return err
 }
 
+// GetReviewContextRequestObject contains validated inputs for its OpenAPI operation.
 type GetReviewContextRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetReviewContextRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RevisionId carries the generated revision id value for GetReviewContextRequestObject.
 	RevisionId RevisionId `json:"revisionId"`
 }
 
+// GetReviewContextResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetReviewContextResponseObject interface {
+	// VisitGetReviewContextResponse carries the generated visit get review context response value for GetReviewContextResponseObject.
 	VisitGetReviewContextResponse(w http.ResponseWriter) error
 }
 
+// GetReviewContext200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetReviewContext200JSONResponse struct{ ReviewContextJSONResponse }
 
+// VisitGetReviewContextResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetReviewContext200JSONResponse) VisitGetReviewContextResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14562,8 +16109,10 @@ func (response GetReviewContext200JSONResponse) VisitGetReviewContextResponse(w 
 	return err
 }
 
+// GetReviewContext404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetReviewContext404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetReviewContextResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetReviewContext404JSONResponse) VisitGetReviewContextResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14577,8 +16126,10 @@ func (response GetReviewContext404JSONResponse) VisitGetReviewContextResponse(w 
 	return err
 }
 
+// GetReviewContext409JSONResponse contains the raw HTTP response and any decoded response body.
 type GetReviewContext409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitGetReviewContextResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetReviewContext409JSONResponse) VisitGetReviewContextResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14592,21 +16143,30 @@ func (response GetReviewContext409JSONResponse) VisitGetReviewContextResponse(w 
 	return err
 }
 
+// ApproveLayerRevisionRequestObject contains validated inputs for its OpenAPI operation.
 type ApproveLayerRevisionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ApproveLayerRevisionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RevisionId carries the generated revision id value for ApproveLayerRevisionRequestObject.
 	RevisionId RevisionId `json:"revisionId"`
-	Params     ApproveLayerRevisionParams
-	Body       *ApproveLayerRevisionJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params ApproveLayerRevisionParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *ApproveLayerRevisionJSONRequestBody
 }
 
+// ApproveLayerRevisionResponseObject is implemented by every declared response for its OpenAPI operation.
 type ApproveLayerRevisionResponseObject interface {
+	// VisitApproveLayerRevisionResponse carries the generated visit approve layer revision response value for ApproveLayerRevisionResponseObject.
 	VisitApproveLayerRevisionResponse(w http.ResponseWriter) error
 }
 
+// ApproveLayerRevision200JSONResponse contains the raw HTTP response and any decoded response body.
 type ApproveLayerRevision200JSONResponse struct {
 	RevisionReviewResultJSONResponse
 }
 
+// VisitApproveLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ApproveLayerRevision200JSONResponse) VisitApproveLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14619,8 +16179,10 @@ func (response ApproveLayerRevision200JSONResponse) VisitApproveLayerRevisionRes
 	return err
 }
 
+// ApproveLayerRevision404JSONResponse contains the raw HTTP response and any decoded response body.
 type ApproveLayerRevision404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitApproveLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ApproveLayerRevision404JSONResponse) VisitApproveLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14634,8 +16196,10 @@ func (response ApproveLayerRevision404JSONResponse) VisitApproveLayerRevisionRes
 	return err
 }
 
+// ApproveLayerRevision409JSONResponse contains the raw HTTP response and any decoded response body.
 type ApproveLayerRevision409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitApproveLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ApproveLayerRevision409JSONResponse) VisitApproveLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14649,21 +16213,30 @@ func (response ApproveLayerRevision409JSONResponse) VisitApproveLayerRevisionRes
 	return err
 }
 
+// RejectLayerRevisionRequestObject contains validated inputs for its OpenAPI operation.
 type RejectLayerRevisionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for RejectLayerRevisionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RevisionId carries the generated revision id value for RejectLayerRevisionRequestObject.
 	RevisionId RevisionId `json:"revisionId"`
-	Params     RejectLayerRevisionParams
-	Body       *RejectLayerRevisionJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params RejectLayerRevisionParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *RejectLayerRevisionJSONRequestBody
 }
 
+// RejectLayerRevisionResponseObject is implemented by every declared response for its OpenAPI operation.
 type RejectLayerRevisionResponseObject interface {
+	// VisitRejectLayerRevisionResponse carries the generated visit reject layer revision response value for RejectLayerRevisionResponseObject.
 	VisitRejectLayerRevisionResponse(w http.ResponseWriter) error
 }
 
+// RejectLayerRevision200JSONResponse contains the raw HTTP response and any decoded response body.
 type RejectLayerRevision200JSONResponse struct {
 	RevisionReviewResultJSONResponse
 }
 
+// VisitRejectLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RejectLayerRevision200JSONResponse) VisitRejectLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14676,8 +16249,10 @@ func (response RejectLayerRevision200JSONResponse) VisitRejectLayerRevisionRespo
 	return err
 }
 
+// RejectLayerRevision404JSONResponse contains the raw HTTP response and any decoded response body.
 type RejectLayerRevision404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRejectLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RejectLayerRevision404JSONResponse) VisitRejectLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14691,8 +16266,10 @@ func (response RejectLayerRevision404JSONResponse) VisitRejectLayerRevisionRespo
 	return err
 }
 
+// RejectLayerRevision409JSONResponse contains the raw HTTP response and any decoded response body.
 type RejectLayerRevision409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitRejectLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RejectLayerRevision409JSONResponse) VisitRejectLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14706,8 +16283,10 @@ func (response RejectLayerRevision409JSONResponse) VisitRejectLayerRevisionRespo
 	return err
 }
 
+// RejectLayerRevision422JSONResponse contains the raw HTTP response and any decoded response body.
 type RejectLayerRevision422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitRejectLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RejectLayerRevision422JSONResponse) VisitRejectLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14721,18 +16300,26 @@ func (response RejectLayerRevision422JSONResponse) VisitRejectLayerRevisionRespo
 	return err
 }
 
+// GetLayerRequestObject contains validated inputs for its OpenAPI operation.
 type GetLayerRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetLayerRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	LayerId    LayerId    `json:"layerId"`
-	Params     GetLayerParams
+	// LayerId carries the generated layer id value for GetLayerRequestObject.
+	LayerId LayerId `json:"layerId"`
+	// Params contains the validated parameters for this request.
+	Params GetLayerParams
 }
 
+// GetLayerResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetLayerResponseObject interface {
+	// VisitGetLayerResponse carries the generated visit get layer response value for GetLayerResponseObject.
 	VisitGetLayerResponse(w http.ResponseWriter) error
 }
 
+// GetLayer200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetLayer200JSONResponse struct{ LayerJSONResponse }
 
+// VisitGetLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetLayer200JSONResponse) VisitGetLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14746,8 +16333,10 @@ func (response GetLayer200JSONResponse) VisitGetLayerResponse(w http.ResponseWri
 	return err
 }
 
+// GetLayer404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetLayer404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetLayer404JSONResponse) VisitGetLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14761,19 +16350,28 @@ func (response GetLayer404JSONResponse) VisitGetLayerResponse(w http.ResponseWri
 	return err
 }
 
+// UpdateLayerRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateLayerRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateLayerRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	LayerId    LayerId    `json:"layerId"`
-	Params     UpdateLayerParams
-	Body       *UpdateLayerJSONRequestBody
+	// LayerId carries the generated layer id value for UpdateLayerRequestObject.
+	LayerId LayerId `json:"layerId"`
+	// Params contains the validated parameters for this request.
+	Params UpdateLayerParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateLayerJSONRequestBody
 }
 
+// UpdateLayerResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateLayerResponseObject interface {
+	// VisitUpdateLayerResponse carries the generated visit update layer response value for UpdateLayerResponseObject.
 	VisitUpdateLayerResponse(w http.ResponseWriter) error
 }
 
+// UpdateLayer200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateLayer200JSONResponse struct{ LayerJSONResponse }
 
+// VisitUpdateLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateLayer200JSONResponse) VisitUpdateLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14787,8 +16385,10 @@ func (response UpdateLayer200JSONResponse) VisitUpdateLayerResponse(w http.Respo
 	return err
 }
 
+// UpdateLayer404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateLayer404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateLayer404JSONResponse) VisitUpdateLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14802,8 +16402,10 @@ func (response UpdateLayer404JSONResponse) VisitUpdateLayerResponse(w http.Respo
 	return err
 }
 
+// UpdateLayer409JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateLayer409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitUpdateLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateLayer409JSONResponse) VisitUpdateLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14817,8 +16419,10 @@ func (response UpdateLayer409JSONResponse) VisitUpdateLayerResponse(w http.Respo
 	return err
 }
 
+// UpdateLayer412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateLayer412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateLayer412JSONResponse) VisitUpdateLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14832,8 +16436,10 @@ func (response UpdateLayer412JSONResponse) VisitUpdateLayerResponse(w http.Respo
 	return err
 }
 
+// UpdateLayer422JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateLayer422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitUpdateLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateLayer422JSONResponse) VisitUpdateLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14847,18 +16453,26 @@ func (response UpdateLayer422JSONResponse) VisitUpdateLayerResponse(w http.Respo
 	return err
 }
 
+// ListLayerRevisionsRequestObject contains validated inputs for its OpenAPI operation.
 type ListLayerRevisionsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListLayerRevisionsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	LayerId    LayerId    `json:"layerId"`
-	Params     ListLayerRevisionsParams
+	// LayerId carries the generated layer id value for ListLayerRevisionsRequestObject.
+	LayerId LayerId `json:"layerId"`
+	// Params contains the validated parameters for this request.
+	Params ListLayerRevisionsParams
 }
 
+// ListLayerRevisionsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListLayerRevisionsResponseObject interface {
+	// VisitListLayerRevisionsResponse carries the generated visit list layer revisions response value for ListLayerRevisionsResponseObject.
 	VisitListLayerRevisionsResponse(w http.ResponseWriter) error
 }
 
+// ListLayerRevisions200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListLayerRevisions200JSONResponse struct{ LayerRevisionPageJSONResponse }
 
+// VisitListLayerRevisionsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListLayerRevisions200JSONResponse) VisitListLayerRevisionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14871,8 +16485,10 @@ func (response ListLayerRevisions200JSONResponse) VisitListLayerRevisionsRespons
 	return err
 }
 
+// ListLayerRevisions404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListLayerRevisions404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListLayerRevisionsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListLayerRevisions404JSONResponse) VisitListLayerRevisionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14886,21 +16502,30 @@ func (response ListLayerRevisions404JSONResponse) VisitListLayerRevisionsRespons
 	return err
 }
 
+// CreateLayerRevisionRequestObject contains validated inputs for its OpenAPI operation.
 type CreateLayerRevisionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateLayerRevisionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	LayerId    LayerId    `json:"layerId"`
-	Params     CreateLayerRevisionParams
-	Body       *CreateLayerRevisionJSONRequestBody
+	// LayerId carries the generated layer id value for CreateLayerRevisionRequestObject.
+	LayerId LayerId `json:"layerId"`
+	// Params contains the validated parameters for this request.
+	Params CreateLayerRevisionParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateLayerRevisionJSONRequestBody
 }
 
+// CreateLayerRevisionResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateLayerRevisionResponseObject interface {
+	// VisitCreateLayerRevisionResponse carries the generated visit create layer revision response value for CreateLayerRevisionResponseObject.
 	VisitCreateLayerRevisionResponse(w http.ResponseWriter) error
 }
 
+// CreateLayerRevision200JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateLayerRevision200JSONResponse struct {
 	LayerRevisionSubmissionJSONResponse
 }
 
+// VisitCreateLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateLayerRevision200JSONResponse) VisitCreateLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14913,8 +16538,10 @@ func (response CreateLayerRevision200JSONResponse) VisitCreateLayerRevisionRespo
 	return err
 }
 
+// CreateLayerRevision201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateLayerRevision201JSONResponse LayerRevisionSubmission
 
+// VisitCreateLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateLayerRevision201JSONResponse) VisitCreateLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14927,8 +16554,10 @@ func (response CreateLayerRevision201JSONResponse) VisitCreateLayerRevisionRespo
 	return err
 }
 
+// CreateLayerRevision404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateLayerRevision404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateLayerRevision404JSONResponse) VisitCreateLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14942,8 +16571,10 @@ func (response CreateLayerRevision404JSONResponse) VisitCreateLayerRevisionRespo
 	return err
 }
 
+// CreateLayerRevision409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateLayerRevision409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitCreateLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateLayerRevision409JSONResponse) VisitCreateLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14957,8 +16588,10 @@ func (response CreateLayerRevision409JSONResponse) VisitCreateLayerRevisionRespo
 	return err
 }
 
+// CreateLayerRevision413JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateLayerRevision413JSONResponse struct{ ContentTooLargeJSONResponse }
 
+// VisitCreateLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateLayerRevision413JSONResponse) VisitCreateLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14972,8 +16605,10 @@ func (response CreateLayerRevision413JSONResponse) VisitCreateLayerRevisionRespo
 	return err
 }
 
+// CreateLayerRevision422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateLayerRevision422JSONResponse struct{ OverlayInvalidJSONResponse }
 
+// VisitCreateLayerRevisionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateLayerRevision422JSONResponse) VisitCreateLayerRevisionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -14987,19 +16622,28 @@ func (response CreateLayerRevision422JSONResponse) VisitCreateLayerRevisionRespo
 	return err
 }
 
+// RollbackLayerRequestObject contains validated inputs for its OpenAPI operation.
 type RollbackLayerRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for RollbackLayerRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	LayerId    LayerId    `json:"layerId"`
-	Params     RollbackLayerParams
-	Body       *RollbackLayerJSONRequestBody
+	// LayerId carries the generated layer id value for RollbackLayerRequestObject.
+	LayerId LayerId `json:"layerId"`
+	// Params contains the validated parameters for this request.
+	Params RollbackLayerParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *RollbackLayerJSONRequestBody
 }
 
+// RollbackLayerResponseObject is implemented by every declared response for its OpenAPI operation.
 type RollbackLayerResponseObject interface {
+	// VisitRollbackLayerResponse carries the generated visit rollback layer response value for RollbackLayerResponseObject.
 	VisitRollbackLayerResponse(w http.ResponseWriter) error
 }
 
+// RollbackLayer202JSONResponse contains the raw HTTP response and any decoded response body.
 type RollbackLayer202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitRollbackLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RollbackLayer202JSONResponse) VisitRollbackLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15012,8 +16656,10 @@ func (response RollbackLayer202JSONResponse) VisitRollbackLayerResponse(w http.R
 	return err
 }
 
+// RollbackLayer404JSONResponse contains the raw HTTP response and any decoded response body.
 type RollbackLayer404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRollbackLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RollbackLayer404JSONResponse) VisitRollbackLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15027,8 +16673,10 @@ func (response RollbackLayer404JSONResponse) VisitRollbackLayerResponse(w http.R
 	return err
 }
 
+// RollbackLayer409JSONResponse contains the raw HTTP response and any decoded response body.
 type RollbackLayer409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitRollbackLayerResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RollbackLayer409JSONResponse) VisitRollbackLayerResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15042,17 +16690,24 @@ func (response RollbackLayer409JSONResponse) VisitRollbackLayerResponse(w http.R
 	return err
 }
 
+// ListTenantMembersRequestObject contains validated inputs for its OpenAPI operation.
 type ListTenantMembersRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListTenantMembersRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListTenantMembersParams
+	// Params contains the validated parameters for this request.
+	Params ListTenantMembersParams
 }
 
+// ListTenantMembersResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListTenantMembersResponseObject interface {
+	// VisitListTenantMembersResponse carries the generated visit list tenant members response value for ListTenantMembersResponseObject.
 	VisitListTenantMembersResponse(w http.ResponseWriter) error
 }
 
+// ListTenantMembers200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTenantMembers200JSONResponse struct{ MemberPageJSONResponse }
 
+// VisitListTenantMembersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTenantMembers200JSONResponse) VisitListTenantMembersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15065,8 +16720,10 @@ func (response ListTenantMembers200JSONResponse) VisitListTenantMembersResponse(
 	return err
 }
 
+// ListTenantMembers404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTenantMembers404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListTenantMembersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTenantMembers404JSONResponse) VisitListTenantMembersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15080,25 +16737,34 @@ func (response ListTenantMembers404JSONResponse) VisitListTenantMembersResponse(
 	return err
 }
 
+// DeleteTenantMemberRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteTenantMemberRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteTenantMemberRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	UserId     UserId     `json:"userId"`
+	// UserId carries the generated user id value for DeleteTenantMemberRequestObject.
+	UserId UserId `json:"userId"`
 }
 
+// DeleteTenantMemberResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteTenantMemberResponseObject interface {
+	// VisitDeleteTenantMemberResponse carries the generated visit delete tenant member response value for DeleteTenantMemberResponseObject.
 	VisitDeleteTenantMemberResponse(w http.ResponseWriter) error
 }
 
+// DeleteTenantMember204Response contains the raw HTTP response and any decoded response body.
 type DeleteTenantMember204Response struct {
 }
 
+// VisitDeleteTenantMemberResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTenantMember204Response) VisitDeleteTenantMemberResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteTenantMember404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTenantMember404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteTenantMemberResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTenantMember404JSONResponse) VisitDeleteTenantMemberResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15112,8 +16778,10 @@ func (response DeleteTenantMember404JSONResponse) VisitDeleteTenantMemberRespons
 	return err
 }
 
+// DeleteTenantMember409JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTenantMember409JSONResponse struct{ LastAdminJSONResponse }
 
+// VisitDeleteTenantMemberResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTenantMember409JSONResponse) VisitDeleteTenantMemberResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15127,18 +16795,26 @@ func (response DeleteTenantMember409JSONResponse) VisitDeleteTenantMemberRespons
 	return err
 }
 
+// PutTenantMemberRequestObject contains validated inputs for its OpenAPI operation.
 type PutTenantMemberRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for PutTenantMemberRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	UserId     UserId     `json:"userId"`
-	Body       *PutTenantMemberJSONRequestBody
+	// UserId carries the generated user id value for PutTenantMemberRequestObject.
+	UserId UserId `json:"userId"`
+	// Body contains the decoded or raw HTTP response body.
+	Body *PutTenantMemberJSONRequestBody
 }
 
+// PutTenantMemberResponseObject is implemented by every declared response for its OpenAPI operation.
 type PutTenantMemberResponseObject interface {
+	// VisitPutTenantMemberResponse carries the generated visit put tenant member response value for PutTenantMemberResponseObject.
 	VisitPutTenantMemberResponse(w http.ResponseWriter) error
 }
 
+// PutTenantMember200JSONResponse contains the raw HTTP response and any decoded response body.
 type PutTenantMember200JSONResponse struct{ MemberJSONResponse }
 
+// VisitPutTenantMemberResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutTenantMember200JSONResponse) VisitPutTenantMemberResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15151,8 +16827,10 @@ func (response PutTenantMember200JSONResponse) VisitPutTenantMemberResponse(w ht
 	return err
 }
 
+// PutTenantMember404JSONResponse contains the raw HTTP response and any decoded response body.
 type PutTenantMember404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPutTenantMemberResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutTenantMember404JSONResponse) VisitPutTenantMemberResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15166,8 +16844,10 @@ func (response PutTenantMember404JSONResponse) VisitPutTenantMemberResponse(w ht
 	return err
 }
 
+// PutTenantMember409JSONResponse contains the raw HTTP response and any decoded response body.
 type PutTenantMember409JSONResponse struct{ LastAdminJSONResponse }
 
+// VisitPutTenantMemberResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutTenantMember409JSONResponse) VisitPutTenantMemberResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15181,18 +16861,24 @@ func (response PutTenantMember409JSONResponse) VisitPutTenantMemberResponse(w ht
 	return err
 }
 
+// ListNotificationChannelsRequestObject contains validated inputs for its OpenAPI operation.
 type ListNotificationChannelsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListNotificationChannelsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// ListNotificationChannelsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListNotificationChannelsResponseObject interface {
+	// VisitListNotificationChannelsResponse carries the generated visit list notification channels response value for ListNotificationChannelsResponseObject.
 	VisitListNotificationChannelsResponse(w http.ResponseWriter) error
 }
 
+// ListNotificationChannels200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListNotificationChannels200JSONResponse struct {
 	NotificationChannelListJSONResponse
 }
 
+// VisitListNotificationChannelsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListNotificationChannels200JSONResponse) VisitListNotificationChannelsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15205,8 +16891,10 @@ func (response ListNotificationChannels200JSONResponse) VisitListNotificationCha
 	return err
 }
 
+// ListNotificationChannels404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListNotificationChannels404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListNotificationChannelsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListNotificationChannels404JSONResponse) VisitListNotificationChannelsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15220,19 +16908,26 @@ func (response ListNotificationChannels404JSONResponse) VisitListNotificationCha
 	return err
 }
 
+// CreateNotificationChannelRequestObject contains validated inputs for its OpenAPI operation.
 type CreateNotificationChannelRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateNotificationChannelRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateNotificationChannelJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateNotificationChannelJSONRequestBody
 }
 
+// CreateNotificationChannelResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateNotificationChannelResponseObject interface {
+	// VisitCreateNotificationChannelResponse carries the generated visit create notification channel response value for CreateNotificationChannelResponseObject.
 	VisitCreateNotificationChannelResponse(w http.ResponseWriter) error
 }
 
+// CreateNotificationChannel201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateNotificationChannel201JSONResponse struct {
 	NotificationChannelJSONResponse
 }
 
+// VisitCreateNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateNotificationChannel201JSONResponse) VisitCreateNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15246,8 +16941,10 @@ func (response CreateNotificationChannel201JSONResponse) VisitCreateNotification
 	return err
 }
 
+// CreateNotificationChannel404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateNotificationChannel404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateNotificationChannel404JSONResponse) VisitCreateNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15261,8 +16958,10 @@ func (response CreateNotificationChannel404JSONResponse) VisitCreateNotification
 	return err
 }
 
+// CreateNotificationChannel422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateNotificationChannel422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitCreateNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateNotificationChannel422JSONResponse) VisitCreateNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15276,26 +16975,36 @@ func (response CreateNotificationChannel422JSONResponse) VisitCreateNotification
 	return err
 }
 
+// DeleteNotificationChannelRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteNotificationChannelRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteNotificationChannelRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	ChannelId  ChannelId  `json:"channelId"`
-	Params     DeleteNotificationChannelParams
+	// ChannelId carries the generated channel id value for DeleteNotificationChannelRequestObject.
+	ChannelId ChannelId `json:"channelId"`
+	// Params contains the validated parameters for this request.
+	Params DeleteNotificationChannelParams
 }
 
+// DeleteNotificationChannelResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteNotificationChannelResponseObject interface {
+	// VisitDeleteNotificationChannelResponse carries the generated visit delete notification channel response value for DeleteNotificationChannelResponseObject.
 	VisitDeleteNotificationChannelResponse(w http.ResponseWriter) error
 }
 
+// DeleteNotificationChannel204Response contains the raw HTTP response and any decoded response body.
 type DeleteNotificationChannel204Response struct {
 }
 
+// VisitDeleteNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteNotificationChannel204Response) VisitDeleteNotificationChannelResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteNotificationChannel404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteNotificationChannel404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteNotificationChannel404JSONResponse) VisitDeleteNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15309,8 +17018,10 @@ func (response DeleteNotificationChannel404JSONResponse) VisitDeleteNotification
 	return err
 }
 
+// DeleteNotificationChannel412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteNotificationChannel412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteNotificationChannel412JSONResponse) VisitDeleteNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15324,21 +17035,30 @@ func (response DeleteNotificationChannel412JSONResponse) VisitDeleteNotification
 	return err
 }
 
+// UpdateNotificationChannelRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateNotificationChannelRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateNotificationChannelRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	ChannelId  ChannelId  `json:"channelId"`
-	Params     UpdateNotificationChannelParams
-	Body       *UpdateNotificationChannelJSONRequestBody
+	// ChannelId carries the generated channel id value for UpdateNotificationChannelRequestObject.
+	ChannelId ChannelId `json:"channelId"`
+	// Params contains the validated parameters for this request.
+	Params UpdateNotificationChannelParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateNotificationChannelJSONRequestBody
 }
 
+// UpdateNotificationChannelResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateNotificationChannelResponseObject interface {
+	// VisitUpdateNotificationChannelResponse carries the generated visit update notification channel response value for UpdateNotificationChannelResponseObject.
 	VisitUpdateNotificationChannelResponse(w http.ResponseWriter) error
 }
 
+// UpdateNotificationChannel200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateNotificationChannel200JSONResponse struct {
 	NotificationChannelJSONResponse
 }
 
+// VisitUpdateNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateNotificationChannel200JSONResponse) VisitUpdateNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15352,8 +17072,10 @@ func (response UpdateNotificationChannel200JSONResponse) VisitUpdateNotification
 	return err
 }
 
+// UpdateNotificationChannel404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateNotificationChannel404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateNotificationChannel404JSONResponse) VisitUpdateNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15367,8 +17089,10 @@ func (response UpdateNotificationChannel404JSONResponse) VisitUpdateNotification
 	return err
 }
 
+// UpdateNotificationChannel412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateNotificationChannel412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateNotificationChannel412JSONResponse) VisitUpdateNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15382,21 +17106,30 @@ func (response UpdateNotificationChannel412JSONResponse) VisitUpdateNotification
 	return err
 }
 
+// RotateNotificationChannelSecretRequestObject contains validated inputs for its OpenAPI operation.
 type RotateNotificationChannelSecretRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for RotateNotificationChannelSecretRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	ChannelId  ChannelId  `json:"channelId"`
-	Params     RotateNotificationChannelSecretParams
-	Body       *RotateNotificationChannelSecretJSONRequestBody
+	// ChannelId carries the generated channel id value for RotateNotificationChannelSecretRequestObject.
+	ChannelId ChannelId `json:"channelId"`
+	// Params contains the validated parameters for this request.
+	Params RotateNotificationChannelSecretParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *RotateNotificationChannelSecretJSONRequestBody
 }
 
+// RotateNotificationChannelSecretResponseObject is implemented by every declared response for its OpenAPI operation.
 type RotateNotificationChannelSecretResponseObject interface {
+	// VisitRotateNotificationChannelSecretResponse carries the generated visit rotate notification channel secret response value for RotateNotificationChannelSecretResponseObject.
 	VisitRotateNotificationChannelSecretResponse(w http.ResponseWriter) error
 }
 
+// RotateNotificationChannelSecret200JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateNotificationChannelSecret200JSONResponse struct {
 	NotificationChannelJSONResponse
 }
 
+// VisitRotateNotificationChannelSecretResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateNotificationChannelSecret200JSONResponse) VisitRotateNotificationChannelSecretResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15410,8 +17143,10 @@ func (response RotateNotificationChannelSecret200JSONResponse) VisitRotateNotifi
 	return err
 }
 
+// RotateNotificationChannelSecret404JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateNotificationChannelSecret404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRotateNotificationChannelSecretResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateNotificationChannelSecret404JSONResponse) VisitRotateNotificationChannelSecretResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15425,8 +17160,10 @@ func (response RotateNotificationChannelSecret404JSONResponse) VisitRotateNotifi
 	return err
 }
 
+// RotateNotificationChannelSecret409JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateNotificationChannelSecret409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitRotateNotificationChannelSecretResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateNotificationChannelSecret409JSONResponse) VisitRotateNotificationChannelSecretResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15440,8 +17177,10 @@ func (response RotateNotificationChannelSecret409JSONResponse) VisitRotateNotifi
 	return err
 }
 
+// RotateNotificationChannelSecret412JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateNotificationChannelSecret412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitRotateNotificationChannelSecretResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateNotificationChannelSecret412JSONResponse) VisitRotateNotificationChannelSecretResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15455,8 +17194,10 @@ func (response RotateNotificationChannelSecret412JSONResponse) VisitRotateNotifi
 	return err
 }
 
+// RotateNotificationChannelSecret422JSONResponse contains the raw HTTP response and any decoded response body.
 type RotateNotificationChannelSecret422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitRotateNotificationChannelSecretResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RotateNotificationChannelSecret422JSONResponse) VisitRotateNotificationChannelSecretResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15470,17 +17211,24 @@ func (response RotateNotificationChannelSecret422JSONResponse) VisitRotateNotifi
 	return err
 }
 
+// TestNotificationChannelRequestObject contains validated inputs for its OpenAPI operation.
 type TestNotificationChannelRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for TestNotificationChannelRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	ChannelId  ChannelId  `json:"channelId"`
+	// ChannelId carries the generated channel id value for TestNotificationChannelRequestObject.
+	ChannelId ChannelId `json:"channelId"`
 }
 
+// TestNotificationChannelResponseObject is implemented by every declared response for its OpenAPI operation.
 type TestNotificationChannelResponseObject interface {
+	// VisitTestNotificationChannelResponse carries the generated visit test notification channel response value for TestNotificationChannelResponseObject.
 	VisitTestNotificationChannelResponse(w http.ResponseWriter) error
 }
 
+// TestNotificationChannel202JSONResponse contains the raw HTTP response and any decoded response body.
 type TestNotificationChannel202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitTestNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response TestNotificationChannel202JSONResponse) VisitTestNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15493,8 +17241,10 @@ func (response TestNotificationChannel202JSONResponse) VisitTestNotificationChan
 	return err
 }
 
+// TestNotificationChannel404JSONResponse contains the raw HTTP response and any decoded response body.
 type TestNotificationChannel404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitTestNotificationChannelResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response TestNotificationChannel404JSONResponse) VisitTestNotificationChannelResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15508,17 +17258,24 @@ func (response TestNotificationChannel404JSONResponse) VisitTestNotificationChan
 	return err
 }
 
+// ListNotificationsRequestObject contains validated inputs for its OpenAPI operation.
 type ListNotificationsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListNotificationsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListNotificationsParams
+	// Params contains the validated parameters for this request.
+	Params ListNotificationsParams
 }
 
+// ListNotificationsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListNotificationsResponseObject interface {
+	// VisitListNotificationsResponse carries the generated visit list notifications response value for ListNotificationsResponseObject.
 	VisitListNotificationsResponse(w http.ResponseWriter) error
 }
 
+// ListNotifications200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListNotifications200JSONResponse struct{ NotificationPageJSONResponse }
 
+// VisitListNotificationsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListNotifications200JSONResponse) VisitListNotificationsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15531,8 +17288,10 @@ func (response ListNotifications200JSONResponse) VisitListNotificationsResponse(
 	return err
 }
 
+// ListNotifications404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListNotifications404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListNotificationsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListNotifications404JSONResponse) VisitListNotificationsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15546,25 +17305,34 @@ func (response ListNotifications404JSONResponse) VisitListNotificationsResponse(
 	return err
 }
 
+// MarkNotificationReadRequestObject contains validated inputs for its OpenAPI operation.
 type MarkNotificationReadRequestObject struct {
-	TenantSlug     TenantSlug     `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for MarkNotificationReadRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// NotificationId carries the generated notification id value for MarkNotificationReadRequestObject.
 	NotificationId NotificationId `json:"notificationId"`
 }
 
+// MarkNotificationReadResponseObject is implemented by every declared response for its OpenAPI operation.
 type MarkNotificationReadResponseObject interface {
+	// VisitMarkNotificationReadResponse carries the generated visit mark notification read response value for MarkNotificationReadResponseObject.
 	VisitMarkNotificationReadResponse(w http.ResponseWriter) error
 }
 
+// MarkNotificationRead204Response contains the raw HTTP response and any decoded response body.
 type MarkNotificationRead204Response struct {
 }
 
+// VisitMarkNotificationReadResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response MarkNotificationRead204Response) VisitMarkNotificationReadResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// MarkNotificationRead404JSONResponse contains the raw HTTP response and any decoded response body.
 type MarkNotificationRead404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitMarkNotificationReadResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response MarkNotificationRead404JSONResponse) VisitMarkNotificationReadResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15578,24 +17346,32 @@ func (response MarkNotificationRead404JSONResponse) VisitMarkNotificationReadRes
 	return err
 }
 
+// MarkAllNotificationsReadRequestObject contains validated inputs for its OpenAPI operation.
 type MarkAllNotificationsReadRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for MarkAllNotificationsReadRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// MarkAllNotificationsReadResponseObject is implemented by every declared response for its OpenAPI operation.
 type MarkAllNotificationsReadResponseObject interface {
+	// VisitMarkAllNotificationsReadResponse carries the generated visit mark all notifications read response value for MarkAllNotificationsReadResponseObject.
 	VisitMarkAllNotificationsReadResponse(w http.ResponseWriter) error
 }
 
+// MarkAllNotificationsRead204Response contains the raw HTTP response and any decoded response body.
 type MarkAllNotificationsRead204Response struct {
 }
 
+// VisitMarkAllNotificationsReadResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response MarkAllNotificationsRead204Response) VisitMarkAllNotificationsReadResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// MarkAllNotificationsRead404JSONResponse contains the raw HTTP response and any decoded response body.
 type MarkAllNotificationsRead404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitMarkAllNotificationsReadResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response MarkAllNotificationsRead404JSONResponse) VisitMarkAllNotificationsReadResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15609,18 +17385,24 @@ func (response MarkAllNotificationsRead404JSONResponse) VisitMarkAllNotification
 	return err
 }
 
+// ListAvailableProducerProfilesRequestObject contains validated inputs for its OpenAPI operation.
 type ListAvailableProducerProfilesRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListAvailableProducerProfilesRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// ListAvailableProducerProfilesResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListAvailableProducerProfilesResponseObject interface {
+	// VisitListAvailableProducerProfilesResponse carries the generated visit list available producer profiles response value for ListAvailableProducerProfilesResponseObject.
 	VisitListAvailableProducerProfilesResponse(w http.ResponseWriter) error
 }
 
+// ListAvailableProducerProfiles200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAvailableProducerProfiles200JSONResponse struct {
 	ProducerProfileOptionListJSONResponse
 }
 
+// VisitListAvailableProducerProfilesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAvailableProducerProfiles200JSONResponse) VisitListAvailableProducerProfilesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15633,8 +17415,10 @@ func (response ListAvailableProducerProfiles200JSONResponse) VisitListAvailableP
 	return err
 }
 
+// ListAvailableProducerProfiles404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListAvailableProducerProfiles404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListAvailableProducerProfilesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListAvailableProducerProfiles404JSONResponse) VisitListAvailableProducerProfilesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15648,17 +17432,24 @@ func (response ListAvailableProducerProfiles404JSONResponse) VisitListAvailableP
 	return err
 }
 
+// ListRepositoriesRequestObject contains validated inputs for its OpenAPI operation.
 type ListRepositoriesRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListRepositoriesRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListRepositoriesParams
+	// Params contains the validated parameters for this request.
+	Params ListRepositoriesParams
 }
 
+// ListRepositoriesResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListRepositoriesResponseObject interface {
+	// VisitListRepositoriesResponse carries the generated visit list repositories response value for ListRepositoriesResponseObject.
 	VisitListRepositoriesResponse(w http.ResponseWriter) error
 }
 
+// ListRepositories200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListRepositories200JSONResponse struct{ RepositoryPageJSONResponse }
 
+// VisitListRepositoriesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListRepositories200JSONResponse) VisitListRepositoriesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15671,8 +17462,10 @@ func (response ListRepositories200JSONResponse) VisitListRepositoriesResponse(w 
 	return err
 }
 
+// ListRepositories404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListRepositories404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListRepositoriesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListRepositories404JSONResponse) VisitListRepositoriesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15686,17 +17479,24 @@ func (response ListRepositories404JSONResponse) VisitListRepositoriesResponse(w 
 	return err
 }
 
+// CreateRepositoryRequestObject contains validated inputs for its OpenAPI operation.
 type CreateRepositoryRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateRepositoryRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateRepositoryJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateRepositoryJSONRequestBody
 }
 
+// CreateRepositoryResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateRepositoryResponseObject interface {
+	// VisitCreateRepositoryResponse carries the generated visit create repository response value for CreateRepositoryResponseObject.
 	VisitCreateRepositoryResponse(w http.ResponseWriter) error
 }
 
+// CreateRepository201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateRepository201JSONResponse struct{ RepositoryJSONResponse }
 
+// VisitCreateRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateRepository201JSONResponse) VisitCreateRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15710,8 +17510,10 @@ func (response CreateRepository201JSONResponse) VisitCreateRepositoryResponse(w 
 	return err
 }
 
+// CreateRepository404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateRepository404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateRepository404JSONResponse) VisitCreateRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15725,8 +17527,10 @@ func (response CreateRepository404JSONResponse) VisitCreateRepositoryResponse(w 
 	return err
 }
 
+// CreateRepository409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateRepository409JSONResponse struct{ QuotaExceededJSONResponse }
 
+// VisitCreateRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateRepository409JSONResponse) VisitCreateRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15740,26 +17544,36 @@ func (response CreateRepository409JSONResponse) VisitCreateRepositoryResponse(w 
 	return err
 }
 
+// DeleteRepositoryRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteRepositoryRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for DeleteRepositoryRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for DeleteRepositoryRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Params       DeleteRepositoryParams
+	// Params contains the validated parameters for this request.
+	Params DeleteRepositoryParams
 }
 
+// DeleteRepositoryResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteRepositoryResponseObject interface {
+	// VisitDeleteRepositoryResponse carries the generated visit delete repository response value for DeleteRepositoryResponseObject.
 	VisitDeleteRepositoryResponse(w http.ResponseWriter) error
 }
 
+// DeleteRepository204Response contains the raw HTTP response and any decoded response body.
 type DeleteRepository204Response struct {
 }
 
+// VisitDeleteRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteRepository204Response) VisitDeleteRepositoryResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteRepository404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteRepository404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteRepository404JSONResponse) VisitDeleteRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15773,8 +17587,10 @@ func (response DeleteRepository404JSONResponse) VisitDeleteRepositoryResponse(w 
 	return err
 }
 
+// DeleteRepository412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteRepository412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteRepository412JSONResponse) VisitDeleteRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15788,17 +17604,24 @@ func (response DeleteRepository412JSONResponse) VisitDeleteRepositoryResponse(w 
 	return err
 }
 
+// GetRepositoryRequestObject contains validated inputs for its OpenAPI operation.
 type GetRepositoryRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for GetRepositoryRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for GetRepositoryRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
 }
 
+// GetRepositoryResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetRepositoryResponseObject interface {
+	// VisitGetRepositoryResponse carries the generated visit get repository response value for GetRepositoryResponseObject.
 	VisitGetRepositoryResponse(w http.ResponseWriter) error
 }
 
+// GetRepository200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetRepository200JSONResponse struct{ RepositoryJSONResponse }
 
+// VisitGetRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetRepository200JSONResponse) VisitGetRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15812,8 +17635,10 @@ func (response GetRepository200JSONResponse) VisitGetRepositoryResponse(w http.R
 	return err
 }
 
+// GetRepository404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetRepository404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetRepository404JSONResponse) VisitGetRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15827,19 +17652,28 @@ func (response GetRepository404JSONResponse) VisitGetRepositoryResponse(w http.R
 	return err
 }
 
+// UpdateRepositoryRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateRepositoryRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for UpdateRepositoryRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for UpdateRepositoryRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Params       UpdateRepositoryParams
-	Body         *UpdateRepositoryJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params UpdateRepositoryParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateRepositoryJSONRequestBody
 }
 
+// UpdateRepositoryResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateRepositoryResponseObject interface {
+	// VisitUpdateRepositoryResponse carries the generated visit update repository response value for UpdateRepositoryResponseObject.
 	VisitUpdateRepositoryResponse(w http.ResponseWriter) error
 }
 
+// UpdateRepository200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateRepository200JSONResponse struct{ RepositoryJSONResponse }
 
+// VisitUpdateRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateRepository200JSONResponse) VisitUpdateRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15853,8 +17687,10 @@ func (response UpdateRepository200JSONResponse) VisitUpdateRepositoryResponse(w 
 	return err
 }
 
+// UpdateRepository404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateRepository404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateRepository404JSONResponse) VisitUpdateRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15868,8 +17704,10 @@ func (response UpdateRepository404JSONResponse) VisitUpdateRepositoryResponse(w 
 	return err
 }
 
+// UpdateRepository412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateRepository412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateRepository412JSONResponse) VisitUpdateRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15883,18 +17721,26 @@ func (response UpdateRepository412JSONResponse) VisitUpdateRepositoryResponse(w 
 	return err
 }
 
+// ListDiscoveryCandidatesRequestObject contains validated inputs for its OpenAPI operation.
 type ListDiscoveryCandidatesRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for ListDiscoveryCandidatesRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for ListDiscoveryCandidatesRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Params       ListDiscoveryCandidatesParams
+	// Params contains the validated parameters for this request.
+	Params ListDiscoveryCandidatesParams
 }
 
+// ListDiscoveryCandidatesResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListDiscoveryCandidatesResponseObject interface {
+	// VisitListDiscoveryCandidatesResponse carries the generated visit list discovery candidates response value for ListDiscoveryCandidatesResponseObject.
 	VisitListDiscoveryCandidatesResponse(w http.ResponseWriter) error
 }
 
+// ListDiscoveryCandidates200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListDiscoveryCandidates200JSONResponse struct{ CandidatePageJSONResponse }
 
+// VisitListDiscoveryCandidatesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListDiscoveryCandidates200JSONResponse) VisitListDiscoveryCandidatesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15907,8 +17753,10 @@ func (response ListDiscoveryCandidates200JSONResponse) VisitListDiscoveryCandida
 	return err
 }
 
+// ListDiscoveryCandidates404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListDiscoveryCandidates404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListDiscoveryCandidatesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListDiscoveryCandidates404JSONResponse) VisitListDiscoveryCandidatesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15922,18 +17770,26 @@ func (response ListDiscoveryCandidates404JSONResponse) VisitListDiscoveryCandida
 	return err
 }
 
+// DismissDiscoveryCandidateRequestObject contains validated inputs for its OpenAPI operation.
 type DismissDiscoveryCandidateRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for DismissDiscoveryCandidateRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for DismissDiscoveryCandidateRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	CandidateId  CandidateId  `json:"candidateId"`
+	// CandidateId carries the generated candidate id value for DismissDiscoveryCandidateRequestObject.
+	CandidateId CandidateId `json:"candidateId"`
 }
 
+// DismissDiscoveryCandidateResponseObject is implemented by every declared response for its OpenAPI operation.
 type DismissDiscoveryCandidateResponseObject interface {
+	// VisitDismissDiscoveryCandidateResponse carries the generated visit dismiss discovery candidate response value for DismissDiscoveryCandidateResponseObject.
 	VisitDismissDiscoveryCandidateResponse(w http.ResponseWriter) error
 }
 
+// DismissDiscoveryCandidate200JSONResponse contains the raw HTTP response and any decoded response body.
 type DismissDiscoveryCandidate200JSONResponse struct{ CandidateJSONResponse }
 
+// VisitDismissDiscoveryCandidateResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DismissDiscoveryCandidate200JSONResponse) VisitDismissDiscoveryCandidateResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15946,8 +17802,10 @@ func (response DismissDiscoveryCandidate200JSONResponse) VisitDismissDiscoveryCa
 	return err
 }
 
+// DismissDiscoveryCandidate404JSONResponse contains the raw HTTP response and any decoded response body.
 type DismissDiscoveryCandidate404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDismissDiscoveryCandidateResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DismissDiscoveryCandidate404JSONResponse) VisitDismissDiscoveryCandidateResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15961,19 +17819,28 @@ func (response DismissDiscoveryCandidate404JSONResponse) VisitDismissDiscoveryCa
 	return err
 }
 
+// AcceptDiscoveryCandidatesRequestObject contains validated inputs for its OpenAPI operation.
 type AcceptDiscoveryCandidatesRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for AcceptDiscoveryCandidatesRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for AcceptDiscoveryCandidatesRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Params       AcceptDiscoveryCandidatesParams
-	Body         *AcceptDiscoveryCandidatesJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params AcceptDiscoveryCandidatesParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *AcceptDiscoveryCandidatesJSONRequestBody
 }
 
+// AcceptDiscoveryCandidatesResponseObject is implemented by every declared response for its OpenAPI operation.
 type AcceptDiscoveryCandidatesResponseObject interface {
+	// VisitAcceptDiscoveryCandidatesResponse carries the generated visit accept discovery candidates response value for AcceptDiscoveryCandidatesResponseObject.
 	VisitAcceptDiscoveryCandidatesResponse(w http.ResponseWriter) error
 }
 
+// AcceptDiscoveryCandidates200JSONResponse contains the raw HTTP response and any decoded response body.
 type AcceptDiscoveryCandidates200JSONResponse struct{ ServiceListJSONResponse }
 
+// VisitAcceptDiscoveryCandidatesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response AcceptDiscoveryCandidates200JSONResponse) VisitAcceptDiscoveryCandidatesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -15986,8 +17853,10 @@ func (response AcceptDiscoveryCandidates200JSONResponse) VisitAcceptDiscoveryCan
 	return err
 }
 
+// AcceptDiscoveryCandidates404JSONResponse contains the raw HTTP response and any decoded response body.
 type AcceptDiscoveryCandidates404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitAcceptDiscoveryCandidatesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response AcceptDiscoveryCandidates404JSONResponse) VisitAcceptDiscoveryCandidatesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16001,8 +17870,10 @@ func (response AcceptDiscoveryCandidates404JSONResponse) VisitAcceptDiscoveryCan
 	return err
 }
 
+// AcceptDiscoveryCandidates409JSONResponse contains the raw HTTP response and any decoded response body.
 type AcceptDiscoveryCandidates409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitAcceptDiscoveryCandidatesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response AcceptDiscoveryCandidates409JSONResponse) VisitAcceptDiscoveryCandidatesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16016,21 +17887,30 @@ func (response AcceptDiscoveryCandidates409JSONResponse) VisitAcceptDiscoveryCan
 	return err
 }
 
+// PreviewRepositoryConfigImportRequestObject contains validated inputs for its OpenAPI operation.
 type PreviewRepositoryConfigImportRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for PreviewRepositoryConfigImportRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for PreviewRepositoryConfigImportRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Params       PreviewRepositoryConfigImportParams
-	Body         *PreviewRepositoryConfigImportJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params PreviewRepositoryConfigImportParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *PreviewRepositoryConfigImportJSONRequestBody
 }
 
+// PreviewRepositoryConfigImportResponseObject is implemented by every declared response for its OpenAPI operation.
 type PreviewRepositoryConfigImportResponseObject interface {
+	// VisitPreviewRepositoryConfigImportResponse carries the generated visit preview repository config import response value for PreviewRepositoryConfigImportResponseObject.
 	VisitPreviewRepositoryConfigImportResponse(w http.ResponseWriter) error
 }
 
+// PreviewRepositoryConfigImport201JSONResponse contains the raw HTTP response and any decoded response body.
 type PreviewRepositoryConfigImport201JSONResponse struct {
 	ConfigImportPreviewJSONResponse
 }
 
+// VisitPreviewRepositoryConfigImportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PreviewRepositoryConfigImport201JSONResponse) VisitPreviewRepositoryConfigImportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16043,8 +17923,10 @@ func (response PreviewRepositoryConfigImport201JSONResponse) VisitPreviewReposit
 	return err
 }
 
+// PreviewRepositoryConfigImport404JSONResponse contains the raw HTTP response and any decoded response body.
 type PreviewRepositoryConfigImport404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPreviewRepositoryConfigImportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PreviewRepositoryConfigImport404JSONResponse) VisitPreviewRepositoryConfigImportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16058,8 +17940,10 @@ func (response PreviewRepositoryConfigImport404JSONResponse) VisitPreviewReposit
 	return err
 }
 
+// PreviewRepositoryConfigImport409JSONResponse contains the raw HTTP response and any decoded response body.
 type PreviewRepositoryConfigImport409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitPreviewRepositoryConfigImportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PreviewRepositoryConfigImport409JSONResponse) VisitPreviewRepositoryConfigImportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16073,20 +17957,30 @@ func (response PreviewRepositoryConfigImport409JSONResponse) VisitPreviewReposit
 	return err
 }
 
+// ApplyRepositoryConfigImportRequestObject contains validated inputs for its OpenAPI operation.
 type ApplyRepositoryConfigImportRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for ApplyRepositoryConfigImportRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for ApplyRepositoryConfigImportRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	PreviewId    PreviewId    `json:"previewId"`
-	Params       ApplyRepositoryConfigImportParams
-	Body         *ApplyRepositoryConfigImportJSONRequestBody
+	// PreviewId carries the generated preview id value for ApplyRepositoryConfigImportRequestObject.
+	PreviewId PreviewId `json:"previewId"`
+	// Params contains the validated parameters for this request.
+	Params ApplyRepositoryConfigImportParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *ApplyRepositoryConfigImportJSONRequestBody
 }
 
+// ApplyRepositoryConfigImportResponseObject is implemented by every declared response for its OpenAPI operation.
 type ApplyRepositoryConfigImportResponseObject interface {
+	// VisitApplyRepositoryConfigImportResponse carries the generated visit apply repository config import response value for ApplyRepositoryConfigImportResponseObject.
 	VisitApplyRepositoryConfigImportResponse(w http.ResponseWriter) error
 }
 
+// ApplyRepositoryConfigImport200JSONResponse contains the raw HTTP response and any decoded response body.
 type ApplyRepositoryConfigImport200JSONResponse struct{ ConfigImportResultJSONResponse }
 
+// VisitApplyRepositoryConfigImportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ApplyRepositoryConfigImport200JSONResponse) VisitApplyRepositoryConfigImportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16099,8 +17993,10 @@ func (response ApplyRepositoryConfigImport200JSONResponse) VisitApplyRepositoryC
 	return err
 }
 
+// ApplyRepositoryConfigImport404JSONResponse contains the raw HTTP response and any decoded response body.
 type ApplyRepositoryConfigImport404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitApplyRepositoryConfigImportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ApplyRepositoryConfigImport404JSONResponse) VisitApplyRepositoryConfigImportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16114,8 +18010,10 @@ func (response ApplyRepositoryConfigImport404JSONResponse) VisitApplyRepositoryC
 	return err
 }
 
+// ApplyRepositoryConfigImport409JSONResponse contains the raw HTTP response and any decoded response body.
 type ApplyRepositoryConfigImport409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitApplyRepositoryConfigImportResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ApplyRepositoryConfigImport409JSONResponse) VisitApplyRepositoryConfigImportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16129,18 +18027,26 @@ func (response ApplyRepositoryConfigImport409JSONResponse) VisitApplyRepositoryC
 	return err
 }
 
+// CreateServiceInRepositoryRequestObject contains validated inputs for its OpenAPI operation.
 type CreateServiceInRepositoryRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for CreateServiceInRepositoryRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for CreateServiceInRepositoryRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Body         *CreateServiceInRepositoryJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateServiceInRepositoryJSONRequestBody
 }
 
+// CreateServiceInRepositoryResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateServiceInRepositoryResponseObject interface {
+	// VisitCreateServiceInRepositoryResponse carries the generated visit create service in repository response value for CreateServiceInRepositoryResponseObject.
 	VisitCreateServiceInRepositoryResponse(w http.ResponseWriter) error
 }
 
+// CreateServiceInRepository201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateServiceInRepository201JSONResponse struct{ ServiceJSONResponse }
 
+// VisitCreateServiceInRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateServiceInRepository201JSONResponse) VisitCreateServiceInRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16154,8 +18060,10 @@ func (response CreateServiceInRepository201JSONResponse) VisitCreateServiceInRep
 	return err
 }
 
+// CreateServiceInRepository404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateServiceInRepository404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateServiceInRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateServiceInRepository404JSONResponse) VisitCreateServiceInRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16169,19 +18077,28 @@ func (response CreateServiceInRepository404JSONResponse) VisitCreateServiceInRep
 	return err
 }
 
+// DiscoverRepositoryRequestObject contains validated inputs for its OpenAPI operation.
 type DiscoverRepositoryRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for DiscoverRepositoryRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for DiscoverRepositoryRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Params       DiscoverRepositoryParams
-	Body         *DiscoverRepositoryJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params DiscoverRepositoryParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *DiscoverRepositoryJSONRequestBody
 }
 
+// DiscoverRepositoryResponseObject is implemented by every declared response for its OpenAPI operation.
 type DiscoverRepositoryResponseObject interface {
+	// VisitDiscoverRepositoryResponse carries the generated visit discover repository response value for DiscoverRepositoryResponseObject.
 	VisitDiscoverRepositoryResponse(w http.ResponseWriter) error
 }
 
+// DiscoverRepository202JSONResponse contains the raw HTTP response and any decoded response body.
 type DiscoverRepository202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitDiscoverRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DiscoverRepository202JSONResponse) VisitDiscoverRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16194,8 +18111,10 @@ func (response DiscoverRepository202JSONResponse) VisitDiscoverRepositoryRespons
 	return err
 }
 
+// DiscoverRepository404JSONResponse contains the raw HTTP response and any decoded response body.
 type DiscoverRepository404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDiscoverRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DiscoverRepository404JSONResponse) VisitDiscoverRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16209,8 +18128,10 @@ func (response DiscoverRepository404JSONResponse) VisitDiscoverRepositoryRespons
 	return err
 }
 
+// DiscoverRepository409JSONResponse contains the raw HTTP response and any decoded response body.
 type DiscoverRepository409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitDiscoverRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DiscoverRepository409JSONResponse) VisitDiscoverRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16224,19 +18145,28 @@ func (response DiscoverRepository409JSONResponse) VisitDiscoverRepositoryRespons
 	return err
 }
 
+// SyncRepositoryRequestObject contains validated inputs for its OpenAPI operation.
 type SyncRepositoryRequestObject struct {
-	TenantSlug   TenantSlug   `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for SyncRepositoryRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// RepositoryId carries the generated repository id value for SyncRepositoryRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Params       SyncRepositoryParams
-	Body         *SyncRepositoryJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params SyncRepositoryParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *SyncRepositoryJSONRequestBody
 }
 
+// SyncRepositoryResponseObject is implemented by every declared response for its OpenAPI operation.
 type SyncRepositoryResponseObject interface {
+	// VisitSyncRepositoryResponse carries the generated visit sync repository response value for SyncRepositoryResponseObject.
 	VisitSyncRepositoryResponse(w http.ResponseWriter) error
 }
 
+// SyncRepository202JSONResponse contains the raw HTTP response and any decoded response body.
 type SyncRepository202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitSyncRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response SyncRepository202JSONResponse) VisitSyncRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16249,8 +18179,10 @@ func (response SyncRepository202JSONResponse) VisitSyncRepositoryResponse(w http
 	return err
 }
 
+// SyncRepository404JSONResponse contains the raw HTTP response and any decoded response body.
 type SyncRepository404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitSyncRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response SyncRepository404JSONResponse) VisitSyncRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16264,8 +18196,10 @@ func (response SyncRepository404JSONResponse) VisitSyncRepositoryResponse(w http
 	return err
 }
 
+// SyncRepository409JSONResponse contains the raw HTTP response and any decoded response body.
 type SyncRepository409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitSyncRepositoryResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response SyncRepository409JSONResponse) VisitSyncRepositoryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16279,17 +18213,24 @@ func (response SyncRepository409JSONResponse) VisitSyncRepositoryResponse(w http
 	return err
 }
 
+// CheckRepositoryConnectionRequestObject contains validated inputs for its OpenAPI operation.
 type CheckRepositoryConnectionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CheckRepositoryConnectionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CheckRepositoryConnectionJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CheckRepositoryConnectionJSONRequestBody
 }
 
+// CheckRepositoryConnectionResponseObject is implemented by every declared response for its OpenAPI operation.
 type CheckRepositoryConnectionResponseObject interface {
+	// VisitCheckRepositoryConnectionResponse carries the generated visit check repository connection response value for CheckRepositoryConnectionResponseObject.
 	VisitCheckRepositoryConnectionResponse(w http.ResponseWriter) error
 }
 
+// CheckRepositoryConnection200JSONResponse contains the raw HTTP response and any decoded response body.
 type CheckRepositoryConnection200JSONResponse struct{ ConnectionTestJSONResponse }
 
+// VisitCheckRepositoryConnectionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CheckRepositoryConnection200JSONResponse) VisitCheckRepositoryConnectionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16302,8 +18243,10 @@ func (response CheckRepositoryConnection200JSONResponse) VisitCheckRepositoryCon
 	return err
 }
 
+// CheckRepositoryConnection404JSONResponse contains the raw HTTP response and any decoded response body.
 type CheckRepositoryConnection404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCheckRepositoryConnectionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CheckRepositoryConnection404JSONResponse) VisitCheckRepositoryConnectionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16317,17 +18260,24 @@ func (response CheckRepositoryConnection404JSONResponse) VisitCheckRepositoryCon
 	return err
 }
 
+// ListReviewsRequestObject contains validated inputs for its OpenAPI operation.
 type ListReviewsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListReviewsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListReviewsParams
+	// Params contains the validated parameters for this request.
+	Params ListReviewsParams
 }
 
+// ListReviewsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListReviewsResponseObject interface {
+	// VisitListReviewsResponse carries the generated visit list reviews response value for ListReviewsResponseObject.
 	VisitListReviewsResponse(w http.ResponseWriter) error
 }
 
+// ListReviews200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListReviews200JSONResponse struct{ ReviewPageJSONResponse }
 
+// VisitListReviewsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListReviews200JSONResponse) VisitListReviewsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16340,8 +18290,10 @@ func (response ListReviews200JSONResponse) VisitListReviewsResponse(w http.Respo
 	return err
 }
 
+// ListReviews404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListReviews404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListReviewsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListReviews404JSONResponse) VisitListReviewsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16355,17 +18307,24 @@ func (response ListReviews404JSONResponse) VisitListReviewsResponse(w http.Respo
 	return err
 }
 
+// SearchRequestObject contains validated inputs for its OpenAPI operation.
 type SearchRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for SearchRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     SearchParams
+	// Params contains the validated parameters for this request.
+	Params SearchParams
 }
 
+// SearchResponseObject is implemented by every declared response for its OpenAPI operation.
 type SearchResponseObject interface {
+	// VisitSearchResponse carries the generated visit search response value for SearchResponseObject.
 	VisitSearchResponse(w http.ResponseWriter) error
 }
 
+// Search200JSONResponse contains the raw HTTP response and any decoded response body.
 type Search200JSONResponse struct{ SearchResultJSONResponse }
 
+// VisitSearchResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Search200JSONResponse) VisitSearchResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16378,8 +18337,10 @@ func (response Search200JSONResponse) VisitSearchResponse(w http.ResponseWriter)
 	return err
 }
 
+// Search404JSONResponse contains the raw HTTP response and any decoded response body.
 type Search404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitSearchResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Search404JSONResponse) VisitSearchResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16393,8 +18354,10 @@ func (response Search404JSONResponse) VisitSearchResponse(w http.ResponseWriter)
 	return err
 }
 
+// Search422JSONResponse contains the raw HTTP response and any decoded response body.
 type Search422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitSearchResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Search422JSONResponse) VisitSearchResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16408,17 +18371,24 @@ func (response Search422JSONResponse) VisitSearchResponse(w http.ResponseWriter)
 	return err
 }
 
+// ListServicesRequestObject contains validated inputs for its OpenAPI operation.
 type ListServicesRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListServicesRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListServicesParams
+	// Params contains the validated parameters for this request.
+	Params ListServicesParams
 }
 
+// ListServicesResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListServicesResponseObject interface {
+	// VisitListServicesResponse carries the generated visit list services response value for ListServicesResponseObject.
 	VisitListServicesResponse(w http.ResponseWriter) error
 }
 
+// ListServices200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListServices200JSONResponse struct{ ServicePageJSONResponse }
 
+// VisitListServicesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListServices200JSONResponse) VisitListServicesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16431,8 +18401,10 @@ func (response ListServices200JSONResponse) VisitListServicesResponse(w http.Res
 	return err
 }
 
+// ListServices404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListServices404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListServicesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListServices404JSONResponse) VisitListServicesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16446,26 +18418,36 @@ func (response ListServices404JSONResponse) VisitListServicesResponse(w http.Res
 	return err
 }
 
+// DeleteServiceRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteServiceRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for DeleteServiceRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for DeleteServiceRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	Params      DeleteServiceParams
+	// Params contains the validated parameters for this request.
+	Params DeleteServiceParams
 }
 
+// DeleteServiceResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteServiceResponseObject interface {
+	// VisitDeleteServiceResponse carries the generated visit delete service response value for DeleteServiceResponseObject.
 	VisitDeleteServiceResponse(w http.ResponseWriter) error
 }
 
+// DeleteService204Response contains the raw HTTP response and any decoded response body.
 type DeleteService204Response struct {
 }
 
+// VisitDeleteServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteService204Response) VisitDeleteServiceResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteService404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteService404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteService404JSONResponse) VisitDeleteServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16479,8 +18461,10 @@ func (response DeleteService404JSONResponse) VisitDeleteServiceResponse(w http.R
 	return err
 }
 
+// DeleteService412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteService412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteService412JSONResponse) VisitDeleteServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16494,17 +18478,24 @@ func (response DeleteService412JSONResponse) VisitDeleteServiceResponse(w http.R
 	return err
 }
 
+// GetServiceRequestObject contains validated inputs for its OpenAPI operation.
 type GetServiceRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for GetServiceRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for GetServiceRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
 }
 
+// GetServiceResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetServiceResponseObject interface {
+	// VisitGetServiceResponse carries the generated visit get service response value for GetServiceResponseObject.
 	VisitGetServiceResponse(w http.ResponseWriter) error
 }
 
+// GetService200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetService200JSONResponse struct{ ServiceJSONResponse }
 
+// VisitGetServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetService200JSONResponse) VisitGetServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16518,8 +18509,10 @@ func (response GetService200JSONResponse) VisitGetServiceResponse(w http.Respons
 	return err
 }
 
+// GetService404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetService404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetService404JSONResponse) VisitGetServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16533,19 +18526,28 @@ func (response GetService404JSONResponse) VisitGetServiceResponse(w http.Respons
 	return err
 }
 
+// UpdateServiceRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateServiceRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for UpdateServiceRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for UpdateServiceRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	Params      UpdateServiceParams
-	Body        *UpdateServiceJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params UpdateServiceParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateServiceJSONRequestBody
 }
 
+// UpdateServiceResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateServiceResponseObject interface {
+	// VisitUpdateServiceResponse carries the generated visit update service response value for UpdateServiceResponseObject.
 	VisitUpdateServiceResponse(w http.ResponseWriter) error
 }
 
+// UpdateService200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateService200JSONResponse struct{ ServiceJSONResponse }
 
+// VisitUpdateServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateService200JSONResponse) VisitUpdateServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16559,8 +18561,10 @@ func (response UpdateService200JSONResponse) VisitUpdateServiceResponse(w http.R
 	return err
 }
 
+// UpdateService404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateService404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateService404JSONResponse) VisitUpdateServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16574,8 +18578,10 @@ func (response UpdateService404JSONResponse) VisitUpdateServiceResponse(w http.R
 	return err
 }
 
+// UpdateService409JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateService409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitUpdateServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateService409JSONResponse) VisitUpdateServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16589,8 +18595,10 @@ func (response UpdateService409JSONResponse) VisitUpdateServiceResponse(w http.R
 	return err
 }
 
+// UpdateService412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateService412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateService412JSONResponse) VisitUpdateServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16604,17 +18612,24 @@ func (response UpdateService412JSONResponse) VisitUpdateServiceResponse(w http.R
 	return err
 }
 
+// GetServiceAccessRequestObject contains validated inputs for its OpenAPI operation.
 type GetServiceAccessRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for GetServiceAccessRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for GetServiceAccessRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
 }
 
+// GetServiceAccessResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetServiceAccessResponseObject interface {
+	// VisitGetServiceAccessResponse carries the generated visit get service access response value for GetServiceAccessResponseObject.
 	VisitGetServiceAccessResponse(w http.ResponseWriter) error
 }
 
+// GetServiceAccess200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetServiceAccess200JSONResponse struct{ ServiceAccessJSONResponse }
 
+// VisitGetServiceAccessResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetServiceAccess200JSONResponse) VisitGetServiceAccessResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16627,8 +18642,10 @@ func (response GetServiceAccess200JSONResponse) VisitGetServiceAccessResponse(w 
 	return err
 }
 
+// GetServiceAccess404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetServiceAccess404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetServiceAccessResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetServiceAccess404JSONResponse) VisitGetServiceAccessResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16642,18 +18659,26 @@ func (response GetServiceAccess404JSONResponse) VisitGetServiceAccessResponse(w 
 	return err
 }
 
+// PutServiceAccessRequestObject contains validated inputs for its OpenAPI operation.
 type PutServiceAccessRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for PutServiceAccessRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for PutServiceAccessRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	Body        *PutServiceAccessJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *PutServiceAccessJSONRequestBody
 }
 
+// PutServiceAccessResponseObject is implemented by every declared response for its OpenAPI operation.
 type PutServiceAccessResponseObject interface {
+	// VisitPutServiceAccessResponse carries the generated visit put service access response value for PutServiceAccessResponseObject.
 	VisitPutServiceAccessResponse(w http.ResponseWriter) error
 }
 
+// PutServiceAccess200JSONResponse contains the raw HTTP response and any decoded response body.
 type PutServiceAccess200JSONResponse struct{ ServiceAccessJSONResponse }
 
+// VisitPutServiceAccessResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutServiceAccess200JSONResponse) VisitPutServiceAccessResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16666,8 +18691,10 @@ func (response PutServiceAccess200JSONResponse) VisitPutServiceAccessResponse(w 
 	return err
 }
 
+// PutServiceAccess404JSONResponse contains the raw HTTP response and any decoded response body.
 type PutServiceAccess404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPutServiceAccessResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutServiceAccess404JSONResponse) VisitPutServiceAccessResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16681,8 +18708,10 @@ func (response PutServiceAccess404JSONResponse) VisitPutServiceAccessResponse(w 
 	return err
 }
 
+// PutServiceAccess409JSONResponse contains the raw HTTP response and any decoded response body.
 type PutServiceAccess409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitPutServiceAccessResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutServiceAccess409JSONResponse) VisitPutServiceAccessResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16696,21 +18725,30 @@ func (response PutServiceAccess409JSONResponse) VisitPutServiceAccessResponse(w 
 	return err
 }
 
+// GenerateMissingAssetWithAiRequestObject contains validated inputs for its OpenAPI operation.
 type GenerateMissingAssetWithAiRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for GenerateMissingAssetWithAiRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for GenerateMissingAssetWithAiRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	Params      GenerateMissingAssetWithAiParams
-	Body        *GenerateMissingAssetWithAiJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params GenerateMissingAssetWithAiParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *GenerateMissingAssetWithAiJSONRequestBody
 }
 
+// GenerateMissingAssetWithAiResponseObject is implemented by every declared response for its OpenAPI operation.
 type GenerateMissingAssetWithAiResponseObject interface {
+	// VisitGenerateMissingAssetWithAiResponse carries the generated visit generate missing asset with ai response value for GenerateMissingAssetWithAiResponseObject.
 	VisitGenerateMissingAssetWithAiResponse(w http.ResponseWriter) error
 }
 
+// GenerateMissingAssetWithAi202JSONResponse contains the raw HTTP response and any decoded response body.
 type GenerateMissingAssetWithAi202JSONResponse struct {
 	AiGenerationAcceptedJSONResponse
 }
 
+// VisitGenerateMissingAssetWithAiResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GenerateMissingAssetWithAi202JSONResponse) VisitGenerateMissingAssetWithAiResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16723,8 +18761,10 @@ func (response GenerateMissingAssetWithAi202JSONResponse) VisitGenerateMissingAs
 	return err
 }
 
+// GenerateMissingAssetWithAi404JSONResponse contains the raw HTTP response and any decoded response body.
 type GenerateMissingAssetWithAi404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGenerateMissingAssetWithAiResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GenerateMissingAssetWithAi404JSONResponse) VisitGenerateMissingAssetWithAiResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16738,8 +18778,10 @@ func (response GenerateMissingAssetWithAi404JSONResponse) VisitGenerateMissingAs
 	return err
 }
 
+// GenerateMissingAssetWithAi409JSONResponse contains the raw HTTP response and any decoded response body.
 type GenerateMissingAssetWithAi409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitGenerateMissingAssetWithAiResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GenerateMissingAssetWithAi409JSONResponse) VisitGenerateMissingAssetWithAiResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16753,10 +18795,12 @@ func (response GenerateMissingAssetWithAi409JSONResponse) VisitGenerateMissingAs
 	return err
 }
 
+// GenerateMissingAssetWithAi422JSONResponse contains the raw HTTP response and any decoded response body.
 type GenerateMissingAssetWithAi422JSONResponse struct {
 	ProducerProfileUnavailableJSONResponse
 }
 
+// VisitGenerateMissingAssetWithAiResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GenerateMissingAssetWithAi422JSONResponse) VisitGenerateMissingAssetWithAiResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16770,18 +18814,26 @@ func (response GenerateMissingAssetWithAi422JSONResponse) VisitGenerateMissingAs
 	return err
 }
 
+// ListServiceCommentsRequestObject contains validated inputs for its OpenAPI operation.
 type ListServiceCommentsRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for ListServiceCommentsRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for ListServiceCommentsRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	Params      ListServiceCommentsParams
+	// Params contains the validated parameters for this request.
+	Params ListServiceCommentsParams
 }
 
+// ListServiceCommentsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListServiceCommentsResponseObject interface {
+	// VisitListServiceCommentsResponse carries the generated visit list service comments response value for ListServiceCommentsResponseObject.
 	VisitListServiceCommentsResponse(w http.ResponseWriter) error
 }
 
+// ListServiceComments200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListServiceComments200JSONResponse struct{ CommentPageJSONResponse }
 
+// VisitListServiceCommentsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListServiceComments200JSONResponse) VisitListServiceCommentsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16794,8 +18846,10 @@ func (response ListServiceComments200JSONResponse) VisitListServiceCommentsRespo
 	return err
 }
 
+// ListServiceComments404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListServiceComments404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListServiceCommentsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListServiceComments404JSONResponse) VisitListServiceCommentsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16809,18 +18863,26 @@ func (response ListServiceComments404JSONResponse) VisitListServiceCommentsRespo
 	return err
 }
 
+// CreateServiceCommentRequestObject contains validated inputs for its OpenAPI operation.
 type CreateServiceCommentRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for CreateServiceCommentRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for CreateServiceCommentRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	Body        *CreateServiceCommentJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateServiceCommentJSONRequestBody
 }
 
+// CreateServiceCommentResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateServiceCommentResponseObject interface {
+	// VisitCreateServiceCommentResponse carries the generated visit create service comment response value for CreateServiceCommentResponseObject.
 	VisitCreateServiceCommentResponse(w http.ResponseWriter) error
 }
 
+// CreateServiceComment201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateServiceComment201JSONResponse struct{ CommentJSONResponse }
 
+// VisitCreateServiceCommentResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateServiceComment201JSONResponse) VisitCreateServiceCommentResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16833,8 +18895,10 @@ func (response CreateServiceComment201JSONResponse) VisitCreateServiceCommentRes
 	return err
 }
 
+// CreateServiceComment404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateServiceComment404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateServiceCommentResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateServiceComment404JSONResponse) VisitCreateServiceCommentResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16848,17 +18912,24 @@ func (response CreateServiceComment404JSONResponse) VisitCreateServiceCommentRes
 	return err
 }
 
+// ListSourceSpecsRequestObject contains validated inputs for its OpenAPI operation.
 type ListSourceSpecsRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for ListSourceSpecsRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for ListSourceSpecsRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
 }
 
+// ListSourceSpecsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListSourceSpecsResponseObject interface {
+	// VisitListSourceSpecsResponse carries the generated visit list source specs response value for ListSourceSpecsResponseObject.
 	VisitListSourceSpecsResponse(w http.ResponseWriter) error
 }
 
+// ListSourceSpecs200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListSourceSpecs200JSONResponse struct{ SourceSpecListJSONResponse }
 
+// VisitListSourceSpecsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListSourceSpecs200JSONResponse) VisitListSourceSpecsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16871,8 +18942,10 @@ func (response ListSourceSpecs200JSONResponse) VisitListSourceSpecsResponse(w ht
 	return err
 }
 
+// ListSourceSpecs404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListSourceSpecs404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListSourceSpecsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListSourceSpecs404JSONResponse) VisitListSourceSpecsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16886,18 +18959,26 @@ func (response ListSourceSpecs404JSONResponse) VisitListSourceSpecsResponse(w ht
 	return err
 }
 
+// CreateSourceSpecRequestObject contains validated inputs for its OpenAPI operation.
 type CreateSourceSpecRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for CreateSourceSpecRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for CreateSourceSpecRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	Body        *CreateSourceSpecJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateSourceSpecJSONRequestBody
 }
 
+// CreateSourceSpecResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateSourceSpecResponseObject interface {
+	// VisitCreateSourceSpecResponse carries the generated visit create source spec response value for CreateSourceSpecResponseObject.
 	VisitCreateSourceSpecResponse(w http.ResponseWriter) error
 }
 
+// CreateSourceSpec201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateSourceSpec201JSONResponse struct{ SourceSpecJSONResponse }
 
+// VisitCreateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateSourceSpec201JSONResponse) VisitCreateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16911,8 +18992,10 @@ func (response CreateSourceSpec201JSONResponse) VisitCreateSourceSpecResponse(w 
 	return err
 }
 
+// CreateSourceSpec404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateSourceSpec404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateSourceSpec404JSONResponse) VisitCreateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16926,8 +19009,10 @@ func (response CreateSourceSpec404JSONResponse) VisitCreateSourceSpecResponse(w 
 	return err
 }
 
+// CreateSourceSpec409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateSourceSpec409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitCreateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateSourceSpec409JSONResponse) VisitCreateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16941,8 +19026,10 @@ func (response CreateSourceSpec409JSONResponse) VisitCreateSourceSpecResponse(w 
 	return err
 }
 
+// CreateSourceSpec422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateSourceSpec422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitCreateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateSourceSpec422JSONResponse) VisitCreateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16956,19 +19043,28 @@ func (response CreateSourceSpec422JSONResponse) VisitCreateSourceSpecResponse(w 
 	return err
 }
 
+// ResolveServiceDriftRequestObject contains validated inputs for its OpenAPI operation.
 type ResolveServiceDriftRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for ResolveServiceDriftRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for ResolveServiceDriftRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
-	Params      ResolveServiceDriftParams
-	Body        *ResolveServiceDriftJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params ResolveServiceDriftParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *ResolveServiceDriftJSONRequestBody
 }
 
+// ResolveServiceDriftResponseObject is implemented by every declared response for its OpenAPI operation.
 type ResolveServiceDriftResponseObject interface {
+	// VisitResolveServiceDriftResponse carries the generated visit resolve service drift response value for ResolveServiceDriftResponseObject.
 	VisitResolveServiceDriftResponse(w http.ResponseWriter) error
 }
 
+// ResolveServiceDrift200JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolveServiceDrift200JSONResponse struct{ ServiceJSONResponse }
 
+// VisitResolveServiceDriftResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolveServiceDrift200JSONResponse) VisitResolveServiceDriftResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16982,8 +19078,10 @@ func (response ResolveServiceDrift200JSONResponse) VisitResolveServiceDriftRespo
 	return err
 }
 
+// ResolveServiceDrift404JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolveServiceDrift404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitResolveServiceDriftResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolveServiceDrift404JSONResponse) VisitResolveServiceDriftResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -16997,8 +19095,10 @@ func (response ResolveServiceDrift404JSONResponse) VisitResolveServiceDriftRespo
 	return err
 }
 
+// ResolveServiceDrift409JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolveServiceDrift409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitResolveServiceDriftResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolveServiceDrift409JSONResponse) VisitResolveServiceDriftResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17012,17 +19112,24 @@ func (response ResolveServiceDrift409JSONResponse) VisitResolveServiceDriftRespo
 	return err
 }
 
+// StarServiceRequestObject contains validated inputs for its OpenAPI operation.
 type StarServiceRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for StarServiceRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for StarServiceRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
 }
 
+// StarServiceResponseObject is implemented by every declared response for its OpenAPI operation.
 type StarServiceResponseObject interface {
+	// VisitStarServiceResponse carries the generated visit star service response value for StarServiceResponseObject.
 	VisitStarServiceResponse(w http.ResponseWriter) error
 }
 
+// StarService200JSONResponse contains the raw HTTP response and any decoded response body.
 type StarService200JSONResponse struct{ StarStateJSONResponse }
 
+// VisitStarServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response StarService200JSONResponse) VisitStarServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17035,8 +19142,10 @@ func (response StarService200JSONResponse) VisitStarServiceResponse(w http.Respo
 	return err
 }
 
+// StarService404JSONResponse contains the raw HTTP response and any decoded response body.
 type StarService404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitStarServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response StarService404JSONResponse) VisitStarServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17050,17 +19159,24 @@ func (response StarService404JSONResponse) VisitStarServiceResponse(w http.Respo
 	return err
 }
 
+// UnstarServiceRequestObject contains validated inputs for its OpenAPI operation.
 type UnstarServiceRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for UnstarServiceRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ServiceSlug carries the generated service slug value for UnstarServiceRequestObject.
 	ServiceSlug ServiceSlug `json:"serviceSlug"`
 }
 
+// UnstarServiceResponseObject is implemented by every declared response for its OpenAPI operation.
 type UnstarServiceResponseObject interface {
+	// VisitUnstarServiceResponse carries the generated visit unstar service response value for UnstarServiceResponseObject.
 	VisitUnstarServiceResponse(w http.ResponseWriter) error
 }
 
+// UnstarService200JSONResponse contains the raw HTTP response and any decoded response body.
 type UnstarService200JSONResponse struct{ StarStateJSONResponse }
 
+// VisitUnstarServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UnstarService200JSONResponse) VisitUnstarServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17073,8 +19189,10 @@ func (response UnstarService200JSONResponse) VisitUnstarServiceResponse(w http.R
 	return err
 }
 
+// UnstarService404JSONResponse contains the raw HTTP response and any decoded response body.
 type UnstarService404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUnstarServiceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UnstarService404JSONResponse) VisitUnstarServiceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17088,17 +19206,24 @@ func (response UnstarService404JSONResponse) VisitUnstarServiceResponse(w http.R
 	return err
 }
 
+// ListRecentServicesRequestObject contains validated inputs for its OpenAPI operation.
 type ListRecentServicesRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListRecentServicesRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListRecentServicesParams
+	// Params contains the validated parameters for this request.
+	Params ListRecentServicesParams
 }
 
+// ListRecentServicesResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListRecentServicesResponseObject interface {
+	// VisitListRecentServicesResponse carries the generated visit list recent services response value for ListRecentServicesResponseObject.
 	VisitListRecentServicesResponse(w http.ResponseWriter) error
 }
 
+// ListRecentServices200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListRecentServices200JSONResponse struct{ ServicePageJSONResponse }
 
+// VisitListRecentServicesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListRecentServices200JSONResponse) VisitListRecentServicesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17111,8 +19236,10 @@ func (response ListRecentServices200JSONResponse) VisitListRecentServicesRespons
 	return err
 }
 
+// ListRecentServices404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListRecentServices404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListRecentServicesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListRecentServices404JSONResponse) VisitListRecentServicesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17126,16 +19253,22 @@ func (response ListRecentServices404JSONResponse) VisitListRecentServicesRespons
 	return err
 }
 
+// GetTenantSettingsRequestObject contains validated inputs for its OpenAPI operation.
 type GetTenantSettingsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetTenantSettingsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// GetTenantSettingsResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetTenantSettingsResponseObject interface {
+	// VisitGetTenantSettingsResponse carries the generated visit get tenant settings response value for GetTenantSettingsResponseObject.
 	VisitGetTenantSettingsResponse(w http.ResponseWriter) error
 }
 
+// GetTenantSettings200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetTenantSettings200JSONResponse struct{ TenantSettingsJSONResponse }
 
+// VisitGetTenantSettingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetTenantSettings200JSONResponse) VisitGetTenantSettingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17149,8 +19282,10 @@ func (response GetTenantSettings200JSONResponse) VisitGetTenantSettingsResponse(
 	return err
 }
 
+// GetTenantSettings404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetTenantSettings404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetTenantSettingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetTenantSettings404JSONResponse) VisitGetTenantSettingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17164,18 +19299,26 @@ func (response GetTenantSettings404JSONResponse) VisitGetTenantSettingsResponse(
 	return err
 }
 
+// UpdateTenantSettingsRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateTenantSettingsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateTenantSettingsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     UpdateTenantSettingsParams
-	Body       *UpdateTenantSettingsJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params UpdateTenantSettingsParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateTenantSettingsJSONRequestBody
 }
 
+// UpdateTenantSettingsResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateTenantSettingsResponseObject interface {
+	// VisitUpdateTenantSettingsResponse carries the generated visit update tenant settings response value for UpdateTenantSettingsResponseObject.
 	VisitUpdateTenantSettingsResponse(w http.ResponseWriter) error
 }
 
+// UpdateTenantSettings200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTenantSettings200JSONResponse struct{ TenantSettingsJSONResponse }
 
+// VisitUpdateTenantSettingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTenantSettings200JSONResponse) VisitUpdateTenantSettingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17189,8 +19332,10 @@ func (response UpdateTenantSettings200JSONResponse) VisitUpdateTenantSettingsRes
 	return err
 }
 
+// UpdateTenantSettings404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTenantSettings404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateTenantSettingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTenantSettings404JSONResponse) VisitUpdateTenantSettingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17204,8 +19349,10 @@ func (response UpdateTenantSettings404JSONResponse) VisitUpdateTenantSettingsRes
 	return err
 }
 
+// UpdateTenantSettings412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTenantSettings412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateTenantSettingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTenantSettings412JSONResponse) VisitUpdateTenantSettingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17219,17 +19366,24 @@ func (response UpdateTenantSettings412JSONResponse) VisitUpdateTenantSettingsRes
 	return err
 }
 
+// ListShareLinksRequestObject contains validated inputs for its OpenAPI operation.
 type ListShareLinksRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListShareLinksRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListShareLinksParams
+	// Params contains the validated parameters for this request.
+	Params ListShareLinksParams
 }
 
+// ListShareLinksResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListShareLinksResponseObject interface {
+	// VisitListShareLinksResponse carries the generated visit list share links response value for ListShareLinksResponseObject.
 	VisitListShareLinksResponse(w http.ResponseWriter) error
 }
 
+// ListShareLinks200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListShareLinks200JSONResponse struct{ ShareLinkPageJSONResponse }
 
+// VisitListShareLinksResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListShareLinks200JSONResponse) VisitListShareLinksResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17242,8 +19396,10 @@ func (response ListShareLinks200JSONResponse) VisitListShareLinksResponse(w http
 	return err
 }
 
+// ListShareLinks404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListShareLinks404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListShareLinksResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListShareLinks404JSONResponse) VisitListShareLinksResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17257,17 +19413,24 @@ func (response ListShareLinks404JSONResponse) VisitListShareLinksResponse(w http
 	return err
 }
 
+// CreateShareLinkRequestObject contains validated inputs for its OpenAPI operation.
 type CreateShareLinkRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateShareLinkRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateShareLinkJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateShareLinkJSONRequestBody
 }
 
+// CreateShareLinkResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateShareLinkResponseObject interface {
+	// VisitCreateShareLinkResponse carries the generated visit create share link response value for CreateShareLinkResponseObject.
 	VisitCreateShareLinkResponse(w http.ResponseWriter) error
 }
 
+// CreateShareLink201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateShareLink201JSONResponse struct{ ShareLinkCreatedJSONResponse }
 
+// VisitCreateShareLinkResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateShareLink201JSONResponse) VisitCreateShareLinkResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17280,8 +19443,10 @@ func (response CreateShareLink201JSONResponse) VisitCreateShareLinkResponse(w ht
 	return err
 }
 
+// CreateShareLink404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateShareLink404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateShareLinkResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateShareLink404JSONResponse) VisitCreateShareLinkResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17295,8 +19460,10 @@ func (response CreateShareLink404JSONResponse) VisitCreateShareLinkResponse(w ht
 	return err
 }
 
+// CreateShareLink422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateShareLink422JSONResponse struct{ InputSpecMismatchJSONResponse }
 
+// VisitCreateShareLinkResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateShareLink422JSONResponse) VisitCreateShareLinkResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17310,25 +19477,34 @@ func (response CreateShareLink422JSONResponse) VisitCreateShareLinkResponse(w ht
 	return err
 }
 
+// RevokeShareLinkRequestObject contains validated inputs for its OpenAPI operation.
 type RevokeShareLinkRequestObject struct {
-	TenantSlug  TenantSlug  `json:"tenantSlug"`
+	// TenantSlug carries the generated tenant slug value for RevokeShareLinkRequestObject.
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	// ShareLinkId carries the generated share link id value for RevokeShareLinkRequestObject.
 	ShareLinkId ShareLinkId `json:"shareLinkId"`
 }
 
+// RevokeShareLinkResponseObject is implemented by every declared response for its OpenAPI operation.
 type RevokeShareLinkResponseObject interface {
+	// VisitRevokeShareLinkResponse carries the generated visit revoke share link response value for RevokeShareLinkResponseObject.
 	VisitRevokeShareLinkResponse(w http.ResponseWriter) error
 }
 
+// RevokeShareLink204Response contains the raw HTTP response and any decoded response body.
 type RevokeShareLink204Response struct {
 }
 
+// VisitRevokeShareLinkResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RevokeShareLink204Response) VisitRevokeShareLinkResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// RevokeShareLink404JSONResponse contains the raw HTTP response and any decoded response body.
 type RevokeShareLink404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRevokeShareLinkResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RevokeShareLink404JSONResponse) VisitRevokeShareLinkResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17342,26 +19518,36 @@ func (response RevokeShareLink404JSONResponse) VisitRevokeShareLinkResponse(w ht
 	return err
 }
 
+// DeleteSourceSpecRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteSourceSpecRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteSourceSpecRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	SourceId   SourceId   `json:"sourceId"`
-	Params     DeleteSourceSpecParams
+	// SourceId carries the generated source id value for DeleteSourceSpecRequestObject.
+	SourceId SourceId `json:"sourceId"`
+	// Params contains the validated parameters for this request.
+	Params DeleteSourceSpecParams
 }
 
+// DeleteSourceSpecResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteSourceSpecResponseObject interface {
+	// VisitDeleteSourceSpecResponse carries the generated visit delete source spec response value for DeleteSourceSpecResponseObject.
 	VisitDeleteSourceSpecResponse(w http.ResponseWriter) error
 }
 
+// DeleteSourceSpec204Response contains the raw HTTP response and any decoded response body.
 type DeleteSourceSpec204Response struct {
 }
 
+// VisitDeleteSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteSourceSpec204Response) VisitDeleteSourceSpecResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteSourceSpec404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteSourceSpec404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteSourceSpec404JSONResponse) VisitDeleteSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17375,8 +19561,10 @@ func (response DeleteSourceSpec404JSONResponse) VisitDeleteSourceSpecResponse(w 
 	return err
 }
 
+// DeleteSourceSpec409JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteSourceSpec409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitDeleteSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteSourceSpec409JSONResponse) VisitDeleteSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17390,8 +19578,10 @@ func (response DeleteSourceSpec409JSONResponse) VisitDeleteSourceSpecResponse(w 
 	return err
 }
 
+// DeleteSourceSpec412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteSourceSpec412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteSourceSpec412JSONResponse) VisitDeleteSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17405,19 +19595,28 @@ func (response DeleteSourceSpec412JSONResponse) VisitDeleteSourceSpecResponse(w 
 	return err
 }
 
+// UpdateSourceSpecRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateSourceSpecRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateSourceSpecRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	SourceId   SourceId   `json:"sourceId"`
-	Params     UpdateSourceSpecParams
-	Body       *UpdateSourceSpecJSONRequestBody
+	// SourceId carries the generated source id value for UpdateSourceSpecRequestObject.
+	SourceId SourceId `json:"sourceId"`
+	// Params contains the validated parameters for this request.
+	Params UpdateSourceSpecParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateSourceSpecJSONRequestBody
 }
 
+// UpdateSourceSpecResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateSourceSpecResponseObject interface {
+	// VisitUpdateSourceSpecResponse carries the generated visit update source spec response value for UpdateSourceSpecResponseObject.
 	VisitUpdateSourceSpecResponse(w http.ResponseWriter) error
 }
 
+// UpdateSourceSpec200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSourceSpec200JSONResponse struct{ SourceSpecJSONResponse }
 
+// VisitUpdateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSourceSpec200JSONResponse) VisitUpdateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17431,8 +19630,10 @@ func (response UpdateSourceSpec200JSONResponse) VisitUpdateSourceSpecResponse(w 
 	return err
 }
 
+// UpdateSourceSpec404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSourceSpec404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSourceSpec404JSONResponse) VisitUpdateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17446,8 +19647,10 @@ func (response UpdateSourceSpec404JSONResponse) VisitUpdateSourceSpecResponse(w 
 	return err
 }
 
+// UpdateSourceSpec409JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSourceSpec409JSONResponse struct{ InvalidStateJSONResponse }
 
+// VisitUpdateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSourceSpec409JSONResponse) VisitUpdateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17461,8 +19664,10 @@ func (response UpdateSourceSpec409JSONResponse) VisitUpdateSourceSpecResponse(w 
 	return err
 }
 
+// UpdateSourceSpec412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSourceSpec412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSourceSpec412JSONResponse) VisitUpdateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17476,8 +19681,10 @@ func (response UpdateSourceSpec412JSONResponse) VisitUpdateSourceSpecResponse(w 
 	return err
 }
 
+// UpdateSourceSpec422JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSourceSpec422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitUpdateSourceSpecResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSourceSpec422JSONResponse) VisitUpdateSourceSpecResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17491,17 +19698,24 @@ func (response UpdateSourceSpec422JSONResponse) VisitUpdateSourceSpecResponse(w 
 	return err
 }
 
+// ListSourceBindingsRequestObject contains validated inputs for its OpenAPI operation.
 type ListSourceBindingsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListSourceBindingsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	SourceId   SourceId   `json:"sourceId"`
+	// SourceId carries the generated source id value for ListSourceBindingsRequestObject.
+	SourceId SourceId `json:"sourceId"`
 }
 
+// ListSourceBindingsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListSourceBindingsResponseObject interface {
+	// VisitListSourceBindingsResponse carries the generated visit list source bindings response value for ListSourceBindingsResponseObject.
 	VisitListSourceBindingsResponse(w http.ResponseWriter) error
 }
 
+// ListSourceBindings200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListSourceBindings200JSONResponse struct{ SourceBindingListJSONResponse }
 
+// VisitListSourceBindingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListSourceBindings200JSONResponse) VisitListSourceBindingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17514,8 +19728,10 @@ func (response ListSourceBindings200JSONResponse) VisitListSourceBindingsRespons
 	return err
 }
 
+// ListSourceBindings404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListSourceBindings404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListSourceBindingsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListSourceBindings404JSONResponse) VisitListSourceBindingsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17529,19 +19745,28 @@ func (response ListSourceBindings404JSONResponse) VisitListSourceBindingsRespons
 	return err
 }
 
+// ProduceSourceRequestObject contains validated inputs for its OpenAPI operation.
 type ProduceSourceRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ProduceSourceRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	SourceId   SourceId   `json:"sourceId"`
-	Params     ProduceSourceParams
-	Body       *ProduceSourceJSONRequestBody
+	// SourceId carries the generated source id value for ProduceSourceRequestObject.
+	SourceId SourceId `json:"sourceId"`
+	// Params contains the validated parameters for this request.
+	Params ProduceSourceParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *ProduceSourceJSONRequestBody
 }
 
+// ProduceSourceResponseObject is implemented by every declared response for its OpenAPI operation.
 type ProduceSourceResponseObject interface {
+	// VisitProduceSourceResponse carries the generated visit produce source response value for ProduceSourceResponseObject.
 	VisitProduceSourceResponse(w http.ResponseWriter) error
 }
 
+// ProduceSource202JSONResponse contains the raw HTTP response and any decoded response body.
 type ProduceSource202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitProduceSourceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ProduceSource202JSONResponse) VisitProduceSourceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17554,8 +19779,10 @@ func (response ProduceSource202JSONResponse) VisitProduceSourceResponse(w http.R
 	return err
 }
 
+// ProduceSource404JSONResponse contains the raw HTTP response and any decoded response body.
 type ProduceSource404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitProduceSourceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ProduceSource404JSONResponse) VisitProduceSourceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17569,8 +19796,10 @@ func (response ProduceSource404JSONResponse) VisitProduceSourceResponse(w http.R
 	return err
 }
 
+// ProduceSource409JSONResponse contains the raw HTTP response and any decoded response body.
 type ProduceSource409JSONResponse struct{ ConflictJSONResponse }
 
+// VisitProduceSourceResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ProduceSource409JSONResponse) VisitProduceSourceResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17584,16 +19813,22 @@ func (response ProduceSource409JSONResponse) VisitProduceSourceResponse(w http.R
 	return err
 }
 
+// ListSubscriptionsRequestObject contains validated inputs for its OpenAPI operation.
 type ListSubscriptionsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListSubscriptionsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// ListSubscriptionsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListSubscriptionsResponseObject interface {
+	// VisitListSubscriptionsResponse carries the generated visit list subscriptions response value for ListSubscriptionsResponseObject.
 	VisitListSubscriptionsResponse(w http.ResponseWriter) error
 }
 
+// ListSubscriptions200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListSubscriptions200JSONResponse struct{ SubscriptionListJSONResponse }
 
+// VisitListSubscriptionsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListSubscriptions200JSONResponse) VisitListSubscriptionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17606,8 +19841,10 @@ func (response ListSubscriptions200JSONResponse) VisitListSubscriptionsResponse(
 	return err
 }
 
+// ListSubscriptions404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListSubscriptions404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListSubscriptionsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListSubscriptions404JSONResponse) VisitListSubscriptionsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17621,17 +19858,24 @@ func (response ListSubscriptions404JSONResponse) VisitListSubscriptionsResponse(
 	return err
 }
 
+// PutSubscriptionRequestObject contains validated inputs for its OpenAPI operation.
 type PutSubscriptionRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for PutSubscriptionRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *PutSubscriptionJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *PutSubscriptionJSONRequestBody
 }
 
+// PutSubscriptionResponseObject is implemented by every declared response for its OpenAPI operation.
 type PutSubscriptionResponseObject interface {
+	// VisitPutSubscriptionResponse carries the generated visit put subscription response value for PutSubscriptionResponseObject.
 	VisitPutSubscriptionResponse(w http.ResponseWriter) error
 }
 
+// PutSubscription200JSONResponse contains the raw HTTP response and any decoded response body.
 type PutSubscription200JSONResponse struct{ SubscriptionJSONResponse }
 
+// VisitPutSubscriptionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutSubscription200JSONResponse) VisitPutSubscriptionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17644,8 +19888,10 @@ func (response PutSubscription200JSONResponse) VisitPutSubscriptionResponse(w ht
 	return err
 }
 
+// PutSubscription404JSONResponse contains the raw HTTP response and any decoded response body.
 type PutSubscription404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPutSubscriptionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutSubscription404JSONResponse) VisitPutSubscriptionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17659,16 +19905,22 @@ func (response PutSubscription404JSONResponse) VisitPutSubscriptionResponse(w ht
 	return err
 }
 
+// ListSystemGroupsRequestObject contains validated inputs for its OpenAPI operation.
 type ListSystemGroupsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListSystemGroupsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// ListSystemGroupsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListSystemGroupsResponseObject interface {
+	// VisitListSystemGroupsResponse carries the generated visit list system groups response value for ListSystemGroupsResponseObject.
 	VisitListSystemGroupsResponse(w http.ResponseWriter) error
 }
 
+// ListSystemGroups200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListSystemGroups200JSONResponse struct{ SystemGroupListJSONResponse }
 
+// VisitListSystemGroupsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListSystemGroups200JSONResponse) VisitListSystemGroupsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17681,8 +19933,10 @@ func (response ListSystemGroups200JSONResponse) VisitListSystemGroupsResponse(w 
 	return err
 }
 
+// ListSystemGroups404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListSystemGroups404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListSystemGroupsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListSystemGroups404JSONResponse) VisitListSystemGroupsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17696,17 +19950,24 @@ func (response ListSystemGroups404JSONResponse) VisitListSystemGroupsResponse(w 
 	return err
 }
 
+// CreateSystemGroupRequestObject contains validated inputs for its OpenAPI operation.
 type CreateSystemGroupRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateSystemGroupRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateSystemGroupJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateSystemGroupJSONRequestBody
 }
 
+// CreateSystemGroupResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateSystemGroupResponseObject interface {
+	// VisitCreateSystemGroupResponse carries the generated visit create system group response value for CreateSystemGroupResponseObject.
 	VisitCreateSystemGroupResponse(w http.ResponseWriter) error
 }
 
+// CreateSystemGroup201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateSystemGroup201JSONResponse struct{ SystemGroupJSONResponse }
 
+// VisitCreateSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateSystemGroup201JSONResponse) VisitCreateSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17720,8 +19981,10 @@ func (response CreateSystemGroup201JSONResponse) VisitCreateSystemGroupResponse(
 	return err
 }
 
+// CreateSystemGroup404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateSystemGroup404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateSystemGroup404JSONResponse) VisitCreateSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17735,8 +19998,10 @@ func (response CreateSystemGroup404JSONResponse) VisitCreateSystemGroupResponse(
 	return err
 }
 
+// CreateSystemGroup422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateSystemGroup422JSONResponse struct{ NestingTooDeepJSONResponse }
 
+// VisitCreateSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateSystemGroup422JSONResponse) VisitCreateSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17750,26 +20015,36 @@ func (response CreateSystemGroup422JSONResponse) VisitCreateSystemGroupResponse(
 	return err
 }
 
+// DeleteSystemGroupRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteSystemGroupRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteSystemGroupRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	GroupId    GroupId    `json:"groupId"`
-	Params     DeleteSystemGroupParams
+	// GroupId carries the generated group id value for DeleteSystemGroupRequestObject.
+	GroupId GroupId `json:"groupId"`
+	// Params contains the validated parameters for this request.
+	Params DeleteSystemGroupParams
 }
 
+// DeleteSystemGroupResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteSystemGroupResponseObject interface {
+	// VisitDeleteSystemGroupResponse carries the generated visit delete system group response value for DeleteSystemGroupResponseObject.
 	VisitDeleteSystemGroupResponse(w http.ResponseWriter) error
 }
 
+// DeleteSystemGroup204Response contains the raw HTTP response and any decoded response body.
 type DeleteSystemGroup204Response struct {
 }
 
+// VisitDeleteSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteSystemGroup204Response) VisitDeleteSystemGroupResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteSystemGroup404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteSystemGroup404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteSystemGroup404JSONResponse) VisitDeleteSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17783,8 +20058,10 @@ func (response DeleteSystemGroup404JSONResponse) VisitDeleteSystemGroupResponse(
 	return err
 }
 
+// DeleteSystemGroup412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteSystemGroup412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteSystemGroup412JSONResponse) VisitDeleteSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17798,17 +20075,24 @@ func (response DeleteSystemGroup412JSONResponse) VisitDeleteSystemGroupResponse(
 	return err
 }
 
+// GetSystemGroupRequestObject contains validated inputs for its OpenAPI operation.
 type GetSystemGroupRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetSystemGroupRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	GroupId    GroupId    `json:"groupId"`
+	// GroupId carries the generated group id value for GetSystemGroupRequestObject.
+	GroupId GroupId `json:"groupId"`
 }
 
+// GetSystemGroupResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetSystemGroupResponseObject interface {
+	// VisitGetSystemGroupResponse carries the generated visit get system group response value for GetSystemGroupResponseObject.
 	VisitGetSystemGroupResponse(w http.ResponseWriter) error
 }
 
+// GetSystemGroup200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetSystemGroup200JSONResponse struct{ SystemGroupJSONResponse }
 
+// VisitGetSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetSystemGroup200JSONResponse) VisitGetSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17822,8 +20106,10 @@ func (response GetSystemGroup200JSONResponse) VisitGetSystemGroupResponse(w http
 	return err
 }
 
+// GetSystemGroup404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetSystemGroup404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetSystemGroup404JSONResponse) VisitGetSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17837,19 +20123,28 @@ func (response GetSystemGroup404JSONResponse) VisitGetSystemGroupResponse(w http
 	return err
 }
 
+// UpdateSystemGroupRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateSystemGroupRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateSystemGroupRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	GroupId    GroupId    `json:"groupId"`
-	Params     UpdateSystemGroupParams
-	Body       *UpdateSystemGroupJSONRequestBody
+	// GroupId carries the generated group id value for UpdateSystemGroupRequestObject.
+	GroupId GroupId `json:"groupId"`
+	// Params contains the validated parameters for this request.
+	Params UpdateSystemGroupParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateSystemGroupJSONRequestBody
 }
 
+// UpdateSystemGroupResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateSystemGroupResponseObject interface {
+	// VisitUpdateSystemGroupResponse carries the generated visit update system group response value for UpdateSystemGroupResponseObject.
 	VisitUpdateSystemGroupResponse(w http.ResponseWriter) error
 }
 
+// UpdateSystemGroup200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSystemGroup200JSONResponse struct{ SystemGroupJSONResponse }
 
+// VisitUpdateSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSystemGroup200JSONResponse) VisitUpdateSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17863,8 +20158,10 @@ func (response UpdateSystemGroup200JSONResponse) VisitUpdateSystemGroupResponse(
 	return err
 }
 
+// UpdateSystemGroup404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSystemGroup404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSystemGroup404JSONResponse) VisitUpdateSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17878,8 +20175,10 @@ func (response UpdateSystemGroup404JSONResponse) VisitUpdateSystemGroupResponse(
 	return err
 }
 
+// UpdateSystemGroup412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSystemGroup412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSystemGroup412JSONResponse) VisitUpdateSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17893,8 +20192,10 @@ func (response UpdateSystemGroup412JSONResponse) VisitUpdateSystemGroupResponse(
 	return err
 }
 
+// UpdateSystemGroup422JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateSystemGroup422JSONResponse struct{ NestingTooDeepJSONResponse }
 
+// VisitUpdateSystemGroupResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateSystemGroup422JSONResponse) VisitUpdateSystemGroupResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17908,19 +20209,28 @@ func (response UpdateSystemGroup422JSONResponse) VisitUpdateSystemGroupResponse(
 	return err
 }
 
+// PutSystemGroupMembersRequestObject contains validated inputs for its OpenAPI operation.
 type PutSystemGroupMembersRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for PutSystemGroupMembersRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	GroupId    GroupId    `json:"groupId"`
-	Params     PutSystemGroupMembersParams
-	Body       *PutSystemGroupMembersJSONRequestBody
+	// GroupId carries the generated group id value for PutSystemGroupMembersRequestObject.
+	GroupId GroupId `json:"groupId"`
+	// Params contains the validated parameters for this request.
+	Params PutSystemGroupMembersParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *PutSystemGroupMembersJSONRequestBody
 }
 
+// PutSystemGroupMembersResponseObject is implemented by every declared response for its OpenAPI operation.
 type PutSystemGroupMembersResponseObject interface {
+	// VisitPutSystemGroupMembersResponse carries the generated visit put system group members response value for PutSystemGroupMembersResponseObject.
 	VisitPutSystemGroupMembersResponse(w http.ResponseWriter) error
 }
 
+// PutSystemGroupMembers200JSONResponse contains the raw HTTP response and any decoded response body.
 type PutSystemGroupMembers200JSONResponse struct{ SystemGroupJSONResponse }
 
+// VisitPutSystemGroupMembersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutSystemGroupMembers200JSONResponse) VisitPutSystemGroupMembersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17934,8 +20244,10 @@ func (response PutSystemGroupMembers200JSONResponse) VisitPutSystemGroupMembersR
 	return err
 }
 
+// PutSystemGroupMembers404JSONResponse contains the raw HTTP response and any decoded response body.
 type PutSystemGroupMembers404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPutSystemGroupMembersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutSystemGroupMembers404JSONResponse) VisitPutSystemGroupMembersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17949,8 +20261,10 @@ func (response PutSystemGroupMembers404JSONResponse) VisitPutSystemGroupMembersR
 	return err
 }
 
+// PutSystemGroupMembers412JSONResponse contains the raw HTTP response and any decoded response body.
 type PutSystemGroupMembers412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitPutSystemGroupMembersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutSystemGroupMembers412JSONResponse) VisitPutSystemGroupMembersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17964,16 +20278,22 @@ func (response PutSystemGroupMembers412JSONResponse) VisitPutSystemGroupMembersR
 	return err
 }
 
+// ListTagsRequestObject contains validated inputs for its OpenAPI operation.
 type ListTagsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListTagsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// ListTagsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListTagsResponseObject interface {
+	// VisitListTagsResponse carries the generated visit list tags response value for ListTagsResponseObject.
 	VisitListTagsResponse(w http.ResponseWriter) error
 }
 
+// ListTags200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTags200JSONResponse struct{ TagListJSONResponse }
 
+// VisitListTagsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTags200JSONResponse) VisitListTagsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -17986,8 +20306,10 @@ func (response ListTags200JSONResponse) VisitListTagsResponse(w http.ResponseWri
 	return err
 }
 
+// ListTags404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTags404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListTagsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTags404JSONResponse) VisitListTagsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18001,17 +20323,24 @@ func (response ListTags404JSONResponse) VisitListTagsResponse(w http.ResponseWri
 	return err
 }
 
+// CreateTagRequestObject contains validated inputs for its OpenAPI operation.
 type CreateTagRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateTagRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateTagJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateTagJSONRequestBody
 }
 
+// CreateTagResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateTagResponseObject interface {
+	// VisitCreateTagResponse carries the generated visit create tag response value for CreateTagResponseObject.
 	VisitCreateTagResponse(w http.ResponseWriter) error
 }
 
+// CreateTag201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTag201JSONResponse struct{ TagJSONResponse }
 
+// VisitCreateTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTag201JSONResponse) VisitCreateTagResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18025,8 +20354,10 @@ func (response CreateTag201JSONResponse) VisitCreateTagResponse(w http.ResponseW
 	return err
 }
 
+// CreateTag404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTag404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTag404JSONResponse) VisitCreateTagResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18040,8 +20371,10 @@ func (response CreateTag404JSONResponse) VisitCreateTagResponse(w http.ResponseW
 	return err
 }
 
+// CreateTag409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTag409JSONResponse struct{ DuplicateJSONResponse }
 
+// VisitCreateTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTag409JSONResponse) VisitCreateTagResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18055,26 +20388,36 @@ func (response CreateTag409JSONResponse) VisitCreateTagResponse(w http.ResponseW
 	return err
 }
 
+// DeleteTagRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteTagRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteTagRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	TagId      TagId      `json:"tagId"`
-	Params     DeleteTagParams
+	// TagId carries the generated tag id value for DeleteTagRequestObject.
+	TagId TagId `json:"tagId"`
+	// Params contains the validated parameters for this request.
+	Params DeleteTagParams
 }
 
+// DeleteTagResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteTagResponseObject interface {
+	// VisitDeleteTagResponse carries the generated visit delete tag response value for DeleteTagResponseObject.
 	VisitDeleteTagResponse(w http.ResponseWriter) error
 }
 
+// DeleteTag204Response contains the raw HTTP response and any decoded response body.
 type DeleteTag204Response struct {
 }
 
+// VisitDeleteTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTag204Response) VisitDeleteTagResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteTag404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTag404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTag404JSONResponse) VisitDeleteTagResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18088,8 +20431,10 @@ func (response DeleteTag404JSONResponse) VisitDeleteTagResponse(w http.ResponseW
 	return err
 }
 
+// DeleteTag412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTag412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTag412JSONResponse) VisitDeleteTagResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18103,19 +20448,28 @@ func (response DeleteTag412JSONResponse) VisitDeleteTagResponse(w http.ResponseW
 	return err
 }
 
+// UpdateTagRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateTagRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateTagRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	TagId      TagId      `json:"tagId"`
-	Params     UpdateTagParams
-	Body       *UpdateTagJSONRequestBody
+	// TagId carries the generated tag id value for UpdateTagRequestObject.
+	TagId TagId `json:"tagId"`
+	// Params contains the validated parameters for this request.
+	Params UpdateTagParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateTagJSONRequestBody
 }
 
+// UpdateTagResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateTagResponseObject interface {
+	// VisitUpdateTagResponse carries the generated visit update tag response value for UpdateTagResponseObject.
 	VisitUpdateTagResponse(w http.ResponseWriter) error
 }
 
+// UpdateTag200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTag200JSONResponse struct{ TagJSONResponse }
 
+// VisitUpdateTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTag200JSONResponse) VisitUpdateTagResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18129,8 +20483,10 @@ func (response UpdateTag200JSONResponse) VisitUpdateTagResponse(w http.ResponseW
 	return err
 }
 
+// UpdateTag404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTag404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTag404JSONResponse) VisitUpdateTagResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18144,8 +20500,10 @@ func (response UpdateTag404JSONResponse) VisitUpdateTagResponse(w http.ResponseW
 	return err
 }
 
+// UpdateTag412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTag412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateTagResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTag412JSONResponse) VisitUpdateTagResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18159,17 +20517,24 @@ func (response UpdateTag412JSONResponse) VisitUpdateTagResponse(w http.ResponseW
 	return err
 }
 
+// ListTeamsRequestObject contains validated inputs for its OpenAPI operation.
 type ListTeamsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListTeamsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListTeamsParams
+	// Params contains the validated parameters for this request.
+	Params ListTeamsParams
 }
 
+// ListTeamsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListTeamsResponseObject interface {
+	// VisitListTeamsResponse carries the generated visit list teams response value for ListTeamsResponseObject.
 	VisitListTeamsResponse(w http.ResponseWriter) error
 }
 
+// ListTeams200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTeams200JSONResponse struct{ TeamPageJSONResponse }
 
+// VisitListTeamsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTeams200JSONResponse) VisitListTeamsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18182,8 +20547,10 @@ func (response ListTeams200JSONResponse) VisitListTeamsResponse(w http.ResponseW
 	return err
 }
 
+// ListTeams404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTeams404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListTeamsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTeams404JSONResponse) VisitListTeamsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18197,17 +20564,24 @@ func (response ListTeams404JSONResponse) VisitListTeamsResponse(w http.ResponseW
 	return err
 }
 
+// CreateTeamRequestObject contains validated inputs for its OpenAPI operation.
 type CreateTeamRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateTeamRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateTeamJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateTeamJSONRequestBody
 }
 
+// CreateTeamResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateTeamResponseObject interface {
+	// VisitCreateTeamResponse carries the generated visit create team response value for CreateTeamResponseObject.
 	VisitCreateTeamResponse(w http.ResponseWriter) error
 }
 
+// CreateTeam201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTeam201JSONResponse struct{ TeamJSONResponse }
 
+// VisitCreateTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTeam201JSONResponse) VisitCreateTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18221,8 +20595,10 @@ func (response CreateTeam201JSONResponse) VisitCreateTeamResponse(w http.Respons
 	return err
 }
 
+// CreateTeam404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTeam404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTeam404JSONResponse) VisitCreateTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18236,8 +20612,10 @@ func (response CreateTeam404JSONResponse) VisitCreateTeamResponse(w http.Respons
 	return err
 }
 
+// CreateTeam409JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateTeam409JSONResponse struct{ DuplicateJSONResponse }
 
+// VisitCreateTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateTeam409JSONResponse) VisitCreateTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18251,26 +20629,36 @@ func (response CreateTeam409JSONResponse) VisitCreateTeamResponse(w http.Respons
 	return err
 }
 
+// DeleteTeamRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteTeamRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteTeamRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	TeamId     TeamId     `json:"teamId"`
-	Params     DeleteTeamParams
+	// TeamId carries the generated team id value for DeleteTeamRequestObject.
+	TeamId TeamId `json:"teamId"`
+	// Params contains the validated parameters for this request.
+	Params DeleteTeamParams
 }
 
+// DeleteTeamResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteTeamResponseObject interface {
+	// VisitDeleteTeamResponse carries the generated visit delete team response value for DeleteTeamResponseObject.
 	VisitDeleteTeamResponse(w http.ResponseWriter) error
 }
 
+// DeleteTeam204Response contains the raw HTTP response and any decoded response body.
 type DeleteTeam204Response struct {
 }
 
+// VisitDeleteTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTeam204Response) VisitDeleteTeamResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteTeam404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTeam404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTeam404JSONResponse) VisitDeleteTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18284,8 +20672,10 @@ func (response DeleteTeam404JSONResponse) VisitDeleteTeamResponse(w http.Respons
 	return err
 }
 
+// DeleteTeam412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteTeam412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteTeam412JSONResponse) VisitDeleteTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18299,17 +20689,24 @@ func (response DeleteTeam412JSONResponse) VisitDeleteTeamResponse(w http.Respons
 	return err
 }
 
+// GetTeamRequestObject contains validated inputs for its OpenAPI operation.
 type GetTeamRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for GetTeamRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	TeamId     TeamId     `json:"teamId"`
+	// TeamId carries the generated team id value for GetTeamRequestObject.
+	TeamId TeamId `json:"teamId"`
 }
 
+// GetTeamResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetTeamResponseObject interface {
+	// VisitGetTeamResponse carries the generated visit get team response value for GetTeamResponseObject.
 	VisitGetTeamResponse(w http.ResponseWriter) error
 }
 
+// GetTeam200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetTeam200JSONResponse struct{ TeamJSONResponse }
 
+// VisitGetTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetTeam200JSONResponse) VisitGetTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18323,8 +20720,10 @@ func (response GetTeam200JSONResponse) VisitGetTeamResponse(w http.ResponseWrite
 	return err
 }
 
+// GetTeam404JSONResponse contains the raw HTTP response and any decoded response body.
 type GetTeam404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitGetTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetTeam404JSONResponse) VisitGetTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18338,19 +20737,28 @@ func (response GetTeam404JSONResponse) VisitGetTeamResponse(w http.ResponseWrite
 	return err
 }
 
+// UpdateTeamRequestObject contains validated inputs for its OpenAPI operation.
 type UpdateTeamRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for UpdateTeamRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	TeamId     TeamId     `json:"teamId"`
-	Params     UpdateTeamParams
-	Body       *UpdateTeamJSONRequestBody
+	// TeamId carries the generated team id value for UpdateTeamRequestObject.
+	TeamId TeamId `json:"teamId"`
+	// Params contains the validated parameters for this request.
+	Params UpdateTeamParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *UpdateTeamJSONRequestBody
 }
 
+// UpdateTeamResponseObject is implemented by every declared response for its OpenAPI operation.
 type UpdateTeamResponseObject interface {
+	// VisitUpdateTeamResponse carries the generated visit update team response value for UpdateTeamResponseObject.
 	VisitUpdateTeamResponse(w http.ResponseWriter) error
 }
 
+// UpdateTeam200JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTeam200JSONResponse struct{ TeamJSONResponse }
 
+// VisitUpdateTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTeam200JSONResponse) VisitUpdateTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18364,8 +20772,10 @@ func (response UpdateTeam200JSONResponse) VisitUpdateTeamResponse(w http.Respons
 	return err
 }
 
+// UpdateTeam404JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTeam404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitUpdateTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTeam404JSONResponse) VisitUpdateTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18379,8 +20789,10 @@ func (response UpdateTeam404JSONResponse) VisitUpdateTeamResponse(w http.Respons
 	return err
 }
 
+// UpdateTeam412JSONResponse contains the raw HTTP response and any decoded response body.
 type UpdateTeam412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitUpdateTeamResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response UpdateTeam412JSONResponse) VisitUpdateTeamResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18394,19 +20806,28 @@ func (response UpdateTeam412JSONResponse) VisitUpdateTeamResponse(w http.Respons
 	return err
 }
 
+// ReplaceTeamMembersRequestObject contains validated inputs for its OpenAPI operation.
 type ReplaceTeamMembersRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ReplaceTeamMembersRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	TeamId     TeamId     `json:"teamId"`
-	Params     ReplaceTeamMembersParams
-	Body       *ReplaceTeamMembersJSONRequestBody
+	// TeamId carries the generated team id value for ReplaceTeamMembersRequestObject.
+	TeamId TeamId `json:"teamId"`
+	// Params contains the validated parameters for this request.
+	Params ReplaceTeamMembersParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *ReplaceTeamMembersJSONRequestBody
 }
 
+// ReplaceTeamMembersResponseObject is implemented by every declared response for its OpenAPI operation.
 type ReplaceTeamMembersResponseObject interface {
+	// VisitReplaceTeamMembersResponse carries the generated visit replace team members response value for ReplaceTeamMembersResponseObject.
 	VisitReplaceTeamMembersResponse(w http.ResponseWriter) error
 }
 
+// ReplaceTeamMembers200JSONResponse contains the raw HTTP response and any decoded response body.
 type ReplaceTeamMembers200JSONResponse struct{ TeamJSONResponse }
 
+// VisitReplaceTeamMembersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReplaceTeamMembers200JSONResponse) VisitReplaceTeamMembersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18420,8 +20841,10 @@ func (response ReplaceTeamMembers200JSONResponse) VisitReplaceTeamMembersRespons
 	return err
 }
 
+// ReplaceTeamMembers404JSONResponse contains the raw HTTP response and any decoded response body.
 type ReplaceTeamMembers404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitReplaceTeamMembersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReplaceTeamMembers404JSONResponse) VisitReplaceTeamMembersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18435,8 +20858,10 @@ func (response ReplaceTeamMembers404JSONResponse) VisitReplaceTeamMembersRespons
 	return err
 }
 
+// ReplaceTeamMembers412JSONResponse contains the raw HTTP response and any decoded response body.
 type ReplaceTeamMembers412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitReplaceTeamMembersResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReplaceTeamMembers412JSONResponse) VisitReplaceTeamMembersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18450,17 +20875,24 @@ func (response ReplaceTeamMembers412JSONResponse) VisitReplaceTeamMembersRespons
 	return err
 }
 
+// ListTokensRequestObject contains validated inputs for its OpenAPI operation.
 type ListTokensRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListTokensRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListTokensParams
+	// Params contains the validated parameters for this request.
+	Params ListTokensParams
 }
 
+// ListTokensResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListTokensResponseObject interface {
+	// VisitListTokensResponse carries the generated visit list tokens response value for ListTokensResponseObject.
 	VisitListTokensResponse(w http.ResponseWriter) error
 }
 
+// ListTokens200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTokens200JSONResponse struct{ TokenPageJSONResponse }
 
+// VisitListTokensResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTokens200JSONResponse) VisitListTokensResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18473,8 +20905,10 @@ func (response ListTokens200JSONResponse) VisitListTokensResponse(w http.Respons
 	return err
 }
 
+// ListTokens404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTokens404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListTokensResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListTokens404JSONResponse) VisitListTokensResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18488,17 +20922,24 @@ func (response ListTokens404JSONResponse) VisitListTokensResponse(w http.Respons
 	return err
 }
 
+// CreateTokenRequestObject contains validated inputs for its OpenAPI operation.
 type CreateTokenRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateTokenRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *CreateTokenJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *CreateTokenJSONRequestBody
 }
 
+// CreateTokenResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateTokenResponseObject interface {
+	// VisitCreateTokenResponse carries the generated visit create token response value for CreateTokenResponseObject.
 	VisitCreateTokenResponse(w http.ResponseWriter) error
 }
 
+// CreateToken201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateToken201JSONResponse struct{ TokenCreatedJSONResponse }
 
+// VisitCreateTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateToken201JSONResponse) VisitCreateTokenResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18511,8 +20952,10 @@ func (response CreateToken201JSONResponse) VisitCreateTokenResponse(w http.Respo
 	return err
 }
 
+// CreateToken404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateToken404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateToken404JSONResponse) VisitCreateTokenResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18526,25 +20969,34 @@ func (response CreateToken404JSONResponse) VisitCreateTokenResponse(w http.Respo
 	return err
 }
 
+// RevokeTokenRequestObject contains validated inputs for its OpenAPI operation.
 type RevokeTokenRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for RevokeTokenRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	TokenId    TokenId    `json:"tokenId"`
+	// TokenId carries the generated token id value for RevokeTokenRequestObject.
+	TokenId TokenId `json:"tokenId"`
 }
 
+// RevokeTokenResponseObject is implemented by every declared response for its OpenAPI operation.
 type RevokeTokenResponseObject interface {
+	// VisitRevokeTokenResponse carries the generated visit revoke token response value for RevokeTokenResponseObject.
 	VisitRevokeTokenResponse(w http.ResponseWriter) error
 }
 
+// RevokeToken204Response contains the raw HTTP response and any decoded response body.
 type RevokeToken204Response struct {
 }
 
+// VisitRevokeTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RevokeToken204Response) VisitRevokeTokenResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// RevokeToken404JSONResponse contains the raw HTTP response and any decoded response body.
 type RevokeToken404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitRevokeTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response RevokeToken404JSONResponse) VisitRevokeTokenResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18558,17 +21010,24 @@ func (response RevokeToken404JSONResponse) VisitRevokeTokenResponse(w http.Respo
 	return err
 }
 
+// CreateDiffUploadRequestObject contains validated inputs for its OpenAPI operation.
 type CreateDiffUploadRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for CreateDiffUploadRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *multipart.Reader
+	// Body contains the decoded or raw HTTP response body.
+	Body *multipart.Reader
 }
 
+// CreateDiffUploadResponseObject is implemented by every declared response for its OpenAPI operation.
 type CreateDiffUploadResponseObject interface {
+	// VisitCreateDiffUploadResponse carries the generated visit create diff upload response value for CreateDiffUploadResponseObject.
 	VisitCreateDiffUploadResponse(w http.ResponseWriter) error
 }
 
+// CreateDiffUpload201JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffUpload201JSONResponse struct{ UploadJSONResponse }
 
+// VisitCreateDiffUploadResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffUpload201JSONResponse) VisitCreateDiffUploadResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18581,8 +21040,10 @@ func (response CreateDiffUpload201JSONResponse) VisitCreateDiffUploadResponse(w 
 	return err
 }
 
+// CreateDiffUpload404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffUpload404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitCreateDiffUploadResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffUpload404JSONResponse) VisitCreateDiffUploadResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18596,8 +21057,10 @@ func (response CreateDiffUpload404JSONResponse) VisitCreateDiffUploadResponse(w 
 	return err
 }
 
+// CreateDiffUpload413JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffUpload413JSONResponse struct{ ContentTooLargeJSONResponse }
 
+// VisitCreateDiffUploadResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffUpload413JSONResponse) VisitCreateDiffUploadResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18611,8 +21074,10 @@ func (response CreateDiffUpload413JSONResponse) VisitCreateDiffUploadResponse(w 
 	return err
 }
 
+// CreateDiffUpload422JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffUpload422JSONResponse struct{ ValidationErrorJSONResponse }
 
+// VisitCreateDiffUploadResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response CreateDiffUpload422JSONResponse) VisitCreateDiffUploadResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18626,16 +21091,22 @@ func (response CreateDiffUpload422JSONResponse) VisitCreateDiffUploadResponse(w 
 	return err
 }
 
+// ListViewOverridesRequestObject contains validated inputs for its OpenAPI operation.
 type ListViewOverridesRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListViewOverridesRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
 }
 
+// ListViewOverridesResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListViewOverridesResponseObject interface {
+	// VisitListViewOverridesResponse carries the generated visit list view overrides response value for ListViewOverridesResponseObject.
 	VisitListViewOverridesResponse(w http.ResponseWriter) error
 }
 
+// ListViewOverrides200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListViewOverrides200JSONResponse struct{ ViewOverrideListJSONResponse }
 
+// VisitListViewOverridesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListViewOverrides200JSONResponse) VisitListViewOverridesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18648,8 +21119,10 @@ func (response ListViewOverrides200JSONResponse) VisitListViewOverridesResponse(
 	return err
 }
 
+// ListViewOverrides404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListViewOverrides404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListViewOverridesResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListViewOverrides404JSONResponse) VisitListViewOverridesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18663,26 +21136,36 @@ func (response ListViewOverrides404JSONResponse) VisitListViewOverridesResponse(
 	return err
 }
 
+// DeleteViewOverrideRequestObject contains validated inputs for its OpenAPI operation.
 type DeleteViewOverrideRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for DeleteViewOverrideRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	ViewId     ViewId     `json:"viewId"`
-	Params     DeleteViewOverrideParams
+	// ViewId carries the generated view id value for DeleteViewOverrideRequestObject.
+	ViewId ViewId `json:"viewId"`
+	// Params contains the validated parameters for this request.
+	Params DeleteViewOverrideParams
 }
 
+// DeleteViewOverrideResponseObject is implemented by every declared response for its OpenAPI operation.
 type DeleteViewOverrideResponseObject interface {
+	// VisitDeleteViewOverrideResponse carries the generated visit delete view override response value for DeleteViewOverrideResponseObject.
 	VisitDeleteViewOverrideResponse(w http.ResponseWriter) error
 }
 
+// DeleteViewOverride204Response contains the raw HTTP response and any decoded response body.
 type DeleteViewOverride204Response struct {
 }
 
+// VisitDeleteViewOverrideResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteViewOverride204Response) VisitDeleteViewOverrideResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
+// DeleteViewOverride404JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteViewOverride404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitDeleteViewOverrideResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteViewOverride404JSONResponse) VisitDeleteViewOverrideResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18696,8 +21179,10 @@ func (response DeleteViewOverride404JSONResponse) VisitDeleteViewOverrideRespons
 	return err
 }
 
+// DeleteViewOverride412JSONResponse contains the raw HTTP response and any decoded response body.
 type DeleteViewOverride412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitDeleteViewOverrideResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response DeleteViewOverride412JSONResponse) VisitDeleteViewOverrideResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18711,19 +21196,28 @@ func (response DeleteViewOverride412JSONResponse) VisitDeleteViewOverrideRespons
 	return err
 }
 
+// PutViewOverrideRequestObject contains validated inputs for its OpenAPI operation.
 type PutViewOverrideRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for PutViewOverrideRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	ViewId     ViewId     `json:"viewId"`
-	Params     PutViewOverrideParams
-	Body       *PutViewOverrideJSONRequestBody
+	// ViewId carries the generated view id value for PutViewOverrideRequestObject.
+	ViewId ViewId `json:"viewId"`
+	// Params contains the validated parameters for this request.
+	Params PutViewOverrideParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *PutViewOverrideJSONRequestBody
 }
 
+// PutViewOverrideResponseObject is implemented by every declared response for its OpenAPI operation.
 type PutViewOverrideResponseObject interface {
+	// VisitPutViewOverrideResponse carries the generated visit put view override response value for PutViewOverrideResponseObject.
 	VisitPutViewOverrideResponse(w http.ResponseWriter) error
 }
 
+// PutViewOverride200JSONResponse contains the raw HTTP response and any decoded response body.
 type PutViewOverride200JSONResponse struct{ ViewOverrideJSONResponse }
 
+// VisitPutViewOverrideResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutViewOverride200JSONResponse) VisitPutViewOverrideResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18737,8 +21231,10 @@ func (response PutViewOverride200JSONResponse) VisitPutViewOverrideResponse(w ht
 	return err
 }
 
+// PutViewOverride404JSONResponse contains the raw HTTP response and any decoded response body.
 type PutViewOverride404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitPutViewOverrideResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutViewOverride404JSONResponse) VisitPutViewOverrideResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18752,8 +21248,10 @@ func (response PutViewOverride404JSONResponse) VisitPutViewOverrideResponse(w ht
 	return err
 }
 
+// PutViewOverride412JSONResponse contains the raw HTTP response and any decoded response body.
 type PutViewOverride412JSONResponse struct{ PreconditionFailedJSONResponse }
 
+// VisitPutViewOverrideResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response PutViewOverride412JSONResponse) VisitPutViewOverrideResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18767,17 +21265,24 @@ func (response PutViewOverride412JSONResponse) VisitPutViewOverrideResponse(w ht
 	return err
 }
 
+// ListViewsRequestObject contains validated inputs for its OpenAPI operation.
 type ListViewsRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ListViewsRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Params     ListViewsParams
+	// Params contains the validated parameters for this request.
+	Params ListViewsParams
 }
 
+// ListViewsResponseObject is implemented by every declared response for its OpenAPI operation.
 type ListViewsResponseObject interface {
+	// VisitListViewsResponse carries the generated visit list views response value for ListViewsResponseObject.
 	VisitListViewsResponse(w http.ResponseWriter) error
 }
 
+// ListViews200JSONResponse contains the raw HTTP response and any decoded response body.
 type ListViews200JSONResponse struct{ ViewListJSONResponse }
 
+// VisitListViewsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListViews200JSONResponse) VisitListViewsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18790,8 +21295,10 @@ func (response ListViews200JSONResponse) VisitListViewsResponse(w http.ResponseW
 	return err
 }
 
+// ListViews404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListViews404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitListViewsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ListViews404JSONResponse) VisitListViewsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18805,17 +21312,24 @@ func (response ListViews404JSONResponse) VisitListViewsResponse(w http.ResponseW
 	return err
 }
 
+// ResolveViewRequestObject contains validated inputs for its OpenAPI operation.
 type ResolveViewRequestObject struct {
+	// TenantSlug carries the generated tenant slug value for ResolveViewRequestObject.
 	TenantSlug TenantSlug `json:"tenantSlug"`
-	Body       *ResolveViewJSONRequestBody
+	// Body contains the decoded or raw HTTP response body.
+	Body *ResolveViewJSONRequestBody
 }
 
+// ResolveViewResponseObject is implemented by every declared response for its OpenAPI operation.
 type ResolveViewResponseObject interface {
+	// VisitResolveViewResponse carries the generated visit resolve view response value for ResolveViewResponseObject.
 	VisitResolveViewResponse(w http.ResponseWriter) error
 }
 
+// ResolveView200JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolveView200JSONResponse struct{ ViewResolutionJSONResponse }
 
+// VisitResolveViewResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolveView200JSONResponse) VisitResolveViewResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18828,8 +21342,10 @@ func (response ResolveView200JSONResponse) VisitResolveViewResponse(w http.Respo
 	return err
 }
 
+// ResolveView404JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolveView404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitResolveViewResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolveView404JSONResponse) VisitResolveViewResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18843,8 +21359,10 @@ func (response ResolveView404JSONResponse) VisitResolveViewResponse(w http.Respo
 	return err
 }
 
+// ResolveView422JSONResponse contains the raw HTTP response and any decoded response body.
 type ResolveView422JSONResponse struct{ InputSpecMismatchJSONResponse }
 
+// VisitResolveViewResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ResolveView422JSONResponse) VisitResolveViewResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18858,15 +21376,20 @@ func (response ResolveView422JSONResponse) VisitResolveViewResponse(w http.Respo
 	return err
 }
 
+// GetVersionRequestObject contains validated inputs for its OpenAPI operation.
 type GetVersionRequestObject struct {
 }
 
+// GetVersionResponseObject is implemented by every declared response for its OpenAPI operation.
 type GetVersionResponseObject interface {
+	// VisitGetVersionResponse carries the generated visit get version response value for GetVersionResponseObject.
 	VisitGetVersionResponse(w http.ResponseWriter) error
 }
 
+// GetVersion200JSONResponse contains the raw HTTP response and any decoded response body.
 type GetVersion200JSONResponse VersionInfo
 
+// VisitGetVersionResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response GetVersion200JSONResponse) VisitGetVersionResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18879,18 +21402,26 @@ func (response GetVersion200JSONResponse) VisitGetVersionResponse(w http.Respons
 	return err
 }
 
+// ReceiveGitWebhookRequestObject contains validated inputs for its OpenAPI operation.
 type ReceiveGitWebhookRequestObject struct {
+	// RepositoryId carries the generated repository id value for ReceiveGitWebhookRequestObject.
 	RepositoryId RepositoryId `json:"repositoryId"`
-	Params       ReceiveGitWebhookParams
-	Body         *ReceiveGitWebhookJSONRequestBody
+	// Params contains the validated parameters for this request.
+	Params ReceiveGitWebhookParams
+	// Body contains the decoded or raw HTTP response body.
+	Body *ReceiveGitWebhookJSONRequestBody
 }
 
+// ReceiveGitWebhookResponseObject is implemented by every declared response for its OpenAPI operation.
 type ReceiveGitWebhookResponseObject interface {
+	// VisitReceiveGitWebhookResponse carries the generated visit receive git webhook response value for ReceiveGitWebhookResponseObject.
 	VisitReceiveGitWebhookResponse(w http.ResponseWriter) error
 }
 
+// ReceiveGitWebhook202JSONResponse contains the raw HTTP response and any decoded response body.
 type ReceiveGitWebhook202JSONResponse struct{ JobAcceptedJSONResponse }
 
+// VisitReceiveGitWebhookResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReceiveGitWebhook202JSONResponse) VisitReceiveGitWebhookResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18903,8 +21434,10 @@ func (response ReceiveGitWebhook202JSONResponse) VisitReceiveGitWebhookResponse(
 	return err
 }
 
+// ReceiveGitWebhook401JSONResponse contains the raw HTTP response and any decoded response body.
 type ReceiveGitWebhook401JSONResponse struct{ UnauthenticatedJSONResponse }
 
+// VisitReceiveGitWebhookResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReceiveGitWebhook401JSONResponse) VisitReceiveGitWebhookResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18918,8 +21451,10 @@ func (response ReceiveGitWebhook401JSONResponse) VisitReceiveGitWebhookResponse(
 	return err
 }
 
+// ReceiveGitWebhook404JSONResponse contains the raw HTTP response and any decoded response body.
 type ReceiveGitWebhook404JSONResponse struct{ NotFoundJSONResponse }
 
+// VisitReceiveGitWebhookResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response ReceiveGitWebhook404JSONResponse) VisitReceiveGitWebhookResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18933,15 +21468,20 @@ func (response ReceiveGitWebhook404JSONResponse) VisitReceiveGitWebhookResponse(
 	return err
 }
 
+// HealthzRequestObject contains validated inputs for its OpenAPI operation.
 type HealthzRequestObject struct {
 }
 
+// HealthzResponseObject is implemented by every declared response for its OpenAPI operation.
 type HealthzResponseObject interface {
+	// VisitHealthzResponse carries the generated visit healthz response value for HealthzResponseObject.
 	VisitHealthzResponse(w http.ResponseWriter) error
 }
 
+// Healthz200JSONResponse contains the raw HTTP response and any decoded response body.
 type Healthz200JSONResponse struct{ HealthJSONResponse }
 
+// VisitHealthzResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Healthz200JSONResponse) VisitHealthzResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18954,15 +21494,20 @@ func (response Healthz200JSONResponse) VisitHealthzResponse(w http.ResponseWrite
 	return err
 }
 
+// MetricsRequestObject contains validated inputs for its OpenAPI operation.
 type MetricsRequestObject struct {
 }
 
+// MetricsResponseObject is implemented by every declared response for its OpenAPI operation.
 type MetricsResponseObject interface {
+	// VisitMetricsResponse carries the generated visit metrics response value for MetricsResponseObject.
 	VisitMetricsResponse(w http.ResponseWriter) error
 }
 
+// Metrics200TextResponse contains the raw HTTP response and any decoded response body.
 type Metrics200TextResponse string
 
+// VisitMetricsResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Metrics200TextResponse) VisitMetricsResponse(w http.ResponseWriter) error {
 
 	w.Header().Set("Content-Type", "text/plain")
@@ -18972,15 +21517,20 @@ func (response Metrics200TextResponse) VisitMetricsResponse(w http.ResponseWrite
 	return err
 }
 
+// ReadyzRequestObject contains validated inputs for its OpenAPI operation.
 type ReadyzRequestObject struct {
 }
 
+// ReadyzResponseObject is implemented by every declared response for its OpenAPI operation.
 type ReadyzResponseObject interface {
+	// VisitReadyzResponse carries the generated visit readyz response value for ReadyzResponseObject.
 	VisitReadyzResponse(w http.ResponseWriter) error
 }
 
+// Readyz200JSONResponse contains the raw HTTP response and any decoded response body.
 type Readyz200JSONResponse struct{ HealthJSONResponse }
 
+// VisitReadyzResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Readyz200JSONResponse) VisitReadyzResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -18993,8 +21543,10 @@ func (response Readyz200JSONResponse) VisitReadyzResponse(w http.ResponseWriter)
 	return err
 }
 
+// Readyz503JSONResponse contains the raw HTTP response and any decoded response body.
 type Readyz503JSONResponse struct{ InternalErrorJSONResponse }
 
+// VisitReadyzResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Readyz503JSONResponse) VisitReadyzResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
@@ -19011,531 +21563,710 @@ func (response Readyz503JSONResponse) VisitReadyzResponse(w http.ResponseWriter)
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 
+	// ListPlatformAuditLogs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/audit-logs)
 	ListPlatformAuditLogs(ctx context.Context, request ListPlatformAuditLogsRequestObject) (ListPlatformAuditLogsResponseObject, error)
 
+	// ListGlobalCredentials handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/global-credentials)
 	ListGlobalCredentials(ctx context.Context, request ListGlobalCredentialsRequestObject) (ListGlobalCredentialsResponseObject, error)
 
+	// CreateGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/global-credentials)
 	CreateGlobalCredential(ctx context.Context, request CreateGlobalCredentialRequestObject) (CreateGlobalCredentialResponseObject, error)
 
+	// DeleteGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/admin/global-credentials/{credentialId})
 	DeleteGlobalCredential(ctx context.Context, request DeleteGlobalCredentialRequestObject) (DeleteGlobalCredentialResponseObject, error)
 
+	// UpdateGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/global-credentials/{credentialId})
 	UpdateGlobalCredential(ctx context.Context, request UpdateGlobalCredentialRequestObject) (UpdateGlobalCredentialResponseObject, error)
 
+	// RotateGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/global-credentials/{credentialId}:rotate)
 	RotateGlobalCredential(ctx context.Context, request RotateGlobalCredentialRequestObject) (RotateGlobalCredentialResponseObject, error)
 
+	// TestGlobalCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/global-credentials/{credentialId}:test)
 	TestGlobalCredential(ctx context.Context, request TestGlobalCredentialRequestObject) (TestGlobalCredentialResponseObject, error)
 
+	// ListPlatformJobs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/jobs)
 	ListPlatformJobs(ctx context.Context, request ListPlatformJobsRequestObject) (ListPlatformJobsResponseObject, error)
 
+	// GetPlatformJob handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/jobs/{jobId})
 	GetPlatformJob(ctx context.Context, request GetPlatformJobRequestObject) (GetPlatformJobResponseObject, error)
 
+	// ListProducerProfiles handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/producer-profiles)
 	ListProducerProfiles(ctx context.Context, request ListProducerProfilesRequestObject) (ListProducerProfilesResponseObject, error)
 
+	// CreateProducerProfile handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/producer-profiles)
 	CreateProducerProfile(ctx context.Context, request CreateProducerProfileRequestObject) (CreateProducerProfileResponseObject, error)
 
+	// DeleteProducerProfile handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/admin/producer-profiles/{producerProfileId})
 	DeleteProducerProfile(ctx context.Context, request DeleteProducerProfileRequestObject) (DeleteProducerProfileResponseObject, error)
 
+	// GetProducerProfile handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/producer-profiles/{producerProfileId})
 	GetProducerProfile(ctx context.Context, request GetProducerProfileRequestObject) (GetProducerProfileResponseObject, error)
 
+	// UpdateProducerProfile handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/producer-profiles/{producerProfileId})
 	UpdateProducerProfile(ctx context.Context, request UpdateProducerProfileRequestObject) (UpdateProducerProfileResponseObject, error)
 
+	// GetPlatformSettings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/settings)
 	GetPlatformSettings(ctx context.Context, request GetPlatformSettingsRequestObject) (GetPlatformSettingsResponseObject, error)
 
+	// UpdatePlatformSettings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/settings)
 	UpdatePlatformSettings(ctx context.Context, request UpdatePlatformSettingsRequestObject) (UpdatePlatformSettingsResponseObject, error)
 
+	// ListTenants handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/tenants)
 	ListTenants(ctx context.Context, request ListTenantsRequestObject) (ListTenantsResponseObject, error)
 
+	// CreateTenant handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/tenants)
 	CreateTenant(ctx context.Context, request CreateTenantRequestObject) (CreateTenantResponseObject, error)
 
+	// DeleteTenant handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/admin/tenants/{tenantSlug})
 	DeleteTenant(ctx context.Context, request DeleteTenantRequestObject) (DeleteTenantResponseObject, error)
 
+	// UpdateTenant handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/tenants/{tenantSlug})
 	UpdateTenant(ctx context.Context, request UpdateTenantRequestObject) (UpdateTenantResponseObject, error)
 
+	// PutTenantMemberAsPlatformAdmin handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId})
 	PutTenantMemberAsPlatformAdmin(ctx context.Context, request PutTenantMemberAsPlatformAdminRequestObject) (PutTenantMemberAsPlatformAdminResponseObject, error)
 
+	// ListUsers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/admin/users)
 	ListUsers(ctx context.Context, request ListUsersRequestObject) (ListUsersResponseObject, error)
 
+	// CreateUser handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/admin/users)
 	CreateUser(ctx context.Context, request CreateUserRequestObject) (CreateUserResponseObject, error)
 
+	// UpdateUser handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/admin/users/{userId})
 	UpdateUser(ctx context.Context, request UpdateUserRequestObject) (UpdateUserResponseObject, error)
 
+	// GetCsrfToken handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/auth/csrf)
 	GetCsrfToken(ctx context.Context, request GetCsrfTokenRequestObject) (GetCsrfTokenResponseObject, error)
 
+	// Login handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/auth/login)
 	Login(ctx context.Context, request LoginRequestObject) (LoginResponseObject, error)
 
+	// Logout handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/auth/logout)
 	Logout(ctx context.Context, request LogoutRequestObject) (LogoutResponseObject, error)
 
+	// GetMe handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/auth/me)
 	GetMe(ctx context.Context, request GetMeRequestObject) (GetMeResponseObject, error)
 
+	// GetMyPreferences handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/auth/me/preferences)
 	GetMyPreferences(ctx context.Context, request GetMyPreferencesRequestObject) (GetMyPreferencesResponseObject, error)
 
+	// UpdateMyPreferences handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/auth/me/preferences)
 	UpdateMyPreferences(ctx context.Context, request UpdateMyPreferencesRequestObject) (UpdateMyPreferencesResponseObject, error)
 
+	// DownloadSignedContent handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/content/{token})
 	DownloadSignedContent(ctx context.Context, request DownloadSignedContentRequestObject) (DownloadSignedContentResponseObject, error)
 
+	// GetOpenApiContract handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/openapi.yaml)
 	GetOpenApiContract(ctx context.Context, request GetOpenApiContractRequestObject) (GetOpenApiContractResponseObject, error)
 
+	// GetPublicService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug})
 	GetPublicService(ctx context.Context, request GetPublicServiceRequestObject) (GetPublicServiceResponseObject, error)
 
+	// GetPublicAsset handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug}/assets/{kindId}/{assetName})
 	GetPublicAsset(ctx context.Context, request GetPublicAssetRequestObject) (GetPublicAssetResponseObject, error)
 
+	// ResolvePublicView handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/public/t/{tenantSlug}/views:resolve)
 	ResolvePublicView(ctx context.Context, request ResolvePublicViewRequestObject) (ResolvePublicViewResponseObject, error)
 
+	// GetSharedView handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/shared/{shareToken})
 	GetSharedView(ctx context.Context, request GetSharedViewRequestObject) (GetSharedViewResponseObject, error)
 
+	// ListAssetKinds handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/asset-kinds)
 	ListAssetKinds(ctx context.Context, request ListAssetKindsRequestObject) (ListAssetKindsResponseObject, error)
 
+	// UpdateAssetKindState handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId})
 	UpdateAssetKindState(ctx context.Context, request UpdateAssetKindStateRequestObject) (UpdateAssetKindStateResponseObject, error)
 
+	// GetAssetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId})
 	GetAssetVersion(ctx context.Context, request GetAssetVersionRequestObject) (GetAssetVersionResponseObject, error)
 
+	// ListAssetVersionItems handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/items)
 	ListAssetVersionItems(ctx context.Context, request ListAssetVersionItemsRequestObject) (ListAssetVersionItemsResponseObject, error)
 
+	// GetAssetVersionProvenance handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/provenance)
 	GetAssetVersionProvenance(ctx context.Context, request GetAssetVersionProvenanceRequestObject) (GetAssetVersionProvenanceResponseObject, error)
 
+	// DeprecateAssetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:deprecate)
 	DeprecateAssetVersion(ctx context.Context, request DeprecateAssetVersionRequestObject) (DeprecateAssetVersionResponseObject, error)
 
+	// PublishAssetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish)
 	PublishAssetVersion(ctx context.Context, request PublishAssetVersionRequestObject) (PublishAssetVersionResponseObject, error)
 
+	// RetireAssetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:retire)
 	RetireAssetVersion(ctx context.Context, request RetireAssetVersionRequestObject) (RetireAssetVersionResponseObject, error)
 
+	// GetAsset handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/assets/{assetId})
 	GetAsset(ctx context.Context, request GetAssetRequestObject) (GetAssetResponseObject, error)
 
+	// ReorderAssetLayers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order)
 	ReorderAssetLayers(ctx context.Context, request ReorderAssetLayersRequestObject) (ReorderAssetLayersResponseObject, error)
 
+	// ListAssetVersions handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/assets/{assetId}/versions)
 	ListAssetVersions(ctx context.Context, request ListAssetVersionsRequestObject) (ListAssetVersionsResponseObject, error)
 
+	// GenerateAssetWithAi handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate)
 	GenerateAssetWithAi(ctx context.Context, request GenerateAssetWithAiRequestObject) (GenerateAssetWithAiResponseObject, error)
 
+	// PreviewMerge handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/assets:preview-merge)
 	PreviewMerge(ctx context.Context, request PreviewMergeRequestObject) (PreviewMergeResponseObject, error)
 
+	// PushAssetRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/assets:push)
 	PushAssetRevision(ctx context.Context, request PushAssetRevisionRequestObject) (PushAssetRevisionResponseObject, error)
 
+	// ListAuditLogs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/audit-logs)
 	ListAuditLogs(ctx context.Context, request ListAuditLogsRequestObject) (ListAuditLogsResponseObject, error)
 
+	// ListBreakingTodos handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/breaking-todos)
 	ListBreakingTodos(ctx context.Context, request ListBreakingTodosRequestObject) (ListBreakingTodosResponseObject, error)
 
+	// AcknowledgeBreakingTodo handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack)
 	AcknowledgeBreakingTodo(ctx context.Context, request AcknowledgeBreakingTodoRequestObject) (AcknowledgeBreakingTodoResponseObject, error)
 
+	// ListCredentials handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/credentials)
 	ListCredentials(ctx context.Context, request ListCredentialsRequestObject) (ListCredentialsResponseObject, error)
 
+	// CreateCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/credentials)
 	CreateCredential(ctx context.Context, request CreateCredentialRequestObject) (CreateCredentialResponseObject, error)
 
+	// DeleteCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/credentials/{credentialId})
 	DeleteCredential(ctx context.Context, request DeleteCredentialRequestObject) (DeleteCredentialResponseObject, error)
 
+	// UpdateCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId})
 	UpdateCredential(ctx context.Context, request UpdateCredentialRequestObject) (UpdateCredentialResponseObject, error)
 
+	// RotateCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate)
 	RotateCredential(ctx context.Context, request RotateCredentialRequestObject) (RotateCredentialResponseObject, error)
 
+	// TestCredential handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test)
 	TestCredential(ctx context.Context, request TestCredentialRequestObject) (TestCredentialResponseObject, error)
 
+	// RunDiff handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/diff)
 	RunDiff(ctx context.Context, request RunDiffRequestObject) (RunDiffResponseObject, error)
 
+	// ListDiffRuleSets handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/diff-rule-sets)
 	ListDiffRuleSets(ctx context.Context, request ListDiffRuleSetsRequestObject) (ListDiffRuleSetsResponseObject, error)
 
+	// CreateDiffRuleSet handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/diff-rule-sets)
 	CreateDiffRuleSet(ctx context.Context, request CreateDiffRuleSetRequestObject) (CreateDiffRuleSetResponseObject, error)
 
+	// DeleteDiffRuleSet handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId})
 	DeleteDiffRuleSet(ctx context.Context, request DeleteDiffRuleSetRequestObject) (DeleteDiffRuleSetResponseObject, error)
 
+	// UpdateDiffRuleSet handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId})
 	UpdateDiffRuleSet(ctx context.Context, request UpdateDiffRuleSetRequestObject) (UpdateDiffRuleSetResponseObject, error)
 
+	// ListDiffSnapshots handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/diff-snapshots)
 	ListDiffSnapshots(ctx context.Context, request ListDiffSnapshotsRequestObject) (ListDiffSnapshotsResponseObject, error)
 
+	// DeleteDiffSnapshot handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId})
 	DeleteDiffSnapshot(ctx context.Context, request DeleteDiffSnapshotRequestObject) (DeleteDiffSnapshotResponseObject, error)
 
+	// GetDiffSnapshot handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId})
 	GetDiffSnapshot(ctx context.Context, request GetDiffSnapshotRequestObject) (GetDiffSnapshotResponseObject, error)
 
+	// ExportDiffSnapshot handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/export)
 	ExportDiffSnapshot(ctx context.Context, request ExportDiffSnapshotRequestObject) (ExportDiffSnapshotResponseObject, error)
 
+	// CreateDiffSnapshotShareLink handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links)
 	CreateDiffSnapshotShareLink(ctx context.Context, request CreateDiffSnapshotShareLinkRequestObject) (CreateDiffSnapshotShareLinkResponseObject, error)
 
+	// SearchTenantUsers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/directory/users)
 	SearchTenantUsers(ctx context.Context, request SearchTenantUsersRequestObject) (SearchTenantUsersResponseObject, error)
 
+	// CreateTenantExport handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/exports)
 	CreateTenantExport(ctx context.Context, request CreateTenantExportRequestObject) (CreateTenantExportResponseObject, error)
 
+	// ListJobs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/jobs)
 	ListJobs(ctx context.Context, request ListJobsRequestObject) (ListJobsResponseObject, error)
 
+	// GetJob handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/jobs/{jobId})
 	GetJob(ctx context.Context, request GetJobRequestObject) (GetJobResponseObject, error)
 
+	// StreamJobLogs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/jobs/{jobId}/logs)
 	StreamJobLogs(ctx context.Context, request StreamJobLogsRequestObject) (StreamJobLogsResponseObject, error)
 
+	// CancelJob handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/jobs/{jobId}:cancel)
 	CancelJob(ctx context.Context, request CancelJobRequestObject) (CancelJobResponseObject, error)
 
+	// RetryJob handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/jobs/{jobId}:retry)
 	RetryJob(ctx context.Context, request RetryJobRequestObject) (RetryJobResponseObject, error)
 
+	// ListKnownHosts handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/known-hosts)
 	ListKnownHosts(ctx context.Context, request ListKnownHostsRequestObject) (ListKnownHostsResponseObject, error)
 
+	// CreateKnownHost handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/known-hosts)
 	CreateKnownHost(ctx context.Context, request CreateKnownHostRequestObject) (CreateKnownHostResponseObject, error)
 
+	// GetLayerRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId})
 	GetLayerRevision(ctx context.Context, request GetLayerRevisionRequestObject) (GetLayerRevisionResponseObject, error)
 
+	// GetReviewContext handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}/review-context)
 	GetReviewContext(ctx context.Context, request GetReviewContextRequestObject) (GetReviewContextResponseObject, error)
 
+	// ApproveLayerRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve)
 	ApproveLayerRevision(ctx context.Context, request ApproveLayerRevisionRequestObject) (ApproveLayerRevisionResponseObject, error)
 
+	// RejectLayerRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject)
 	RejectLayerRevision(ctx context.Context, request RejectLayerRevisionRequestObject) (RejectLayerRevisionResponseObject, error)
 
+	// GetLayer handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/layers/{layerId})
 	GetLayer(ctx context.Context, request GetLayerRequestObject) (GetLayerResponseObject, error)
 
+	// UpdateLayer handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/layers/{layerId})
 	UpdateLayer(ctx context.Context, request UpdateLayerRequestObject) (UpdateLayerResponseObject, error)
 
+	// ListLayerRevisions handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/layers/{layerId}/revisions)
 	ListLayerRevisions(ctx context.Context, request ListLayerRevisionsRequestObject) (ListLayerRevisionsResponseObject, error)
 
+	// CreateLayerRevision handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions)
 	CreateLayerRevision(ctx context.Context, request CreateLayerRevisionRequestObject) (CreateLayerRevisionResponseObject, error)
 
+	// RollbackLayer handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback)
 	RollbackLayer(ctx context.Context, request RollbackLayerRequestObject) (RollbackLayerResponseObject, error)
 
+	// ListTenantMembers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/members)
 	ListTenantMembers(ctx context.Context, request ListTenantMembersRequestObject) (ListTenantMembersResponseObject, error)
 
+	// DeleteTenantMember handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/members/{userId})
 	DeleteTenantMember(ctx context.Context, request DeleteTenantMemberRequestObject) (DeleteTenantMemberResponseObject, error)
 
+	// PutTenantMember handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/members/{userId})
 	PutTenantMember(ctx context.Context, request PutTenantMemberRequestObject) (PutTenantMemberResponseObject, error)
 
+	// ListNotificationChannels handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/notification-channels)
 	ListNotificationChannels(ctx context.Context, request ListNotificationChannelsRequestObject) (ListNotificationChannelsResponseObject, error)
 
+	// CreateNotificationChannel handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notification-channels)
 	CreateNotificationChannel(ctx context.Context, request CreateNotificationChannelRequestObject) (CreateNotificationChannelResponseObject, error)
 
+	// DeleteNotificationChannel handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/notification-channels/{channelId})
 	DeleteNotificationChannel(ctx context.Context, request DeleteNotificationChannelRequestObject) (DeleteNotificationChannelResponseObject, error)
 
+	// UpdateNotificationChannel handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId})
 	UpdateNotificationChannel(ctx context.Context, request UpdateNotificationChannelRequestObject) (UpdateNotificationChannelResponseObject, error)
 
+	// RotateNotificationChannelSecret handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate)
 	RotateNotificationChannelSecret(ctx context.Context, request RotateNotificationChannelSecretRequestObject) (RotateNotificationChannelSecretResponseObject, error)
 
+	// TestNotificationChannel handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:test)
 	TestNotificationChannel(ctx context.Context, request TestNotificationChannelRequestObject) (TestNotificationChannelResponseObject, error)
 
+	// ListNotifications handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/notifications)
 	ListNotifications(ctx context.Context, request ListNotificationsRequestObject) (ListNotificationsResponseObject, error)
 
+	// MarkNotificationRead handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notifications/{notificationId}:read)
 	MarkNotificationRead(ctx context.Context, request MarkNotificationReadRequestObject) (MarkNotificationReadResponseObject, error)
 
+	// MarkAllNotificationsRead handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/notifications:read-all)
 	MarkAllNotificationsRead(ctx context.Context, request MarkAllNotificationsReadRequestObject) (MarkAllNotificationsReadResponseObject, error)
 
+	// ListAvailableProducerProfiles handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/producer-profiles)
 	ListAvailableProducerProfiles(ctx context.Context, request ListAvailableProducerProfilesRequestObject) (ListAvailableProducerProfilesResponseObject, error)
 
+	// ListRepositories handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/repositories)
 	ListRepositories(ctx context.Context, request ListRepositoriesRequestObject) (ListRepositoriesResponseObject, error)
 
+	// CreateRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories)
 	CreateRepository(ctx context.Context, request CreateRepositoryRequestObject) (CreateRepositoryResponseObject, error)
 
+	// DeleteRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 	DeleteRepository(ctx context.Context, request DeleteRepositoryRequestObject) (DeleteRepositoryResponseObject, error)
 
+	// GetRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 	GetRepository(ctx context.Context, request GetRepositoryRequestObject) (GetRepositoryResponseObject, error)
 
+	// UpdateRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId})
 	UpdateRepository(ctx context.Context, request UpdateRepositoryRequestObject) (UpdateRepositoryResponseObject, error)
 
+	// ListDiscoveryCandidates handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates)
 	ListDiscoveryCandidates(ctx context.Context, request ListDiscoveryCandidatesRequestObject) (ListDiscoveryCandidatesResponseObject, error)
 
+	// DismissDiscoveryCandidate handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates/{candidateId}:dismiss)
 	DismissDiscoveryCandidate(ctx context.Context, request DismissDiscoveryCandidateRequestObject) (DismissDiscoveryCandidateResponseObject, error)
 
+	// AcceptDiscoveryCandidates handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept)
 	AcceptDiscoveryCandidates(ctx context.Context, request AcceptDiscoveryCandidatesRequestObject) (AcceptDiscoveryCandidatesResponseObject, error)
 
+	// PreviewRepositoryConfigImport handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports)
 	PreviewRepositoryConfigImport(ctx context.Context, request PreviewRepositoryConfigImportRequestObject) (PreviewRepositoryConfigImportResponseObject, error)
 
+	// ApplyRepositoryConfigImport handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply)
 	ApplyRepositoryConfigImport(ctx context.Context, request ApplyRepositoryConfigImportRequestObject) (ApplyRepositoryConfigImportResponseObject, error)
 
+	// CreateServiceInRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services)
 	CreateServiceInRepository(ctx context.Context, request CreateServiceInRepositoryRequestObject) (CreateServiceInRepositoryResponseObject, error)
 
+	// DiscoverRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover)
 	DiscoverRepository(ctx context.Context, request DiscoverRepositoryRequestObject) (DiscoverRepositoryResponseObject, error)
 
+	// SyncRepository handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync)
 	SyncRepository(ctx context.Context, request SyncRepositoryRequestObject) (SyncRepositoryResponseObject, error)
 
+	// CheckRepositoryConnection handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/repositories:check-connection)
 	CheckRepositoryConnection(ctx context.Context, request CheckRepositoryConnectionRequestObject) (CheckRepositoryConnectionResponseObject, error)
 
+	// ListReviews handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/reviews)
 	ListReviews(ctx context.Context, request ListReviewsRequestObject) (ListReviewsResponseObject, error)
 
+	// Search handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/search)
 	Search(ctx context.Context, request SearchRequestObject) (SearchResponseObject, error)
 
+	// ListServices handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services)
 	ListServices(ctx context.Context, request ListServicesRequestObject) (ListServicesResponseObject, error)
 
+	// DeleteService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/services/{serviceSlug})
 	DeleteService(ctx context.Context, request DeleteServiceRequestObject) (DeleteServiceResponseObject, error)
 
+	// GetService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services/{serviceSlug})
 	GetService(ctx context.Context, request GetServiceRequestObject) (GetServiceResponseObject, error)
 
+	// UpdateService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug})
 	UpdateService(ctx context.Context, request UpdateServiceRequestObject) (UpdateServiceResponseObject, error)
 
+	// GetServiceAccess handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/access)
 	GetServiceAccess(ctx context.Context, request GetServiceAccessRequestObject) (GetServiceAccessResponseObject, error)
 
+	// PutServiceAccess handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access)
 	PutServiceAccess(ctx context.Context, request PutServiceAccessRequestObject) (PutServiceAccessResponseObject, error)
 
+	// GenerateMissingAssetWithAi handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate)
 	GenerateMissingAssetWithAi(ctx context.Context, request GenerateMissingAssetWithAiRequestObject) (GenerateMissingAssetWithAiResponseObject, error)
 
+	// ListServiceComments handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments)
 	ListServiceComments(ctx context.Context, request ListServiceCommentsRequestObject) (ListServiceCommentsResponseObject, error)
 
+	// CreateServiceComment handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments)
 	CreateServiceComment(ctx context.Context, request CreateServiceCommentRequestObject) (CreateServiceCommentResponseObject, error)
 
+	// ListSourceSpecs handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources)
 	ListSourceSpecs(ctx context.Context, request ListSourceSpecsRequestObject) (ListSourceSpecsResponseObject, error)
 
+	// CreateSourceSpec handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources)
 	CreateSourceSpec(ctx context.Context, request CreateSourceSpecRequestObject) (CreateSourceSpecResponseObject, error)
 
+	// ResolveServiceDrift handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift)
 	ResolveServiceDrift(ctx context.Context, request ResolveServiceDriftRequestObject) (ResolveServiceDriftResponseObject, error)
 
+	// StarService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:star)
 	StarService(ctx context.Context, request StarServiceRequestObject) (StarServiceResponseObject, error)
 
+	// UnstarService handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:unstar)
 	UnstarService(ctx context.Context, request UnstarServiceRequestObject) (UnstarServiceResponseObject, error)
 
+	// ListRecentServices handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/services:recent)
 	ListRecentServices(ctx context.Context, request ListRecentServicesRequestObject) (ListRecentServicesResponseObject, error)
 
+	// GetTenantSettings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/settings)
 	GetTenantSettings(ctx context.Context, request GetTenantSettingsRequestObject) (GetTenantSettingsResponseObject, error)
 
+	// UpdateTenantSettings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/settings)
 	UpdateTenantSettings(ctx context.Context, request UpdateTenantSettingsRequestObject) (UpdateTenantSettingsResponseObject, error)
 
+	// ListShareLinks handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/share-links)
 	ListShareLinks(ctx context.Context, request ListShareLinksRequestObject) (ListShareLinksResponseObject, error)
 
+	// CreateShareLink handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/share-links)
 	CreateShareLink(ctx context.Context, request CreateShareLinkRequestObject) (CreateShareLinkResponseObject, error)
 
+	// RevokeShareLink handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/share-links/{shareLinkId})
 	RevokeShareLink(ctx context.Context, request RevokeShareLinkRequestObject) (RevokeShareLinkResponseObject, error)
 
+	// DeleteSourceSpec handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/sources/{sourceId})
 	DeleteSourceSpec(ctx context.Context, request DeleteSourceSpecRequestObject) (DeleteSourceSpecResponseObject, error)
 
+	// UpdateSourceSpec handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/sources/{sourceId})
 	UpdateSourceSpec(ctx context.Context, request UpdateSourceSpecRequestObject) (UpdateSourceSpecResponseObject, error)
 
+	// ListSourceBindings handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/sources/{sourceId}/bindings)
 	ListSourceBindings(ctx context.Context, request ListSourceBindingsRequestObject) (ListSourceBindingsResponseObject, error)
 
+	// ProduceSource handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce)
 	ProduceSource(ctx context.Context, request ProduceSourceRequestObject) (ProduceSourceResponseObject, error)
 
+	// ListSubscriptions handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/subscriptions)
 	ListSubscriptions(ctx context.Context, request ListSubscriptionsRequestObject) (ListSubscriptionsResponseObject, error)
 
+	// PutSubscription handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/subscriptions)
 	PutSubscription(ctx context.Context, request PutSubscriptionRequestObject) (PutSubscriptionResponseObject, error)
 
+	// ListSystemGroups handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/system-groups)
 	ListSystemGroups(ctx context.Context, request ListSystemGroupsRequestObject) (ListSystemGroupsResponseObject, error)
 
+	// CreateSystemGroup handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/system-groups)
 	CreateSystemGroup(ctx context.Context, request CreateSystemGroupRequestObject) (CreateSystemGroupResponseObject, error)
 
+	// DeleteSystemGroup handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/system-groups/{groupId})
 	DeleteSystemGroup(ctx context.Context, request DeleteSystemGroupRequestObject) (DeleteSystemGroupResponseObject, error)
 
+	// GetSystemGroup handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/system-groups/{groupId})
 	GetSystemGroup(ctx context.Context, request GetSystemGroupRequestObject) (GetSystemGroupResponseObject, error)
 
+	// UpdateSystemGroup handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId})
 	UpdateSystemGroup(ctx context.Context, request UpdateSystemGroupRequestObject) (UpdateSystemGroupResponseObject, error)
 
+	// PutSystemGroupMembers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members)
 	PutSystemGroupMembers(ctx context.Context, request PutSystemGroupMembersRequestObject) (PutSystemGroupMembersResponseObject, error)
 
+	// ListTags handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/tags)
 	ListTags(ctx context.Context, request ListTagsRequestObject) (ListTagsResponseObject, error)
 
+	// CreateTag handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/tags)
 	CreateTag(ctx context.Context, request CreateTagRequestObject) (CreateTagResponseObject, error)
 
+	// DeleteTag handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/tags/{tagId})
 	DeleteTag(ctx context.Context, request DeleteTagRequestObject) (DeleteTagResponseObject, error)
 
+	// UpdateTag handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/tags/{tagId})
 	UpdateTag(ctx context.Context, request UpdateTagRequestObject) (UpdateTagResponseObject, error)
 
+	// ListTeams handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/teams)
 	ListTeams(ctx context.Context, request ListTeamsRequestObject) (ListTeamsResponseObject, error)
 
+	// CreateTeam handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/teams)
 	CreateTeam(ctx context.Context, request CreateTeamRequestObject) (CreateTeamResponseObject, error)
 
+	// DeleteTeam handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/teams/{teamId})
 	DeleteTeam(ctx context.Context, request DeleteTeamRequestObject) (DeleteTeamResponseObject, error)
 
+	// GetTeam handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/teams/{teamId})
 	GetTeam(ctx context.Context, request GetTeamRequestObject) (GetTeamResponseObject, error)
 
+	// UpdateTeam handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PATCH /api/v1/t/{tenantSlug}/teams/{teamId})
 	UpdateTeam(ctx context.Context, request UpdateTeamRequestObject) (UpdateTeamResponseObject, error)
 
+	// ReplaceTeamMembers handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members)
 	ReplaceTeamMembers(ctx context.Context, request ReplaceTeamMembersRequestObject) (ReplaceTeamMembersResponseObject, error)
 
+	// ListTokens handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/tokens)
 	ListTokens(ctx context.Context, request ListTokensRequestObject) (ListTokensResponseObject, error)
 
+	// CreateToken handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/tokens)
 	CreateToken(ctx context.Context, request CreateTokenRequestObject) (CreateTokenResponseObject, error)
 
+	// RevokeToken handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/tokens/{tokenId})
 	RevokeToken(ctx context.Context, request RevokeTokenRequestObject) (RevokeTokenResponseObject, error)
 
+	// CreateDiffUpload handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/uploads)
 	CreateDiffUpload(ctx context.Context, request CreateDiffUploadRequestObject) (CreateDiffUploadResponseObject, error)
 
+	// ListViewOverrides handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/view-overrides)
 	ListViewOverrides(ctx context.Context, request ListViewOverridesRequestObject) (ListViewOverridesResponseObject, error)
 
+	// DeleteViewOverride handles the corresponding operation from the Meridian OpenAPI contract.
 	// (DELETE /api/v1/t/{tenantSlug}/view-overrides/{viewId})
 	DeleteViewOverride(ctx context.Context, request DeleteViewOverrideRequestObject) (DeleteViewOverrideResponseObject, error)
 
+	// PutViewOverride handles the corresponding operation from the Meridian OpenAPI contract.
 	// (PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId})
 	PutViewOverride(ctx context.Context, request PutViewOverrideRequestObject) (PutViewOverrideResponseObject, error)
 
+	// ListViews handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/t/{tenantSlug}/views)
 	ListViews(ctx context.Context, request ListViewsRequestObject) (ListViewsResponseObject, error)
 
+	// ResolveView handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/t/{tenantSlug}/views:resolve)
 	ResolveView(ctx context.Context, request ResolveViewRequestObject) (ResolveViewResponseObject, error)
 
+	// GetVersion handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /api/v1/version)
 	GetVersion(ctx context.Context, request GetVersionRequestObject) (GetVersionResponseObject, error)
 
+	// ReceiveGitWebhook handles the corresponding operation from the Meridian OpenAPI contract.
 	// (POST /api/v1/webhooks/git/{repositoryId})
 	ReceiveGitWebhook(ctx context.Context, request ReceiveGitWebhookRequestObject) (ReceiveGitWebhookResponseObject, error)
 
+	// Healthz handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /healthz)
 	Healthz(ctx context.Context, request HealthzRequestObject) (HealthzResponseObject, error)
 
+	// Metrics handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /metrics)
 	Metrics(ctx context.Context, request MetricsRequestObject) (MetricsResponseObject, error)
 
+	// Readyz handles the corresponding operation from the Meridian OpenAPI contract.
 	// (GET /readyz)
 	Readyz(ctx context.Context, request ReadyzRequestObject) (ReadyzResponseObject, error)
 }
 
+// StrictHandlerFunc is generated transport code derived from the Meridian OpenAPI contract.
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
+
+// StrictMiddlewareFunc is generated transport code derived from the Meridian OpenAPI contract.
 type StrictMiddlewareFunc func(f StrictHandlerFunc, operationID string) StrictHandlerFunc
 
+// StrictHTTPServerOptions is generated transport code derived from the Meridian OpenAPI contract.
 type StrictHTTPServerOptions struct {
-	RequestErrorHandlerFunc  func(w http.ResponseWriter, r *http.Request, err error)
+	// RequestErrorHandlerFunc carries the generated request error handler func value for StrictHTTPServerOptions.
+	RequestErrorHandlerFunc func(w http.ResponseWriter, r *http.Request, err error)
+	// ResponseErrorHandlerFunc carries the generated response error handler func value for StrictHTTPServerOptions.
 	ResponseErrorHandlerFunc func(w http.ResponseWriter, r *http.Request, err error)
 }
 
+// NewStrictHandler implements generated transport behavior for the Meridian OpenAPI contract.
 func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareFunc) ServerInterface {
 	return &strictHandler{ssi: ssi, middlewares: middlewares, options: StrictHTTPServerOptions{
 		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
@@ -19547,6 +22278,7 @@ func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareF
 	}}
 }
 
+// NewStrictHandlerWithOptions implements generated transport behavior for the Meridian OpenAPI contract.
 func NewStrictHandlerWithOptions(ssi StrictServerInterface, middlewares []StrictMiddlewareFunc, options StrictHTTPServerOptions) ServerInterface {
 	if options.RequestErrorHandlerFunc == nil {
 		options.RequestErrorHandlerFunc = func(w http.ResponseWriter, r *http.Request, err error) {

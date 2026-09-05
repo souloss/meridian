@@ -52,57 +52,81 @@ import type {
 } from '../../models';
 
 
+/** getListUsersResponseMock provides generated MSW behavior for contract tests. */
 export const getListUsersResponseMock = (): UserPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
 
+/** getCreateUserResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateUserResponseMock = (overrideResponse: Partial<Extract<UserResponse, object>> = {}): UserResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getUpdateUserResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateUserResponseMock = (overrideResponse: Partial<Extract<UserResponse, object>> = {}): UserResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getListTenantsResponseMock provides generated MSW behavior for contract tests. */
 export const getListTenantsResponseMock = (): TenantPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), status: faker.helpers.arrayElement(Object.values(TenantStatus)), quota: {maxRepositories: faker.number.int({min: 0}), maxServices: faker.number.int({min: 0}), maxStorageBytes: faker.number.int({min: 0}), maxCollectConcurrency: faker.number.int({min: 1})}, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
 
+/** getCreateTenantResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateTenantResponseMock = (overrideResponse: Partial<Extract<TenantResponse, object>> = {}): TenantResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), status: faker.helpers.arrayElement(Object.values(TenantStatus)), quota: {maxRepositories: faker.number.int({min: 0}), maxServices: faker.number.int({min: 0}), maxStorageBytes: faker.number.int({min: 0}), maxCollectConcurrency: faker.number.int({min: 1})}, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getUpdateTenantResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateTenantResponseMock = (overrideResponse: Partial<Extract<TenantResponse, object>> = {}): TenantResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), status: faker.helpers.arrayElement(Object.values(TenantStatus)), quota: {maxRepositories: faker.number.int({min: 0}), maxServices: faker.number.int({min: 0}), maxStorageBytes: faker.number.int({min: 0}), maxCollectConcurrency: faker.number.int({min: 1})}, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getDeleteTenantResponseMock provides generated MSW behavior for contract tests. */
 export const getDeleteTenantResponseMock = (overrideResponse: Partial<Extract<TenantDeletionAcceptedResponse, object>> = {}): TenantDeletionAcceptedResponse => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
+/** getPutTenantMemberAsPlatformAdminResponseMock provides generated MSW behavior for contract tests. */
 export const getPutTenantMemberAsPlatformAdminResponseMock = (overrideResponse: Partial<Extract<MemberResponse, object>> = {}): MemberResponse => ({user: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, role: faker.helpers.arrayElement(Object.values(TenantRole)), joinedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getGetPlatformSettingsResponseMock provides generated MSW behavior for contract tests. */
 export const getGetPlatformSettingsResponseMock = (overrideResponse: Partial<Extract<PlatformSettingsResponse, object>> = {}): PlatformSettingsResponse => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), defaultQuota: {maxRepositories: faker.number.int({min: 0}), maxServices: faker.number.int({min: 0}), maxStorageBytes: faker.number.int({min: 0}), maxCollectConcurrency: faker.number.int({min: 1})}, defaultTenantSettings: {externalRevisionTrustMode: faker.helpers.arrayElement(Object.values(ExternalRevisionTrustMode)), autoPublish: faker.datatype.boolean(), defaultLocale: faker.helpers.arrayElement(['zh-CN','en'] as const), defaultAiProducerProfileId: faker.helpers.arrayElement([faker.string.uuid(), null]), retention: {jobLogsDays: faker.number.int({min: 1, max: 3650}), archivedRevisionsDays: faker.number.int({min: 1, max: 3650})}}, defaultViewOverrides: {
         [faker.string.alphanumeric(5)]: {enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), defaultOptions: faker.helpers.arrayElement([{}, undefined])}
       }, defaultNotificationChannels: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({key: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: "in_app", enabled: faker.datatype.boolean()})), ...overrideResponse})
 
+/** getUpdatePlatformSettingsResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdatePlatformSettingsResponseMock = (overrideResponse: Partial<Extract<PlatformSettingsResponse, object>> = {}): PlatformSettingsResponse => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), defaultQuota: {maxRepositories: faker.number.int({min: 0}), maxServices: faker.number.int({min: 0}), maxStorageBytes: faker.number.int({min: 0}), maxCollectConcurrency: faker.number.int({min: 1})}, defaultTenantSettings: {externalRevisionTrustMode: faker.helpers.arrayElement(Object.values(ExternalRevisionTrustMode)), autoPublish: faker.datatype.boolean(), defaultLocale: faker.helpers.arrayElement(['zh-CN','en'] as const), defaultAiProducerProfileId: faker.helpers.arrayElement([faker.string.uuid(), null]), retention: {jobLogsDays: faker.number.int({min: 1, max: 3650}), archivedRevisionsDays: faker.number.int({min: 1, max: 3650})}}, defaultViewOverrides: {
         [faker.string.alphanumeric(5)]: {enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), defaultOptions: faker.helpers.arrayElement([{}, undefined])}
       }, defaultNotificationChannels: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({key: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: "in_app", enabled: faker.datatype.boolean()})), ...overrideResponse})
 
+/** getListGlobalCredentialsResponseMock provides generated MSW behavior for contract tests. */
 export const getListGlobalCredentialsResponseMock = (): GlobalCredentialPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), revision: faker.number.int({min: 1}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
 
+/** getCreateGlobalCredentialResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateGlobalCredentialResponseMock = (overrideResponse: Partial<Extract<GlobalCredentialResponse, object>> = {}): GlobalCredentialResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), revision: faker.number.int({min: 1}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getUpdateGlobalCredentialResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateGlobalCredentialResponseMock = (overrideResponse: Partial<Extract<GlobalCredentialResponse, object>> = {}): GlobalCredentialResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), revision: faker.number.int({min: 1}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getTestGlobalCredentialResponseKnownHostCandidateMock provides generated MSW behavior for contract tests. */
 export const getTestGlobalCredentialResponseKnownHostCandidateMock = (overrideResponse: Partial<KnownHostCandidate> = {}): KnownHostCandidate => ({...{host: faker.string.alpha({length: {min: 1, max: 255}}), port: faker.number.int({min: 1, max: 65535}), keyType: faker.helpers.arrayElement(['ssh-ed25519','ssh-rsa'] as const), publicKey: faker.helpers.fromRegExp("^[A-Za-z0-9+/]+={0,2}$"), fingerprint: faker.helpers.fromRegExp("^SHA256:[A-Za-z0-9+/]{43}$")}, ...overrideResponse});
 
+/** getTestGlobalCredentialResponseMock provides generated MSW behavior for contract tests. */
 export const getTestGlobalCredentialResponseMock = (overrideResponse: Partial<Extract<ConnectionTestResponse, object>> = {}): ConnectionTestResponse => ({ok: faker.datatype.boolean(), errorClass: faker.helpers.arrayElement([faker.helpers.arrayElement(['dns','auth','host_key','timeout','other'] as const), null]), message: faker.string.alpha({length: {min: 10, max: 20}}), hostKeyCandidate: faker.helpers.arrayElement([{...getTestGlobalCredentialResponseKnownHostCandidateMock()},null,]), ...overrideResponse})
 
+/** getRotateGlobalCredentialResponseMock provides generated MSW behavior for contract tests. */
 export const getRotateGlobalCredentialResponseMock = (overrideResponse: Partial<Extract<GlobalCredentialRotationResponse, object>> = {}): GlobalCredentialRotationResponse => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), credential: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), revision: faker.number.int({min: 1}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, syncJobs: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({tenantSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), repositoryId: faker.string.uuid(), jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean()})), ...overrideResponse})
 
+/** getListProducerProfilesResponseMock provides generated MSW behavior for contract tests. */
 export const getListProducerProfilesResponseMock = (): ProducerProfilePageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(ProducerProfileKind)), executable: faker.helpers.fromRegExp("^/"), args: Array.from({ length: faker.number.int({min: 1, max: 64}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), envAllowlist: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Z][A-Z0-9_]*$"))), supportedKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"))), replaySafe: faker.datatype.boolean(), network: faker.helpers.arrayElement(Object.values(ProducerNetworkMode)), timeoutSec: faker.number.int({min: 10, max: 3600}), memoryMiB: faker.number.int({min: 64, max: 16384}), cpuSeconds: faker.number.int({min: 1, max: 3600}), pids: faker.number.int({min: 1, max: 1024}), enabled: faker.datatype.boolean(), dependencyStatus: faker.helpers.arrayElement(Object.values(ProducerDependencyStatus)), unavailableReason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), revision: faker.number.int({min: 1}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
 
+/** getCreateProducerProfileResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateProducerProfileResponseMock = (overrideResponse: Partial<Extract<ProducerProfileResponse, object>> = {}): ProducerProfileResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(ProducerProfileKind)), executable: faker.helpers.fromRegExp("^/"), args: Array.from({ length: faker.number.int({min: 1, max: 64}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), envAllowlist: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Z][A-Z0-9_]*$"))), supportedKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"))), replaySafe: faker.datatype.boolean(), network: faker.helpers.arrayElement(Object.values(ProducerNetworkMode)), timeoutSec: faker.number.int({min: 10, max: 3600}), memoryMiB: faker.number.int({min: 64, max: 16384}), cpuSeconds: faker.number.int({min: 1, max: 3600}), pids: faker.number.int({min: 1, max: 1024}), enabled: faker.datatype.boolean(), dependencyStatus: faker.helpers.arrayElement(Object.values(ProducerDependencyStatus)), unavailableReason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), revision: faker.number.int({min: 1}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getGetProducerProfileResponseMock provides generated MSW behavior for contract tests. */
 export const getGetProducerProfileResponseMock = (overrideResponse: Partial<Extract<ProducerProfileResponse, object>> = {}): ProducerProfileResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(ProducerProfileKind)), executable: faker.helpers.fromRegExp("^/"), args: Array.from({ length: faker.number.int({min: 1, max: 64}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), envAllowlist: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Z][A-Z0-9_]*$"))), supportedKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"))), replaySafe: faker.datatype.boolean(), network: faker.helpers.arrayElement(Object.values(ProducerNetworkMode)), timeoutSec: faker.number.int({min: 10, max: 3600}), memoryMiB: faker.number.int({min: 64, max: 16384}), cpuSeconds: faker.number.int({min: 1, max: 3600}), pids: faker.number.int({min: 1, max: 1024}), enabled: faker.datatype.boolean(), dependencyStatus: faker.helpers.arrayElement(Object.values(ProducerDependencyStatus)), unavailableReason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), revision: faker.number.int({min: 1}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getUpdateProducerProfileResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateProducerProfileResponseMock = (overrideResponse: Partial<Extract<ProducerProfileResponse, object>> = {}): ProducerProfileResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(ProducerProfileKind)), executable: faker.helpers.fromRegExp("^/"), args: Array.from({ length: faker.number.int({min: 1, max: 64}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), envAllowlist: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Z][A-Z0-9_]*$"))), supportedKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"))), replaySafe: faker.datatype.boolean(), network: faker.helpers.arrayElement(Object.values(ProducerNetworkMode)), timeoutSec: faker.number.int({min: 10, max: 3600}), memoryMiB: faker.number.int({min: 64, max: 16384}), cpuSeconds: faker.number.int({min: 1, max: 3600}), pids: faker.number.int({min: 1, max: 1024}), enabled: faker.datatype.boolean(), dependencyStatus: faker.helpers.arrayElement(Object.values(ProducerDependencyStatus)), unavailableReason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), revision: faker.number.int({min: 1}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getListPlatformJobsResponseMock provides generated MSW behavior for contract tests. */
 export const getListPlatformJobsResponseMock = (): PlatformJobPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), tenantSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), type: faker.helpers.arrayElement(Object.values(JobType)), trigger: faker.helpers.arrayElement(Object.values(JobTrigger)), status: faker.helpers.arrayElement(Object.values(JobStatus)), stage: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PipelineStage)),null,]), scopeType: faker.helpers.arrayElement(Object.values(JobScopeType)), scopeId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', startedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])}))},})
 
+/** getGetPlatformJobResponseMock provides generated MSW behavior for contract tests. */
 export const getGetPlatformJobResponseMock = (overrideResponse: Partial<Extract<PlatformJobResponse, object>> = {}): PlatformJobResponse => ({id: faker.string.uuid(), tenantSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), type: faker.helpers.arrayElement(Object.values(JobType)), trigger: faker.helpers.arrayElement(Object.values(JobTrigger)), status: faker.helpers.arrayElement(Object.values(JobStatus)), stage: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PipelineStage)),null,]), scopeType: faker.helpers.arrayElement(Object.values(JobScopeType)), scopeId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', startedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), ...overrideResponse})
 
+/** getListPlatformAuditLogsResponseMock provides generated MSW behavior for contract tests. */
 export const getListPlatformAuditLogsResponseMock = (): AuditLogPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), tenantSlug: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"),null,]), actorId: faker.helpers.arrayElement([faker.string.uuid(),null,]), action: faker.string.alpha({length: {min: 10, max: 20}}), resourceType: faker.string.alpha({length: {min: 10, max: 20}}), resourceId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), requestId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), metadata: {}, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
 
 
+/** getListUsersMockHandler provides generated MSW behavior for contract tests. */
 export const getListUsersMockHandler = (overrideResponse?: UserPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserPageResponse> | UserPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/users', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -115,6 +139,7 @@ export const getListUsersMockHandler = (overrideResponse?: UserPageResponse | ((
   }, options)
 }
 
+/** getCreateUserMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateUserMockHandler = (overrideResponse?: UserResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<UserResponse> | UserResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/admin/users', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -127,6 +152,7 @@ export const getCreateUserMockHandler = (overrideResponse?: UserResponse | ((inf
   }, options)
 }
 
+/** getUpdateUserMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdateUserMockHandler = (overrideResponse?: UserResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<UserResponse> | UserResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/admin/users/:userId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -139,6 +165,7 @@ export const getUpdateUserMockHandler = (overrideResponse?: UserResponse | ((inf
   }, options)
 }
 
+/** getListTenantsMockHandler provides generated MSW behavior for contract tests. */
 export const getListTenantsMockHandler = (overrideResponse?: TenantPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TenantPageResponse> | TenantPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/tenants', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -151,6 +178,7 @@ export const getListTenantsMockHandler = (overrideResponse?: TenantPageResponse 
   }, options)
 }
 
+/** getCreateTenantMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateTenantMockHandler = (overrideResponse?: TenantResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<TenantResponse> | TenantResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/admin/tenants', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -163,6 +191,7 @@ export const getCreateTenantMockHandler = (overrideResponse?: TenantResponse | (
   }, options)
 }
 
+/** getUpdateTenantMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdateTenantMockHandler = (overrideResponse?: TenantResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<TenantResponse> | TenantResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/admin/tenants/:tenantSlug', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -175,6 +204,7 @@ export const getUpdateTenantMockHandler = (overrideResponse?: TenantResponse | (
   }, options)
 }
 
+/** getDeleteTenantMockHandler provides generated MSW behavior for contract tests. */
 export const getDeleteTenantMockHandler = (overrideResponse?: TenantDeletionAcceptedResponse | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<TenantDeletionAcceptedResponse> | TenantDeletionAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.delete('*/api/v1/admin/tenants/:tenantSlug', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
 
@@ -187,6 +217,7 @@ export const getDeleteTenantMockHandler = (overrideResponse?: TenantDeletionAcce
   }, options)
 }
 
+/** getPutTenantMemberAsPlatformAdminMockHandler provides generated MSW behavior for contract tests. */
 export const getPutTenantMemberAsPlatformAdminMockHandler = (overrideResponse?: MemberResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<MemberResponse> | MemberResponse), options?: RequestHandlerOptions) => {
   return http.put('*/api/v1/admin/tenants/:tenantSlug/members/:userId', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
 
@@ -199,6 +230,7 @@ export const getPutTenantMemberAsPlatformAdminMockHandler = (overrideResponse?: 
   }, options)
 }
 
+/** getGetPlatformSettingsMockHandler provides generated MSW behavior for contract tests. */
 export const getGetPlatformSettingsMockHandler = (overrideResponse?: PlatformSettingsResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlatformSettingsResponse> | PlatformSettingsResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/settings', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -211,6 +243,7 @@ export const getGetPlatformSettingsMockHandler = (overrideResponse?: PlatformSet
   }, options)
 }
 
+/** getUpdatePlatformSettingsMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdatePlatformSettingsMockHandler = (overrideResponse?: PlatformSettingsResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<PlatformSettingsResponse> | PlatformSettingsResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/admin/settings', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -223,6 +256,7 @@ export const getUpdatePlatformSettingsMockHandler = (overrideResponse?: Platform
   }, options)
 }
 
+/** getListGlobalCredentialsMockHandler provides generated MSW behavior for contract tests. */
 export const getListGlobalCredentialsMockHandler = (overrideResponse?: GlobalCredentialPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GlobalCredentialPageResponse> | GlobalCredentialPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/global-credentials', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -235,6 +269,7 @@ export const getListGlobalCredentialsMockHandler = (overrideResponse?: GlobalCre
   }, options)
 }
 
+/** getCreateGlobalCredentialMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateGlobalCredentialMockHandler = (overrideResponse?: GlobalCredentialResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<GlobalCredentialResponse> | GlobalCredentialResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/admin/global-credentials', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -247,6 +282,7 @@ export const getCreateGlobalCredentialMockHandler = (overrideResponse?: GlobalCr
   }, options)
 }
 
+/** getUpdateGlobalCredentialMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdateGlobalCredentialMockHandler = (overrideResponse?: GlobalCredentialResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<GlobalCredentialResponse> | GlobalCredentialResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/admin/global-credentials/:credentialId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -259,6 +295,7 @@ export const getUpdateGlobalCredentialMockHandler = (overrideResponse?: GlobalCr
   }, options)
 }
 
+/** getDeleteGlobalCredentialMockHandler provides generated MSW behavior for contract tests. */
 export const getDeleteGlobalCredentialMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
   return http.delete('*/api/v1/admin/global-credentials/:credentialId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
@@ -269,6 +306,7 @@ export const getDeleteGlobalCredentialMockHandler = (overrideResponse?: void | (
   }, options)
 }
 
+/** getTestGlobalCredentialMockHandler provides generated MSW behavior for contract tests. */
 export const getTestGlobalCredentialMockHandler = (overrideResponse?: ConnectionTestResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ConnectionTestResponse> | ConnectionTestResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/admin/global-credentials/:credentialId\\:test', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -281,6 +319,7 @@ export const getTestGlobalCredentialMockHandler = (overrideResponse?: Connection
   }, options)
 }
 
+/** getRotateGlobalCredentialMockHandler provides generated MSW behavior for contract tests. */
 export const getRotateGlobalCredentialMockHandler = (overrideResponse?: GlobalCredentialRotationResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<GlobalCredentialRotationResponse> | GlobalCredentialRotationResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/admin/global-credentials/:credentialId\\:rotate', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -293,6 +332,7 @@ export const getRotateGlobalCredentialMockHandler = (overrideResponse?: GlobalCr
   }, options)
 }
 
+/** getListProducerProfilesMockHandler provides generated MSW behavior for contract tests. */
 export const getListProducerProfilesMockHandler = (overrideResponse?: ProducerProfilePageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProducerProfilePageResponse> | ProducerProfilePageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/producer-profiles', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -305,6 +345,7 @@ export const getListProducerProfilesMockHandler = (overrideResponse?: ProducerPr
   }, options)
 }
 
+/** getCreateProducerProfileMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateProducerProfileMockHandler = (overrideResponse?: ProducerProfileResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ProducerProfileResponse> | ProducerProfileResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/admin/producer-profiles', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -317,6 +358,7 @@ export const getCreateProducerProfileMockHandler = (overrideResponse?: ProducerP
   }, options)
 }
 
+/** getGetProducerProfileMockHandler provides generated MSW behavior for contract tests. */
 export const getGetProducerProfileMockHandler = (overrideResponse?: ProducerProfileResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProducerProfileResponse> | ProducerProfileResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/producer-profiles/:producerProfileId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -329,6 +371,7 @@ export const getGetProducerProfileMockHandler = (overrideResponse?: ProducerProf
   }, options)
 }
 
+/** getUpdateProducerProfileMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdateProducerProfileMockHandler = (overrideResponse?: ProducerProfileResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<ProducerProfileResponse> | ProducerProfileResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/admin/producer-profiles/:producerProfileId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -341,6 +384,7 @@ export const getUpdateProducerProfileMockHandler = (overrideResponse?: ProducerP
   }, options)
 }
 
+/** getDeleteProducerProfileMockHandler provides generated MSW behavior for contract tests. */
 export const getDeleteProducerProfileMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
   return http.delete('*/api/v1/admin/producer-profiles/:producerProfileId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
@@ -351,6 +395,7 @@ export const getDeleteProducerProfileMockHandler = (overrideResponse?: void | ((
   }, options)
 }
 
+/** getListPlatformJobsMockHandler provides generated MSW behavior for contract tests. */
 export const getListPlatformJobsMockHandler = (overrideResponse?: PlatformJobPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlatformJobPageResponse> | PlatformJobPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/jobs', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -363,6 +408,7 @@ export const getListPlatformJobsMockHandler = (overrideResponse?: PlatformJobPag
   }, options)
 }
 
+/** getGetPlatformJobMockHandler provides generated MSW behavior for contract tests. */
 export const getGetPlatformJobMockHandler = (overrideResponse?: PlatformJobResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlatformJobResponse> | PlatformJobResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/jobs/:jobId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -375,6 +421,7 @@ export const getGetPlatformJobMockHandler = (overrideResponse?: PlatformJobRespo
   }, options)
 }
 
+/** getListPlatformAuditLogsMockHandler provides generated MSW behavior for contract tests. */
 export const getListPlatformAuditLogsMockHandler = (overrideResponse?: AuditLogPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AuditLogPageResponse> | AuditLogPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/admin/audit-logs', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -386,6 +433,7 @@ export const getListPlatformAuditLogsMockHandler = (overrideResponse?: AuditLogP
       })
   }, options)
 }
+/** getPlatformMock provides generated MSW behavior for contract tests. */
 export const getPlatformMock = () => [
   getListUsersMockHandler(),
   getCreateUserMockHandler(),

@@ -7,4 +7,5 @@
  */
 import type { CandidatesAcceptRequest } from './candidatesAcceptRequest.ts';
 
+/** CandidatesAcceptBody is the request body type for its generated OpenAPI operation. */
 export type CandidatesAcceptBody = CandidatesAcceptRequest;

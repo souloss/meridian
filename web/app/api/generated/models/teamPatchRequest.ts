@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface TeamPatchRequest {
   /**
+     * specifies the display name associated with this team patch request.
      * @minLength 1
      * @maxLength 128
      */

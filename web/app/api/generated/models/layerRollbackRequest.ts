@@ -8,7 +8,11 @@
 import type { LayerRollbackRequestScopeType } from './layerRollbackRequestScopeType.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface LayerRollbackRequest {
+  /** specifies the scope type associated with this layer rollback request. */
   scopeType: LayerRollbackRequestScopeType;
   /**
      * '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
@@ -16,6 +20,8 @@ export interface LayerRollbackRequest {
      * @maxLength 260
      */
   scopeKey: string;
+  /** specifies the expected effective revision id associated with this layer rollback request. */
   expectedEffectiveRevisionId: Uuid | null;
+  /** contains the uuid associated with this layer rollback request. */
   targetRevisionId: Uuid;
 }

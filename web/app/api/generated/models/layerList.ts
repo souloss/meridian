@@ -8,7 +8,12 @@
 import type { ETag } from './eTag.ts';
 import type { Layer } from './layer.ts';
 
+/**
+ * contains an ordered collection of layer values.
+ */
 export interface LayerList {
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the ordered items associated with this layer list. */
   items: Layer[];
 }

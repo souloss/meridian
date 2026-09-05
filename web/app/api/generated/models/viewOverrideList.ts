@@ -7,6 +7,10 @@
  */
 import type { ViewOverride } from './viewOverride.ts';
 
+/**
+ * contains an ordered collection of view override values.
+ */
 export interface ViewOverrideList {
+  /** contains the ordered items associated with this view override list. */
   items: ViewOverride[];
 }

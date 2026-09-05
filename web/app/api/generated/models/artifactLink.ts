@@ -7,7 +7,12 @@
  */
 import type { Timestamp } from './timestamp.ts';
 
+/**
+ * represents artifact link data exchanged through the Meridian API.
+ */
 export interface ArtifactLink {
+  /** specifies the url associated with this artifact link. */
   url: string;
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp;
 }

@@ -11,32 +11,61 @@ import type { PageSizeParameter } from './pageSizeParameter.ts';
 import type { QueryParameter } from './queryParameter.ts';
 import type { SortParameter } from './sortParameter.ts';
 
+/** ListServicesParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListServicesParams = {
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */
 pageSize?: PageSizeParameter;
 /**
+ * identifies or filters the q value in the query.
  * @minLength 1
  * @maxLength 200
  */
 q?: QueryParameter;
 /**
+ * identifies or filters the sort value in the query.
  * @minLength 1
  * @maxLength 64
  */
 sort?: SortParameter;
+/**
+ * identifies or filters the group id value in the query.
+ */
 groupId?: string;
+/**
+ * identifies or filters the tag value in the query.
+ */
 tag?: string;
+/**
+ * identifies or filters the team value in the query.
+ */
 team?: string;
+/**
+ * identifies or filters the lifecycle value in the query.
+ */
 lifecycle?: Lifecycle;
+/**
+ * identifies or filters the language value in the query.
+ */
 language?: string;
+/**
+ * identifies or filters the kind value in the query.
+ */
 kind?: string;
+/**
+ * identifies or filters the starred value in the query.
+ */
 starred?: boolean;
+/**
+ * identifies or filters the mine value in the query.
+ */
 mine?: boolean;
 };

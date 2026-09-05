@@ -8,4 +8,7 @@
 import type { JobLogEvent } from './jobLogEvent.ts';
 import type { JobStateEvent } from './jobStateEvent.ts';
 
+/**
+ * represents a job sse event emitted by Meridian.
+ */
 export type JobSseEvent = JobLogEvent | JobStateEvent;

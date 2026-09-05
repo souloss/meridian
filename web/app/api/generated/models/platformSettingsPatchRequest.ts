@@ -10,9 +10,16 @@ import type { PlatformSettingsPatchRequestDefaultViewOverrides } from './platfor
 import type { Quota } from './quota.ts';
 import type { TenantSettingsTemplate } from './tenantSettingsTemplate.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface PlatformSettingsPatchRequest {
+  /** contains the quota associated with this platform settings patch request. */
   defaultQuota?: Quota;
+  /** contains the tenant settings template associated with this platform settings patch request. */
   defaultTenantSettings?: TenantSettingsTemplate;
+  /** specifies the default view overrides associated with this platform settings patch request. */
   defaultViewOverrides?: PlatformSettingsPatchRequestDefaultViewOverrides;
+  /** contains the ordered default notification channels associated with this platform settings patch request. */
   defaultNotificationChannels?: DefaultNotificationChannelTemplate[];
 }

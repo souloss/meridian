@@ -13,20 +13,40 @@ import type { LayerRole } from './layerRole.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents layer data exchanged through the Meridian API.
+ */
 export interface Layer {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** identifies the asset associated with this resource. */
   assetId: Uuid;
+  /** specifies the source spec id associated with this layer. */
   sourceSpecId: Uuid | null;
+  /** contains the layer role associated with this layer. */
   role: LayerRole;
+  /** contains the layer origin associated with this layer. */
   origin: LayerOrigin;
-  /** @minimum 0 */
+  /**
+     * specifies the ord associated with this layer.
+     * @minimum 0
+     */
   ord: number;
-  /** @nullable */
+  /**
+     * specifies the dialect associated with this layer.
+     * @nullable
+     */
   dialect: string | null;
+  /** indicates whether enabled applies to this layer. */
   enabled: boolean;
+  /** contains the ordered heads associated with this layer. */
   heads: LayerHead[];
+  /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

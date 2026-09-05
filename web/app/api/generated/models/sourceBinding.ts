@@ -9,9 +9,15 @@ import type { SourceBindingScopeType } from './sourceBindingScopeType.ts';
 import type { SourceBindingState } from './sourceBindingState.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents source binding data exchanged through the Meridian API.
+ */
 export interface SourceBinding {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the uuid associated with this source binding. */
   sourceSpecId: Uuid;
+  /** specifies the scope type associated with this source binding. */
   scopeType: SourceBindingScopeType;
   /**
      * '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
@@ -19,14 +25,18 @@ export interface SourceBinding {
      * @maxLength 260
      */
   scopeKey: string;
+  /** specifies the expansion key associated with this source binding. */
   expansionKey: string;
   /**
      * Null only for push/manual sources with no repository file. A previously resolved repository path is retained when a file disappears and the binding becomes stale.
      * @nullable
      */
   resolvedPath: string | null;
+  /** identifies the asset associated with this resource. */
   assetId: Uuid;
+  /** contains the uuid associated with this source binding. */
   layerId: Uuid;
+  /** specifies the state associated with this source binding. */
   state: SourceBindingState;
   /**
      * Null for global non-Git materializations.

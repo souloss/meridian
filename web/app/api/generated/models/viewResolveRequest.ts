@@ -13,6 +13,7 @@ import type { ViewResolveRequestOptions } from './viewResolveRequestOptions.ts';
  * Input arity and kind constraints are validated from the selected entry in views.yaml.
  */
 export interface ViewResolveRequest {
+  /** specifies the view id associated with this view resolve request. */
   viewId: string;
   /**
      * Required by single, versions and collection views; omitted for scope views.
@@ -21,5 +22,6 @@ export interface ViewResolveRequest {
   inputs?: DocumentSelector[];
   /** Required by scope views; omitted for document-input views. */
   scope?: ScopeSelector | null;
+  /** specifies the options associated with this view resolve request. */
   options?: ViewResolveRequestOptions;
 }

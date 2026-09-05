@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported external revision trust mode value.
+ */
 export type ExternalRevisionTrustMode = typeof ExternalRevisionTrustMode[keyof typeof ExternalRevisionTrustMode];
 
 
+/** ExternalRevisionTrustMode is generated from the Meridian OpenAPI contract for external revision trust mode. */
 export const ExternalRevisionTrustMode = {
   review_required: 'review_required',
   trust_ai: 'trust_ai',

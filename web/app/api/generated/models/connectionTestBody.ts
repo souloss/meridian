@@ -7,4 +7,5 @@
  */
 import type { ConnectionTestRequest } from './connectionTestRequest.ts';
 
+/** ConnectionTestBody is the request body type for its generated OpenAPI operation. */
 export type ConnectionTestBody = ConnectionTestRequest;

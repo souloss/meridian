@@ -46,6 +46,12 @@ generatedArtifacts:
   typescriptMocks: web/app/api/generated/mocks
   frontendStatic: web/.output/public
   openapiBundle: dist/contracts/openapi.yaml
+documentationPolicy:
+  generatedCode: descriptions-must-originate-in-openapi-and-survive-regeneration
+  databaseTablesAndColumns: every-application-owned-table-and-column-must-have-a-postgresql-comment
+  enforcement:
+    api: go-contract-tests-check-source-and-generated-comments
+    database: postgresql-integration-tests-query-pg-description
 toolchain:
   decisionRecord: ../docs/05_technology-stack-decision.md
   versionPolicy:
@@ -124,6 +130,7 @@ validation:
     - validate-storage-field-type-and-index-coverage
     - validate-acceptance-operation-ids
     - generate-go-and-typescript-and-require-clean-diff
+    - require-comments-on-generated-api-surfaces-and-every-application-ddl-column
     - validate-toolchain-version-ranges
     - reject-nuxt-server-runtime-and-runtime-cdn-dependencies
     - reject-handwritten-dto-contracts-in-narrative-docs

@@ -10,8 +10,14 @@ import type { SharedViewResourceType } from './sharedViewResourceType.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { ViewResolution } from './viewResolution.ts';
 
+/**
+ * represents shared view data exchanged through the Meridian API.
+ */
 export interface SharedView {
+  /** specifies the resource type associated with this shared view. */
   resourceType: SharedViewResourceType;
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp;
+  /** specifies the resolution associated with this shared view. */
   resolution: ViewResolution | DiffSnapshot;
 }

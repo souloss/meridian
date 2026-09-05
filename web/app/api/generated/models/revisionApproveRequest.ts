@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface RevisionApproveRequest {
   /**
+     * specifies the comment associated with this revision approve request.
      * @maxLength 2000
      * @nullable
      */

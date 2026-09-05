@@ -11,13 +11,25 @@ import type { ProducerNetworkMode } from './producerNetworkMode.ts';
 import type { ProducerProfileKind } from './producerProfileKind.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents producer profile option data exchanged through the Meridian API.
+ */
 export interface ProducerProfileOption {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** specifies the name associated with this producer profile option. */
   name: string;
+  /** contains the producer profile kind associated with this producer profile option. */
   kind: ProducerProfileKind;
+  /** contains the ordered supported kinds associated with this producer profile option. */
   supportedKinds: KindId[];
+  /** contains the producer network mode associated with this producer profile option. */
   network: ProducerNetworkMode;
+  /** contains the producer dependency status associated with this producer profile option. */
   dependencyStatus: ProducerDependencyStatus;
-  /** @nullable */
+  /**
+     * specifies the unavailable reason associated with this producer profile option.
+     * @nullable
+     */
   unavailableReason: string | null;
 }

@@ -7,6 +7,10 @@
  */
 import type { TenantRole } from './tenantRole.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface MemberPutRequest {
+  /** contains the tenant role associated with this member put request. */
   role: TenantRole;
 }

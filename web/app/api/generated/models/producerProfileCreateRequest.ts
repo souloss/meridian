@@ -9,19 +9,26 @@ import type { KindId } from './kindId.ts';
 import type { ProducerNetworkMode } from './producerNetworkMode.ts';
 import type { ProducerProfileKind } from './producerProfileKind.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ProducerProfileCreateRequest {
   /**
+     * specifies the name associated with this producer profile create request.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** contains the producer profile kind associated with this producer profile create request. */
   kind: ProducerProfileKind;
   /**
+     * specifies the executable associated with this producer profile create request.
      * @maxLength 512
      * @pattern ^/
      */
   executable: string;
   /**
+     * contains the ordered args associated with this producer profile create request.
      * @maxItems 64
      * @items.maxLength 512
      */
@@ -31,9 +38,14 @@ export interface ProducerProfileCreateRequest {
      * @items.pattern ^[A-Z][A-Z0-9_]*$
      */
   envAllowlist: string[];
-  /** @minItems 1 */
+  /**
+     * contains the ordered supported kinds associated with this producer profile create request.
+     * @minItems 1
+     */
   supportedKinds: KindId[];
+  /** indicates whether replay safe applies to this producer profile create request. */
   replaySafe: boolean;
+  /** contains the producer network mode associated with this producer profile create request. */
   network: ProducerNetworkMode;
   /**
      * Omitted values default to 300 seconds for command profiles and 600 seconds for ai profiles, as defined in domain.yaml.
@@ -42,19 +54,23 @@ export interface ProducerProfileCreateRequest {
      */
   timeoutSec?: number;
   /**
+     * specifies the memory mi b associated with this producer profile create request.
      * @minimum 64
      * @maximum 16384
      */
   memoryMiB: number;
   /**
+     * specifies the cpu seconds associated with this producer profile create request.
      * @minimum 1
      * @maximum 3600
      */
   cpuSeconds: number;
   /**
+     * specifies the pids associated with this producer profile create request.
      * @minimum 1
      * @maximum 1024
      */
   pids: number;
+  /** indicates whether enabled applies to this producer profile create request. */
   enabled: boolean;
 }

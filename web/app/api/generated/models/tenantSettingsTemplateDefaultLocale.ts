@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the default locale associated with this tenant settings template.
+ */
 export type TenantSettingsTemplateDefaultLocale = typeof TenantSettingsTemplateDefaultLocale[keyof typeof TenantSettingsTemplateDefaultLocale];
 
 
+/** TenantSettingsTemplateDefaultLocale is generated from the Meridian OpenAPI contract for tenant settings template default locale. */
 export const TenantSettingsTemplateDefaultLocale = {
   'zh-CN': 'zh-CN',
   en: 'en',

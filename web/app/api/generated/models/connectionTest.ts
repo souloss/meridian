@@ -8,10 +8,19 @@
 import type { ConnectionTestErrorClass } from './connectionTestErrorClass.ts';
 import type { KnownHostCandidate } from './knownHostCandidate.ts';
 
+/**
+ * represents connection test data exchanged through the Meridian API.
+ */
 export interface ConnectionTest {
+  /** indicates whether ok applies to this connection test. */
   ok: boolean;
-  /** @nullable */
+  /**
+     * specifies the error class associated with this connection test.
+     * @nullable
+     */
   errorClass: ConnectionTestErrorClass;
+  /** specifies the message associated with this connection test. */
   message: string;
+  /** specifies the host key candidate associated with this connection test. */
   hostKeyCandidate: KnownHostCandidate | null;
 }

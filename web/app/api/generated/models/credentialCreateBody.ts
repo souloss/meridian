@@ -7,4 +7,5 @@
  */
 import type { CredentialCreateRequest } from './credentialCreateRequest.ts';
 
+/** CredentialCreateBody is the request body type for its generated OpenAPI operation. */
 export type CredentialCreateBody = CredentialCreateRequest;

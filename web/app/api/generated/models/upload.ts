@@ -10,15 +10,24 @@ import type { KindId } from './kindId.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents upload data exchanged through the Meridian API.
+ */
 export interface Upload {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the kind id associated with this upload. */
   kind: KindId;
+  /** contains the content type associated with this upload. */
   contentType: ContentType;
+  /** specifies the digest associated with this upload. */
   digest: string;
   /**
+     * specifies the size bytes associated with this upload.
      * @minimum 1
      * @maximum 10485760
      */
   sizeBytes: number;
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp;
 }

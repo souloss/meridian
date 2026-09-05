@@ -18,27 +18,45 @@ import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 import type { VersionRef } from './versionRef.ts';
 
+/**
+ * represents asset data exchanged through the Meridian API.
+ */
 export interface Asset {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** identifies the service associated with this resource. */
   serviceId: Uuid;
+  /** contains the kind id associated with this asset. */
   kind: KindId;
+  /** contains the asset name associated with this asset. */
   name: AssetName;
-  /** Lifecycle of currentVersion, otherwise latestVersion, otherwise draft for the selected ref Track. */
+  /** of currentVersion, otherwise latestVersion, otherwise draft for the selected ref Track. */
   lifecycle: Lifecycle;
+  /** specifies the health associated with this asset. */
   health: AssetHealth;
   /**
+     * specifies the quality score associated with this asset.
      * @minimum 0
      * @maximum 100
      * @nullable
      */
   qualityScore: number | null;
+  /** specifies the current version associated with this asset. */
   currentVersion: VersionRef | null;
+  /** specifies the latest version associated with this asset. */
   latestVersion: VersionRef | null;
+  /** contains the ref type associated with this asset. */
   refType: RefType;
+  /** contains the ref name associated with this asset. */
   ref: RefName;
+  /** contains the ordered layers associated with this asset. */
   layers: LayerSummary[];
+  /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

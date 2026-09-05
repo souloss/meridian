@@ -7,4 +7,7 @@
  */
 import type { SourceSpecInput } from './sourceSpecInput.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export type SourceSpecCreateRequest = SourceSpecInput;

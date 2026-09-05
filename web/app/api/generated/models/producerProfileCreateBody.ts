@@ -7,4 +7,5 @@
  */
 import type { ProducerProfileCreateRequest } from './producerProfileCreateRequest.ts';
 
+/** ProducerProfileCreateBody is the request body type for its generated OpenAPI operation. */
 export type ProducerProfileCreateBody = ProducerProfileCreateRequest;

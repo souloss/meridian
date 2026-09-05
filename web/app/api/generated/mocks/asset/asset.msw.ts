@@ -50,85 +50,115 @@ import type {
 } from '../../models';
 
 
+/** getListAssetKindsResponseMock provides generated MSW behavior for contract tests. */
 export const getListAssetKindsResponseMock = (overrideResponse: Partial<Extract<AssetKindListResponse, object>> = {}): AssetKindListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), enabled: faker.datatype.boolean(), milestone: faker.helpers.fromRegExp("^M[0-9]+$"), acceptedMediaTypes: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), defaultViews: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), schemaVersion: faker.number.int({min: 1})})), ...overrideResponse})
 
+/** getUpdateAssetKindStateResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateAssetKindStateResponseMock = (overrideResponse: Partial<Extract<AssetKindResponse, object>> = {}): AssetKindResponse => ({id: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), enabled: faker.datatype.boolean(), milestone: faker.helpers.fromRegExp("^M[0-9]+$"), acceptedMediaTypes: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), defaultViews: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), schemaVersion: faker.number.int({min: 1}), ...overrideResponse})
 
+/** getListSourceSpecsResponseSourceRunSummaryMock provides generated MSW behavior for contract tests. */
 export const getListSourceSpecsResponseSourceRunSummaryMock = (overrideResponse: Partial<SourceRunSummary> = {}): SourceRunSummary => ({...{jobId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), status: faker.helpers.arrayElement(Object.values(JobStatus)), startedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])}, ...overrideResponse});
 
+/** getListSourceSpecsResponseMock provides generated MSW behavior for contract tests. */
 export const getListSourceSpecsResponseMock = (overrideResponse: Partial<Extract<SourceSpecListResponse, object>> = {}): SourceSpecListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), serviceId: faker.string.uuid(), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), assetNameTemplate: faker.helpers.fromRegExp("^(?:[a-z0-9-]|\\{file_stem\\}|\\{parent_dir\\})+$"), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), mode: faker.helpers.arrayElement(Object.values(SourceMode)), path: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 512}}), null]), producerProfileId: faker.helpers.arrayElement([faker.string.uuid(),null,]), ord: faker.number.int({min: 0}), timeoutSec: faker.number.int({min: 10, max: 3600}), branchPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$"))), enabled: faker.datatype.boolean(), configOrigin: faker.helpers.arrayElement(Object.values(ConfigSource)), configFieldSources: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), source: faker.helpers.arrayElement(Object.values(ConfigSource))})), lastError: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), lastRun: faker.helpers.arrayElement([{...getListSourceSpecsResponseSourceRunSummaryMock()},null,]), bindingsCount: faker.number.int({min: 0}), initialLayerId: faker.helpers.arrayElement([faker.string.uuid(),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
+/** getCreateSourceSpecResponseSourceRunSummaryMock provides generated MSW behavior for contract tests. */
 export const getCreateSourceSpecResponseSourceRunSummaryMock = (overrideResponse: Partial<SourceRunSummary> = {}): SourceRunSummary => ({...{jobId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), status: faker.helpers.arrayElement(Object.values(JobStatus)), startedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])}, ...overrideResponse});
 
+/** getCreateSourceSpecResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateSourceSpecResponseMock = (overrideResponse: Partial<Extract<SourceSpecResponse, object>> = {}): SourceSpecResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), serviceId: faker.string.uuid(), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), assetNameTemplate: faker.helpers.fromRegExp("^(?:[a-z0-9-]|\\{file_stem\\}|\\{parent_dir\\})+$"), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), mode: faker.helpers.arrayElement(Object.values(SourceMode)), path: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 512}}), null]), producerProfileId: faker.helpers.arrayElement([faker.string.uuid(),null,]), ord: faker.number.int({min: 0}), timeoutSec: faker.number.int({min: 10, max: 3600}), branchPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$"))), enabled: faker.datatype.boolean(), configOrigin: faker.helpers.arrayElement(Object.values(ConfigSource)), configFieldSources: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), source: faker.helpers.arrayElement(Object.values(ConfigSource))})), lastError: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), lastRun: faker.helpers.arrayElement([{...getCreateSourceSpecResponseSourceRunSummaryMock()},null,]), bindingsCount: faker.number.int({min: 0}), initialLayerId: faker.helpers.arrayElement([faker.string.uuid(),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getUpdateSourceSpecResponseSourceRunSummaryMock provides generated MSW behavior for contract tests. */
 export const getUpdateSourceSpecResponseSourceRunSummaryMock = (overrideResponse: Partial<SourceRunSummary> = {}): SourceRunSummary => ({...{jobId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), status: faker.helpers.arrayElement(Object.values(JobStatus)), startedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])}, ...overrideResponse});
 
+/** getUpdateSourceSpecResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateSourceSpecResponseMock = (overrideResponse: Partial<Extract<SourceSpecResponse, object>> = {}): SourceSpecResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), serviceId: faker.string.uuid(), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), assetNameTemplate: faker.helpers.fromRegExp("^(?:[a-z0-9-]|\\{file_stem\\}|\\{parent_dir\\})+$"), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), mode: faker.helpers.arrayElement(Object.values(SourceMode)), path: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 512}}), null]), producerProfileId: faker.helpers.arrayElement([faker.string.uuid(),null,]), ord: faker.number.int({min: 0}), timeoutSec: faker.number.int({min: 10, max: 3600}), branchPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$"))), enabled: faker.datatype.boolean(), configOrigin: faker.helpers.arrayElement(Object.values(ConfigSource)), configFieldSources: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), source: faker.helpers.arrayElement(Object.values(ConfigSource))})), lastError: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), lastRun: faker.helpers.arrayElement([{...getUpdateSourceSpecResponseSourceRunSummaryMock()},null,]), bindingsCount: faker.number.int({min: 0}), initialLayerId: faker.helpers.arrayElement([faker.string.uuid(),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getListSourceBindingsResponseMock provides generated MSW behavior for contract tests. */
 export const getListSourceBindingsResponseMock = (overrideResponse: Partial<Extract<SourceBindingListResponse, object>> = {}): SourceBindingListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), sourceSpecId: faker.string.uuid(), scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), expansionKey: faker.string.alpha({length: {min: 10, max: 20}}), resolvedPath: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), assetId: faker.string.uuid(), layerId: faker.string.uuid(), state: faker.helpers.arrayElement(['active','stale','error'] as const), lastSeenCommit: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[0-9a-f]{40,64}$"), null])})), ...overrideResponse})
 
+/** getProduceSourceResponseMock provides generated MSW behavior for contract tests. */
 export const getProduceSourceResponseMock = (overrideResponse: Partial<Extract<JobAcceptedResponse, object>> = {}): JobAcceptedResponse => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
+/** getGenerateMissingAssetWithAiResponseMock provides generated MSW behavior for contract tests. */
 export const getGenerateMissingAssetWithAiResponseMock = (overrideResponse: Partial<Extract<AiGenerationAcceptedResponse, object>> = {}): AiGenerationAcceptedResponse => ({assetId: faker.string.uuid(), sourceId: faker.string.uuid(), jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
+/** getGetAssetResponseVersionRefMock provides generated MSW behavior for contract tests. */
 export const getGetAssetResponseVersionRefMock = (overrideResponse: Partial<VersionRef> = {}): VersionRef => ({...{id: faker.string.uuid(), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle))}, ...overrideResponse});
 
+/** getGetAssetResponseMock provides generated MSW behavior for contract tests. */
 export const getGetAssetResponseMock = (overrideResponse: Partial<Extract<AssetResponse, object>> = {}): AssetResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), serviceId: faker.string.uuid(), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), name: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), health: faker.helpers.arrayElement(['ok','stale','invalid'] as const), qualityScore: faker.helpers.arrayElement([faker.number.int({min: 0, max: 100}), null]), currentVersion: faker.helpers.arrayElement([{...getGetAssetResponseVersionRefMock()},null,]), latestVersion: faker.helpers.arrayElement([{...getGetAssetResponseVersionRefMock()},null,]), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), layers: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), ord: faker.number.int({min: 0}), heads: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), latestRevisionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), effectiveRevisionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), candidateRevisionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), generation: faker.number.int({min: 0})}))})), capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getListAssetVersionsResponseDiffCountsMock provides generated MSW behavior for contract tests. */
 export const getListAssetVersionsResponseDiffCountsMock = (overrideResponse: Partial<DiffCounts> = {}): DiffCounts => ({...{added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, ...overrideResponse});
 
+/** getListAssetVersionsResponseMock provides generated MSW behavior for contract tests. */
 export const getListAssetVersionsResponseMock = (): AssetVersionPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), assetId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), sequenceNo: faker.number.int({min: 1}), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), qualityScore: faker.number.int({min: 0, max: 100}), mergeEngineVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayCompilerVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayMode: faker.helpers.arrayElement(['lenient','strict'] as const), normalizerVersion: faker.string.alpha({length: {min: 10, max: 20}}), kindPluginVersion: faker.string.alpha({length: {min: 10, max: 20}}), inputFingerprint: faker.string.alpha({length: {min: 10, max: 20}}), mergedHash: faker.string.alpha({length: {min: 10, max: 20}}), layerManifest: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({layerId: faker.string.uuid(), revisionId: faker.string.uuid(), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), reviewStatus: faker.helpers.arrayElement(Object.values(RevisionStatus)), scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), ord: faker.number.int({min: 0}), contentHash: faker.string.alpha({length: {min: 10, max: 20}})})), sourceCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), baselineVersionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), diffSummary: faker.helpers.arrayElement([{...getListAssetVersionsResponseDiffCountsMock()},null,]), labels: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, downloads: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, indexedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}})))}))},})
 
+/** getGetAssetVersionResponseDiffCountsMock provides generated MSW behavior for contract tests. */
 export const getGetAssetVersionResponseDiffCountsMock = (overrideResponse: Partial<DiffCounts> = {}): DiffCounts => ({...{added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, ...overrideResponse});
 
+/** getGetAssetVersionResponseMock provides generated MSW behavior for contract tests. */
 export const getGetAssetVersionResponseMock = (overrideResponse: Partial<Extract<AssetVersionResponse, object>> = {}): AssetVersionResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), assetId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), sequenceNo: faker.number.int({min: 1}), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), qualityScore: faker.number.int({min: 0, max: 100}), mergeEngineVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayCompilerVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayMode: faker.helpers.arrayElement(['lenient','strict'] as const), normalizerVersion: faker.string.alpha({length: {min: 10, max: 20}}), kindPluginVersion: faker.string.alpha({length: {min: 10, max: 20}}), inputFingerprint: faker.string.alpha({length: {min: 10, max: 20}}), mergedHash: faker.string.alpha({length: {min: 10, max: 20}}), layerManifest: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({layerId: faker.string.uuid(), revisionId: faker.string.uuid(), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), reviewStatus: faker.helpers.arrayElement(Object.values(RevisionStatus)), scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), ord: faker.number.int({min: 0}), contentHash: faker.string.alpha({length: {min: 10, max: 20}})})), sourceCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), baselineVersionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), diffSummary: faker.helpers.arrayElement([{...getGetAssetVersionResponseDiffCountsMock()},null,]), labels: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, downloads: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, indexedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
+/** getListAssetVersionItemsResponseMock provides generated MSW behavior for contract tests. */
 export const getListAssetVersionItemsResponseMock = (): AssetItemPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({itemType: faker.string.alpha({length: {min: 10, max: 20}}), key: faker.string.alpha({length: {min: 10, max: 20}}), display: {}, provenance: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), layerId: faker.string.uuid(), revisionId: faker.string.uuid()}))}))},})
 
+/** getGetAssetVersionProvenanceResponseMock provides generated MSW behavior for contract tests. */
 export const getGetAssetVersionProvenanceResponseMock = (overrideResponse: Partial<Extract<ProvenanceListResponse, object>> = {}): ProvenanceListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), layerId: faker.string.uuid(), revisionId: faker.string.uuid()})), ...overrideResponse})
 
+/** getPublishAssetVersionResponseDiffCountsMock provides generated MSW behavior for contract tests. */
 export const getPublishAssetVersionResponseDiffCountsMock = (overrideResponse: Partial<DiffCounts> = {}): DiffCounts => ({...{added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, ...overrideResponse});
 
+/** getPublishAssetVersionResponseMock provides generated MSW behavior for contract tests. */
 export const getPublishAssetVersionResponseMock = (overrideResponse: Partial<Extract<AssetVersionResponse, object>> = {}): AssetVersionResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), assetId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), sequenceNo: faker.number.int({min: 1}), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), qualityScore: faker.number.int({min: 0, max: 100}), mergeEngineVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayCompilerVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayMode: faker.helpers.arrayElement(['lenient','strict'] as const), normalizerVersion: faker.string.alpha({length: {min: 10, max: 20}}), kindPluginVersion: faker.string.alpha({length: {min: 10, max: 20}}), inputFingerprint: faker.string.alpha({length: {min: 10, max: 20}}), mergedHash: faker.string.alpha({length: {min: 10, max: 20}}), layerManifest: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({layerId: faker.string.uuid(), revisionId: faker.string.uuid(), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), reviewStatus: faker.helpers.arrayElement(Object.values(RevisionStatus)), scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), ord: faker.number.int({min: 0}), contentHash: faker.string.alpha({length: {min: 10, max: 20}})})), sourceCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), baselineVersionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), diffSummary: faker.helpers.arrayElement([{...getPublishAssetVersionResponseDiffCountsMock()},null,]), labels: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, downloads: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, indexedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
+/** getDeprecateAssetVersionResponseDiffCountsMock provides generated MSW behavior for contract tests. */
 export const getDeprecateAssetVersionResponseDiffCountsMock = (overrideResponse: Partial<DiffCounts> = {}): DiffCounts => ({...{added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, ...overrideResponse});
 
+/** getDeprecateAssetVersionResponseMock provides generated MSW behavior for contract tests. */
 export const getDeprecateAssetVersionResponseMock = (overrideResponse: Partial<Extract<AssetVersionResponse, object>> = {}): AssetVersionResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), assetId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), sequenceNo: faker.number.int({min: 1}), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), qualityScore: faker.number.int({min: 0, max: 100}), mergeEngineVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayCompilerVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayMode: faker.helpers.arrayElement(['lenient','strict'] as const), normalizerVersion: faker.string.alpha({length: {min: 10, max: 20}}), kindPluginVersion: faker.string.alpha({length: {min: 10, max: 20}}), inputFingerprint: faker.string.alpha({length: {min: 10, max: 20}}), mergedHash: faker.string.alpha({length: {min: 10, max: 20}}), layerManifest: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({layerId: faker.string.uuid(), revisionId: faker.string.uuid(), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), reviewStatus: faker.helpers.arrayElement(Object.values(RevisionStatus)), scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), ord: faker.number.int({min: 0}), contentHash: faker.string.alpha({length: {min: 10, max: 20}})})), sourceCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), baselineVersionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), diffSummary: faker.helpers.arrayElement([{...getDeprecateAssetVersionResponseDiffCountsMock()},null,]), labels: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, downloads: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, indexedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
+/** getRetireAssetVersionResponseDiffCountsMock provides generated MSW behavior for contract tests. */
 export const getRetireAssetVersionResponseDiffCountsMock = (overrideResponse: Partial<DiffCounts> = {}): DiffCounts => ({...{added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, ...overrideResponse});
 
+/** getRetireAssetVersionResponseMock provides generated MSW behavior for contract tests. */
 export const getRetireAssetVersionResponseMock = (overrideResponse: Partial<Extract<AssetVersionResponse, object>> = {}): AssetVersionResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), assetId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), sequenceNo: faker.number.int({min: 1}), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), qualityScore: faker.number.int({min: 0, max: 100}), mergeEngineVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayCompilerVersion: faker.string.alpha({length: {min: 10, max: 20}}), overlayMode: faker.helpers.arrayElement(['lenient','strict'] as const), normalizerVersion: faker.string.alpha({length: {min: 10, max: 20}}), kindPluginVersion: faker.string.alpha({length: {min: 10, max: 20}}), inputFingerprint: faker.string.alpha({length: {min: 10, max: 20}}), mergedHash: faker.string.alpha({length: {min: 10, max: 20}}), layerManifest: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({layerId: faker.string.uuid(), revisionId: faker.string.uuid(), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), reviewStatus: faker.helpers.arrayElement(Object.values(RevisionStatus)), scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), ord: faker.number.int({min: 0}), contentHash: faker.string.alpha({length: {min: 10, max: 20}})})), sourceCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), baselineVersionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), diffSummary: faker.helpers.arrayElement([{...getRetireAssetVersionResponseDiffCountsMock()},null,]), labels: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, downloads: {
         [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
       }, indexedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
+/** getGenerateAssetWithAiResponseMock provides generated MSW behavior for contract tests. */
 export const getGenerateAssetWithAiResponseMock = (overrideResponse: Partial<Extract<AiGenerationAcceptedResponse, object>> = {}): AiGenerationAcceptedResponse => ({assetId: faker.string.uuid(), sourceId: faker.string.uuid(), jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
+/** getPreviewMergeResponseMock provides generated MSW behavior for contract tests. */
 export const getPreviewMergeResponseMock = (overrideResponse: Partial<Extract<MergePreviewResponse, object>> = {}): MergePreviewResponse => ({inputFingerprint: faker.string.alpha({length: {min: 10, max: 20}}), content: faker.string.alpha({length: {min: 10, max: 1048576}}), contentType: faker.helpers.arrayElement(Object.values(ContentType)), validation: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({severity: faker.helpers.arrayElement(['error','warning','info'] as const), code: faker.string.alpha({length: {min: 10, max: 20}}), message: faker.string.alpha({length: {min: 10, max: 20}}), pointer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])})), provenance: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), layerId: faker.string.uuid(), revisionId: faker.string.uuid()})), ...overrideResponse})
 
+/** getPushAssetRevisionResponseMock provides generated MSW behavior for contract tests. */
 export const getPushAssetRevisionResponseMock = (overrideResponse: Partial<Extract<AssetPushResultResponse, object>> = {}): AssetPushResultResponse => (faker.helpers.arrayElement([{assetId: faker.string.uuid(), layerId: faker.string.uuid(), revisionId: faker.string.uuid(), jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse}, {assetId: faker.string.uuid(), layerId: faker.string.uuid(), revisionId: faker.string.uuid(), jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse}]))
 
+/** getGetPublicAssetResponseMock provides generated MSW behavior for contract tests. */
 export const getGetPublicAssetResponseMock = (overrideResponse: Partial<Extract<PublicAssetResponse, object>> = {}): PublicAssetResponse => ({kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), name: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), currentVersion: {id: faker.string.uuid(), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle))}, contentUrl: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 
+/** getListAssetKindsMockHandler provides generated MSW behavior for contract tests. */
 export const getListAssetKindsMockHandler = (overrideResponse?: AssetKindListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AssetKindListResponse> | AssetKindListResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/asset-kinds', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -141,6 +171,7 @@ export const getListAssetKindsMockHandler = (overrideResponse?: AssetKindListRes
   }, options)
 }
 
+/** getUpdateAssetKindStateMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdateAssetKindStateMockHandler = (overrideResponse?: AssetKindResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<AssetKindResponse> | AssetKindResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/t/:tenantSlug/asset-kinds/:kindId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -153,6 +184,7 @@ export const getUpdateAssetKindStateMockHandler = (overrideResponse?: AssetKindR
   }, options)
 }
 
+/** getListSourceSpecsMockHandler provides generated MSW behavior for contract tests. */
 export const getListSourceSpecsMockHandler = (overrideResponse?: SourceSpecListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<SourceSpecListResponse> | SourceSpecListResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/services/:serviceSlug/sources', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -165,6 +197,7 @@ export const getListSourceSpecsMockHandler = (overrideResponse?: SourceSpecListR
   }, options)
 }
 
+/** getCreateSourceSpecMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateSourceSpecMockHandler = (overrideResponse?: SourceSpecResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<SourceSpecResponse> | SourceSpecResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/services/:serviceSlug/sources', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -177,6 +210,7 @@ export const getCreateSourceSpecMockHandler = (overrideResponse?: SourceSpecResp
   }, options)
 }
 
+/** getUpdateSourceSpecMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdateSourceSpecMockHandler = (overrideResponse?: SourceSpecResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<SourceSpecResponse> | SourceSpecResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/t/:tenantSlug/sources/:sourceId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -189,6 +223,7 @@ export const getUpdateSourceSpecMockHandler = (overrideResponse?: SourceSpecResp
   }, options)
 }
 
+/** getDeleteSourceSpecMockHandler provides generated MSW behavior for contract tests. */
 export const getDeleteSourceSpecMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
   return http.delete('*/api/v1/t/:tenantSlug/sources/:sourceId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
@@ -199,6 +234,7 @@ export const getDeleteSourceSpecMockHandler = (overrideResponse?: void | ((info:
   }, options)
 }
 
+/** getListSourceBindingsMockHandler provides generated MSW behavior for contract tests. */
 export const getListSourceBindingsMockHandler = (overrideResponse?: SourceBindingListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<SourceBindingListResponse> | SourceBindingListResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/sources/:sourceId/bindings', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -211,6 +247,7 @@ export const getListSourceBindingsMockHandler = (overrideResponse?: SourceBindin
   }, options)
 }
 
+/** getProduceSourceMockHandler provides generated MSW behavior for contract tests. */
 export const getProduceSourceMockHandler = (overrideResponse?: JobAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAcceptedResponse> | JobAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/sources/:sourceId\\:produce', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -223,6 +260,7 @@ export const getProduceSourceMockHandler = (overrideResponse?: JobAcceptedRespon
   }, options)
 }
 
+/** getGenerateMissingAssetWithAiMockHandler provides generated MSW behavior for contract tests. */
 export const getGenerateMissingAssetWithAiMockHandler = (overrideResponse?: AiGenerationAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AiGenerationAcceptedResponse> | AiGenerationAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/services/:serviceSlug/assets\\:ai-generate', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -235,6 +273,7 @@ export const getGenerateMissingAssetWithAiMockHandler = (overrideResponse?: AiGe
   }, options)
 }
 
+/** getGetAssetMockHandler provides generated MSW behavior for contract tests. */
 export const getGetAssetMockHandler = (overrideResponse?: AssetResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AssetResponse> | AssetResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/assets/:assetId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -247,6 +286,7 @@ export const getGetAssetMockHandler = (overrideResponse?: AssetResponse | ((info
   }, options)
 }
 
+/** getListAssetVersionsMockHandler provides generated MSW behavior for contract tests. */
 export const getListAssetVersionsMockHandler = (overrideResponse?: AssetVersionPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AssetVersionPageResponse> | AssetVersionPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/assets/:assetId/versions', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -259,6 +299,7 @@ export const getListAssetVersionsMockHandler = (overrideResponse?: AssetVersionP
   }, options)
 }
 
+/** getGetAssetVersionMockHandler provides generated MSW behavior for contract tests. */
 export const getGetAssetVersionMockHandler = (overrideResponse?: AssetVersionResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AssetVersionResponse> | AssetVersionResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/asset-versions/:versionId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -271,6 +312,7 @@ export const getGetAssetVersionMockHandler = (overrideResponse?: AssetVersionRes
   }, options)
 }
 
+/** getListAssetVersionItemsMockHandler provides generated MSW behavior for contract tests. */
 export const getListAssetVersionItemsMockHandler = (overrideResponse?: AssetItemPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AssetItemPageResponse> | AssetItemPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/asset-versions/:versionId/items', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -283,6 +325,7 @@ export const getListAssetVersionItemsMockHandler = (overrideResponse?: AssetItem
   }, options)
 }
 
+/** getGetAssetVersionProvenanceMockHandler provides generated MSW behavior for contract tests. */
 export const getGetAssetVersionProvenanceMockHandler = (overrideResponse?: ProvenanceListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProvenanceListResponse> | ProvenanceListResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/asset-versions/:versionId/provenance', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -295,6 +338,7 @@ export const getGetAssetVersionProvenanceMockHandler = (overrideResponse?: Prove
   }, options)
 }
 
+/** getPublishAssetVersionMockHandler provides generated MSW behavior for contract tests. */
 export const getPublishAssetVersionMockHandler = (overrideResponse?: AssetVersionResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AssetVersionResponse> | AssetVersionResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/asset-versions/:versionId\\:publish', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -307,6 +351,7 @@ export const getPublishAssetVersionMockHandler = (overrideResponse?: AssetVersio
   }, options)
 }
 
+/** getDeprecateAssetVersionMockHandler provides generated MSW behavior for contract tests. */
 export const getDeprecateAssetVersionMockHandler = (overrideResponse?: AssetVersionResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AssetVersionResponse> | AssetVersionResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/asset-versions/:versionId\\:deprecate', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -319,6 +364,7 @@ export const getDeprecateAssetVersionMockHandler = (overrideResponse?: AssetVers
   }, options)
 }
 
+/** getRetireAssetVersionMockHandler provides generated MSW behavior for contract tests. */
 export const getRetireAssetVersionMockHandler = (overrideResponse?: AssetVersionResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AssetVersionResponse> | AssetVersionResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/asset-versions/:versionId\\:retire', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -331,6 +377,7 @@ export const getRetireAssetVersionMockHandler = (overrideResponse?: AssetVersion
   }, options)
 }
 
+/** getGenerateAssetWithAiMockHandler provides generated MSW behavior for contract tests. */
 export const getGenerateAssetWithAiMockHandler = (overrideResponse?: AiGenerationAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AiGenerationAcceptedResponse> | AiGenerationAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/assets/:assetId\\:ai-generate', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -343,6 +390,7 @@ export const getGenerateAssetWithAiMockHandler = (overrideResponse?: AiGeneratio
   }, options)
 }
 
+/** getPreviewMergeMockHandler provides generated MSW behavior for contract tests. */
 export const getPreviewMergeMockHandler = (overrideResponse?: MergePreviewResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<MergePreviewResponse> | MergePreviewResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/assets\\:preview-merge', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -355,6 +403,7 @@ export const getPreviewMergeMockHandler = (overrideResponse?: MergePreviewRespon
   }, options)
 }
 
+/** getPushAssetRevisionMockHandler provides generated MSW behavior for contract tests. */
 export const getPushAssetRevisionMockHandler = (overrideResponse?: AssetPushResultResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AssetPushResultResponse> | AssetPushResultResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/assets\\:push', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -367,6 +416,7 @@ export const getPushAssetRevisionMockHandler = (overrideResponse?: AssetPushResu
   }, options)
 }
 
+/** getGetPublicAssetMockHandler provides generated MSW behavior for contract tests. */
 export const getGetPublicAssetMockHandler = (overrideResponse?: PublicAssetResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PublicAssetResponse> | PublicAssetResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/public/t/:tenantSlug/services/:serviceSlug/assets/:kindId/:assetName', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -378,6 +428,7 @@ export const getGetPublicAssetMockHandler = (overrideResponse?: PublicAssetRespo
       })
   }, options)
 }
+/** getAssetMock provides generated MSW behavior for contract tests. */
 export const getAssetMock = () => [
   getListAssetKindsMockHandler(),
   getUpdateAssetKindStateMockHandler(),

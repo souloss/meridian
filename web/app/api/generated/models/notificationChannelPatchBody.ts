@@ -7,4 +7,5 @@
  */
 import type { NotificationChannelPatchRequest } from './notificationChannelPatchRequest.ts';
 
+/** NotificationChannelPatchBody is the request body type for its generated OpenAPI operation. */
 export type NotificationChannelPatchBody = NotificationChannelPatchRequest;

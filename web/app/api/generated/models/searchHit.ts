@@ -12,19 +12,31 @@ import type { SearchHitHighlights } from './searchHitHighlights.ts';
 import type { SearchHitType } from './searchHitType.ts';
 import type { ServiceRef } from './serviceRef.ts';
 
+/**
+ * represents search hit data exchanged through the Meridian API.
+ */
 export interface SearchHit {
+  /** specifies the type associated with this search hit. */
   type: SearchHitType;
+  /** uniquely identifies this resource. */
   id: string;
+  /** specifies the title associated with this search hit. */
   title: string;
-  /** @nullable */
+  /**
+     * specifies the subtitle associated with this search hit.
+     * @nullable
+     */
   subtitle: string | null;
+  /** specifies the score associated with this search hit. */
   score: number;
   /** Non-null for every hit; repository hits use this as their owning resource. */
   repository: RepositoryRef | null;
   /** Null only for repository hits. */
   service: ServiceRef | null;
+  /** specifies the kind associated with this search hit. */
   kind: KindId | null;
   /** Required for asset and item hits; null for repository and service hits. */
   deepLink: SearchDeepLink | null;
+  /** specifies the highlights associated with this search hit. */
   highlights: SearchHitHighlights;
 }

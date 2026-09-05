@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported pipeline stage value.
+ */
 export type PipelineStage = typeof PipelineStage[keyof typeof PipelineStage];
 
 
+/** PipelineStage is generated from the Meridian OpenAPI contract for pipeline stage. */
 export const PipelineStage = {
   resolve: 'resolve',
   discover: 'discover',

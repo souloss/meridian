@@ -13,25 +13,46 @@ import type { RefName } from './refName.ts';
 import type { RefType } from './refType.ts';
 import type { Slug } from './slug.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface AssetPushRequest {
+  /** contains the slug associated with this asset push request. */
   serviceSlug: Slug;
+  /** contains the kind id associated with this asset push request. */
   kind: KindId;
+  /** contains the asset name associated with this asset push request. */
   name: AssetName;
+  /** contains the ref type associated with this asset push request. */
   refType?: RefType;
+  /** contains the ref name associated with this asset push request. */
   ref: RefName;
   /**
+     * specifies the source system associated with this asset push request.
      * @minLength 1
      * @maxLength 128
      * @pattern ^[A-Za-z0-9._:-]+$
      */
   sourceSystem: string;
+  /** indicates whether create if missing applies to this asset push request. */
   createIfMissing?: boolean;
-  /** @maxLength 1048576 */
+  /**
+     * specifies the content associated with this asset push request.
+     * @maxLength 1048576
+     */
   content: string;
+  /** contains the content type associated with this asset push request. */
   contentType: ContentType;
+  /** specifies the role associated with this asset push request. */
   role?: LayerRole;
-  /** @nullable */
+  /**
+     * specifies the dialect associated with this asset push request.
+     * @nullable
+     */
   dialect?: string | null;
-  /** @nullable */
+  /**
+     * specifies the source commit associated with this asset push request.
+     * @nullable
+     */
   sourceCommit?: string | null;
 }

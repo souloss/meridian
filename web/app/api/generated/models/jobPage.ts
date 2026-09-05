@@ -8,6 +8,10 @@
 import type { Job } from './job.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of job records.
+ */
 export type JobPage = PageInfo & {
+  /** contains the ordered items associated with this job page. */
   items: Job[];
 };

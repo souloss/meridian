@@ -11,20 +11,27 @@ import type { RequiredQueryParameter } from './requiredQueryParameter.ts';
 import type { SearchFacetsParameter } from './searchFacetsParameter.ts';
 import type { SearchFilter } from './searchFilter.ts';
 
+/** SearchParams contains parameters accepted by its generated OpenAPI operation. */
 export type SearchParams = {
 /**
+ * identifies or filters the q value in the query.
  * @minLength 1
  * @maxLength 200
  */
 q: RequiredQueryParameter;
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */
 pageSize?: PageSizeParameter;
+/**
+ * defines supported filters for selecting search records.
+ */
 filter?: SearchFacetsParameter;
 };

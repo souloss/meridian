@@ -10,9 +10,14 @@ import type { RefNameParameter } from './refNameParameter.ts';
 import type { RefType } from './refType.ts';
 import type { RefTypeParameter } from './refTypeParameter.ts';
 
+/** GetLayerParams contains parameters accepted by its generated OpenAPI operation. */
 export type GetLayerParams = {
+/**
+ * identifies one supported ref type value.
+ */
 refType?: RefTypeParameter;
 /**
+ * is a validated Git branch or tag name without a refs prefix.
  * @minLength 1
  * @maxLength 255
  * @pattern ^[A-Za-z0-9._/-]+$

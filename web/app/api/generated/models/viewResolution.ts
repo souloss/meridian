@@ -10,4 +10,7 @@ import type { DocumentViewResolution } from './documentViewResolution.ts';
 import type { GraphViewResolution } from './graphViewResolution.ts';
 import type { ItemsViewResolution } from './itemsViewResolution.ts';
 
+/**
+ * represents view resolution data exchanged through the Meridian API.
+ */
 export type ViewResolution = DocumentViewResolution | ItemsViewResolution | GraphViewResolution | DashboardViewResolution;

@@ -8,10 +8,18 @@
 import type { PipelineStage } from './pipelineStage.ts';
 import type { Timestamp } from './timestamp.ts';
 
+/**
+ * represents a job log event emitted by Meridian.
+ */
 export interface JobLogEvent {
+  /** specifies the event associated with this job log event. */
   event: 'log';
+  /** uniquely identifies this resource. */
   id: string;
+  /** contains the timestamp associated with this job log event. */
   at: Timestamp;
+  /** specifies the message associated with this job log event. */
   message: string;
+  /** specifies the stage associated with this job log event. */
   stage?: PipelineStage | null;
 }

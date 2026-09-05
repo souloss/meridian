@@ -7,11 +7,16 @@
  */
 import type { DiffRule } from './diffRule.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface DiffRuleSetPatchRequest {
   /**
+     * specifies the name associated with this diff rule set patch request.
      * @minLength 1
      * @maxLength 128
      */
   name?: string;
+  /** contains the ordered rules associated with this diff rule set patch request. */
   rules?: DiffRule[];
 }

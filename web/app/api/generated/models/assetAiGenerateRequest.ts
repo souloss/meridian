@@ -9,14 +9,22 @@ import type { RefName } from './refName.ts';
 import type { RefType } from './refType.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface AssetAiGenerateRequest {
+  /** identifies the source associated with this resource. */
   sourceId?: Uuid | null;
+  /** contains the ref type associated with this asset ai generate request. */
   refType?: RefType;
+  /** contains the ref name associated with this asset ai generate request. */
   ref?: RefName;
   /**
+     * specifies the hint associated with this asset ai generate request.
      * @maxLength 500
      * @nullable
      */
   hint?: string | null;
+  /** contains the uuid associated with this asset ai generate request. */
   producerProfileId?: Uuid;
 }

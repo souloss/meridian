@@ -7,6 +7,10 @@
  */
 import type { ProducerProfileOption } from './producerProfileOption.ts';
 
+/**
+ * contains an ordered collection of producer profile option values.
+ */
 export interface ProducerProfileOptionList {
+  /** contains the ordered items associated with this producer profile option list. */
   items: ProducerProfileOption[];
 }

@@ -8,9 +8,17 @@
 import type { RefName } from './refName.ts';
 import type { RefType } from './refType.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface RepositoryDiscoverRequest {
+  /** contains the ref type associated with this repository discover request. */
   refType?: RefType;
+  /** contains the ref name associated with this repository discover request. */
   ref?: RefName;
-  /** @items.maxLength 512 */
+  /**
+     * contains the ordered path prefixes associated with this repository discover request.
+     * @items.maxLength 512
+     */
   pathPrefixes?: string[];
 }

@@ -7,8 +7,14 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents provenance entry data exchanged through the Meridian API.
+ */
 export interface ProvenanceEntry {
+  /** specifies the pointer associated with this provenance entry. */
   pointer: string;
+  /** contains the uuid associated with this provenance entry. */
   layerId: Uuid;
+  /** contains the uuid associated with this provenance entry. */
   revisionId: Uuid;
 }

@@ -8,12 +8,20 @@
 import type { JobStatus } from './jobStatus.ts';
 import type { Timestamp } from './timestamp.ts';
 
+/**
+ * represents a job state event emitted by Meridian.
+ */
 export interface JobStateEvent {
+  /** specifies the event associated with this job state event. */
   event: 'state';
+  /** uniquely identifies this resource. */
   id: string;
+  /** contains the timestamp associated with this job state event. */
   at: Timestamp;
+  /** is the current lifecycle or processing state. */
   status: JobStatus;
   /**
+     * specifies the progress associated with this job state event.
      * @minimum 0
      * @maximum 100
      */

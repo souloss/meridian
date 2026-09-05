@@ -14,15 +14,26 @@ import type { RefType } from './refType.ts';
 import type { Uuid } from './uuid.ts';
 import type { VersionRef } from './versionRef.ts';
 
+/**
+ * represents asset summary data exchanged through the Meridian API.
+ */
 export interface AssetSummary {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the kind id associated with this asset summary. */
   kind: KindId;
+  /** contains the asset name associated with this asset summary. */
   name: AssetName;
-  /** Lifecycle of currentVersion, otherwise latestVersion, otherwise draft for the repository default Track. */
+  /** of currentVersion, otherwise latestVersion, otherwise draft for the repository default Track. */
   lifecycle: Lifecycle;
+  /** specifies the health associated with this asset summary. */
   health: AssetSummaryHealth;
+  /** specifies the current version associated with this asset summary. */
   currentVersion: VersionRef | null;
+  /** specifies the latest version associated with this asset summary. */
   latestVersion: VersionRef | null;
+  /** contains the ref type associated with this asset summary. */
   refType: RefType;
+  /** contains the ref name associated with this asset summary. */
   ref: RefName;
 }

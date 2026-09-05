@@ -6,12 +6,19 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * carries write-only HTTP basic or token credentials for encryption at rest.
+ */
 export interface HttpSecretInput {
   /**
+     * specifies the username associated with this http secret input.
      * @minLength 1
      * @maxLength 128
      */
   username: string;
-  /** @minLength 8 */
+  /**
+     * is secret bearer material and must never be logged or persisted as plaintext.
+     * @minLength 8
+     */
   token: string;
 }

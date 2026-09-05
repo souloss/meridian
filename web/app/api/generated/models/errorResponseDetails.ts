@@ -7,6 +7,7 @@
  */
 
 /**
+ * contains error-code-specific structured diagnostics, or null when no detail is available.
  * @nullable
  */
 export type ErrorResponseDetails = { [key: string]: unknown } | null;

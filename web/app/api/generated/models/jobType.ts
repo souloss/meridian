@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported job type value.
+ */
 export type JobType = typeof JobType[keyof typeof JobType];
 
 
+/** JobType is generated from the Meridian OpenAPI contract for job type. */
 export const JobType = {
   tenantdelete: 'tenant.delete',
   reposync: 'repo.sync',

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported token scope value.
+ */
 export type TokenScope = typeof TokenScope[keyof typeof TokenScope];
 
 
+/** TokenScope is generated from the Meridian OpenAPI contract for token scope. */
 export const TokenScope = {
   'asset:push': 'asset:push',
   'asset:read': 'asset:read',

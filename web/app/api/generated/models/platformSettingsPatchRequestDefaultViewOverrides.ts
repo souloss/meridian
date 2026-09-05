@@ -7,4 +7,7 @@
  */
 import type { ViewOverrideValue } from './viewOverrideValue.ts';
 
+/**
+ * specifies the default view overrides associated with this platform settings patch request.
+ */
 export type PlatformSettingsPatchRequestDefaultViewOverrides = {[key: string]: ViewOverrideValue};

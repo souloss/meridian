@@ -10,22 +10,35 @@ import type { Timestamp } from './timestamp.ts';
 import type { UserStatus } from './userStatus.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * is a local Meridian identity; password hashes and session secrets are never exposed.
+ */
 export interface User {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
   /**
+     * specifies the username associated with this user.
      * @minLength 1
      * @maxLength 128
      */
   username: string;
   /**
+     * specifies the display name associated with this user.
      * @minLength 1
      * @maxLength 128
      */
   displayName: string;
-  /** @nullable */
+  /**
+     * specifies the email associated with this user.
+     * @nullable
+     */
   email: string | null;
+  /** is the current lifecycle or processing state. */
   status: UserStatus;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

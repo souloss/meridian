@@ -8,7 +8,12 @@
 import type { ServiceGrant } from './serviceGrant.ts';
 import type { Timestamp } from './timestamp.ts';
 
+/**
+ * represents service access data exchanged through the Meridian API.
+ */
 export interface ServiceAccess {
+  /** contains the ordered grants associated with this service access. */
   grants: ServiceGrant[];
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

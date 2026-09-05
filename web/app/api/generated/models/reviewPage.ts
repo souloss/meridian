@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { ReviewContext } from './reviewContext.ts';
 
+/**
+ * contains one paginated page of review records.
+ */
 export type ReviewPage = PageInfo & {
+  /** contains the ordered items associated with this review page. */
   items: ReviewContext[];
 };

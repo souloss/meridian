@@ -7,4 +7,5 @@
  */
 import type { GlobalCredentialCreateRequest } from './globalCredentialCreateRequest.ts';
 
+/** GlobalCredentialCreateBody is the request body type for its generated OpenAPI operation. */
 export type GlobalCredentialCreateBody = GlobalCredentialCreateRequest;

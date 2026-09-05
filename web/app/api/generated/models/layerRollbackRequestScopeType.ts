@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the scope type associated with this layer rollback request.
+ */
 export type LayerRollbackRequestScopeType = typeof LayerRollbackRequestScopeType[keyof typeof LayerRollbackRequestScopeType];
 
 
+/** LayerRollbackRequestScopeType is generated from the Meridian OpenAPI contract for layer rollback request scope type. */
 export const LayerRollbackRequestScopeType = {
   ref: 'ref',
   global: 'global',

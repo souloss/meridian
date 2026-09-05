@@ -7,4 +7,5 @@
  */
 import type { SystemGroupPatchRequest } from './systemGroupPatchRequest.ts';
 
+/** SystemGroupPatchBody is the request body type for its generated OpenAPI operation. */
 export type SystemGroupPatchBody = SystemGroupPatchRequest;

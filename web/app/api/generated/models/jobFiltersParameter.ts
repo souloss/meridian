@@ -7,4 +7,5 @@
  */
 import type { JobFilter } from './jobFilter.ts';
 
+/** JobFiltersParameter is generated from the Meridian OpenAPI contract for job filters parameter. */
 export type JobFiltersParameter = JobFilter;

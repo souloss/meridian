@@ -9,11 +9,21 @@ import type { ExternalRevisionTrustMode } from './externalRevisionTrustMode.ts';
 import type { RetentionSettings } from './retentionSettings.ts';
 import type { TenantSettingsPatchRequestDefaultLocale } from './tenantSettingsPatchRequestDefaultLocale.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface TenantSettingsPatchRequest {
+  /** contains the external revision trust mode associated with this tenant settings patch request. */
   externalRevisionTrustMode?: ExternalRevisionTrustMode;
+  /** indicates whether auto publish applies to this tenant settings patch request. */
   autoPublish?: boolean;
+  /** specifies the default locale associated with this tenant settings patch request. */
   defaultLocale?: TenantSettingsPatchRequestDefaultLocale;
-  /** @nullable */
+  /**
+     * specifies the default ai producer profile id associated with this tenant settings patch request.
+     * @nullable
+     */
   defaultAiProducerProfileId?: string | null;
+  /** contains the retention settings associated with this tenant settings patch request. */
   retention?: RetentionSettings;
 }

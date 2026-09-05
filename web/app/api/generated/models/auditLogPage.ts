@@ -8,6 +8,10 @@
 import type { AuditEntry } from './auditEntry.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of audit log records.
+ */
 export type AuditLogPage = PageInfo & {
+  /** contains the ordered items associated with this audit log page. */
   items: AuditEntry[];
 };

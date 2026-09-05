@@ -10,20 +10,29 @@ import type { ServiceVisibility } from './serviceVisibility.ts';
 import type { Slug } from './slug.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ServiceCreateRequest {
+  /** contains the slug associated with this service create request. */
   slug: Slug;
   /**
+     * specifies the display name associated with this service create request.
      * @minLength 1
      * @maxLength 128
      */
   displayName: string;
   /**
+     * specifies the description associated with this service create request.
      * @maxLength 2000
      * @nullable
      */
   description?: string | null;
+  /** specifies the visibility associated with this service create request. */
   visibility?: ServiceVisibility;
+  /** contains the owner refs associated with this service create request. */
   owners?: OwnerRefs;
+  /** contains the ordered tag ids associated with this service create request. */
   tagIds?: Uuid[];
   /**
      * Null or omitted means repository root and is stored as an empty rootDir.

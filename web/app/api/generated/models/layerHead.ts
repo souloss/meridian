@@ -8,7 +8,11 @@
 import type { LayerHeadScopeType } from './layerHeadScopeType.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents layer head data exchanged through the Meridian API.
+ */
 export interface LayerHead {
+  /** specifies the scope type associated with this layer head. */
   scopeType: LayerHeadScopeType;
   /**
      * '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
@@ -16,9 +20,15 @@ export interface LayerHead {
      * @maxLength 260
      */
   scopeKey: string;
+  /** specifies the latest revision id associated with this layer head. */
   latestRevisionId: Uuid | null;
+  /** specifies the effective revision id associated with this layer head. */
   effectiveRevisionId: Uuid | null;
+  /** indicates whether candidate revision id applies to this layer head. */
   candidateRevisionId: Uuid | null;
-  /** @minimum 0 */
+  /**
+     * specifies the generation associated with this layer head.
+     * @minimum 0
+     */
   generation: number;
 }

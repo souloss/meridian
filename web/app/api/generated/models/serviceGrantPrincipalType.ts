@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the principal type associated with this service grant.
+ */
 export type ServiceGrantPrincipalType = typeof ServiceGrantPrincipalType[keyof typeof ServiceGrantPrincipalType];
 
 
+/** ServiceGrantPrincipalType is generated from the Meridian OpenAPI contract for service grant principal type. */
 export const ServiceGrantPrincipalType = {
   user: 'user',
   team: 'team',

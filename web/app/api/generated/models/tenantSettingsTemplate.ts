@@ -9,11 +9,21 @@ import type { ExternalRevisionTrustMode } from './externalRevisionTrustMode.ts';
 import type { RetentionSettings } from './retentionSettings.ts';
 import type { TenantSettingsTemplateDefaultLocale } from './tenantSettingsTemplateDefaultLocale.ts';
 
+/**
+ * represents tenant settings template data exchanged through the Meridian API.
+ */
 export interface TenantSettingsTemplate {
+  /** contains the external revision trust mode associated with this tenant settings template. */
   externalRevisionTrustMode: ExternalRevisionTrustMode;
+  /** indicates whether auto publish applies to this tenant settings template. */
   autoPublish: boolean;
+  /** specifies the default locale associated with this tenant settings template. */
   defaultLocale: TenantSettingsTemplateDefaultLocale;
-  /** @nullable */
+  /**
+     * specifies the default ai producer profile id associated with this tenant settings template.
+     * @nullable
+     */
   defaultAiProducerProfileId: string | null;
+  /** contains the retention settings associated with this tenant settings template. */
   retention: RetentionSettings;
 }

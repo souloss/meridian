@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported producer network mode value.
+ */
 export type ProducerNetworkMode = typeof ProducerNetworkMode[keyof typeof ProducerNetworkMode];
 
 
+/** ProducerNetworkMode is generated from the Meridian OpenAPI contract for producer network mode. */
 export const ProducerNetworkMode = {
   none: 'none',
   inherit: 'inherit',

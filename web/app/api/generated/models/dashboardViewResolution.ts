@@ -8,8 +8,14 @@
 import type { DashboardViewResolutionMetrics } from './dashboardViewResolutionMetrics.ts';
 import type { ViewDefinition } from './viewDefinition.ts';
 
+/**
+ * represents dashboard view resolution data exchanged through the Meridian API.
+ */
 export interface DashboardViewResolution {
+  /** specifies the kind associated with this dashboard view resolution. */
   kind: 'catalog_dashboard';
+  /** contains the view definition associated with this dashboard view resolution. */
   view: ViewDefinition;
+  /** specifies the metrics associated with this dashboard view resolution. */
   metrics: DashboardViewResolutionMetrics;
 }

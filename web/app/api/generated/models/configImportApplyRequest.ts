@@ -8,10 +8,16 @@
 import type { ConfigImportApplyRequestDefaultResolution } from './configImportApplyRequestDefaultResolution.ts';
 import type { ConfigImportApplyRequestFieldResolutions } from './configImportApplyRequestFieldResolutions.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ConfigImportApplyRequest {
+  /** is the lowercase SHA-256 digest of the normalized configuration. */
   configDigest: string;
+  /** specifies the default resolution associated with this config import apply request. */
   defaultResolution: ConfigImportApplyRequestDefaultResolution;
   /** Explicitly applies the domain baseReplacement transaction for matching repository bases. */
   replaceAiBases?: boolean;
+  /** specifies the field resolutions associated with this config import apply request. */
   fieldResolutions?: ConfigImportApplyRequestFieldResolutions;
 }

@@ -10,16 +10,26 @@ import type { Slug } from './slug.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents team data exchanged through the Meridian API.
+ */
 export interface Team {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the slug associated with this team. */
   slug: Slug;
   /**
+     * specifies the display name associated with this team.
      * @minLength 1
      * @maxLength 128
      */
   displayName: string;
+  /** contains the ordered member ids associated with this team. */
   memberIds: Uuid[];
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

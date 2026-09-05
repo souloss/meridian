@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the default resolution associated with this config import apply request.
+ */
 export type ConfigImportApplyRequestDefaultResolution = typeof ConfigImportApplyRequestDefaultResolution[keyof typeof ConfigImportApplyRequestDefaultResolution];
 
 
+/** ConfigImportApplyRequestDefaultResolution is generated from the Meridian OpenAPI contract for config import apply request default resolution. */
 export const ConfigImportApplyRequestDefaultResolution = {
   keep_db: 'keep_db',
   take_file: 'take_file',

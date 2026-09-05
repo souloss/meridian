@@ -6,13 +6,18 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface KnownHostCreateRequest {
   /**
+     * specifies the host associated with this known host create request.
      * @minLength 1
      * @maxLength 255
      */
   host: string;
   /**
+     * specifies the port associated with this known host create request.
      * @minimum 1
      * @maximum 65535
      */

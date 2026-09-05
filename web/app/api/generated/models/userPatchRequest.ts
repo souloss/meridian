@@ -7,16 +7,25 @@
  */
 import type { UserPatchRequestStatus } from './userPatchRequestStatus.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface UserPatchRequest {
   /**
+     * specifies the display name associated with this user patch request.
      * @minLength 1
      * @maxLength 128
      */
   displayName?: string;
-  /** @nullable */
+  /**
+     * specifies the email associated with this user patch request.
+     * @nullable
+     */
   email?: string | null;
+  /** is the current lifecycle or processing state. */
   status?: UserPatchRequestStatus;
   /**
+     * is the write-only plaintext password supplied for authentication.
      * @minLength 12
      * @maxLength 1024
      */

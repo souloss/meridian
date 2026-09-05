@@ -7,6 +7,10 @@
  */
 import type { ServiceGrant } from './serviceGrant.ts';
 
+/**
+ * contains an ordered collection of service grant values.
+ */
 export interface ServiceGrantList {
+  /** contains the ordered items associated with this service grant list. */
   items: ServiceGrant[];
 }

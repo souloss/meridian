@@ -7,9 +7,16 @@
  */
 import type { GraphEdgeDetails } from './graphEdgeDetails.ts';
 
+/**
+ * represents graph edge data exchanged through the Meridian API.
+ */
 export interface GraphEdge {
+  /** uniquely identifies this resource. */
   id: string;
+  /** specifies the from associated with this graph edge. */
   from: string;
+  /** specifies the to associated with this graph edge. */
   to: string;
+  /** specifies the details associated with this graph edge. */
   details: GraphEdgeDetails;
 }

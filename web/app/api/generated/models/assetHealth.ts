@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the health associated with this asset.
+ */
 export type AssetHealth = typeof AssetHealth[keyof typeof AssetHealth];
 
 
+/** AssetHealth is generated from the Meridian OpenAPI contract for asset health. */
 export const AssetHealth = {
   ok: 'ok',
   stale: 'stale',

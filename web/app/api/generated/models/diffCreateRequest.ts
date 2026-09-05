@@ -8,9 +8,16 @@
 import type { DocumentSelector } from './documentSelector.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface DiffCreateRequest {
+  /** contains the document selector associated with this diff create request. */
   left: DocumentSelector;
+  /** contains the document selector associated with this diff create request. */
   right: DocumentSelector;
+  /** specifies the rule set id associated with this diff create request. */
   ruleSetId?: Uuid | null;
+  /** indicates whether persist applies to this diff create request. */
   persist?: boolean;
 }

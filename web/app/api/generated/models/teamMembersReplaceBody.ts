@@ -7,4 +7,5 @@
  */
 import type { TeamMembersReplaceRequest } from './teamMembersReplaceRequest.ts';
 
+/** TeamMembersReplaceBody is the request body type for its generated OpenAPI operation. */
 export type TeamMembersReplaceBody = TeamMembersReplaceRequest;

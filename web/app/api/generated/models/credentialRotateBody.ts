@@ -7,4 +7,5 @@
  */
 import type { CredentialRotateRequest } from './credentialRotateRequest.ts';
 
+/** CredentialRotateBody is the request body type for its generated OpenAPI operation. */
 export type CredentialRotateBody = CredentialRotateRequest;

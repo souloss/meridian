@@ -9,17 +9,29 @@ import type { Timestamp } from './timestamp.ts';
 import type { TokenScope } from './tokenScope.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * exposes PAT metadata without returning the bearer token or stored token hash.
+ */
 export interface ApiToken {
+  /** uniquely identifies this resource. */
   id: Uuid;
   /**
+     * specifies the name associated with this api token.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
-  /** @minItems 1 */
+  /**
+     * lists the explicit capabilities granted to this token.
+     * @minItems 1
+     */
   scopes: TokenScope[];
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp | null;
+  /** is the most recent successful authentication instant, or null when unused. */
   lastUsedAt: Timestamp | null;
+  /** is the revocation instant, or null while the token remains active. */
   revokedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
 }

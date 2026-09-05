@@ -10,15 +10,21 @@ import type { AuditFiltersParameter } from './auditFiltersParameter.ts';
 import type { PageParameter } from './pageParameter.ts';
 import type { PageSizeParameter } from './pageSizeParameter.ts';
 
+/** ListAuditLogsParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListAuditLogsParams = {
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */
 pageSize?: PageSizeParameter;
+/**
+ * defines supported filters for selecting audit records.
+ */
 filter?: AuditFiltersParameter;
 };

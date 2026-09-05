@@ -7,4 +7,5 @@
  */
 import type { TenantDeleteRequest } from './tenantDeleteRequest.ts';
 
+/** TenantDeleteBody is the request body type for its generated OpenAPI operation. */
 export type TenantDeleteBody = TenantDeleteRequest;

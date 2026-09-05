@@ -8,6 +8,10 @@
 import type { ApiToken } from './apiToken.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of token records.
+ */
 export type TokenPage = PageInfo & {
+  /** contains the ordered items associated with this token page. */
   items: ApiToken[];
 };

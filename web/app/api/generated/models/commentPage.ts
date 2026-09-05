@@ -8,6 +8,10 @@
 import type { Comment } from './comment.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of comment records.
+ */
 export type CommentPage = PageInfo & {
+  /** contains the ordered items associated with this comment page. */
   items: Comment[];
 };

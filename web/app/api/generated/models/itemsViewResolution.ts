@@ -8,8 +8,14 @@
 import type { AssetItem } from './assetItem.ts';
 import type { ViewDefinition } from './viewDefinition.ts';
 
+/**
+ * represents items view resolution data exchanged through the Meridian API.
+ */
 export interface ItemsViewResolution {
+  /** specifies the kind associated with this items view resolution. */
   kind: 'items';
+  /** contains the view definition associated with this items view resolution. */
   view: ViewDefinition;
+  /** contains the ordered items associated with this items view resolution. */
   items: AssetItem[];
 }

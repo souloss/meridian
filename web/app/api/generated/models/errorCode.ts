@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported error code value.
+ */
 export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
 
 
+/** ErrorCode is generated from the Meridian OpenAPI contract for error code. */
 export const ErrorCode = {
   unauthenticated: 'unauthenticated',
   csrf_invalid: 'csrf_invalid',

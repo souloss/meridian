@@ -7,4 +7,5 @@
  */
 import type { AssetPushRequest } from './assetPushRequest.ts';
 
+/** AssetPushBody is the request body type for its generated OpenAPI operation. */
 export type AssetPushBody = AssetPushRequest;

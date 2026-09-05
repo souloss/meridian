@@ -7,4 +7,5 @@
  */
 import type { TodoStatus } from './todoStatus.ts';
 
+/** TodoStatusFilterParameter is generated from the Meridian OpenAPI contract for todo status filter parameter. */
 export type TodoStatusFilterParameter = TodoStatus;

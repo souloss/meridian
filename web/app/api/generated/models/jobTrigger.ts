@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported job trigger value.
+ */
 export type JobTrigger = typeof JobTrigger[keyof typeof JobTrigger];
 
 
+/** JobTrigger is generated from the Meridian OpenAPI contract for job trigger. */
 export const JobTrigger = {
   manual: 'manual',
   schedule: 'schedule',

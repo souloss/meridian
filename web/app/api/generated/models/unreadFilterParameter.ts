@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies or filters the unread value in the query.
+ */
 export type UnreadFilterParameter = boolean;

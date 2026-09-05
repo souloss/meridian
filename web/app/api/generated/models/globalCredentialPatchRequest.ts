@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface GlobalCredentialPatchRequest {
   /**
+     * specifies the name associated with this global credential patch request.
      * @minLength 1
      * @maxLength 64
      */

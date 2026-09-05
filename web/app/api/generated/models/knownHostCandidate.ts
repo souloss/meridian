@@ -7,13 +7,18 @@
  */
 import type { KnownHostCandidateKeyType } from './knownHostCandidateKeyType.ts';
 
+/**
+ * represents known host candidate data exchanged through the Meridian API.
+ */
 export interface KnownHostCandidate {
   /**
+     * specifies the host associated with this known host candidate.
      * @minLength 1
      * @maxLength 255
      */
   host: string;
   /**
+     * specifies the port associated with this known host candidate.
      * @minimum 1
      * @maximum 65535
      */

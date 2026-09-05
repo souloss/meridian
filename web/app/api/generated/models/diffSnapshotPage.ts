@@ -8,6 +8,10 @@
 import type { DiffSnapshot } from './diffSnapshot.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of diff snapshot records.
+ */
 export type DiffSnapshotPage = PageInfo & {
+  /** contains the ordered items associated with this diff snapshot page. */
   items: DiffSnapshot[];
 };

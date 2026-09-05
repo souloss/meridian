@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the scope type associated with this source binding.
+ */
 export type SourceBindingScopeType = typeof SourceBindingScopeType[keyof typeof SourceBindingScopeType];
 
 
+/** SourceBindingScopeType is generated from the Meridian OpenAPI contract for source binding scope type. */
 export const SourceBindingScopeType = {
   ref: 'ref',
   global: 'global',

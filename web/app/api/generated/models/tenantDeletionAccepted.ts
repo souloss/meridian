@@ -8,8 +8,14 @@
 import type { ETag } from './eTag.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents tenant deletion accepted data exchanged through the Meridian API.
+ */
 export interface TenantDeletionAccepted {
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** identifies the asynchronous job associated with this resource. */
   jobId: Uuid;
+  /** indicates whether deduplicated applies to this tenant deletion accepted. */
   deduplicated: boolean;
 }

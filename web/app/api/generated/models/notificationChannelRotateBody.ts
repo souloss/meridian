@@ -7,4 +7,5 @@
  */
 import type { NotificationChannelRotateRequest } from './notificationChannelRotateRequest.ts';
 
+/** NotificationChannelRotateBody is the request body type for its generated OpenAPI operation. */
 export type NotificationChannelRotateBody = NotificationChannelRotateRequest;

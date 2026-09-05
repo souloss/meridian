@@ -7,4 +7,7 @@
  */
 import type { ViewOverrideValue } from './viewOverrideValue.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export type ViewOverridePutRequest = ViewOverrideValue;

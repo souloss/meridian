@@ -8,14 +8,26 @@
 import type { RepositoryError } from './repositoryError.ts';
 import type { Timestamp } from './timestamp.ts';
 
+/**
+ * represents repository health data exchanged through the Meridian API.
+ */
 export interface RepositoryHealth {
+  /** specifies the last sync at associated with this repository health. */
   lastSyncAt: Timestamp | null;
-  /** @nullable */
+  /**
+     * specifies the last commit associated with this repository health.
+     * @nullable
+     */
   lastCommit: string | null;
+  /** specifies the last error associated with this repository health. */
   lastError: RepositoryError | null;
-  /** @minimum 0 */
+  /**
+     * specifies the fail streak associated with this repository health.
+     * @minimum 0
+     */
   failStreak: number;
   /**
+     * specifies the duration ms associated with this repository health.
      * @minimum 0
      * @nullable
      */

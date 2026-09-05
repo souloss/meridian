@@ -10,12 +10,23 @@ import type { JobStatus } from './jobStatus.ts';
 import type { PipelineStage } from './pipelineStage.ts';
 import type { Timestamp } from './timestamp.ts';
 
+/**
+ * represents job stage attempt data exchanged through the Meridian API.
+ */
 export interface JobStageAttempt {
+  /** contains the pipeline stage associated with this job stage attempt. */
   stage: PipelineStage;
-  /** @minimum 1 */
+  /**
+     * specifies the attempt associated with this job stage attempt.
+     * @minimum 1
+     */
   attempt: number;
+  /** is the current lifecycle or processing state. */
   status: JobStatus;
+  /** is the RFC 3339 UTC instant when processing began. */
   startedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when processing reached a terminal state. */
   finishedAt: Timestamp | null;
+  /** specifies the error associated with this job stage attempt. */
   error: ErrorResponse | null;
 }

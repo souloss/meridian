@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the fields associated with this drift resolution request.
+ */
 export type DriftResolutionRequestFields = {[key: string]: 'keep_db' | 'take_file' | 'ignore'};

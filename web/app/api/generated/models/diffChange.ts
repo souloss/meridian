@@ -7,12 +7,22 @@
  */
 import type { DiffLevel } from './diffLevel.ts';
 
+/**
+ * represents diff change data exchanged through the Meridian API.
+ */
 export interface DiffChange {
+  /** uniquely identifies this resource. */
   id: string;
+  /** contains the diff level associated with this diff change. */
   level: DiffLevel;
+  /** specifies the code associated with this diff change. */
   code: string;
+  /** specifies the path associated with this diff change. */
   path: string;
+  /** specifies the summary associated with this diff change. */
   summary: string;
+  /** specifies the before associated with this diff change. */
   before: unknown;
+  /** specifies the after associated with this diff change. */
   after: unknown;
 }

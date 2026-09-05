@@ -7,4 +7,7 @@
  */
 import type { Tag } from './tag.ts';
 
+/**
+ * contains an ordered collection of tag values.
+ */
 export type TagList = Tag[];

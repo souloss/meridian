@@ -6,9 +6,17 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * represents field error data exchanged through the Meridian API.
+ */
 export interface FieldError {
+  /** specifies the path associated with this field error. */
   path: string;
+  /** specifies the message associated with this field error. */
   message: string;
-  /** @nullable */
+  /**
+     * specifies the rule associated with this field error.
+     * @nullable
+     */
   rule?: string | null;
 }

@@ -8,8 +8,14 @@
 import type { DriftResolutionRequestFields } from './driftResolutionRequestFields.ts';
 import type { DriftResolutionRequestResolution } from './driftResolutionRequestResolution.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface DriftResolutionRequest {
+  /** is the lowercase SHA-256 digest of the normalized configuration. */
   configDigest: string;
+  /** specifies the resolution associated with this drift resolution request. */
   resolution: DriftResolutionRequestResolution;
+  /** specifies the fields associated with this drift resolution request. */
   fields?: DriftResolutionRequestFields;
 }

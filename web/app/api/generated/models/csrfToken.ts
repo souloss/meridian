@@ -6,7 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * carries the anti-forgery token bound to the current cookie session.
+ */
 export interface CsrfToken {
-  /** @minLength 32 */
+  /**
+     * binds a state-changing browser request to the current session.
+     * @minLength 32
+     */
   csrfToken: string;
 }

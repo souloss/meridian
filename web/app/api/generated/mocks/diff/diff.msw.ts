@@ -38,35 +38,49 @@ import type {
 } from '../../models';
 
 
+/** getCreateDiffUploadResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateDiffUploadResponseMock = (overrideResponse: Partial<Extract<UploadResponse, object>> = {}): UploadResponse => ({id: faker.string.uuid(), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentType: faker.helpers.arrayElement(Object.values(ContentType)), digest: faker.string.alpha({length: {min: 10, max: 20}}), sizeBytes: faker.number.int({min: 1, max: 10485760}), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getRunDiffResponseMock provides generated MSW behavior for contract tests. */
 export const getRunDiffResponseMock = (overrideResponse: Partial<Extract<DiffResultResponse, object>> = {}): DiffResultResponse => ({kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), left: {sourceType: faker.helpers.arrayElement(['version','upload'] as const), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.helpers.arrayElement([faker.string.uuid(),null,]), versionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), uploadId: faker.helpers.arrayElement([faker.string.uuid(),null,]), requestedRefType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), requestedRef: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,])}, right: {sourceType: faker.helpers.arrayElement(['version','upload'] as const), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.helpers.arrayElement([faker.string.uuid(),null,]), versionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), uploadId: faker.helpers.arrayElement([faker.string.uuid(),null,]), requestedRefType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), requestedRef: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,])}, snapshotId: faker.helpers.arrayElement([faker.string.uuid(),null,]), summary: {added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, changes: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), level: faker.helpers.arrayElement(Object.values(DiffLevel)), code: faker.string.alpha({length: {min: 10, max: 20}}), path: faker.string.alpha({length: {min: 10, max: 20}}), summary: faker.string.alpha({length: {min: 10, max: 20}}), before: {}, after: {}})), generatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getListDiffSnapshotsResponseMock provides generated MSW behavior for contract tests. */
 export const getListDiffSnapshotsResponseMock = (): DiffSnapshotPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), result: {kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), left: {sourceType: faker.helpers.arrayElement(['version','upload'] as const), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.helpers.arrayElement([faker.string.uuid(),null,]), versionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), uploadId: faker.helpers.arrayElement([faker.string.uuid(),null,]), requestedRefType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), requestedRef: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,])}, right: {sourceType: faker.helpers.arrayElement(['version','upload'] as const), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.helpers.arrayElement([faker.string.uuid(),null,]), versionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), uploadId: faker.helpers.arrayElement([faker.string.uuid(),null,]), requestedRefType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), requestedRef: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,])}, snapshotId: faker.helpers.arrayElement([faker.string.uuid(),null,]), summary: {added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, changes: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), level: faker.helpers.arrayElement(Object.values(DiffLevel)), code: faker.string.alpha({length: {min: 10, max: 20}}), path: faker.string.alpha({length: {min: 10, max: 20}}), summary: faker.string.alpha({length: {min: 10, max: 20}}), before: {}, after: {}})), generatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, createdBy: faker.string.uuid(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
 
+/** getGetDiffSnapshotResponseMock provides generated MSW behavior for contract tests. */
 export const getGetDiffSnapshotResponseMock = (overrideResponse: Partial<Extract<DiffSnapshotResponse, object>> = {}): DiffSnapshotResponse => ({id: faker.string.uuid(), result: {kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), left: {sourceType: faker.helpers.arrayElement(['version','upload'] as const), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.helpers.arrayElement([faker.string.uuid(),null,]), versionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), uploadId: faker.helpers.arrayElement([faker.string.uuid(),null,]), requestedRefType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), requestedRef: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,])}, right: {sourceType: faker.helpers.arrayElement(['version','upload'] as const), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.helpers.arrayElement([faker.string.uuid(),null,]), versionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), uploadId: faker.helpers.arrayElement([faker.string.uuid(),null,]), requestedRefType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), requestedRef: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,])}, snapshotId: faker.helpers.arrayElement([faker.string.uuid(),null,]), summary: {added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, changes: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), level: faker.helpers.arrayElement(Object.values(DiffLevel)), code: faker.string.alpha({length: {min: 10, max: 20}}), path: faker.string.alpha({length: {min: 10, max: 20}}), summary: faker.string.alpha({length: {min: 10, max: 20}}), before: {}, after: {}})), generatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, createdBy: faker.string.uuid(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getExportDiffSnapshotResponseMock provides generated MSW behavior for contract tests. */
 export const getExportDiffSnapshotResponseMock = (overrideResponse: Partial<Extract<ArtifactLinkResponse, object>> = {}): ArtifactLinkResponse => ({url: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getCreateDiffSnapshotShareLinkResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateDiffSnapshotShareLinkResponseMock = (overrideResponse: Partial<Extract<ShareLinkCreatedResponse, object>> = {}): ShareLinkCreatedResponse => ({id: faker.string.uuid(), token: faker.string.alpha({length: {min: 32, max: 32}}), resourceType: faker.helpers.arrayElement(['view','diff_snapshot'] as const), resourceId: faker.helpers.arrayElement([faker.string.uuid(),null,]), descriptorDigest: faker.string.alpha({length: {min: 10, max: 20}}), url: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', revokedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getListDiffRuleSetsResponseMock provides generated MSW behavior for contract tests. */
 export const getListDiffRuleSetsResponseMock = (overrideResponse: Partial<Extract<DiffRuleSetListResponse, object>> = {}): DiffRuleSetListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), version: faker.number.int({min: 1}), rules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), level: faker.helpers.arrayElement(Object.values(DiffLevel)), enabled: faker.datatype.boolean()})), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
+/** getCreateDiffRuleSetResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateDiffRuleSetResponseMock = (overrideResponse: Partial<Extract<DiffRuleSetResponse, object>> = {}): DiffRuleSetResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), version: faker.number.int({min: 1}), rules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), level: faker.helpers.arrayElement(Object.values(DiffLevel)), enabled: faker.datatype.boolean()})), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getUpdateDiffRuleSetResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateDiffRuleSetResponseMock = (overrideResponse: Partial<Extract<DiffRuleSetResponse, object>> = {}): DiffRuleSetResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), version: faker.number.int({min: 1}), rules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), level: faker.helpers.arrayElement(Object.values(DiffLevel)), enabled: faker.datatype.boolean()})), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getSearchResponseRepositoryRefMock provides generated MSW behavior for contract tests. */
 export const getSearchResponseRepositoryRefMock = (overrideResponse: Partial<RepositoryRef> = {}): RepositoryRef => ({...{id: faker.string.uuid(), defaultBranch: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$")}, ...overrideResponse});
 
+/** getSearchResponseServiceRefMock provides generated MSW behavior for contract tests. */
 export const getSearchResponseServiceRefMock = (overrideResponse: Partial<ServiceRef> = {}): ServiceRef => ({...{id: faker.string.uuid(), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 10, max: 20}})}, ...overrideResponse});
 
+/** getSearchResponseSearchDeepLinkMock provides generated MSW behavior for contract tests. */
 export const getSearchResponseSearchDeepLinkMock = (overrideResponse: Partial<SearchDeepLink> = {}): SearchDeepLink => ({...{assetId: faker.string.uuid(), versionId: faker.string.uuid(), itemKey: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, ...overrideResponse});
 
+/** getSearchResponseMock provides generated MSW behavior for contract tests. */
 export const getSearchResponseMock = (): SearchResultResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({type: faker.helpers.arrayElement(['repository','service','asset','item'] as const), id: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), subtitle: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), score: faker.number.float({fractionDigits: 2}), repository: faker.helpers.arrayElement([{...getSearchResponseRepositoryRefMock()},null,]), service: faker.helpers.arrayElement([{...getSearchResponseServiceRefMock()},null,]), kind: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"),null,]), deepLink: faker.helpers.arrayElement([{...getSearchResponseSearchDeepLinkMock()},null,]), highlights: {
         [faker.string.alphanumeric(5)]: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}})))
       }})), facets: {repositories: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), teams: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), groups: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), kinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), lifecycles: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), tags: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), languages: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), itemTypes: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), hasAiLayer: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})})), hasBreakingChanges: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({value: faker.string.alpha({length: {min: 10, max: 20}}), count: faker.number.int({min: 0})}))}},})
 
 
+/** getCreateDiffUploadMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateDiffUploadMockHandler = (overrideResponse?: UploadResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<UploadResponse> | UploadResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/uploads', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -79,6 +93,7 @@ export const getCreateDiffUploadMockHandler = (overrideResponse?: UploadResponse
   }, options)
 }
 
+/** getRunDiffMockHandler provides generated MSW behavior for contract tests. */
 export const getRunDiffMockHandler = (overrideResponse?: DiffResultResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<DiffResultResponse> | DiffResultResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/diff', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -91,6 +106,7 @@ export const getRunDiffMockHandler = (overrideResponse?: DiffResultResponse | ((
   }, options)
 }
 
+/** getListDiffSnapshotsMockHandler provides generated MSW behavior for contract tests. */
 export const getListDiffSnapshotsMockHandler = (overrideResponse?: DiffSnapshotPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<DiffSnapshotPageResponse> | DiffSnapshotPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/diff-snapshots', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -103,6 +119,7 @@ export const getListDiffSnapshotsMockHandler = (overrideResponse?: DiffSnapshotP
   }, options)
 }
 
+/** getGetDiffSnapshotMockHandler provides generated MSW behavior for contract tests. */
 export const getGetDiffSnapshotMockHandler = (overrideResponse?: DiffSnapshotResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<DiffSnapshotResponse> | DiffSnapshotResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/diff-snapshots/:snapshotId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -115,6 +132,7 @@ export const getGetDiffSnapshotMockHandler = (overrideResponse?: DiffSnapshotRes
   }, options)
 }
 
+/** getDeleteDiffSnapshotMockHandler provides generated MSW behavior for contract tests. */
 export const getDeleteDiffSnapshotMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
   return http.delete('*/api/v1/t/:tenantSlug/diff-snapshots/:snapshotId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
@@ -125,6 +143,7 @@ export const getDeleteDiffSnapshotMockHandler = (overrideResponse?: void | ((inf
   }, options)
 }
 
+/** getExportDiffSnapshotMockHandler provides generated MSW behavior for contract tests. */
 export const getExportDiffSnapshotMockHandler = (overrideResponse?: ArtifactLinkResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ArtifactLinkResponse> | ArtifactLinkResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/diff-snapshots/:snapshotId/export', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -137,6 +156,7 @@ export const getExportDiffSnapshotMockHandler = (overrideResponse?: ArtifactLink
   }, options)
 }
 
+/** getCreateDiffSnapshotShareLinkMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateDiffSnapshotShareLinkMockHandler = (overrideResponse?: ShareLinkCreatedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ShareLinkCreatedResponse> | ShareLinkCreatedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/diff-snapshots/:snapshotId/share-links', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -149,6 +169,7 @@ export const getCreateDiffSnapshotShareLinkMockHandler = (overrideResponse?: Sha
   }, options)
 }
 
+/** getListDiffRuleSetsMockHandler provides generated MSW behavior for contract tests. */
 export const getListDiffRuleSetsMockHandler = (overrideResponse?: DiffRuleSetListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<DiffRuleSetListResponse> | DiffRuleSetListResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/diff-rule-sets', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -161,6 +182,7 @@ export const getListDiffRuleSetsMockHandler = (overrideResponse?: DiffRuleSetLis
   }, options)
 }
 
+/** getCreateDiffRuleSetMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateDiffRuleSetMockHandler = (overrideResponse?: DiffRuleSetResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<DiffRuleSetResponse> | DiffRuleSetResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/diff-rule-sets', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -173,6 +195,7 @@ export const getCreateDiffRuleSetMockHandler = (overrideResponse?: DiffRuleSetRe
   }, options)
 }
 
+/** getUpdateDiffRuleSetMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdateDiffRuleSetMockHandler = (overrideResponse?: DiffRuleSetResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<DiffRuleSetResponse> | DiffRuleSetResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/t/:tenantSlug/diff-rule-sets/:ruleSetId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -185,6 +208,7 @@ export const getUpdateDiffRuleSetMockHandler = (overrideResponse?: DiffRuleSetRe
   }, options)
 }
 
+/** getDeleteDiffRuleSetMockHandler provides generated MSW behavior for contract tests. */
 export const getDeleteDiffRuleSetMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
   return http.delete('*/api/v1/t/:tenantSlug/diff-rule-sets/:ruleSetId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
@@ -195,6 +219,7 @@ export const getDeleteDiffRuleSetMockHandler = (overrideResponse?: void | ((info
   }, options)
 }
 
+/** getSearchMockHandler provides generated MSW behavior for contract tests. */
 export const getSearchMockHandler = (overrideResponse?: SearchResultResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<SearchResultResponse> | SearchResultResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/search', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -206,6 +231,7 @@ export const getSearchMockHandler = (overrideResponse?: SearchResultResponse | (
       })
   }, options)
 }
+/** getDiffMock provides generated MSW behavior for contract tests. */
 export const getDiffMock = () => [
   getCreateDiffUploadMockHandler(),
   getRunDiffMockHandler(),

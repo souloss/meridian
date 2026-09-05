@@ -20,18 +20,34 @@ import type { Slug } from './slug.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents job data exchanged through the Meridian API.
+ */
 export interface Job {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the slug associated with this job. */
   tenantSlug: Slug;
+  /** specifies the retry of job id associated with this job. */
   retryOfJobId: Uuid | null;
+  /** contains the job type associated with this job. */
   type: JobType;
+  /** contains the job trigger associated with this job. */
   trigger: JobTrigger;
+  /** is the current lifecycle or processing state. */
   status: JobStatus;
+  /** specifies the stage associated with this job. */
   stage: PipelineStage | null;
+  /** contains the job scope type associated with this job. */
   scopeType: JobScopeType;
-  /** @nullable */
+  /**
+     * specifies the scope id associated with this job.
+     * @nullable
+     */
   scopeId: string | null;
+  /** specifies the ref type associated with this job. */
   refType: RefType | null;
+  /** specifies the ref associated with this job. */
   ref: RefName | null;
   /**
      * Operation-specific non-secret result identifiers and counters.
@@ -39,20 +55,35 @@ export interface Job {
      */
   result: JobResult;
   /**
+     * specifies the progress associated with this job.
      * @minimum 0
      * @maximum 100
      */
   progress: number;
+  /** indicates whether dirty applies to this job. */
   dirty: boolean;
-  /** @minimum 0 */
+  /**
+     * specifies the attempt associated with this job.
+     * @minimum 0
+     */
   attempt: number;
-  /** @minimum 1 */
+  /**
+     * specifies the max attempts associated with this job.
+     * @minimum 1
+     */
   maxAttempts: number;
+  /** specifies the next attempt at associated with this job. */
   nextAttemptAt: Timestamp | null;
+  /** contains the ordered attempts associated with this job. */
   attempts: JobStageAttempt[];
+  /** specifies the error associated with this job. */
   error: ErrorResponse | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when processing began. */
   startedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when processing reached a terminal state. */
   finishedAt: Timestamp | null;
+  /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
 }

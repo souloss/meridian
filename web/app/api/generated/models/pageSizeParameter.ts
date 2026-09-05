@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * limits the number of records returned on one page.
+ */
 export type PageSizeParameter = number;

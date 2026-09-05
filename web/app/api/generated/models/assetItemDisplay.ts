@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the display associated with this asset item.
+ */
 export type AssetItemDisplay = { [key: string]: unknown };

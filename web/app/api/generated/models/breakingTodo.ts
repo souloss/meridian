@@ -10,14 +10,27 @@ import type { Timestamp } from './timestamp.ts';
 import type { TodoStatus } from './todoStatus.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents breaking todo data exchanged through the Meridian API.
+ */
 export interface BreakingTodo {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the uuid associated with this breaking todo. */
   assetVersionId: Uuid;
+  /** contains the uuid associated with this breaking todo. */
   assigneeId: Uuid;
+  /** is the current lifecycle or processing state. */
   status: TodoStatus;
+  /** contains the diff counts associated with this breaking todo. */
   summary: DiffCounts;
-  /** @nullable */
+  /**
+     * specifies the comment associated with this breaking todo.
+     * @nullable
+     */
   comment: string | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** specifies the acknowledged at associated with this breaking todo. */
   acknowledgedAt: Timestamp | null;
 }

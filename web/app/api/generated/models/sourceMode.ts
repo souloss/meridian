@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported source mode value.
+ */
 export type SourceMode = typeof SourceMode[keyof typeof SourceMode];
 
 
+/** SourceMode is generated from the Meridian OpenAPI contract for source mode. */
 export const SourceMode = {
   builtin: 'builtin',
   command: 'command',

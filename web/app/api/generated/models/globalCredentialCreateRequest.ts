@@ -8,20 +8,29 @@
 import type { HttpSecretInput } from './httpSecretInput.ts';
 import type { SshSecretInput } from './sshSecretInput.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export type GlobalCredentialCreateRequest = {
   /**
+     * specifies the name associated with this global credential create request.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** specifies the kind associated with this global credential create request. */
   kind: 'ssh_key';
+  /** contains the ssh secret input associated with this global credential create request. */
   sshKey: SshSecretInput;
 } | {
   /**
+     * specifies the name associated with this global credential create request.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** specifies the kind associated with this global credential create request. */
   kind: 'http_token';
+  /** contains the http secret input associated with this global credential create request. */
   httpToken: HttpSecretInput;
 };

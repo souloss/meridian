@@ -10,16 +10,32 @@ import type { Slug } from './slug.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents audit entry data exchanged through the Meridian API.
+ */
 export interface AuditEntry {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** specifies the tenant slug associated with this audit entry. */
   tenantSlug: Slug | null;
+  /** specifies the actor id associated with this audit entry. */
   actorId: Uuid | null;
+  /** specifies the action associated with this audit entry. */
   action: string;
+  /** specifies the resource type associated with this audit entry. */
   resourceType: string;
-  /** @nullable */
+  /**
+     * specifies the resource id associated with this audit entry.
+     * @nullable
+     */
   resourceId: string | null;
-  /** @nullable */
+  /**
+     * correlates this result with server logs and audit records.
+     * @nullable
+     */
   requestId: string | null;
+  /** specifies the metadata associated with this audit entry. */
   metadata: AuditEntryMetadata;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
 }

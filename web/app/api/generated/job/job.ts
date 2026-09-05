@@ -49,25 +49,37 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
+/** listJobsResponse200 represents a declared HTTP response from the list jobs response200 operation. */
 export type listJobsResponse200 = {
+  /** Data contains the decoded response payload. */
   data: JobPageResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** listJobsResponse404 represents a declared HTTP response from the list jobs response404 operation. */
 export type listJobsResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** listJobsResponseSuccess represents a declared HTTP response from the list jobs response success operation. */
 export type listJobsResponseSuccess = (listJobsResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** listJobsResponseError represents a declared HTTP response from the list jobs response error operation. */
 export type listJobsResponseError = (listJobsResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** listJobsResponse represents a declared HTTP response from the list jobs response operation. */
 export type listJobsResponse = (listJobsResponseSuccess | listJobsResponseError)
 
+/** getListJobsUrl builds the relative URL for its OpenAPI operation. */
 export const getListJobsUrl = (tenantSlug: string,
     params?: ListJobsParams,) => {
   const stringifiedParams = serializeQueryParams(params);
@@ -75,6 +87,9 @@ export const getListJobsUrl = (tenantSlug: string,
   return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/jobs?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/jobs`
 }
 
+/**
+ * Returns the requested page of jobs within the authorized request scope.
+ */
 export const listJobs = async (tenantSlug: string,
     params?: ListJobsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listJobsResponse> => {
 
@@ -91,6 +106,7 @@ export const listJobs = async (tenantSlug: string,
 
 
 
+/** getListJobsQueryKey is generated from the Meridian OpenAPI contract for get list jobs query key. */
 export const getListJobsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListJobsParams>,) => {
     return [
@@ -99,6 +115,7 @@ export const getListJobsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     }
 
 
+/** getListJobsQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getListJobsQueryOptions = <TData = Awaited<ReturnType<typeof listJobs>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListJobsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listJobs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -118,11 +135,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listJobs>>, TError, TData>
 }
 
+/** ListJobsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListJobsQueryResult = NonNullable<Awaited<ReturnType<typeof listJobs>>>
+/** ListJobsQueryError is the error type returned by its generated Vue Query hook. */
 export type ListJobsQueryError = NotFoundResponse
 
 
 
+/** useListJobs executes its OpenAPI operation through TanStack Vue Query. */
 export function useListJobs<TData = Awaited<ReturnType<typeof listJobs>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListJobsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listJobs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -143,25 +163,37 @@ export function useListJobs<TData = Awaited<ReturnType<typeof listJobs>>, TError
 
 
 
+/** getJobResponse200 represents a declared HTTP response from the get job response200 operation. */
 export type getJobResponse200 = {
+  /** Data contains the decoded response payload. */
   data: JobResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** getJobResponse404 represents a declared HTTP response from the get job response404 operation. */
 export type getJobResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** getJobResponseSuccess represents a declared HTTP response from the get job response success operation. */
 export type getJobResponseSuccess = (getJobResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** getJobResponseError represents a declared HTTP response from the get job response error operation. */
 export type getJobResponseError = (getJobResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** getJobResponse represents a declared HTTP response from the get job response operation. */
 export type getJobResponse = (getJobResponseSuccess | getJobResponseError)
 
+/** getGetJobUrl builds the relative URL for its OpenAPI operation. */
 export const getGetJobUrl = (tenantSlug: string,
     jobId: string,) => {
 
@@ -169,6 +201,9 @@ export const getGetJobUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/jobs/${jobId}`
 }
 
+/**
+ * Returns the selected job within the authorized request scope.
+ */
 export const getJob = async (tenantSlug: string,
     jobId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getJobResponse> => {
 
@@ -185,6 +220,7 @@ export const getJob = async (tenantSlug: string,
 
 
 
+/** getGetJobQueryKey is generated from the Meridian OpenAPI contract for get get job query key. */
 export const getGetJobQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     jobId: MaybeRefOrGetter<string>,) => {
     return [
@@ -193,6 +229,7 @@ export const getGetJobQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     }
 
 
+/** getGetJobQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getGetJobQueryOptions = <TData = Awaited<ReturnType<typeof getJob>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     jobId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJob>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -212,11 +249,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(jobId) !== null && toValue(jobId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getJob>>, TError, TData>
 }
 
+/** GetJobQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetJobQueryResult = NonNullable<Awaited<ReturnType<typeof getJob>>>
+/** GetJobQueryError is the error type returned by its generated Vue Query hook. */
 export type GetJobQueryError = NotFoundResponse
 
 
 
+/** useGetJob executes its OpenAPI operation through TanStack Vue Query. */
 export function useGetJob<TData = Awaited<ReturnType<typeof getJob>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     jobId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJob>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -237,25 +277,37 @@ export function useGetJob<TData = Awaited<ReturnType<typeof getJob>>, TError = N
 
 
 
+/** streamJobLogsResponse200 represents a declared HTTP response from the stream job logs response200 operation. */
 export type streamJobLogsResponse200 = {
+  /** Data contains the decoded response payload. */
   data: JobSseEvent
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** streamJobLogsResponse404 represents a declared HTTP response from the stream job logs response404 operation. */
 export type streamJobLogsResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** streamJobLogsResponseSuccess represents a declared HTTP response from the stream job logs response success operation. */
 export type streamJobLogsResponseSuccess = (streamJobLogsResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** streamJobLogsResponseError represents a declared HTTP response from the stream job logs response error operation. */
 export type streamJobLogsResponseError = (streamJobLogsResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** streamJobLogsResponse represents a declared HTTP response from the stream job logs response operation. */
 export type streamJobLogsResponse = (streamJobLogsResponseSuccess | streamJobLogsResponseError)
 
+/** getStreamJobLogsUrl builds the relative URL for its OpenAPI operation. */
 export const getStreamJobLogsUrl = (tenantSlug: string,
     jobId: string,) => {
 
@@ -263,6 +315,9 @@ export const getStreamJobLogsUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/jobs/${jobId}/logs`
 }
 
+/**
+ * Streams ordered events for job logs within the authorized request scope.
+ */
 export const streamJobLogs = async (tenantSlug: string,
     jobId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<streamJobLogsResponse> => {
 
@@ -279,6 +334,7 @@ export const streamJobLogs = async (tenantSlug: string,
 
 
 
+/** getStreamJobLogsQueryKey is generated from the Meridian OpenAPI contract for get stream job logs query key. */
 export const getStreamJobLogsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     jobId: MaybeRefOrGetter<string>,) => {
     return [
@@ -287,6 +343,7 @@ export const getStreamJobLogsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     }
 
 
+/** getStreamJobLogsQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getStreamJobLogsQueryOptions = <TData = Awaited<ReturnType<typeof streamJobLogs>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     jobId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamJobLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -306,11 +363,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(jobId) !== null && toValue(jobId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof streamJobLogs>>, TError, TData>
 }
 
+/** StreamJobLogsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type StreamJobLogsQueryResult = NonNullable<Awaited<ReturnType<typeof streamJobLogs>>>
+/** StreamJobLogsQueryError is the error type returned by its generated Vue Query hook. */
 export type StreamJobLogsQueryError = NotFoundResponse
 
 
 
+/** useStreamJobLogs executes its OpenAPI operation through TanStack Vue Query. */
 export function useStreamJobLogs<TData = Awaited<ReturnType<typeof streamJobLogs>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     jobId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamJobLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -331,30 +391,45 @@ export function useStreamJobLogs<TData = Awaited<ReturnType<typeof streamJobLogs
 
 
 
+/** cancelJobResponse202 represents a declared HTTP response from the cancel job response202 operation. */
 export type cancelJobResponse202 = {
+  /** Data contains the decoded response payload. */
   data: JobAcceptedResponse
+  /** Status is the HTTP response status code. */
   status: 202
 }
 
+/** cancelJobResponse404 represents a declared HTTP response from the cancel job response404 operation. */
 export type cancelJobResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** cancelJobResponse409 represents a declared HTTP response from the cancel job response409 operation. */
 export type cancelJobResponse409 = {
+  /** Data contains the decoded response payload. */
   data: JobNotCancellableResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** cancelJobResponseSuccess represents a declared HTTP response from the cancel job response success operation. */
 export type cancelJobResponseSuccess = (cancelJobResponse202) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** cancelJobResponseError represents a declared HTTP response from the cancel job response error operation. */
 export type cancelJobResponseError = (cancelJobResponse404 | cancelJobResponse409) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** cancelJobResponse represents a declared HTTP response from the cancel job response operation. */
 export type cancelJobResponse = (cancelJobResponseSuccess | cancelJobResponseError)
 
+/** getCancelJobUrl builds the relative URL for its OpenAPI operation. */
 export const getCancelJobUrl = (tenantSlug: string,
     jobId: string,) => {
 
@@ -362,6 +437,9 @@ export const getCancelJobUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/jobs/${jobId}:cancel`
 }
 
+/**
+ * Performs the cancel job workflow within the authorized request scope.
+ */
 export const cancelJob = async (tenantSlug: string,
     jobId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<cancelJobResponse> => {
 
@@ -378,8 +456,10 @@ export const cancelJob = async (tenantSlug: string,
 
 
 
+/** getCancelJobMutationKey is generated from the Meridian OpenAPI contract for get cancel job mutation key. */
 export const getCancelJobMutationKey = () => ['cancelJob'] as const;
 
+/** getCancelJobMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getCancelJobMutationOptions = <TError = NotFoundResponse | JobNotCancellableResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelJob>>, TError,CancelJobMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof cancelJob>>, TError,CancelJobMutationVariables, TContext> => {
@@ -407,11 +487,15 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** CancelJobMutationResult is generated from the Meridian OpenAPI contract for cancel job mutation result. */
     export type CancelJobMutationResult = NonNullable<Awaited<ReturnType<typeof cancelJob>>>
 
+    /** CancelJobMutationError is generated from the Meridian OpenAPI contract for cancel job mutation error. */
     export type CancelJobMutationError = NotFoundResponse | JobNotCancellableResponse
-    export type CancelJobMutationVariables = {tenantSlug: string;jobId: string}
+    /** CancelJobMutationVariables is generated from the Meridian OpenAPI contract for cancel job mutation variables. */
+    export type CancelJobMutationVariables = {/** TenantSlug carries the tenant slug value for CancelJobMutationVariables. */ tenantSlug: string;/** JobId carries the job id value for CancelJobMutationVariables. */ jobId: string}
 
+    /** useCancelJob executes its OpenAPI operation through TanStack Vue Query. */
     export const useCancelJob = <TError = NotFoundResponse | JobNotCancellableResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelJob>>, TError,CancelJobMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -422,30 +506,45 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCancelJobMutationOptions(options), queryClient);
     }
+    /** retryJobResponse202 represents a declared HTTP response from the retry job response202 operation. */
     export type retryJobResponse202 = {
+  /** Data contains the decoded response payload. */
   data: JobAcceptedResponse
+  /** Status is the HTTP response status code. */
   status: 202
 }
 
+/** retryJobResponse404 represents a declared HTTP response from the retry job response404 operation. */
 export type retryJobResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** retryJobResponse409 represents a declared HTTP response from the retry job response409 operation. */
 export type retryJobResponse409 = {
+  /** Data contains the decoded response payload. */
   data: ConflictResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** retryJobResponseSuccess represents a declared HTTP response from the retry job response success operation. */
 export type retryJobResponseSuccess = (retryJobResponse202) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** retryJobResponseError represents a declared HTTP response from the retry job response error operation. */
 export type retryJobResponseError = (retryJobResponse404 | retryJobResponse409) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** retryJobResponse represents a declared HTTP response from the retry job response operation. */
 export type retryJobResponse = (retryJobResponseSuccess | retryJobResponseError)
 
+/** getRetryJobUrl builds the relative URL for its OpenAPI operation. */
 export const getRetryJobUrl = (tenantSlug: string,
     jobId: string,) => {
 
@@ -453,6 +552,9 @@ export const getRetryJobUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/jobs/${jobId}:retry`
 }
 
+/**
+ * Performs the retry job workflow within the authorized request scope.
+ */
 export const retryJob = async (tenantSlug: string,
     jobId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<retryJobResponse> => {
 
@@ -469,8 +571,10 @@ export const retryJob = async (tenantSlug: string,
 
 
 
+/** getRetryJobMutationKey is generated from the Meridian OpenAPI contract for get retry job mutation key. */
 export const getRetryJobMutationKey = () => ['retryJob'] as const;
 
+/** getRetryJobMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getRetryJobMutationOptions = <TError = NotFoundResponse | ConflictResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryJob>>, TError,RetryJobMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof retryJob>>, TError,RetryJobMutationVariables, TContext> => {
@@ -498,11 +602,15 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** RetryJobMutationResult is generated from the Meridian OpenAPI contract for retry job mutation result. */
     export type RetryJobMutationResult = NonNullable<Awaited<ReturnType<typeof retryJob>>>
 
+    /** RetryJobMutationError is generated from the Meridian OpenAPI contract for retry job mutation error. */
     export type RetryJobMutationError = NotFoundResponse | ConflictResponse
-    export type RetryJobMutationVariables = {tenantSlug: string;jobId: string}
+    /** RetryJobMutationVariables is generated from the Meridian OpenAPI contract for retry job mutation variables. */
+    export type RetryJobMutationVariables = {/** TenantSlug carries the tenant slug value for RetryJobMutationVariables. */ tenantSlug: string;/** JobId carries the job id value for RetryJobMutationVariables. */ jobId: string}
 
+    /** useRetryJob executes its OpenAPI operation through TanStack Vue Query. */
     export const useRetryJob = <TError = NotFoundResponse | ConflictResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryJob>>, TError,RetryJobMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<

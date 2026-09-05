@@ -7,6 +7,10 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface SystemGroupMembersReplaceRequest {
+  /** contains the ordered service ids associated with this system group members replace request. */
   serviceIds: Uuid[];
 }

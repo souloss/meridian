@@ -9,6 +9,7 @@
 export type ViewInputSpecScopesItem = typeof ViewInputSpecScopesItem[keyof typeof ViewInputSpecScopesItem];
 
 
+/** ViewInputSpecScopesItem is generated from the Meridian OpenAPI contract for view input spec scopes item. */
 export const ViewInputSpecScopesItem = {
   service: 'service',
   system_group: 'system_group',

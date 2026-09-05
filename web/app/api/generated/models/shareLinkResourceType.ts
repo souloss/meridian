@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the resource type associated with this share link.
+ */
 export type ShareLinkResourceType = typeof ShareLinkResourceType[keyof typeof ShareLinkResourceType];
 
 
+/** ShareLinkResourceType is generated from the Meridian OpenAPI contract for share link resource type. */
 export const ShareLinkResourceType = {
   view: 'view',
   diff_snapshot: 'diff_snapshot',

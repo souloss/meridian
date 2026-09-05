@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "generate:api": "orval --config orval.config.ts",
+    "generate:api": "orval --config orval.config.ts && node scripts/document-generated-api.mjs",
+    "check:generated-docs": "node scripts/document-generated-api.mjs --check",
     "typecheck": "nuxt typecheck"
   },
   "engines": {

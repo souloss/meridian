@@ -7,6 +7,10 @@
  */
 import type { ExportFormatParameter } from './exportFormatParameter.ts';
 
+/** ExportDiffSnapshotParams contains parameters accepted by its generated OpenAPI operation. */
 export type ExportDiffSnapshotParams = {
+/**
+ * identifies or filters the format value in the query.
+ */
 format: ExportFormatParameter;
 };

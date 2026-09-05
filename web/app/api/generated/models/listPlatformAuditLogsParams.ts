@@ -10,15 +10,21 @@ import type { PageSizeParameter } from './pageSizeParameter.ts';
 import type { PlatformAuditFilter } from './platformAuditFilter.ts';
 import type { PlatformAuditFiltersParameter } from './platformAuditFiltersParameter.ts';
 
+/** ListPlatformAuditLogsParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListPlatformAuditLogsParams = {
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */
 pageSize?: PageSizeParameter;
+/**
+ * defines supported filters for selecting platform audit records.
+ */
 filter?: PlatformAuditFiltersParameter;
 };

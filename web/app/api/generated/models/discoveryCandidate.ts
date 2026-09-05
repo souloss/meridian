@@ -11,17 +11,28 @@ import type { Slug } from './slug.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents discovery candidate data exchanged through the Meridian API.
+ */
 export interface DiscoveryCandidate {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** specifies the path associated with this discovery candidate. */
   path: string;
+  /** contains the slug associated with this discovery candidate. */
   suggestedSlug: Slug;
+  /** specifies the display name associated with this discovery candidate. */
   displayName: string;
   /**
+     * specifies the confidence associated with this discovery candidate.
      * @minimum 0
      * @maximum 1
      */
   confidence: number;
+  /** contains the ordered detected kinds associated with this discovery candidate. */
   detectedKinds: KindId[];
+  /** is the current lifecycle or processing state. */
   status: DiscoveryCandidateStatus;
+  /** contains the timestamp associated with this discovery candidate. */
   discoveredAt: Timestamp;
 }

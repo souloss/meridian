@@ -21,25 +21,30 @@ import (
 // RequestEditorFn is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
+// HttpRequestDoer sends generated client requests and returns HTTP responses.
 // Doer performs HTTP requests.
 //
 // The standard http.Client implements this interface.
 type HttpRequestDoer interface {
+	// Do sends one HTTP request and returns its response.
 	Do(req *http.Request) (*http.Response, error)
 }
 
 // Client which conforms to the OpenAPI3 specification for this service.
 type Client struct {
+	// Server is the base URL used for generated client requests.
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
 	// paths in the swagger spec will be appended to the server.
 	Server string
 
+	// Client performs generated HTTP requests.
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
 	Client HttpRequestDoer
 
+	// RequestEditors mutate each generated request before it is sent.
 	// A list of callbacks for modifying requests which are generated before sending over
 	// the network.
 	RequestEditors []RequestEditorFn
@@ -48,6 +53,7 @@ type Client struct {
 // ClientOption allows setting custom parameters during construction
 type ClientOption func(*Client) error
 
+// NewClient implements generated transport behavior for the Meridian OpenAPI contract.
 // Creates a new Client, with reasonable defaults
 func NewClient(server string, opts ...ClientOption) (*Client, error) {
 	// create a client with sane default values
@@ -89,893 +95,1386 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 	}
 }
 
+// ClientInterface exposes every client operation generated from the OpenAPI contract.
 // The interface specification for the client above.
 type ClientInterface interface {
 
 	// ListPlatformAuditLogs performs a GET /api/v1/admin/audit-logs (the `ListPlatformAuditLogs` operationId) request.
+	//
+	// Returns the requested page of platform audit logs within the authorized request scope.
 	ListPlatformAuditLogs(ctx context.Context, params *ListPlatformAuditLogsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListGlobalCredentials performs a GET /api/v1/admin/global-credentials (the `ListGlobalCredentials` operationId) request.
+	//
+	// Returns the requested page of global credentials within the authorized request scope.
 	ListGlobalCredentials(ctx context.Context, params *ListGlobalCredentialsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateGlobalCredentialWithBody performs a POST /api/v1/admin/global-credentials (the `CreateGlobalCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates global credential within the authorized request scope.
 	CreateGlobalCredentialWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateGlobalCredential performs a POST /api/v1/admin/global-credentials (the `CreateGlobalCredential` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates global credential within the authorized request scope.
 	CreateGlobalCredential(ctx context.Context, body CreateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteGlobalCredential performs a DELETE /api/v1/admin/global-credentials/{credentialId} (the `DeleteGlobalCredential` operationId) request.
+	//
+	// Deletes the selected global credential within the authorized request scope.
 	DeleteGlobalCredential(ctx context.Context, credentialId CredentialId, params *DeleteGlobalCredentialParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateGlobalCredentialWithBody performs a PATCH /api/v1/admin/global-credentials/{credentialId} (the `UpdateGlobalCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected global credential within the authorized request scope.
 	UpdateGlobalCredentialWithBody(ctx context.Context, credentialId CredentialId, params *UpdateGlobalCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateGlobalCredential performs a PATCH /api/v1/admin/global-credentials/{credentialId} (the `UpdateGlobalCredential` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected global credential within the authorized request scope.
 	UpdateGlobalCredential(ctx context.Context, credentialId CredentialId, params *UpdateGlobalCredentialParams, body UpdateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RotateGlobalCredentialWithBody performs a POST /api/v1/admin/global-credentials/{credentialId}:rotate (the `RotateGlobalCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the rotate global credential workflow within the authorized request scope.
 	RotateGlobalCredentialWithBody(ctx context.Context, credentialId CredentialId, params *RotateGlobalCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RotateGlobalCredential performs a POST /api/v1/admin/global-credentials/{credentialId}:rotate (the `RotateGlobalCredential` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the rotate global credential workflow within the authorized request scope.
 	RotateGlobalCredential(ctx context.Context, credentialId CredentialId, params *RotateGlobalCredentialParams, body RotateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// TestGlobalCredentialWithBody performs a POST /api/v1/admin/global-credentials/{credentialId}:test (the `TestGlobalCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Tests global credential within the authorized request scope.
 	TestGlobalCredentialWithBody(ctx context.Context, credentialId CredentialId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// TestGlobalCredential performs a POST /api/v1/admin/global-credentials/{credentialId}:test (the `TestGlobalCredential` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Tests global credential within the authorized request scope.
 	TestGlobalCredential(ctx context.Context, credentialId CredentialId, body TestGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListPlatformJobs performs a GET /api/v1/admin/jobs (the `ListPlatformJobs` operationId) request.
+	//
+	// Returns the requested page of platform jobs within the authorized request scope.
 	ListPlatformJobs(ctx context.Context, params *ListPlatformJobsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetPlatformJob performs a GET /api/v1/admin/jobs/{jobId} (the `GetPlatformJob` operationId) request.
+	//
+	// Returns the selected platform job within the authorized request scope.
 	GetPlatformJob(ctx context.Context, jobId JobId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListProducerProfiles performs a GET /api/v1/admin/producer-profiles (the `ListProducerProfiles` operationId) request.
+	//
+	// Returns the requested page of producer profiles within the authorized request scope.
 	ListProducerProfiles(ctx context.Context, params *ListProducerProfilesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateProducerProfileWithBody performs a POST /api/v1/admin/producer-profiles (the `CreateProducerProfile` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates producer profile within the authorized request scope.
 	CreateProducerProfileWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateProducerProfile performs a POST /api/v1/admin/producer-profiles (the `CreateProducerProfile` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates producer profile within the authorized request scope.
 	CreateProducerProfile(ctx context.Context, body CreateProducerProfileJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteProducerProfile performs a DELETE /api/v1/admin/producer-profiles/{producerProfileId} (the `DeleteProducerProfile` operationId) request.
+	//
+	// Deletes the selected producer profile within the authorized request scope.
 	DeleteProducerProfile(ctx context.Context, producerProfileId ProducerProfileId, params *DeleteProducerProfileParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetProducerProfile performs a GET /api/v1/admin/producer-profiles/{producerProfileId} (the `GetProducerProfile` operationId) request.
+	//
+	// Returns the selected producer profile within the authorized request scope.
 	GetProducerProfile(ctx context.Context, producerProfileId ProducerProfileId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateProducerProfileWithBody performs a PATCH /api/v1/admin/producer-profiles/{producerProfileId} (the `UpdateProducerProfile` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected producer profile within the authorized request scope.
 	UpdateProducerProfileWithBody(ctx context.Context, producerProfileId ProducerProfileId, params *UpdateProducerProfileParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateProducerProfile performs a PATCH /api/v1/admin/producer-profiles/{producerProfileId} (the `UpdateProducerProfile` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected producer profile within the authorized request scope.
 	UpdateProducerProfile(ctx context.Context, producerProfileId ProducerProfileId, params *UpdateProducerProfileParams, body UpdateProducerProfileJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetPlatformSettings performs a GET /api/v1/admin/settings (the `GetPlatformSettings` operationId) request.
+	//
+	// Returns the selected platform settings within the authorized request scope.
 	GetPlatformSettings(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdatePlatformSettingsWithBody performs a PATCH /api/v1/admin/settings (the `UpdatePlatformSettings` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected platform settings within the authorized request scope.
 	UpdatePlatformSettingsWithBody(ctx context.Context, params *UpdatePlatformSettingsParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdatePlatformSettings performs a PATCH /api/v1/admin/settings (the `UpdatePlatformSettings` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected platform settings within the authorized request scope.
 	UpdatePlatformSettings(ctx context.Context, params *UpdatePlatformSettingsParams, body UpdatePlatformSettingsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListTenants performs a GET /api/v1/admin/tenants (the `ListTenants` operationId) request.
+	//
+	// Returns the requested page of tenants within the authorized request scope.
 	ListTenants(ctx context.Context, params *ListTenantsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTenantWithBody performs a POST /api/v1/admin/tenants (the `CreateTenant` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates tenant within the authorized request scope.
 	CreateTenantWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTenant performs a POST /api/v1/admin/tenants (the `CreateTenant` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates tenant within the authorized request scope.
 	CreateTenant(ctx context.Context, body CreateTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteTenantWithBody performs a DELETE /api/v1/admin/tenants/{tenantSlug} (the `DeleteTenant` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Deletes the selected tenant within the authorized request scope.
 	DeleteTenantWithBody(ctx context.Context, tenantSlug TenantSlug, params *DeleteTenantParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteTenant performs a DELETE /api/v1/admin/tenants/{tenantSlug} (the `DeleteTenant` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Deletes the selected tenant within the authorized request scope.
 	DeleteTenant(ctx context.Context, tenantSlug TenantSlug, params *DeleteTenantParams, body DeleteTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateTenantWithBody performs a PATCH /api/v1/admin/tenants/{tenantSlug} (the `UpdateTenant` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected tenant within the authorized request scope.
 	UpdateTenantWithBody(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateTenant performs a PATCH /api/v1/admin/tenants/{tenantSlug} (the `UpdateTenant` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected tenant within the authorized request scope.
 	UpdateTenant(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantParams, body UpdateTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutTenantMemberAsPlatformAdminWithBody performs a PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId} (the `PutTenantMemberAsPlatformAdmin` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates or replaces the selected tenant member as platform admin within the authorized request scope.
 	PutTenantMemberAsPlatformAdminWithBody(ctx context.Context, tenantSlug TenantSlug, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutTenantMemberAsPlatformAdmin performs a PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId} (the `PutTenantMemberAsPlatformAdmin` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates or replaces the selected tenant member as platform admin within the authorized request scope.
 	PutTenantMemberAsPlatformAdmin(ctx context.Context, tenantSlug TenantSlug, userId UserId, body PutTenantMemberAsPlatformAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListUsers performs a GET /api/v1/admin/users (the `ListUsers` operationId) request.
+	//
+	// Returns the requested page of users within the authorized request scope.
 	ListUsers(ctx context.Context, params *ListUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateUserWithBody performs a POST /api/v1/admin/users (the `CreateUser` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates user within the authorized request scope.
 	CreateUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateUser performs a POST /api/v1/admin/users (the `CreateUser` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates user within the authorized request scope.
 	CreateUser(ctx context.Context, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateUserWithBody performs a PATCH /api/v1/admin/users/{userId} (the `UpdateUser` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected user within the authorized request scope.
 	UpdateUserWithBody(ctx context.Context, userId UserId, params *UpdateUserParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateUser performs a PATCH /api/v1/admin/users/{userId} (the `UpdateUser` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected user within the authorized request scope.
 	UpdateUser(ctx context.Context, userId UserId, params *UpdateUserParams, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetCsrfToken performs a GET /api/v1/auth/csrf (the `GetCsrfToken` operationId) request.
+	//
+	// Returns a CSRF token bound to the current authenticated browser session.
 	GetCsrfToken(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LoginWithBody performs a POST /api/v1/auth/login (the `Login` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Authenticates local credentials and creates a browser session.
 	LoginWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Login performs a POST /api/v1/auth/login (the `Login` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Authenticates local credentials and creates a browser session.
 	Login(ctx context.Context, body LoginJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Logout performs a POST /api/v1/auth/logout (the `Logout` operationId) request.
+	//
+	// Revokes the current browser session and clears its session cookie.
 	Logout(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetMe performs a GET /api/v1/auth/me (the `GetMe` operationId) request.
+	//
+	// Returns the authenticated principal and tenant memberships.
 	GetMe(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetMyPreferences performs a GET /api/v1/auth/me/preferences (the `GetMyPreferences` operationId) request.
+	//
+	// Returns the selected my preferences within the authorized request scope.
 	GetMyPreferences(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateMyPreferencesWithBody performs a PATCH /api/v1/auth/me/preferences (the `UpdateMyPreferences` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected my preferences within the authorized request scope.
 	UpdateMyPreferencesWithBody(ctx context.Context, params *UpdateMyPreferencesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateMyPreferences performs a PATCH /api/v1/auth/me/preferences (the `UpdateMyPreferences` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected my preferences within the authorized request scope.
 	UpdateMyPreferences(ctx context.Context, params *UpdateMyPreferencesParams, body UpdateMyPreferencesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DownloadSignedContent performs a GET /api/v1/content/{token} (the `DownloadSignedContent` operationId) request.
+	//
+	// Downloads signed content within the authorized request scope.
 	DownloadSignedContent(ctx context.Context, token ContentToken, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetOpenApiContract performs a GET /api/v1/openapi.yaml (the `GetOpenApiContract` operationId) request.
+	//
+	// Returns the exact OpenAPI contract embedded in this server build.
 	GetOpenApiContract(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetPublicService performs a GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug} (the `GetPublicService` operationId) request.
+	//
+	// Returns the selected public service within the authorized request scope.
 	GetPublicService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetPublicAsset performs a GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug}/assets/{kindId}/{assetName} (the `GetPublicAsset` operationId) request.
+	//
+	// Returns the selected public asset within the authorized request scope.
 	GetPublicAsset(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, kindId KindId, assetName AssetName, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ResolvePublicViewWithBody performs a POST /api/v1/public/t/{tenantSlug}/views:resolve (the `ResolvePublicView` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Resolves public view within the authorized request scope.
 	ResolvePublicViewWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ResolvePublicView performs a POST /api/v1/public/t/{tenantSlug}/views:resolve (the `ResolvePublicView` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Resolves public view within the authorized request scope.
 	ResolvePublicView(ctx context.Context, tenantSlug TenantSlug, body ResolvePublicViewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSharedView performs a GET /api/v1/shared/{shareToken} (the `GetSharedView` operationId) request.
+	//
+	// Returns the selected shared view within the authorized request scope.
 	GetSharedView(ctx context.Context, shareToken ShareToken, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListAssetKinds performs a GET /api/v1/t/{tenantSlug}/asset-kinds (the `ListAssetKinds` operationId) request.
+	//
+	// Returns the requested page of asset kinds within the authorized request scope.
 	ListAssetKinds(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateAssetKindStateWithBody performs a PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId} (the `UpdateAssetKindState` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected asset kind state within the authorized request scope.
 	UpdateAssetKindStateWithBody(ctx context.Context, tenantSlug TenantSlug, kindId KindId, params *UpdateAssetKindStateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateAssetKindState performs a PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId} (the `UpdateAssetKindState` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected asset kind state within the authorized request scope.
 	UpdateAssetKindState(ctx context.Context, tenantSlug TenantSlug, kindId KindId, params *UpdateAssetKindStateParams, body UpdateAssetKindStateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetAssetVersion performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId} (the `GetAssetVersion` operationId) request.
+	//
+	// Returns the selected asset version within the authorized request scope.
 	GetAssetVersion(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListAssetVersionItems performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/items (the `ListAssetVersionItems` operationId) request.
+	//
+	// Returns the requested page of asset version items within the authorized request scope.
 	ListAssetVersionItems(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *ListAssetVersionItemsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetAssetVersionProvenance performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/provenance (the `GetAssetVersionProvenance` operationId) request.
+	//
+	// Returns the selected asset version provenance within the authorized request scope.
 	GetAssetVersionProvenance(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeprecateAssetVersion performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:deprecate (the `DeprecateAssetVersion` operationId) request.
+	//
+	// Performs the deprecate asset version workflow within the authorized request scope.
 	DeprecateAssetVersion(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *DeprecateAssetVersionParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PublishAssetVersionWithBody performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish (the `PublishAssetVersion` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the publish asset version workflow within the authorized request scope.
 	PublishAssetVersionWithBody(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *PublishAssetVersionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PublishAssetVersion performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish (the `PublishAssetVersion` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the publish asset version workflow within the authorized request scope.
 	PublishAssetVersion(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *PublishAssetVersionParams, body PublishAssetVersionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RetireAssetVersion performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:retire (the `RetireAssetVersion` operationId) request.
+	//
+	// Performs the retire asset version workflow within the authorized request scope.
 	RetireAssetVersion(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *RetireAssetVersionParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetAsset performs a GET /api/v1/t/{tenantSlug}/assets/{assetId} (the `GetAsset` operationId) request.
+	//
+	// Returns the selected asset within the authorized request scope.
 	GetAsset(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GetAssetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReorderAssetLayersWithBody performs a PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order (the `ReorderAssetLayers` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the reorder asset layers workflow within the authorized request scope.
 	ReorderAssetLayersWithBody(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ReorderAssetLayersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReorderAssetLayers performs a PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order (the `ReorderAssetLayers` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the reorder asset layers workflow within the authorized request scope.
 	ReorderAssetLayers(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ReorderAssetLayersParams, body ReorderAssetLayersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListAssetVersions performs a GET /api/v1/t/{tenantSlug}/assets/{assetId}/versions (the `ListAssetVersions` operationId) request.
+	//
+	// Returns the requested page of asset versions within the authorized request scope.
 	ListAssetVersions(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ListAssetVersionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GenerateAssetWithAiWithBody performs a POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate (the `GenerateAssetWithAi` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the generate asset with ai workflow within the authorized request scope.
 	GenerateAssetWithAiWithBody(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GenerateAssetWithAiParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GenerateAssetWithAi performs a POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate (the `GenerateAssetWithAi` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the generate asset with ai workflow within the authorized request scope.
 	GenerateAssetWithAi(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GenerateAssetWithAiParams, body GenerateAssetWithAiJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PreviewMergeWithBody performs a POST /api/v1/t/{tenantSlug}/assets:preview-merge (the `PreviewMerge` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the preview merge workflow within the authorized request scope.
 	PreviewMergeWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PreviewMerge performs a POST /api/v1/t/{tenantSlug}/assets:preview-merge (the `PreviewMerge` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the preview merge workflow within the authorized request scope.
 	PreviewMerge(ctx context.Context, tenantSlug TenantSlug, body PreviewMergeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PushAssetRevisionWithBody performs a POST /api/v1/t/{tenantSlug}/assets:push (the `PushAssetRevision` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the push asset revision workflow within the authorized request scope.
 	PushAssetRevisionWithBody(ctx context.Context, tenantSlug TenantSlug, params *PushAssetRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PushAssetRevision performs a POST /api/v1/t/{tenantSlug}/assets:push (the `PushAssetRevision` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the push asset revision workflow within the authorized request scope.
 	PushAssetRevision(ctx context.Context, tenantSlug TenantSlug, params *PushAssetRevisionParams, body PushAssetRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListAuditLogs performs a GET /api/v1/t/{tenantSlug}/audit-logs (the `ListAuditLogs` operationId) request.
+	//
+	// Returns the requested page of audit logs within the authorized request scope.
 	ListAuditLogs(ctx context.Context, tenantSlug TenantSlug, params *ListAuditLogsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListBreakingTodos performs a GET /api/v1/t/{tenantSlug}/breaking-todos (the `ListBreakingTodos` operationId) request.
+	//
+	// Returns the requested page of breaking todos within the authorized request scope.
 	ListBreakingTodos(ctx context.Context, tenantSlug TenantSlug, params *ListBreakingTodosParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AcknowledgeBreakingTodoWithBody performs a POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack (the `AcknowledgeBreakingTodo` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the acknowledge breaking todo workflow within the authorized request scope.
 	AcknowledgeBreakingTodoWithBody(ctx context.Context, tenantSlug TenantSlug, todoId TodoId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AcknowledgeBreakingTodo performs a POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack (the `AcknowledgeBreakingTodo` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the acknowledge breaking todo workflow within the authorized request scope.
 	AcknowledgeBreakingTodo(ctx context.Context, tenantSlug TenantSlug, todoId TodoId, body AcknowledgeBreakingTodoJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListCredentials performs a GET /api/v1/t/{tenantSlug}/credentials (the `ListCredentials` operationId) request.
+	//
+	// Returns the requested page of credentials within the authorized request scope.
 	ListCredentials(ctx context.Context, tenantSlug TenantSlug, params *ListCredentialsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateCredentialWithBody performs a POST /api/v1/t/{tenantSlug}/credentials (the `CreateCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates credential within the authorized request scope.
 	CreateCredentialWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateCredential performs a POST /api/v1/t/{tenantSlug}/credentials (the `CreateCredential` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates credential within the authorized request scope.
 	CreateCredential(ctx context.Context, tenantSlug TenantSlug, body CreateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteCredential performs a DELETE /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `DeleteCredential` operationId) request.
+	//
+	// Deletes the selected credential within the authorized request scope.
 	DeleteCredential(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *DeleteCredentialParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateCredentialWithBody performs a PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `UpdateCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected credential within the authorized request scope.
 	UpdateCredentialWithBody(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *UpdateCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateCredential performs a PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `UpdateCredential` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected credential within the authorized request scope.
 	UpdateCredential(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *UpdateCredentialParams, body UpdateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RotateCredentialWithBody performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate (the `RotateCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the rotate credential workflow within the authorized request scope.
 	RotateCredentialWithBody(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *RotateCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RotateCredential performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate (the `RotateCredential` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the rotate credential workflow within the authorized request scope.
 	RotateCredential(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *RotateCredentialParams, body RotateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// TestCredentialWithBody performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test (the `TestCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Tests credential within the authorized request scope.
 	TestCredentialWithBody(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// TestCredential performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test (the `TestCredential` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Tests credential within the authorized request scope.
 	TestCredential(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, body TestCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RunDiffWithBody performs a POST /api/v1/t/{tenantSlug}/diff (the `RunDiff` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Runs diff within the authorized request scope.
 	RunDiffWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RunDiff performs a POST /api/v1/t/{tenantSlug}/diff (the `RunDiff` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Runs diff within the authorized request scope.
 	RunDiff(ctx context.Context, tenantSlug TenantSlug, body RunDiffJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListDiffRuleSets performs a GET /api/v1/t/{tenantSlug}/diff-rule-sets (the `ListDiffRuleSets` operationId) request.
+	//
+	// Returns the requested page of diff rule sets within the authorized request scope.
 	ListDiffRuleSets(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateDiffRuleSetWithBody performs a POST /api/v1/t/{tenantSlug}/diff-rule-sets (the `CreateDiffRuleSet` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates diff rule set within the authorized request scope.
 	CreateDiffRuleSetWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateDiffRuleSet performs a POST /api/v1/t/{tenantSlug}/diff-rule-sets (the `CreateDiffRuleSet` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates diff rule set within the authorized request scope.
 	CreateDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, body CreateDiffRuleSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteDiffRuleSet performs a DELETE /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `DeleteDiffRuleSet` operationId) request.
+	//
+	// Deletes the selected diff rule set within the authorized request scope.
 	DeleteDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *DeleteDiffRuleSetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateDiffRuleSetWithBody performs a PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `UpdateDiffRuleSet` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected diff rule set within the authorized request scope.
 	UpdateDiffRuleSetWithBody(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *UpdateDiffRuleSetParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateDiffRuleSet performs a PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `UpdateDiffRuleSet` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected diff rule set within the authorized request scope.
 	UpdateDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *UpdateDiffRuleSetParams, body UpdateDiffRuleSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListDiffSnapshots performs a GET /api/v1/t/{tenantSlug}/diff-snapshots (the `ListDiffSnapshots` operationId) request.
+	//
+	// Returns the requested page of diff snapshots within the authorized request scope.
 	ListDiffSnapshots(ctx context.Context, tenantSlug TenantSlug, params *ListDiffSnapshotsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteDiffSnapshot performs a DELETE /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId} (the `DeleteDiffSnapshot` operationId) request.
+	//
+	// Deletes the selected diff snapshot within the authorized request scope.
 	DeleteDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetDiffSnapshot performs a GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId} (the `GetDiffSnapshot` operationId) request.
+	//
+	// Returns the selected diff snapshot within the authorized request scope.
 	GetDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ExportDiffSnapshot performs a GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/export (the `ExportDiffSnapshot` operationId) request.
+	//
+	// Exports diff snapshot within the authorized request scope.
 	ExportDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, params *ExportDiffSnapshotParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateDiffSnapshotShareLinkWithBody performs a POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links (the `CreateDiffSnapshotShareLink` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates diff snapshot share link within the authorized request scope.
 	CreateDiffSnapshotShareLinkWithBody(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateDiffSnapshotShareLink performs a POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links (the `CreateDiffSnapshotShareLink` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates diff snapshot share link within the authorized request scope.
 	CreateDiffSnapshotShareLink(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, body CreateDiffSnapshotShareLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SearchTenantUsers performs a GET /api/v1/t/{tenantSlug}/directory/users (the `SearchTenantUsers` operationId) request.
+	//
+	// Searches for tenant users within the authorized request scope.
 	SearchTenantUsers(ctx context.Context, tenantSlug TenantSlug, params *SearchTenantUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTenantExport performs a POST /api/v1/t/{tenantSlug}/exports (the `CreateTenantExport` operationId) request.
+	//
+	// Creates tenant export within the authorized request scope.
 	CreateTenantExport(ctx context.Context, tenantSlug TenantSlug, params *CreateTenantExportParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListJobs performs a GET /api/v1/t/{tenantSlug}/jobs (the `ListJobs` operationId) request.
+	//
+	// Returns the requested page of jobs within the authorized request scope.
 	ListJobs(ctx context.Context, tenantSlug TenantSlug, params *ListJobsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetJob performs a GET /api/v1/t/{tenantSlug}/jobs/{jobId} (the `GetJob` operationId) request.
+	//
+	// Returns the selected job within the authorized request scope.
 	GetJob(ctx context.Context, tenantSlug TenantSlug, jobId JobId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// StreamJobLogs performs a GET /api/v1/t/{tenantSlug}/jobs/{jobId}/logs (the `StreamJobLogs` operationId) request.
+	//
+	// Streams ordered events for job logs within the authorized request scope.
 	StreamJobLogs(ctx context.Context, tenantSlug TenantSlug, jobId JobId, params *StreamJobLogsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CancelJob performs a POST /api/v1/t/{tenantSlug}/jobs/{jobId}:cancel (the `CancelJob` operationId) request.
+	//
+	// Performs the cancel job workflow within the authorized request scope.
 	CancelJob(ctx context.Context, tenantSlug TenantSlug, jobId JobId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RetryJob performs a POST /api/v1/t/{tenantSlug}/jobs/{jobId}:retry (the `RetryJob` operationId) request.
+	//
+	// Performs the retry job workflow within the authorized request scope.
 	RetryJob(ctx context.Context, tenantSlug TenantSlug, jobId JobId, params *RetryJobParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListKnownHosts performs a GET /api/v1/t/{tenantSlug}/known-hosts (the `ListKnownHosts` operationId) request.
+	//
+	// Returns the requested page of known hosts within the authorized request scope.
 	ListKnownHosts(ctx context.Context, tenantSlug TenantSlug, params *ListKnownHostsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateKnownHostWithBody performs a POST /api/v1/t/{tenantSlug}/known-hosts (the `CreateKnownHost` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates known host within the authorized request scope.
 	CreateKnownHostWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateKnownHost performs a POST /api/v1/t/{tenantSlug}/known-hosts (the `CreateKnownHost` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates known host within the authorized request scope.
 	CreateKnownHost(ctx context.Context, tenantSlug TenantSlug, body CreateKnownHostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetLayerRevision performs a GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId} (the `GetLayerRevision` operationId) request.
+	//
+	// Returns the selected layer revision within the authorized request scope.
 	GetLayerRevision(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetReviewContext performs a GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}/review-context (the `GetReviewContext` operationId) request.
+	//
+	// Returns the selected review context within the authorized request scope.
 	GetReviewContext(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ApproveLayerRevisionWithBody performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve (the `ApproveLayerRevision` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the approve layer revision workflow within the authorized request scope.
 	ApproveLayerRevisionWithBody(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *ApproveLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ApproveLayerRevision performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve (the `ApproveLayerRevision` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the approve layer revision workflow within the authorized request scope.
 	ApproveLayerRevision(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *ApproveLayerRevisionParams, body ApproveLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RejectLayerRevisionWithBody performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject (the `RejectLayerRevision` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the reject layer revision workflow within the authorized request scope.
 	RejectLayerRevisionWithBody(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *RejectLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RejectLayerRevision performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject (the `RejectLayerRevision` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the reject layer revision workflow within the authorized request scope.
 	RejectLayerRevision(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *RejectLayerRevisionParams, body RejectLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetLayer performs a GET /api/v1/t/{tenantSlug}/layers/{layerId} (the `GetLayer` operationId) request.
+	//
+	// Returns the selected layer within the authorized request scope.
 	GetLayer(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *GetLayerParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateLayerWithBody performs a PATCH /api/v1/t/{tenantSlug}/layers/{layerId} (the `UpdateLayer` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected layer within the authorized request scope.
 	UpdateLayerWithBody(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *UpdateLayerParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateLayer performs a PATCH /api/v1/t/{tenantSlug}/layers/{layerId} (the `UpdateLayer` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected layer within the authorized request scope.
 	UpdateLayer(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *UpdateLayerParams, body UpdateLayerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListLayerRevisions performs a GET /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `ListLayerRevisions` operationId) request.
+	//
+	// Returns the requested page of layer revisions within the authorized request scope.
 	ListLayerRevisions(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *ListLayerRevisionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateLayerRevisionWithBody performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `CreateLayerRevision` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates layer revision within the authorized request scope.
 	CreateLayerRevisionWithBody(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *CreateLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateLayerRevision performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `CreateLayerRevision` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates layer revision within the authorized request scope.
 	CreateLayerRevision(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *CreateLayerRevisionParams, body CreateLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RollbackLayerWithBody performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback (the `RollbackLayer` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the rollback layer workflow within the authorized request scope.
 	RollbackLayerWithBody(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *RollbackLayerParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RollbackLayer performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback (the `RollbackLayer` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the rollback layer workflow within the authorized request scope.
 	RollbackLayer(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *RollbackLayerParams, body RollbackLayerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListTenantMembers performs a GET /api/v1/t/{tenantSlug}/members (the `ListTenantMembers` operationId) request.
+	//
+	// Returns the requested page of tenant members within the authorized request scope.
 	ListTenantMembers(ctx context.Context, tenantSlug TenantSlug, params *ListTenantMembersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteTenantMember performs a DELETE /api/v1/t/{tenantSlug}/members/{userId} (the `DeleteTenantMember` operationId) request.
+	//
+	// Deletes the selected tenant member within the authorized request scope.
 	DeleteTenantMember(ctx context.Context, tenantSlug TenantSlug, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutTenantMemberWithBody performs a PUT /api/v1/t/{tenantSlug}/members/{userId} (the `PutTenantMember` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates or replaces the selected tenant member within the authorized request scope.
 	PutTenantMemberWithBody(ctx context.Context, tenantSlug TenantSlug, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutTenantMember performs a PUT /api/v1/t/{tenantSlug}/members/{userId} (the `PutTenantMember` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates or replaces the selected tenant member within the authorized request scope.
 	PutTenantMember(ctx context.Context, tenantSlug TenantSlug, userId UserId, body PutTenantMemberJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListNotificationChannels performs a GET /api/v1/t/{tenantSlug}/notification-channels (the `ListNotificationChannels` operationId) request.
+	//
+	// Returns the requested page of notification channels within the authorized request scope.
 	ListNotificationChannels(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateNotificationChannelWithBody performs a POST /api/v1/t/{tenantSlug}/notification-channels (the `CreateNotificationChannel` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates notification channel within the authorized request scope.
 	CreateNotificationChannelWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateNotificationChannel performs a POST /api/v1/t/{tenantSlug}/notification-channels (the `CreateNotificationChannel` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates notification channel within the authorized request scope.
 	CreateNotificationChannel(ctx context.Context, tenantSlug TenantSlug, body CreateNotificationChannelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteNotificationChannel performs a DELETE /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `DeleteNotificationChannel` operationId) request.
+	//
+	// Deletes the selected notification channel within the authorized request scope.
 	DeleteNotificationChannel(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *DeleteNotificationChannelParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateNotificationChannelWithBody performs a PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `UpdateNotificationChannel` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected notification channel within the authorized request scope.
 	UpdateNotificationChannelWithBody(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *UpdateNotificationChannelParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateNotificationChannel performs a PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `UpdateNotificationChannel` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected notification channel within the authorized request scope.
 	UpdateNotificationChannel(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *UpdateNotificationChannelParams, body UpdateNotificationChannelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RotateNotificationChannelSecretWithBody performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate (the `RotateNotificationChannelSecret` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the rotate notification channel secret workflow within the authorized request scope.
 	RotateNotificationChannelSecretWithBody(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *RotateNotificationChannelSecretParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RotateNotificationChannelSecret performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate (the `RotateNotificationChannelSecret` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the rotate notification channel secret workflow within the authorized request scope.
 	RotateNotificationChannelSecret(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *RotateNotificationChannelSecretParams, body RotateNotificationChannelSecretJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// TestNotificationChannel performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:test (the `TestNotificationChannel` operationId) request.
+	//
+	// Tests notification channel within the authorized request scope.
 	TestNotificationChannel(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListNotifications performs a GET /api/v1/t/{tenantSlug}/notifications (the `ListNotifications` operationId) request.
+	//
+	// Returns the requested page of notifications within the authorized request scope.
 	ListNotifications(ctx context.Context, tenantSlug TenantSlug, params *ListNotificationsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// MarkNotificationRead performs a POST /api/v1/t/{tenantSlug}/notifications/{notificationId}:read (the `MarkNotificationRead` operationId) request.
+	//
+	// Performs the mark notification read workflow within the authorized request scope.
 	MarkNotificationRead(ctx context.Context, tenantSlug TenantSlug, notificationId NotificationId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// MarkAllNotificationsRead performs a POST /api/v1/t/{tenantSlug}/notifications:read-all (the `MarkAllNotificationsRead` operationId) request.
+	//
+	// Performs the mark all notifications read workflow within the authorized request scope.
 	MarkAllNotificationsRead(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListAvailableProducerProfiles performs a GET /api/v1/t/{tenantSlug}/producer-profiles (the `ListAvailableProducerProfiles` operationId) request.
+	//
+	// Returns the requested page of available producer profiles within the authorized request scope.
 	ListAvailableProducerProfiles(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListRepositories performs a GET /api/v1/t/{tenantSlug}/repositories (the `ListRepositories` operationId) request.
+	//
+	// Returns the requested page of repositories within the authorized request scope.
 	ListRepositories(ctx context.Context, tenantSlug TenantSlug, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateRepositoryWithBody performs a POST /api/v1/t/{tenantSlug}/repositories (the `CreateRepository` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates repository within the authorized request scope.
 	CreateRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateRepository performs a POST /api/v1/t/{tenantSlug}/repositories (the `CreateRepository` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates repository within the authorized request scope.
 	CreateRepository(ctx context.Context, tenantSlug TenantSlug, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteRepository performs a DELETE /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `DeleteRepository` operationId) request.
+	//
+	// Deletes the selected repository within the authorized request scope.
 	DeleteRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DeleteRepositoryParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetRepository performs a GET /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `GetRepository` operationId) request.
+	//
+	// Returns the selected repository within the authorized request scope.
 	GetRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateRepositoryWithBody performs a PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `UpdateRepository` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected repository within the authorized request scope.
 	UpdateRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *UpdateRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateRepository performs a PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `UpdateRepository` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected repository within the authorized request scope.
 	UpdateRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *UpdateRepositoryParams, body UpdateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListDiscoveryCandidates performs a GET /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates (the `ListDiscoveryCandidates` operationId) request.
+	//
+	// Returns the requested page of discovery candidates within the authorized request scope.
 	ListDiscoveryCandidates(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *ListDiscoveryCandidatesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DismissDiscoveryCandidate performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates/{candidateId}:dismiss (the `DismissDiscoveryCandidate` operationId) request.
+	//
+	// Performs the dismiss discovery candidate workflow within the authorized request scope.
 	DismissDiscoveryCandidate(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, candidateId CandidateId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AcceptDiscoveryCandidatesWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept (the `AcceptDiscoveryCandidates` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the accept discovery candidates workflow within the authorized request scope.
 	AcceptDiscoveryCandidatesWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *AcceptDiscoveryCandidatesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AcceptDiscoveryCandidates performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept (the `AcceptDiscoveryCandidates` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the accept discovery candidates workflow within the authorized request scope.
 	AcceptDiscoveryCandidates(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *AcceptDiscoveryCandidatesParams, body AcceptDiscoveryCandidatesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PreviewRepositoryConfigImportWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports (the `PreviewRepositoryConfigImport` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the preview repository config import workflow within the authorized request scope.
 	PreviewRepositoryConfigImportWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *PreviewRepositoryConfigImportParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PreviewRepositoryConfigImport performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports (the `PreviewRepositoryConfigImport` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the preview repository config import workflow within the authorized request scope.
 	PreviewRepositoryConfigImport(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *PreviewRepositoryConfigImportParams, body PreviewRepositoryConfigImportJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ApplyRepositoryConfigImportWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply (the `ApplyRepositoryConfigImport` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the apply repository config import workflow within the authorized request scope.
 	ApplyRepositoryConfigImportWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params *ApplyRepositoryConfigImportParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ApplyRepositoryConfigImport performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply (the `ApplyRepositoryConfigImport` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the apply repository config import workflow within the authorized request scope.
 	ApplyRepositoryConfigImport(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params *ApplyRepositoryConfigImportParams, body ApplyRepositoryConfigImportJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateServiceInRepositoryWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services (the `CreateServiceInRepository` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates service in repository within the authorized request scope.
 	CreateServiceInRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateServiceInRepository performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services (the `CreateServiceInRepository` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates service in repository within the authorized request scope.
 	CreateServiceInRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, body CreateServiceInRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DiscoverRepositoryWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover (the `DiscoverRepository` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the discover repository workflow within the authorized request scope.
 	DiscoverRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DiscoverRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DiscoverRepository performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover (the `DiscoverRepository` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the discover repository workflow within the authorized request scope.
 	DiscoverRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DiscoverRepositoryParams, body DiscoverRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SyncRepositoryWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync (the `SyncRepository` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the sync repository workflow within the authorized request scope.
 	SyncRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *SyncRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SyncRepository performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync (the `SyncRepository` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the sync repository workflow within the authorized request scope.
 	SyncRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *SyncRepositoryParams, body SyncRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CheckRepositoryConnectionWithBody performs a POST /api/v1/t/{tenantSlug}/repositories:check-connection (the `CheckRepositoryConnection` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Checks repository connection within the authorized request scope.
 	CheckRepositoryConnectionWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CheckRepositoryConnection performs a POST /api/v1/t/{tenantSlug}/repositories:check-connection (the `CheckRepositoryConnection` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Checks repository connection within the authorized request scope.
 	CheckRepositoryConnection(ctx context.Context, tenantSlug TenantSlug, body CheckRepositoryConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListReviews performs a GET /api/v1/t/{tenantSlug}/reviews (the `ListReviews` operationId) request.
+	//
+	// Returns the requested page of reviews within the authorized request scope.
 	ListReviews(ctx context.Context, tenantSlug TenantSlug, params *ListReviewsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Search performs a GET /api/v1/t/{tenantSlug}/search (the `Search` operationId) request.
+	//
+	// Performs the search workflow within the authorized request scope.
 	Search(ctx context.Context, tenantSlug TenantSlug, params *SearchParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListServices performs a GET /api/v1/t/{tenantSlug}/services (the `ListServices` operationId) request.
+	//
+	// Returns the requested page of services within the authorized request scope.
 	ListServices(ctx context.Context, tenantSlug TenantSlug, params *ListServicesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteService performs a DELETE /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `DeleteService` operationId) request.
+	//
+	// Deletes the selected service within the authorized request scope.
 	DeleteService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *DeleteServiceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetService performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `GetService` operationId) request.
+	//
+	// Returns the selected service within the authorized request scope.
 	GetService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateServiceWithBody performs a PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `UpdateService` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected service within the authorized request scope.
 	UpdateServiceWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *UpdateServiceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateService performs a PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `UpdateService` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected service within the authorized request scope.
 	UpdateService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *UpdateServiceParams, body UpdateServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetServiceAccess performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `GetServiceAccess` operationId) request.
+	//
+	// Returns the selected service access within the authorized request scope.
 	GetServiceAccess(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutServiceAccessWithBody performs a PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `PutServiceAccess` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates or replaces the selected service access within the authorized request scope.
 	PutServiceAccessWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutServiceAccess performs a PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `PutServiceAccess` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates or replaces the selected service access within the authorized request scope.
 	PutServiceAccess(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body PutServiceAccessJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GenerateMissingAssetWithAiWithBody performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate (the `GenerateMissingAssetWithAi` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the generate missing asset with ai workflow within the authorized request scope.
 	GenerateMissingAssetWithAiWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *GenerateMissingAssetWithAiParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GenerateMissingAssetWithAi performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate (the `GenerateMissingAssetWithAi` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the generate missing asset with ai workflow within the authorized request scope.
 	GenerateMissingAssetWithAi(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *GenerateMissingAssetWithAiParams, body GenerateMissingAssetWithAiJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListServiceComments performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `ListServiceComments` operationId) request.
+	//
+	// Returns the requested page of service comments within the authorized request scope.
 	ListServiceComments(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ListServiceCommentsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateServiceCommentWithBody performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `CreateServiceComment` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates service comment within the authorized request scope.
 	CreateServiceCommentWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateServiceComment performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `CreateServiceComment` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates service comment within the authorized request scope.
 	CreateServiceComment(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body CreateServiceCommentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListSourceSpecs performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `ListSourceSpecs` operationId) request.
+	//
+	// Returns the requested page of source specs within the authorized request scope.
 	ListSourceSpecs(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateSourceSpecWithBody performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `CreateSourceSpec` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates source spec within the authorized request scope.
 	CreateSourceSpecWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateSourceSpec performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `CreateSourceSpec` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates source spec within the authorized request scope.
 	CreateSourceSpec(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body CreateSourceSpecJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ResolveServiceDriftWithBody performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift (the `ResolveServiceDrift` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Resolves service drift within the authorized request scope.
 	ResolveServiceDriftWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ResolveServiceDriftParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ResolveServiceDrift performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift (the `ResolveServiceDrift` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Resolves service drift within the authorized request scope.
 	ResolveServiceDrift(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ResolveServiceDriftParams, body ResolveServiceDriftJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// StarService performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:star (the `StarService` operationId) request.
+	//
+	// Performs the star service workflow within the authorized request scope.
 	StarService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnstarService performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:unstar (the `UnstarService` operationId) request.
+	//
+	// Performs the unstar service workflow within the authorized request scope.
 	UnstarService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListRecentServices performs a GET /api/v1/t/{tenantSlug}/services:recent (the `ListRecentServices` operationId) request.
+	//
+	// Returns the requested page of recent services within the authorized request scope.
 	ListRecentServices(ctx context.Context, tenantSlug TenantSlug, params *ListRecentServicesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetTenantSettings performs a GET /api/v1/t/{tenantSlug}/settings (the `GetTenantSettings` operationId) request.
+	//
+	// Returns the selected tenant settings within the authorized request scope.
 	GetTenantSettings(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateTenantSettingsWithBody performs a PATCH /api/v1/t/{tenantSlug}/settings (the `UpdateTenantSettings` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected tenant settings within the authorized request scope.
 	UpdateTenantSettingsWithBody(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantSettingsParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateTenantSettings performs a PATCH /api/v1/t/{tenantSlug}/settings (the `UpdateTenantSettings` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected tenant settings within the authorized request scope.
 	UpdateTenantSettings(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantSettingsParams, body UpdateTenantSettingsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListShareLinks performs a GET /api/v1/t/{tenantSlug}/share-links (the `ListShareLinks` operationId) request.
+	//
+	// Returns the requested page of share links within the authorized request scope.
 	ListShareLinks(ctx context.Context, tenantSlug TenantSlug, params *ListShareLinksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateShareLinkWithBody performs a POST /api/v1/t/{tenantSlug}/share-links (the `CreateShareLink` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates share link within the authorized request scope.
 	CreateShareLinkWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateShareLink performs a POST /api/v1/t/{tenantSlug}/share-links (the `CreateShareLink` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates share link within the authorized request scope.
 	CreateShareLink(ctx context.Context, tenantSlug TenantSlug, body CreateShareLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RevokeShareLink performs a DELETE /api/v1/t/{tenantSlug}/share-links/{shareLinkId} (the `RevokeShareLink` operationId) request.
+	//
+	// Performs the revoke share link workflow within the authorized request scope.
 	RevokeShareLink(ctx context.Context, tenantSlug TenantSlug, shareLinkId ShareLinkId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSourceSpec performs a DELETE /api/v1/t/{tenantSlug}/sources/{sourceId} (the `DeleteSourceSpec` operationId) request.
+	//
+	// Deletes the selected source spec within the authorized request scope.
 	DeleteSourceSpec(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *DeleteSourceSpecParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateSourceSpecWithBody performs a PATCH /api/v1/t/{tenantSlug}/sources/{sourceId} (the `UpdateSourceSpec` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected source spec within the authorized request scope.
 	UpdateSourceSpecWithBody(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *UpdateSourceSpecParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateSourceSpec performs a PATCH /api/v1/t/{tenantSlug}/sources/{sourceId} (the `UpdateSourceSpec` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected source spec within the authorized request scope.
 	UpdateSourceSpec(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *UpdateSourceSpecParams, body UpdateSourceSpecJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListSourceBindings performs a GET /api/v1/t/{tenantSlug}/sources/{sourceId}/bindings (the `ListSourceBindings` operationId) request.
+	//
+	// Returns the requested page of source bindings within the authorized request scope.
 	ListSourceBindings(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ProduceSourceWithBody performs a POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce (the `ProduceSource` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the produce source workflow within the authorized request scope.
 	ProduceSourceWithBody(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *ProduceSourceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ProduceSource performs a POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce (the `ProduceSource` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the produce source workflow within the authorized request scope.
 	ProduceSource(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *ProduceSourceParams, body ProduceSourceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListSubscriptions performs a GET /api/v1/t/{tenantSlug}/subscriptions (the `ListSubscriptions` operationId) request.
+	//
+	// Returns the requested page of subscriptions within the authorized request scope.
 	ListSubscriptions(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutSubscriptionWithBody performs a PUT /api/v1/t/{tenantSlug}/subscriptions (the `PutSubscription` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates or replaces the selected subscription within the authorized request scope.
 	PutSubscriptionWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutSubscription performs a PUT /api/v1/t/{tenantSlug}/subscriptions (the `PutSubscription` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates or replaces the selected subscription within the authorized request scope.
 	PutSubscription(ctx context.Context, tenantSlug TenantSlug, body PutSubscriptionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListSystemGroups performs a GET /api/v1/t/{tenantSlug}/system-groups (the `ListSystemGroups` operationId) request.
+	//
+	// Returns the requested page of system groups within the authorized request scope.
 	ListSystemGroups(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateSystemGroupWithBody performs a POST /api/v1/t/{tenantSlug}/system-groups (the `CreateSystemGroup` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates system group within the authorized request scope.
 	CreateSystemGroupWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateSystemGroup performs a POST /api/v1/t/{tenantSlug}/system-groups (the `CreateSystemGroup` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates system group within the authorized request scope.
 	CreateSystemGroup(ctx context.Context, tenantSlug TenantSlug, body CreateSystemGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSystemGroup performs a DELETE /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `DeleteSystemGroup` operationId) request.
+	//
+	// Deletes the selected system group within the authorized request scope.
 	DeleteSystemGroup(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *DeleteSystemGroupParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSystemGroup performs a GET /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `GetSystemGroup` operationId) request.
+	//
+	// Returns the selected system group within the authorized request scope.
 	GetSystemGroup(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateSystemGroupWithBody performs a PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `UpdateSystemGroup` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected system group within the authorized request scope.
 	UpdateSystemGroupWithBody(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *UpdateSystemGroupParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateSystemGroup performs a PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `UpdateSystemGroup` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected system group within the authorized request scope.
 	UpdateSystemGroup(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *UpdateSystemGroupParams, body UpdateSystemGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutSystemGroupMembersWithBody performs a PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members (the `PutSystemGroupMembers` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates or replaces the selected system group members within the authorized request scope.
 	PutSystemGroupMembersWithBody(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *PutSystemGroupMembersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutSystemGroupMembers performs a PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members (the `PutSystemGroupMembers` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates or replaces the selected system group members within the authorized request scope.
 	PutSystemGroupMembers(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *PutSystemGroupMembersParams, body PutSystemGroupMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListTags performs a GET /api/v1/t/{tenantSlug}/tags (the `ListTags` operationId) request.
+	//
+	// Returns the requested page of tags within the authorized request scope.
 	ListTags(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTagWithBody performs a POST /api/v1/t/{tenantSlug}/tags (the `CreateTag` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates tag within the authorized request scope.
 	CreateTagWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTag performs a POST /api/v1/t/{tenantSlug}/tags (the `CreateTag` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates tag within the authorized request scope.
 	CreateTag(ctx context.Context, tenantSlug TenantSlug, body CreateTagJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteTag performs a DELETE /api/v1/t/{tenantSlug}/tags/{tagId} (the `DeleteTag` operationId) request.
+	//
+	// Deletes the selected tag within the authorized request scope.
 	DeleteTag(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *DeleteTagParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateTagWithBody performs a PATCH /api/v1/t/{tenantSlug}/tags/{tagId} (the `UpdateTag` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected tag within the authorized request scope.
 	UpdateTagWithBody(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *UpdateTagParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateTag performs a PATCH /api/v1/t/{tenantSlug}/tags/{tagId} (the `UpdateTag` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected tag within the authorized request scope.
 	UpdateTag(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *UpdateTagParams, body UpdateTagJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListTeams performs a GET /api/v1/t/{tenantSlug}/teams (the `ListTeams` operationId) request.
+	//
+	// Returns the requested page of teams within the authorized request scope.
 	ListTeams(ctx context.Context, tenantSlug TenantSlug, params *ListTeamsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTeamWithBody performs a POST /api/v1/t/{tenantSlug}/teams (the `CreateTeam` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates team within the authorized request scope.
 	CreateTeamWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTeam performs a POST /api/v1/t/{tenantSlug}/teams (the `CreateTeam` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates team within the authorized request scope.
 	CreateTeam(ctx context.Context, tenantSlug TenantSlug, body CreateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteTeam performs a DELETE /api/v1/t/{tenantSlug}/teams/{teamId} (the `DeleteTeam` operationId) request.
+	//
+	// Deletes the selected team within the authorized request scope.
 	DeleteTeam(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *DeleteTeamParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetTeam performs a GET /api/v1/t/{tenantSlug}/teams/{teamId} (the `GetTeam` operationId) request.
+	//
+	// Returns the selected team within the authorized request scope.
 	GetTeam(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateTeamWithBody performs a PATCH /api/v1/t/{tenantSlug}/teams/{teamId} (the `UpdateTeam` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected team within the authorized request scope.
 	UpdateTeamWithBody(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *UpdateTeamParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateTeam performs a PATCH /api/v1/t/{tenantSlug}/teams/{teamId} (the `UpdateTeam` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Updates the selected team within the authorized request scope.
 	UpdateTeam(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *UpdateTeamParams, body UpdateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReplaceTeamMembersWithBody performs a PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members (the `ReplaceTeamMembers` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Replaces the selected team members within the authorized request scope.
 	ReplaceTeamMembersWithBody(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *ReplaceTeamMembersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReplaceTeamMembers performs a PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members (the `ReplaceTeamMembers` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Replaces the selected team members within the authorized request scope.
 	ReplaceTeamMembers(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *ReplaceTeamMembersParams, body ReplaceTeamMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListTokens performs a GET /api/v1/t/{tenantSlug}/tokens (the `ListTokens` operationId) request.
+	//
+	// Returns the requested page of tokens within the authorized request scope.
 	ListTokens(ctx context.Context, tenantSlug TenantSlug, params *ListTokensParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTokenWithBody performs a POST /api/v1/t/{tenantSlug}/tokens (the `CreateToken` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates token within the authorized request scope.
 	CreateTokenWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateToken performs a POST /api/v1/t/{tenantSlug}/tokens (the `CreateToken` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates token within the authorized request scope.
 	CreateToken(ctx context.Context, tenantSlug TenantSlug, body CreateTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RevokeToken performs a DELETE /api/v1/t/{tenantSlug}/tokens/{tokenId} (the `RevokeToken` operationId) request.
+	//
+	// Performs the revoke token workflow within the authorized request scope.
 	RevokeToken(ctx context.Context, tenantSlug TenantSlug, tokenId TokenId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateDiffUploadWithBody performs a POST /api/v1/t/{tenantSlug}/uploads (the `CreateDiffUpload` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates diff upload within the authorized request scope.
 	CreateDiffUploadWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListViewOverrides performs a GET /api/v1/t/{tenantSlug}/view-overrides (the `ListViewOverrides` operationId) request.
+	//
+	// Returns the requested page of view overrides within the authorized request scope.
 	ListViewOverrides(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteViewOverride performs a DELETE /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `DeleteViewOverride` operationId) request.
+	//
+	// Deletes the selected view override within the authorized request scope.
 	DeleteViewOverride(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *DeleteViewOverrideParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutViewOverrideWithBody performs a PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `PutViewOverride` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates or replaces the selected view override within the authorized request scope.
 	PutViewOverrideWithBody(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *PutViewOverrideParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PutViewOverride performs a PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `PutViewOverride` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Creates or replaces the selected view override within the authorized request scope.
 	PutViewOverride(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *PutViewOverrideParams, body PutViewOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListViews performs a GET /api/v1/t/{tenantSlug}/views (the `ListViews` operationId) request.
+	//
+	// Returns the requested page of views within the authorized request scope.
 	ListViews(ctx context.Context, tenantSlug TenantSlug, params *ListViewsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ResolveViewWithBody performs a POST /api/v1/t/{tenantSlug}/views:resolve (the `ResolveView` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Resolves view within the authorized request scope.
 	ResolveViewWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ResolveView performs a POST /api/v1/t/{tenantSlug}/views:resolve (the `ResolveView` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Resolves view within the authorized request scope.
 	ResolveView(ctx context.Context, tenantSlug TenantSlug, body ResolveViewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetVersion performs a GET /api/v1/version (the `GetVersion` operationId) request.
+	//
+	// Returns the server build, API, and contract versions.
 	GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReceiveGitWebhookWithBody performs a POST /api/v1/webhooks/git/{repositoryId} (the `ReceiveGitWebhook` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the receive git webhook workflow within the authorized request scope.
 	ReceiveGitWebhookWithBody(ctx context.Context, repositoryId RepositoryId, params *ReceiveGitWebhookParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReceiveGitWebhook performs a POST /api/v1/webhooks/git/{repositoryId} (the `ReceiveGitWebhook` operationId) request.
 	// Takes a body of the `application/json` content type.
+	//
+	// Performs the receive git webhook workflow within the authorized request scope.
 	ReceiveGitWebhook(ctx context.Context, repositoryId RepositoryId, params *ReceiveGitWebhookParams, body ReceiveGitWebhookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Healthz performs a GET /healthz (the `Healthz` operationId) request.
+	//
+	// Reports whether the Meridian process is alive.
 	Healthz(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Metrics performs a GET /metrics (the `Metrics` operationId) request.
+	//
+	// Returns deployment metrics in Prometheus text exposition format.
 	Metrics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Readyz performs a GET /readyz (the `Readyz` operationId) request.
+	//
+	// Reports whether Meridian dependencies are ready to serve traffic.
 	Readyz(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 // ListPlatformAuditLogs performs a GET /api/v1/admin/audit-logs (the `ListPlatformAuditLogs` operationId) request.
+//
+// Returns the requested page of platform audit logs within the authorized request scope.
 func (c *Client) ListPlatformAuditLogs(ctx context.Context, params *ListPlatformAuditLogsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListPlatformAuditLogsRequest(c.Server, params)
 	if err != nil {
@@ -989,6 +1488,8 @@ func (c *Client) ListPlatformAuditLogs(ctx context.Context, params *ListPlatform
 }
 
 // ListGlobalCredentials performs a GET /api/v1/admin/global-credentials (the `ListGlobalCredentials` operationId) request.
+//
+// Returns the requested page of global credentials within the authorized request scope.
 func (c *Client) ListGlobalCredentials(ctx context.Context, params *ListGlobalCredentialsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListGlobalCredentialsRequest(c.Server, params)
 	if err != nil {
@@ -1003,6 +1504,8 @@ func (c *Client) ListGlobalCredentials(ctx context.Context, params *ListGlobalCr
 
 // CreateGlobalCredentialWithBody performs a POST /api/v1/admin/global-credentials (the `CreateGlobalCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates global credential within the authorized request scope.
 func (c *Client) CreateGlobalCredentialWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateGlobalCredentialRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1017,6 +1520,8 @@ func (c *Client) CreateGlobalCredentialWithBody(ctx context.Context, contentType
 
 // CreateGlobalCredential performs a POST /api/v1/admin/global-credentials (the `CreateGlobalCredential` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates global credential within the authorized request scope.
 func (c *Client) CreateGlobalCredential(ctx context.Context, body CreateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateGlobalCredentialRequest(c.Server, body)
 	if err != nil {
@@ -1030,6 +1535,8 @@ func (c *Client) CreateGlobalCredential(ctx context.Context, body CreateGlobalCr
 }
 
 // DeleteGlobalCredential performs a DELETE /api/v1/admin/global-credentials/{credentialId} (the `DeleteGlobalCredential` operationId) request.
+//
+// Deletes the selected global credential within the authorized request scope.
 func (c *Client) DeleteGlobalCredential(ctx context.Context, credentialId CredentialId, params *DeleteGlobalCredentialParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteGlobalCredentialRequest(c.Server, credentialId, params)
 	if err != nil {
@@ -1044,6 +1551,8 @@ func (c *Client) DeleteGlobalCredential(ctx context.Context, credentialId Creden
 
 // UpdateGlobalCredentialWithBody performs a PATCH /api/v1/admin/global-credentials/{credentialId} (the `UpdateGlobalCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected global credential within the authorized request scope.
 func (c *Client) UpdateGlobalCredentialWithBody(ctx context.Context, credentialId CredentialId, params *UpdateGlobalCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateGlobalCredentialRequestWithBody(c.Server, credentialId, params, contentType, body)
 	if err != nil {
@@ -1058,6 +1567,8 @@ func (c *Client) UpdateGlobalCredentialWithBody(ctx context.Context, credentialI
 
 // UpdateGlobalCredential performs a PATCH /api/v1/admin/global-credentials/{credentialId} (the `UpdateGlobalCredential` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected global credential within the authorized request scope.
 func (c *Client) UpdateGlobalCredential(ctx context.Context, credentialId CredentialId, params *UpdateGlobalCredentialParams, body UpdateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateGlobalCredentialRequest(c.Server, credentialId, params, body)
 	if err != nil {
@@ -1072,6 +1583,8 @@ func (c *Client) UpdateGlobalCredential(ctx context.Context, credentialId Creden
 
 // RotateGlobalCredentialWithBody performs a POST /api/v1/admin/global-credentials/{credentialId}:rotate (the `RotateGlobalCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the rotate global credential workflow within the authorized request scope.
 func (c *Client) RotateGlobalCredentialWithBody(ctx context.Context, credentialId CredentialId, params *RotateGlobalCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRotateGlobalCredentialRequestWithBody(c.Server, credentialId, params, contentType, body)
 	if err != nil {
@@ -1086,6 +1599,8 @@ func (c *Client) RotateGlobalCredentialWithBody(ctx context.Context, credentialI
 
 // RotateGlobalCredential performs a POST /api/v1/admin/global-credentials/{credentialId}:rotate (the `RotateGlobalCredential` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the rotate global credential workflow within the authorized request scope.
 func (c *Client) RotateGlobalCredential(ctx context.Context, credentialId CredentialId, params *RotateGlobalCredentialParams, body RotateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRotateGlobalCredentialRequest(c.Server, credentialId, params, body)
 	if err != nil {
@@ -1100,6 +1615,8 @@ func (c *Client) RotateGlobalCredential(ctx context.Context, credentialId Creden
 
 // TestGlobalCredentialWithBody performs a POST /api/v1/admin/global-credentials/{credentialId}:test (the `TestGlobalCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Tests global credential within the authorized request scope.
 func (c *Client) TestGlobalCredentialWithBody(ctx context.Context, credentialId CredentialId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTestGlobalCredentialRequestWithBody(c.Server, credentialId, contentType, body)
 	if err != nil {
@@ -1114,6 +1631,8 @@ func (c *Client) TestGlobalCredentialWithBody(ctx context.Context, credentialId 
 
 // TestGlobalCredential performs a POST /api/v1/admin/global-credentials/{credentialId}:test (the `TestGlobalCredential` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Tests global credential within the authorized request scope.
 func (c *Client) TestGlobalCredential(ctx context.Context, credentialId CredentialId, body TestGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTestGlobalCredentialRequest(c.Server, credentialId, body)
 	if err != nil {
@@ -1127,6 +1646,8 @@ func (c *Client) TestGlobalCredential(ctx context.Context, credentialId Credenti
 }
 
 // ListPlatformJobs performs a GET /api/v1/admin/jobs (the `ListPlatformJobs` operationId) request.
+//
+// Returns the requested page of platform jobs within the authorized request scope.
 func (c *Client) ListPlatformJobs(ctx context.Context, params *ListPlatformJobsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListPlatformJobsRequest(c.Server, params)
 	if err != nil {
@@ -1140,6 +1661,8 @@ func (c *Client) ListPlatformJobs(ctx context.Context, params *ListPlatformJobsP
 }
 
 // GetPlatformJob performs a GET /api/v1/admin/jobs/{jobId} (the `GetPlatformJob` operationId) request.
+//
+// Returns the selected platform job within the authorized request scope.
 func (c *Client) GetPlatformJob(ctx context.Context, jobId JobId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPlatformJobRequest(c.Server, jobId)
 	if err != nil {
@@ -1153,6 +1676,8 @@ func (c *Client) GetPlatformJob(ctx context.Context, jobId JobId, reqEditors ...
 }
 
 // ListProducerProfiles performs a GET /api/v1/admin/producer-profiles (the `ListProducerProfiles` operationId) request.
+//
+// Returns the requested page of producer profiles within the authorized request scope.
 func (c *Client) ListProducerProfiles(ctx context.Context, params *ListProducerProfilesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListProducerProfilesRequest(c.Server, params)
 	if err != nil {
@@ -1167,6 +1692,8 @@ func (c *Client) ListProducerProfiles(ctx context.Context, params *ListProducerP
 
 // CreateProducerProfileWithBody performs a POST /api/v1/admin/producer-profiles (the `CreateProducerProfile` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates producer profile within the authorized request scope.
 func (c *Client) CreateProducerProfileWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateProducerProfileRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1181,6 +1708,8 @@ func (c *Client) CreateProducerProfileWithBody(ctx context.Context, contentType 
 
 // CreateProducerProfile performs a POST /api/v1/admin/producer-profiles (the `CreateProducerProfile` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates producer profile within the authorized request scope.
 func (c *Client) CreateProducerProfile(ctx context.Context, body CreateProducerProfileJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateProducerProfileRequest(c.Server, body)
 	if err != nil {
@@ -1194,6 +1723,8 @@ func (c *Client) CreateProducerProfile(ctx context.Context, body CreateProducerP
 }
 
 // DeleteProducerProfile performs a DELETE /api/v1/admin/producer-profiles/{producerProfileId} (the `DeleteProducerProfile` operationId) request.
+//
+// Deletes the selected producer profile within the authorized request scope.
 func (c *Client) DeleteProducerProfile(ctx context.Context, producerProfileId ProducerProfileId, params *DeleteProducerProfileParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteProducerProfileRequest(c.Server, producerProfileId, params)
 	if err != nil {
@@ -1207,6 +1738,8 @@ func (c *Client) DeleteProducerProfile(ctx context.Context, producerProfileId Pr
 }
 
 // GetProducerProfile performs a GET /api/v1/admin/producer-profiles/{producerProfileId} (the `GetProducerProfile` operationId) request.
+//
+// Returns the selected producer profile within the authorized request scope.
 func (c *Client) GetProducerProfile(ctx context.Context, producerProfileId ProducerProfileId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetProducerProfileRequest(c.Server, producerProfileId)
 	if err != nil {
@@ -1221,6 +1754,8 @@ func (c *Client) GetProducerProfile(ctx context.Context, producerProfileId Produ
 
 // UpdateProducerProfileWithBody performs a PATCH /api/v1/admin/producer-profiles/{producerProfileId} (the `UpdateProducerProfile` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected producer profile within the authorized request scope.
 func (c *Client) UpdateProducerProfileWithBody(ctx context.Context, producerProfileId ProducerProfileId, params *UpdateProducerProfileParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateProducerProfileRequestWithBody(c.Server, producerProfileId, params, contentType, body)
 	if err != nil {
@@ -1235,6 +1770,8 @@ func (c *Client) UpdateProducerProfileWithBody(ctx context.Context, producerProf
 
 // UpdateProducerProfile performs a PATCH /api/v1/admin/producer-profiles/{producerProfileId} (the `UpdateProducerProfile` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected producer profile within the authorized request scope.
 func (c *Client) UpdateProducerProfile(ctx context.Context, producerProfileId ProducerProfileId, params *UpdateProducerProfileParams, body UpdateProducerProfileJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateProducerProfileRequest(c.Server, producerProfileId, params, body)
 	if err != nil {
@@ -1248,6 +1785,8 @@ func (c *Client) UpdateProducerProfile(ctx context.Context, producerProfileId Pr
 }
 
 // GetPlatformSettings performs a GET /api/v1/admin/settings (the `GetPlatformSettings` operationId) request.
+//
+// Returns the selected platform settings within the authorized request scope.
 func (c *Client) GetPlatformSettings(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPlatformSettingsRequest(c.Server)
 	if err != nil {
@@ -1262,6 +1801,8 @@ func (c *Client) GetPlatformSettings(ctx context.Context, reqEditors ...RequestE
 
 // UpdatePlatformSettingsWithBody performs a PATCH /api/v1/admin/settings (the `UpdatePlatformSettings` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected platform settings within the authorized request scope.
 func (c *Client) UpdatePlatformSettingsWithBody(ctx context.Context, params *UpdatePlatformSettingsParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdatePlatformSettingsRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
@@ -1276,6 +1817,8 @@ func (c *Client) UpdatePlatformSettingsWithBody(ctx context.Context, params *Upd
 
 // UpdatePlatformSettings performs a PATCH /api/v1/admin/settings (the `UpdatePlatformSettings` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected platform settings within the authorized request scope.
 func (c *Client) UpdatePlatformSettings(ctx context.Context, params *UpdatePlatformSettingsParams, body UpdatePlatformSettingsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdatePlatformSettingsRequest(c.Server, params, body)
 	if err != nil {
@@ -1289,6 +1832,8 @@ func (c *Client) UpdatePlatformSettings(ctx context.Context, params *UpdatePlatf
 }
 
 // ListTenants performs a GET /api/v1/admin/tenants (the `ListTenants` operationId) request.
+//
+// Returns the requested page of tenants within the authorized request scope.
 func (c *Client) ListTenants(ctx context.Context, params *ListTenantsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListTenantsRequest(c.Server, params)
 	if err != nil {
@@ -1303,6 +1848,8 @@ func (c *Client) ListTenants(ctx context.Context, params *ListTenantsParams, req
 
 // CreateTenantWithBody performs a POST /api/v1/admin/tenants (the `CreateTenant` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates tenant within the authorized request scope.
 func (c *Client) CreateTenantWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTenantRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1317,6 +1864,8 @@ func (c *Client) CreateTenantWithBody(ctx context.Context, contentType string, b
 
 // CreateTenant performs a POST /api/v1/admin/tenants (the `CreateTenant` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates tenant within the authorized request scope.
 func (c *Client) CreateTenant(ctx context.Context, body CreateTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTenantRequest(c.Server, body)
 	if err != nil {
@@ -1331,6 +1880,8 @@ func (c *Client) CreateTenant(ctx context.Context, body CreateTenantJSONRequestB
 
 // DeleteTenantWithBody performs a DELETE /api/v1/admin/tenants/{tenantSlug} (the `DeleteTenant` operationId) request,
 // with any type of body and a specified content type.
+//
+// Deletes the selected tenant within the authorized request scope.
 func (c *Client) DeleteTenantWithBody(ctx context.Context, tenantSlug TenantSlug, params *DeleteTenantParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteTenantRequestWithBody(c.Server, tenantSlug, params, contentType, body)
 	if err != nil {
@@ -1345,6 +1896,8 @@ func (c *Client) DeleteTenantWithBody(ctx context.Context, tenantSlug TenantSlug
 
 // DeleteTenant performs a DELETE /api/v1/admin/tenants/{tenantSlug} (the `DeleteTenant` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Deletes the selected tenant within the authorized request scope.
 func (c *Client) DeleteTenant(ctx context.Context, tenantSlug TenantSlug, params *DeleteTenantParams, body DeleteTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteTenantRequest(c.Server, tenantSlug, params, body)
 	if err != nil {
@@ -1359,6 +1912,8 @@ func (c *Client) DeleteTenant(ctx context.Context, tenantSlug TenantSlug, params
 
 // UpdateTenantWithBody performs a PATCH /api/v1/admin/tenants/{tenantSlug} (the `UpdateTenant` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected tenant within the authorized request scope.
 func (c *Client) UpdateTenantWithBody(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateTenantRequestWithBody(c.Server, tenantSlug, params, contentType, body)
 	if err != nil {
@@ -1373,6 +1928,8 @@ func (c *Client) UpdateTenantWithBody(ctx context.Context, tenantSlug TenantSlug
 
 // UpdateTenant performs a PATCH /api/v1/admin/tenants/{tenantSlug} (the `UpdateTenant` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected tenant within the authorized request scope.
 func (c *Client) UpdateTenant(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantParams, body UpdateTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateTenantRequest(c.Server, tenantSlug, params, body)
 	if err != nil {
@@ -1387,6 +1944,8 @@ func (c *Client) UpdateTenant(ctx context.Context, tenantSlug TenantSlug, params
 
 // PutTenantMemberAsPlatformAdminWithBody performs a PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId} (the `PutTenantMemberAsPlatformAdmin` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates or replaces the selected tenant member as platform admin within the authorized request scope.
 func (c *Client) PutTenantMemberAsPlatformAdminWithBody(ctx context.Context, tenantSlug TenantSlug, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutTenantMemberAsPlatformAdminRequestWithBody(c.Server, tenantSlug, userId, contentType, body)
 	if err != nil {
@@ -1401,6 +1960,8 @@ func (c *Client) PutTenantMemberAsPlatformAdminWithBody(ctx context.Context, ten
 
 // PutTenantMemberAsPlatformAdmin performs a PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId} (the `PutTenantMemberAsPlatformAdmin` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates or replaces the selected tenant member as platform admin within the authorized request scope.
 func (c *Client) PutTenantMemberAsPlatformAdmin(ctx context.Context, tenantSlug TenantSlug, userId UserId, body PutTenantMemberAsPlatformAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutTenantMemberAsPlatformAdminRequest(c.Server, tenantSlug, userId, body)
 	if err != nil {
@@ -1414,6 +1975,8 @@ func (c *Client) PutTenantMemberAsPlatformAdmin(ctx context.Context, tenantSlug 
 }
 
 // ListUsers performs a GET /api/v1/admin/users (the `ListUsers` operationId) request.
+//
+// Returns the requested page of users within the authorized request scope.
 func (c *Client) ListUsers(ctx context.Context, params *ListUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListUsersRequest(c.Server, params)
 	if err != nil {
@@ -1428,6 +1991,8 @@ func (c *Client) ListUsers(ctx context.Context, params *ListUsersParams, reqEdit
 
 // CreateUserWithBody performs a POST /api/v1/admin/users (the `CreateUser` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates user within the authorized request scope.
 func (c *Client) CreateUserWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateUserRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1442,6 +2007,8 @@ func (c *Client) CreateUserWithBody(ctx context.Context, contentType string, bod
 
 // CreateUser performs a POST /api/v1/admin/users (the `CreateUser` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates user within the authorized request scope.
 func (c *Client) CreateUser(ctx context.Context, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateUserRequest(c.Server, body)
 	if err != nil {
@@ -1456,6 +2023,8 @@ func (c *Client) CreateUser(ctx context.Context, body CreateUserJSONRequestBody,
 
 // UpdateUserWithBody performs a PATCH /api/v1/admin/users/{userId} (the `UpdateUser` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected user within the authorized request scope.
 func (c *Client) UpdateUserWithBody(ctx context.Context, userId UserId, params *UpdateUserParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateUserRequestWithBody(c.Server, userId, params, contentType, body)
 	if err != nil {
@@ -1470,6 +2039,8 @@ func (c *Client) UpdateUserWithBody(ctx context.Context, userId UserId, params *
 
 // UpdateUser performs a PATCH /api/v1/admin/users/{userId} (the `UpdateUser` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected user within the authorized request scope.
 func (c *Client) UpdateUser(ctx context.Context, userId UserId, params *UpdateUserParams, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateUserRequest(c.Server, userId, params, body)
 	if err != nil {
@@ -1483,6 +2054,8 @@ func (c *Client) UpdateUser(ctx context.Context, userId UserId, params *UpdateUs
 }
 
 // GetCsrfToken performs a GET /api/v1/auth/csrf (the `GetCsrfToken` operationId) request.
+//
+// Returns a CSRF token bound to the current authenticated browser session.
 func (c *Client) GetCsrfToken(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetCsrfTokenRequest(c.Server)
 	if err != nil {
@@ -1497,6 +2070,8 @@ func (c *Client) GetCsrfToken(ctx context.Context, reqEditors ...RequestEditorFn
 
 // LoginWithBody performs a POST /api/v1/auth/login (the `Login` operationId) request,
 // with any type of body and a specified content type.
+//
+// Authenticates local credentials and creates a browser session.
 func (c *Client) LoginWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewLoginRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1511,6 +2086,8 @@ func (c *Client) LoginWithBody(ctx context.Context, contentType string, body io.
 
 // Login performs a POST /api/v1/auth/login (the `Login` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Authenticates local credentials and creates a browser session.
 func (c *Client) Login(ctx context.Context, body LoginJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewLoginRequest(c.Server, body)
 	if err != nil {
@@ -1524,6 +2101,8 @@ func (c *Client) Login(ctx context.Context, body LoginJSONRequestBody, reqEditor
 }
 
 // Logout performs a POST /api/v1/auth/logout (the `Logout` operationId) request.
+//
+// Revokes the current browser session and clears its session cookie.
 func (c *Client) Logout(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewLogoutRequest(c.Server)
 	if err != nil {
@@ -1537,6 +2116,8 @@ func (c *Client) Logout(ctx context.Context, reqEditors ...RequestEditorFn) (*ht
 }
 
 // GetMe performs a GET /api/v1/auth/me (the `GetMe` operationId) request.
+//
+// Returns the authenticated principal and tenant memberships.
 func (c *Client) GetMe(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetMeRequest(c.Server)
 	if err != nil {
@@ -1550,6 +2131,8 @@ func (c *Client) GetMe(ctx context.Context, reqEditors ...RequestEditorFn) (*htt
 }
 
 // GetMyPreferences performs a GET /api/v1/auth/me/preferences (the `GetMyPreferences` operationId) request.
+//
+// Returns the selected my preferences within the authorized request scope.
 func (c *Client) GetMyPreferences(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetMyPreferencesRequest(c.Server)
 	if err != nil {
@@ -1564,6 +2147,8 @@ func (c *Client) GetMyPreferences(ctx context.Context, reqEditors ...RequestEdit
 
 // UpdateMyPreferencesWithBody performs a PATCH /api/v1/auth/me/preferences (the `UpdateMyPreferences` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected my preferences within the authorized request scope.
 func (c *Client) UpdateMyPreferencesWithBody(ctx context.Context, params *UpdateMyPreferencesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateMyPreferencesRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
@@ -1578,6 +2163,8 @@ func (c *Client) UpdateMyPreferencesWithBody(ctx context.Context, params *Update
 
 // UpdateMyPreferences performs a PATCH /api/v1/auth/me/preferences (the `UpdateMyPreferences` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected my preferences within the authorized request scope.
 func (c *Client) UpdateMyPreferences(ctx context.Context, params *UpdateMyPreferencesParams, body UpdateMyPreferencesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateMyPreferencesRequest(c.Server, params, body)
 	if err != nil {
@@ -1591,6 +2178,8 @@ func (c *Client) UpdateMyPreferences(ctx context.Context, params *UpdateMyPrefer
 }
 
 // DownloadSignedContent performs a GET /api/v1/content/{token} (the `DownloadSignedContent` operationId) request.
+//
+// Downloads signed content within the authorized request scope.
 func (c *Client) DownloadSignedContent(ctx context.Context, token ContentToken, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDownloadSignedContentRequest(c.Server, token)
 	if err != nil {
@@ -1604,6 +2193,8 @@ func (c *Client) DownloadSignedContent(ctx context.Context, token ContentToken, 
 }
 
 // GetOpenApiContract performs a GET /api/v1/openapi.yaml (the `GetOpenApiContract` operationId) request.
+//
+// Returns the exact OpenAPI contract embedded in this server build.
 func (c *Client) GetOpenApiContract(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetOpenApiContractRequest(c.Server)
 	if err != nil {
@@ -1617,6 +2208,8 @@ func (c *Client) GetOpenApiContract(ctx context.Context, reqEditors ...RequestEd
 }
 
 // GetPublicService performs a GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug} (the `GetPublicService` operationId) request.
+//
+// Returns the selected public service within the authorized request scope.
 func (c *Client) GetPublicService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPublicServiceRequest(c.Server, tenantSlug, serviceSlug)
 	if err != nil {
@@ -1630,6 +2223,8 @@ func (c *Client) GetPublicService(ctx context.Context, tenantSlug TenantSlug, se
 }
 
 // GetPublicAsset performs a GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug}/assets/{kindId}/{assetName} (the `GetPublicAsset` operationId) request.
+//
+// Returns the selected public asset within the authorized request scope.
 func (c *Client) GetPublicAsset(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, kindId KindId, assetName AssetName, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPublicAssetRequest(c.Server, tenantSlug, serviceSlug, kindId, assetName)
 	if err != nil {
@@ -1644,6 +2239,8 @@ func (c *Client) GetPublicAsset(ctx context.Context, tenantSlug TenantSlug, serv
 
 // ResolvePublicViewWithBody performs a POST /api/v1/public/t/{tenantSlug}/views:resolve (the `ResolvePublicView` operationId) request,
 // with any type of body and a specified content type.
+//
+// Resolves public view within the authorized request scope.
 func (c *Client) ResolvePublicViewWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewResolvePublicViewRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -1658,6 +2255,8 @@ func (c *Client) ResolvePublicViewWithBody(ctx context.Context, tenantSlug Tenan
 
 // ResolvePublicView performs a POST /api/v1/public/t/{tenantSlug}/views:resolve (the `ResolvePublicView` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Resolves public view within the authorized request scope.
 func (c *Client) ResolvePublicView(ctx context.Context, tenantSlug TenantSlug, body ResolvePublicViewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewResolvePublicViewRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -1671,6 +2270,8 @@ func (c *Client) ResolvePublicView(ctx context.Context, tenantSlug TenantSlug, b
 }
 
 // GetSharedView performs a GET /api/v1/shared/{shareToken} (the `GetSharedView` operationId) request.
+//
+// Returns the selected shared view within the authorized request scope.
 func (c *Client) GetSharedView(ctx context.Context, shareToken ShareToken, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetSharedViewRequest(c.Server, shareToken)
 	if err != nil {
@@ -1684,6 +2285,8 @@ func (c *Client) GetSharedView(ctx context.Context, shareToken ShareToken, reqEd
 }
 
 // ListAssetKinds performs a GET /api/v1/t/{tenantSlug}/asset-kinds (the `ListAssetKinds` operationId) request.
+//
+// Returns the requested page of asset kinds within the authorized request scope.
 func (c *Client) ListAssetKinds(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListAssetKindsRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -1698,6 +2301,8 @@ func (c *Client) ListAssetKinds(ctx context.Context, tenantSlug TenantSlug, reqE
 
 // UpdateAssetKindStateWithBody performs a PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId} (the `UpdateAssetKindState` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected asset kind state within the authorized request scope.
 func (c *Client) UpdateAssetKindStateWithBody(ctx context.Context, tenantSlug TenantSlug, kindId KindId, params *UpdateAssetKindStateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateAssetKindStateRequestWithBody(c.Server, tenantSlug, kindId, params, contentType, body)
 	if err != nil {
@@ -1712,6 +2317,8 @@ func (c *Client) UpdateAssetKindStateWithBody(ctx context.Context, tenantSlug Te
 
 // UpdateAssetKindState performs a PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId} (the `UpdateAssetKindState` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected asset kind state within the authorized request scope.
 func (c *Client) UpdateAssetKindState(ctx context.Context, tenantSlug TenantSlug, kindId KindId, params *UpdateAssetKindStateParams, body UpdateAssetKindStateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateAssetKindStateRequest(c.Server, tenantSlug, kindId, params, body)
 	if err != nil {
@@ -1725,6 +2332,8 @@ func (c *Client) UpdateAssetKindState(ctx context.Context, tenantSlug TenantSlug
 }
 
 // GetAssetVersion performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId} (the `GetAssetVersion` operationId) request.
+//
+// Returns the selected asset version within the authorized request scope.
 func (c *Client) GetAssetVersion(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetAssetVersionRequest(c.Server, tenantSlug, versionId)
 	if err != nil {
@@ -1738,6 +2347,8 @@ func (c *Client) GetAssetVersion(ctx context.Context, tenantSlug TenantSlug, ver
 }
 
 // ListAssetVersionItems performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/items (the `ListAssetVersionItems` operationId) request.
+//
+// Returns the requested page of asset version items within the authorized request scope.
 func (c *Client) ListAssetVersionItems(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *ListAssetVersionItemsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListAssetVersionItemsRequest(c.Server, tenantSlug, versionId, params)
 	if err != nil {
@@ -1751,6 +2362,8 @@ func (c *Client) ListAssetVersionItems(ctx context.Context, tenantSlug TenantSlu
 }
 
 // GetAssetVersionProvenance performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/provenance (the `GetAssetVersionProvenance` operationId) request.
+//
+// Returns the selected asset version provenance within the authorized request scope.
 func (c *Client) GetAssetVersionProvenance(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetAssetVersionProvenanceRequest(c.Server, tenantSlug, versionId)
 	if err != nil {
@@ -1764,6 +2377,8 @@ func (c *Client) GetAssetVersionProvenance(ctx context.Context, tenantSlug Tenan
 }
 
 // DeprecateAssetVersion performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:deprecate (the `DeprecateAssetVersion` operationId) request.
+//
+// Performs the deprecate asset version workflow within the authorized request scope.
 func (c *Client) DeprecateAssetVersion(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *DeprecateAssetVersionParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeprecateAssetVersionRequest(c.Server, tenantSlug, versionId, params)
 	if err != nil {
@@ -1778,6 +2393,8 @@ func (c *Client) DeprecateAssetVersion(ctx context.Context, tenantSlug TenantSlu
 
 // PublishAssetVersionWithBody performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish (the `PublishAssetVersion` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the publish asset version workflow within the authorized request scope.
 func (c *Client) PublishAssetVersionWithBody(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *PublishAssetVersionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPublishAssetVersionRequestWithBody(c.Server, tenantSlug, versionId, params, contentType, body)
 	if err != nil {
@@ -1792,6 +2409,8 @@ func (c *Client) PublishAssetVersionWithBody(ctx context.Context, tenantSlug Ten
 
 // PublishAssetVersion performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish (the `PublishAssetVersion` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the publish asset version workflow within the authorized request scope.
 func (c *Client) PublishAssetVersion(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *PublishAssetVersionParams, body PublishAssetVersionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPublishAssetVersionRequest(c.Server, tenantSlug, versionId, params, body)
 	if err != nil {
@@ -1805,6 +2424,8 @@ func (c *Client) PublishAssetVersion(ctx context.Context, tenantSlug TenantSlug,
 }
 
 // RetireAssetVersion performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:retire (the `RetireAssetVersion` operationId) request.
+//
+// Performs the retire asset version workflow within the authorized request scope.
 func (c *Client) RetireAssetVersion(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *RetireAssetVersionParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRetireAssetVersionRequest(c.Server, tenantSlug, versionId, params)
 	if err != nil {
@@ -1818,6 +2439,8 @@ func (c *Client) RetireAssetVersion(ctx context.Context, tenantSlug TenantSlug, 
 }
 
 // GetAsset performs a GET /api/v1/t/{tenantSlug}/assets/{assetId} (the `GetAsset` operationId) request.
+//
+// Returns the selected asset within the authorized request scope.
 func (c *Client) GetAsset(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GetAssetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetAssetRequest(c.Server, tenantSlug, assetId, params)
 	if err != nil {
@@ -1832,6 +2455,8 @@ func (c *Client) GetAsset(ctx context.Context, tenantSlug TenantSlug, assetId As
 
 // ReorderAssetLayersWithBody performs a PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order (the `ReorderAssetLayers` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the reorder asset layers workflow within the authorized request scope.
 func (c *Client) ReorderAssetLayersWithBody(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ReorderAssetLayersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReorderAssetLayersRequestWithBody(c.Server, tenantSlug, assetId, params, contentType, body)
 	if err != nil {
@@ -1846,6 +2471,8 @@ func (c *Client) ReorderAssetLayersWithBody(ctx context.Context, tenantSlug Tena
 
 // ReorderAssetLayers performs a PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order (the `ReorderAssetLayers` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the reorder asset layers workflow within the authorized request scope.
 func (c *Client) ReorderAssetLayers(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ReorderAssetLayersParams, body ReorderAssetLayersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReorderAssetLayersRequest(c.Server, tenantSlug, assetId, params, body)
 	if err != nil {
@@ -1859,6 +2486,8 @@ func (c *Client) ReorderAssetLayers(ctx context.Context, tenantSlug TenantSlug, 
 }
 
 // ListAssetVersions performs a GET /api/v1/t/{tenantSlug}/assets/{assetId}/versions (the `ListAssetVersions` operationId) request.
+//
+// Returns the requested page of asset versions within the authorized request scope.
 func (c *Client) ListAssetVersions(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ListAssetVersionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListAssetVersionsRequest(c.Server, tenantSlug, assetId, params)
 	if err != nil {
@@ -1873,6 +2502,8 @@ func (c *Client) ListAssetVersions(ctx context.Context, tenantSlug TenantSlug, a
 
 // GenerateAssetWithAiWithBody performs a POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate (the `GenerateAssetWithAi` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the generate asset with ai workflow within the authorized request scope.
 func (c *Client) GenerateAssetWithAiWithBody(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GenerateAssetWithAiParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGenerateAssetWithAiRequestWithBody(c.Server, tenantSlug, assetId, params, contentType, body)
 	if err != nil {
@@ -1887,6 +2518,8 @@ func (c *Client) GenerateAssetWithAiWithBody(ctx context.Context, tenantSlug Ten
 
 // GenerateAssetWithAi performs a POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate (the `GenerateAssetWithAi` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the generate asset with ai workflow within the authorized request scope.
 func (c *Client) GenerateAssetWithAi(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GenerateAssetWithAiParams, body GenerateAssetWithAiJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGenerateAssetWithAiRequest(c.Server, tenantSlug, assetId, params, body)
 	if err != nil {
@@ -1901,6 +2534,8 @@ func (c *Client) GenerateAssetWithAi(ctx context.Context, tenantSlug TenantSlug,
 
 // PreviewMergeWithBody performs a POST /api/v1/t/{tenantSlug}/assets:preview-merge (the `PreviewMerge` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the preview merge workflow within the authorized request scope.
 func (c *Client) PreviewMergeWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPreviewMergeRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -1915,6 +2550,8 @@ func (c *Client) PreviewMergeWithBody(ctx context.Context, tenantSlug TenantSlug
 
 // PreviewMerge performs a POST /api/v1/t/{tenantSlug}/assets:preview-merge (the `PreviewMerge` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the preview merge workflow within the authorized request scope.
 func (c *Client) PreviewMerge(ctx context.Context, tenantSlug TenantSlug, body PreviewMergeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPreviewMergeRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -1929,6 +2566,8 @@ func (c *Client) PreviewMerge(ctx context.Context, tenantSlug TenantSlug, body P
 
 // PushAssetRevisionWithBody performs a POST /api/v1/t/{tenantSlug}/assets:push (the `PushAssetRevision` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the push asset revision workflow within the authorized request scope.
 func (c *Client) PushAssetRevisionWithBody(ctx context.Context, tenantSlug TenantSlug, params *PushAssetRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPushAssetRevisionRequestWithBody(c.Server, tenantSlug, params, contentType, body)
 	if err != nil {
@@ -1943,6 +2582,8 @@ func (c *Client) PushAssetRevisionWithBody(ctx context.Context, tenantSlug Tenan
 
 // PushAssetRevision performs a POST /api/v1/t/{tenantSlug}/assets:push (the `PushAssetRevision` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the push asset revision workflow within the authorized request scope.
 func (c *Client) PushAssetRevision(ctx context.Context, tenantSlug TenantSlug, params *PushAssetRevisionParams, body PushAssetRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPushAssetRevisionRequest(c.Server, tenantSlug, params, body)
 	if err != nil {
@@ -1956,6 +2597,8 @@ func (c *Client) PushAssetRevision(ctx context.Context, tenantSlug TenantSlug, p
 }
 
 // ListAuditLogs performs a GET /api/v1/t/{tenantSlug}/audit-logs (the `ListAuditLogs` operationId) request.
+//
+// Returns the requested page of audit logs within the authorized request scope.
 func (c *Client) ListAuditLogs(ctx context.Context, tenantSlug TenantSlug, params *ListAuditLogsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListAuditLogsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -1969,6 +2612,8 @@ func (c *Client) ListAuditLogs(ctx context.Context, tenantSlug TenantSlug, param
 }
 
 // ListBreakingTodos performs a GET /api/v1/t/{tenantSlug}/breaking-todos (the `ListBreakingTodos` operationId) request.
+//
+// Returns the requested page of breaking todos within the authorized request scope.
 func (c *Client) ListBreakingTodos(ctx context.Context, tenantSlug TenantSlug, params *ListBreakingTodosParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListBreakingTodosRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -1983,6 +2628,8 @@ func (c *Client) ListBreakingTodos(ctx context.Context, tenantSlug TenantSlug, p
 
 // AcknowledgeBreakingTodoWithBody performs a POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack (the `AcknowledgeBreakingTodo` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the acknowledge breaking todo workflow within the authorized request scope.
 func (c *Client) AcknowledgeBreakingTodoWithBody(ctx context.Context, tenantSlug TenantSlug, todoId TodoId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAcknowledgeBreakingTodoRequestWithBody(c.Server, tenantSlug, todoId, contentType, body)
 	if err != nil {
@@ -1997,6 +2644,8 @@ func (c *Client) AcknowledgeBreakingTodoWithBody(ctx context.Context, tenantSlug
 
 // AcknowledgeBreakingTodo performs a POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack (the `AcknowledgeBreakingTodo` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the acknowledge breaking todo workflow within the authorized request scope.
 func (c *Client) AcknowledgeBreakingTodo(ctx context.Context, tenantSlug TenantSlug, todoId TodoId, body AcknowledgeBreakingTodoJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAcknowledgeBreakingTodoRequest(c.Server, tenantSlug, todoId, body)
 	if err != nil {
@@ -2010,6 +2659,8 @@ func (c *Client) AcknowledgeBreakingTodo(ctx context.Context, tenantSlug TenantS
 }
 
 // ListCredentials performs a GET /api/v1/t/{tenantSlug}/credentials (the `ListCredentials` operationId) request.
+//
+// Returns the requested page of credentials within the authorized request scope.
 func (c *Client) ListCredentials(ctx context.Context, tenantSlug TenantSlug, params *ListCredentialsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListCredentialsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2024,6 +2675,8 @@ func (c *Client) ListCredentials(ctx context.Context, tenantSlug TenantSlug, par
 
 // CreateCredentialWithBody performs a POST /api/v1/t/{tenantSlug}/credentials (the `CreateCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates credential within the authorized request scope.
 func (c *Client) CreateCredentialWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateCredentialRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -2038,6 +2691,8 @@ func (c *Client) CreateCredentialWithBody(ctx context.Context, tenantSlug Tenant
 
 // CreateCredential performs a POST /api/v1/t/{tenantSlug}/credentials (the `CreateCredential` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates credential within the authorized request scope.
 func (c *Client) CreateCredential(ctx context.Context, tenantSlug TenantSlug, body CreateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateCredentialRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -2051,6 +2706,8 @@ func (c *Client) CreateCredential(ctx context.Context, tenantSlug TenantSlug, bo
 }
 
 // DeleteCredential performs a DELETE /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `DeleteCredential` operationId) request.
+//
+// Deletes the selected credential within the authorized request scope.
 func (c *Client) DeleteCredential(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *DeleteCredentialParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteCredentialRequest(c.Server, tenantSlug, credentialId, params)
 	if err != nil {
@@ -2065,6 +2722,8 @@ func (c *Client) DeleteCredential(ctx context.Context, tenantSlug TenantSlug, cr
 
 // UpdateCredentialWithBody performs a PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `UpdateCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected credential within the authorized request scope.
 func (c *Client) UpdateCredentialWithBody(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *UpdateCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateCredentialRequestWithBody(c.Server, tenantSlug, credentialId, params, contentType, body)
 	if err != nil {
@@ -2079,6 +2738,8 @@ func (c *Client) UpdateCredentialWithBody(ctx context.Context, tenantSlug Tenant
 
 // UpdateCredential performs a PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `UpdateCredential` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected credential within the authorized request scope.
 func (c *Client) UpdateCredential(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *UpdateCredentialParams, body UpdateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateCredentialRequest(c.Server, tenantSlug, credentialId, params, body)
 	if err != nil {
@@ -2093,6 +2754,8 @@ func (c *Client) UpdateCredential(ctx context.Context, tenantSlug TenantSlug, cr
 
 // RotateCredentialWithBody performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate (the `RotateCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the rotate credential workflow within the authorized request scope.
 func (c *Client) RotateCredentialWithBody(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *RotateCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRotateCredentialRequestWithBody(c.Server, tenantSlug, credentialId, params, contentType, body)
 	if err != nil {
@@ -2107,6 +2770,8 @@ func (c *Client) RotateCredentialWithBody(ctx context.Context, tenantSlug Tenant
 
 // RotateCredential performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate (the `RotateCredential` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the rotate credential workflow within the authorized request scope.
 func (c *Client) RotateCredential(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *RotateCredentialParams, body RotateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRotateCredentialRequest(c.Server, tenantSlug, credentialId, params, body)
 	if err != nil {
@@ -2121,6 +2786,8 @@ func (c *Client) RotateCredential(ctx context.Context, tenantSlug TenantSlug, cr
 
 // TestCredentialWithBody performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test (the `TestCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Tests credential within the authorized request scope.
 func (c *Client) TestCredentialWithBody(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTestCredentialRequestWithBody(c.Server, tenantSlug, credentialId, contentType, body)
 	if err != nil {
@@ -2135,6 +2802,8 @@ func (c *Client) TestCredentialWithBody(ctx context.Context, tenantSlug TenantSl
 
 // TestCredential performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test (the `TestCredential` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Tests credential within the authorized request scope.
 func (c *Client) TestCredential(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, body TestCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTestCredentialRequest(c.Server, tenantSlug, credentialId, body)
 	if err != nil {
@@ -2149,6 +2818,8 @@ func (c *Client) TestCredential(ctx context.Context, tenantSlug TenantSlug, cred
 
 // RunDiffWithBody performs a POST /api/v1/t/{tenantSlug}/diff (the `RunDiff` operationId) request,
 // with any type of body and a specified content type.
+//
+// Runs diff within the authorized request scope.
 func (c *Client) RunDiffWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRunDiffRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -2163,6 +2834,8 @@ func (c *Client) RunDiffWithBody(ctx context.Context, tenantSlug TenantSlug, con
 
 // RunDiff performs a POST /api/v1/t/{tenantSlug}/diff (the `RunDiff` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Runs diff within the authorized request scope.
 func (c *Client) RunDiff(ctx context.Context, tenantSlug TenantSlug, body RunDiffJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRunDiffRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -2176,6 +2849,8 @@ func (c *Client) RunDiff(ctx context.Context, tenantSlug TenantSlug, body RunDif
 }
 
 // ListDiffRuleSets performs a GET /api/v1/t/{tenantSlug}/diff-rule-sets (the `ListDiffRuleSets` operationId) request.
+//
+// Returns the requested page of diff rule sets within the authorized request scope.
 func (c *Client) ListDiffRuleSets(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListDiffRuleSetsRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -2190,6 +2865,8 @@ func (c *Client) ListDiffRuleSets(ctx context.Context, tenantSlug TenantSlug, re
 
 // CreateDiffRuleSetWithBody performs a POST /api/v1/t/{tenantSlug}/diff-rule-sets (the `CreateDiffRuleSet` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates diff rule set within the authorized request scope.
 func (c *Client) CreateDiffRuleSetWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateDiffRuleSetRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -2204,6 +2881,8 @@ func (c *Client) CreateDiffRuleSetWithBody(ctx context.Context, tenantSlug Tenan
 
 // CreateDiffRuleSet performs a POST /api/v1/t/{tenantSlug}/diff-rule-sets (the `CreateDiffRuleSet` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates diff rule set within the authorized request scope.
 func (c *Client) CreateDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, body CreateDiffRuleSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateDiffRuleSetRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -2217,6 +2896,8 @@ func (c *Client) CreateDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, b
 }
 
 // DeleteDiffRuleSet performs a DELETE /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `DeleteDiffRuleSet` operationId) request.
+//
+// Deletes the selected diff rule set within the authorized request scope.
 func (c *Client) DeleteDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *DeleteDiffRuleSetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteDiffRuleSetRequest(c.Server, tenantSlug, ruleSetId, params)
 	if err != nil {
@@ -2231,6 +2912,8 @@ func (c *Client) DeleteDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, r
 
 // UpdateDiffRuleSetWithBody performs a PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `UpdateDiffRuleSet` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected diff rule set within the authorized request scope.
 func (c *Client) UpdateDiffRuleSetWithBody(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *UpdateDiffRuleSetParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateDiffRuleSetRequestWithBody(c.Server, tenantSlug, ruleSetId, params, contentType, body)
 	if err != nil {
@@ -2245,6 +2928,8 @@ func (c *Client) UpdateDiffRuleSetWithBody(ctx context.Context, tenantSlug Tenan
 
 // UpdateDiffRuleSet performs a PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `UpdateDiffRuleSet` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected diff rule set within the authorized request scope.
 func (c *Client) UpdateDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *UpdateDiffRuleSetParams, body UpdateDiffRuleSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateDiffRuleSetRequest(c.Server, tenantSlug, ruleSetId, params, body)
 	if err != nil {
@@ -2258,6 +2943,8 @@ func (c *Client) UpdateDiffRuleSet(ctx context.Context, tenantSlug TenantSlug, r
 }
 
 // ListDiffSnapshots performs a GET /api/v1/t/{tenantSlug}/diff-snapshots (the `ListDiffSnapshots` operationId) request.
+//
+// Returns the requested page of diff snapshots within the authorized request scope.
 func (c *Client) ListDiffSnapshots(ctx context.Context, tenantSlug TenantSlug, params *ListDiffSnapshotsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListDiffSnapshotsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2271,6 +2958,8 @@ func (c *Client) ListDiffSnapshots(ctx context.Context, tenantSlug TenantSlug, p
 }
 
 // DeleteDiffSnapshot performs a DELETE /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId} (the `DeleteDiffSnapshot` operationId) request.
+//
+// Deletes the selected diff snapshot within the authorized request scope.
 func (c *Client) DeleteDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteDiffSnapshotRequest(c.Server, tenantSlug, snapshotId)
 	if err != nil {
@@ -2284,6 +2973,8 @@ func (c *Client) DeleteDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, 
 }
 
 // GetDiffSnapshot performs a GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId} (the `GetDiffSnapshot` operationId) request.
+//
+// Returns the selected diff snapshot within the authorized request scope.
 func (c *Client) GetDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetDiffSnapshotRequest(c.Server, tenantSlug, snapshotId)
 	if err != nil {
@@ -2297,6 +2988,8 @@ func (c *Client) GetDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, sna
 }
 
 // ExportDiffSnapshot performs a GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/export (the `ExportDiffSnapshot` operationId) request.
+//
+// Exports diff snapshot within the authorized request scope.
 func (c *Client) ExportDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, params *ExportDiffSnapshotParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewExportDiffSnapshotRequest(c.Server, tenantSlug, snapshotId, params)
 	if err != nil {
@@ -2311,6 +3004,8 @@ func (c *Client) ExportDiffSnapshot(ctx context.Context, tenantSlug TenantSlug, 
 
 // CreateDiffSnapshotShareLinkWithBody performs a POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links (the `CreateDiffSnapshotShareLink` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates diff snapshot share link within the authorized request scope.
 func (c *Client) CreateDiffSnapshotShareLinkWithBody(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateDiffSnapshotShareLinkRequestWithBody(c.Server, tenantSlug, snapshotId, contentType, body)
 	if err != nil {
@@ -2325,6 +3020,8 @@ func (c *Client) CreateDiffSnapshotShareLinkWithBody(ctx context.Context, tenant
 
 // CreateDiffSnapshotShareLink performs a POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links (the `CreateDiffSnapshotShareLink` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates diff snapshot share link within the authorized request scope.
 func (c *Client) CreateDiffSnapshotShareLink(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, body CreateDiffSnapshotShareLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateDiffSnapshotShareLinkRequest(c.Server, tenantSlug, snapshotId, body)
 	if err != nil {
@@ -2338,6 +3035,8 @@ func (c *Client) CreateDiffSnapshotShareLink(ctx context.Context, tenantSlug Ten
 }
 
 // SearchTenantUsers performs a GET /api/v1/t/{tenantSlug}/directory/users (the `SearchTenantUsers` operationId) request.
+//
+// Searches for tenant users within the authorized request scope.
 func (c *Client) SearchTenantUsers(ctx context.Context, tenantSlug TenantSlug, params *SearchTenantUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSearchTenantUsersRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2351,6 +3050,8 @@ func (c *Client) SearchTenantUsers(ctx context.Context, tenantSlug TenantSlug, p
 }
 
 // CreateTenantExport performs a POST /api/v1/t/{tenantSlug}/exports (the `CreateTenantExport` operationId) request.
+//
+// Creates tenant export within the authorized request scope.
 func (c *Client) CreateTenantExport(ctx context.Context, tenantSlug TenantSlug, params *CreateTenantExportParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTenantExportRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2364,6 +3065,8 @@ func (c *Client) CreateTenantExport(ctx context.Context, tenantSlug TenantSlug, 
 }
 
 // ListJobs performs a GET /api/v1/t/{tenantSlug}/jobs (the `ListJobs` operationId) request.
+//
+// Returns the requested page of jobs within the authorized request scope.
 func (c *Client) ListJobs(ctx context.Context, tenantSlug TenantSlug, params *ListJobsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListJobsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2377,6 +3080,8 @@ func (c *Client) ListJobs(ctx context.Context, tenantSlug TenantSlug, params *Li
 }
 
 // GetJob performs a GET /api/v1/t/{tenantSlug}/jobs/{jobId} (the `GetJob` operationId) request.
+//
+// Returns the selected job within the authorized request scope.
 func (c *Client) GetJob(ctx context.Context, tenantSlug TenantSlug, jobId JobId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetJobRequest(c.Server, tenantSlug, jobId)
 	if err != nil {
@@ -2390,6 +3095,8 @@ func (c *Client) GetJob(ctx context.Context, tenantSlug TenantSlug, jobId JobId,
 }
 
 // StreamJobLogs performs a GET /api/v1/t/{tenantSlug}/jobs/{jobId}/logs (the `StreamJobLogs` operationId) request.
+//
+// Streams ordered events for job logs within the authorized request scope.
 func (c *Client) StreamJobLogs(ctx context.Context, tenantSlug TenantSlug, jobId JobId, params *StreamJobLogsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewStreamJobLogsRequest(c.Server, tenantSlug, jobId, params)
 	if err != nil {
@@ -2403,6 +3110,8 @@ func (c *Client) StreamJobLogs(ctx context.Context, tenantSlug TenantSlug, jobId
 }
 
 // CancelJob performs a POST /api/v1/t/{tenantSlug}/jobs/{jobId}:cancel (the `CancelJob` operationId) request.
+//
+// Performs the cancel job workflow within the authorized request scope.
 func (c *Client) CancelJob(ctx context.Context, tenantSlug TenantSlug, jobId JobId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCancelJobRequest(c.Server, tenantSlug, jobId)
 	if err != nil {
@@ -2416,6 +3125,8 @@ func (c *Client) CancelJob(ctx context.Context, tenantSlug TenantSlug, jobId Job
 }
 
 // RetryJob performs a POST /api/v1/t/{tenantSlug}/jobs/{jobId}:retry (the `RetryJob` operationId) request.
+//
+// Performs the retry job workflow within the authorized request scope.
 func (c *Client) RetryJob(ctx context.Context, tenantSlug TenantSlug, jobId JobId, params *RetryJobParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRetryJobRequest(c.Server, tenantSlug, jobId, params)
 	if err != nil {
@@ -2429,6 +3140,8 @@ func (c *Client) RetryJob(ctx context.Context, tenantSlug TenantSlug, jobId JobI
 }
 
 // ListKnownHosts performs a GET /api/v1/t/{tenantSlug}/known-hosts (the `ListKnownHosts` operationId) request.
+//
+// Returns the requested page of known hosts within the authorized request scope.
 func (c *Client) ListKnownHosts(ctx context.Context, tenantSlug TenantSlug, params *ListKnownHostsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListKnownHostsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2443,6 +3156,8 @@ func (c *Client) ListKnownHosts(ctx context.Context, tenantSlug TenantSlug, para
 
 // CreateKnownHostWithBody performs a POST /api/v1/t/{tenantSlug}/known-hosts (the `CreateKnownHost` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates known host within the authorized request scope.
 func (c *Client) CreateKnownHostWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateKnownHostRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -2457,6 +3172,8 @@ func (c *Client) CreateKnownHostWithBody(ctx context.Context, tenantSlug TenantS
 
 // CreateKnownHost performs a POST /api/v1/t/{tenantSlug}/known-hosts (the `CreateKnownHost` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates known host within the authorized request scope.
 func (c *Client) CreateKnownHost(ctx context.Context, tenantSlug TenantSlug, body CreateKnownHostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateKnownHostRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -2470,6 +3187,8 @@ func (c *Client) CreateKnownHost(ctx context.Context, tenantSlug TenantSlug, bod
 }
 
 // GetLayerRevision performs a GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId} (the `GetLayerRevision` operationId) request.
+//
+// Returns the selected layer revision within the authorized request scope.
 func (c *Client) GetLayerRevision(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetLayerRevisionRequest(c.Server, tenantSlug, revisionId)
 	if err != nil {
@@ -2483,6 +3202,8 @@ func (c *Client) GetLayerRevision(ctx context.Context, tenantSlug TenantSlug, re
 }
 
 // GetReviewContext performs a GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}/review-context (the `GetReviewContext` operationId) request.
+//
+// Returns the selected review context within the authorized request scope.
 func (c *Client) GetReviewContext(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetReviewContextRequest(c.Server, tenantSlug, revisionId)
 	if err != nil {
@@ -2497,6 +3218,8 @@ func (c *Client) GetReviewContext(ctx context.Context, tenantSlug TenantSlug, re
 
 // ApproveLayerRevisionWithBody performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve (the `ApproveLayerRevision` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the approve layer revision workflow within the authorized request scope.
 func (c *Client) ApproveLayerRevisionWithBody(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *ApproveLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewApproveLayerRevisionRequestWithBody(c.Server, tenantSlug, revisionId, params, contentType, body)
 	if err != nil {
@@ -2511,6 +3234,8 @@ func (c *Client) ApproveLayerRevisionWithBody(ctx context.Context, tenantSlug Te
 
 // ApproveLayerRevision performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve (the `ApproveLayerRevision` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the approve layer revision workflow within the authorized request scope.
 func (c *Client) ApproveLayerRevision(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *ApproveLayerRevisionParams, body ApproveLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewApproveLayerRevisionRequest(c.Server, tenantSlug, revisionId, params, body)
 	if err != nil {
@@ -2525,6 +3250,8 @@ func (c *Client) ApproveLayerRevision(ctx context.Context, tenantSlug TenantSlug
 
 // RejectLayerRevisionWithBody performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject (the `RejectLayerRevision` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the reject layer revision workflow within the authorized request scope.
 func (c *Client) RejectLayerRevisionWithBody(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *RejectLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRejectLayerRevisionRequestWithBody(c.Server, tenantSlug, revisionId, params, contentType, body)
 	if err != nil {
@@ -2539,6 +3266,8 @@ func (c *Client) RejectLayerRevisionWithBody(ctx context.Context, tenantSlug Ten
 
 // RejectLayerRevision performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject (the `RejectLayerRevision` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the reject layer revision workflow within the authorized request scope.
 func (c *Client) RejectLayerRevision(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *RejectLayerRevisionParams, body RejectLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRejectLayerRevisionRequest(c.Server, tenantSlug, revisionId, params, body)
 	if err != nil {
@@ -2552,6 +3281,8 @@ func (c *Client) RejectLayerRevision(ctx context.Context, tenantSlug TenantSlug,
 }
 
 // GetLayer performs a GET /api/v1/t/{tenantSlug}/layers/{layerId} (the `GetLayer` operationId) request.
+//
+// Returns the selected layer within the authorized request scope.
 func (c *Client) GetLayer(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *GetLayerParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetLayerRequest(c.Server, tenantSlug, layerId, params)
 	if err != nil {
@@ -2566,6 +3297,8 @@ func (c *Client) GetLayer(ctx context.Context, tenantSlug TenantSlug, layerId La
 
 // UpdateLayerWithBody performs a PATCH /api/v1/t/{tenantSlug}/layers/{layerId} (the `UpdateLayer` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected layer within the authorized request scope.
 func (c *Client) UpdateLayerWithBody(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *UpdateLayerParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateLayerRequestWithBody(c.Server, tenantSlug, layerId, params, contentType, body)
 	if err != nil {
@@ -2580,6 +3313,8 @@ func (c *Client) UpdateLayerWithBody(ctx context.Context, tenantSlug TenantSlug,
 
 // UpdateLayer performs a PATCH /api/v1/t/{tenantSlug}/layers/{layerId} (the `UpdateLayer` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected layer within the authorized request scope.
 func (c *Client) UpdateLayer(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *UpdateLayerParams, body UpdateLayerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateLayerRequest(c.Server, tenantSlug, layerId, params, body)
 	if err != nil {
@@ -2593,6 +3328,8 @@ func (c *Client) UpdateLayer(ctx context.Context, tenantSlug TenantSlug, layerId
 }
 
 // ListLayerRevisions performs a GET /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `ListLayerRevisions` operationId) request.
+//
+// Returns the requested page of layer revisions within the authorized request scope.
 func (c *Client) ListLayerRevisions(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *ListLayerRevisionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListLayerRevisionsRequest(c.Server, tenantSlug, layerId, params)
 	if err != nil {
@@ -2607,6 +3344,8 @@ func (c *Client) ListLayerRevisions(ctx context.Context, tenantSlug TenantSlug, 
 
 // CreateLayerRevisionWithBody performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `CreateLayerRevision` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates layer revision within the authorized request scope.
 func (c *Client) CreateLayerRevisionWithBody(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *CreateLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateLayerRevisionRequestWithBody(c.Server, tenantSlug, layerId, params, contentType, body)
 	if err != nil {
@@ -2621,6 +3360,8 @@ func (c *Client) CreateLayerRevisionWithBody(ctx context.Context, tenantSlug Ten
 
 // CreateLayerRevision performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `CreateLayerRevision` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates layer revision within the authorized request scope.
 func (c *Client) CreateLayerRevision(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *CreateLayerRevisionParams, body CreateLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateLayerRevisionRequest(c.Server, tenantSlug, layerId, params, body)
 	if err != nil {
@@ -2635,6 +3376,8 @@ func (c *Client) CreateLayerRevision(ctx context.Context, tenantSlug TenantSlug,
 
 // RollbackLayerWithBody performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback (the `RollbackLayer` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the rollback layer workflow within the authorized request scope.
 func (c *Client) RollbackLayerWithBody(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *RollbackLayerParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRollbackLayerRequestWithBody(c.Server, tenantSlug, layerId, params, contentType, body)
 	if err != nil {
@@ -2649,6 +3392,8 @@ func (c *Client) RollbackLayerWithBody(ctx context.Context, tenantSlug TenantSlu
 
 // RollbackLayer performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback (the `RollbackLayer` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the rollback layer workflow within the authorized request scope.
 func (c *Client) RollbackLayer(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *RollbackLayerParams, body RollbackLayerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRollbackLayerRequest(c.Server, tenantSlug, layerId, params, body)
 	if err != nil {
@@ -2662,6 +3407,8 @@ func (c *Client) RollbackLayer(ctx context.Context, tenantSlug TenantSlug, layer
 }
 
 // ListTenantMembers performs a GET /api/v1/t/{tenantSlug}/members (the `ListTenantMembers` operationId) request.
+//
+// Returns the requested page of tenant members within the authorized request scope.
 func (c *Client) ListTenantMembers(ctx context.Context, tenantSlug TenantSlug, params *ListTenantMembersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListTenantMembersRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2675,6 +3422,8 @@ func (c *Client) ListTenantMembers(ctx context.Context, tenantSlug TenantSlug, p
 }
 
 // DeleteTenantMember performs a DELETE /api/v1/t/{tenantSlug}/members/{userId} (the `DeleteTenantMember` operationId) request.
+//
+// Deletes the selected tenant member within the authorized request scope.
 func (c *Client) DeleteTenantMember(ctx context.Context, tenantSlug TenantSlug, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteTenantMemberRequest(c.Server, tenantSlug, userId)
 	if err != nil {
@@ -2689,6 +3438,8 @@ func (c *Client) DeleteTenantMember(ctx context.Context, tenantSlug TenantSlug, 
 
 // PutTenantMemberWithBody performs a PUT /api/v1/t/{tenantSlug}/members/{userId} (the `PutTenantMember` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates or replaces the selected tenant member within the authorized request scope.
 func (c *Client) PutTenantMemberWithBody(ctx context.Context, tenantSlug TenantSlug, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutTenantMemberRequestWithBody(c.Server, tenantSlug, userId, contentType, body)
 	if err != nil {
@@ -2703,6 +3454,8 @@ func (c *Client) PutTenantMemberWithBody(ctx context.Context, tenantSlug TenantS
 
 // PutTenantMember performs a PUT /api/v1/t/{tenantSlug}/members/{userId} (the `PutTenantMember` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates or replaces the selected tenant member within the authorized request scope.
 func (c *Client) PutTenantMember(ctx context.Context, tenantSlug TenantSlug, userId UserId, body PutTenantMemberJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutTenantMemberRequest(c.Server, tenantSlug, userId, body)
 	if err != nil {
@@ -2716,6 +3469,8 @@ func (c *Client) PutTenantMember(ctx context.Context, tenantSlug TenantSlug, use
 }
 
 // ListNotificationChannels performs a GET /api/v1/t/{tenantSlug}/notification-channels (the `ListNotificationChannels` operationId) request.
+//
+// Returns the requested page of notification channels within the authorized request scope.
 func (c *Client) ListNotificationChannels(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListNotificationChannelsRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -2730,6 +3485,8 @@ func (c *Client) ListNotificationChannels(ctx context.Context, tenantSlug Tenant
 
 // CreateNotificationChannelWithBody performs a POST /api/v1/t/{tenantSlug}/notification-channels (the `CreateNotificationChannel` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates notification channel within the authorized request scope.
 func (c *Client) CreateNotificationChannelWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateNotificationChannelRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -2744,6 +3501,8 @@ func (c *Client) CreateNotificationChannelWithBody(ctx context.Context, tenantSl
 
 // CreateNotificationChannel performs a POST /api/v1/t/{tenantSlug}/notification-channels (the `CreateNotificationChannel` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates notification channel within the authorized request scope.
 func (c *Client) CreateNotificationChannel(ctx context.Context, tenantSlug TenantSlug, body CreateNotificationChannelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateNotificationChannelRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -2757,6 +3516,8 @@ func (c *Client) CreateNotificationChannel(ctx context.Context, tenantSlug Tenan
 }
 
 // DeleteNotificationChannel performs a DELETE /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `DeleteNotificationChannel` operationId) request.
+//
+// Deletes the selected notification channel within the authorized request scope.
 func (c *Client) DeleteNotificationChannel(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *DeleteNotificationChannelParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteNotificationChannelRequest(c.Server, tenantSlug, channelId, params)
 	if err != nil {
@@ -2771,6 +3532,8 @@ func (c *Client) DeleteNotificationChannel(ctx context.Context, tenantSlug Tenan
 
 // UpdateNotificationChannelWithBody performs a PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `UpdateNotificationChannel` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected notification channel within the authorized request scope.
 func (c *Client) UpdateNotificationChannelWithBody(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *UpdateNotificationChannelParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateNotificationChannelRequestWithBody(c.Server, tenantSlug, channelId, params, contentType, body)
 	if err != nil {
@@ -2785,6 +3548,8 @@ func (c *Client) UpdateNotificationChannelWithBody(ctx context.Context, tenantSl
 
 // UpdateNotificationChannel performs a PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `UpdateNotificationChannel` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected notification channel within the authorized request scope.
 func (c *Client) UpdateNotificationChannel(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *UpdateNotificationChannelParams, body UpdateNotificationChannelJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateNotificationChannelRequest(c.Server, tenantSlug, channelId, params, body)
 	if err != nil {
@@ -2799,6 +3564,8 @@ func (c *Client) UpdateNotificationChannel(ctx context.Context, tenantSlug Tenan
 
 // RotateNotificationChannelSecretWithBody performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate (the `RotateNotificationChannelSecret` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the rotate notification channel secret workflow within the authorized request scope.
 func (c *Client) RotateNotificationChannelSecretWithBody(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *RotateNotificationChannelSecretParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRotateNotificationChannelSecretRequestWithBody(c.Server, tenantSlug, channelId, params, contentType, body)
 	if err != nil {
@@ -2813,6 +3580,8 @@ func (c *Client) RotateNotificationChannelSecretWithBody(ctx context.Context, te
 
 // RotateNotificationChannelSecret performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate (the `RotateNotificationChannelSecret` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the rotate notification channel secret workflow within the authorized request scope.
 func (c *Client) RotateNotificationChannelSecret(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *RotateNotificationChannelSecretParams, body RotateNotificationChannelSecretJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRotateNotificationChannelSecretRequest(c.Server, tenantSlug, channelId, params, body)
 	if err != nil {
@@ -2826,6 +3595,8 @@ func (c *Client) RotateNotificationChannelSecret(ctx context.Context, tenantSlug
 }
 
 // TestNotificationChannel performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:test (the `TestNotificationChannel` operationId) request.
+//
+// Tests notification channel within the authorized request scope.
 func (c *Client) TestNotificationChannel(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTestNotificationChannelRequest(c.Server, tenantSlug, channelId)
 	if err != nil {
@@ -2839,6 +3610,8 @@ func (c *Client) TestNotificationChannel(ctx context.Context, tenantSlug TenantS
 }
 
 // ListNotifications performs a GET /api/v1/t/{tenantSlug}/notifications (the `ListNotifications` operationId) request.
+//
+// Returns the requested page of notifications within the authorized request scope.
 func (c *Client) ListNotifications(ctx context.Context, tenantSlug TenantSlug, params *ListNotificationsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListNotificationsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2852,6 +3625,8 @@ func (c *Client) ListNotifications(ctx context.Context, tenantSlug TenantSlug, p
 }
 
 // MarkNotificationRead performs a POST /api/v1/t/{tenantSlug}/notifications/{notificationId}:read (the `MarkNotificationRead` operationId) request.
+//
+// Performs the mark notification read workflow within the authorized request scope.
 func (c *Client) MarkNotificationRead(ctx context.Context, tenantSlug TenantSlug, notificationId NotificationId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewMarkNotificationReadRequest(c.Server, tenantSlug, notificationId)
 	if err != nil {
@@ -2865,6 +3640,8 @@ func (c *Client) MarkNotificationRead(ctx context.Context, tenantSlug TenantSlug
 }
 
 // MarkAllNotificationsRead performs a POST /api/v1/t/{tenantSlug}/notifications:read-all (the `MarkAllNotificationsRead` operationId) request.
+//
+// Performs the mark all notifications read workflow within the authorized request scope.
 func (c *Client) MarkAllNotificationsRead(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewMarkAllNotificationsReadRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -2878,6 +3655,8 @@ func (c *Client) MarkAllNotificationsRead(ctx context.Context, tenantSlug Tenant
 }
 
 // ListAvailableProducerProfiles performs a GET /api/v1/t/{tenantSlug}/producer-profiles (the `ListAvailableProducerProfiles` operationId) request.
+//
+// Returns the requested page of available producer profiles within the authorized request scope.
 func (c *Client) ListAvailableProducerProfiles(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListAvailableProducerProfilesRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -2891,6 +3670,8 @@ func (c *Client) ListAvailableProducerProfiles(ctx context.Context, tenantSlug T
 }
 
 // ListRepositories performs a GET /api/v1/t/{tenantSlug}/repositories (the `ListRepositories` operationId) request.
+//
+// Returns the requested page of repositories within the authorized request scope.
 func (c *Client) ListRepositories(ctx context.Context, tenantSlug TenantSlug, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRepositoriesRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -2905,6 +3686,8 @@ func (c *Client) ListRepositories(ctx context.Context, tenantSlug TenantSlug, pa
 
 // CreateRepositoryWithBody performs a POST /api/v1/t/{tenantSlug}/repositories (the `CreateRepository` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates repository within the authorized request scope.
 func (c *Client) CreateRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRepositoryRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -2919,6 +3702,8 @@ func (c *Client) CreateRepositoryWithBody(ctx context.Context, tenantSlug Tenant
 
 // CreateRepository performs a POST /api/v1/t/{tenantSlug}/repositories (the `CreateRepository` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates repository within the authorized request scope.
 func (c *Client) CreateRepository(ctx context.Context, tenantSlug TenantSlug, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRepositoryRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -2932,6 +3717,8 @@ func (c *Client) CreateRepository(ctx context.Context, tenantSlug TenantSlug, bo
 }
 
 // DeleteRepository performs a DELETE /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `DeleteRepository` operationId) request.
+//
+// Deletes the selected repository within the authorized request scope.
 func (c *Client) DeleteRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DeleteRepositoryParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteRepositoryRequest(c.Server, tenantSlug, repositoryId, params)
 	if err != nil {
@@ -2945,6 +3732,8 @@ func (c *Client) DeleteRepository(ctx context.Context, tenantSlug TenantSlug, re
 }
 
 // GetRepository performs a GET /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `GetRepository` operationId) request.
+//
+// Returns the selected repository within the authorized request scope.
 func (c *Client) GetRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRepositoryRequest(c.Server, tenantSlug, repositoryId)
 	if err != nil {
@@ -2959,6 +3748,8 @@ func (c *Client) GetRepository(ctx context.Context, tenantSlug TenantSlug, repos
 
 // UpdateRepositoryWithBody performs a PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `UpdateRepository` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected repository within the authorized request scope.
 func (c *Client) UpdateRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *UpdateRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRepositoryRequestWithBody(c.Server, tenantSlug, repositoryId, params, contentType, body)
 	if err != nil {
@@ -2973,6 +3764,8 @@ func (c *Client) UpdateRepositoryWithBody(ctx context.Context, tenantSlug Tenant
 
 // UpdateRepository performs a PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `UpdateRepository` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected repository within the authorized request scope.
 func (c *Client) UpdateRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *UpdateRepositoryParams, body UpdateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRepositoryRequest(c.Server, tenantSlug, repositoryId, params, body)
 	if err != nil {
@@ -2986,6 +3779,8 @@ func (c *Client) UpdateRepository(ctx context.Context, tenantSlug TenantSlug, re
 }
 
 // ListDiscoveryCandidates performs a GET /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates (the `ListDiscoveryCandidates` operationId) request.
+//
+// Returns the requested page of discovery candidates within the authorized request scope.
 func (c *Client) ListDiscoveryCandidates(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *ListDiscoveryCandidatesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListDiscoveryCandidatesRequest(c.Server, tenantSlug, repositoryId, params)
 	if err != nil {
@@ -2999,6 +3794,8 @@ func (c *Client) ListDiscoveryCandidates(ctx context.Context, tenantSlug TenantS
 }
 
 // DismissDiscoveryCandidate performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates/{candidateId}:dismiss (the `DismissDiscoveryCandidate` operationId) request.
+//
+// Performs the dismiss discovery candidate workflow within the authorized request scope.
 func (c *Client) DismissDiscoveryCandidate(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, candidateId CandidateId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDismissDiscoveryCandidateRequest(c.Server, tenantSlug, repositoryId, candidateId)
 	if err != nil {
@@ -3013,6 +3810,8 @@ func (c *Client) DismissDiscoveryCandidate(ctx context.Context, tenantSlug Tenan
 
 // AcceptDiscoveryCandidatesWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept (the `AcceptDiscoveryCandidates` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the accept discovery candidates workflow within the authorized request scope.
 func (c *Client) AcceptDiscoveryCandidatesWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *AcceptDiscoveryCandidatesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAcceptDiscoveryCandidatesRequestWithBody(c.Server, tenantSlug, repositoryId, params, contentType, body)
 	if err != nil {
@@ -3027,6 +3826,8 @@ func (c *Client) AcceptDiscoveryCandidatesWithBody(ctx context.Context, tenantSl
 
 // AcceptDiscoveryCandidates performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept (the `AcceptDiscoveryCandidates` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the accept discovery candidates workflow within the authorized request scope.
 func (c *Client) AcceptDiscoveryCandidates(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *AcceptDiscoveryCandidatesParams, body AcceptDiscoveryCandidatesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAcceptDiscoveryCandidatesRequest(c.Server, tenantSlug, repositoryId, params, body)
 	if err != nil {
@@ -3041,6 +3842,8 @@ func (c *Client) AcceptDiscoveryCandidates(ctx context.Context, tenantSlug Tenan
 
 // PreviewRepositoryConfigImportWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports (the `PreviewRepositoryConfigImport` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the preview repository config import workflow within the authorized request scope.
 func (c *Client) PreviewRepositoryConfigImportWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *PreviewRepositoryConfigImportParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPreviewRepositoryConfigImportRequestWithBody(c.Server, tenantSlug, repositoryId, params, contentType, body)
 	if err != nil {
@@ -3055,6 +3858,8 @@ func (c *Client) PreviewRepositoryConfigImportWithBody(ctx context.Context, tena
 
 // PreviewRepositoryConfigImport performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports (the `PreviewRepositoryConfigImport` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the preview repository config import workflow within the authorized request scope.
 func (c *Client) PreviewRepositoryConfigImport(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *PreviewRepositoryConfigImportParams, body PreviewRepositoryConfigImportJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPreviewRepositoryConfigImportRequest(c.Server, tenantSlug, repositoryId, params, body)
 	if err != nil {
@@ -3069,6 +3874,8 @@ func (c *Client) PreviewRepositoryConfigImport(ctx context.Context, tenantSlug T
 
 // ApplyRepositoryConfigImportWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply (the `ApplyRepositoryConfigImport` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the apply repository config import workflow within the authorized request scope.
 func (c *Client) ApplyRepositoryConfigImportWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params *ApplyRepositoryConfigImportParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewApplyRepositoryConfigImportRequestWithBody(c.Server, tenantSlug, repositoryId, previewId, params, contentType, body)
 	if err != nil {
@@ -3083,6 +3890,8 @@ func (c *Client) ApplyRepositoryConfigImportWithBody(ctx context.Context, tenant
 
 // ApplyRepositoryConfigImport performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply (the `ApplyRepositoryConfigImport` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the apply repository config import workflow within the authorized request scope.
 func (c *Client) ApplyRepositoryConfigImport(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params *ApplyRepositoryConfigImportParams, body ApplyRepositoryConfigImportJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewApplyRepositoryConfigImportRequest(c.Server, tenantSlug, repositoryId, previewId, params, body)
 	if err != nil {
@@ -3097,6 +3906,8 @@ func (c *Client) ApplyRepositoryConfigImport(ctx context.Context, tenantSlug Ten
 
 // CreateServiceInRepositoryWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services (the `CreateServiceInRepository` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates service in repository within the authorized request scope.
 func (c *Client) CreateServiceInRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateServiceInRepositoryRequestWithBody(c.Server, tenantSlug, repositoryId, contentType, body)
 	if err != nil {
@@ -3111,6 +3922,8 @@ func (c *Client) CreateServiceInRepositoryWithBody(ctx context.Context, tenantSl
 
 // CreateServiceInRepository performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services (the `CreateServiceInRepository` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates service in repository within the authorized request scope.
 func (c *Client) CreateServiceInRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, body CreateServiceInRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateServiceInRepositoryRequest(c.Server, tenantSlug, repositoryId, body)
 	if err != nil {
@@ -3125,6 +3938,8 @@ func (c *Client) CreateServiceInRepository(ctx context.Context, tenantSlug Tenan
 
 // DiscoverRepositoryWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover (the `DiscoverRepository` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the discover repository workflow within the authorized request scope.
 func (c *Client) DiscoverRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DiscoverRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDiscoverRepositoryRequestWithBody(c.Server, tenantSlug, repositoryId, params, contentType, body)
 	if err != nil {
@@ -3139,6 +3954,8 @@ func (c *Client) DiscoverRepositoryWithBody(ctx context.Context, tenantSlug Tena
 
 // DiscoverRepository performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover (the `DiscoverRepository` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the discover repository workflow within the authorized request scope.
 func (c *Client) DiscoverRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DiscoverRepositoryParams, body DiscoverRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDiscoverRepositoryRequest(c.Server, tenantSlug, repositoryId, params, body)
 	if err != nil {
@@ -3153,6 +3970,8 @@ func (c *Client) DiscoverRepository(ctx context.Context, tenantSlug TenantSlug, 
 
 // SyncRepositoryWithBody performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync (the `SyncRepository` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the sync repository workflow within the authorized request scope.
 func (c *Client) SyncRepositoryWithBody(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *SyncRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSyncRepositoryRequestWithBody(c.Server, tenantSlug, repositoryId, params, contentType, body)
 	if err != nil {
@@ -3167,6 +3986,8 @@ func (c *Client) SyncRepositoryWithBody(ctx context.Context, tenantSlug TenantSl
 
 // SyncRepository performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync (the `SyncRepository` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the sync repository workflow within the authorized request scope.
 func (c *Client) SyncRepository(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *SyncRepositoryParams, body SyncRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSyncRepositoryRequest(c.Server, tenantSlug, repositoryId, params, body)
 	if err != nil {
@@ -3181,6 +4002,8 @@ func (c *Client) SyncRepository(ctx context.Context, tenantSlug TenantSlug, repo
 
 // CheckRepositoryConnectionWithBody performs a POST /api/v1/t/{tenantSlug}/repositories:check-connection (the `CheckRepositoryConnection` operationId) request,
 // with any type of body and a specified content type.
+//
+// Checks repository connection within the authorized request scope.
 func (c *Client) CheckRepositoryConnectionWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCheckRepositoryConnectionRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -3195,6 +4018,8 @@ func (c *Client) CheckRepositoryConnectionWithBody(ctx context.Context, tenantSl
 
 // CheckRepositoryConnection performs a POST /api/v1/t/{tenantSlug}/repositories:check-connection (the `CheckRepositoryConnection` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Checks repository connection within the authorized request scope.
 func (c *Client) CheckRepositoryConnection(ctx context.Context, tenantSlug TenantSlug, body CheckRepositoryConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCheckRepositoryConnectionRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -3208,6 +4033,8 @@ func (c *Client) CheckRepositoryConnection(ctx context.Context, tenantSlug Tenan
 }
 
 // ListReviews performs a GET /api/v1/t/{tenantSlug}/reviews (the `ListReviews` operationId) request.
+//
+// Returns the requested page of reviews within the authorized request scope.
 func (c *Client) ListReviews(ctx context.Context, tenantSlug TenantSlug, params *ListReviewsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListReviewsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -3221,6 +4048,8 @@ func (c *Client) ListReviews(ctx context.Context, tenantSlug TenantSlug, params 
 }
 
 // Search performs a GET /api/v1/t/{tenantSlug}/search (the `Search` operationId) request.
+//
+// Performs the search workflow within the authorized request scope.
 func (c *Client) Search(ctx context.Context, tenantSlug TenantSlug, params *SearchParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSearchRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -3234,6 +4063,8 @@ func (c *Client) Search(ctx context.Context, tenantSlug TenantSlug, params *Sear
 }
 
 // ListServices performs a GET /api/v1/t/{tenantSlug}/services (the `ListServices` operationId) request.
+//
+// Returns the requested page of services within the authorized request scope.
 func (c *Client) ListServices(ctx context.Context, tenantSlug TenantSlug, params *ListServicesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListServicesRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -3247,6 +4078,8 @@ func (c *Client) ListServices(ctx context.Context, tenantSlug TenantSlug, params
 }
 
 // DeleteService performs a DELETE /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `DeleteService` operationId) request.
+//
+// Deletes the selected service within the authorized request scope.
 func (c *Client) DeleteService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *DeleteServiceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteServiceRequest(c.Server, tenantSlug, serviceSlug, params)
 	if err != nil {
@@ -3260,6 +4093,8 @@ func (c *Client) DeleteService(ctx context.Context, tenantSlug TenantSlug, servi
 }
 
 // GetService performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `GetService` operationId) request.
+//
+// Returns the selected service within the authorized request scope.
 func (c *Client) GetService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetServiceRequest(c.Server, tenantSlug, serviceSlug)
 	if err != nil {
@@ -3274,6 +4109,8 @@ func (c *Client) GetService(ctx context.Context, tenantSlug TenantSlug, serviceS
 
 // UpdateServiceWithBody performs a PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `UpdateService` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected service within the authorized request scope.
 func (c *Client) UpdateServiceWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *UpdateServiceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateServiceRequestWithBody(c.Server, tenantSlug, serviceSlug, params, contentType, body)
 	if err != nil {
@@ -3288,6 +4125,8 @@ func (c *Client) UpdateServiceWithBody(ctx context.Context, tenantSlug TenantSlu
 
 // UpdateService performs a PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `UpdateService` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected service within the authorized request scope.
 func (c *Client) UpdateService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *UpdateServiceParams, body UpdateServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateServiceRequest(c.Server, tenantSlug, serviceSlug, params, body)
 	if err != nil {
@@ -3301,6 +4140,8 @@ func (c *Client) UpdateService(ctx context.Context, tenantSlug TenantSlug, servi
 }
 
 // GetServiceAccess performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `GetServiceAccess` operationId) request.
+//
+// Returns the selected service access within the authorized request scope.
 func (c *Client) GetServiceAccess(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetServiceAccessRequest(c.Server, tenantSlug, serviceSlug)
 	if err != nil {
@@ -3315,6 +4156,8 @@ func (c *Client) GetServiceAccess(ctx context.Context, tenantSlug TenantSlug, se
 
 // PutServiceAccessWithBody performs a PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `PutServiceAccess` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates or replaces the selected service access within the authorized request scope.
 func (c *Client) PutServiceAccessWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutServiceAccessRequestWithBody(c.Server, tenantSlug, serviceSlug, contentType, body)
 	if err != nil {
@@ -3329,6 +4172,8 @@ func (c *Client) PutServiceAccessWithBody(ctx context.Context, tenantSlug Tenant
 
 // PutServiceAccess performs a PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `PutServiceAccess` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates or replaces the selected service access within the authorized request scope.
 func (c *Client) PutServiceAccess(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body PutServiceAccessJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutServiceAccessRequest(c.Server, tenantSlug, serviceSlug, body)
 	if err != nil {
@@ -3343,6 +4188,8 @@ func (c *Client) PutServiceAccess(ctx context.Context, tenantSlug TenantSlug, se
 
 // GenerateMissingAssetWithAiWithBody performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate (the `GenerateMissingAssetWithAi` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the generate missing asset with ai workflow within the authorized request scope.
 func (c *Client) GenerateMissingAssetWithAiWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *GenerateMissingAssetWithAiParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGenerateMissingAssetWithAiRequestWithBody(c.Server, tenantSlug, serviceSlug, params, contentType, body)
 	if err != nil {
@@ -3357,6 +4204,8 @@ func (c *Client) GenerateMissingAssetWithAiWithBody(ctx context.Context, tenantS
 
 // GenerateMissingAssetWithAi performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate (the `GenerateMissingAssetWithAi` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the generate missing asset with ai workflow within the authorized request scope.
 func (c *Client) GenerateMissingAssetWithAi(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *GenerateMissingAssetWithAiParams, body GenerateMissingAssetWithAiJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGenerateMissingAssetWithAiRequest(c.Server, tenantSlug, serviceSlug, params, body)
 	if err != nil {
@@ -3370,6 +4219,8 @@ func (c *Client) GenerateMissingAssetWithAi(ctx context.Context, tenantSlug Tena
 }
 
 // ListServiceComments performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `ListServiceComments` operationId) request.
+//
+// Returns the requested page of service comments within the authorized request scope.
 func (c *Client) ListServiceComments(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ListServiceCommentsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListServiceCommentsRequest(c.Server, tenantSlug, serviceSlug, params)
 	if err != nil {
@@ -3384,6 +4235,8 @@ func (c *Client) ListServiceComments(ctx context.Context, tenantSlug TenantSlug,
 
 // CreateServiceCommentWithBody performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `CreateServiceComment` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates service comment within the authorized request scope.
 func (c *Client) CreateServiceCommentWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateServiceCommentRequestWithBody(c.Server, tenantSlug, serviceSlug, contentType, body)
 	if err != nil {
@@ -3398,6 +4251,8 @@ func (c *Client) CreateServiceCommentWithBody(ctx context.Context, tenantSlug Te
 
 // CreateServiceComment performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `CreateServiceComment` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates service comment within the authorized request scope.
 func (c *Client) CreateServiceComment(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body CreateServiceCommentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateServiceCommentRequest(c.Server, tenantSlug, serviceSlug, body)
 	if err != nil {
@@ -3411,6 +4266,8 @@ func (c *Client) CreateServiceComment(ctx context.Context, tenantSlug TenantSlug
 }
 
 // ListSourceSpecs performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `ListSourceSpecs` operationId) request.
+//
+// Returns the requested page of source specs within the authorized request scope.
 func (c *Client) ListSourceSpecs(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListSourceSpecsRequest(c.Server, tenantSlug, serviceSlug)
 	if err != nil {
@@ -3425,6 +4282,8 @@ func (c *Client) ListSourceSpecs(ctx context.Context, tenantSlug TenantSlug, ser
 
 // CreateSourceSpecWithBody performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `CreateSourceSpec` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates source spec within the authorized request scope.
 func (c *Client) CreateSourceSpecWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateSourceSpecRequestWithBody(c.Server, tenantSlug, serviceSlug, contentType, body)
 	if err != nil {
@@ -3439,6 +4298,8 @@ func (c *Client) CreateSourceSpecWithBody(ctx context.Context, tenantSlug Tenant
 
 // CreateSourceSpec performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `CreateSourceSpec` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates source spec within the authorized request scope.
 func (c *Client) CreateSourceSpec(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body CreateSourceSpecJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateSourceSpecRequest(c.Server, tenantSlug, serviceSlug, body)
 	if err != nil {
@@ -3453,6 +4314,8 @@ func (c *Client) CreateSourceSpec(ctx context.Context, tenantSlug TenantSlug, se
 
 // ResolveServiceDriftWithBody performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift (the `ResolveServiceDrift` operationId) request,
 // with any type of body and a specified content type.
+//
+// Resolves service drift within the authorized request scope.
 func (c *Client) ResolveServiceDriftWithBody(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ResolveServiceDriftParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewResolveServiceDriftRequestWithBody(c.Server, tenantSlug, serviceSlug, params, contentType, body)
 	if err != nil {
@@ -3467,6 +4330,8 @@ func (c *Client) ResolveServiceDriftWithBody(ctx context.Context, tenantSlug Ten
 
 // ResolveServiceDrift performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift (the `ResolveServiceDrift` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Resolves service drift within the authorized request scope.
 func (c *Client) ResolveServiceDrift(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ResolveServiceDriftParams, body ResolveServiceDriftJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewResolveServiceDriftRequest(c.Server, tenantSlug, serviceSlug, params, body)
 	if err != nil {
@@ -3480,6 +4345,8 @@ func (c *Client) ResolveServiceDrift(ctx context.Context, tenantSlug TenantSlug,
 }
 
 // StarService performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:star (the `StarService` operationId) request.
+//
+// Performs the star service workflow within the authorized request scope.
 func (c *Client) StarService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewStarServiceRequest(c.Server, tenantSlug, serviceSlug)
 	if err != nil {
@@ -3493,6 +4360,8 @@ func (c *Client) StarService(ctx context.Context, tenantSlug TenantSlug, service
 }
 
 // UnstarService performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:unstar (the `UnstarService` operationId) request.
+//
+// Performs the unstar service workflow within the authorized request scope.
 func (c *Client) UnstarService(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUnstarServiceRequest(c.Server, tenantSlug, serviceSlug)
 	if err != nil {
@@ -3506,6 +4375,8 @@ func (c *Client) UnstarService(ctx context.Context, tenantSlug TenantSlug, servi
 }
 
 // ListRecentServices performs a GET /api/v1/t/{tenantSlug}/services:recent (the `ListRecentServices` operationId) request.
+//
+// Returns the requested page of recent services within the authorized request scope.
 func (c *Client) ListRecentServices(ctx context.Context, tenantSlug TenantSlug, params *ListRecentServicesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRecentServicesRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -3519,6 +4390,8 @@ func (c *Client) ListRecentServices(ctx context.Context, tenantSlug TenantSlug, 
 }
 
 // GetTenantSettings performs a GET /api/v1/t/{tenantSlug}/settings (the `GetTenantSettings` operationId) request.
+//
+// Returns the selected tenant settings within the authorized request scope.
 func (c *Client) GetTenantSettings(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetTenantSettingsRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -3533,6 +4406,8 @@ func (c *Client) GetTenantSettings(ctx context.Context, tenantSlug TenantSlug, r
 
 // UpdateTenantSettingsWithBody performs a PATCH /api/v1/t/{tenantSlug}/settings (the `UpdateTenantSettings` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected tenant settings within the authorized request scope.
 func (c *Client) UpdateTenantSettingsWithBody(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantSettingsParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateTenantSettingsRequestWithBody(c.Server, tenantSlug, params, contentType, body)
 	if err != nil {
@@ -3547,6 +4422,8 @@ func (c *Client) UpdateTenantSettingsWithBody(ctx context.Context, tenantSlug Te
 
 // UpdateTenantSettings performs a PATCH /api/v1/t/{tenantSlug}/settings (the `UpdateTenantSettings` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected tenant settings within the authorized request scope.
 func (c *Client) UpdateTenantSettings(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantSettingsParams, body UpdateTenantSettingsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateTenantSettingsRequest(c.Server, tenantSlug, params, body)
 	if err != nil {
@@ -3560,6 +4437,8 @@ func (c *Client) UpdateTenantSettings(ctx context.Context, tenantSlug TenantSlug
 }
 
 // ListShareLinks performs a GET /api/v1/t/{tenantSlug}/share-links (the `ListShareLinks` operationId) request.
+//
+// Returns the requested page of share links within the authorized request scope.
 func (c *Client) ListShareLinks(ctx context.Context, tenantSlug TenantSlug, params *ListShareLinksParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListShareLinksRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -3574,6 +4453,8 @@ func (c *Client) ListShareLinks(ctx context.Context, tenantSlug TenantSlug, para
 
 // CreateShareLinkWithBody performs a POST /api/v1/t/{tenantSlug}/share-links (the `CreateShareLink` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates share link within the authorized request scope.
 func (c *Client) CreateShareLinkWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateShareLinkRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -3588,6 +4469,8 @@ func (c *Client) CreateShareLinkWithBody(ctx context.Context, tenantSlug TenantS
 
 // CreateShareLink performs a POST /api/v1/t/{tenantSlug}/share-links (the `CreateShareLink` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates share link within the authorized request scope.
 func (c *Client) CreateShareLink(ctx context.Context, tenantSlug TenantSlug, body CreateShareLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateShareLinkRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -3601,6 +4484,8 @@ func (c *Client) CreateShareLink(ctx context.Context, tenantSlug TenantSlug, bod
 }
 
 // RevokeShareLink performs a DELETE /api/v1/t/{tenantSlug}/share-links/{shareLinkId} (the `RevokeShareLink` operationId) request.
+//
+// Performs the revoke share link workflow within the authorized request scope.
 func (c *Client) RevokeShareLink(ctx context.Context, tenantSlug TenantSlug, shareLinkId ShareLinkId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRevokeShareLinkRequest(c.Server, tenantSlug, shareLinkId)
 	if err != nil {
@@ -3614,6 +4499,8 @@ func (c *Client) RevokeShareLink(ctx context.Context, tenantSlug TenantSlug, sha
 }
 
 // DeleteSourceSpec performs a DELETE /api/v1/t/{tenantSlug}/sources/{sourceId} (the `DeleteSourceSpec` operationId) request.
+//
+// Deletes the selected source spec within the authorized request scope.
 func (c *Client) DeleteSourceSpec(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *DeleteSourceSpecParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteSourceSpecRequest(c.Server, tenantSlug, sourceId, params)
 	if err != nil {
@@ -3628,6 +4515,8 @@ func (c *Client) DeleteSourceSpec(ctx context.Context, tenantSlug TenantSlug, so
 
 // UpdateSourceSpecWithBody performs a PATCH /api/v1/t/{tenantSlug}/sources/{sourceId} (the `UpdateSourceSpec` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected source spec within the authorized request scope.
 func (c *Client) UpdateSourceSpecWithBody(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *UpdateSourceSpecParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateSourceSpecRequestWithBody(c.Server, tenantSlug, sourceId, params, contentType, body)
 	if err != nil {
@@ -3642,6 +4531,8 @@ func (c *Client) UpdateSourceSpecWithBody(ctx context.Context, tenantSlug Tenant
 
 // UpdateSourceSpec performs a PATCH /api/v1/t/{tenantSlug}/sources/{sourceId} (the `UpdateSourceSpec` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected source spec within the authorized request scope.
 func (c *Client) UpdateSourceSpec(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *UpdateSourceSpecParams, body UpdateSourceSpecJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateSourceSpecRequest(c.Server, tenantSlug, sourceId, params, body)
 	if err != nil {
@@ -3655,6 +4546,8 @@ func (c *Client) UpdateSourceSpec(ctx context.Context, tenantSlug TenantSlug, so
 }
 
 // ListSourceBindings performs a GET /api/v1/t/{tenantSlug}/sources/{sourceId}/bindings (the `ListSourceBindings` operationId) request.
+//
+// Returns the requested page of source bindings within the authorized request scope.
 func (c *Client) ListSourceBindings(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListSourceBindingsRequest(c.Server, tenantSlug, sourceId)
 	if err != nil {
@@ -3669,6 +4562,8 @@ func (c *Client) ListSourceBindings(ctx context.Context, tenantSlug TenantSlug, 
 
 // ProduceSourceWithBody performs a POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce (the `ProduceSource` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the produce source workflow within the authorized request scope.
 func (c *Client) ProduceSourceWithBody(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *ProduceSourceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewProduceSourceRequestWithBody(c.Server, tenantSlug, sourceId, params, contentType, body)
 	if err != nil {
@@ -3683,6 +4578,8 @@ func (c *Client) ProduceSourceWithBody(ctx context.Context, tenantSlug TenantSlu
 
 // ProduceSource performs a POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce (the `ProduceSource` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the produce source workflow within the authorized request scope.
 func (c *Client) ProduceSource(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *ProduceSourceParams, body ProduceSourceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewProduceSourceRequest(c.Server, tenantSlug, sourceId, params, body)
 	if err != nil {
@@ -3696,6 +4593,8 @@ func (c *Client) ProduceSource(ctx context.Context, tenantSlug TenantSlug, sourc
 }
 
 // ListSubscriptions performs a GET /api/v1/t/{tenantSlug}/subscriptions (the `ListSubscriptions` operationId) request.
+//
+// Returns the requested page of subscriptions within the authorized request scope.
 func (c *Client) ListSubscriptions(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListSubscriptionsRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -3710,6 +4609,8 @@ func (c *Client) ListSubscriptions(ctx context.Context, tenantSlug TenantSlug, r
 
 // PutSubscriptionWithBody performs a PUT /api/v1/t/{tenantSlug}/subscriptions (the `PutSubscription` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates or replaces the selected subscription within the authorized request scope.
 func (c *Client) PutSubscriptionWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutSubscriptionRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -3724,6 +4625,8 @@ func (c *Client) PutSubscriptionWithBody(ctx context.Context, tenantSlug TenantS
 
 // PutSubscription performs a PUT /api/v1/t/{tenantSlug}/subscriptions (the `PutSubscription` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates or replaces the selected subscription within the authorized request scope.
 func (c *Client) PutSubscription(ctx context.Context, tenantSlug TenantSlug, body PutSubscriptionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutSubscriptionRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -3737,6 +4640,8 @@ func (c *Client) PutSubscription(ctx context.Context, tenantSlug TenantSlug, bod
 }
 
 // ListSystemGroups performs a GET /api/v1/t/{tenantSlug}/system-groups (the `ListSystemGroups` operationId) request.
+//
+// Returns the requested page of system groups within the authorized request scope.
 func (c *Client) ListSystemGroups(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListSystemGroupsRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -3751,6 +4656,8 @@ func (c *Client) ListSystemGroups(ctx context.Context, tenantSlug TenantSlug, re
 
 // CreateSystemGroupWithBody performs a POST /api/v1/t/{tenantSlug}/system-groups (the `CreateSystemGroup` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates system group within the authorized request scope.
 func (c *Client) CreateSystemGroupWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateSystemGroupRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -3765,6 +4672,8 @@ func (c *Client) CreateSystemGroupWithBody(ctx context.Context, tenantSlug Tenan
 
 // CreateSystemGroup performs a POST /api/v1/t/{tenantSlug}/system-groups (the `CreateSystemGroup` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates system group within the authorized request scope.
 func (c *Client) CreateSystemGroup(ctx context.Context, tenantSlug TenantSlug, body CreateSystemGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateSystemGroupRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -3778,6 +4687,8 @@ func (c *Client) CreateSystemGroup(ctx context.Context, tenantSlug TenantSlug, b
 }
 
 // DeleteSystemGroup performs a DELETE /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `DeleteSystemGroup` operationId) request.
+//
+// Deletes the selected system group within the authorized request scope.
 func (c *Client) DeleteSystemGroup(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *DeleteSystemGroupParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteSystemGroupRequest(c.Server, tenantSlug, groupId, params)
 	if err != nil {
@@ -3791,6 +4702,8 @@ func (c *Client) DeleteSystemGroup(ctx context.Context, tenantSlug TenantSlug, g
 }
 
 // GetSystemGroup performs a GET /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `GetSystemGroup` operationId) request.
+//
+// Returns the selected system group within the authorized request scope.
 func (c *Client) GetSystemGroup(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetSystemGroupRequest(c.Server, tenantSlug, groupId)
 	if err != nil {
@@ -3805,6 +4718,8 @@ func (c *Client) GetSystemGroup(ctx context.Context, tenantSlug TenantSlug, grou
 
 // UpdateSystemGroupWithBody performs a PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `UpdateSystemGroup` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected system group within the authorized request scope.
 func (c *Client) UpdateSystemGroupWithBody(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *UpdateSystemGroupParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateSystemGroupRequestWithBody(c.Server, tenantSlug, groupId, params, contentType, body)
 	if err != nil {
@@ -3819,6 +4734,8 @@ func (c *Client) UpdateSystemGroupWithBody(ctx context.Context, tenantSlug Tenan
 
 // UpdateSystemGroup performs a PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `UpdateSystemGroup` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected system group within the authorized request scope.
 func (c *Client) UpdateSystemGroup(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *UpdateSystemGroupParams, body UpdateSystemGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateSystemGroupRequest(c.Server, tenantSlug, groupId, params, body)
 	if err != nil {
@@ -3833,6 +4750,8 @@ func (c *Client) UpdateSystemGroup(ctx context.Context, tenantSlug TenantSlug, g
 
 // PutSystemGroupMembersWithBody performs a PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members (the `PutSystemGroupMembers` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates or replaces the selected system group members within the authorized request scope.
 func (c *Client) PutSystemGroupMembersWithBody(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *PutSystemGroupMembersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutSystemGroupMembersRequestWithBody(c.Server, tenantSlug, groupId, params, contentType, body)
 	if err != nil {
@@ -3847,6 +4766,8 @@ func (c *Client) PutSystemGroupMembersWithBody(ctx context.Context, tenantSlug T
 
 // PutSystemGroupMembers performs a PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members (the `PutSystemGroupMembers` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates or replaces the selected system group members within the authorized request scope.
 func (c *Client) PutSystemGroupMembers(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *PutSystemGroupMembersParams, body PutSystemGroupMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutSystemGroupMembersRequest(c.Server, tenantSlug, groupId, params, body)
 	if err != nil {
@@ -3860,6 +4781,8 @@ func (c *Client) PutSystemGroupMembers(ctx context.Context, tenantSlug TenantSlu
 }
 
 // ListTags performs a GET /api/v1/t/{tenantSlug}/tags (the `ListTags` operationId) request.
+//
+// Returns the requested page of tags within the authorized request scope.
 func (c *Client) ListTags(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListTagsRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -3874,6 +4797,8 @@ func (c *Client) ListTags(ctx context.Context, tenantSlug TenantSlug, reqEditors
 
 // CreateTagWithBody performs a POST /api/v1/t/{tenantSlug}/tags (the `CreateTag` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates tag within the authorized request scope.
 func (c *Client) CreateTagWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTagRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -3888,6 +4813,8 @@ func (c *Client) CreateTagWithBody(ctx context.Context, tenantSlug TenantSlug, c
 
 // CreateTag performs a POST /api/v1/t/{tenantSlug}/tags (the `CreateTag` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates tag within the authorized request scope.
 func (c *Client) CreateTag(ctx context.Context, tenantSlug TenantSlug, body CreateTagJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTagRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -3901,6 +4828,8 @@ func (c *Client) CreateTag(ctx context.Context, tenantSlug TenantSlug, body Crea
 }
 
 // DeleteTag performs a DELETE /api/v1/t/{tenantSlug}/tags/{tagId} (the `DeleteTag` operationId) request.
+//
+// Deletes the selected tag within the authorized request scope.
 func (c *Client) DeleteTag(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *DeleteTagParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteTagRequest(c.Server, tenantSlug, tagId, params)
 	if err != nil {
@@ -3915,6 +4844,8 @@ func (c *Client) DeleteTag(ctx context.Context, tenantSlug TenantSlug, tagId Tag
 
 // UpdateTagWithBody performs a PATCH /api/v1/t/{tenantSlug}/tags/{tagId} (the `UpdateTag` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected tag within the authorized request scope.
 func (c *Client) UpdateTagWithBody(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *UpdateTagParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateTagRequestWithBody(c.Server, tenantSlug, tagId, params, contentType, body)
 	if err != nil {
@@ -3929,6 +4860,8 @@ func (c *Client) UpdateTagWithBody(ctx context.Context, tenantSlug TenantSlug, t
 
 // UpdateTag performs a PATCH /api/v1/t/{tenantSlug}/tags/{tagId} (the `UpdateTag` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected tag within the authorized request scope.
 func (c *Client) UpdateTag(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *UpdateTagParams, body UpdateTagJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateTagRequest(c.Server, tenantSlug, tagId, params, body)
 	if err != nil {
@@ -3942,6 +4875,8 @@ func (c *Client) UpdateTag(ctx context.Context, tenantSlug TenantSlug, tagId Tag
 }
 
 // ListTeams performs a GET /api/v1/t/{tenantSlug}/teams (the `ListTeams` operationId) request.
+//
+// Returns the requested page of teams within the authorized request scope.
 func (c *Client) ListTeams(ctx context.Context, tenantSlug TenantSlug, params *ListTeamsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListTeamsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -3956,6 +4891,8 @@ func (c *Client) ListTeams(ctx context.Context, tenantSlug TenantSlug, params *L
 
 // CreateTeamWithBody performs a POST /api/v1/t/{tenantSlug}/teams (the `CreateTeam` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates team within the authorized request scope.
 func (c *Client) CreateTeamWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTeamRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -3970,6 +4907,8 @@ func (c *Client) CreateTeamWithBody(ctx context.Context, tenantSlug TenantSlug, 
 
 // CreateTeam performs a POST /api/v1/t/{tenantSlug}/teams (the `CreateTeam` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates team within the authorized request scope.
 func (c *Client) CreateTeam(ctx context.Context, tenantSlug TenantSlug, body CreateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTeamRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -3983,6 +4922,8 @@ func (c *Client) CreateTeam(ctx context.Context, tenantSlug TenantSlug, body Cre
 }
 
 // DeleteTeam performs a DELETE /api/v1/t/{tenantSlug}/teams/{teamId} (the `DeleteTeam` operationId) request.
+//
+// Deletes the selected team within the authorized request scope.
 func (c *Client) DeleteTeam(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *DeleteTeamParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteTeamRequest(c.Server, tenantSlug, teamId, params)
 	if err != nil {
@@ -3996,6 +4937,8 @@ func (c *Client) DeleteTeam(ctx context.Context, tenantSlug TenantSlug, teamId T
 }
 
 // GetTeam performs a GET /api/v1/t/{tenantSlug}/teams/{teamId} (the `GetTeam` operationId) request.
+//
+// Returns the selected team within the authorized request scope.
 func (c *Client) GetTeam(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetTeamRequest(c.Server, tenantSlug, teamId)
 	if err != nil {
@@ -4010,6 +4953,8 @@ func (c *Client) GetTeam(ctx context.Context, tenantSlug TenantSlug, teamId Team
 
 // UpdateTeamWithBody performs a PATCH /api/v1/t/{tenantSlug}/teams/{teamId} (the `UpdateTeam` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected team within the authorized request scope.
 func (c *Client) UpdateTeamWithBody(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *UpdateTeamParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateTeamRequestWithBody(c.Server, tenantSlug, teamId, params, contentType, body)
 	if err != nil {
@@ -4024,6 +4969,8 @@ func (c *Client) UpdateTeamWithBody(ctx context.Context, tenantSlug TenantSlug, 
 
 // UpdateTeam performs a PATCH /api/v1/t/{tenantSlug}/teams/{teamId} (the `UpdateTeam` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Updates the selected team within the authorized request scope.
 func (c *Client) UpdateTeam(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *UpdateTeamParams, body UpdateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateTeamRequest(c.Server, tenantSlug, teamId, params, body)
 	if err != nil {
@@ -4038,6 +4985,8 @@ func (c *Client) UpdateTeam(ctx context.Context, tenantSlug TenantSlug, teamId T
 
 // ReplaceTeamMembersWithBody performs a PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members (the `ReplaceTeamMembers` operationId) request,
 // with any type of body and a specified content type.
+//
+// Replaces the selected team members within the authorized request scope.
 func (c *Client) ReplaceTeamMembersWithBody(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *ReplaceTeamMembersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReplaceTeamMembersRequestWithBody(c.Server, tenantSlug, teamId, params, contentType, body)
 	if err != nil {
@@ -4052,6 +5001,8 @@ func (c *Client) ReplaceTeamMembersWithBody(ctx context.Context, tenantSlug Tena
 
 // ReplaceTeamMembers performs a PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members (the `ReplaceTeamMembers` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Replaces the selected team members within the authorized request scope.
 func (c *Client) ReplaceTeamMembers(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *ReplaceTeamMembersParams, body ReplaceTeamMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReplaceTeamMembersRequest(c.Server, tenantSlug, teamId, params, body)
 	if err != nil {
@@ -4065,6 +5016,8 @@ func (c *Client) ReplaceTeamMembers(ctx context.Context, tenantSlug TenantSlug, 
 }
 
 // ListTokens performs a GET /api/v1/t/{tenantSlug}/tokens (the `ListTokens` operationId) request.
+//
+// Returns the requested page of tokens within the authorized request scope.
 func (c *Client) ListTokens(ctx context.Context, tenantSlug TenantSlug, params *ListTokensParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListTokensRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -4079,6 +5032,8 @@ func (c *Client) ListTokens(ctx context.Context, tenantSlug TenantSlug, params *
 
 // CreateTokenWithBody performs a POST /api/v1/t/{tenantSlug}/tokens (the `CreateToken` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates token within the authorized request scope.
 func (c *Client) CreateTokenWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTokenRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -4093,6 +5048,8 @@ func (c *Client) CreateTokenWithBody(ctx context.Context, tenantSlug TenantSlug,
 
 // CreateToken performs a POST /api/v1/t/{tenantSlug}/tokens (the `CreateToken` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates token within the authorized request scope.
 func (c *Client) CreateToken(ctx context.Context, tenantSlug TenantSlug, body CreateTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTokenRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -4106,6 +5063,8 @@ func (c *Client) CreateToken(ctx context.Context, tenantSlug TenantSlug, body Cr
 }
 
 // RevokeToken performs a DELETE /api/v1/t/{tenantSlug}/tokens/{tokenId} (the `RevokeToken` operationId) request.
+//
+// Performs the revoke token workflow within the authorized request scope.
 func (c *Client) RevokeToken(ctx context.Context, tenantSlug TenantSlug, tokenId TokenId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRevokeTokenRequest(c.Server, tenantSlug, tokenId)
 	if err != nil {
@@ -4120,6 +5079,8 @@ func (c *Client) RevokeToken(ctx context.Context, tenantSlug TenantSlug, tokenId
 
 // CreateDiffUploadWithBody performs a POST /api/v1/t/{tenantSlug}/uploads (the `CreateDiffUpload` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates diff upload within the authorized request scope.
 func (c *Client) CreateDiffUploadWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateDiffUploadRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -4133,6 +5094,8 @@ func (c *Client) CreateDiffUploadWithBody(ctx context.Context, tenantSlug Tenant
 }
 
 // ListViewOverrides performs a GET /api/v1/t/{tenantSlug}/view-overrides (the `ListViewOverrides` operationId) request.
+//
+// Returns the requested page of view overrides within the authorized request scope.
 func (c *Client) ListViewOverrides(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListViewOverridesRequest(c.Server, tenantSlug)
 	if err != nil {
@@ -4146,6 +5109,8 @@ func (c *Client) ListViewOverrides(ctx context.Context, tenantSlug TenantSlug, r
 }
 
 // DeleteViewOverride performs a DELETE /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `DeleteViewOverride` operationId) request.
+//
+// Deletes the selected view override within the authorized request scope.
 func (c *Client) DeleteViewOverride(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *DeleteViewOverrideParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteViewOverrideRequest(c.Server, tenantSlug, viewId, params)
 	if err != nil {
@@ -4160,6 +5125,8 @@ func (c *Client) DeleteViewOverride(ctx context.Context, tenantSlug TenantSlug, 
 
 // PutViewOverrideWithBody performs a PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `PutViewOverride` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates or replaces the selected view override within the authorized request scope.
 func (c *Client) PutViewOverrideWithBody(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *PutViewOverrideParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutViewOverrideRequestWithBody(c.Server, tenantSlug, viewId, params, contentType, body)
 	if err != nil {
@@ -4174,6 +5141,8 @@ func (c *Client) PutViewOverrideWithBody(ctx context.Context, tenantSlug TenantS
 
 // PutViewOverride performs a PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `PutViewOverride` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Creates or replaces the selected view override within the authorized request scope.
 func (c *Client) PutViewOverride(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *PutViewOverrideParams, body PutViewOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutViewOverrideRequest(c.Server, tenantSlug, viewId, params, body)
 	if err != nil {
@@ -4187,6 +5156,8 @@ func (c *Client) PutViewOverride(ctx context.Context, tenantSlug TenantSlug, vie
 }
 
 // ListViews performs a GET /api/v1/t/{tenantSlug}/views (the `ListViews` operationId) request.
+//
+// Returns the requested page of views within the authorized request scope.
 func (c *Client) ListViews(ctx context.Context, tenantSlug TenantSlug, params *ListViewsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListViewsRequest(c.Server, tenantSlug, params)
 	if err != nil {
@@ -4201,6 +5172,8 @@ func (c *Client) ListViews(ctx context.Context, tenantSlug TenantSlug, params *L
 
 // ResolveViewWithBody performs a POST /api/v1/t/{tenantSlug}/views:resolve (the `ResolveView` operationId) request,
 // with any type of body and a specified content type.
+//
+// Resolves view within the authorized request scope.
 func (c *Client) ResolveViewWithBody(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewResolveViewRequestWithBody(c.Server, tenantSlug, contentType, body)
 	if err != nil {
@@ -4215,6 +5188,8 @@ func (c *Client) ResolveViewWithBody(ctx context.Context, tenantSlug TenantSlug,
 
 // ResolveView performs a POST /api/v1/t/{tenantSlug}/views:resolve (the `ResolveView` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Resolves view within the authorized request scope.
 func (c *Client) ResolveView(ctx context.Context, tenantSlug TenantSlug, body ResolveViewJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewResolveViewRequest(c.Server, tenantSlug, body)
 	if err != nil {
@@ -4228,6 +5203,8 @@ func (c *Client) ResolveView(ctx context.Context, tenantSlug TenantSlug, body Re
 }
 
 // GetVersion performs a GET /api/v1/version (the `GetVersion` operationId) request.
+//
+// Returns the server build, API, and contract versions.
 func (c *Client) GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetVersionRequest(c.Server)
 	if err != nil {
@@ -4242,6 +5219,8 @@ func (c *Client) GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) 
 
 // ReceiveGitWebhookWithBody performs a POST /api/v1/webhooks/git/{repositoryId} (the `ReceiveGitWebhook` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the receive git webhook workflow within the authorized request scope.
 func (c *Client) ReceiveGitWebhookWithBody(ctx context.Context, repositoryId RepositoryId, params *ReceiveGitWebhookParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiveGitWebhookRequestWithBody(c.Server, repositoryId, params, contentType, body)
 	if err != nil {
@@ -4256,6 +5235,8 @@ func (c *Client) ReceiveGitWebhookWithBody(ctx context.Context, repositoryId Rep
 
 // ReceiveGitWebhook performs a POST /api/v1/webhooks/git/{repositoryId} (the `ReceiveGitWebhook` operationId) request.
 // Takes a body of the `application/json` content type.
+//
+// Performs the receive git webhook workflow within the authorized request scope.
 func (c *Client) ReceiveGitWebhook(ctx context.Context, repositoryId RepositoryId, params *ReceiveGitWebhookParams, body ReceiveGitWebhookJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiveGitWebhookRequest(c.Server, repositoryId, params, body)
 	if err != nil {
@@ -4269,6 +5250,8 @@ func (c *Client) ReceiveGitWebhook(ctx context.Context, repositoryId RepositoryI
 }
 
 // Healthz performs a GET /healthz (the `Healthz` operationId) request.
+//
+// Reports whether the Meridian process is alive.
 func (c *Client) Healthz(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewHealthzRequest(c.Server)
 	if err != nil {
@@ -4282,6 +5265,8 @@ func (c *Client) Healthz(ctx context.Context, reqEditors ...RequestEditorFn) (*h
 }
 
 // Metrics performs a GET /metrics (the `Metrics` operationId) request.
+//
+// Returns deployment metrics in Prometheus text exposition format.
 func (c *Client) Metrics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewMetricsRequest(c.Server)
 	if err != nil {
@@ -4295,6 +5280,8 @@ func (c *Client) Metrics(ctx context.Context, reqEditors ...RequestEditorFn) (*h
 }
 
 // Readyz performs a GET /readyz (the `Readyz` operationId) request.
+//
+// Reports whether Meridian dependencies are ready to serve traffic.
 func (c *Client) Readyz(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReadyzRequest(c.Server)
 	if err != nil {
@@ -13728,10 +14715,14 @@ type ClientWithResponsesInterface interface {
 
 	// ListPlatformAuditLogsWithResponse performs a GET /api/v1/admin/audit-logs (the `ListPlatformAuditLogs` operationId) request.
 	//
+	// Returns the requested page of platform audit logs within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ListPlatformAuditLogsWithResponse(ctx context.Context, params *ListPlatformAuditLogsParams, reqEditors ...RequestEditorFn) (*ListPlatformAuditLogsResponse, error)
 
 	// ListGlobalCredentialsWithResponse performs a GET /api/v1/admin/global-credentials (the `ListGlobalCredentials` operationId) request.
+	//
+	// Returns the requested page of global credentials within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListGlobalCredentialsWithResponse(ctx context.Context, params *ListGlobalCredentialsParams, reqEditors ...RequestEditorFn) (*ListGlobalCredentialsResponse, error)
@@ -13739,14 +14730,20 @@ type ClientWithResponsesInterface interface {
 	// CreateGlobalCredentialWithBodyWithResponse performs a POST /api/v1/admin/global-credentials (the `CreateGlobalCredential` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates global credential within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateGlobalCredentialWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateGlobalCredentialResponse, error)
 
 	// CreateGlobalCredentialWithResponse performs a POST /api/v1/admin/global-credentials (the `CreateGlobalCredential` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates global credential within the authorized request scope.
 	CreateGlobalCredentialWithResponse(ctx context.Context, body CreateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateGlobalCredentialResponse, error)
 
 	// DeleteGlobalCredentialWithResponse performs a DELETE /api/v1/admin/global-credentials/{credentialId} (the `DeleteGlobalCredential` operationId) request.
+	//
+	// Deletes the selected global credential within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteGlobalCredentialWithResponse(ctx context.Context, credentialId CredentialId, params *DeleteGlobalCredentialParams, reqEditors ...RequestEditorFn) (*DeleteGlobalCredentialResponse, error)
@@ -13754,44 +14751,62 @@ type ClientWithResponsesInterface interface {
 	// UpdateGlobalCredentialWithBodyWithResponse performs a PATCH /api/v1/admin/global-credentials/{credentialId} (the `UpdateGlobalCredential` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected global credential within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateGlobalCredentialWithBodyWithResponse(ctx context.Context, credentialId CredentialId, params *UpdateGlobalCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateGlobalCredentialResponse, error)
 
 	// UpdateGlobalCredentialWithResponse performs a PATCH /api/v1/admin/global-credentials/{credentialId} (the `UpdateGlobalCredential` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected global credential within the authorized request scope.
 	UpdateGlobalCredentialWithResponse(ctx context.Context, credentialId CredentialId, params *UpdateGlobalCredentialParams, body UpdateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateGlobalCredentialResponse, error)
 
 	// RotateGlobalCredentialWithBodyWithResponse performs a POST /api/v1/admin/global-credentials/{credentialId}:rotate (the `RotateGlobalCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the rotate global credential workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RotateGlobalCredentialWithBodyWithResponse(ctx context.Context, credentialId CredentialId, params *RotateGlobalCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RotateGlobalCredentialResponse, error)
 
 	// RotateGlobalCredentialWithResponse performs a POST /api/v1/admin/global-credentials/{credentialId}:rotate (the `RotateGlobalCredential` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the rotate global credential workflow within the authorized request scope.
 	RotateGlobalCredentialWithResponse(ctx context.Context, credentialId CredentialId, params *RotateGlobalCredentialParams, body RotateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*RotateGlobalCredentialResponse, error)
 
 	// TestGlobalCredentialWithBodyWithResponse performs a POST /api/v1/admin/global-credentials/{credentialId}:test (the `TestGlobalCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Tests global credential within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	TestGlobalCredentialWithBodyWithResponse(ctx context.Context, credentialId CredentialId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TestGlobalCredentialResponse, error)
 
 	// TestGlobalCredentialWithResponse performs a POST /api/v1/admin/global-credentials/{credentialId}:test (the `TestGlobalCredential` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Tests global credential within the authorized request scope.
 	TestGlobalCredentialWithResponse(ctx context.Context, credentialId CredentialId, body TestGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*TestGlobalCredentialResponse, error)
 
 	// ListPlatformJobsWithResponse performs a GET /api/v1/admin/jobs (the `ListPlatformJobs` operationId) request.
+	//
+	// Returns the requested page of platform jobs within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListPlatformJobsWithResponse(ctx context.Context, params *ListPlatformJobsParams, reqEditors ...RequestEditorFn) (*ListPlatformJobsResponse, error)
 
 	// GetPlatformJobWithResponse performs a GET /api/v1/admin/jobs/{jobId} (the `GetPlatformJob` operationId) request.
 	//
+	// Returns the selected platform job within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	GetPlatformJobWithResponse(ctx context.Context, jobId JobId, reqEditors ...RequestEditorFn) (*GetPlatformJobResponse, error)
 
 	// ListProducerProfilesWithResponse performs a GET /api/v1/admin/producer-profiles (the `ListProducerProfiles` operationId) request.
+	//
+	// Returns the requested page of producer profiles within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListProducerProfilesWithResponse(ctx context.Context, params *ListProducerProfilesParams, reqEditors ...RequestEditorFn) (*ListProducerProfilesResponse, error)
@@ -13799,19 +14814,27 @@ type ClientWithResponsesInterface interface {
 	// CreateProducerProfileWithBodyWithResponse performs a POST /api/v1/admin/producer-profiles (the `CreateProducerProfile` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates producer profile within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateProducerProfileWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateProducerProfileResponse, error)
 
 	// CreateProducerProfileWithResponse performs a POST /api/v1/admin/producer-profiles (the `CreateProducerProfile` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates producer profile within the authorized request scope.
 	CreateProducerProfileWithResponse(ctx context.Context, body CreateProducerProfileJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateProducerProfileResponse, error)
 
 	// DeleteProducerProfileWithResponse performs a DELETE /api/v1/admin/producer-profiles/{producerProfileId} (the `DeleteProducerProfile` operationId) request.
+	//
+	// Deletes the selected producer profile within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteProducerProfileWithResponse(ctx context.Context, producerProfileId ProducerProfileId, params *DeleteProducerProfileParams, reqEditors ...RequestEditorFn) (*DeleteProducerProfileResponse, error)
 
 	// GetProducerProfileWithResponse performs a GET /api/v1/admin/producer-profiles/{producerProfileId} (the `GetProducerProfile` operationId) request.
+	//
+	// Returns the selected producer profile within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetProducerProfileWithResponse(ctx context.Context, producerProfileId ProducerProfileId, reqEditors ...RequestEditorFn) (*GetProducerProfileResponse, error)
@@ -13819,14 +14842,20 @@ type ClientWithResponsesInterface interface {
 	// UpdateProducerProfileWithBodyWithResponse performs a PATCH /api/v1/admin/producer-profiles/{producerProfileId} (the `UpdateProducerProfile` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected producer profile within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateProducerProfileWithBodyWithResponse(ctx context.Context, producerProfileId ProducerProfileId, params *UpdateProducerProfileParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateProducerProfileResponse, error)
 
 	// UpdateProducerProfileWithResponse performs a PATCH /api/v1/admin/producer-profiles/{producerProfileId} (the `UpdateProducerProfile` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected producer profile within the authorized request scope.
 	UpdateProducerProfileWithResponse(ctx context.Context, producerProfileId ProducerProfileId, params *UpdateProducerProfileParams, body UpdateProducerProfileJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateProducerProfileResponse, error)
 
 	// GetPlatformSettingsWithResponse performs a GET /api/v1/admin/settings (the `GetPlatformSettings` operationId) request.
+	//
+	// Returns the selected platform settings within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetPlatformSettingsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetPlatformSettingsResponse, error)
@@ -13834,14 +14863,20 @@ type ClientWithResponsesInterface interface {
 	// UpdatePlatformSettingsWithBodyWithResponse performs a PATCH /api/v1/admin/settings (the `UpdatePlatformSettings` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected platform settings within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdatePlatformSettingsWithBodyWithResponse(ctx context.Context, params *UpdatePlatformSettingsParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdatePlatformSettingsResponse, error)
 
 	// UpdatePlatformSettingsWithResponse performs a PATCH /api/v1/admin/settings (the `UpdatePlatformSettings` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected platform settings within the authorized request scope.
 	UpdatePlatformSettingsWithResponse(ctx context.Context, params *UpdatePlatformSettingsParams, body UpdatePlatformSettingsJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdatePlatformSettingsResponse, error)
 
 	// ListTenantsWithResponse performs a GET /api/v1/admin/tenants (the `ListTenants` operationId) request.
+	//
+	// Returns the requested page of tenants within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListTenantsWithResponse(ctx context.Context, params *ListTenantsParams, reqEditors ...RequestEditorFn) (*ListTenantsResponse, error)
@@ -13849,44 +14884,62 @@ type ClientWithResponsesInterface interface {
 	// CreateTenantWithBodyWithResponse performs a POST /api/v1/admin/tenants (the `CreateTenant` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates tenant within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateTenantWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTenantResponse, error)
 
 	// CreateTenantWithResponse performs a POST /api/v1/admin/tenants (the `CreateTenant` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates tenant within the authorized request scope.
 	CreateTenantWithResponse(ctx context.Context, body CreateTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTenantResponse, error)
 
 	// DeleteTenantWithBodyWithResponse performs a DELETE /api/v1/admin/tenants/{tenantSlug} (the `DeleteTenant` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Deletes the selected tenant within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteTenantWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, params *DeleteTenantParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteTenantResponse, error)
 
 	// DeleteTenantWithResponse performs a DELETE /api/v1/admin/tenants/{tenantSlug} (the `DeleteTenant` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Deletes the selected tenant within the authorized request scope.
 	DeleteTenantWithResponse(ctx context.Context, tenantSlug TenantSlug, params *DeleteTenantParams, body DeleteTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteTenantResponse, error)
 
 	// UpdateTenantWithBodyWithResponse performs a PATCH /api/v1/admin/tenants/{tenantSlug} (the `UpdateTenant` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected tenant within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateTenantWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTenantResponse, error)
 
 	// UpdateTenantWithResponse performs a PATCH /api/v1/admin/tenants/{tenantSlug} (the `UpdateTenant` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected tenant within the authorized request scope.
 	UpdateTenantWithResponse(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantParams, body UpdateTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTenantResponse, error)
 
 	// PutTenantMemberAsPlatformAdminWithBodyWithResponse performs a PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId} (the `PutTenantMemberAsPlatformAdmin` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates or replaces the selected tenant member as platform admin within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	PutTenantMemberAsPlatformAdminWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutTenantMemberAsPlatformAdminResponse, error)
 
 	// PutTenantMemberAsPlatformAdminWithResponse performs a PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId} (the `PutTenantMemberAsPlatformAdmin` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates or replaces the selected tenant member as platform admin within the authorized request scope.
 	PutTenantMemberAsPlatformAdminWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, body PutTenantMemberAsPlatformAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*PutTenantMemberAsPlatformAdminResponse, error)
 
 	// ListUsersWithResponse performs a GET /api/v1/admin/users (the `ListUsers` operationId) request.
+	//
+	// Returns the requested page of users within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListUsersWithResponse(ctx context.Context, params *ListUsersParams, reqEditors ...RequestEditorFn) (*ListUsersResponse, error)
@@ -13894,24 +14947,34 @@ type ClientWithResponsesInterface interface {
 	// CreateUserWithBodyWithResponse performs a POST /api/v1/admin/users (the `CreateUser` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates user within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserResponse, error)
 
 	// CreateUserWithResponse performs a POST /api/v1/admin/users (the `CreateUser` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates user within the authorized request scope.
 	CreateUserWithResponse(ctx context.Context, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUserResponse, error)
 
 	// UpdateUserWithBodyWithResponse performs a PATCH /api/v1/admin/users/{userId} (the `UpdateUser` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Updates the selected user within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateUserWithBodyWithResponse(ctx context.Context, userId UserId, params *UpdateUserParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
 
 	// UpdateUserWithResponse performs a PATCH /api/v1/admin/users/{userId} (the `UpdateUser` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected user within the authorized request scope.
 	UpdateUserWithResponse(ctx context.Context, userId UserId, params *UpdateUserParams, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error)
 
 	// GetCsrfTokenWithResponse performs a GET /api/v1/auth/csrf (the `GetCsrfToken` operationId) request.
+	//
+	// Returns a CSRF token bound to the current authenticated browser session.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetCsrfTokenWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCsrfTokenResponse, error)
@@ -13919,24 +14982,34 @@ type ClientWithResponsesInterface interface {
 	// LoginWithBodyWithResponse performs a POST /api/v1/auth/login (the `Login` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Authenticates local credentials and creates a browser session.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	LoginWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LoginResponse, error)
 
 	// LoginWithResponse performs a POST /api/v1/auth/login (the `Login` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Authenticates local credentials and creates a browser session.
 	LoginWithResponse(ctx context.Context, body LoginJSONRequestBody, reqEditors ...RequestEditorFn) (*LoginResponse, error)
 
 	// LogoutWithResponse performs a POST /api/v1/auth/logout (the `Logout` operationId) request.
+	//
+	// Revokes the current browser session and clears its session cookie.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	LogoutWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*LogoutResponse, error)
 
 	// GetMeWithResponse performs a GET /api/v1/auth/me (the `GetMe` operationId) request.
 	//
+	// Returns the authenticated principal and tenant memberships.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	GetMeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMeResponse, error)
 
 	// GetMyPreferencesWithResponse performs a GET /api/v1/auth/me/preferences (the `GetMyPreferences` operationId) request.
+	//
+	// Returns the selected my preferences within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetMyPreferencesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMyPreferencesResponse, error)
@@ -13944,29 +15017,41 @@ type ClientWithResponsesInterface interface {
 	// UpdateMyPreferencesWithBodyWithResponse performs a PATCH /api/v1/auth/me/preferences (the `UpdateMyPreferences` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected my preferences within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateMyPreferencesWithBodyWithResponse(ctx context.Context, params *UpdateMyPreferencesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateMyPreferencesResponse, error)
 
 	// UpdateMyPreferencesWithResponse performs a PATCH /api/v1/auth/me/preferences (the `UpdateMyPreferences` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected my preferences within the authorized request scope.
 	UpdateMyPreferencesWithResponse(ctx context.Context, params *UpdateMyPreferencesParams, body UpdateMyPreferencesJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateMyPreferencesResponse, error)
 
 	// DownloadSignedContentWithResponse performs a GET /api/v1/content/{token} (the `DownloadSignedContent` operationId) request.
+	//
+	// Downloads signed content within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DownloadSignedContentWithResponse(ctx context.Context, token ContentToken, reqEditors ...RequestEditorFn) (*DownloadSignedContentResponse, error)
 
 	// GetOpenApiContractWithResponse performs a GET /api/v1/openapi.yaml (the `GetOpenApiContract` operationId) request.
 	//
+	// Returns the exact OpenAPI contract embedded in this server build.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	GetOpenApiContractWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetOpenApiContractResponse, error)
 
 	// GetPublicServiceWithResponse performs a GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug} (the `GetPublicService` operationId) request.
 	//
+	// Returns the selected public service within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	GetPublicServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*GetPublicServiceResponse, error)
 
 	// GetPublicAssetWithResponse performs a GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug}/assets/{kindId}/{assetName} (the `GetPublicAsset` operationId) request.
+	//
+	// Returns the selected public asset within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetPublicAssetWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, kindId KindId, assetName AssetName, reqEditors ...RequestEditorFn) (*GetPublicAssetResponse, error)
@@ -13974,19 +15059,27 @@ type ClientWithResponsesInterface interface {
 	// ResolvePublicViewWithBodyWithResponse performs a POST /api/v1/public/t/{tenantSlug}/views:resolve (the `ResolvePublicView` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Resolves public view within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ResolvePublicViewWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResolvePublicViewResponse, error)
 
 	// ResolvePublicViewWithResponse performs a POST /api/v1/public/t/{tenantSlug}/views:resolve (the `ResolvePublicView` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Resolves public view within the authorized request scope.
 	ResolvePublicViewWithResponse(ctx context.Context, tenantSlug TenantSlug, body ResolvePublicViewJSONRequestBody, reqEditors ...RequestEditorFn) (*ResolvePublicViewResponse, error)
 
 	// GetSharedViewWithResponse performs a GET /api/v1/shared/{shareToken} (the `GetSharedView` operationId) request.
+	//
+	// Returns the selected shared view within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetSharedViewWithResponse(ctx context.Context, shareToken ShareToken, reqEditors ...RequestEditorFn) (*GetSharedViewResponse, error)
 
 	// ListAssetKindsWithResponse performs a GET /api/v1/t/{tenantSlug}/asset-kinds (the `ListAssetKinds` operationId) request.
+	//
+	// Returns the requested page of asset kinds within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListAssetKindsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListAssetKindsResponse, error)
@@ -13994,29 +15087,41 @@ type ClientWithResponsesInterface interface {
 	// UpdateAssetKindStateWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId} (the `UpdateAssetKindState` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected asset kind state within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateAssetKindStateWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, kindId KindId, params *UpdateAssetKindStateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateAssetKindStateResponse, error)
 
 	// UpdateAssetKindStateWithResponse performs a PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId} (the `UpdateAssetKindState` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected asset kind state within the authorized request scope.
 	UpdateAssetKindStateWithResponse(ctx context.Context, tenantSlug TenantSlug, kindId KindId, params *UpdateAssetKindStateParams, body UpdateAssetKindStateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateAssetKindStateResponse, error)
 
 	// GetAssetVersionWithResponse performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId} (the `GetAssetVersion` operationId) request.
+	//
+	// Returns the selected asset version within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetAssetVersionWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, reqEditors ...RequestEditorFn) (*GetAssetVersionResponse, error)
 
 	// ListAssetVersionItemsWithResponse performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/items (the `ListAssetVersionItems` operationId) request.
 	//
+	// Returns the requested page of asset version items within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ListAssetVersionItemsWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *ListAssetVersionItemsParams, reqEditors ...RequestEditorFn) (*ListAssetVersionItemsResponse, error)
 
 	// GetAssetVersionProvenanceWithResponse performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/provenance (the `GetAssetVersionProvenance` operationId) request.
 	//
+	// Returns the selected asset version provenance within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	GetAssetVersionProvenanceWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, reqEditors ...RequestEditorFn) (*GetAssetVersionProvenanceResponse, error)
 
 	// DeprecateAssetVersionWithResponse performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:deprecate (the `DeprecateAssetVersion` operationId) request.
+	//
+	// Performs the deprecate asset version workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeprecateAssetVersionWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *DeprecateAssetVersionParams, reqEditors ...RequestEditorFn) (*DeprecateAssetVersionResponse, error)
@@ -14024,19 +15129,27 @@ type ClientWithResponsesInterface interface {
 	// PublishAssetVersionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish (the `PublishAssetVersion` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Performs the publish asset version workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	PublishAssetVersionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *PublishAssetVersionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PublishAssetVersionResponse, error)
 
 	// PublishAssetVersionWithResponse performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish (the `PublishAssetVersion` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the publish asset version workflow within the authorized request scope.
 	PublishAssetVersionWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *PublishAssetVersionParams, body PublishAssetVersionJSONRequestBody, reqEditors ...RequestEditorFn) (*PublishAssetVersionResponse, error)
 
 	// RetireAssetVersionWithResponse performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:retire (the `RetireAssetVersion` operationId) request.
+	//
+	// Performs the retire asset version workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RetireAssetVersionWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *RetireAssetVersionParams, reqEditors ...RequestEditorFn) (*RetireAssetVersionResponse, error)
 
 	// GetAssetWithResponse performs a GET /api/v1/t/{tenantSlug}/assets/{assetId} (the `GetAsset` operationId) request.
+	//
+	// Returns the selected asset within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetAssetWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GetAssetParams, reqEditors ...RequestEditorFn) (*GetAssetResponse, error)
@@ -14044,14 +15157,20 @@ type ClientWithResponsesInterface interface {
 	// ReorderAssetLayersWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order (the `ReorderAssetLayers` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Performs the reorder asset layers workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ReorderAssetLayersWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ReorderAssetLayersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReorderAssetLayersResponse, error)
 
 	// ReorderAssetLayersWithResponse performs a PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order (the `ReorderAssetLayers` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the reorder asset layers workflow within the authorized request scope.
 	ReorderAssetLayersWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ReorderAssetLayersParams, body ReorderAssetLayersJSONRequestBody, reqEditors ...RequestEditorFn) (*ReorderAssetLayersResponse, error)
 
 	// ListAssetVersionsWithResponse performs a GET /api/v1/t/{tenantSlug}/assets/{assetId}/versions (the `ListAssetVersions` operationId) request.
+	//
+	// Returns the requested page of asset versions within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListAssetVersionsWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ListAssetVersionsParams, reqEditors ...RequestEditorFn) (*ListAssetVersionsResponse, error)
@@ -14059,39 +15178,55 @@ type ClientWithResponsesInterface interface {
 	// GenerateAssetWithAiWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate (the `GenerateAssetWithAi` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Performs the generate asset with ai workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	GenerateAssetWithAiWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GenerateAssetWithAiParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GenerateAssetWithAiResponse, error)
 
 	// GenerateAssetWithAiWithResponse performs a POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate (the `GenerateAssetWithAi` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the generate asset with ai workflow within the authorized request scope.
 	GenerateAssetWithAiWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GenerateAssetWithAiParams, body GenerateAssetWithAiJSONRequestBody, reqEditors ...RequestEditorFn) (*GenerateAssetWithAiResponse, error)
 
 	// PreviewMergeWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/assets:preview-merge (the `PreviewMerge` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the preview merge workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	PreviewMergeWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewMergeResponse, error)
 
 	// PreviewMergeWithResponse performs a POST /api/v1/t/{tenantSlug}/assets:preview-merge (the `PreviewMerge` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the preview merge workflow within the authorized request scope.
 	PreviewMergeWithResponse(ctx context.Context, tenantSlug TenantSlug, body PreviewMergeJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewMergeResponse, error)
 
 	// PushAssetRevisionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/assets:push (the `PushAssetRevision` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the push asset revision workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	PushAssetRevisionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, params *PushAssetRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PushAssetRevisionResponse, error)
 
 	// PushAssetRevisionWithResponse performs a POST /api/v1/t/{tenantSlug}/assets:push (the `PushAssetRevision` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the push asset revision workflow within the authorized request scope.
 	PushAssetRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, params *PushAssetRevisionParams, body PushAssetRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*PushAssetRevisionResponse, error)
 
 	// ListAuditLogsWithResponse performs a GET /api/v1/t/{tenantSlug}/audit-logs (the `ListAuditLogs` operationId) request.
+	//
+	// Returns the requested page of audit logs within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListAuditLogsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListAuditLogsParams, reqEditors ...RequestEditorFn) (*ListAuditLogsResponse, error)
 
 	// ListBreakingTodosWithResponse performs a GET /api/v1/t/{tenantSlug}/breaking-todos (the `ListBreakingTodos` operationId) request.
+	//
+	// Returns the requested page of breaking todos within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListBreakingTodosWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListBreakingTodosParams, reqEditors ...RequestEditorFn) (*ListBreakingTodosResponse, error)
@@ -14099,14 +15234,20 @@ type ClientWithResponsesInterface interface {
 	// AcknowledgeBreakingTodoWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack (the `AcknowledgeBreakingTodo` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Performs the acknowledge breaking todo workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	AcknowledgeBreakingTodoWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, todoId TodoId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AcknowledgeBreakingTodoResponse, error)
 
 	// AcknowledgeBreakingTodoWithResponse performs a POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack (the `AcknowledgeBreakingTodo` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the acknowledge breaking todo workflow within the authorized request scope.
 	AcknowledgeBreakingTodoWithResponse(ctx context.Context, tenantSlug TenantSlug, todoId TodoId, body AcknowledgeBreakingTodoJSONRequestBody, reqEditors ...RequestEditorFn) (*AcknowledgeBreakingTodoResponse, error)
 
 	// ListCredentialsWithResponse performs a GET /api/v1/t/{tenantSlug}/credentials (the `ListCredentials` operationId) request.
+	//
+	// Returns the requested page of credentials within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListCredentialsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListCredentialsParams, reqEditors ...RequestEditorFn) (*ListCredentialsResponse, error)
@@ -14114,14 +15255,20 @@ type ClientWithResponsesInterface interface {
 	// CreateCredentialWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials (the `CreateCredential` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates credential within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateCredentialWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCredentialResponse, error)
 
 	// CreateCredentialWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials (the `CreateCredential` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates credential within the authorized request scope.
 	CreateCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCredentialResponse, error)
 
 	// DeleteCredentialWithResponse performs a DELETE /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `DeleteCredential` operationId) request.
+	//
+	// Deletes the selected credential within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *DeleteCredentialParams, reqEditors ...RequestEditorFn) (*DeleteCredentialResponse, error)
@@ -14129,44 +15276,62 @@ type ClientWithResponsesInterface interface {
 	// UpdateCredentialWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `UpdateCredential` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected credential within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateCredentialWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *UpdateCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateCredentialResponse, error)
 
 	// UpdateCredentialWithResponse performs a PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `UpdateCredential` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected credential within the authorized request scope.
 	UpdateCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *UpdateCredentialParams, body UpdateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCredentialResponse, error)
 
 	// RotateCredentialWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate (the `RotateCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the rotate credential workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RotateCredentialWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *RotateCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RotateCredentialResponse, error)
 
 	// RotateCredentialWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate (the `RotateCredential` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the rotate credential workflow within the authorized request scope.
 	RotateCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *RotateCredentialParams, body RotateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*RotateCredentialResponse, error)
 
 	// TestCredentialWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test (the `TestCredential` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Tests credential within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	TestCredentialWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TestCredentialResponse, error)
 
 	// TestCredentialWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test (the `TestCredential` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Tests credential within the authorized request scope.
 	TestCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, body TestCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*TestCredentialResponse, error)
 
 	// RunDiffWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/diff (the `RunDiff` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Runs diff within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RunDiffWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RunDiffResponse, error)
 
 	// RunDiffWithResponse performs a POST /api/v1/t/{tenantSlug}/diff (the `RunDiff` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Runs diff within the authorized request scope.
 	RunDiffWithResponse(ctx context.Context, tenantSlug TenantSlug, body RunDiffJSONRequestBody, reqEditors ...RequestEditorFn) (*RunDiffResponse, error)
 
 	// ListDiffRuleSetsWithResponse performs a GET /api/v1/t/{tenantSlug}/diff-rule-sets (the `ListDiffRuleSets` operationId) request.
+	//
+	// Returns the requested page of diff rule sets within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListDiffRuleSetsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListDiffRuleSetsResponse, error)
@@ -14174,14 +15339,20 @@ type ClientWithResponsesInterface interface {
 	// CreateDiffRuleSetWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/diff-rule-sets (the `CreateDiffRuleSet` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates diff rule set within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateDiffRuleSetWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDiffRuleSetResponse, error)
 
 	// CreateDiffRuleSetWithResponse performs a POST /api/v1/t/{tenantSlug}/diff-rule-sets (the `CreateDiffRuleSet` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates diff rule set within the authorized request scope.
 	CreateDiffRuleSetWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateDiffRuleSetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDiffRuleSetResponse, error)
 
 	// DeleteDiffRuleSetWithResponse performs a DELETE /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `DeleteDiffRuleSet` operationId) request.
+	//
+	// Deletes the selected diff rule set within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteDiffRuleSetWithResponse(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *DeleteDiffRuleSetParams, reqEditors ...RequestEditorFn) (*DeleteDiffRuleSetResponse, error)
@@ -14189,29 +15360,41 @@ type ClientWithResponsesInterface interface {
 	// UpdateDiffRuleSetWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `UpdateDiffRuleSet` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected diff rule set within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateDiffRuleSetWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *UpdateDiffRuleSetParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDiffRuleSetResponse, error)
 
 	// UpdateDiffRuleSetWithResponse performs a PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `UpdateDiffRuleSet` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected diff rule set within the authorized request scope.
 	UpdateDiffRuleSetWithResponse(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *UpdateDiffRuleSetParams, body UpdateDiffRuleSetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDiffRuleSetResponse, error)
 
 	// ListDiffSnapshotsWithResponse performs a GET /api/v1/t/{tenantSlug}/diff-snapshots (the `ListDiffSnapshots` operationId) request.
+	//
+	// Returns the requested page of diff snapshots within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListDiffSnapshotsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListDiffSnapshotsParams, reqEditors ...RequestEditorFn) (*ListDiffSnapshotsResponse, error)
 
 	// DeleteDiffSnapshotWithResponse performs a DELETE /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId} (the `DeleteDiffSnapshot` operationId) request.
 	//
+	// Deletes the selected diff snapshot within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteDiffSnapshotWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, reqEditors ...RequestEditorFn) (*DeleteDiffSnapshotResponse, error)
 
 	// GetDiffSnapshotWithResponse performs a GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId} (the `GetDiffSnapshot` operationId) request.
 	//
+	// Returns the selected diff snapshot within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	GetDiffSnapshotWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, reqEditors ...RequestEditorFn) (*GetDiffSnapshotResponse, error)
 
 	// ExportDiffSnapshotWithResponse performs a GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/export (the `ExportDiffSnapshot` operationId) request.
+	//
+	// Exports diff snapshot within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ExportDiffSnapshotWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, params *ExportDiffSnapshotParams, reqEditors ...RequestEditorFn) (*ExportDiffSnapshotResponse, error)
@@ -14219,49 +15402,69 @@ type ClientWithResponsesInterface interface {
 	// CreateDiffSnapshotShareLinkWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links (the `CreateDiffSnapshotShareLink` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates diff snapshot share link within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateDiffSnapshotShareLinkWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDiffSnapshotShareLinkResponse, error)
 
 	// CreateDiffSnapshotShareLinkWithResponse performs a POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links (the `CreateDiffSnapshotShareLink` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates diff snapshot share link within the authorized request scope.
 	CreateDiffSnapshotShareLinkWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, body CreateDiffSnapshotShareLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDiffSnapshotShareLinkResponse, error)
 
 	// SearchTenantUsersWithResponse performs a GET /api/v1/t/{tenantSlug}/directory/users (the `SearchTenantUsers` operationId) request.
+	//
+	// Searches for tenant users within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	SearchTenantUsersWithResponse(ctx context.Context, tenantSlug TenantSlug, params *SearchTenantUsersParams, reqEditors ...RequestEditorFn) (*SearchTenantUsersResponse, error)
 
 	// CreateTenantExportWithResponse performs a POST /api/v1/t/{tenantSlug}/exports (the `CreateTenantExport` operationId) request.
 	//
+	// Creates tenant export within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateTenantExportWithResponse(ctx context.Context, tenantSlug TenantSlug, params *CreateTenantExportParams, reqEditors ...RequestEditorFn) (*CreateTenantExportResponse, error)
 
 	// ListJobsWithResponse performs a GET /api/v1/t/{tenantSlug}/jobs (the `ListJobs` operationId) request.
+	//
+	// Returns the requested page of jobs within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListJobsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListJobsParams, reqEditors ...RequestEditorFn) (*ListJobsResponse, error)
 
 	// GetJobWithResponse performs a GET /api/v1/t/{tenantSlug}/jobs/{jobId} (the `GetJob` operationId) request.
 	//
+	// Returns the selected job within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	GetJobWithResponse(ctx context.Context, tenantSlug TenantSlug, jobId JobId, reqEditors ...RequestEditorFn) (*GetJobResponse, error)
 
 	// StreamJobLogsWithResponse performs a GET /api/v1/t/{tenantSlug}/jobs/{jobId}/logs (the `StreamJobLogs` operationId) request.
+	//
+	// Streams ordered events for job logs within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	StreamJobLogsWithResponse(ctx context.Context, tenantSlug TenantSlug, jobId JobId, params *StreamJobLogsParams, reqEditors ...RequestEditorFn) (*StreamJobLogsResponse, error)
 
 	// CancelJobWithResponse performs a POST /api/v1/t/{tenantSlug}/jobs/{jobId}:cancel (the `CancelJob` operationId) request.
 	//
+	// Performs the cancel job workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CancelJobWithResponse(ctx context.Context, tenantSlug TenantSlug, jobId JobId, reqEditors ...RequestEditorFn) (*CancelJobResponse, error)
 
 	// RetryJobWithResponse performs a POST /api/v1/t/{tenantSlug}/jobs/{jobId}:retry (the `RetryJob` operationId) request.
 	//
+	// Performs the retry job workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	RetryJobWithResponse(ctx context.Context, tenantSlug TenantSlug, jobId JobId, params *RetryJobParams, reqEditors ...RequestEditorFn) (*RetryJobResponse, error)
 
 	// ListKnownHostsWithResponse performs a GET /api/v1/t/{tenantSlug}/known-hosts (the `ListKnownHosts` operationId) request.
+	//
+	// Returns the requested page of known hosts within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListKnownHostsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListKnownHostsParams, reqEditors ...RequestEditorFn) (*ListKnownHostsResponse, error)
@@ -14269,19 +15472,27 @@ type ClientWithResponsesInterface interface {
 	// CreateKnownHostWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/known-hosts (the `CreateKnownHost` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates known host within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateKnownHostWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKnownHostResponse, error)
 
 	// CreateKnownHostWithResponse performs a POST /api/v1/t/{tenantSlug}/known-hosts (the `CreateKnownHost` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates known host within the authorized request scope.
 	CreateKnownHostWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateKnownHostJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKnownHostResponse, error)
 
 	// GetLayerRevisionWithResponse performs a GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId} (the `GetLayerRevision` operationId) request.
+	//
+	// Returns the selected layer revision within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetLayerRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, reqEditors ...RequestEditorFn) (*GetLayerRevisionResponse, error)
 
 	// GetReviewContextWithResponse performs a GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}/review-context (the `GetReviewContext` operationId) request.
+	//
+	// Returns the selected review context within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetReviewContextWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, reqEditors ...RequestEditorFn) (*GetReviewContextResponse, error)
@@ -14289,24 +15500,34 @@ type ClientWithResponsesInterface interface {
 	// ApproveLayerRevisionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve (the `ApproveLayerRevision` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Performs the approve layer revision workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ApproveLayerRevisionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *ApproveLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApproveLayerRevisionResponse, error)
 
 	// ApproveLayerRevisionWithResponse performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve (the `ApproveLayerRevision` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the approve layer revision workflow within the authorized request scope.
 	ApproveLayerRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *ApproveLayerRevisionParams, body ApproveLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*ApproveLayerRevisionResponse, error)
 
 	// RejectLayerRevisionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject (the `RejectLayerRevision` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the reject layer revision workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RejectLayerRevisionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *RejectLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RejectLayerRevisionResponse, error)
 
 	// RejectLayerRevisionWithResponse performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject (the `RejectLayerRevision` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the reject layer revision workflow within the authorized request scope.
 	RejectLayerRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *RejectLayerRevisionParams, body RejectLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*RejectLayerRevisionResponse, error)
 
 	// GetLayerWithResponse performs a GET /api/v1/t/{tenantSlug}/layers/{layerId} (the `GetLayer` operationId) request.
+	//
+	// Returns the selected layer within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetLayerWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *GetLayerParams, reqEditors ...RequestEditorFn) (*GetLayerResponse, error)
@@ -14314,14 +15535,20 @@ type ClientWithResponsesInterface interface {
 	// UpdateLayerWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/layers/{layerId} (the `UpdateLayer` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected layer within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateLayerWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *UpdateLayerParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateLayerResponse, error)
 
 	// UpdateLayerWithResponse performs a PATCH /api/v1/t/{tenantSlug}/layers/{layerId} (the `UpdateLayer` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected layer within the authorized request scope.
 	UpdateLayerWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *UpdateLayerParams, body UpdateLayerJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateLayerResponse, error)
 
 	// ListLayerRevisionsWithResponse performs a GET /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `ListLayerRevisions` operationId) request.
+	//
+	// Returns the requested page of layer revisions within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListLayerRevisionsWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *ListLayerRevisionsParams, reqEditors ...RequestEditorFn) (*ListLayerRevisionsResponse, error)
@@ -14329,29 +15556,41 @@ type ClientWithResponsesInterface interface {
 	// CreateLayerRevisionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `CreateLayerRevision` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates layer revision within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateLayerRevisionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *CreateLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLayerRevisionResponse, error)
 
 	// CreateLayerRevisionWithResponse performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `CreateLayerRevision` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates layer revision within the authorized request scope.
 	CreateLayerRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *CreateLayerRevisionParams, body CreateLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLayerRevisionResponse, error)
 
 	// RollbackLayerWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback (the `RollbackLayer` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the rollback layer workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RollbackLayerWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *RollbackLayerParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RollbackLayerResponse, error)
 
 	// RollbackLayerWithResponse performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback (the `RollbackLayer` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the rollback layer workflow within the authorized request scope.
 	RollbackLayerWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *RollbackLayerParams, body RollbackLayerJSONRequestBody, reqEditors ...RequestEditorFn) (*RollbackLayerResponse, error)
 
 	// ListTenantMembersWithResponse performs a GET /api/v1/t/{tenantSlug}/members (the `ListTenantMembers` operationId) request.
+	//
+	// Returns the requested page of tenant members within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListTenantMembersWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListTenantMembersParams, reqEditors ...RequestEditorFn) (*ListTenantMembersResponse, error)
 
 	// DeleteTenantMemberWithResponse performs a DELETE /api/v1/t/{tenantSlug}/members/{userId} (the `DeleteTenantMember` operationId) request.
+	//
+	// Deletes the selected tenant member within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteTenantMemberWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, reqEditors ...RequestEditorFn) (*DeleteTenantMemberResponse, error)
@@ -14359,14 +15598,20 @@ type ClientWithResponsesInterface interface {
 	// PutTenantMemberWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/members/{userId} (the `PutTenantMember` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates or replaces the selected tenant member within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	PutTenantMemberWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutTenantMemberResponse, error)
 
 	// PutTenantMemberWithResponse performs a PUT /api/v1/t/{tenantSlug}/members/{userId} (the `PutTenantMember` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates or replaces the selected tenant member within the authorized request scope.
 	PutTenantMemberWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, body PutTenantMemberJSONRequestBody, reqEditors ...RequestEditorFn) (*PutTenantMemberResponse, error)
 
 	// ListNotificationChannelsWithResponse performs a GET /api/v1/t/{tenantSlug}/notification-channels (the `ListNotificationChannels` operationId) request.
+	//
+	// Returns the requested page of notification channels within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListNotificationChannelsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListNotificationChannelsResponse, error)
@@ -14374,14 +15619,20 @@ type ClientWithResponsesInterface interface {
 	// CreateNotificationChannelWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels (the `CreateNotificationChannel` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates notification channel within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateNotificationChannelWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNotificationChannelResponse, error)
 
 	// CreateNotificationChannelWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels (the `CreateNotificationChannel` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates notification channel within the authorized request scope.
 	CreateNotificationChannelWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateNotificationChannelJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNotificationChannelResponse, error)
 
 	// DeleteNotificationChannelWithResponse performs a DELETE /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `DeleteNotificationChannel` operationId) request.
+	//
+	// Deletes the selected notification channel within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteNotificationChannelWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *DeleteNotificationChannelParams, reqEditors ...RequestEditorFn) (*DeleteNotificationChannelResponse, error)
@@ -14389,49 +15640,69 @@ type ClientWithResponsesInterface interface {
 	// UpdateNotificationChannelWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `UpdateNotificationChannel` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected notification channel within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateNotificationChannelWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *UpdateNotificationChannelParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNotificationChannelResponse, error)
 
 	// UpdateNotificationChannelWithResponse performs a PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `UpdateNotificationChannel` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected notification channel within the authorized request scope.
 	UpdateNotificationChannelWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *UpdateNotificationChannelParams, body UpdateNotificationChannelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNotificationChannelResponse, error)
 
 	// RotateNotificationChannelSecretWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate (the `RotateNotificationChannelSecret` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the rotate notification channel secret workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RotateNotificationChannelSecretWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *RotateNotificationChannelSecretParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RotateNotificationChannelSecretResponse, error)
 
 	// RotateNotificationChannelSecretWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate (the `RotateNotificationChannelSecret` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the rotate notification channel secret workflow within the authorized request scope.
 	RotateNotificationChannelSecretWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *RotateNotificationChannelSecretParams, body RotateNotificationChannelSecretJSONRequestBody, reqEditors ...RequestEditorFn) (*RotateNotificationChannelSecretResponse, error)
 
 	// TestNotificationChannelWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:test (the `TestNotificationChannel` operationId) request.
+	//
+	// Tests notification channel within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	TestNotificationChannelWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, reqEditors ...RequestEditorFn) (*TestNotificationChannelResponse, error)
 
 	// ListNotificationsWithResponse performs a GET /api/v1/t/{tenantSlug}/notifications (the `ListNotifications` operationId) request.
 	//
+	// Returns the requested page of notifications within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ListNotificationsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListNotificationsParams, reqEditors ...RequestEditorFn) (*ListNotificationsResponse, error)
 
 	// MarkNotificationReadWithResponse performs a POST /api/v1/t/{tenantSlug}/notifications/{notificationId}:read (the `MarkNotificationRead` operationId) request.
+	//
+	// Performs the mark notification read workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	MarkNotificationReadWithResponse(ctx context.Context, tenantSlug TenantSlug, notificationId NotificationId, reqEditors ...RequestEditorFn) (*MarkNotificationReadResponse, error)
 
 	// MarkAllNotificationsReadWithResponse performs a POST /api/v1/t/{tenantSlug}/notifications:read-all (the `MarkAllNotificationsRead` operationId) request.
 	//
+	// Performs the mark all notifications read workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	MarkAllNotificationsReadWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*MarkAllNotificationsReadResponse, error)
 
 	// ListAvailableProducerProfilesWithResponse performs a GET /api/v1/t/{tenantSlug}/producer-profiles (the `ListAvailableProducerProfiles` operationId) request.
 	//
+	// Returns the requested page of available producer profiles within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ListAvailableProducerProfilesWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListAvailableProducerProfilesResponse, error)
 
 	// ListRepositoriesWithResponse performs a GET /api/v1/t/{tenantSlug}/repositories (the `ListRepositories` operationId) request.
+	//
+	// Returns the requested page of repositories within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListRepositoriesWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*ListRepositoriesResponse, error)
@@ -14439,19 +15710,27 @@ type ClientWithResponsesInterface interface {
 	// CreateRepositoryWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories (the `CreateRepository` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates repository within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error)
 
 	// CreateRepositoryWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories (the `CreateRepository` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates repository within the authorized request scope.
 	CreateRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error)
 
 	// DeleteRepositoryWithResponse performs a DELETE /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `DeleteRepository` operationId) request.
+	//
+	// Deletes the selected repository within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DeleteRepositoryParams, reqEditors ...RequestEditorFn) (*DeleteRepositoryResponse, error)
 
 	// GetRepositoryWithResponse performs a GET /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `GetRepository` operationId) request.
+	//
+	// Returns the selected repository within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, reqEditors ...RequestEditorFn) (*GetRepositoryResponse, error)
@@ -14459,19 +15738,27 @@ type ClientWithResponsesInterface interface {
 	// UpdateRepositoryWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `UpdateRepository` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected repository within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *UpdateRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRepositoryResponse, error)
 
 	// UpdateRepositoryWithResponse performs a PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `UpdateRepository` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected repository within the authorized request scope.
 	UpdateRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *UpdateRepositoryParams, body UpdateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRepositoryResponse, error)
 
 	// ListDiscoveryCandidatesWithResponse performs a GET /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates (the `ListDiscoveryCandidates` operationId) request.
+	//
+	// Returns the requested page of discovery candidates within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListDiscoveryCandidatesWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *ListDiscoveryCandidatesParams, reqEditors ...RequestEditorFn) (*ListDiscoveryCandidatesResponse, error)
 
 	// DismissDiscoveryCandidateWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates/{candidateId}:dismiss (the `DismissDiscoveryCandidate` operationId) request.
+	//
+	// Performs the dismiss discovery candidate workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DismissDiscoveryCandidateWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, candidateId CandidateId, reqEditors ...RequestEditorFn) (*DismissDiscoveryCandidateResponse, error)
@@ -14479,94 +15766,132 @@ type ClientWithResponsesInterface interface {
 	// AcceptDiscoveryCandidatesWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept (the `AcceptDiscoveryCandidates` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Performs the accept discovery candidates workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	AcceptDiscoveryCandidatesWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *AcceptDiscoveryCandidatesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AcceptDiscoveryCandidatesResponse, error)
 
 	// AcceptDiscoveryCandidatesWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept (the `AcceptDiscoveryCandidates` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the accept discovery candidates workflow within the authorized request scope.
 	AcceptDiscoveryCandidatesWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *AcceptDiscoveryCandidatesParams, body AcceptDiscoveryCandidatesJSONRequestBody, reqEditors ...RequestEditorFn) (*AcceptDiscoveryCandidatesResponse, error)
 
 	// PreviewRepositoryConfigImportWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports (the `PreviewRepositoryConfigImport` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the preview repository config import workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	PreviewRepositoryConfigImportWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *PreviewRepositoryConfigImportParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewRepositoryConfigImportResponse, error)
 
 	// PreviewRepositoryConfigImportWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports (the `PreviewRepositoryConfigImport` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the preview repository config import workflow within the authorized request scope.
 	PreviewRepositoryConfigImportWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *PreviewRepositoryConfigImportParams, body PreviewRepositoryConfigImportJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewRepositoryConfigImportResponse, error)
 
 	// ApplyRepositoryConfigImportWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply (the `ApplyRepositoryConfigImport` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the apply repository config import workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ApplyRepositoryConfigImportWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params *ApplyRepositoryConfigImportParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApplyRepositoryConfigImportResponse, error)
 
 	// ApplyRepositoryConfigImportWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply (the `ApplyRepositoryConfigImport` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the apply repository config import workflow within the authorized request scope.
 	ApplyRepositoryConfigImportWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params *ApplyRepositoryConfigImportParams, body ApplyRepositoryConfigImportJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyRepositoryConfigImportResponse, error)
 
 	// CreateServiceInRepositoryWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services (the `CreateServiceInRepository` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates service in repository within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateServiceInRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceInRepositoryResponse, error)
 
 	// CreateServiceInRepositoryWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services (the `CreateServiceInRepository` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates service in repository within the authorized request scope.
 	CreateServiceInRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, body CreateServiceInRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceInRepositoryResponse, error)
 
 	// DiscoverRepositoryWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover (the `DiscoverRepository` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the discover repository workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DiscoverRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DiscoverRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DiscoverRepositoryResponse, error)
 
 	// DiscoverRepositoryWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover (the `DiscoverRepository` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the discover repository workflow within the authorized request scope.
 	DiscoverRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DiscoverRepositoryParams, body DiscoverRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*DiscoverRepositoryResponse, error)
 
 	// SyncRepositoryWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync (the `SyncRepository` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the sync repository workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	SyncRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *SyncRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SyncRepositoryResponse, error)
 
 	// SyncRepositoryWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync (the `SyncRepository` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the sync repository workflow within the authorized request scope.
 	SyncRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *SyncRepositoryParams, body SyncRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*SyncRepositoryResponse, error)
 
 	// CheckRepositoryConnectionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories:check-connection (the `CheckRepositoryConnection` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Checks repository connection within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	CheckRepositoryConnectionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CheckRepositoryConnectionResponse, error)
 
 	// CheckRepositoryConnectionWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories:check-connection (the `CheckRepositoryConnection` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Checks repository connection within the authorized request scope.
 	CheckRepositoryConnectionWithResponse(ctx context.Context, tenantSlug TenantSlug, body CheckRepositoryConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*CheckRepositoryConnectionResponse, error)
 
 	// ListReviewsWithResponse performs a GET /api/v1/t/{tenantSlug}/reviews (the `ListReviews` operationId) request.
+	//
+	// Returns the requested page of reviews within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListReviewsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListReviewsParams, reqEditors ...RequestEditorFn) (*ListReviewsResponse, error)
 
 	// SearchWithResponse performs a GET /api/v1/t/{tenantSlug}/search (the `Search` operationId) request.
 	//
+	// Performs the search workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	SearchWithResponse(ctx context.Context, tenantSlug TenantSlug, params *SearchParams, reqEditors ...RequestEditorFn) (*SearchResponse, error)
 
 	// ListServicesWithResponse performs a GET /api/v1/t/{tenantSlug}/services (the `ListServices` operationId) request.
+	//
+	// Returns the requested page of services within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListServicesWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListServicesParams, reqEditors ...RequestEditorFn) (*ListServicesResponse, error)
 
 	// DeleteServiceWithResponse performs a DELETE /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `DeleteService` operationId) request.
 	//
+	// Deletes the selected service within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *DeleteServiceParams, reqEditors ...RequestEditorFn) (*DeleteServiceResponse, error)
 
 	// GetServiceWithResponse performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `GetService` operationId) request.
+	//
+	// Returns the selected service within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*GetServiceResponse, error)
@@ -14574,14 +15899,20 @@ type ClientWithResponsesInterface interface {
 	// UpdateServiceWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `UpdateService` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected service within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateServiceWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *UpdateServiceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceResponse, error)
 
 	// UpdateServiceWithResponse performs a PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `UpdateService` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected service within the authorized request scope.
 	UpdateServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *UpdateServiceParams, body UpdateServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceResponse, error)
 
 	// GetServiceAccessWithResponse performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `GetServiceAccess` operationId) request.
+	//
+	// Returns the selected service access within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetServiceAccessWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*GetServiceAccessResponse, error)
@@ -14589,24 +15920,34 @@ type ClientWithResponsesInterface interface {
 	// PutServiceAccessWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `PutServiceAccess` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates or replaces the selected service access within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	PutServiceAccessWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutServiceAccessResponse, error)
 
 	// PutServiceAccessWithResponse performs a PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `PutServiceAccess` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates or replaces the selected service access within the authorized request scope.
 	PutServiceAccessWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body PutServiceAccessJSONRequestBody, reqEditors ...RequestEditorFn) (*PutServiceAccessResponse, error)
 
 	// GenerateMissingAssetWithAiWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate (the `GenerateMissingAssetWithAi` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Performs the generate missing asset with ai workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GenerateMissingAssetWithAiWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *GenerateMissingAssetWithAiParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GenerateMissingAssetWithAiResponse, error)
 
 	// GenerateMissingAssetWithAiWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate (the `GenerateMissingAssetWithAi` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the generate missing asset with ai workflow within the authorized request scope.
 	GenerateMissingAssetWithAiWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *GenerateMissingAssetWithAiParams, body GenerateMissingAssetWithAiJSONRequestBody, reqEditors ...RequestEditorFn) (*GenerateMissingAssetWithAiResponse, error)
 
 	// ListServiceCommentsWithResponse performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `ListServiceComments` operationId) request.
+	//
+	// Returns the requested page of service comments within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListServiceCommentsWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ListServiceCommentsParams, reqEditors ...RequestEditorFn) (*ListServiceCommentsResponse, error)
@@ -14614,14 +15955,20 @@ type ClientWithResponsesInterface interface {
 	// CreateServiceCommentWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `CreateServiceComment` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates service comment within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateServiceCommentWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceCommentResponse, error)
 
 	// CreateServiceCommentWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `CreateServiceComment` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates service comment within the authorized request scope.
 	CreateServiceCommentWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body CreateServiceCommentJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceCommentResponse, error)
 
 	// ListSourceSpecsWithResponse performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `ListSourceSpecs` operationId) request.
+	//
+	// Returns the requested page of source specs within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListSourceSpecsWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*ListSourceSpecsResponse, error)
@@ -14629,39 +15976,55 @@ type ClientWithResponsesInterface interface {
 	// CreateSourceSpecWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `CreateSourceSpec` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates source spec within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateSourceSpecWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSourceSpecResponse, error)
 
 	// CreateSourceSpecWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `CreateSourceSpec` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates source spec within the authorized request scope.
 	CreateSourceSpecWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body CreateSourceSpecJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSourceSpecResponse, error)
 
 	// ResolveServiceDriftWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift (the `ResolveServiceDrift` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Resolves service drift within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ResolveServiceDriftWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ResolveServiceDriftParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResolveServiceDriftResponse, error)
 
 	// ResolveServiceDriftWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift (the `ResolveServiceDrift` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Resolves service drift within the authorized request scope.
 	ResolveServiceDriftWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ResolveServiceDriftParams, body ResolveServiceDriftJSONRequestBody, reqEditors ...RequestEditorFn) (*ResolveServiceDriftResponse, error)
 
 	// StarServiceWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:star (the `StarService` operationId) request.
+	//
+	// Performs the star service workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	StarServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*StarServiceResponse, error)
 
 	// UnstarServiceWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:unstar (the `UnstarService` operationId) request.
 	//
+	// Performs the unstar service workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UnstarServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*UnstarServiceResponse, error)
 
 	// ListRecentServicesWithResponse performs a GET /api/v1/t/{tenantSlug}/services:recent (the `ListRecentServices` operationId) request.
 	//
+	// Returns the requested page of recent services within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ListRecentServicesWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListRecentServicesParams, reqEditors ...RequestEditorFn) (*ListRecentServicesResponse, error)
 
 	// GetTenantSettingsWithResponse performs a GET /api/v1/t/{tenantSlug}/settings (the `GetTenantSettings` operationId) request.
+	//
+	// Returns the selected tenant settings within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetTenantSettingsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*GetTenantSettingsResponse, error)
@@ -14669,14 +16032,20 @@ type ClientWithResponsesInterface interface {
 	// UpdateTenantSettingsWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/settings (the `UpdateTenantSettings` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected tenant settings within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateTenantSettingsWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantSettingsParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTenantSettingsResponse, error)
 
 	// UpdateTenantSettingsWithResponse performs a PATCH /api/v1/t/{tenantSlug}/settings (the `UpdateTenantSettings` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected tenant settings within the authorized request scope.
 	UpdateTenantSettingsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantSettingsParams, body UpdateTenantSettingsJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTenantSettingsResponse, error)
 
 	// ListShareLinksWithResponse performs a GET /api/v1/t/{tenantSlug}/share-links (the `ListShareLinks` operationId) request.
+	//
+	// Returns the requested page of share links within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListShareLinksWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListShareLinksParams, reqEditors ...RequestEditorFn) (*ListShareLinksResponse, error)
@@ -14684,19 +16053,27 @@ type ClientWithResponsesInterface interface {
 	// CreateShareLinkWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/share-links (the `CreateShareLink` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates share link within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateShareLinkWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateShareLinkResponse, error)
 
 	// CreateShareLinkWithResponse performs a POST /api/v1/t/{tenantSlug}/share-links (the `CreateShareLink` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates share link within the authorized request scope.
 	CreateShareLinkWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateShareLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateShareLinkResponse, error)
 
 	// RevokeShareLinkWithResponse performs a DELETE /api/v1/t/{tenantSlug}/share-links/{shareLinkId} (the `RevokeShareLink` operationId) request.
+	//
+	// Performs the revoke share link workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RevokeShareLinkWithResponse(ctx context.Context, tenantSlug TenantSlug, shareLinkId ShareLinkId, reqEditors ...RequestEditorFn) (*RevokeShareLinkResponse, error)
 
 	// DeleteSourceSpecWithResponse performs a DELETE /api/v1/t/{tenantSlug}/sources/{sourceId} (the `DeleteSourceSpec` operationId) request.
+	//
+	// Deletes the selected source spec within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteSourceSpecWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *DeleteSourceSpecParams, reqEditors ...RequestEditorFn) (*DeleteSourceSpecResponse, error)
@@ -14704,14 +16081,20 @@ type ClientWithResponsesInterface interface {
 	// UpdateSourceSpecWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/sources/{sourceId} (the `UpdateSourceSpec` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected source spec within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateSourceSpecWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *UpdateSourceSpecParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSourceSpecResponse, error)
 
 	// UpdateSourceSpecWithResponse performs a PATCH /api/v1/t/{tenantSlug}/sources/{sourceId} (the `UpdateSourceSpec` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected source spec within the authorized request scope.
 	UpdateSourceSpecWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *UpdateSourceSpecParams, body UpdateSourceSpecJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSourceSpecResponse, error)
 
 	// ListSourceBindingsWithResponse performs a GET /api/v1/t/{tenantSlug}/sources/{sourceId}/bindings (the `ListSourceBindings` operationId) request.
+	//
+	// Returns the requested page of source bindings within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListSourceBindingsWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, reqEditors ...RequestEditorFn) (*ListSourceBindingsResponse, error)
@@ -14719,14 +16102,20 @@ type ClientWithResponsesInterface interface {
 	// ProduceSourceWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce (the `ProduceSource` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Performs the produce source workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ProduceSourceWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *ProduceSourceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ProduceSourceResponse, error)
 
 	// ProduceSourceWithResponse performs a POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce (the `ProduceSource` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the produce source workflow within the authorized request scope.
 	ProduceSourceWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *ProduceSourceParams, body ProduceSourceJSONRequestBody, reqEditors ...RequestEditorFn) (*ProduceSourceResponse, error)
 
 	// ListSubscriptionsWithResponse performs a GET /api/v1/t/{tenantSlug}/subscriptions (the `ListSubscriptions` operationId) request.
+	//
+	// Returns the requested page of subscriptions within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListSubscriptionsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListSubscriptionsResponse, error)
@@ -14734,14 +16123,20 @@ type ClientWithResponsesInterface interface {
 	// PutSubscriptionWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/subscriptions (the `PutSubscription` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates or replaces the selected subscription within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	PutSubscriptionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSubscriptionResponse, error)
 
 	// PutSubscriptionWithResponse performs a PUT /api/v1/t/{tenantSlug}/subscriptions (the `PutSubscription` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates or replaces the selected subscription within the authorized request scope.
 	PutSubscriptionWithResponse(ctx context.Context, tenantSlug TenantSlug, body PutSubscriptionJSONRequestBody, reqEditors ...RequestEditorFn) (*PutSubscriptionResponse, error)
 
 	// ListSystemGroupsWithResponse performs a GET /api/v1/t/{tenantSlug}/system-groups (the `ListSystemGroups` operationId) request.
+	//
+	// Returns the requested page of system groups within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListSystemGroupsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListSystemGroupsResponse, error)
@@ -14749,19 +16144,27 @@ type ClientWithResponsesInterface interface {
 	// CreateSystemGroupWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/system-groups (the `CreateSystemGroup` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates system group within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateSystemGroupWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSystemGroupResponse, error)
 
 	// CreateSystemGroupWithResponse performs a POST /api/v1/t/{tenantSlug}/system-groups (the `CreateSystemGroup` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates system group within the authorized request scope.
 	CreateSystemGroupWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateSystemGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSystemGroupResponse, error)
 
 	// DeleteSystemGroupWithResponse performs a DELETE /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `DeleteSystemGroup` operationId) request.
+	//
+	// Deletes the selected system group within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteSystemGroupWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *DeleteSystemGroupParams, reqEditors ...RequestEditorFn) (*DeleteSystemGroupResponse, error)
 
 	// GetSystemGroupWithResponse performs a GET /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `GetSystemGroup` operationId) request.
+	//
+	// Returns the selected system group within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetSystemGroupWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, reqEditors ...RequestEditorFn) (*GetSystemGroupResponse, error)
@@ -14769,24 +16172,34 @@ type ClientWithResponsesInterface interface {
 	// UpdateSystemGroupWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `UpdateSystemGroup` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected system group within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateSystemGroupWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *UpdateSystemGroupParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSystemGroupResponse, error)
 
 	// UpdateSystemGroupWithResponse performs a PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `UpdateSystemGroup` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected system group within the authorized request scope.
 	UpdateSystemGroupWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *UpdateSystemGroupParams, body UpdateSystemGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSystemGroupResponse, error)
 
 	// PutSystemGroupMembersWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members (the `PutSystemGroupMembers` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Creates or replaces the selected system group members within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	PutSystemGroupMembersWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *PutSystemGroupMembersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSystemGroupMembersResponse, error)
 
 	// PutSystemGroupMembersWithResponse performs a PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members (the `PutSystemGroupMembers` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates or replaces the selected system group members within the authorized request scope.
 	PutSystemGroupMembersWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *PutSystemGroupMembersParams, body PutSystemGroupMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*PutSystemGroupMembersResponse, error)
 
 	// ListTagsWithResponse performs a GET /api/v1/t/{tenantSlug}/tags (the `ListTags` operationId) request.
+	//
+	// Returns the requested page of tags within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListTagsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListTagsResponse, error)
@@ -14794,14 +16207,20 @@ type ClientWithResponsesInterface interface {
 	// CreateTagWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/tags (the `CreateTag` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates tag within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateTagWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTagResponse, error)
 
 	// CreateTagWithResponse performs a POST /api/v1/t/{tenantSlug}/tags (the `CreateTag` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates tag within the authorized request scope.
 	CreateTagWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateTagJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTagResponse, error)
 
 	// DeleteTagWithResponse performs a DELETE /api/v1/t/{tenantSlug}/tags/{tagId} (the `DeleteTag` operationId) request.
+	//
+	// Deletes the selected tag within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteTagWithResponse(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *DeleteTagParams, reqEditors ...RequestEditorFn) (*DeleteTagResponse, error)
@@ -14809,14 +16228,20 @@ type ClientWithResponsesInterface interface {
 	// UpdateTagWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/tags/{tagId} (the `UpdateTag` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected tag within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateTagWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *UpdateTagParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTagResponse, error)
 
 	// UpdateTagWithResponse performs a PATCH /api/v1/t/{tenantSlug}/tags/{tagId} (the `UpdateTag` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected tag within the authorized request scope.
 	UpdateTagWithResponse(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *UpdateTagParams, body UpdateTagJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTagResponse, error)
 
 	// ListTeamsWithResponse performs a GET /api/v1/t/{tenantSlug}/teams (the `ListTeams` operationId) request.
+	//
+	// Returns the requested page of teams within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListTeamsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListTeamsParams, reqEditors ...RequestEditorFn) (*ListTeamsResponse, error)
@@ -14824,19 +16249,27 @@ type ClientWithResponsesInterface interface {
 	// CreateTeamWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/teams (the `CreateTeam` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates team within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateTeamWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTeamResponse, error)
 
 	// CreateTeamWithResponse performs a POST /api/v1/t/{tenantSlug}/teams (the `CreateTeam` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates team within the authorized request scope.
 	CreateTeamWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTeamResponse, error)
 
 	// DeleteTeamWithResponse performs a DELETE /api/v1/t/{tenantSlug}/teams/{teamId} (the `DeleteTeam` operationId) request.
+	//
+	// Deletes the selected team within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteTeamWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *DeleteTeamParams, reqEditors ...RequestEditorFn) (*DeleteTeamResponse, error)
 
 	// GetTeamWithResponse performs a GET /api/v1/t/{tenantSlug}/teams/{teamId} (the `GetTeam` operationId) request.
+	//
+	// Returns the selected team within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetTeamWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, reqEditors ...RequestEditorFn) (*GetTeamResponse, error)
@@ -14844,24 +16277,34 @@ type ClientWithResponsesInterface interface {
 	// UpdateTeamWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/teams/{teamId} (the `UpdateTeam` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Updates the selected team within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	UpdateTeamWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *UpdateTeamParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTeamResponse, error)
 
 	// UpdateTeamWithResponse performs a PATCH /api/v1/t/{tenantSlug}/teams/{teamId} (the `UpdateTeam` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Updates the selected team within the authorized request scope.
 	UpdateTeamWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *UpdateTeamParams, body UpdateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTeamResponse, error)
 
 	// ReplaceTeamMembersWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members (the `ReplaceTeamMembers` operationId) request,
 	// with any type of body and a specified content type.
+	//
+	// Replaces the selected team members within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ReplaceTeamMembersWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *ReplaceTeamMembersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceTeamMembersResponse, error)
 
 	// ReplaceTeamMembersWithResponse performs a PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members (the `ReplaceTeamMembers` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Replaces the selected team members within the authorized request scope.
 	ReplaceTeamMembersWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *ReplaceTeamMembersParams, body ReplaceTeamMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceTeamMembersResponse, error)
 
 	// ListTokensWithResponse performs a GET /api/v1/t/{tenantSlug}/tokens (the `ListTokens` operationId) request.
+	//
+	// Returns the requested page of tokens within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListTokensWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListTokensParams, reqEditors ...RequestEditorFn) (*ListTokensResponse, error)
@@ -14869,14 +16312,20 @@ type ClientWithResponsesInterface interface {
 	// CreateTokenWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/tokens (the `CreateToken` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates token within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateTokenWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error)
 
 	// CreateTokenWithResponse performs a POST /api/v1/t/{tenantSlug}/tokens (the `CreateToken` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates token within the authorized request scope.
 	CreateTokenWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error)
 
 	// RevokeTokenWithResponse performs a DELETE /api/v1/t/{tenantSlug}/tokens/{tokenId} (the `RevokeToken` operationId) request.
+	//
+	// Performs the revoke token workflow within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	RevokeTokenWithResponse(ctx context.Context, tenantSlug TenantSlug, tokenId TokenId, reqEditors ...RequestEditorFn) (*RevokeTokenResponse, error)
@@ -14884,15 +16333,21 @@ type ClientWithResponsesInterface interface {
 	// CreateDiffUploadWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/uploads (the `CreateDiffUpload` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates diff upload within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	CreateDiffUploadWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDiffUploadResponse, error)
 
 	// ListViewOverridesWithResponse performs a GET /api/v1/t/{tenantSlug}/view-overrides (the `ListViewOverrides` operationId) request.
 	//
+	// Returns the requested page of view overrides within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ListViewOverridesWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListViewOverridesResponse, error)
 
 	// DeleteViewOverrideWithResponse performs a DELETE /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `DeleteViewOverride` operationId) request.
+	//
+	// Deletes the selected view override within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteViewOverrideWithResponse(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *DeleteViewOverrideParams, reqEditors ...RequestEditorFn) (*DeleteViewOverrideResponse, error)
@@ -14900,14 +16355,20 @@ type ClientWithResponsesInterface interface {
 	// PutViewOverrideWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `PutViewOverride` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Creates or replaces the selected view override within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	PutViewOverrideWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *PutViewOverrideParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutViewOverrideResponse, error)
 
 	// PutViewOverrideWithResponse performs a PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `PutViewOverride` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Creates or replaces the selected view override within the authorized request scope.
 	PutViewOverrideWithResponse(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *PutViewOverrideParams, body PutViewOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*PutViewOverrideResponse, error)
 
 	// ListViewsWithResponse performs a GET /api/v1/t/{tenantSlug}/views (the `ListViews` operationId) request.
+	//
+	// Returns the requested page of views within the authorized request scope.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListViewsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListViewsParams, reqEditors ...RequestEditorFn) (*ListViewsResponse, error)
@@ -14915,14 +16376,20 @@ type ClientWithResponsesInterface interface {
 	// ResolveViewWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/views:resolve (the `ResolveView` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Resolves view within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ResolveViewWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResolveViewResponse, error)
 
 	// ResolveViewWithResponse performs a POST /api/v1/t/{tenantSlug}/views:resolve (the `ResolveView` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Resolves view within the authorized request scope.
 	ResolveViewWithResponse(ctx context.Context, tenantSlug TenantSlug, body ResolveViewJSONRequestBody, reqEditors ...RequestEditorFn) (*ResolveViewResponse, error)
 
 	// GetVersionWithResponse performs a GET /api/v1/version (the `GetVersion` operationId) request.
+	//
+	// Returns the server build, API, and contract versions.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVersionResponse, error)
@@ -14930,24 +16397,34 @@ type ClientWithResponsesInterface interface {
 	// ReceiveGitWebhookWithBodyWithResponse performs a POST /api/v1/webhooks/git/{repositoryId} (the `ReceiveGitWebhook` operationId) request,
 	// with any type of body and a specified content type.
 	//
+	// Performs the receive git webhook workflow within the authorized request scope.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	ReceiveGitWebhookWithBodyWithResponse(ctx context.Context, repositoryId RepositoryId, params *ReceiveGitWebhookParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReceiveGitWebhookResponse, error)
 
 	// ReceiveGitWebhookWithResponse performs a POST /api/v1/webhooks/git/{repositoryId} (the `ReceiveGitWebhook` operationId) request.
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Performs the receive git webhook workflow within the authorized request scope.
 	ReceiveGitWebhookWithResponse(ctx context.Context, repositoryId RepositoryId, params *ReceiveGitWebhookParams, body ReceiveGitWebhookJSONRequestBody, reqEditors ...RequestEditorFn) (*ReceiveGitWebhookResponse, error)
 
 	// HealthzWithResponse performs a GET /healthz (the `Healthz` operationId) request.
+	//
+	// Reports whether the Meridian process is alive.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	HealthzWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*HealthzResponse, error)
 
 	// MetricsWithResponse performs a GET /metrics (the `Metrics` operationId) request.
 	//
+	// Returns deployment metrics in Prometheus text exposition format.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	MetricsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*MetricsResponse, error)
 
 	// ReadyzWithResponse performs a GET /readyz (the `Readyz` operationId) request.
+	//
+	// Reports whether Meridian dependencies are ready to serve traffic.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ReadyzWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadyzResponse, error)
@@ -14955,11 +16432,15 @@ type ClientWithResponsesInterface interface {
 
 // ListPlatformAuditLogsResponse404Headers the declared response headers of an HTTP 404 response for ListPlatformAuditLogs
 type ListPlatformAuditLogsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListPlatformAuditLogsResponse contains the raw HTTP response and any decoded response body.
 type ListPlatformAuditLogsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AuditLogPage
@@ -15008,8 +16489,11 @@ func (r ListPlatformAuditLogsResponse) ContentType() string {
 	return ""
 }
 
+// ListGlobalCredentialsResponse contains the raw HTTP response and any decoded response body.
 type ListGlobalCredentialsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *GlobalCredentialPage
@@ -15051,21 +16535,27 @@ func (r ListGlobalCredentialsResponse) ContentType() string {
 
 // CreateGlobalCredentialResponse201Headers the declared response headers of an HTTP 201 response for CreateGlobalCredential
 type CreateGlobalCredentialResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateGlobalCredentialResponse409Headers the declared response headers of an HTTP 409 response for CreateGlobalCredential
 type CreateGlobalCredentialResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateGlobalCredentialResponse422Headers the declared response headers of an HTTP 422 response for CreateGlobalCredential
 type CreateGlobalCredentialResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
 type CreateGlobalCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *GlobalCredential
@@ -15127,21 +16617,27 @@ func (r CreateGlobalCredentialResponse) ContentType() string {
 
 // DeleteGlobalCredentialResponse404Headers the declared response headers of an HTTP 404 response for DeleteGlobalCredential
 type DeleteGlobalCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteGlobalCredentialResponse409Headers the declared response headers of an HTTP 409 response for DeleteGlobalCredential
 type DeleteGlobalCredentialResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteGlobalCredentialResponse412Headers the declared response headers of an HTTP 412 response for DeleteGlobalCredential
 type DeleteGlobalCredentialResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
 type DeleteGlobalCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -15203,21 +16699,27 @@ func (r DeleteGlobalCredentialResponse) ContentType() string {
 
 // UpdateGlobalCredentialResponse200Headers the declared response headers of an HTTP 200 response for UpdateGlobalCredential
 type UpdateGlobalCredentialResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateGlobalCredentialResponse404Headers the declared response headers of an HTTP 404 response for UpdateGlobalCredential
 type UpdateGlobalCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateGlobalCredentialResponse412Headers the declared response headers of an HTTP 412 response for UpdateGlobalCredential
 type UpdateGlobalCredentialResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
 type UpdateGlobalCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *GlobalCredential
@@ -15279,31 +16781,39 @@ func (r UpdateGlobalCredentialResponse) ContentType() string {
 
 // RotateGlobalCredentialResponse200Headers the declared response headers of an HTTP 200 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // RotateGlobalCredentialResponse404Headers the declared response headers of an HTTP 404 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateGlobalCredentialResponse409Headers the declared response headers of an HTTP 409 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateGlobalCredentialResponse412Headers the declared response headers of an HTTP 412 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateGlobalCredentialResponse422Headers the declared response headers of an HTTP 422 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RotateGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
 type RotateGlobalCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *GlobalCredentialRotation
@@ -15383,11 +16893,15 @@ func (r RotateGlobalCredentialResponse) ContentType() string {
 
 // TestGlobalCredentialResponse404Headers the declared response headers of an HTTP 404 response for TestGlobalCredential
 type TestGlobalCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// TestGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
 type TestGlobalCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ConnectionTest
@@ -15438,11 +16952,15 @@ func (r TestGlobalCredentialResponse) ContentType() string {
 
 // ListPlatformJobsResponse404Headers the declared response headers of an HTTP 404 response for ListPlatformJobs
 type ListPlatformJobsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListPlatformJobsResponse contains the raw HTTP response and any decoded response body.
 type ListPlatformJobsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *PlatformJobPage
@@ -15493,11 +17011,15 @@ func (r ListPlatformJobsResponse) ContentType() string {
 
 // GetPlatformJobResponse404Headers the declared response headers of an HTTP 404 response for GetPlatformJob
 type GetPlatformJobResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetPlatformJobResponse contains the raw HTTP response and any decoded response body.
 type GetPlatformJobResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *PlatformJob
@@ -15546,8 +17068,11 @@ func (r GetPlatformJobResponse) ContentType() string {
 	return ""
 }
 
+// ListProducerProfilesResponse contains the raw HTTP response and any decoded response body.
 type ListProducerProfilesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ProducerProfilePage
@@ -15589,21 +17114,27 @@ func (r ListProducerProfilesResponse) ContentType() string {
 
 // CreateProducerProfileResponse201Headers the declared response headers of an HTTP 201 response for CreateProducerProfile
 type CreateProducerProfileResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateProducerProfileResponse409Headers the declared response headers of an HTTP 409 response for CreateProducerProfile
 type CreateProducerProfileResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateProducerProfileResponse422Headers the declared response headers of an HTTP 422 response for CreateProducerProfile
 type CreateProducerProfileResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateProducerProfileResponse contains the raw HTTP response and any decoded response body.
 type CreateProducerProfileResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *ProducerProfile
@@ -15665,21 +17196,27 @@ func (r CreateProducerProfileResponse) ContentType() string {
 
 // DeleteProducerProfileResponse404Headers the declared response headers of an HTTP 404 response for DeleteProducerProfile
 type DeleteProducerProfileResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteProducerProfileResponse409Headers the declared response headers of an HTTP 409 response for DeleteProducerProfile
 type DeleteProducerProfileResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteProducerProfileResponse412Headers the declared response headers of an HTTP 412 response for DeleteProducerProfile
 type DeleteProducerProfileResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteProducerProfileResponse contains the raw HTTP response and any decoded response body.
 type DeleteProducerProfileResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -15741,16 +17278,21 @@ func (r DeleteProducerProfileResponse) ContentType() string {
 
 // GetProducerProfileResponse200Headers the declared response headers of an HTTP 200 response for GetProducerProfile
 type GetProducerProfileResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetProducerProfileResponse404Headers the declared response headers of an HTTP 404 response for GetProducerProfile
 type GetProducerProfileResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetProducerProfileResponse contains the raw HTTP response and any decoded response body.
 type GetProducerProfileResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ProducerProfile
@@ -15803,21 +17345,27 @@ func (r GetProducerProfileResponse) ContentType() string {
 
 // UpdateProducerProfileResponse200Headers the declared response headers of an HTTP 200 response for UpdateProducerProfile
 type UpdateProducerProfileResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateProducerProfileResponse404Headers the declared response headers of an HTTP 404 response for UpdateProducerProfile
 type UpdateProducerProfileResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateProducerProfileResponse412Headers the declared response headers of an HTTP 412 response for UpdateProducerProfile
 type UpdateProducerProfileResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateProducerProfileResponse contains the raw HTTP response and any decoded response body.
 type UpdateProducerProfileResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ProducerProfile
@@ -15879,11 +17427,15 @@ func (r UpdateProducerProfileResponse) ContentType() string {
 
 // GetPlatformSettingsResponse200Headers the declared response headers of an HTTP 200 response for GetPlatformSettings
 type GetPlatformSettingsResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
+// GetPlatformSettingsResponse contains the raw HTTP response and any decoded response body.
 type GetPlatformSettingsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *PlatformSettings
@@ -15927,16 +17479,21 @@ func (r GetPlatformSettingsResponse) ContentType() string {
 
 // UpdatePlatformSettingsResponse200Headers the declared response headers of an HTTP 200 response for UpdatePlatformSettings
 type UpdatePlatformSettingsResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdatePlatformSettingsResponse412Headers the declared response headers of an HTTP 412 response for UpdatePlatformSettings
 type UpdatePlatformSettingsResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdatePlatformSettingsResponse contains the raw HTTP response and any decoded response body.
 type UpdatePlatformSettingsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *PlatformSettings
@@ -15987,8 +17544,11 @@ func (r UpdatePlatformSettingsResponse) ContentType() string {
 	return ""
 }
 
+// ListTenantsResponse contains the raw HTTP response and any decoded response body.
 type ListTenantsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *TenantPage
@@ -16030,16 +17590,21 @@ func (r ListTenantsResponse) ContentType() string {
 
 // CreateTenantResponse201Headers the declared response headers of an HTTP 201 response for CreateTenant
 type CreateTenantResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateTenantResponse409Headers the declared response headers of an HTTP 409 response for CreateTenant
 type CreateTenantResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateTenantResponse contains the raw HTTP response and any decoded response body.
 type CreateTenantResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Tenant
@@ -16092,21 +17657,27 @@ func (r CreateTenantResponse) ContentType() string {
 
 // DeleteTenantResponse202Headers the declared response headers of an HTTP 202 response for DeleteTenant
 type DeleteTenantResponse202Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // DeleteTenantResponse404Headers the declared response headers of an HTTP 404 response for DeleteTenant
 type DeleteTenantResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteTenantResponse412Headers the declared response headers of an HTTP 412 response for DeleteTenant
 type DeleteTenantResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteTenantResponse contains the raw HTTP response and any decoded response body.
 type DeleteTenantResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *TenantDeletionAccepted
@@ -16168,21 +17739,27 @@ func (r DeleteTenantResponse) ContentType() string {
 
 // UpdateTenantResponse200Headers the declared response headers of an HTTP 200 response for UpdateTenant
 type UpdateTenantResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateTenantResponse404Headers the declared response headers of an HTTP 404 response for UpdateTenant
 type UpdateTenantResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateTenantResponse412Headers the declared response headers of an HTTP 412 response for UpdateTenant
 type UpdateTenantResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateTenantResponse contains the raw HTTP response and any decoded response body.
 type UpdateTenantResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Tenant
@@ -16244,11 +17821,15 @@ func (r UpdateTenantResponse) ContentType() string {
 
 // PutTenantMemberAsPlatformAdminResponse404Headers the declared response headers of an HTTP 404 response for PutTenantMemberAsPlatformAdmin
 type PutTenantMemberAsPlatformAdminResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PutTenantMemberAsPlatformAdminResponse contains the raw HTTP response and any decoded response body.
 type PutTenantMemberAsPlatformAdminResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Member
@@ -16299,11 +17880,15 @@ func (r PutTenantMemberAsPlatformAdminResponse) ContentType() string {
 
 // ListUsersResponse404Headers the declared response headers of an HTTP 404 response for ListUsers
 type ListUsersResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListUsersResponse contains the raw HTTP response and any decoded response body.
 type ListUsersResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *UserPage
@@ -16354,21 +17939,27 @@ func (r ListUsersResponse) ContentType() string {
 
 // CreateUserResponse201Headers the declared response headers of an HTTP 201 response for CreateUser
 type CreateUserResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateUserResponse409Headers the declared response headers of an HTTP 409 response for CreateUser
 type CreateUserResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateUserResponse422Headers the declared response headers of an HTTP 422 response for CreateUser
 type CreateUserResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateUserResponse contains the raw HTTP response and any decoded response body.
 type CreateUserResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *User
@@ -16430,21 +18021,27 @@ func (r CreateUserResponse) ContentType() string {
 
 // UpdateUserResponse200Headers the declared response headers of an HTTP 200 response for UpdateUser
 type UpdateUserResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateUserResponse404Headers the declared response headers of an HTTP 404 response for UpdateUser
 type UpdateUserResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateUserResponse412Headers the declared response headers of an HTTP 412 response for UpdateUser
 type UpdateUserResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateUserResponse contains the raw HTTP response and any decoded response body.
 type UpdateUserResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *User
@@ -16506,11 +18103,15 @@ func (r UpdateUserResponse) ContentType() string {
 
 // GetCsrfTokenResponse401Headers the declared response headers of an HTTP 401 response for GetCsrfToken
 type GetCsrfTokenResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetCsrfTokenResponse contains the raw HTTP response and any decoded response body.
 type GetCsrfTokenResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *CsrfToken
@@ -16561,22 +18162,29 @@ func (r GetCsrfTokenResponse) ContentType() string {
 
 // LoginResponse200Headers the declared response headers of an HTTP 200 response for Login
 type LoginResponse200Headers struct {
+	// SetCookie carries the generated set cookie value for LoginResponse200Headers.
 	SetCookie string
 }
 
 // LoginResponse401Headers the declared response headers of an HTTP 401 response for Login
 type LoginResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // LoginResponse429Headers the declared response headers of an HTTP 429 response for Login
 type LoginResponse429Headers struct {
+	// RetryAfter carries the generated retry after value for LoginResponse429Headers.
 	RetryAfter int
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// LoginResponse contains the raw HTTP response and any decoded response body.
 type LoginResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *LoginResult
@@ -16638,11 +18246,15 @@ func (r LoginResponse) ContentType() string {
 
 // LogoutResponse401Headers the declared response headers of an HTTP 401 response for Logout
 type LogoutResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// LogoutResponse contains the raw HTTP response and any decoded response body.
 type LogoutResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON401 the response for an HTTP 401 `application/json` response
 	JSON401 *Unauthenticated
@@ -16686,11 +18298,15 @@ func (r LogoutResponse) ContentType() string {
 
 // GetMeResponse401Headers the declared response headers of an HTTP 401 response for GetMe
 type GetMeResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetMeResponse contains the raw HTTP response and any decoded response body.
 type GetMeResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Me
@@ -16741,11 +18357,15 @@ func (r GetMeResponse) ContentType() string {
 
 // GetMyPreferencesResponse200Headers the declared response headers of an HTTP 200 response for GetMyPreferences
 type GetMyPreferencesResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
+// GetMyPreferencesResponse contains the raw HTTP response and any decoded response body.
 type GetMyPreferencesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *UserPreferences
@@ -16789,21 +18409,27 @@ func (r GetMyPreferencesResponse) ContentType() string {
 
 // UpdateMyPreferencesResponse200Headers the declared response headers of an HTTP 200 response for UpdateMyPreferences
 type UpdateMyPreferencesResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateMyPreferencesResponse412Headers the declared response headers of an HTTP 412 response for UpdateMyPreferences
 type UpdateMyPreferencesResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateMyPreferencesResponse422Headers the declared response headers of an HTTP 422 response for UpdateMyPreferences
 type UpdateMyPreferencesResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateMyPreferencesResponse contains the raw HTTP response and any decoded response body.
 type UpdateMyPreferencesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *UserPreferences
@@ -16865,11 +18491,15 @@ func (r UpdateMyPreferencesResponse) ContentType() string {
 
 // DownloadSignedContentResponse404Headers the declared response headers of an HTTP 404 response for DownloadSignedContent
 type DownloadSignedContentResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DownloadSignedContentResponse contains the raw HTTP response and any decoded response body.
 type DownloadSignedContentResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -16911,8 +18541,11 @@ func (r DownloadSignedContentResponse) ContentType() string {
 	return ""
 }
 
+// GetOpenApiContractResponse contains the raw HTTP response and any decoded response body.
 type GetOpenApiContractResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// YAML200 the response for an HTTP 200 `application/yaml` response
 	YAML200 *string
@@ -16954,11 +18587,15 @@ func (r GetOpenApiContractResponse) ContentType() string {
 
 // GetPublicServiceResponse404Headers the declared response headers of an HTTP 404 response for GetPublicService
 type GetPublicServiceResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetPublicServiceResponse contains the raw HTTP response and any decoded response body.
 type GetPublicServiceResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *PublicService
@@ -17009,11 +18646,15 @@ func (r GetPublicServiceResponse) ContentType() string {
 
 // GetPublicAssetResponse404Headers the declared response headers of an HTTP 404 response for GetPublicAsset
 type GetPublicAssetResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetPublicAssetResponse contains the raw HTTP response and any decoded response body.
 type GetPublicAssetResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *PublicAsset
@@ -17064,16 +18705,21 @@ func (r GetPublicAssetResponse) ContentType() string {
 
 // ResolvePublicViewResponse404Headers the declared response headers of an HTTP 404 response for ResolvePublicView
 type ResolvePublicViewResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ResolvePublicViewResponse422Headers the declared response headers of an HTTP 422 response for ResolvePublicView
 type ResolvePublicViewResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ResolvePublicViewResponse contains the raw HTTP response and any decoded response body.
 type ResolvePublicViewResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ViewResolution
@@ -17133,11 +18779,15 @@ func (r ResolvePublicViewResponse) ContentType() string {
 
 // GetSharedViewResponse404Headers the declared response headers of an HTTP 404 response for GetSharedView
 type GetSharedViewResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetSharedViewResponse contains the raw HTTP response and any decoded response body.
 type GetSharedViewResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SharedView
@@ -17188,11 +18838,15 @@ func (r GetSharedViewResponse) ContentType() string {
 
 // ListAssetKindsResponse404Headers the declared response headers of an HTTP 404 response for ListAssetKinds
 type ListAssetKindsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListAssetKindsResponse contains the raw HTTP response and any decoded response body.
 type ListAssetKindsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetKindList
@@ -17243,21 +18897,27 @@ func (r ListAssetKindsResponse) ContentType() string {
 
 // UpdateAssetKindStateResponse200Headers the declared response headers of an HTTP 200 response for UpdateAssetKindState
 type UpdateAssetKindStateResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateAssetKindStateResponse404Headers the declared response headers of an HTTP 404 response for UpdateAssetKindState
 type UpdateAssetKindStateResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateAssetKindStateResponse412Headers the declared response headers of an HTTP 412 response for UpdateAssetKindState
 type UpdateAssetKindStateResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateAssetKindStateResponse contains the raw HTTP response and any decoded response body.
 type UpdateAssetKindStateResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetKind
@@ -17319,16 +18979,21 @@ func (r UpdateAssetKindStateResponse) ContentType() string {
 
 // GetAssetVersionResponse200Headers the declared response headers of an HTTP 200 response for GetAssetVersion
 type GetAssetVersionResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetAssetVersionResponse404Headers the declared response headers of an HTTP 404 response for GetAssetVersion
 type GetAssetVersionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetAssetVersionResponse contains the raw HTTP response and any decoded response body.
 type GetAssetVersionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetVersion
@@ -17381,11 +19046,15 @@ func (r GetAssetVersionResponse) ContentType() string {
 
 // ListAssetVersionItemsResponse404Headers the declared response headers of an HTTP 404 response for ListAssetVersionItems
 type ListAssetVersionItemsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListAssetVersionItemsResponse contains the raw HTTP response and any decoded response body.
 type ListAssetVersionItemsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetItemPage
@@ -17436,11 +19105,15 @@ func (r ListAssetVersionItemsResponse) ContentType() string {
 
 // GetAssetVersionProvenanceResponse404Headers the declared response headers of an HTTP 404 response for GetAssetVersionProvenance
 type GetAssetVersionProvenanceResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetAssetVersionProvenanceResponse contains the raw HTTP response and any decoded response body.
 type GetAssetVersionProvenanceResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ProvenanceList
@@ -17491,26 +19164,33 @@ func (r GetAssetVersionProvenanceResponse) ContentType() string {
 
 // DeprecateAssetVersionResponse200Headers the declared response headers of an HTTP 200 response for DeprecateAssetVersion
 type DeprecateAssetVersionResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // DeprecateAssetVersionResponse404Headers the declared response headers of an HTTP 404 response for DeprecateAssetVersion
 type DeprecateAssetVersionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeprecateAssetVersionResponse409Headers the declared response headers of an HTTP 409 response for DeprecateAssetVersion
 type DeprecateAssetVersionResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeprecateAssetVersionResponse412Headers the declared response headers of an HTTP 412 response for DeprecateAssetVersion
 type DeprecateAssetVersionResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeprecateAssetVersionResponse contains the raw HTTP response and any decoded response body.
 type DeprecateAssetVersionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetVersion
@@ -17581,26 +19261,33 @@ func (r DeprecateAssetVersionResponse) ContentType() string {
 
 // PublishAssetVersionResponse200Headers the declared response headers of an HTTP 200 response for PublishAssetVersion
 type PublishAssetVersionResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // PublishAssetVersionResponse404Headers the declared response headers of an HTTP 404 response for PublishAssetVersion
 type PublishAssetVersionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PublishAssetVersionResponse409Headers the declared response headers of an HTTP 409 response for PublishAssetVersion
 type PublishAssetVersionResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PublishAssetVersionResponse412Headers the declared response headers of an HTTP 412 response for PublishAssetVersion
 type PublishAssetVersionResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PublishAssetVersionResponse contains the raw HTTP response and any decoded response body.
 type PublishAssetVersionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetVersion
@@ -17671,26 +19358,33 @@ func (r PublishAssetVersionResponse) ContentType() string {
 
 // RetireAssetVersionResponse200Headers the declared response headers of an HTTP 200 response for RetireAssetVersion
 type RetireAssetVersionResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // RetireAssetVersionResponse404Headers the declared response headers of an HTTP 404 response for RetireAssetVersion
 type RetireAssetVersionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RetireAssetVersionResponse409Headers the declared response headers of an HTTP 409 response for RetireAssetVersion
 type RetireAssetVersionResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RetireAssetVersionResponse412Headers the declared response headers of an HTTP 412 response for RetireAssetVersion
 type RetireAssetVersionResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RetireAssetVersionResponse contains the raw HTTP response and any decoded response body.
 type RetireAssetVersionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetVersion
@@ -17761,16 +19455,21 @@ func (r RetireAssetVersionResponse) ContentType() string {
 
 // GetAssetResponse200Headers the declared response headers of an HTTP 200 response for GetAsset
 type GetAssetResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetAssetResponse404Headers the declared response headers of an HTTP 404 response for GetAsset
 type GetAssetResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetAssetResponse contains the raw HTTP response and any decoded response body.
 type GetAssetResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Asset
@@ -17823,31 +19522,39 @@ func (r GetAssetResponse) ContentType() string {
 
 // ReorderAssetLayersResponse200Headers the declared response headers of an HTTP 200 response for ReorderAssetLayers
 type ReorderAssetLayersResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // ReorderAssetLayersResponse404Headers the declared response headers of an HTTP 404 response for ReorderAssetLayers
 type ReorderAssetLayersResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ReorderAssetLayersResponse409Headers the declared response headers of an HTTP 409 response for ReorderAssetLayers
 type ReorderAssetLayersResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ReorderAssetLayersResponse412Headers the declared response headers of an HTTP 412 response for ReorderAssetLayers
 type ReorderAssetLayersResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ReorderAssetLayersResponse422Headers the declared response headers of an HTTP 422 response for ReorderAssetLayers
 type ReorderAssetLayersResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ReorderAssetLayersResponse contains the raw HTTP response and any decoded response body.
 type ReorderAssetLayersResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *LayerList
@@ -17927,11 +19634,15 @@ func (r ReorderAssetLayersResponse) ContentType() string {
 
 // ListAssetVersionsResponse404Headers the declared response headers of an HTTP 404 response for ListAssetVersions
 type ListAssetVersionsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListAssetVersionsResponse contains the raw HTTP response and any decoded response body.
 type ListAssetVersionsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetVersionPage
@@ -17982,21 +19693,27 @@ func (r ListAssetVersionsResponse) ContentType() string {
 
 // GenerateAssetWithAiResponse404Headers the declared response headers of an HTTP 404 response for GenerateAssetWithAi
 type GenerateAssetWithAiResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // GenerateAssetWithAiResponse409Headers the declared response headers of an HTTP 409 response for GenerateAssetWithAi
 type GenerateAssetWithAiResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // GenerateAssetWithAiResponse422Headers the declared response headers of an HTTP 422 response for GenerateAssetWithAi
 type GenerateAssetWithAiResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GenerateAssetWithAiResponse contains the raw HTTP response and any decoded response body.
 type GenerateAssetWithAiResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *AiGenerationAccepted
@@ -18065,26 +19782,33 @@ func (r GenerateAssetWithAiResponse) ContentType() string {
 
 // PreviewMergeResponse404Headers the declared response headers of an HTTP 404 response for PreviewMerge
 type PreviewMergeResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PreviewMergeResponse409Headers the declared response headers of an HTTP 409 response for PreviewMerge
 type PreviewMergeResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PreviewMergeResponse413Headers the declared response headers of an HTTP 413 response for PreviewMerge
 type PreviewMergeResponse413Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PreviewMergeResponse422Headers the declared response headers of an HTTP 422 response for PreviewMerge
 type PreviewMergeResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PreviewMergeResponse contains the raw HTTP response and any decoded response body.
 type PreviewMergeResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *MergePreview
@@ -18162,26 +19886,33 @@ func (r PreviewMergeResponse) ContentType() string {
 
 // PushAssetRevisionResponse404Headers the declared response headers of an HTTP 404 response for PushAssetRevision
 type PushAssetRevisionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PushAssetRevisionResponse409Headers the declared response headers of an HTTP 409 response for PushAssetRevision
 type PushAssetRevisionResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PushAssetRevisionResponse413Headers the declared response headers of an HTTP 413 response for PushAssetRevision
 type PushAssetRevisionResponse413Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PushAssetRevisionResponse422Headers the declared response headers of an HTTP 422 response for PushAssetRevision
 type PushAssetRevisionResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PushAssetRevisionResponse contains the raw HTTP response and any decoded response body.
 type PushAssetRevisionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AssetPushResult
@@ -18266,11 +19997,15 @@ func (r PushAssetRevisionResponse) ContentType() string {
 
 // ListAuditLogsResponse404Headers the declared response headers of an HTTP 404 response for ListAuditLogs
 type ListAuditLogsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListAuditLogsResponse contains the raw HTTP response and any decoded response body.
 type ListAuditLogsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *AuditLogPage
@@ -18321,11 +20056,15 @@ func (r ListAuditLogsResponse) ContentType() string {
 
 // ListBreakingTodosResponse404Headers the declared response headers of an HTTP 404 response for ListBreakingTodos
 type ListBreakingTodosResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListBreakingTodosResponse contains the raw HTTP response and any decoded response body.
 type ListBreakingTodosResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *BreakingTodoPage
@@ -18376,16 +20115,21 @@ func (r ListBreakingTodosResponse) ContentType() string {
 
 // AcknowledgeBreakingTodoResponse404Headers the declared response headers of an HTTP 404 response for AcknowledgeBreakingTodo
 type AcknowledgeBreakingTodoResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // AcknowledgeBreakingTodoResponse409Headers the declared response headers of an HTTP 409 response for AcknowledgeBreakingTodo
 type AcknowledgeBreakingTodoResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// AcknowledgeBreakingTodoResponse contains the raw HTTP response and any decoded response body.
 type AcknowledgeBreakingTodoResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *BreakingTodo
@@ -18445,11 +20189,15 @@ func (r AcknowledgeBreakingTodoResponse) ContentType() string {
 
 // ListCredentialsResponse404Headers the declared response headers of an HTTP 404 response for ListCredentials
 type ListCredentialsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListCredentialsResponse contains the raw HTTP response and any decoded response body.
 type ListCredentialsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *CredentialPage
@@ -18500,21 +20248,27 @@ func (r ListCredentialsResponse) ContentType() string {
 
 // CreateCredentialResponse201Headers the declared response headers of an HTTP 201 response for CreateCredential
 type CreateCredentialResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateCredentialResponse404Headers the declared response headers of an HTTP 404 response for CreateCredential
 type CreateCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateCredentialResponse422Headers the declared response headers of an HTTP 422 response for CreateCredential
 type CreateCredentialResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateCredentialResponse contains the raw HTTP response and any decoded response body.
 type CreateCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Credential
@@ -18576,21 +20330,27 @@ func (r CreateCredentialResponse) ContentType() string {
 
 // DeleteCredentialResponse404Headers the declared response headers of an HTTP 404 response for DeleteCredential
 type DeleteCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteCredentialResponse409Headers the declared response headers of an HTTP 409 response for DeleteCredential
 type DeleteCredentialResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteCredentialResponse412Headers the declared response headers of an HTTP 412 response for DeleteCredential
 type DeleteCredentialResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteCredentialResponse contains the raw HTTP response and any decoded response body.
 type DeleteCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -18652,21 +20412,27 @@ func (r DeleteCredentialResponse) ContentType() string {
 
 // UpdateCredentialResponse200Headers the declared response headers of an HTTP 200 response for UpdateCredential
 type UpdateCredentialResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateCredentialResponse404Headers the declared response headers of an HTTP 404 response for UpdateCredential
 type UpdateCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateCredentialResponse412Headers the declared response headers of an HTTP 412 response for UpdateCredential
 type UpdateCredentialResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateCredentialResponse contains the raw HTTP response and any decoded response body.
 type UpdateCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Credential
@@ -18728,31 +20494,39 @@ func (r UpdateCredentialResponse) ContentType() string {
 
 // RotateCredentialResponse200Headers the declared response headers of an HTTP 200 response for RotateCredential
 type RotateCredentialResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // RotateCredentialResponse404Headers the declared response headers of an HTTP 404 response for RotateCredential
 type RotateCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateCredentialResponse409Headers the declared response headers of an HTTP 409 response for RotateCredential
 type RotateCredentialResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateCredentialResponse412Headers the declared response headers of an HTTP 412 response for RotateCredential
 type RotateCredentialResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateCredentialResponse422Headers the declared response headers of an HTTP 422 response for RotateCredential
 type RotateCredentialResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RotateCredentialResponse contains the raw HTTP response and any decoded response body.
 type RotateCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *CredentialRotation
@@ -18832,11 +20606,15 @@ func (r RotateCredentialResponse) ContentType() string {
 
 // TestCredentialResponse404Headers the declared response headers of an HTTP 404 response for TestCredential
 type TestCredentialResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// TestCredentialResponse contains the raw HTTP response and any decoded response body.
 type TestCredentialResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ConnectionTest
@@ -18887,16 +20665,21 @@ func (r TestCredentialResponse) ContentType() string {
 
 // RunDiffResponse404Headers the declared response headers of an HTTP 404 response for RunDiff
 type RunDiffResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RunDiffResponse422Headers the declared response headers of an HTTP 422 response for RunDiff
 type RunDiffResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RunDiffResponse contains the raw HTTP response and any decoded response body.
 type RunDiffResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *DiffResult
@@ -18956,11 +20739,15 @@ func (r RunDiffResponse) ContentType() string {
 
 // ListDiffRuleSetsResponse404Headers the declared response headers of an HTTP 404 response for ListDiffRuleSets
 type ListDiffRuleSetsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListDiffRuleSetsResponse contains the raw HTTP response and any decoded response body.
 type ListDiffRuleSetsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *DiffRuleSetList
@@ -19011,21 +20798,27 @@ func (r ListDiffRuleSetsResponse) ContentType() string {
 
 // CreateDiffRuleSetResponse201Headers the declared response headers of an HTTP 201 response for CreateDiffRuleSet
 type CreateDiffRuleSetResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateDiffRuleSetResponse404Headers the declared response headers of an HTTP 404 response for CreateDiffRuleSet
 type CreateDiffRuleSetResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateDiffRuleSetResponse409Headers the declared response headers of an HTTP 409 response for CreateDiffRuleSet
 type CreateDiffRuleSetResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateDiffRuleSetResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffRuleSetResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *DiffRuleSet
@@ -19087,21 +20880,27 @@ func (r CreateDiffRuleSetResponse) ContentType() string {
 
 // DeleteDiffRuleSetResponse404Headers the declared response headers of an HTTP 404 response for DeleteDiffRuleSet
 type DeleteDiffRuleSetResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteDiffRuleSetResponse409Headers the declared response headers of an HTTP 409 response for DeleteDiffRuleSet
 type DeleteDiffRuleSetResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteDiffRuleSetResponse412Headers the declared response headers of an HTTP 412 response for DeleteDiffRuleSet
 type DeleteDiffRuleSetResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteDiffRuleSetResponse contains the raw HTTP response and any decoded response body.
 type DeleteDiffRuleSetResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -19163,21 +20962,27 @@ func (r DeleteDiffRuleSetResponse) ContentType() string {
 
 // UpdateDiffRuleSetResponse200Headers the declared response headers of an HTTP 200 response for UpdateDiffRuleSet
 type UpdateDiffRuleSetResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateDiffRuleSetResponse404Headers the declared response headers of an HTTP 404 response for UpdateDiffRuleSet
 type UpdateDiffRuleSetResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateDiffRuleSetResponse412Headers the declared response headers of an HTTP 412 response for UpdateDiffRuleSet
 type UpdateDiffRuleSetResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateDiffRuleSetResponse contains the raw HTTP response and any decoded response body.
 type UpdateDiffRuleSetResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *DiffRuleSet
@@ -19239,11 +21044,15 @@ func (r UpdateDiffRuleSetResponse) ContentType() string {
 
 // ListDiffSnapshotsResponse404Headers the declared response headers of an HTTP 404 response for ListDiffSnapshots
 type ListDiffSnapshotsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListDiffSnapshotsResponse contains the raw HTTP response and any decoded response body.
 type ListDiffSnapshotsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *DiffSnapshotPage
@@ -19294,11 +21103,15 @@ func (r ListDiffSnapshotsResponse) ContentType() string {
 
 // DeleteDiffSnapshotResponse404Headers the declared response headers of an HTTP 404 response for DeleteDiffSnapshot
 type DeleteDiffSnapshotResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteDiffSnapshotResponse contains the raw HTTP response and any decoded response body.
 type DeleteDiffSnapshotResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -19342,11 +21155,15 @@ func (r DeleteDiffSnapshotResponse) ContentType() string {
 
 // GetDiffSnapshotResponse404Headers the declared response headers of an HTTP 404 response for GetDiffSnapshot
 type GetDiffSnapshotResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetDiffSnapshotResponse contains the raw HTTP response and any decoded response body.
 type GetDiffSnapshotResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *DiffSnapshot
@@ -19397,11 +21214,15 @@ func (r GetDiffSnapshotResponse) ContentType() string {
 
 // ExportDiffSnapshotResponse404Headers the declared response headers of an HTTP 404 response for ExportDiffSnapshot
 type ExportDiffSnapshotResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ExportDiffSnapshotResponse contains the raw HTTP response and any decoded response body.
 type ExportDiffSnapshotResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ArtifactLink
@@ -19452,11 +21273,15 @@ func (r ExportDiffSnapshotResponse) ContentType() string {
 
 // CreateDiffSnapshotShareLinkResponse404Headers the declared response headers of an HTTP 404 response for CreateDiffSnapshotShareLink
 type CreateDiffSnapshotShareLinkResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateDiffSnapshotShareLinkResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffSnapshotShareLinkResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *ShareLinkCreated
@@ -19507,11 +21332,15 @@ func (r CreateDiffSnapshotShareLinkResponse) ContentType() string {
 
 // SearchTenantUsersResponse404Headers the declared response headers of an HTTP 404 response for SearchTenantUsers
 type SearchTenantUsersResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// SearchTenantUsersResponse contains the raw HTTP response and any decoded response body.
 type SearchTenantUsersResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *UserPage
@@ -19562,16 +21391,21 @@ func (r SearchTenantUsersResponse) ContentType() string {
 
 // CreateTenantExportResponse404Headers the declared response headers of an HTTP 404 response for CreateTenantExport
 type CreateTenantExportResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateTenantExportResponse409Headers the declared response headers of an HTTP 409 response for CreateTenantExport
 type CreateTenantExportResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateTenantExportResponse contains the raw HTTP response and any decoded response body.
 type CreateTenantExportResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -19631,11 +21465,15 @@ func (r CreateTenantExportResponse) ContentType() string {
 
 // ListJobsResponse404Headers the declared response headers of an HTTP 404 response for ListJobs
 type ListJobsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListJobsResponse contains the raw HTTP response and any decoded response body.
 type ListJobsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *JobPage
@@ -19686,11 +21524,15 @@ func (r ListJobsResponse) ContentType() string {
 
 // GetJobResponse404Headers the declared response headers of an HTTP 404 response for GetJob
 type GetJobResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetJobResponse contains the raw HTTP response and any decoded response body.
 type GetJobResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Job
@@ -19741,11 +21583,15 @@ func (r GetJobResponse) ContentType() string {
 
 // StreamJobLogsResponse404Headers the declared response headers of an HTTP 404 response for StreamJobLogs
 type StreamJobLogsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// StreamJobLogsResponse contains the raw HTTP response and any decoded response body.
 type StreamJobLogsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -19789,16 +21635,21 @@ func (r StreamJobLogsResponse) ContentType() string {
 
 // CancelJobResponse404Headers the declared response headers of an HTTP 404 response for CancelJob
 type CancelJobResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CancelJobResponse409Headers the declared response headers of an HTTP 409 response for CancelJob
 type CancelJobResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CancelJobResponse contains the raw HTTP response and any decoded response body.
 type CancelJobResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -19858,16 +21709,21 @@ func (r CancelJobResponse) ContentType() string {
 
 // RetryJobResponse404Headers the declared response headers of an HTTP 404 response for RetryJob
 type RetryJobResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RetryJobResponse409Headers the declared response headers of an HTTP 409 response for RetryJob
 type RetryJobResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RetryJobResponse contains the raw HTTP response and any decoded response body.
 type RetryJobResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -19927,11 +21783,15 @@ func (r RetryJobResponse) ContentType() string {
 
 // ListKnownHostsResponse404Headers the declared response headers of an HTTP 404 response for ListKnownHosts
 type ListKnownHostsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListKnownHostsResponse contains the raw HTTP response and any decoded response body.
 type ListKnownHostsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *KnownHostPage
@@ -19982,21 +21842,27 @@ func (r ListKnownHostsResponse) ContentType() string {
 
 // CreateKnownHostResponse404Headers the declared response headers of an HTTP 404 response for CreateKnownHost
 type CreateKnownHostResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateKnownHostResponse409Headers the declared response headers of an HTTP 409 response for CreateKnownHost
 type CreateKnownHostResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateKnownHostResponse422Headers the declared response headers of an HTTP 422 response for CreateKnownHost
 type CreateKnownHostResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateKnownHostResponse contains the raw HTTP response and any decoded response body.
 type CreateKnownHostResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *KnownHost
@@ -20065,11 +21931,15 @@ func (r CreateKnownHostResponse) ContentType() string {
 
 // GetLayerRevisionResponse404Headers the declared response headers of an HTTP 404 response for GetLayerRevision
 type GetLayerRevisionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetLayerRevisionResponse contains the raw HTTP response and any decoded response body.
 type GetLayerRevisionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *LayerRevision
@@ -20120,16 +21990,21 @@ func (r GetLayerRevisionResponse) ContentType() string {
 
 // GetReviewContextResponse404Headers the declared response headers of an HTTP 404 response for GetReviewContext
 type GetReviewContextResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // GetReviewContextResponse409Headers the declared response headers of an HTTP 409 response for GetReviewContext
 type GetReviewContextResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetReviewContextResponse contains the raw HTTP response and any decoded response body.
 type GetReviewContextResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ReviewContext
@@ -20189,16 +22064,21 @@ func (r GetReviewContextResponse) ContentType() string {
 
 // ApproveLayerRevisionResponse404Headers the declared response headers of an HTTP 404 response for ApproveLayerRevision
 type ApproveLayerRevisionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ApproveLayerRevisionResponse409Headers the declared response headers of an HTTP 409 response for ApproveLayerRevision
 type ApproveLayerRevisionResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ApproveLayerRevisionResponse contains the raw HTTP response and any decoded response body.
 type ApproveLayerRevisionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *RevisionReviewResult
@@ -20258,21 +22138,27 @@ func (r ApproveLayerRevisionResponse) ContentType() string {
 
 // RejectLayerRevisionResponse404Headers the declared response headers of an HTTP 404 response for RejectLayerRevision
 type RejectLayerRevisionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RejectLayerRevisionResponse409Headers the declared response headers of an HTTP 409 response for RejectLayerRevision
 type RejectLayerRevisionResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RejectLayerRevisionResponse422Headers the declared response headers of an HTTP 422 response for RejectLayerRevision
 type RejectLayerRevisionResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RejectLayerRevisionResponse contains the raw HTTP response and any decoded response body.
 type RejectLayerRevisionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *RevisionReviewResult
@@ -20341,16 +22227,21 @@ func (r RejectLayerRevisionResponse) ContentType() string {
 
 // GetLayerResponse200Headers the declared response headers of an HTTP 200 response for GetLayer
 type GetLayerResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetLayerResponse404Headers the declared response headers of an HTTP 404 response for GetLayer
 type GetLayerResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetLayerResponse contains the raw HTTP response and any decoded response body.
 type GetLayerResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Layer
@@ -20403,31 +22294,39 @@ func (r GetLayerResponse) ContentType() string {
 
 // UpdateLayerResponse200Headers the declared response headers of an HTTP 200 response for UpdateLayer
 type UpdateLayerResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateLayerResponse404Headers the declared response headers of an HTTP 404 response for UpdateLayer
 type UpdateLayerResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateLayerResponse409Headers the declared response headers of an HTTP 409 response for UpdateLayer
 type UpdateLayerResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateLayerResponse412Headers the declared response headers of an HTTP 412 response for UpdateLayer
 type UpdateLayerResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateLayerResponse422Headers the declared response headers of an HTTP 422 response for UpdateLayer
 type UpdateLayerResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateLayerResponse contains the raw HTTP response and any decoded response body.
 type UpdateLayerResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Layer
@@ -20507,11 +22406,15 @@ func (r UpdateLayerResponse) ContentType() string {
 
 // ListLayerRevisionsResponse404Headers the declared response headers of an HTTP 404 response for ListLayerRevisions
 type ListLayerRevisionsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListLayerRevisionsResponse contains the raw HTTP response and any decoded response body.
 type ListLayerRevisionsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *LayerRevisionPage
@@ -20562,26 +22465,33 @@ func (r ListLayerRevisionsResponse) ContentType() string {
 
 // CreateLayerRevisionResponse404Headers the declared response headers of an HTTP 404 response for CreateLayerRevision
 type CreateLayerRevisionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateLayerRevisionResponse409Headers the declared response headers of an HTTP 409 response for CreateLayerRevision
 type CreateLayerRevisionResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateLayerRevisionResponse413Headers the declared response headers of an HTTP 413 response for CreateLayerRevision
 type CreateLayerRevisionResponse413Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateLayerRevisionResponse422Headers the declared response headers of an HTTP 422 response for CreateLayerRevision
 type CreateLayerRevisionResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateLayerRevisionResponse contains the raw HTTP response and any decoded response body.
 type CreateLayerRevisionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *LayerRevisionSubmission
@@ -20666,16 +22576,21 @@ func (r CreateLayerRevisionResponse) ContentType() string {
 
 // RollbackLayerResponse404Headers the declared response headers of an HTTP 404 response for RollbackLayer
 type RollbackLayerResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RollbackLayerResponse409Headers the declared response headers of an HTTP 409 response for RollbackLayer
 type RollbackLayerResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RollbackLayerResponse contains the raw HTTP response and any decoded response body.
 type RollbackLayerResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -20735,11 +22650,15 @@ func (r RollbackLayerResponse) ContentType() string {
 
 // ListTenantMembersResponse404Headers the declared response headers of an HTTP 404 response for ListTenantMembers
 type ListTenantMembersResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListTenantMembersResponse contains the raw HTTP response and any decoded response body.
 type ListTenantMembersResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *MemberPage
@@ -20790,16 +22709,21 @@ func (r ListTenantMembersResponse) ContentType() string {
 
 // DeleteTenantMemberResponse404Headers the declared response headers of an HTTP 404 response for DeleteTenantMember
 type DeleteTenantMemberResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteTenantMemberResponse409Headers the declared response headers of an HTTP 409 response for DeleteTenantMember
 type DeleteTenantMemberResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteTenantMemberResponse contains the raw HTTP response and any decoded response body.
 type DeleteTenantMemberResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -20852,16 +22776,21 @@ func (r DeleteTenantMemberResponse) ContentType() string {
 
 // PutTenantMemberResponse404Headers the declared response headers of an HTTP 404 response for PutTenantMember
 type PutTenantMemberResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PutTenantMemberResponse409Headers the declared response headers of an HTTP 409 response for PutTenantMember
 type PutTenantMemberResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PutTenantMemberResponse contains the raw HTTP response and any decoded response body.
 type PutTenantMemberResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Member
@@ -20921,11 +22850,15 @@ func (r PutTenantMemberResponse) ContentType() string {
 
 // ListNotificationChannelsResponse404Headers the declared response headers of an HTTP 404 response for ListNotificationChannels
 type ListNotificationChannelsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListNotificationChannelsResponse contains the raw HTTP response and any decoded response body.
 type ListNotificationChannelsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *NotificationChannelList
@@ -20976,21 +22909,27 @@ func (r ListNotificationChannelsResponse) ContentType() string {
 
 // CreateNotificationChannelResponse201Headers the declared response headers of an HTTP 201 response for CreateNotificationChannel
 type CreateNotificationChannelResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateNotificationChannelResponse404Headers the declared response headers of an HTTP 404 response for CreateNotificationChannel
 type CreateNotificationChannelResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateNotificationChannelResponse422Headers the declared response headers of an HTTP 422 response for CreateNotificationChannel
 type CreateNotificationChannelResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateNotificationChannelResponse contains the raw HTTP response and any decoded response body.
 type CreateNotificationChannelResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *NotificationChannel
@@ -21052,16 +22991,21 @@ func (r CreateNotificationChannelResponse) ContentType() string {
 
 // DeleteNotificationChannelResponse404Headers the declared response headers of an HTTP 404 response for DeleteNotificationChannel
 type DeleteNotificationChannelResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteNotificationChannelResponse412Headers the declared response headers of an HTTP 412 response for DeleteNotificationChannel
 type DeleteNotificationChannelResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteNotificationChannelResponse contains the raw HTTP response and any decoded response body.
 type DeleteNotificationChannelResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -21114,21 +23058,27 @@ func (r DeleteNotificationChannelResponse) ContentType() string {
 
 // UpdateNotificationChannelResponse200Headers the declared response headers of an HTTP 200 response for UpdateNotificationChannel
 type UpdateNotificationChannelResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateNotificationChannelResponse404Headers the declared response headers of an HTTP 404 response for UpdateNotificationChannel
 type UpdateNotificationChannelResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateNotificationChannelResponse412Headers the declared response headers of an HTTP 412 response for UpdateNotificationChannel
 type UpdateNotificationChannelResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateNotificationChannelResponse contains the raw HTTP response and any decoded response body.
 type UpdateNotificationChannelResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *NotificationChannel
@@ -21190,31 +23140,39 @@ func (r UpdateNotificationChannelResponse) ContentType() string {
 
 // RotateNotificationChannelSecretResponse200Headers the declared response headers of an HTTP 200 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // RotateNotificationChannelSecretResponse404Headers the declared response headers of an HTTP 404 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateNotificationChannelSecretResponse409Headers the declared response headers of an HTTP 409 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateNotificationChannelSecretResponse412Headers the declared response headers of an HTTP 412 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // RotateNotificationChannelSecretResponse422Headers the declared response headers of an HTTP 422 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RotateNotificationChannelSecretResponse contains the raw HTTP response and any decoded response body.
 type RotateNotificationChannelSecretResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *NotificationChannel
@@ -21294,11 +23252,15 @@ func (r RotateNotificationChannelSecretResponse) ContentType() string {
 
 // TestNotificationChannelResponse404Headers the declared response headers of an HTTP 404 response for TestNotificationChannel
 type TestNotificationChannelResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// TestNotificationChannelResponse contains the raw HTTP response and any decoded response body.
 type TestNotificationChannelResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -21349,11 +23311,15 @@ func (r TestNotificationChannelResponse) ContentType() string {
 
 // ListNotificationsResponse404Headers the declared response headers of an HTTP 404 response for ListNotifications
 type ListNotificationsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListNotificationsResponse contains the raw HTTP response and any decoded response body.
 type ListNotificationsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *NotificationPage
@@ -21404,11 +23370,15 @@ func (r ListNotificationsResponse) ContentType() string {
 
 // MarkNotificationReadResponse404Headers the declared response headers of an HTTP 404 response for MarkNotificationRead
 type MarkNotificationReadResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// MarkNotificationReadResponse contains the raw HTTP response and any decoded response body.
 type MarkNotificationReadResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -21452,11 +23422,15 @@ func (r MarkNotificationReadResponse) ContentType() string {
 
 // MarkAllNotificationsReadResponse404Headers the declared response headers of an HTTP 404 response for MarkAllNotificationsRead
 type MarkAllNotificationsReadResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// MarkAllNotificationsReadResponse contains the raw HTTP response and any decoded response body.
 type MarkAllNotificationsReadResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -21500,11 +23474,15 @@ func (r MarkAllNotificationsReadResponse) ContentType() string {
 
 // ListAvailableProducerProfilesResponse404Headers the declared response headers of an HTTP 404 response for ListAvailableProducerProfiles
 type ListAvailableProducerProfilesResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListAvailableProducerProfilesResponse contains the raw HTTP response and any decoded response body.
 type ListAvailableProducerProfilesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ProducerProfileOptionList
@@ -21555,11 +23533,15 @@ func (r ListAvailableProducerProfilesResponse) ContentType() string {
 
 // ListRepositoriesResponse404Headers the declared response headers of an HTTP 404 response for ListRepositories
 type ListRepositoriesResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListRepositoriesResponse contains the raw HTTP response and any decoded response body.
 type ListRepositoriesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *RepositoryPage
@@ -21610,21 +23592,27 @@ func (r ListRepositoriesResponse) ContentType() string {
 
 // CreateRepositoryResponse201Headers the declared response headers of an HTTP 201 response for CreateRepository
 type CreateRepositoryResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateRepositoryResponse404Headers the declared response headers of an HTTP 404 response for CreateRepository
 type CreateRepositoryResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateRepositoryResponse409Headers the declared response headers of an HTTP 409 response for CreateRepository
 type CreateRepositoryResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateRepositoryResponse contains the raw HTTP response and any decoded response body.
 type CreateRepositoryResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Repository
@@ -21686,16 +23674,21 @@ func (r CreateRepositoryResponse) ContentType() string {
 
 // DeleteRepositoryResponse404Headers the declared response headers of an HTTP 404 response for DeleteRepository
 type DeleteRepositoryResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteRepositoryResponse412Headers the declared response headers of an HTTP 412 response for DeleteRepository
 type DeleteRepositoryResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteRepositoryResponse contains the raw HTTP response and any decoded response body.
 type DeleteRepositoryResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -21748,16 +23741,21 @@ func (r DeleteRepositoryResponse) ContentType() string {
 
 // GetRepositoryResponse200Headers the declared response headers of an HTTP 200 response for GetRepository
 type GetRepositoryResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetRepositoryResponse404Headers the declared response headers of an HTTP 404 response for GetRepository
 type GetRepositoryResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetRepositoryResponse contains the raw HTTP response and any decoded response body.
 type GetRepositoryResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Repository
@@ -21810,21 +23808,27 @@ func (r GetRepositoryResponse) ContentType() string {
 
 // UpdateRepositoryResponse200Headers the declared response headers of an HTTP 200 response for UpdateRepository
 type UpdateRepositoryResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateRepositoryResponse404Headers the declared response headers of an HTTP 404 response for UpdateRepository
 type UpdateRepositoryResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateRepositoryResponse412Headers the declared response headers of an HTTP 412 response for UpdateRepository
 type UpdateRepositoryResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateRepositoryResponse contains the raw HTTP response and any decoded response body.
 type UpdateRepositoryResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Repository
@@ -21886,11 +23890,15 @@ func (r UpdateRepositoryResponse) ContentType() string {
 
 // ListDiscoveryCandidatesResponse404Headers the declared response headers of an HTTP 404 response for ListDiscoveryCandidates
 type ListDiscoveryCandidatesResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListDiscoveryCandidatesResponse contains the raw HTTP response and any decoded response body.
 type ListDiscoveryCandidatesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *CandidatePage
@@ -21941,11 +23949,15 @@ func (r ListDiscoveryCandidatesResponse) ContentType() string {
 
 // DismissDiscoveryCandidateResponse404Headers the declared response headers of an HTTP 404 response for DismissDiscoveryCandidate
 type DismissDiscoveryCandidateResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DismissDiscoveryCandidateResponse contains the raw HTTP response and any decoded response body.
 type DismissDiscoveryCandidateResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Candidate
@@ -21996,16 +24008,21 @@ func (r DismissDiscoveryCandidateResponse) ContentType() string {
 
 // AcceptDiscoveryCandidatesResponse404Headers the declared response headers of an HTTP 404 response for AcceptDiscoveryCandidates
 type AcceptDiscoveryCandidatesResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // AcceptDiscoveryCandidatesResponse409Headers the declared response headers of an HTTP 409 response for AcceptDiscoveryCandidates
 type AcceptDiscoveryCandidatesResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// AcceptDiscoveryCandidatesResponse contains the raw HTTP response and any decoded response body.
 type AcceptDiscoveryCandidatesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ServiceList
@@ -22065,16 +24082,21 @@ func (r AcceptDiscoveryCandidatesResponse) ContentType() string {
 
 // PreviewRepositoryConfigImportResponse404Headers the declared response headers of an HTTP 404 response for PreviewRepositoryConfigImport
 type PreviewRepositoryConfigImportResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PreviewRepositoryConfigImportResponse409Headers the declared response headers of an HTTP 409 response for PreviewRepositoryConfigImport
 type PreviewRepositoryConfigImportResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PreviewRepositoryConfigImportResponse contains the raw HTTP response and any decoded response body.
 type PreviewRepositoryConfigImportResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *ConfigImportPreview
@@ -22134,16 +24156,21 @@ func (r PreviewRepositoryConfigImportResponse) ContentType() string {
 
 // ApplyRepositoryConfigImportResponse404Headers the declared response headers of an HTTP 404 response for ApplyRepositoryConfigImport
 type ApplyRepositoryConfigImportResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ApplyRepositoryConfigImportResponse409Headers the declared response headers of an HTTP 409 response for ApplyRepositoryConfigImport
 type ApplyRepositoryConfigImportResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ApplyRepositoryConfigImportResponse contains the raw HTTP response and any decoded response body.
 type ApplyRepositoryConfigImportResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ConfigImportResult
@@ -22203,16 +24230,21 @@ func (r ApplyRepositoryConfigImportResponse) ContentType() string {
 
 // CreateServiceInRepositoryResponse201Headers the declared response headers of an HTTP 201 response for CreateServiceInRepository
 type CreateServiceInRepositoryResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateServiceInRepositoryResponse404Headers the declared response headers of an HTTP 404 response for CreateServiceInRepository
 type CreateServiceInRepositoryResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateServiceInRepositoryResponse contains the raw HTTP response and any decoded response body.
 type CreateServiceInRepositoryResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Service
@@ -22265,16 +24297,21 @@ func (r CreateServiceInRepositoryResponse) ContentType() string {
 
 // DiscoverRepositoryResponse404Headers the declared response headers of an HTTP 404 response for DiscoverRepository
 type DiscoverRepositoryResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DiscoverRepositoryResponse409Headers the declared response headers of an HTTP 409 response for DiscoverRepository
 type DiscoverRepositoryResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DiscoverRepositoryResponse contains the raw HTTP response and any decoded response body.
 type DiscoverRepositoryResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -22334,16 +24371,21 @@ func (r DiscoverRepositoryResponse) ContentType() string {
 
 // SyncRepositoryResponse404Headers the declared response headers of an HTTP 404 response for SyncRepository
 type SyncRepositoryResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // SyncRepositoryResponse409Headers the declared response headers of an HTTP 409 response for SyncRepository
 type SyncRepositoryResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// SyncRepositoryResponse contains the raw HTTP response and any decoded response body.
 type SyncRepositoryResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -22403,11 +24445,15 @@ func (r SyncRepositoryResponse) ContentType() string {
 
 // CheckRepositoryConnectionResponse404Headers the declared response headers of an HTTP 404 response for CheckRepositoryConnection
 type CheckRepositoryConnectionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CheckRepositoryConnectionResponse contains the raw HTTP response and any decoded response body.
 type CheckRepositoryConnectionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ConnectionTest
@@ -22458,11 +24504,15 @@ func (r CheckRepositoryConnectionResponse) ContentType() string {
 
 // ListReviewsResponse404Headers the declared response headers of an HTTP 404 response for ListReviews
 type ListReviewsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListReviewsResponse contains the raw HTTP response and any decoded response body.
 type ListReviewsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ReviewPage
@@ -22513,16 +24563,21 @@ func (r ListReviewsResponse) ContentType() string {
 
 // SearchResponse404Headers the declared response headers of an HTTP 404 response for Search
 type SearchResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // SearchResponse422Headers the declared response headers of an HTTP 422 response for Search
 type SearchResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// SearchResponse contains the raw HTTP response and any decoded response body.
 type SearchResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SearchResult
@@ -22582,11 +24637,15 @@ func (r SearchResponse) ContentType() string {
 
 // ListServicesResponse404Headers the declared response headers of an HTTP 404 response for ListServices
 type ListServicesResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListServicesResponse contains the raw HTTP response and any decoded response body.
 type ListServicesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ServicePage
@@ -22637,16 +24696,21 @@ func (r ListServicesResponse) ContentType() string {
 
 // DeleteServiceResponse404Headers the declared response headers of an HTTP 404 response for DeleteService
 type DeleteServiceResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteServiceResponse412Headers the declared response headers of an HTTP 412 response for DeleteService
 type DeleteServiceResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteServiceResponse contains the raw HTTP response and any decoded response body.
 type DeleteServiceResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -22699,16 +24763,21 @@ func (r DeleteServiceResponse) ContentType() string {
 
 // GetServiceResponse200Headers the declared response headers of an HTTP 200 response for GetService
 type GetServiceResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetServiceResponse404Headers the declared response headers of an HTTP 404 response for GetService
 type GetServiceResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetServiceResponse contains the raw HTTP response and any decoded response body.
 type GetServiceResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Service
@@ -22761,26 +24830,33 @@ func (r GetServiceResponse) ContentType() string {
 
 // UpdateServiceResponse200Headers the declared response headers of an HTTP 200 response for UpdateService
 type UpdateServiceResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateServiceResponse404Headers the declared response headers of an HTTP 404 response for UpdateService
 type UpdateServiceResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateServiceResponse409Headers the declared response headers of an HTTP 409 response for UpdateService
 type UpdateServiceResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateServiceResponse412Headers the declared response headers of an HTTP 412 response for UpdateService
 type UpdateServiceResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateServiceResponse contains the raw HTTP response and any decoded response body.
 type UpdateServiceResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Service
@@ -22851,11 +24927,15 @@ func (r UpdateServiceResponse) ContentType() string {
 
 // GetServiceAccessResponse404Headers the declared response headers of an HTTP 404 response for GetServiceAccess
 type GetServiceAccessResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetServiceAccessResponse contains the raw HTTP response and any decoded response body.
 type GetServiceAccessResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ServiceAccess
@@ -22906,16 +24986,21 @@ func (r GetServiceAccessResponse) ContentType() string {
 
 // PutServiceAccessResponse404Headers the declared response headers of an HTTP 404 response for PutServiceAccess
 type PutServiceAccessResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PutServiceAccessResponse409Headers the declared response headers of an HTTP 409 response for PutServiceAccess
 type PutServiceAccessResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PutServiceAccessResponse contains the raw HTTP response and any decoded response body.
 type PutServiceAccessResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ServiceAccess
@@ -22975,21 +25060,27 @@ func (r PutServiceAccessResponse) ContentType() string {
 
 // GenerateMissingAssetWithAiResponse404Headers the declared response headers of an HTTP 404 response for GenerateMissingAssetWithAi
 type GenerateMissingAssetWithAiResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // GenerateMissingAssetWithAiResponse409Headers the declared response headers of an HTTP 409 response for GenerateMissingAssetWithAi
 type GenerateMissingAssetWithAiResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // GenerateMissingAssetWithAiResponse422Headers the declared response headers of an HTTP 422 response for GenerateMissingAssetWithAi
 type GenerateMissingAssetWithAiResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GenerateMissingAssetWithAiResponse contains the raw HTTP response and any decoded response body.
 type GenerateMissingAssetWithAiResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *AiGenerationAccepted
@@ -23058,11 +25149,15 @@ func (r GenerateMissingAssetWithAiResponse) ContentType() string {
 
 // ListServiceCommentsResponse404Headers the declared response headers of an HTTP 404 response for ListServiceComments
 type ListServiceCommentsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListServiceCommentsResponse contains the raw HTTP response and any decoded response body.
 type ListServiceCommentsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *CommentPage
@@ -23113,11 +25208,15 @@ func (r ListServiceCommentsResponse) ContentType() string {
 
 // CreateServiceCommentResponse404Headers the declared response headers of an HTTP 404 response for CreateServiceComment
 type CreateServiceCommentResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateServiceCommentResponse contains the raw HTTP response and any decoded response body.
 type CreateServiceCommentResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Comment
@@ -23168,11 +25267,15 @@ func (r CreateServiceCommentResponse) ContentType() string {
 
 // ListSourceSpecsResponse404Headers the declared response headers of an HTTP 404 response for ListSourceSpecs
 type ListSourceSpecsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListSourceSpecsResponse contains the raw HTTP response and any decoded response body.
 type ListSourceSpecsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SourceSpecList
@@ -23223,26 +25326,33 @@ func (r ListSourceSpecsResponse) ContentType() string {
 
 // CreateSourceSpecResponse201Headers the declared response headers of an HTTP 201 response for CreateSourceSpec
 type CreateSourceSpecResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateSourceSpecResponse404Headers the declared response headers of an HTTP 404 response for CreateSourceSpec
 type CreateSourceSpecResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateSourceSpecResponse409Headers the declared response headers of an HTTP 409 response for CreateSourceSpec
 type CreateSourceSpecResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateSourceSpecResponse422Headers the declared response headers of an HTTP 422 response for CreateSourceSpec
 type CreateSourceSpecResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateSourceSpecResponse contains the raw HTTP response and any decoded response body.
 type CreateSourceSpecResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *SourceSpec
@@ -23313,21 +25423,27 @@ func (r CreateSourceSpecResponse) ContentType() string {
 
 // ResolveServiceDriftResponse200Headers the declared response headers of an HTTP 200 response for ResolveServiceDrift
 type ResolveServiceDriftResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // ResolveServiceDriftResponse404Headers the declared response headers of an HTTP 404 response for ResolveServiceDrift
 type ResolveServiceDriftResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ResolveServiceDriftResponse409Headers the declared response headers of an HTTP 409 response for ResolveServiceDrift
 type ResolveServiceDriftResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ResolveServiceDriftResponse contains the raw HTTP response and any decoded response body.
 type ResolveServiceDriftResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Service
@@ -23389,11 +25505,15 @@ func (r ResolveServiceDriftResponse) ContentType() string {
 
 // StarServiceResponse404Headers the declared response headers of an HTTP 404 response for StarService
 type StarServiceResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// StarServiceResponse contains the raw HTTP response and any decoded response body.
 type StarServiceResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *StarState
@@ -23444,11 +25564,15 @@ func (r StarServiceResponse) ContentType() string {
 
 // UnstarServiceResponse404Headers the declared response headers of an HTTP 404 response for UnstarService
 type UnstarServiceResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UnstarServiceResponse contains the raw HTTP response and any decoded response body.
 type UnstarServiceResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *StarState
@@ -23499,11 +25623,15 @@ func (r UnstarServiceResponse) ContentType() string {
 
 // ListRecentServicesResponse404Headers the declared response headers of an HTTP 404 response for ListRecentServices
 type ListRecentServicesResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListRecentServicesResponse contains the raw HTTP response and any decoded response body.
 type ListRecentServicesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ServicePage
@@ -23554,16 +25682,21 @@ func (r ListRecentServicesResponse) ContentType() string {
 
 // GetTenantSettingsResponse200Headers the declared response headers of an HTTP 200 response for GetTenantSettings
 type GetTenantSettingsResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetTenantSettingsResponse404Headers the declared response headers of an HTTP 404 response for GetTenantSettings
 type GetTenantSettingsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetTenantSettingsResponse contains the raw HTTP response and any decoded response body.
 type GetTenantSettingsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *TenantSettings
@@ -23616,21 +25749,27 @@ func (r GetTenantSettingsResponse) ContentType() string {
 
 // UpdateTenantSettingsResponse200Headers the declared response headers of an HTTP 200 response for UpdateTenantSettings
 type UpdateTenantSettingsResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateTenantSettingsResponse404Headers the declared response headers of an HTTP 404 response for UpdateTenantSettings
 type UpdateTenantSettingsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateTenantSettingsResponse412Headers the declared response headers of an HTTP 412 response for UpdateTenantSettings
 type UpdateTenantSettingsResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateTenantSettingsResponse contains the raw HTTP response and any decoded response body.
 type UpdateTenantSettingsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *TenantSettings
@@ -23692,11 +25831,15 @@ func (r UpdateTenantSettingsResponse) ContentType() string {
 
 // ListShareLinksResponse404Headers the declared response headers of an HTTP 404 response for ListShareLinks
 type ListShareLinksResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListShareLinksResponse contains the raw HTTP response and any decoded response body.
 type ListShareLinksResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ShareLinkPage
@@ -23747,16 +25890,21 @@ func (r ListShareLinksResponse) ContentType() string {
 
 // CreateShareLinkResponse404Headers the declared response headers of an HTTP 404 response for CreateShareLink
 type CreateShareLinkResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateShareLinkResponse422Headers the declared response headers of an HTTP 422 response for CreateShareLink
 type CreateShareLinkResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateShareLinkResponse contains the raw HTTP response and any decoded response body.
 type CreateShareLinkResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *ShareLinkCreated
@@ -23816,11 +25964,15 @@ func (r CreateShareLinkResponse) ContentType() string {
 
 // RevokeShareLinkResponse404Headers the declared response headers of an HTTP 404 response for RevokeShareLink
 type RevokeShareLinkResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RevokeShareLinkResponse contains the raw HTTP response and any decoded response body.
 type RevokeShareLinkResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -23864,21 +26016,27 @@ func (r RevokeShareLinkResponse) ContentType() string {
 
 // DeleteSourceSpecResponse404Headers the declared response headers of an HTTP 404 response for DeleteSourceSpec
 type DeleteSourceSpecResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteSourceSpecResponse409Headers the declared response headers of an HTTP 409 response for DeleteSourceSpec
 type DeleteSourceSpecResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteSourceSpecResponse412Headers the declared response headers of an HTTP 412 response for DeleteSourceSpec
 type DeleteSourceSpecResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteSourceSpecResponse contains the raw HTTP response and any decoded response body.
 type DeleteSourceSpecResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -23940,31 +26098,39 @@ func (r DeleteSourceSpecResponse) ContentType() string {
 
 // UpdateSourceSpecResponse200Headers the declared response headers of an HTTP 200 response for UpdateSourceSpec
 type UpdateSourceSpecResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateSourceSpecResponse404Headers the declared response headers of an HTTP 404 response for UpdateSourceSpec
 type UpdateSourceSpecResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateSourceSpecResponse409Headers the declared response headers of an HTTP 409 response for UpdateSourceSpec
 type UpdateSourceSpecResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateSourceSpecResponse412Headers the declared response headers of an HTTP 412 response for UpdateSourceSpec
 type UpdateSourceSpecResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateSourceSpecResponse422Headers the declared response headers of an HTTP 422 response for UpdateSourceSpec
 type UpdateSourceSpecResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateSourceSpecResponse contains the raw HTTP response and any decoded response body.
 type UpdateSourceSpecResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SourceSpec
@@ -24044,11 +26210,15 @@ func (r UpdateSourceSpecResponse) ContentType() string {
 
 // ListSourceBindingsResponse404Headers the declared response headers of an HTTP 404 response for ListSourceBindings
 type ListSourceBindingsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListSourceBindingsResponse contains the raw HTTP response and any decoded response body.
 type ListSourceBindingsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SourceBindingList
@@ -24099,16 +26269,21 @@ func (r ListSourceBindingsResponse) ContentType() string {
 
 // ProduceSourceResponse404Headers the declared response headers of an HTTP 404 response for ProduceSource
 type ProduceSourceResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ProduceSourceResponse409Headers the declared response headers of an HTTP 409 response for ProduceSource
 type ProduceSourceResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ProduceSourceResponse contains the raw HTTP response and any decoded response body.
 type ProduceSourceResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -24168,11 +26343,15 @@ func (r ProduceSourceResponse) ContentType() string {
 
 // ListSubscriptionsResponse404Headers the declared response headers of an HTTP 404 response for ListSubscriptions
 type ListSubscriptionsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListSubscriptionsResponse contains the raw HTTP response and any decoded response body.
 type ListSubscriptionsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SubscriptionList
@@ -24223,11 +26402,15 @@ func (r ListSubscriptionsResponse) ContentType() string {
 
 // PutSubscriptionResponse404Headers the declared response headers of an HTTP 404 response for PutSubscription
 type PutSubscriptionResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PutSubscriptionResponse contains the raw HTTP response and any decoded response body.
 type PutSubscriptionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Subscription
@@ -24278,11 +26461,15 @@ func (r PutSubscriptionResponse) ContentType() string {
 
 // ListSystemGroupsResponse404Headers the declared response headers of an HTTP 404 response for ListSystemGroups
 type ListSystemGroupsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListSystemGroupsResponse contains the raw HTTP response and any decoded response body.
 type ListSystemGroupsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SystemGroupList
@@ -24333,21 +26520,27 @@ func (r ListSystemGroupsResponse) ContentType() string {
 
 // CreateSystemGroupResponse201Headers the declared response headers of an HTTP 201 response for CreateSystemGroup
 type CreateSystemGroupResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateSystemGroupResponse404Headers the declared response headers of an HTTP 404 response for CreateSystemGroup
 type CreateSystemGroupResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateSystemGroupResponse422Headers the declared response headers of an HTTP 422 response for CreateSystemGroup
 type CreateSystemGroupResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateSystemGroupResponse contains the raw HTTP response and any decoded response body.
 type CreateSystemGroupResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *SystemGroup
@@ -24409,16 +26602,21 @@ func (r CreateSystemGroupResponse) ContentType() string {
 
 // DeleteSystemGroupResponse404Headers the declared response headers of an HTTP 404 response for DeleteSystemGroup
 type DeleteSystemGroupResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteSystemGroupResponse412Headers the declared response headers of an HTTP 412 response for DeleteSystemGroup
 type DeleteSystemGroupResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteSystemGroupResponse contains the raw HTTP response and any decoded response body.
 type DeleteSystemGroupResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -24471,16 +26669,21 @@ func (r DeleteSystemGroupResponse) ContentType() string {
 
 // GetSystemGroupResponse200Headers the declared response headers of an HTTP 200 response for GetSystemGroup
 type GetSystemGroupResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetSystemGroupResponse404Headers the declared response headers of an HTTP 404 response for GetSystemGroup
 type GetSystemGroupResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetSystemGroupResponse contains the raw HTTP response and any decoded response body.
 type GetSystemGroupResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SystemGroup
@@ -24533,26 +26736,33 @@ func (r GetSystemGroupResponse) ContentType() string {
 
 // UpdateSystemGroupResponse200Headers the declared response headers of an HTTP 200 response for UpdateSystemGroup
 type UpdateSystemGroupResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateSystemGroupResponse404Headers the declared response headers of an HTTP 404 response for UpdateSystemGroup
 type UpdateSystemGroupResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateSystemGroupResponse412Headers the declared response headers of an HTTP 412 response for UpdateSystemGroup
 type UpdateSystemGroupResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateSystemGroupResponse422Headers the declared response headers of an HTTP 422 response for UpdateSystemGroup
 type UpdateSystemGroupResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateSystemGroupResponse contains the raw HTTP response and any decoded response body.
 type UpdateSystemGroupResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SystemGroup
@@ -24623,21 +26833,27 @@ func (r UpdateSystemGroupResponse) ContentType() string {
 
 // PutSystemGroupMembersResponse200Headers the declared response headers of an HTTP 200 response for PutSystemGroupMembers
 type PutSystemGroupMembersResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // PutSystemGroupMembersResponse404Headers the declared response headers of an HTTP 404 response for PutSystemGroupMembers
 type PutSystemGroupMembersResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PutSystemGroupMembersResponse412Headers the declared response headers of an HTTP 412 response for PutSystemGroupMembers
 type PutSystemGroupMembersResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PutSystemGroupMembersResponse contains the raw HTTP response and any decoded response body.
 type PutSystemGroupMembersResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *SystemGroup
@@ -24699,11 +26915,15 @@ func (r PutSystemGroupMembersResponse) ContentType() string {
 
 // ListTagsResponse404Headers the declared response headers of an HTTP 404 response for ListTags
 type ListTagsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListTagsResponse contains the raw HTTP response and any decoded response body.
 type ListTagsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *TagList
@@ -24754,21 +26974,27 @@ func (r ListTagsResponse) ContentType() string {
 
 // CreateTagResponse201Headers the declared response headers of an HTTP 201 response for CreateTag
 type CreateTagResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateTagResponse404Headers the declared response headers of an HTTP 404 response for CreateTag
 type CreateTagResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateTagResponse409Headers the declared response headers of an HTTP 409 response for CreateTag
 type CreateTagResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateTagResponse contains the raw HTTP response and any decoded response body.
 type CreateTagResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Tag
@@ -24830,16 +27056,21 @@ func (r CreateTagResponse) ContentType() string {
 
 // DeleteTagResponse404Headers the declared response headers of an HTTP 404 response for DeleteTag
 type DeleteTagResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteTagResponse412Headers the declared response headers of an HTTP 412 response for DeleteTag
 type DeleteTagResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteTagResponse contains the raw HTTP response and any decoded response body.
 type DeleteTagResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -24892,21 +27123,27 @@ func (r DeleteTagResponse) ContentType() string {
 
 // UpdateTagResponse200Headers the declared response headers of an HTTP 200 response for UpdateTag
 type UpdateTagResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateTagResponse404Headers the declared response headers of an HTTP 404 response for UpdateTag
 type UpdateTagResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateTagResponse412Headers the declared response headers of an HTTP 412 response for UpdateTag
 type UpdateTagResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateTagResponse contains the raw HTTP response and any decoded response body.
 type UpdateTagResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Tag
@@ -24968,11 +27205,15 @@ func (r UpdateTagResponse) ContentType() string {
 
 // ListTeamsResponse404Headers the declared response headers of an HTTP 404 response for ListTeams
 type ListTeamsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListTeamsResponse contains the raw HTTP response and any decoded response body.
 type ListTeamsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *TeamPage
@@ -25023,21 +27264,27 @@ func (r ListTeamsResponse) ContentType() string {
 
 // CreateTeamResponse201Headers the declared response headers of an HTTP 201 response for CreateTeam
 type CreateTeamResponse201Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // CreateTeamResponse404Headers the declared response headers of an HTTP 404 response for CreateTeam
 type CreateTeamResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateTeamResponse409Headers the declared response headers of an HTTP 409 response for CreateTeam
 type CreateTeamResponse409Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateTeamResponse contains the raw HTTP response and any decoded response body.
 type CreateTeamResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Team
@@ -25099,16 +27346,21 @@ func (r CreateTeamResponse) ContentType() string {
 
 // DeleteTeamResponse404Headers the declared response headers of an HTTP 404 response for DeleteTeam
 type DeleteTeamResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteTeamResponse412Headers the declared response headers of an HTTP 412 response for DeleteTeam
 type DeleteTeamResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteTeamResponse contains the raw HTTP response and any decoded response body.
 type DeleteTeamResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -25161,16 +27413,21 @@ func (r DeleteTeamResponse) ContentType() string {
 
 // GetTeamResponse200Headers the declared response headers of an HTTP 200 response for GetTeam
 type GetTeamResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // GetTeamResponse404Headers the declared response headers of an HTTP 404 response for GetTeam
 type GetTeamResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// GetTeamResponse contains the raw HTTP response and any decoded response body.
 type GetTeamResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Team
@@ -25223,21 +27480,27 @@ func (r GetTeamResponse) ContentType() string {
 
 // UpdateTeamResponse200Headers the declared response headers of an HTTP 200 response for UpdateTeam
 type UpdateTeamResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // UpdateTeamResponse404Headers the declared response headers of an HTTP 404 response for UpdateTeam
 type UpdateTeamResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // UpdateTeamResponse412Headers the declared response headers of an HTTP 412 response for UpdateTeam
 type UpdateTeamResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// UpdateTeamResponse contains the raw HTTP response and any decoded response body.
 type UpdateTeamResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Team
@@ -25299,21 +27562,27 @@ func (r UpdateTeamResponse) ContentType() string {
 
 // ReplaceTeamMembersResponse200Headers the declared response headers of an HTTP 200 response for ReplaceTeamMembers
 type ReplaceTeamMembersResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // ReplaceTeamMembersResponse404Headers the declared response headers of an HTTP 404 response for ReplaceTeamMembers
 type ReplaceTeamMembersResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ReplaceTeamMembersResponse412Headers the declared response headers of an HTTP 412 response for ReplaceTeamMembers
 type ReplaceTeamMembersResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ReplaceTeamMembersResponse contains the raw HTTP response and any decoded response body.
 type ReplaceTeamMembersResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Team
@@ -25375,11 +27644,15 @@ func (r ReplaceTeamMembersResponse) ContentType() string {
 
 // ListTokensResponse404Headers the declared response headers of an HTTP 404 response for ListTokens
 type ListTokensResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListTokensResponse contains the raw HTTP response and any decoded response body.
 type ListTokensResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *TokenPage
@@ -25430,11 +27703,15 @@ func (r ListTokensResponse) ContentType() string {
 
 // CreateTokenResponse404Headers the declared response headers of an HTTP 404 response for CreateToken
 type CreateTokenResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateTokenResponse contains the raw HTTP response and any decoded response body.
 type CreateTokenResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *TokenCreated
@@ -25485,11 +27762,15 @@ func (r CreateTokenResponse) ContentType() string {
 
 // RevokeTokenResponse404Headers the declared response headers of an HTTP 404 response for RevokeToken
 type RevokeTokenResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// RevokeTokenResponse contains the raw HTTP response and any decoded response body.
 type RevokeTokenResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -25533,21 +27814,27 @@ func (r RevokeTokenResponse) ContentType() string {
 
 // CreateDiffUploadResponse404Headers the declared response headers of an HTTP 404 response for CreateDiffUpload
 type CreateDiffUploadResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateDiffUploadResponse413Headers the declared response headers of an HTTP 413 response for CreateDiffUpload
 type CreateDiffUploadResponse413Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // CreateDiffUploadResponse422Headers the declared response headers of an HTTP 422 response for CreateDiffUpload
 type CreateDiffUploadResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// CreateDiffUploadResponse contains the raw HTTP response and any decoded response body.
 type CreateDiffUploadResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Upload
@@ -25616,11 +27903,15 @@ func (r CreateDiffUploadResponse) ContentType() string {
 
 // ListViewOverridesResponse404Headers the declared response headers of an HTTP 404 response for ListViewOverrides
 type ListViewOverridesResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListViewOverridesResponse contains the raw HTTP response and any decoded response body.
 type ListViewOverridesResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ViewOverrideList
@@ -25671,16 +27962,21 @@ func (r ListViewOverridesResponse) ContentType() string {
 
 // DeleteViewOverrideResponse404Headers the declared response headers of an HTTP 404 response for DeleteViewOverride
 type DeleteViewOverrideResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // DeleteViewOverrideResponse412Headers the declared response headers of an HTTP 412 response for DeleteViewOverride
 type DeleteViewOverrideResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// DeleteViewOverrideResponse contains the raw HTTP response and any decoded response body.
 type DeleteViewOverrideResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
@@ -25733,21 +28029,27 @@ func (r DeleteViewOverrideResponse) ContentType() string {
 
 // PutViewOverrideResponse200Headers the declared response headers of an HTTP 200 response for PutViewOverride
 type PutViewOverrideResponse200Headers struct {
+	// ETag is the entity tag used for optimistic concurrency control.
 	ETag ETag
 }
 
 // PutViewOverrideResponse404Headers the declared response headers of an HTTP 404 response for PutViewOverride
 type PutViewOverrideResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // PutViewOverrideResponse412Headers the declared response headers of an HTTP 412 response for PutViewOverride
 type PutViewOverrideResponse412Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// PutViewOverrideResponse contains the raw HTTP response and any decoded response body.
 type PutViewOverrideResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ViewOverride
@@ -25809,11 +28111,15 @@ func (r PutViewOverrideResponse) ContentType() string {
 
 // ListViewsResponse404Headers the declared response headers of an HTTP 404 response for ListViews
 type ListViewsResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ListViewsResponse contains the raw HTTP response and any decoded response body.
 type ListViewsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ViewList
@@ -25864,16 +28170,21 @@ func (r ListViewsResponse) ContentType() string {
 
 // ResolveViewResponse404Headers the declared response headers of an HTTP 404 response for ResolveView
 type ResolveViewResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ResolveViewResponse422Headers the declared response headers of an HTTP 422 response for ResolveView
 type ResolveViewResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ResolveViewResponse contains the raw HTTP response and any decoded response body.
 type ResolveViewResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *ViewResolution
@@ -25931,8 +28242,11 @@ func (r ResolveViewResponse) ContentType() string {
 	return ""
 }
 
+// GetVersionResponse contains the raw HTTP response and any decoded response body.
 type GetVersionResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *VersionInfo
@@ -25974,16 +28288,21 @@ func (r GetVersionResponse) ContentType() string {
 
 // ReceiveGitWebhookResponse401Headers the declared response headers of an HTTP 401 response for ReceiveGitWebhook
 type ReceiveGitWebhookResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
 // ReceiveGitWebhookResponse404Headers the declared response headers of an HTTP 404 response for ReceiveGitWebhook
 type ReceiveGitWebhookResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ReceiveGitWebhookResponse contains the raw HTTP response and any decoded response body.
 type ReceiveGitWebhookResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON202 the response for an HTTP 202 `application/json` response
 	JSON202 *JobAccepted
@@ -26041,8 +28360,11 @@ func (r ReceiveGitWebhookResponse) ContentType() string {
 	return ""
 }
 
+// HealthzResponse contains the raw HTTP response and any decoded response body.
 type HealthzResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Health
@@ -26082,8 +28404,11 @@ func (r HealthzResponse) ContentType() string {
 	return ""
 }
 
+// MetricsResponse contains the raw HTTP response and any decoded response body.
 type MetricsResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 }
 
@@ -26118,11 +28443,15 @@ func (r MetricsResponse) ContentType() string {
 
 // ReadyzResponse503Headers the declared response headers of an HTTP 503 response for Readyz
 type ReadyzResponse503Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
 	XRequestId string
 }
 
+// ReadyzResponse contains the raw HTTP response and any decoded response body.
 type ReadyzResponse struct {
-	Body         []byte
+	// Body contains the decoded or raw HTTP response body.
+	Body []byte
+	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Health
@@ -26173,6 +28502,8 @@ func (r ReadyzResponse) ContentType() string {
 
 // ListPlatformAuditLogsWithResponse performs a GET /api/v1/admin/audit-logs (the `ListPlatformAuditLogs` operationId) request.
 //
+// Returns the requested page of platform audit logs within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListPlatformAuditLogsWithResponse(ctx context.Context, params *ListPlatformAuditLogsParams, reqEditors ...RequestEditorFn) (*ListPlatformAuditLogsResponse, error) {
 	rsp, err := c.ListPlatformAuditLogs(ctx, params, reqEditors...)
@@ -26183,6 +28514,8 @@ func (c *ClientWithResponses) ListPlatformAuditLogsWithResponse(ctx context.Cont
 }
 
 // ListGlobalCredentialsWithResponse performs a GET /api/v1/admin/global-credentials (the `ListGlobalCredentials` operationId) request.
+//
+// Returns the requested page of global credentials within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListGlobalCredentialsWithResponse(ctx context.Context, params *ListGlobalCredentialsParams, reqEditors ...RequestEditorFn) (*ListGlobalCredentialsResponse, error) {
@@ -26196,6 +28529,8 @@ func (c *ClientWithResponses) ListGlobalCredentialsWithResponse(ctx context.Cont
 // CreateGlobalCredentialWithBodyWithResponse performs a POST /api/v1/admin/global-credentials (the `CreateGlobalCredential` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates global credential within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateGlobalCredentialWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateGlobalCredentialResponse, error) {
 	rsp, err := c.CreateGlobalCredentialWithBody(ctx, contentType, body, reqEditors...)
@@ -26207,6 +28542,8 @@ func (c *ClientWithResponses) CreateGlobalCredentialWithBodyWithResponse(ctx con
 
 // CreateGlobalCredentialWithResponse performs a POST /api/v1/admin/global-credentials (the `CreateGlobalCredential` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates global credential within the authorized request scope.
 func (c *ClientWithResponses) CreateGlobalCredentialWithResponse(ctx context.Context, body CreateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateGlobalCredentialResponse, error) {
 	rsp, err := c.CreateGlobalCredential(ctx, body, reqEditors...)
 	if err != nil {
@@ -26216,6 +28553,8 @@ func (c *ClientWithResponses) CreateGlobalCredentialWithResponse(ctx context.Con
 }
 
 // DeleteGlobalCredentialWithResponse performs a DELETE /api/v1/admin/global-credentials/{credentialId} (the `DeleteGlobalCredential` operationId) request.
+//
+// Deletes the selected global credential within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteGlobalCredentialWithResponse(ctx context.Context, credentialId CredentialId, params *DeleteGlobalCredentialParams, reqEditors ...RequestEditorFn) (*DeleteGlobalCredentialResponse, error) {
@@ -26229,6 +28568,8 @@ func (c *ClientWithResponses) DeleteGlobalCredentialWithResponse(ctx context.Con
 // UpdateGlobalCredentialWithBodyWithResponse performs a PATCH /api/v1/admin/global-credentials/{credentialId} (the `UpdateGlobalCredential` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected global credential within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateGlobalCredentialWithBodyWithResponse(ctx context.Context, credentialId CredentialId, params *UpdateGlobalCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateGlobalCredentialResponse, error) {
 	rsp, err := c.UpdateGlobalCredentialWithBody(ctx, credentialId, params, contentType, body, reqEditors...)
@@ -26240,6 +28581,8 @@ func (c *ClientWithResponses) UpdateGlobalCredentialWithBodyWithResponse(ctx con
 
 // UpdateGlobalCredentialWithResponse performs a PATCH /api/v1/admin/global-credentials/{credentialId} (the `UpdateGlobalCredential` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected global credential within the authorized request scope.
 func (c *ClientWithResponses) UpdateGlobalCredentialWithResponse(ctx context.Context, credentialId CredentialId, params *UpdateGlobalCredentialParams, body UpdateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateGlobalCredentialResponse, error) {
 	rsp, err := c.UpdateGlobalCredential(ctx, credentialId, params, body, reqEditors...)
 	if err != nil {
@@ -26250,6 +28593,8 @@ func (c *ClientWithResponses) UpdateGlobalCredentialWithResponse(ctx context.Con
 
 // RotateGlobalCredentialWithBodyWithResponse performs a POST /api/v1/admin/global-credentials/{credentialId}:rotate (the `RotateGlobalCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the rotate global credential workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RotateGlobalCredentialWithBodyWithResponse(ctx context.Context, credentialId CredentialId, params *RotateGlobalCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RotateGlobalCredentialResponse, error) {
@@ -26262,6 +28607,8 @@ func (c *ClientWithResponses) RotateGlobalCredentialWithBodyWithResponse(ctx con
 
 // RotateGlobalCredentialWithResponse performs a POST /api/v1/admin/global-credentials/{credentialId}:rotate (the `RotateGlobalCredential` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the rotate global credential workflow within the authorized request scope.
 func (c *ClientWithResponses) RotateGlobalCredentialWithResponse(ctx context.Context, credentialId CredentialId, params *RotateGlobalCredentialParams, body RotateGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*RotateGlobalCredentialResponse, error) {
 	rsp, err := c.RotateGlobalCredential(ctx, credentialId, params, body, reqEditors...)
 	if err != nil {
@@ -26272,6 +28619,8 @@ func (c *ClientWithResponses) RotateGlobalCredentialWithResponse(ctx context.Con
 
 // TestGlobalCredentialWithBodyWithResponse performs a POST /api/v1/admin/global-credentials/{credentialId}:test (the `TestGlobalCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Tests global credential within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) TestGlobalCredentialWithBodyWithResponse(ctx context.Context, credentialId CredentialId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TestGlobalCredentialResponse, error) {
@@ -26284,6 +28633,8 @@ func (c *ClientWithResponses) TestGlobalCredentialWithBodyWithResponse(ctx conte
 
 // TestGlobalCredentialWithResponse performs a POST /api/v1/admin/global-credentials/{credentialId}:test (the `TestGlobalCredential` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Tests global credential within the authorized request scope.
 func (c *ClientWithResponses) TestGlobalCredentialWithResponse(ctx context.Context, credentialId CredentialId, body TestGlobalCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*TestGlobalCredentialResponse, error) {
 	rsp, err := c.TestGlobalCredential(ctx, credentialId, body, reqEditors...)
 	if err != nil {
@@ -26293,6 +28644,8 @@ func (c *ClientWithResponses) TestGlobalCredentialWithResponse(ctx context.Conte
 }
 
 // ListPlatformJobsWithResponse performs a GET /api/v1/admin/jobs (the `ListPlatformJobs` operationId) request.
+//
+// Returns the requested page of platform jobs within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListPlatformJobsWithResponse(ctx context.Context, params *ListPlatformJobsParams, reqEditors ...RequestEditorFn) (*ListPlatformJobsResponse, error) {
@@ -26305,6 +28658,8 @@ func (c *ClientWithResponses) ListPlatformJobsWithResponse(ctx context.Context, 
 
 // GetPlatformJobWithResponse performs a GET /api/v1/admin/jobs/{jobId} (the `GetPlatformJob` operationId) request.
 //
+// Returns the selected platform job within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetPlatformJobWithResponse(ctx context.Context, jobId JobId, reqEditors ...RequestEditorFn) (*GetPlatformJobResponse, error) {
 	rsp, err := c.GetPlatformJob(ctx, jobId, reqEditors...)
@@ -26315,6 +28670,8 @@ func (c *ClientWithResponses) GetPlatformJobWithResponse(ctx context.Context, jo
 }
 
 // ListProducerProfilesWithResponse performs a GET /api/v1/admin/producer-profiles (the `ListProducerProfiles` operationId) request.
+//
+// Returns the requested page of producer profiles within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListProducerProfilesWithResponse(ctx context.Context, params *ListProducerProfilesParams, reqEditors ...RequestEditorFn) (*ListProducerProfilesResponse, error) {
@@ -26328,6 +28685,8 @@ func (c *ClientWithResponses) ListProducerProfilesWithResponse(ctx context.Conte
 // CreateProducerProfileWithBodyWithResponse performs a POST /api/v1/admin/producer-profiles (the `CreateProducerProfile` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates producer profile within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateProducerProfileWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateProducerProfileResponse, error) {
 	rsp, err := c.CreateProducerProfileWithBody(ctx, contentType, body, reqEditors...)
@@ -26339,6 +28698,8 @@ func (c *ClientWithResponses) CreateProducerProfileWithBodyWithResponse(ctx cont
 
 // CreateProducerProfileWithResponse performs a POST /api/v1/admin/producer-profiles (the `CreateProducerProfile` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates producer profile within the authorized request scope.
 func (c *ClientWithResponses) CreateProducerProfileWithResponse(ctx context.Context, body CreateProducerProfileJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateProducerProfileResponse, error) {
 	rsp, err := c.CreateProducerProfile(ctx, body, reqEditors...)
 	if err != nil {
@@ -26348,6 +28709,8 @@ func (c *ClientWithResponses) CreateProducerProfileWithResponse(ctx context.Cont
 }
 
 // DeleteProducerProfileWithResponse performs a DELETE /api/v1/admin/producer-profiles/{producerProfileId} (the `DeleteProducerProfile` operationId) request.
+//
+// Deletes the selected producer profile within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteProducerProfileWithResponse(ctx context.Context, producerProfileId ProducerProfileId, params *DeleteProducerProfileParams, reqEditors ...RequestEditorFn) (*DeleteProducerProfileResponse, error) {
@@ -26359,6 +28722,8 @@ func (c *ClientWithResponses) DeleteProducerProfileWithResponse(ctx context.Cont
 }
 
 // GetProducerProfileWithResponse performs a GET /api/v1/admin/producer-profiles/{producerProfileId} (the `GetProducerProfile` operationId) request.
+//
+// Returns the selected producer profile within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetProducerProfileWithResponse(ctx context.Context, producerProfileId ProducerProfileId, reqEditors ...RequestEditorFn) (*GetProducerProfileResponse, error) {
@@ -26372,6 +28737,8 @@ func (c *ClientWithResponses) GetProducerProfileWithResponse(ctx context.Context
 // UpdateProducerProfileWithBodyWithResponse performs a PATCH /api/v1/admin/producer-profiles/{producerProfileId} (the `UpdateProducerProfile` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected producer profile within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateProducerProfileWithBodyWithResponse(ctx context.Context, producerProfileId ProducerProfileId, params *UpdateProducerProfileParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateProducerProfileResponse, error) {
 	rsp, err := c.UpdateProducerProfileWithBody(ctx, producerProfileId, params, contentType, body, reqEditors...)
@@ -26383,6 +28750,8 @@ func (c *ClientWithResponses) UpdateProducerProfileWithBodyWithResponse(ctx cont
 
 // UpdateProducerProfileWithResponse performs a PATCH /api/v1/admin/producer-profiles/{producerProfileId} (the `UpdateProducerProfile` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected producer profile within the authorized request scope.
 func (c *ClientWithResponses) UpdateProducerProfileWithResponse(ctx context.Context, producerProfileId ProducerProfileId, params *UpdateProducerProfileParams, body UpdateProducerProfileJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateProducerProfileResponse, error) {
 	rsp, err := c.UpdateProducerProfile(ctx, producerProfileId, params, body, reqEditors...)
 	if err != nil {
@@ -26392,6 +28761,8 @@ func (c *ClientWithResponses) UpdateProducerProfileWithResponse(ctx context.Cont
 }
 
 // GetPlatformSettingsWithResponse performs a GET /api/v1/admin/settings (the `GetPlatformSettings` operationId) request.
+//
+// Returns the selected platform settings within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetPlatformSettingsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetPlatformSettingsResponse, error) {
@@ -26405,6 +28776,8 @@ func (c *ClientWithResponses) GetPlatformSettingsWithResponse(ctx context.Contex
 // UpdatePlatformSettingsWithBodyWithResponse performs a PATCH /api/v1/admin/settings (the `UpdatePlatformSettings` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected platform settings within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdatePlatformSettingsWithBodyWithResponse(ctx context.Context, params *UpdatePlatformSettingsParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdatePlatformSettingsResponse, error) {
 	rsp, err := c.UpdatePlatformSettingsWithBody(ctx, params, contentType, body, reqEditors...)
@@ -26416,6 +28789,8 @@ func (c *ClientWithResponses) UpdatePlatformSettingsWithBodyWithResponse(ctx con
 
 // UpdatePlatformSettingsWithResponse performs a PATCH /api/v1/admin/settings (the `UpdatePlatformSettings` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected platform settings within the authorized request scope.
 func (c *ClientWithResponses) UpdatePlatformSettingsWithResponse(ctx context.Context, params *UpdatePlatformSettingsParams, body UpdatePlatformSettingsJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdatePlatformSettingsResponse, error) {
 	rsp, err := c.UpdatePlatformSettings(ctx, params, body, reqEditors...)
 	if err != nil {
@@ -26425,6 +28800,8 @@ func (c *ClientWithResponses) UpdatePlatformSettingsWithResponse(ctx context.Con
 }
 
 // ListTenantsWithResponse performs a GET /api/v1/admin/tenants (the `ListTenants` operationId) request.
+//
+// Returns the requested page of tenants within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListTenantsWithResponse(ctx context.Context, params *ListTenantsParams, reqEditors ...RequestEditorFn) (*ListTenantsResponse, error) {
@@ -26438,6 +28815,8 @@ func (c *ClientWithResponses) ListTenantsWithResponse(ctx context.Context, param
 // CreateTenantWithBodyWithResponse performs a POST /api/v1/admin/tenants (the `CreateTenant` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates tenant within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateTenantWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTenantResponse, error) {
 	rsp, err := c.CreateTenantWithBody(ctx, contentType, body, reqEditors...)
@@ -26449,6 +28828,8 @@ func (c *ClientWithResponses) CreateTenantWithBodyWithResponse(ctx context.Conte
 
 // CreateTenantWithResponse performs a POST /api/v1/admin/tenants (the `CreateTenant` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates tenant within the authorized request scope.
 func (c *ClientWithResponses) CreateTenantWithResponse(ctx context.Context, body CreateTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTenantResponse, error) {
 	rsp, err := c.CreateTenant(ctx, body, reqEditors...)
 	if err != nil {
@@ -26459,6 +28840,8 @@ func (c *ClientWithResponses) CreateTenantWithResponse(ctx context.Context, body
 
 // DeleteTenantWithBodyWithResponse performs a DELETE /api/v1/admin/tenants/{tenantSlug} (the `DeleteTenant` operationId) request,
 // with any type of body and a specified content type.
+//
+// Deletes the selected tenant within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteTenantWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, params *DeleteTenantParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteTenantResponse, error) {
@@ -26471,6 +28854,8 @@ func (c *ClientWithResponses) DeleteTenantWithBodyWithResponse(ctx context.Conte
 
 // DeleteTenantWithResponse performs a DELETE /api/v1/admin/tenants/{tenantSlug} (the `DeleteTenant` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Deletes the selected tenant within the authorized request scope.
 func (c *ClientWithResponses) DeleteTenantWithResponse(ctx context.Context, tenantSlug TenantSlug, params *DeleteTenantParams, body DeleteTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteTenantResponse, error) {
 	rsp, err := c.DeleteTenant(ctx, tenantSlug, params, body, reqEditors...)
 	if err != nil {
@@ -26481,6 +28866,8 @@ func (c *ClientWithResponses) DeleteTenantWithResponse(ctx context.Context, tena
 
 // UpdateTenantWithBodyWithResponse performs a PATCH /api/v1/admin/tenants/{tenantSlug} (the `UpdateTenant` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected tenant within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateTenantWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTenantResponse, error) {
@@ -26493,6 +28880,8 @@ func (c *ClientWithResponses) UpdateTenantWithBodyWithResponse(ctx context.Conte
 
 // UpdateTenantWithResponse performs a PATCH /api/v1/admin/tenants/{tenantSlug} (the `UpdateTenant` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected tenant within the authorized request scope.
 func (c *ClientWithResponses) UpdateTenantWithResponse(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantParams, body UpdateTenantJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTenantResponse, error) {
 	rsp, err := c.UpdateTenant(ctx, tenantSlug, params, body, reqEditors...)
 	if err != nil {
@@ -26503,6 +28892,8 @@ func (c *ClientWithResponses) UpdateTenantWithResponse(ctx context.Context, tena
 
 // PutTenantMemberAsPlatformAdminWithBodyWithResponse performs a PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId} (the `PutTenantMemberAsPlatformAdmin` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates or replaces the selected tenant member as platform admin within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PutTenantMemberAsPlatformAdminWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutTenantMemberAsPlatformAdminResponse, error) {
@@ -26515,6 +28906,8 @@ func (c *ClientWithResponses) PutTenantMemberAsPlatformAdminWithBodyWithResponse
 
 // PutTenantMemberAsPlatformAdminWithResponse performs a PUT /api/v1/admin/tenants/{tenantSlug}/members/{userId} (the `PutTenantMemberAsPlatformAdmin` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates or replaces the selected tenant member as platform admin within the authorized request scope.
 func (c *ClientWithResponses) PutTenantMemberAsPlatformAdminWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, body PutTenantMemberAsPlatformAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*PutTenantMemberAsPlatformAdminResponse, error) {
 	rsp, err := c.PutTenantMemberAsPlatformAdmin(ctx, tenantSlug, userId, body, reqEditors...)
 	if err != nil {
@@ -26524,6 +28917,8 @@ func (c *ClientWithResponses) PutTenantMemberAsPlatformAdminWithResponse(ctx con
 }
 
 // ListUsersWithResponse performs a GET /api/v1/admin/users (the `ListUsers` operationId) request.
+//
+// Returns the requested page of users within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListUsersWithResponse(ctx context.Context, params *ListUsersParams, reqEditors ...RequestEditorFn) (*ListUsersResponse, error) {
@@ -26537,6 +28932,8 @@ func (c *ClientWithResponses) ListUsersWithResponse(ctx context.Context, params 
 // CreateUserWithBodyWithResponse performs a POST /api/v1/admin/users (the `CreateUser` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates user within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateUserWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserResponse, error) {
 	rsp, err := c.CreateUserWithBody(ctx, contentType, body, reqEditors...)
@@ -26548,6 +28945,8 @@ func (c *ClientWithResponses) CreateUserWithBodyWithResponse(ctx context.Context
 
 // CreateUserWithResponse performs a POST /api/v1/admin/users (the `CreateUser` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates user within the authorized request scope.
 func (c *ClientWithResponses) CreateUserWithResponse(ctx context.Context, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUserResponse, error) {
 	rsp, err := c.CreateUser(ctx, body, reqEditors...)
 	if err != nil {
@@ -26558,6 +28957,8 @@ func (c *ClientWithResponses) CreateUserWithResponse(ctx context.Context, body C
 
 // UpdateUserWithBodyWithResponse performs a PATCH /api/v1/admin/users/{userId} (the `UpdateUser` operationId) request,
 // with any type of body and a specified content type.
+//
+// Updates the selected user within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateUserWithBodyWithResponse(ctx context.Context, userId UserId, params *UpdateUserParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
@@ -26570,6 +28971,8 @@ func (c *ClientWithResponses) UpdateUserWithBodyWithResponse(ctx context.Context
 
 // UpdateUserWithResponse performs a PATCH /api/v1/admin/users/{userId} (the `UpdateUser` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected user within the authorized request scope.
 func (c *ClientWithResponses) UpdateUserWithResponse(ctx context.Context, userId UserId, params *UpdateUserParams, body UpdateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserResponse, error) {
 	rsp, err := c.UpdateUser(ctx, userId, params, body, reqEditors...)
 	if err != nil {
@@ -26579,6 +28982,8 @@ func (c *ClientWithResponses) UpdateUserWithResponse(ctx context.Context, userId
 }
 
 // GetCsrfTokenWithResponse performs a GET /api/v1/auth/csrf (the `GetCsrfToken` operationId) request.
+//
+// Returns a CSRF token bound to the current authenticated browser session.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetCsrfTokenWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCsrfTokenResponse, error) {
@@ -26592,6 +28997,8 @@ func (c *ClientWithResponses) GetCsrfTokenWithResponse(ctx context.Context, reqE
 // LoginWithBodyWithResponse performs a POST /api/v1/auth/login (the `Login` operationId) request,
 // with any type of body and a specified content type.
 //
+// Authenticates local credentials and creates a browser session.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) LoginWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LoginResponse, error) {
 	rsp, err := c.LoginWithBody(ctx, contentType, body, reqEditors...)
@@ -26603,6 +29010,8 @@ func (c *ClientWithResponses) LoginWithBodyWithResponse(ctx context.Context, con
 
 // LoginWithResponse performs a POST /api/v1/auth/login (the `Login` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Authenticates local credentials and creates a browser session.
 func (c *ClientWithResponses) LoginWithResponse(ctx context.Context, body LoginJSONRequestBody, reqEditors ...RequestEditorFn) (*LoginResponse, error) {
 	rsp, err := c.Login(ctx, body, reqEditors...)
 	if err != nil {
@@ -26612,6 +29021,8 @@ func (c *ClientWithResponses) LoginWithResponse(ctx context.Context, body LoginJ
 }
 
 // LogoutWithResponse performs a POST /api/v1/auth/logout (the `Logout` operationId) request.
+//
+// Revokes the current browser session and clears its session cookie.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) LogoutWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*LogoutResponse, error) {
@@ -26624,6 +29035,8 @@ func (c *ClientWithResponses) LogoutWithResponse(ctx context.Context, reqEditors
 
 // GetMeWithResponse performs a GET /api/v1/auth/me (the `GetMe` operationId) request.
 //
+// Returns the authenticated principal and tenant memberships.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetMeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMeResponse, error) {
 	rsp, err := c.GetMe(ctx, reqEditors...)
@@ -26634,6 +29047,8 @@ func (c *ClientWithResponses) GetMeWithResponse(ctx context.Context, reqEditors 
 }
 
 // GetMyPreferencesWithResponse performs a GET /api/v1/auth/me/preferences (the `GetMyPreferences` operationId) request.
+//
+// Returns the selected my preferences within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetMyPreferencesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMyPreferencesResponse, error) {
@@ -26647,6 +29062,8 @@ func (c *ClientWithResponses) GetMyPreferencesWithResponse(ctx context.Context, 
 // UpdateMyPreferencesWithBodyWithResponse performs a PATCH /api/v1/auth/me/preferences (the `UpdateMyPreferences` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected my preferences within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateMyPreferencesWithBodyWithResponse(ctx context.Context, params *UpdateMyPreferencesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateMyPreferencesResponse, error) {
 	rsp, err := c.UpdateMyPreferencesWithBody(ctx, params, contentType, body, reqEditors...)
@@ -26658,6 +29075,8 @@ func (c *ClientWithResponses) UpdateMyPreferencesWithBodyWithResponse(ctx contex
 
 // UpdateMyPreferencesWithResponse performs a PATCH /api/v1/auth/me/preferences (the `UpdateMyPreferences` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected my preferences within the authorized request scope.
 func (c *ClientWithResponses) UpdateMyPreferencesWithResponse(ctx context.Context, params *UpdateMyPreferencesParams, body UpdateMyPreferencesJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateMyPreferencesResponse, error) {
 	rsp, err := c.UpdateMyPreferences(ctx, params, body, reqEditors...)
 	if err != nil {
@@ -26667,6 +29086,8 @@ func (c *ClientWithResponses) UpdateMyPreferencesWithResponse(ctx context.Contex
 }
 
 // DownloadSignedContentWithResponse performs a GET /api/v1/content/{token} (the `DownloadSignedContent` operationId) request.
+//
+// Downloads signed content within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DownloadSignedContentWithResponse(ctx context.Context, token ContentToken, reqEditors ...RequestEditorFn) (*DownloadSignedContentResponse, error) {
@@ -26679,6 +29100,8 @@ func (c *ClientWithResponses) DownloadSignedContentWithResponse(ctx context.Cont
 
 // GetOpenApiContractWithResponse performs a GET /api/v1/openapi.yaml (the `GetOpenApiContract` operationId) request.
 //
+// Returns the exact OpenAPI contract embedded in this server build.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetOpenApiContractWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetOpenApiContractResponse, error) {
 	rsp, err := c.GetOpenApiContract(ctx, reqEditors...)
@@ -26690,6 +29113,8 @@ func (c *ClientWithResponses) GetOpenApiContractWithResponse(ctx context.Context
 
 // GetPublicServiceWithResponse performs a GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug} (the `GetPublicService` operationId) request.
 //
+// Returns the selected public service within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetPublicServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*GetPublicServiceResponse, error) {
 	rsp, err := c.GetPublicService(ctx, tenantSlug, serviceSlug, reqEditors...)
@@ -26700,6 +29125,8 @@ func (c *ClientWithResponses) GetPublicServiceWithResponse(ctx context.Context, 
 }
 
 // GetPublicAssetWithResponse performs a GET /api/v1/public/t/{tenantSlug}/services/{serviceSlug}/assets/{kindId}/{assetName} (the `GetPublicAsset` operationId) request.
+//
+// Returns the selected public asset within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetPublicAssetWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, kindId KindId, assetName AssetName, reqEditors ...RequestEditorFn) (*GetPublicAssetResponse, error) {
@@ -26713,6 +29140,8 @@ func (c *ClientWithResponses) GetPublicAssetWithResponse(ctx context.Context, te
 // ResolvePublicViewWithBodyWithResponse performs a POST /api/v1/public/t/{tenantSlug}/views:resolve (the `ResolvePublicView` operationId) request,
 // with any type of body and a specified content type.
 //
+// Resolves public view within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ResolvePublicViewWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResolvePublicViewResponse, error) {
 	rsp, err := c.ResolvePublicViewWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -26724,6 +29153,8 @@ func (c *ClientWithResponses) ResolvePublicViewWithBodyWithResponse(ctx context.
 
 // ResolvePublicViewWithResponse performs a POST /api/v1/public/t/{tenantSlug}/views:resolve (the `ResolvePublicView` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Resolves public view within the authorized request scope.
 func (c *ClientWithResponses) ResolvePublicViewWithResponse(ctx context.Context, tenantSlug TenantSlug, body ResolvePublicViewJSONRequestBody, reqEditors ...RequestEditorFn) (*ResolvePublicViewResponse, error) {
 	rsp, err := c.ResolvePublicView(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -26733,6 +29164,8 @@ func (c *ClientWithResponses) ResolvePublicViewWithResponse(ctx context.Context,
 }
 
 // GetSharedViewWithResponse performs a GET /api/v1/shared/{shareToken} (the `GetSharedView` operationId) request.
+//
+// Returns the selected shared view within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetSharedViewWithResponse(ctx context.Context, shareToken ShareToken, reqEditors ...RequestEditorFn) (*GetSharedViewResponse, error) {
@@ -26744,6 +29177,8 @@ func (c *ClientWithResponses) GetSharedViewWithResponse(ctx context.Context, sha
 }
 
 // ListAssetKindsWithResponse performs a GET /api/v1/t/{tenantSlug}/asset-kinds (the `ListAssetKinds` operationId) request.
+//
+// Returns the requested page of asset kinds within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListAssetKindsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListAssetKindsResponse, error) {
@@ -26757,6 +29192,8 @@ func (c *ClientWithResponses) ListAssetKindsWithResponse(ctx context.Context, te
 // UpdateAssetKindStateWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId} (the `UpdateAssetKindState` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected asset kind state within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateAssetKindStateWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, kindId KindId, params *UpdateAssetKindStateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateAssetKindStateResponse, error) {
 	rsp, err := c.UpdateAssetKindStateWithBody(ctx, tenantSlug, kindId, params, contentType, body, reqEditors...)
@@ -26768,6 +29205,8 @@ func (c *ClientWithResponses) UpdateAssetKindStateWithBodyWithResponse(ctx conte
 
 // UpdateAssetKindStateWithResponse performs a PATCH /api/v1/t/{tenantSlug}/asset-kinds/{kindId} (the `UpdateAssetKindState` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected asset kind state within the authorized request scope.
 func (c *ClientWithResponses) UpdateAssetKindStateWithResponse(ctx context.Context, tenantSlug TenantSlug, kindId KindId, params *UpdateAssetKindStateParams, body UpdateAssetKindStateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateAssetKindStateResponse, error) {
 	rsp, err := c.UpdateAssetKindState(ctx, tenantSlug, kindId, params, body, reqEditors...)
 	if err != nil {
@@ -26777,6 +29216,8 @@ func (c *ClientWithResponses) UpdateAssetKindStateWithResponse(ctx context.Conte
 }
 
 // GetAssetVersionWithResponse performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId} (the `GetAssetVersion` operationId) request.
+//
+// Returns the selected asset version within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetAssetVersionWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, reqEditors ...RequestEditorFn) (*GetAssetVersionResponse, error) {
@@ -26789,6 +29230,8 @@ func (c *ClientWithResponses) GetAssetVersionWithResponse(ctx context.Context, t
 
 // ListAssetVersionItemsWithResponse performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/items (the `ListAssetVersionItems` operationId) request.
 //
+// Returns the requested page of asset version items within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListAssetVersionItemsWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *ListAssetVersionItemsParams, reqEditors ...RequestEditorFn) (*ListAssetVersionItemsResponse, error) {
 	rsp, err := c.ListAssetVersionItems(ctx, tenantSlug, versionId, params, reqEditors...)
@@ -26800,6 +29243,8 @@ func (c *ClientWithResponses) ListAssetVersionItemsWithResponse(ctx context.Cont
 
 // GetAssetVersionProvenanceWithResponse performs a GET /api/v1/t/{tenantSlug}/asset-versions/{versionId}/provenance (the `GetAssetVersionProvenance` operationId) request.
 //
+// Returns the selected asset version provenance within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetAssetVersionProvenanceWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, reqEditors ...RequestEditorFn) (*GetAssetVersionProvenanceResponse, error) {
 	rsp, err := c.GetAssetVersionProvenance(ctx, tenantSlug, versionId, reqEditors...)
@@ -26810,6 +29255,8 @@ func (c *ClientWithResponses) GetAssetVersionProvenanceWithResponse(ctx context.
 }
 
 // DeprecateAssetVersionWithResponse performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:deprecate (the `DeprecateAssetVersion` operationId) request.
+//
+// Performs the deprecate asset version workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeprecateAssetVersionWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *DeprecateAssetVersionParams, reqEditors ...RequestEditorFn) (*DeprecateAssetVersionResponse, error) {
@@ -26823,6 +29270,8 @@ func (c *ClientWithResponses) DeprecateAssetVersionWithResponse(ctx context.Cont
 // PublishAssetVersionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish (the `PublishAssetVersion` operationId) request,
 // with any type of body and a specified content type.
 //
+// Performs the publish asset version workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PublishAssetVersionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *PublishAssetVersionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PublishAssetVersionResponse, error) {
 	rsp, err := c.PublishAssetVersionWithBody(ctx, tenantSlug, versionId, params, contentType, body, reqEditors...)
@@ -26834,6 +29283,8 @@ func (c *ClientWithResponses) PublishAssetVersionWithBodyWithResponse(ctx contex
 
 // PublishAssetVersionWithResponse performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:publish (the `PublishAssetVersion` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the publish asset version workflow within the authorized request scope.
 func (c *ClientWithResponses) PublishAssetVersionWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *PublishAssetVersionParams, body PublishAssetVersionJSONRequestBody, reqEditors ...RequestEditorFn) (*PublishAssetVersionResponse, error) {
 	rsp, err := c.PublishAssetVersion(ctx, tenantSlug, versionId, params, body, reqEditors...)
 	if err != nil {
@@ -26843,6 +29294,8 @@ func (c *ClientWithResponses) PublishAssetVersionWithResponse(ctx context.Contex
 }
 
 // RetireAssetVersionWithResponse performs a POST /api/v1/t/{tenantSlug}/asset-versions/{versionId}:retire (the `RetireAssetVersion` operationId) request.
+//
+// Performs the retire asset version workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RetireAssetVersionWithResponse(ctx context.Context, tenantSlug TenantSlug, versionId VersionId, params *RetireAssetVersionParams, reqEditors ...RequestEditorFn) (*RetireAssetVersionResponse, error) {
@@ -26854,6 +29307,8 @@ func (c *ClientWithResponses) RetireAssetVersionWithResponse(ctx context.Context
 }
 
 // GetAssetWithResponse performs a GET /api/v1/t/{tenantSlug}/assets/{assetId} (the `GetAsset` operationId) request.
+//
+// Returns the selected asset within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetAssetWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GetAssetParams, reqEditors ...RequestEditorFn) (*GetAssetResponse, error) {
@@ -26867,6 +29322,8 @@ func (c *ClientWithResponses) GetAssetWithResponse(ctx context.Context, tenantSl
 // ReorderAssetLayersWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order (the `ReorderAssetLayers` operationId) request,
 // with any type of body and a specified content type.
 //
+// Performs the reorder asset layers workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ReorderAssetLayersWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ReorderAssetLayersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReorderAssetLayersResponse, error) {
 	rsp, err := c.ReorderAssetLayersWithBody(ctx, tenantSlug, assetId, params, contentType, body, reqEditors...)
@@ -26878,6 +29335,8 @@ func (c *ClientWithResponses) ReorderAssetLayersWithBodyWithResponse(ctx context
 
 // ReorderAssetLayersWithResponse performs a PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order (the `ReorderAssetLayers` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the reorder asset layers workflow within the authorized request scope.
 func (c *ClientWithResponses) ReorderAssetLayersWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ReorderAssetLayersParams, body ReorderAssetLayersJSONRequestBody, reqEditors ...RequestEditorFn) (*ReorderAssetLayersResponse, error) {
 	rsp, err := c.ReorderAssetLayers(ctx, tenantSlug, assetId, params, body, reqEditors...)
 	if err != nil {
@@ -26887,6 +29346,8 @@ func (c *ClientWithResponses) ReorderAssetLayersWithResponse(ctx context.Context
 }
 
 // ListAssetVersionsWithResponse performs a GET /api/v1/t/{tenantSlug}/assets/{assetId}/versions (the `ListAssetVersions` operationId) request.
+//
+// Returns the requested page of asset versions within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListAssetVersionsWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *ListAssetVersionsParams, reqEditors ...RequestEditorFn) (*ListAssetVersionsResponse, error) {
@@ -26900,6 +29361,8 @@ func (c *ClientWithResponses) ListAssetVersionsWithResponse(ctx context.Context,
 // GenerateAssetWithAiWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate (the `GenerateAssetWithAi` operationId) request,
 // with any type of body and a specified content type.
 //
+// Performs the generate asset with ai workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GenerateAssetWithAiWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GenerateAssetWithAiParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GenerateAssetWithAiResponse, error) {
 	rsp, err := c.GenerateAssetWithAiWithBody(ctx, tenantSlug, assetId, params, contentType, body, reqEditors...)
@@ -26911,6 +29374,8 @@ func (c *ClientWithResponses) GenerateAssetWithAiWithBodyWithResponse(ctx contex
 
 // GenerateAssetWithAiWithResponse performs a POST /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate (the `GenerateAssetWithAi` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the generate asset with ai workflow within the authorized request scope.
 func (c *ClientWithResponses) GenerateAssetWithAiWithResponse(ctx context.Context, tenantSlug TenantSlug, assetId AssetId, params *GenerateAssetWithAiParams, body GenerateAssetWithAiJSONRequestBody, reqEditors ...RequestEditorFn) (*GenerateAssetWithAiResponse, error) {
 	rsp, err := c.GenerateAssetWithAi(ctx, tenantSlug, assetId, params, body, reqEditors...)
 	if err != nil {
@@ -26921,6 +29386,8 @@ func (c *ClientWithResponses) GenerateAssetWithAiWithResponse(ctx context.Contex
 
 // PreviewMergeWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/assets:preview-merge (the `PreviewMerge` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the preview merge workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PreviewMergeWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewMergeResponse, error) {
@@ -26933,6 +29400,8 @@ func (c *ClientWithResponses) PreviewMergeWithBodyWithResponse(ctx context.Conte
 
 // PreviewMergeWithResponse performs a POST /api/v1/t/{tenantSlug}/assets:preview-merge (the `PreviewMerge` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the preview merge workflow within the authorized request scope.
 func (c *ClientWithResponses) PreviewMergeWithResponse(ctx context.Context, tenantSlug TenantSlug, body PreviewMergeJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewMergeResponse, error) {
 	rsp, err := c.PreviewMerge(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -26943,6 +29412,8 @@ func (c *ClientWithResponses) PreviewMergeWithResponse(ctx context.Context, tena
 
 // PushAssetRevisionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/assets:push (the `PushAssetRevision` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the push asset revision workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PushAssetRevisionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, params *PushAssetRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PushAssetRevisionResponse, error) {
@@ -26955,6 +29426,8 @@ func (c *ClientWithResponses) PushAssetRevisionWithBodyWithResponse(ctx context.
 
 // PushAssetRevisionWithResponse performs a POST /api/v1/t/{tenantSlug}/assets:push (the `PushAssetRevision` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the push asset revision workflow within the authorized request scope.
 func (c *ClientWithResponses) PushAssetRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, params *PushAssetRevisionParams, body PushAssetRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*PushAssetRevisionResponse, error) {
 	rsp, err := c.PushAssetRevision(ctx, tenantSlug, params, body, reqEditors...)
 	if err != nil {
@@ -26964,6 +29437,8 @@ func (c *ClientWithResponses) PushAssetRevisionWithResponse(ctx context.Context,
 }
 
 // ListAuditLogsWithResponse performs a GET /api/v1/t/{tenantSlug}/audit-logs (the `ListAuditLogs` operationId) request.
+//
+// Returns the requested page of audit logs within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListAuditLogsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListAuditLogsParams, reqEditors ...RequestEditorFn) (*ListAuditLogsResponse, error) {
@@ -26975,6 +29450,8 @@ func (c *ClientWithResponses) ListAuditLogsWithResponse(ctx context.Context, ten
 }
 
 // ListBreakingTodosWithResponse performs a GET /api/v1/t/{tenantSlug}/breaking-todos (the `ListBreakingTodos` operationId) request.
+//
+// Returns the requested page of breaking todos within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListBreakingTodosWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListBreakingTodosParams, reqEditors ...RequestEditorFn) (*ListBreakingTodosResponse, error) {
@@ -26988,6 +29465,8 @@ func (c *ClientWithResponses) ListBreakingTodosWithResponse(ctx context.Context,
 // AcknowledgeBreakingTodoWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack (the `AcknowledgeBreakingTodo` operationId) request,
 // with any type of body and a specified content type.
 //
+// Performs the acknowledge breaking todo workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) AcknowledgeBreakingTodoWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, todoId TodoId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AcknowledgeBreakingTodoResponse, error) {
 	rsp, err := c.AcknowledgeBreakingTodoWithBody(ctx, tenantSlug, todoId, contentType, body, reqEditors...)
@@ -26999,6 +29478,8 @@ func (c *ClientWithResponses) AcknowledgeBreakingTodoWithBodyWithResponse(ctx co
 
 // AcknowledgeBreakingTodoWithResponse performs a POST /api/v1/t/{tenantSlug}/breaking-todos/{todoId}:ack (the `AcknowledgeBreakingTodo` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the acknowledge breaking todo workflow within the authorized request scope.
 func (c *ClientWithResponses) AcknowledgeBreakingTodoWithResponse(ctx context.Context, tenantSlug TenantSlug, todoId TodoId, body AcknowledgeBreakingTodoJSONRequestBody, reqEditors ...RequestEditorFn) (*AcknowledgeBreakingTodoResponse, error) {
 	rsp, err := c.AcknowledgeBreakingTodo(ctx, tenantSlug, todoId, body, reqEditors...)
 	if err != nil {
@@ -27008,6 +29489,8 @@ func (c *ClientWithResponses) AcknowledgeBreakingTodoWithResponse(ctx context.Co
 }
 
 // ListCredentialsWithResponse performs a GET /api/v1/t/{tenantSlug}/credentials (the `ListCredentials` operationId) request.
+//
+// Returns the requested page of credentials within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListCredentialsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListCredentialsParams, reqEditors ...RequestEditorFn) (*ListCredentialsResponse, error) {
@@ -27021,6 +29504,8 @@ func (c *ClientWithResponses) ListCredentialsWithResponse(ctx context.Context, t
 // CreateCredentialWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials (the `CreateCredential` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates credential within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateCredentialWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCredentialResponse, error) {
 	rsp, err := c.CreateCredentialWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -27032,6 +29517,8 @@ func (c *ClientWithResponses) CreateCredentialWithBodyWithResponse(ctx context.C
 
 // CreateCredentialWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials (the `CreateCredential` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates credential within the authorized request scope.
 func (c *ClientWithResponses) CreateCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCredentialResponse, error) {
 	rsp, err := c.CreateCredential(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -27041,6 +29528,8 @@ func (c *ClientWithResponses) CreateCredentialWithResponse(ctx context.Context, 
 }
 
 // DeleteCredentialWithResponse performs a DELETE /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `DeleteCredential` operationId) request.
+//
+// Deletes the selected credential within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *DeleteCredentialParams, reqEditors ...RequestEditorFn) (*DeleteCredentialResponse, error) {
@@ -27054,6 +29543,8 @@ func (c *ClientWithResponses) DeleteCredentialWithResponse(ctx context.Context, 
 // UpdateCredentialWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `UpdateCredential` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected credential within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateCredentialWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *UpdateCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateCredentialResponse, error) {
 	rsp, err := c.UpdateCredentialWithBody(ctx, tenantSlug, credentialId, params, contentType, body, reqEditors...)
@@ -27065,6 +29556,8 @@ func (c *ClientWithResponses) UpdateCredentialWithBodyWithResponse(ctx context.C
 
 // UpdateCredentialWithResponse performs a PATCH /api/v1/t/{tenantSlug}/credentials/{credentialId} (the `UpdateCredential` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected credential within the authorized request scope.
 func (c *ClientWithResponses) UpdateCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *UpdateCredentialParams, body UpdateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCredentialResponse, error) {
 	rsp, err := c.UpdateCredential(ctx, tenantSlug, credentialId, params, body, reqEditors...)
 	if err != nil {
@@ -27075,6 +29568,8 @@ func (c *ClientWithResponses) UpdateCredentialWithResponse(ctx context.Context, 
 
 // RotateCredentialWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate (the `RotateCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the rotate credential workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RotateCredentialWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *RotateCredentialParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RotateCredentialResponse, error) {
@@ -27087,6 +29582,8 @@ func (c *ClientWithResponses) RotateCredentialWithBodyWithResponse(ctx context.C
 
 // RotateCredentialWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:rotate (the `RotateCredential` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the rotate credential workflow within the authorized request scope.
 func (c *ClientWithResponses) RotateCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, params *RotateCredentialParams, body RotateCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*RotateCredentialResponse, error) {
 	rsp, err := c.RotateCredential(ctx, tenantSlug, credentialId, params, body, reqEditors...)
 	if err != nil {
@@ -27097,6 +29594,8 @@ func (c *ClientWithResponses) RotateCredentialWithResponse(ctx context.Context, 
 
 // TestCredentialWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test (the `TestCredential` operationId) request,
 // with any type of body and a specified content type.
+//
+// Tests credential within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) TestCredentialWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TestCredentialResponse, error) {
@@ -27109,6 +29608,8 @@ func (c *ClientWithResponses) TestCredentialWithBodyWithResponse(ctx context.Con
 
 // TestCredentialWithResponse performs a POST /api/v1/t/{tenantSlug}/credentials/{credentialId}:test (the `TestCredential` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Tests credential within the authorized request scope.
 func (c *ClientWithResponses) TestCredentialWithResponse(ctx context.Context, tenantSlug TenantSlug, credentialId CredentialId, body TestCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*TestCredentialResponse, error) {
 	rsp, err := c.TestCredential(ctx, tenantSlug, credentialId, body, reqEditors...)
 	if err != nil {
@@ -27119,6 +29620,8 @@ func (c *ClientWithResponses) TestCredentialWithResponse(ctx context.Context, te
 
 // RunDiffWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/diff (the `RunDiff` operationId) request,
 // with any type of body and a specified content type.
+//
+// Runs diff within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RunDiffWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RunDiffResponse, error) {
@@ -27131,6 +29634,8 @@ func (c *ClientWithResponses) RunDiffWithBodyWithResponse(ctx context.Context, t
 
 // RunDiffWithResponse performs a POST /api/v1/t/{tenantSlug}/diff (the `RunDiff` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Runs diff within the authorized request scope.
 func (c *ClientWithResponses) RunDiffWithResponse(ctx context.Context, tenantSlug TenantSlug, body RunDiffJSONRequestBody, reqEditors ...RequestEditorFn) (*RunDiffResponse, error) {
 	rsp, err := c.RunDiff(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -27140,6 +29645,8 @@ func (c *ClientWithResponses) RunDiffWithResponse(ctx context.Context, tenantSlu
 }
 
 // ListDiffRuleSetsWithResponse performs a GET /api/v1/t/{tenantSlug}/diff-rule-sets (the `ListDiffRuleSets` operationId) request.
+//
+// Returns the requested page of diff rule sets within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListDiffRuleSetsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListDiffRuleSetsResponse, error) {
@@ -27153,6 +29660,8 @@ func (c *ClientWithResponses) ListDiffRuleSetsWithResponse(ctx context.Context, 
 // CreateDiffRuleSetWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/diff-rule-sets (the `CreateDiffRuleSet` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates diff rule set within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateDiffRuleSetWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDiffRuleSetResponse, error) {
 	rsp, err := c.CreateDiffRuleSetWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -27164,6 +29673,8 @@ func (c *ClientWithResponses) CreateDiffRuleSetWithBodyWithResponse(ctx context.
 
 // CreateDiffRuleSetWithResponse performs a POST /api/v1/t/{tenantSlug}/diff-rule-sets (the `CreateDiffRuleSet` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates diff rule set within the authorized request scope.
 func (c *ClientWithResponses) CreateDiffRuleSetWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateDiffRuleSetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDiffRuleSetResponse, error) {
 	rsp, err := c.CreateDiffRuleSet(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -27173,6 +29684,8 @@ func (c *ClientWithResponses) CreateDiffRuleSetWithResponse(ctx context.Context,
 }
 
 // DeleteDiffRuleSetWithResponse performs a DELETE /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `DeleteDiffRuleSet` operationId) request.
+//
+// Deletes the selected diff rule set within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteDiffRuleSetWithResponse(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *DeleteDiffRuleSetParams, reqEditors ...RequestEditorFn) (*DeleteDiffRuleSetResponse, error) {
@@ -27186,6 +29699,8 @@ func (c *ClientWithResponses) DeleteDiffRuleSetWithResponse(ctx context.Context,
 // UpdateDiffRuleSetWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `UpdateDiffRuleSet` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected diff rule set within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateDiffRuleSetWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *UpdateDiffRuleSetParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDiffRuleSetResponse, error) {
 	rsp, err := c.UpdateDiffRuleSetWithBody(ctx, tenantSlug, ruleSetId, params, contentType, body, reqEditors...)
@@ -27197,6 +29712,8 @@ func (c *ClientWithResponses) UpdateDiffRuleSetWithBodyWithResponse(ctx context.
 
 // UpdateDiffRuleSetWithResponse performs a PATCH /api/v1/t/{tenantSlug}/diff-rule-sets/{ruleSetId} (the `UpdateDiffRuleSet` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected diff rule set within the authorized request scope.
 func (c *ClientWithResponses) UpdateDiffRuleSetWithResponse(ctx context.Context, tenantSlug TenantSlug, ruleSetId RuleSetId, params *UpdateDiffRuleSetParams, body UpdateDiffRuleSetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDiffRuleSetResponse, error) {
 	rsp, err := c.UpdateDiffRuleSet(ctx, tenantSlug, ruleSetId, params, body, reqEditors...)
 	if err != nil {
@@ -27206,6 +29723,8 @@ func (c *ClientWithResponses) UpdateDiffRuleSetWithResponse(ctx context.Context,
 }
 
 // ListDiffSnapshotsWithResponse performs a GET /api/v1/t/{tenantSlug}/diff-snapshots (the `ListDiffSnapshots` operationId) request.
+//
+// Returns the requested page of diff snapshots within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListDiffSnapshotsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListDiffSnapshotsParams, reqEditors ...RequestEditorFn) (*ListDiffSnapshotsResponse, error) {
@@ -27218,6 +29737,8 @@ func (c *ClientWithResponses) ListDiffSnapshotsWithResponse(ctx context.Context,
 
 // DeleteDiffSnapshotWithResponse performs a DELETE /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId} (the `DeleteDiffSnapshot` operationId) request.
 //
+// Deletes the selected diff snapshot within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteDiffSnapshotWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, reqEditors ...RequestEditorFn) (*DeleteDiffSnapshotResponse, error) {
 	rsp, err := c.DeleteDiffSnapshot(ctx, tenantSlug, snapshotId, reqEditors...)
@@ -27229,6 +29750,8 @@ func (c *ClientWithResponses) DeleteDiffSnapshotWithResponse(ctx context.Context
 
 // GetDiffSnapshotWithResponse performs a GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId} (the `GetDiffSnapshot` operationId) request.
 //
+// Returns the selected diff snapshot within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetDiffSnapshotWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, reqEditors ...RequestEditorFn) (*GetDiffSnapshotResponse, error) {
 	rsp, err := c.GetDiffSnapshot(ctx, tenantSlug, snapshotId, reqEditors...)
@@ -27239,6 +29762,8 @@ func (c *ClientWithResponses) GetDiffSnapshotWithResponse(ctx context.Context, t
 }
 
 // ExportDiffSnapshotWithResponse performs a GET /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/export (the `ExportDiffSnapshot` operationId) request.
+//
+// Exports diff snapshot within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ExportDiffSnapshotWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, params *ExportDiffSnapshotParams, reqEditors ...RequestEditorFn) (*ExportDiffSnapshotResponse, error) {
@@ -27252,6 +29777,8 @@ func (c *ClientWithResponses) ExportDiffSnapshotWithResponse(ctx context.Context
 // CreateDiffSnapshotShareLinkWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links (the `CreateDiffSnapshotShareLink` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates diff snapshot share link within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateDiffSnapshotShareLinkWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDiffSnapshotShareLinkResponse, error) {
 	rsp, err := c.CreateDiffSnapshotShareLinkWithBody(ctx, tenantSlug, snapshotId, contentType, body, reqEditors...)
@@ -27263,6 +29790,8 @@ func (c *ClientWithResponses) CreateDiffSnapshotShareLinkWithBodyWithResponse(ct
 
 // CreateDiffSnapshotShareLinkWithResponse performs a POST /api/v1/t/{tenantSlug}/diff-snapshots/{snapshotId}/share-links (the `CreateDiffSnapshotShareLink` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates diff snapshot share link within the authorized request scope.
 func (c *ClientWithResponses) CreateDiffSnapshotShareLinkWithResponse(ctx context.Context, tenantSlug TenantSlug, snapshotId SnapshotId, body CreateDiffSnapshotShareLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDiffSnapshotShareLinkResponse, error) {
 	rsp, err := c.CreateDiffSnapshotShareLink(ctx, tenantSlug, snapshotId, body, reqEditors...)
 	if err != nil {
@@ -27272,6 +29801,8 @@ func (c *ClientWithResponses) CreateDiffSnapshotShareLinkWithResponse(ctx contex
 }
 
 // SearchTenantUsersWithResponse performs a GET /api/v1/t/{tenantSlug}/directory/users (the `SearchTenantUsers` operationId) request.
+//
+// Searches for tenant users within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) SearchTenantUsersWithResponse(ctx context.Context, tenantSlug TenantSlug, params *SearchTenantUsersParams, reqEditors ...RequestEditorFn) (*SearchTenantUsersResponse, error) {
@@ -27284,6 +29815,8 @@ func (c *ClientWithResponses) SearchTenantUsersWithResponse(ctx context.Context,
 
 // CreateTenantExportWithResponse performs a POST /api/v1/t/{tenantSlug}/exports (the `CreateTenantExport` operationId) request.
 //
+// Creates tenant export within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateTenantExportWithResponse(ctx context.Context, tenantSlug TenantSlug, params *CreateTenantExportParams, reqEditors ...RequestEditorFn) (*CreateTenantExportResponse, error) {
 	rsp, err := c.CreateTenantExport(ctx, tenantSlug, params, reqEditors...)
@@ -27294,6 +29827,8 @@ func (c *ClientWithResponses) CreateTenantExportWithResponse(ctx context.Context
 }
 
 // ListJobsWithResponse performs a GET /api/v1/t/{tenantSlug}/jobs (the `ListJobs` operationId) request.
+//
+// Returns the requested page of jobs within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListJobsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListJobsParams, reqEditors ...RequestEditorFn) (*ListJobsResponse, error) {
@@ -27306,6 +29841,8 @@ func (c *ClientWithResponses) ListJobsWithResponse(ctx context.Context, tenantSl
 
 // GetJobWithResponse performs a GET /api/v1/t/{tenantSlug}/jobs/{jobId} (the `GetJob` operationId) request.
 //
+// Returns the selected job within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetJobWithResponse(ctx context.Context, tenantSlug TenantSlug, jobId JobId, reqEditors ...RequestEditorFn) (*GetJobResponse, error) {
 	rsp, err := c.GetJob(ctx, tenantSlug, jobId, reqEditors...)
@@ -27316,6 +29853,8 @@ func (c *ClientWithResponses) GetJobWithResponse(ctx context.Context, tenantSlug
 }
 
 // StreamJobLogsWithResponse performs a GET /api/v1/t/{tenantSlug}/jobs/{jobId}/logs (the `StreamJobLogs` operationId) request.
+//
+// Streams ordered events for job logs within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) StreamJobLogsWithResponse(ctx context.Context, tenantSlug TenantSlug, jobId JobId, params *StreamJobLogsParams, reqEditors ...RequestEditorFn) (*StreamJobLogsResponse, error) {
@@ -27328,6 +29867,8 @@ func (c *ClientWithResponses) StreamJobLogsWithResponse(ctx context.Context, ten
 
 // CancelJobWithResponse performs a POST /api/v1/t/{tenantSlug}/jobs/{jobId}:cancel (the `CancelJob` operationId) request.
 //
+// Performs the cancel job workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CancelJobWithResponse(ctx context.Context, tenantSlug TenantSlug, jobId JobId, reqEditors ...RequestEditorFn) (*CancelJobResponse, error) {
 	rsp, err := c.CancelJob(ctx, tenantSlug, jobId, reqEditors...)
@@ -27339,6 +29880,8 @@ func (c *ClientWithResponses) CancelJobWithResponse(ctx context.Context, tenantS
 
 // RetryJobWithResponse performs a POST /api/v1/t/{tenantSlug}/jobs/{jobId}:retry (the `RetryJob` operationId) request.
 //
+// Performs the retry job workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RetryJobWithResponse(ctx context.Context, tenantSlug TenantSlug, jobId JobId, params *RetryJobParams, reqEditors ...RequestEditorFn) (*RetryJobResponse, error) {
 	rsp, err := c.RetryJob(ctx, tenantSlug, jobId, params, reqEditors...)
@@ -27349,6 +29892,8 @@ func (c *ClientWithResponses) RetryJobWithResponse(ctx context.Context, tenantSl
 }
 
 // ListKnownHostsWithResponse performs a GET /api/v1/t/{tenantSlug}/known-hosts (the `ListKnownHosts` operationId) request.
+//
+// Returns the requested page of known hosts within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListKnownHostsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListKnownHostsParams, reqEditors ...RequestEditorFn) (*ListKnownHostsResponse, error) {
@@ -27362,6 +29907,8 @@ func (c *ClientWithResponses) ListKnownHostsWithResponse(ctx context.Context, te
 // CreateKnownHostWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/known-hosts (the `CreateKnownHost` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates known host within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateKnownHostWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKnownHostResponse, error) {
 	rsp, err := c.CreateKnownHostWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -27373,6 +29920,8 @@ func (c *ClientWithResponses) CreateKnownHostWithBodyWithResponse(ctx context.Co
 
 // CreateKnownHostWithResponse performs a POST /api/v1/t/{tenantSlug}/known-hosts (the `CreateKnownHost` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates known host within the authorized request scope.
 func (c *ClientWithResponses) CreateKnownHostWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateKnownHostJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKnownHostResponse, error) {
 	rsp, err := c.CreateKnownHost(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -27382,6 +29931,8 @@ func (c *ClientWithResponses) CreateKnownHostWithResponse(ctx context.Context, t
 }
 
 // GetLayerRevisionWithResponse performs a GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId} (the `GetLayerRevision` operationId) request.
+//
+// Returns the selected layer revision within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetLayerRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, reqEditors ...RequestEditorFn) (*GetLayerRevisionResponse, error) {
@@ -27393,6 +29944,8 @@ func (c *ClientWithResponses) GetLayerRevisionWithResponse(ctx context.Context, 
 }
 
 // GetReviewContextWithResponse performs a GET /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}/review-context (the `GetReviewContext` operationId) request.
+//
+// Returns the selected review context within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetReviewContextWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, reqEditors ...RequestEditorFn) (*GetReviewContextResponse, error) {
@@ -27406,6 +29959,8 @@ func (c *ClientWithResponses) GetReviewContextWithResponse(ctx context.Context, 
 // ApproveLayerRevisionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve (the `ApproveLayerRevision` operationId) request,
 // with any type of body and a specified content type.
 //
+// Performs the approve layer revision workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ApproveLayerRevisionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *ApproveLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApproveLayerRevisionResponse, error) {
 	rsp, err := c.ApproveLayerRevisionWithBody(ctx, tenantSlug, revisionId, params, contentType, body, reqEditors...)
@@ -27417,6 +29972,8 @@ func (c *ClientWithResponses) ApproveLayerRevisionWithBodyWithResponse(ctx conte
 
 // ApproveLayerRevisionWithResponse performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:approve (the `ApproveLayerRevision` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the approve layer revision workflow within the authorized request scope.
 func (c *ClientWithResponses) ApproveLayerRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *ApproveLayerRevisionParams, body ApproveLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*ApproveLayerRevisionResponse, error) {
 	rsp, err := c.ApproveLayerRevision(ctx, tenantSlug, revisionId, params, body, reqEditors...)
 	if err != nil {
@@ -27427,6 +29984,8 @@ func (c *ClientWithResponses) ApproveLayerRevisionWithResponse(ctx context.Conte
 
 // RejectLayerRevisionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject (the `RejectLayerRevision` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the reject layer revision workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RejectLayerRevisionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *RejectLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RejectLayerRevisionResponse, error) {
@@ -27439,6 +29998,8 @@ func (c *ClientWithResponses) RejectLayerRevisionWithBodyWithResponse(ctx contex
 
 // RejectLayerRevisionWithResponse performs a POST /api/v1/t/{tenantSlug}/layer-revisions/{revisionId}:reject (the `RejectLayerRevision` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the reject layer revision workflow within the authorized request scope.
 func (c *ClientWithResponses) RejectLayerRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, revisionId RevisionId, params *RejectLayerRevisionParams, body RejectLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*RejectLayerRevisionResponse, error) {
 	rsp, err := c.RejectLayerRevision(ctx, tenantSlug, revisionId, params, body, reqEditors...)
 	if err != nil {
@@ -27448,6 +30009,8 @@ func (c *ClientWithResponses) RejectLayerRevisionWithResponse(ctx context.Contex
 }
 
 // GetLayerWithResponse performs a GET /api/v1/t/{tenantSlug}/layers/{layerId} (the `GetLayer` operationId) request.
+//
+// Returns the selected layer within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetLayerWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *GetLayerParams, reqEditors ...RequestEditorFn) (*GetLayerResponse, error) {
@@ -27461,6 +30024,8 @@ func (c *ClientWithResponses) GetLayerWithResponse(ctx context.Context, tenantSl
 // UpdateLayerWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/layers/{layerId} (the `UpdateLayer` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected layer within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateLayerWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *UpdateLayerParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateLayerResponse, error) {
 	rsp, err := c.UpdateLayerWithBody(ctx, tenantSlug, layerId, params, contentType, body, reqEditors...)
@@ -27472,6 +30037,8 @@ func (c *ClientWithResponses) UpdateLayerWithBodyWithResponse(ctx context.Contex
 
 // UpdateLayerWithResponse performs a PATCH /api/v1/t/{tenantSlug}/layers/{layerId} (the `UpdateLayer` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected layer within the authorized request scope.
 func (c *ClientWithResponses) UpdateLayerWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *UpdateLayerParams, body UpdateLayerJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateLayerResponse, error) {
 	rsp, err := c.UpdateLayer(ctx, tenantSlug, layerId, params, body, reqEditors...)
 	if err != nil {
@@ -27481,6 +30048,8 @@ func (c *ClientWithResponses) UpdateLayerWithResponse(ctx context.Context, tenan
 }
 
 // ListLayerRevisionsWithResponse performs a GET /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `ListLayerRevisions` operationId) request.
+//
+// Returns the requested page of layer revisions within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListLayerRevisionsWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *ListLayerRevisionsParams, reqEditors ...RequestEditorFn) (*ListLayerRevisionsResponse, error) {
@@ -27494,6 +30063,8 @@ func (c *ClientWithResponses) ListLayerRevisionsWithResponse(ctx context.Context
 // CreateLayerRevisionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `CreateLayerRevision` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates layer revision within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateLayerRevisionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *CreateLayerRevisionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLayerRevisionResponse, error) {
 	rsp, err := c.CreateLayerRevisionWithBody(ctx, tenantSlug, layerId, params, contentType, body, reqEditors...)
@@ -27505,6 +30076,8 @@ func (c *ClientWithResponses) CreateLayerRevisionWithBodyWithResponse(ctx contex
 
 // CreateLayerRevisionWithResponse performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}/revisions (the `CreateLayerRevision` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates layer revision within the authorized request scope.
 func (c *ClientWithResponses) CreateLayerRevisionWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *CreateLayerRevisionParams, body CreateLayerRevisionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLayerRevisionResponse, error) {
 	rsp, err := c.CreateLayerRevision(ctx, tenantSlug, layerId, params, body, reqEditors...)
 	if err != nil {
@@ -27515,6 +30088,8 @@ func (c *ClientWithResponses) CreateLayerRevisionWithResponse(ctx context.Contex
 
 // RollbackLayerWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback (the `RollbackLayer` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the rollback layer workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RollbackLayerWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *RollbackLayerParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RollbackLayerResponse, error) {
@@ -27527,6 +30102,8 @@ func (c *ClientWithResponses) RollbackLayerWithBodyWithResponse(ctx context.Cont
 
 // RollbackLayerWithResponse performs a POST /api/v1/t/{tenantSlug}/layers/{layerId}:rollback (the `RollbackLayer` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the rollback layer workflow within the authorized request scope.
 func (c *ClientWithResponses) RollbackLayerWithResponse(ctx context.Context, tenantSlug TenantSlug, layerId LayerId, params *RollbackLayerParams, body RollbackLayerJSONRequestBody, reqEditors ...RequestEditorFn) (*RollbackLayerResponse, error) {
 	rsp, err := c.RollbackLayer(ctx, tenantSlug, layerId, params, body, reqEditors...)
 	if err != nil {
@@ -27536,6 +30113,8 @@ func (c *ClientWithResponses) RollbackLayerWithResponse(ctx context.Context, ten
 }
 
 // ListTenantMembersWithResponse performs a GET /api/v1/t/{tenantSlug}/members (the `ListTenantMembers` operationId) request.
+//
+// Returns the requested page of tenant members within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListTenantMembersWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListTenantMembersParams, reqEditors ...RequestEditorFn) (*ListTenantMembersResponse, error) {
@@ -27547,6 +30126,8 @@ func (c *ClientWithResponses) ListTenantMembersWithResponse(ctx context.Context,
 }
 
 // DeleteTenantMemberWithResponse performs a DELETE /api/v1/t/{tenantSlug}/members/{userId} (the `DeleteTenantMember` operationId) request.
+//
+// Deletes the selected tenant member within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteTenantMemberWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, reqEditors ...RequestEditorFn) (*DeleteTenantMemberResponse, error) {
@@ -27560,6 +30141,8 @@ func (c *ClientWithResponses) DeleteTenantMemberWithResponse(ctx context.Context
 // PutTenantMemberWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/members/{userId} (the `PutTenantMember` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates or replaces the selected tenant member within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PutTenantMemberWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutTenantMemberResponse, error) {
 	rsp, err := c.PutTenantMemberWithBody(ctx, tenantSlug, userId, contentType, body, reqEditors...)
@@ -27571,6 +30154,8 @@ func (c *ClientWithResponses) PutTenantMemberWithBodyWithResponse(ctx context.Co
 
 // PutTenantMemberWithResponse performs a PUT /api/v1/t/{tenantSlug}/members/{userId} (the `PutTenantMember` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates or replaces the selected tenant member within the authorized request scope.
 func (c *ClientWithResponses) PutTenantMemberWithResponse(ctx context.Context, tenantSlug TenantSlug, userId UserId, body PutTenantMemberJSONRequestBody, reqEditors ...RequestEditorFn) (*PutTenantMemberResponse, error) {
 	rsp, err := c.PutTenantMember(ctx, tenantSlug, userId, body, reqEditors...)
 	if err != nil {
@@ -27580,6 +30165,8 @@ func (c *ClientWithResponses) PutTenantMemberWithResponse(ctx context.Context, t
 }
 
 // ListNotificationChannelsWithResponse performs a GET /api/v1/t/{tenantSlug}/notification-channels (the `ListNotificationChannels` operationId) request.
+//
+// Returns the requested page of notification channels within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListNotificationChannelsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListNotificationChannelsResponse, error) {
@@ -27593,6 +30180,8 @@ func (c *ClientWithResponses) ListNotificationChannelsWithResponse(ctx context.C
 // CreateNotificationChannelWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels (the `CreateNotificationChannel` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates notification channel within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateNotificationChannelWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNotificationChannelResponse, error) {
 	rsp, err := c.CreateNotificationChannelWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -27604,6 +30193,8 @@ func (c *ClientWithResponses) CreateNotificationChannelWithBodyWithResponse(ctx 
 
 // CreateNotificationChannelWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels (the `CreateNotificationChannel` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates notification channel within the authorized request scope.
 func (c *ClientWithResponses) CreateNotificationChannelWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateNotificationChannelJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNotificationChannelResponse, error) {
 	rsp, err := c.CreateNotificationChannel(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -27613,6 +30204,8 @@ func (c *ClientWithResponses) CreateNotificationChannelWithResponse(ctx context.
 }
 
 // DeleteNotificationChannelWithResponse performs a DELETE /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `DeleteNotificationChannel` operationId) request.
+//
+// Deletes the selected notification channel within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteNotificationChannelWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *DeleteNotificationChannelParams, reqEditors ...RequestEditorFn) (*DeleteNotificationChannelResponse, error) {
@@ -27626,6 +30219,8 @@ func (c *ClientWithResponses) DeleteNotificationChannelWithResponse(ctx context.
 // UpdateNotificationChannelWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `UpdateNotificationChannel` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected notification channel within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateNotificationChannelWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *UpdateNotificationChannelParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNotificationChannelResponse, error) {
 	rsp, err := c.UpdateNotificationChannelWithBody(ctx, tenantSlug, channelId, params, contentType, body, reqEditors...)
@@ -27637,6 +30232,8 @@ func (c *ClientWithResponses) UpdateNotificationChannelWithBodyWithResponse(ctx 
 
 // UpdateNotificationChannelWithResponse performs a PATCH /api/v1/t/{tenantSlug}/notification-channels/{channelId} (the `UpdateNotificationChannel` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected notification channel within the authorized request scope.
 func (c *ClientWithResponses) UpdateNotificationChannelWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *UpdateNotificationChannelParams, body UpdateNotificationChannelJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNotificationChannelResponse, error) {
 	rsp, err := c.UpdateNotificationChannel(ctx, tenantSlug, channelId, params, body, reqEditors...)
 	if err != nil {
@@ -27647,6 +30244,8 @@ func (c *ClientWithResponses) UpdateNotificationChannelWithResponse(ctx context.
 
 // RotateNotificationChannelSecretWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate (the `RotateNotificationChannelSecret` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the rotate notification channel secret workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RotateNotificationChannelSecretWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *RotateNotificationChannelSecretParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RotateNotificationChannelSecretResponse, error) {
@@ -27659,6 +30258,8 @@ func (c *ClientWithResponses) RotateNotificationChannelSecretWithBodyWithRespons
 
 // RotateNotificationChannelSecretWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:rotate (the `RotateNotificationChannelSecret` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the rotate notification channel secret workflow within the authorized request scope.
 func (c *ClientWithResponses) RotateNotificationChannelSecretWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, params *RotateNotificationChannelSecretParams, body RotateNotificationChannelSecretJSONRequestBody, reqEditors ...RequestEditorFn) (*RotateNotificationChannelSecretResponse, error) {
 	rsp, err := c.RotateNotificationChannelSecret(ctx, tenantSlug, channelId, params, body, reqEditors...)
 	if err != nil {
@@ -27668,6 +30269,8 @@ func (c *ClientWithResponses) RotateNotificationChannelSecretWithResponse(ctx co
 }
 
 // TestNotificationChannelWithResponse performs a POST /api/v1/t/{tenantSlug}/notification-channels/{channelId}:test (the `TestNotificationChannel` operationId) request.
+//
+// Tests notification channel within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) TestNotificationChannelWithResponse(ctx context.Context, tenantSlug TenantSlug, channelId ChannelId, reqEditors ...RequestEditorFn) (*TestNotificationChannelResponse, error) {
@@ -27680,6 +30283,8 @@ func (c *ClientWithResponses) TestNotificationChannelWithResponse(ctx context.Co
 
 // ListNotificationsWithResponse performs a GET /api/v1/t/{tenantSlug}/notifications (the `ListNotifications` operationId) request.
 //
+// Returns the requested page of notifications within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListNotificationsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListNotificationsParams, reqEditors ...RequestEditorFn) (*ListNotificationsResponse, error) {
 	rsp, err := c.ListNotifications(ctx, tenantSlug, params, reqEditors...)
@@ -27690,6 +30295,8 @@ func (c *ClientWithResponses) ListNotificationsWithResponse(ctx context.Context,
 }
 
 // MarkNotificationReadWithResponse performs a POST /api/v1/t/{tenantSlug}/notifications/{notificationId}:read (the `MarkNotificationRead` operationId) request.
+//
+// Performs the mark notification read workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) MarkNotificationReadWithResponse(ctx context.Context, tenantSlug TenantSlug, notificationId NotificationId, reqEditors ...RequestEditorFn) (*MarkNotificationReadResponse, error) {
@@ -27702,6 +30309,8 @@ func (c *ClientWithResponses) MarkNotificationReadWithResponse(ctx context.Conte
 
 // MarkAllNotificationsReadWithResponse performs a POST /api/v1/t/{tenantSlug}/notifications:read-all (the `MarkAllNotificationsRead` operationId) request.
 //
+// Performs the mark all notifications read workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) MarkAllNotificationsReadWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*MarkAllNotificationsReadResponse, error) {
 	rsp, err := c.MarkAllNotificationsRead(ctx, tenantSlug, reqEditors...)
@@ -27713,6 +30322,8 @@ func (c *ClientWithResponses) MarkAllNotificationsReadWithResponse(ctx context.C
 
 // ListAvailableProducerProfilesWithResponse performs a GET /api/v1/t/{tenantSlug}/producer-profiles (the `ListAvailableProducerProfiles` operationId) request.
 //
+// Returns the requested page of available producer profiles within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListAvailableProducerProfilesWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListAvailableProducerProfilesResponse, error) {
 	rsp, err := c.ListAvailableProducerProfiles(ctx, tenantSlug, reqEditors...)
@@ -27723,6 +30334,8 @@ func (c *ClientWithResponses) ListAvailableProducerProfilesWithResponse(ctx cont
 }
 
 // ListRepositoriesWithResponse performs a GET /api/v1/t/{tenantSlug}/repositories (the `ListRepositories` operationId) request.
+//
+// Returns the requested page of repositories within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListRepositoriesWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*ListRepositoriesResponse, error) {
@@ -27736,6 +30349,8 @@ func (c *ClientWithResponses) ListRepositoriesWithResponse(ctx context.Context, 
 // CreateRepositoryWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories (the `CreateRepository` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates repository within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error) {
 	rsp, err := c.CreateRepositoryWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -27747,6 +30362,8 @@ func (c *ClientWithResponses) CreateRepositoryWithBodyWithResponse(ctx context.C
 
 // CreateRepositoryWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories (the `CreateRepository` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates repository within the authorized request scope.
 func (c *ClientWithResponses) CreateRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error) {
 	rsp, err := c.CreateRepository(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -27756,6 +30373,8 @@ func (c *ClientWithResponses) CreateRepositoryWithResponse(ctx context.Context, 
 }
 
 // DeleteRepositoryWithResponse performs a DELETE /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `DeleteRepository` operationId) request.
+//
+// Deletes the selected repository within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DeleteRepositoryParams, reqEditors ...RequestEditorFn) (*DeleteRepositoryResponse, error) {
@@ -27767,6 +30386,8 @@ func (c *ClientWithResponses) DeleteRepositoryWithResponse(ctx context.Context, 
 }
 
 // GetRepositoryWithResponse performs a GET /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `GetRepository` operationId) request.
+//
+// Returns the selected repository within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, reqEditors ...RequestEditorFn) (*GetRepositoryResponse, error) {
@@ -27780,6 +30401,8 @@ func (c *ClientWithResponses) GetRepositoryWithResponse(ctx context.Context, ten
 // UpdateRepositoryWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `UpdateRepository` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected repository within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *UpdateRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRepositoryResponse, error) {
 	rsp, err := c.UpdateRepositoryWithBody(ctx, tenantSlug, repositoryId, params, contentType, body, reqEditors...)
@@ -27791,6 +30414,8 @@ func (c *ClientWithResponses) UpdateRepositoryWithBodyWithResponse(ctx context.C
 
 // UpdateRepositoryWithResponse performs a PATCH /api/v1/t/{tenantSlug}/repositories/{repositoryId} (the `UpdateRepository` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected repository within the authorized request scope.
 func (c *ClientWithResponses) UpdateRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *UpdateRepositoryParams, body UpdateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRepositoryResponse, error) {
 	rsp, err := c.UpdateRepository(ctx, tenantSlug, repositoryId, params, body, reqEditors...)
 	if err != nil {
@@ -27800,6 +30425,8 @@ func (c *ClientWithResponses) UpdateRepositoryWithResponse(ctx context.Context, 
 }
 
 // ListDiscoveryCandidatesWithResponse performs a GET /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates (the `ListDiscoveryCandidates` operationId) request.
+//
+// Returns the requested page of discovery candidates within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListDiscoveryCandidatesWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *ListDiscoveryCandidatesParams, reqEditors ...RequestEditorFn) (*ListDiscoveryCandidatesResponse, error) {
@@ -27811,6 +30438,8 @@ func (c *ClientWithResponses) ListDiscoveryCandidatesWithResponse(ctx context.Co
 }
 
 // DismissDiscoveryCandidateWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates/{candidateId}:dismiss (the `DismissDiscoveryCandidate` operationId) request.
+//
+// Performs the dismiss discovery candidate workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DismissDiscoveryCandidateWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, candidateId CandidateId, reqEditors ...RequestEditorFn) (*DismissDiscoveryCandidateResponse, error) {
@@ -27824,6 +30453,8 @@ func (c *ClientWithResponses) DismissDiscoveryCandidateWithResponse(ctx context.
 // AcceptDiscoveryCandidatesWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept (the `AcceptDiscoveryCandidates` operationId) request,
 // with any type of body and a specified content type.
 //
+// Performs the accept discovery candidates workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) AcceptDiscoveryCandidatesWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *AcceptDiscoveryCandidatesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AcceptDiscoveryCandidatesResponse, error) {
 	rsp, err := c.AcceptDiscoveryCandidatesWithBody(ctx, tenantSlug, repositoryId, params, contentType, body, reqEditors...)
@@ -27835,6 +30466,8 @@ func (c *ClientWithResponses) AcceptDiscoveryCandidatesWithBodyWithResponse(ctx 
 
 // AcceptDiscoveryCandidatesWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept (the `AcceptDiscoveryCandidates` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the accept discovery candidates workflow within the authorized request scope.
 func (c *ClientWithResponses) AcceptDiscoveryCandidatesWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *AcceptDiscoveryCandidatesParams, body AcceptDiscoveryCandidatesJSONRequestBody, reqEditors ...RequestEditorFn) (*AcceptDiscoveryCandidatesResponse, error) {
 	rsp, err := c.AcceptDiscoveryCandidates(ctx, tenantSlug, repositoryId, params, body, reqEditors...)
 	if err != nil {
@@ -27845,6 +30478,8 @@ func (c *ClientWithResponses) AcceptDiscoveryCandidatesWithResponse(ctx context.
 
 // PreviewRepositoryConfigImportWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports (the `PreviewRepositoryConfigImport` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the preview repository config import workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PreviewRepositoryConfigImportWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *PreviewRepositoryConfigImportParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PreviewRepositoryConfigImportResponse, error) {
@@ -27857,6 +30492,8 @@ func (c *ClientWithResponses) PreviewRepositoryConfigImportWithBodyWithResponse(
 
 // PreviewRepositoryConfigImportWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports (the `PreviewRepositoryConfigImport` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the preview repository config import workflow within the authorized request scope.
 func (c *ClientWithResponses) PreviewRepositoryConfigImportWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *PreviewRepositoryConfigImportParams, body PreviewRepositoryConfigImportJSONRequestBody, reqEditors ...RequestEditorFn) (*PreviewRepositoryConfigImportResponse, error) {
 	rsp, err := c.PreviewRepositoryConfigImport(ctx, tenantSlug, repositoryId, params, body, reqEditors...)
 	if err != nil {
@@ -27867,6 +30504,8 @@ func (c *ClientWithResponses) PreviewRepositoryConfigImportWithResponse(ctx cont
 
 // ApplyRepositoryConfigImportWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply (the `ApplyRepositoryConfigImport` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the apply repository config import workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ApplyRepositoryConfigImportWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params *ApplyRepositoryConfigImportParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApplyRepositoryConfigImportResponse, error) {
@@ -27879,6 +30518,8 @@ func (c *ClientWithResponses) ApplyRepositoryConfigImportWithBodyWithResponse(ct
 
 // ApplyRepositoryConfigImportWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/config-imports/{previewId}:apply (the `ApplyRepositoryConfigImport` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the apply repository config import workflow within the authorized request scope.
 func (c *ClientWithResponses) ApplyRepositoryConfigImportWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, previewId PreviewId, params *ApplyRepositoryConfigImportParams, body ApplyRepositoryConfigImportJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyRepositoryConfigImportResponse, error) {
 	rsp, err := c.ApplyRepositoryConfigImport(ctx, tenantSlug, repositoryId, previewId, params, body, reqEditors...)
 	if err != nil {
@@ -27889,6 +30530,8 @@ func (c *ClientWithResponses) ApplyRepositoryConfigImportWithResponse(ctx contex
 
 // CreateServiceInRepositoryWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services (the `CreateServiceInRepository` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates service in repository within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateServiceInRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceInRepositoryResponse, error) {
@@ -27901,6 +30544,8 @@ func (c *ClientWithResponses) CreateServiceInRepositoryWithBodyWithResponse(ctx 
 
 // CreateServiceInRepositoryWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}/services (the `CreateServiceInRepository` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates service in repository within the authorized request scope.
 func (c *ClientWithResponses) CreateServiceInRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, body CreateServiceInRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceInRepositoryResponse, error) {
 	rsp, err := c.CreateServiceInRepository(ctx, tenantSlug, repositoryId, body, reqEditors...)
 	if err != nil {
@@ -27911,6 +30556,8 @@ func (c *ClientWithResponses) CreateServiceInRepositoryWithResponse(ctx context.
 
 // DiscoverRepositoryWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover (the `DiscoverRepository` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the discover repository workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DiscoverRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DiscoverRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DiscoverRepositoryResponse, error) {
@@ -27923,6 +30570,8 @@ func (c *ClientWithResponses) DiscoverRepositoryWithBodyWithResponse(ctx context
 
 // DiscoverRepositoryWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover (the `DiscoverRepository` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the discover repository workflow within the authorized request scope.
 func (c *ClientWithResponses) DiscoverRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *DiscoverRepositoryParams, body DiscoverRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*DiscoverRepositoryResponse, error) {
 	rsp, err := c.DiscoverRepository(ctx, tenantSlug, repositoryId, params, body, reqEditors...)
 	if err != nil {
@@ -27933,6 +30582,8 @@ func (c *ClientWithResponses) DiscoverRepositoryWithResponse(ctx context.Context
 
 // SyncRepositoryWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync (the `SyncRepository` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the sync repository workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) SyncRepositoryWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *SyncRepositoryParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SyncRepositoryResponse, error) {
@@ -27945,6 +30596,8 @@ func (c *ClientWithResponses) SyncRepositoryWithBodyWithResponse(ctx context.Con
 
 // SyncRepositoryWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories/{repositoryId}:sync (the `SyncRepository` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the sync repository workflow within the authorized request scope.
 func (c *ClientWithResponses) SyncRepositoryWithResponse(ctx context.Context, tenantSlug TenantSlug, repositoryId RepositoryId, params *SyncRepositoryParams, body SyncRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*SyncRepositoryResponse, error) {
 	rsp, err := c.SyncRepository(ctx, tenantSlug, repositoryId, params, body, reqEditors...)
 	if err != nil {
@@ -27955,6 +30608,8 @@ func (c *ClientWithResponses) SyncRepositoryWithResponse(ctx context.Context, te
 
 // CheckRepositoryConnectionWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories:check-connection (the `CheckRepositoryConnection` operationId) request,
 // with any type of body and a specified content type.
+//
+// Checks repository connection within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CheckRepositoryConnectionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CheckRepositoryConnectionResponse, error) {
@@ -27967,6 +30622,8 @@ func (c *ClientWithResponses) CheckRepositoryConnectionWithBodyWithResponse(ctx 
 
 // CheckRepositoryConnectionWithResponse performs a POST /api/v1/t/{tenantSlug}/repositories:check-connection (the `CheckRepositoryConnection` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Checks repository connection within the authorized request scope.
 func (c *ClientWithResponses) CheckRepositoryConnectionWithResponse(ctx context.Context, tenantSlug TenantSlug, body CheckRepositoryConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*CheckRepositoryConnectionResponse, error) {
 	rsp, err := c.CheckRepositoryConnection(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -27976,6 +30633,8 @@ func (c *ClientWithResponses) CheckRepositoryConnectionWithResponse(ctx context.
 }
 
 // ListReviewsWithResponse performs a GET /api/v1/t/{tenantSlug}/reviews (the `ListReviews` operationId) request.
+//
+// Returns the requested page of reviews within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListReviewsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListReviewsParams, reqEditors ...RequestEditorFn) (*ListReviewsResponse, error) {
@@ -27988,6 +30647,8 @@ func (c *ClientWithResponses) ListReviewsWithResponse(ctx context.Context, tenan
 
 // SearchWithResponse performs a GET /api/v1/t/{tenantSlug}/search (the `Search` operationId) request.
 //
+// Performs the search workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) SearchWithResponse(ctx context.Context, tenantSlug TenantSlug, params *SearchParams, reqEditors ...RequestEditorFn) (*SearchResponse, error) {
 	rsp, err := c.Search(ctx, tenantSlug, params, reqEditors...)
@@ -27998,6 +30659,8 @@ func (c *ClientWithResponses) SearchWithResponse(ctx context.Context, tenantSlug
 }
 
 // ListServicesWithResponse performs a GET /api/v1/t/{tenantSlug}/services (the `ListServices` operationId) request.
+//
+// Returns the requested page of services within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListServicesWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListServicesParams, reqEditors ...RequestEditorFn) (*ListServicesResponse, error) {
@@ -28010,6 +30673,8 @@ func (c *ClientWithResponses) ListServicesWithResponse(ctx context.Context, tena
 
 // DeleteServiceWithResponse performs a DELETE /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `DeleteService` operationId) request.
 //
+// Deletes the selected service within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *DeleteServiceParams, reqEditors ...RequestEditorFn) (*DeleteServiceResponse, error) {
 	rsp, err := c.DeleteService(ctx, tenantSlug, serviceSlug, params, reqEditors...)
@@ -28020,6 +30685,8 @@ func (c *ClientWithResponses) DeleteServiceWithResponse(ctx context.Context, ten
 }
 
 // GetServiceWithResponse performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `GetService` operationId) request.
+//
+// Returns the selected service within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*GetServiceResponse, error) {
@@ -28033,6 +30700,8 @@ func (c *ClientWithResponses) GetServiceWithResponse(ctx context.Context, tenant
 // UpdateServiceWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `UpdateService` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected service within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateServiceWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *UpdateServiceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceResponse, error) {
 	rsp, err := c.UpdateServiceWithBody(ctx, tenantSlug, serviceSlug, params, contentType, body, reqEditors...)
@@ -28044,6 +30713,8 @@ func (c *ClientWithResponses) UpdateServiceWithBodyWithResponse(ctx context.Cont
 
 // UpdateServiceWithResponse performs a PATCH /api/v1/t/{tenantSlug}/services/{serviceSlug} (the `UpdateService` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected service within the authorized request scope.
 func (c *ClientWithResponses) UpdateServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *UpdateServiceParams, body UpdateServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceResponse, error) {
 	rsp, err := c.UpdateService(ctx, tenantSlug, serviceSlug, params, body, reqEditors...)
 	if err != nil {
@@ -28053,6 +30724,8 @@ func (c *ClientWithResponses) UpdateServiceWithResponse(ctx context.Context, ten
 }
 
 // GetServiceAccessWithResponse performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `GetServiceAccess` operationId) request.
+//
+// Returns the selected service access within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetServiceAccessWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*GetServiceAccessResponse, error) {
@@ -28066,6 +30739,8 @@ func (c *ClientWithResponses) GetServiceAccessWithResponse(ctx context.Context, 
 // PutServiceAccessWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `PutServiceAccess` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates or replaces the selected service access within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PutServiceAccessWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutServiceAccessResponse, error) {
 	rsp, err := c.PutServiceAccessWithBody(ctx, tenantSlug, serviceSlug, contentType, body, reqEditors...)
@@ -28077,6 +30752,8 @@ func (c *ClientWithResponses) PutServiceAccessWithBodyWithResponse(ctx context.C
 
 // PutServiceAccessWithResponse performs a PUT /api/v1/t/{tenantSlug}/services/{serviceSlug}/access (the `PutServiceAccess` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates or replaces the selected service access within the authorized request scope.
 func (c *ClientWithResponses) PutServiceAccessWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body PutServiceAccessJSONRequestBody, reqEditors ...RequestEditorFn) (*PutServiceAccessResponse, error) {
 	rsp, err := c.PutServiceAccess(ctx, tenantSlug, serviceSlug, body, reqEditors...)
 	if err != nil {
@@ -28087,6 +30764,8 @@ func (c *ClientWithResponses) PutServiceAccessWithResponse(ctx context.Context, 
 
 // GenerateMissingAssetWithAiWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate (the `GenerateMissingAssetWithAi` operationId) request,
 // with any type of body and a specified content type.
+//
+// Performs the generate missing asset with ai workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GenerateMissingAssetWithAiWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *GenerateMissingAssetWithAiParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GenerateMissingAssetWithAiResponse, error) {
@@ -28099,6 +30778,8 @@ func (c *ClientWithResponses) GenerateMissingAssetWithAiWithBodyWithResponse(ctx
 
 // GenerateMissingAssetWithAiWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate (the `GenerateMissingAssetWithAi` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the generate missing asset with ai workflow within the authorized request scope.
 func (c *ClientWithResponses) GenerateMissingAssetWithAiWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *GenerateMissingAssetWithAiParams, body GenerateMissingAssetWithAiJSONRequestBody, reqEditors ...RequestEditorFn) (*GenerateMissingAssetWithAiResponse, error) {
 	rsp, err := c.GenerateMissingAssetWithAi(ctx, tenantSlug, serviceSlug, params, body, reqEditors...)
 	if err != nil {
@@ -28108,6 +30789,8 @@ func (c *ClientWithResponses) GenerateMissingAssetWithAiWithResponse(ctx context
 }
 
 // ListServiceCommentsWithResponse performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `ListServiceComments` operationId) request.
+//
+// Returns the requested page of service comments within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListServiceCommentsWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ListServiceCommentsParams, reqEditors ...RequestEditorFn) (*ListServiceCommentsResponse, error) {
@@ -28121,6 +30804,8 @@ func (c *ClientWithResponses) ListServiceCommentsWithResponse(ctx context.Contex
 // CreateServiceCommentWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `CreateServiceComment` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates service comment within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateServiceCommentWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceCommentResponse, error) {
 	rsp, err := c.CreateServiceCommentWithBody(ctx, tenantSlug, serviceSlug, contentType, body, reqEditors...)
@@ -28132,6 +30817,8 @@ func (c *ClientWithResponses) CreateServiceCommentWithBodyWithResponse(ctx conte
 
 // CreateServiceCommentWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/comments (the `CreateServiceComment` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates service comment within the authorized request scope.
 func (c *ClientWithResponses) CreateServiceCommentWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body CreateServiceCommentJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceCommentResponse, error) {
 	rsp, err := c.CreateServiceComment(ctx, tenantSlug, serviceSlug, body, reqEditors...)
 	if err != nil {
@@ -28141,6 +30828,8 @@ func (c *ClientWithResponses) CreateServiceCommentWithResponse(ctx context.Conte
 }
 
 // ListSourceSpecsWithResponse performs a GET /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `ListSourceSpecs` operationId) request.
+//
+// Returns the requested page of source specs within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListSourceSpecsWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*ListSourceSpecsResponse, error) {
@@ -28154,6 +30843,8 @@ func (c *ClientWithResponses) ListSourceSpecsWithResponse(ctx context.Context, t
 // CreateSourceSpecWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `CreateSourceSpec` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates source spec within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateSourceSpecWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSourceSpecResponse, error) {
 	rsp, err := c.CreateSourceSpecWithBody(ctx, tenantSlug, serviceSlug, contentType, body, reqEditors...)
@@ -28165,6 +30856,8 @@ func (c *ClientWithResponses) CreateSourceSpecWithBodyWithResponse(ctx context.C
 
 // CreateSourceSpecWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}/sources (the `CreateSourceSpec` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates source spec within the authorized request scope.
 func (c *ClientWithResponses) CreateSourceSpecWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, body CreateSourceSpecJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSourceSpecResponse, error) {
 	rsp, err := c.CreateSourceSpec(ctx, tenantSlug, serviceSlug, body, reqEditors...)
 	if err != nil {
@@ -28175,6 +30868,8 @@ func (c *ClientWithResponses) CreateSourceSpecWithResponse(ctx context.Context, 
 
 // ResolveServiceDriftWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift (the `ResolveServiceDrift` operationId) request,
 // with any type of body and a specified content type.
+//
+// Resolves service drift within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ResolveServiceDriftWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ResolveServiceDriftParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResolveServiceDriftResponse, error) {
@@ -28187,6 +30882,8 @@ func (c *ClientWithResponses) ResolveServiceDriftWithBodyWithResponse(ctx contex
 
 // ResolveServiceDriftWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift (the `ResolveServiceDrift` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Resolves service drift within the authorized request scope.
 func (c *ClientWithResponses) ResolveServiceDriftWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, params *ResolveServiceDriftParams, body ResolveServiceDriftJSONRequestBody, reqEditors ...RequestEditorFn) (*ResolveServiceDriftResponse, error) {
 	rsp, err := c.ResolveServiceDrift(ctx, tenantSlug, serviceSlug, params, body, reqEditors...)
 	if err != nil {
@@ -28196,6 +30893,8 @@ func (c *ClientWithResponses) ResolveServiceDriftWithResponse(ctx context.Contex
 }
 
 // StarServiceWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:star (the `StarService` operationId) request.
+//
+// Performs the star service workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) StarServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*StarServiceResponse, error) {
@@ -28208,6 +30907,8 @@ func (c *ClientWithResponses) StarServiceWithResponse(ctx context.Context, tenan
 
 // UnstarServiceWithResponse performs a POST /api/v1/t/{tenantSlug}/services/{serviceSlug}:unstar (the `UnstarService` operationId) request.
 //
+// Performs the unstar service workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UnstarServiceWithResponse(ctx context.Context, tenantSlug TenantSlug, serviceSlug ServiceSlug, reqEditors ...RequestEditorFn) (*UnstarServiceResponse, error) {
 	rsp, err := c.UnstarService(ctx, tenantSlug, serviceSlug, reqEditors...)
@@ -28219,6 +30920,8 @@ func (c *ClientWithResponses) UnstarServiceWithResponse(ctx context.Context, ten
 
 // ListRecentServicesWithResponse performs a GET /api/v1/t/{tenantSlug}/services:recent (the `ListRecentServices` operationId) request.
 //
+// Returns the requested page of recent services within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListRecentServicesWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListRecentServicesParams, reqEditors ...RequestEditorFn) (*ListRecentServicesResponse, error) {
 	rsp, err := c.ListRecentServices(ctx, tenantSlug, params, reqEditors...)
@@ -28229,6 +30932,8 @@ func (c *ClientWithResponses) ListRecentServicesWithResponse(ctx context.Context
 }
 
 // GetTenantSettingsWithResponse performs a GET /api/v1/t/{tenantSlug}/settings (the `GetTenantSettings` operationId) request.
+//
+// Returns the selected tenant settings within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetTenantSettingsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*GetTenantSettingsResponse, error) {
@@ -28242,6 +30947,8 @@ func (c *ClientWithResponses) GetTenantSettingsWithResponse(ctx context.Context,
 // UpdateTenantSettingsWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/settings (the `UpdateTenantSettings` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected tenant settings within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateTenantSettingsWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantSettingsParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTenantSettingsResponse, error) {
 	rsp, err := c.UpdateTenantSettingsWithBody(ctx, tenantSlug, params, contentType, body, reqEditors...)
@@ -28253,6 +30960,8 @@ func (c *ClientWithResponses) UpdateTenantSettingsWithBodyWithResponse(ctx conte
 
 // UpdateTenantSettingsWithResponse performs a PATCH /api/v1/t/{tenantSlug}/settings (the `UpdateTenantSettings` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected tenant settings within the authorized request scope.
 func (c *ClientWithResponses) UpdateTenantSettingsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *UpdateTenantSettingsParams, body UpdateTenantSettingsJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTenantSettingsResponse, error) {
 	rsp, err := c.UpdateTenantSettings(ctx, tenantSlug, params, body, reqEditors...)
 	if err != nil {
@@ -28262,6 +30971,8 @@ func (c *ClientWithResponses) UpdateTenantSettingsWithResponse(ctx context.Conte
 }
 
 // ListShareLinksWithResponse performs a GET /api/v1/t/{tenantSlug}/share-links (the `ListShareLinks` operationId) request.
+//
+// Returns the requested page of share links within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListShareLinksWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListShareLinksParams, reqEditors ...RequestEditorFn) (*ListShareLinksResponse, error) {
@@ -28275,6 +30986,8 @@ func (c *ClientWithResponses) ListShareLinksWithResponse(ctx context.Context, te
 // CreateShareLinkWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/share-links (the `CreateShareLink` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates share link within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateShareLinkWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateShareLinkResponse, error) {
 	rsp, err := c.CreateShareLinkWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -28286,6 +30999,8 @@ func (c *ClientWithResponses) CreateShareLinkWithBodyWithResponse(ctx context.Co
 
 // CreateShareLinkWithResponse performs a POST /api/v1/t/{tenantSlug}/share-links (the `CreateShareLink` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates share link within the authorized request scope.
 func (c *ClientWithResponses) CreateShareLinkWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateShareLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateShareLinkResponse, error) {
 	rsp, err := c.CreateShareLink(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -28295,6 +31010,8 @@ func (c *ClientWithResponses) CreateShareLinkWithResponse(ctx context.Context, t
 }
 
 // RevokeShareLinkWithResponse performs a DELETE /api/v1/t/{tenantSlug}/share-links/{shareLinkId} (the `RevokeShareLink` operationId) request.
+//
+// Performs the revoke share link workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RevokeShareLinkWithResponse(ctx context.Context, tenantSlug TenantSlug, shareLinkId ShareLinkId, reqEditors ...RequestEditorFn) (*RevokeShareLinkResponse, error) {
@@ -28306,6 +31023,8 @@ func (c *ClientWithResponses) RevokeShareLinkWithResponse(ctx context.Context, t
 }
 
 // DeleteSourceSpecWithResponse performs a DELETE /api/v1/t/{tenantSlug}/sources/{sourceId} (the `DeleteSourceSpec` operationId) request.
+//
+// Deletes the selected source spec within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteSourceSpecWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *DeleteSourceSpecParams, reqEditors ...RequestEditorFn) (*DeleteSourceSpecResponse, error) {
@@ -28319,6 +31038,8 @@ func (c *ClientWithResponses) DeleteSourceSpecWithResponse(ctx context.Context, 
 // UpdateSourceSpecWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/sources/{sourceId} (the `UpdateSourceSpec` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected source spec within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateSourceSpecWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *UpdateSourceSpecParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSourceSpecResponse, error) {
 	rsp, err := c.UpdateSourceSpecWithBody(ctx, tenantSlug, sourceId, params, contentType, body, reqEditors...)
@@ -28330,6 +31051,8 @@ func (c *ClientWithResponses) UpdateSourceSpecWithBodyWithResponse(ctx context.C
 
 // UpdateSourceSpecWithResponse performs a PATCH /api/v1/t/{tenantSlug}/sources/{sourceId} (the `UpdateSourceSpec` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected source spec within the authorized request scope.
 func (c *ClientWithResponses) UpdateSourceSpecWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *UpdateSourceSpecParams, body UpdateSourceSpecJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSourceSpecResponse, error) {
 	rsp, err := c.UpdateSourceSpec(ctx, tenantSlug, sourceId, params, body, reqEditors...)
 	if err != nil {
@@ -28339,6 +31062,8 @@ func (c *ClientWithResponses) UpdateSourceSpecWithResponse(ctx context.Context, 
 }
 
 // ListSourceBindingsWithResponse performs a GET /api/v1/t/{tenantSlug}/sources/{sourceId}/bindings (the `ListSourceBindings` operationId) request.
+//
+// Returns the requested page of source bindings within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListSourceBindingsWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, reqEditors ...RequestEditorFn) (*ListSourceBindingsResponse, error) {
@@ -28352,6 +31077,8 @@ func (c *ClientWithResponses) ListSourceBindingsWithResponse(ctx context.Context
 // ProduceSourceWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce (the `ProduceSource` operationId) request,
 // with any type of body and a specified content type.
 //
+// Performs the produce source workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ProduceSourceWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *ProduceSourceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ProduceSourceResponse, error) {
 	rsp, err := c.ProduceSourceWithBody(ctx, tenantSlug, sourceId, params, contentType, body, reqEditors...)
@@ -28363,6 +31090,8 @@ func (c *ClientWithResponses) ProduceSourceWithBodyWithResponse(ctx context.Cont
 
 // ProduceSourceWithResponse performs a POST /api/v1/t/{tenantSlug}/sources/{sourceId}:produce (the `ProduceSource` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the produce source workflow within the authorized request scope.
 func (c *ClientWithResponses) ProduceSourceWithResponse(ctx context.Context, tenantSlug TenantSlug, sourceId SourceId, params *ProduceSourceParams, body ProduceSourceJSONRequestBody, reqEditors ...RequestEditorFn) (*ProduceSourceResponse, error) {
 	rsp, err := c.ProduceSource(ctx, tenantSlug, sourceId, params, body, reqEditors...)
 	if err != nil {
@@ -28372,6 +31101,8 @@ func (c *ClientWithResponses) ProduceSourceWithResponse(ctx context.Context, ten
 }
 
 // ListSubscriptionsWithResponse performs a GET /api/v1/t/{tenantSlug}/subscriptions (the `ListSubscriptions` operationId) request.
+//
+// Returns the requested page of subscriptions within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListSubscriptionsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListSubscriptionsResponse, error) {
@@ -28385,6 +31116,8 @@ func (c *ClientWithResponses) ListSubscriptionsWithResponse(ctx context.Context,
 // PutSubscriptionWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/subscriptions (the `PutSubscription` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates or replaces the selected subscription within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PutSubscriptionWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSubscriptionResponse, error) {
 	rsp, err := c.PutSubscriptionWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -28396,6 +31129,8 @@ func (c *ClientWithResponses) PutSubscriptionWithBodyWithResponse(ctx context.Co
 
 // PutSubscriptionWithResponse performs a PUT /api/v1/t/{tenantSlug}/subscriptions (the `PutSubscription` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates or replaces the selected subscription within the authorized request scope.
 func (c *ClientWithResponses) PutSubscriptionWithResponse(ctx context.Context, tenantSlug TenantSlug, body PutSubscriptionJSONRequestBody, reqEditors ...RequestEditorFn) (*PutSubscriptionResponse, error) {
 	rsp, err := c.PutSubscription(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -28405,6 +31140,8 @@ func (c *ClientWithResponses) PutSubscriptionWithResponse(ctx context.Context, t
 }
 
 // ListSystemGroupsWithResponse performs a GET /api/v1/t/{tenantSlug}/system-groups (the `ListSystemGroups` operationId) request.
+//
+// Returns the requested page of system groups within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListSystemGroupsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListSystemGroupsResponse, error) {
@@ -28418,6 +31155,8 @@ func (c *ClientWithResponses) ListSystemGroupsWithResponse(ctx context.Context, 
 // CreateSystemGroupWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/system-groups (the `CreateSystemGroup` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates system group within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateSystemGroupWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSystemGroupResponse, error) {
 	rsp, err := c.CreateSystemGroupWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -28429,6 +31168,8 @@ func (c *ClientWithResponses) CreateSystemGroupWithBodyWithResponse(ctx context.
 
 // CreateSystemGroupWithResponse performs a POST /api/v1/t/{tenantSlug}/system-groups (the `CreateSystemGroup` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates system group within the authorized request scope.
 func (c *ClientWithResponses) CreateSystemGroupWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateSystemGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSystemGroupResponse, error) {
 	rsp, err := c.CreateSystemGroup(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -28438,6 +31179,8 @@ func (c *ClientWithResponses) CreateSystemGroupWithResponse(ctx context.Context,
 }
 
 // DeleteSystemGroupWithResponse performs a DELETE /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `DeleteSystemGroup` operationId) request.
+//
+// Deletes the selected system group within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteSystemGroupWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *DeleteSystemGroupParams, reqEditors ...RequestEditorFn) (*DeleteSystemGroupResponse, error) {
@@ -28449,6 +31192,8 @@ func (c *ClientWithResponses) DeleteSystemGroupWithResponse(ctx context.Context,
 }
 
 // GetSystemGroupWithResponse performs a GET /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `GetSystemGroup` operationId) request.
+//
+// Returns the selected system group within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetSystemGroupWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, reqEditors ...RequestEditorFn) (*GetSystemGroupResponse, error) {
@@ -28462,6 +31207,8 @@ func (c *ClientWithResponses) GetSystemGroupWithResponse(ctx context.Context, te
 // UpdateSystemGroupWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `UpdateSystemGroup` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected system group within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateSystemGroupWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *UpdateSystemGroupParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSystemGroupResponse, error) {
 	rsp, err := c.UpdateSystemGroupWithBody(ctx, tenantSlug, groupId, params, contentType, body, reqEditors...)
@@ -28473,6 +31220,8 @@ func (c *ClientWithResponses) UpdateSystemGroupWithBodyWithResponse(ctx context.
 
 // UpdateSystemGroupWithResponse performs a PATCH /api/v1/t/{tenantSlug}/system-groups/{groupId} (the `UpdateSystemGroup` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected system group within the authorized request scope.
 func (c *ClientWithResponses) UpdateSystemGroupWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *UpdateSystemGroupParams, body UpdateSystemGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSystemGroupResponse, error) {
 	rsp, err := c.UpdateSystemGroup(ctx, tenantSlug, groupId, params, body, reqEditors...)
 	if err != nil {
@@ -28483,6 +31232,8 @@ func (c *ClientWithResponses) UpdateSystemGroupWithResponse(ctx context.Context,
 
 // PutSystemGroupMembersWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members (the `PutSystemGroupMembers` operationId) request,
 // with any type of body and a specified content type.
+//
+// Creates or replaces the selected system group members within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PutSystemGroupMembersWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *PutSystemGroupMembersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSystemGroupMembersResponse, error) {
@@ -28495,6 +31246,8 @@ func (c *ClientWithResponses) PutSystemGroupMembersWithBodyWithResponse(ctx cont
 
 // PutSystemGroupMembersWithResponse performs a PUT /api/v1/t/{tenantSlug}/system-groups/{groupId}/members (the `PutSystemGroupMembers` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates or replaces the selected system group members within the authorized request scope.
 func (c *ClientWithResponses) PutSystemGroupMembersWithResponse(ctx context.Context, tenantSlug TenantSlug, groupId GroupId, params *PutSystemGroupMembersParams, body PutSystemGroupMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*PutSystemGroupMembersResponse, error) {
 	rsp, err := c.PutSystemGroupMembers(ctx, tenantSlug, groupId, params, body, reqEditors...)
 	if err != nil {
@@ -28504,6 +31257,8 @@ func (c *ClientWithResponses) PutSystemGroupMembersWithResponse(ctx context.Cont
 }
 
 // ListTagsWithResponse performs a GET /api/v1/t/{tenantSlug}/tags (the `ListTags` operationId) request.
+//
+// Returns the requested page of tags within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListTagsWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListTagsResponse, error) {
@@ -28517,6 +31272,8 @@ func (c *ClientWithResponses) ListTagsWithResponse(ctx context.Context, tenantSl
 // CreateTagWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/tags (the `CreateTag` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates tag within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateTagWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTagResponse, error) {
 	rsp, err := c.CreateTagWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -28528,6 +31285,8 @@ func (c *ClientWithResponses) CreateTagWithBodyWithResponse(ctx context.Context,
 
 // CreateTagWithResponse performs a POST /api/v1/t/{tenantSlug}/tags (the `CreateTag` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates tag within the authorized request scope.
 func (c *ClientWithResponses) CreateTagWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateTagJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTagResponse, error) {
 	rsp, err := c.CreateTag(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -28537,6 +31296,8 @@ func (c *ClientWithResponses) CreateTagWithResponse(ctx context.Context, tenantS
 }
 
 // DeleteTagWithResponse performs a DELETE /api/v1/t/{tenantSlug}/tags/{tagId} (the `DeleteTag` operationId) request.
+//
+// Deletes the selected tag within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteTagWithResponse(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *DeleteTagParams, reqEditors ...RequestEditorFn) (*DeleteTagResponse, error) {
@@ -28550,6 +31311,8 @@ func (c *ClientWithResponses) DeleteTagWithResponse(ctx context.Context, tenantS
 // UpdateTagWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/tags/{tagId} (the `UpdateTag` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected tag within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateTagWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *UpdateTagParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTagResponse, error) {
 	rsp, err := c.UpdateTagWithBody(ctx, tenantSlug, tagId, params, contentType, body, reqEditors...)
@@ -28561,6 +31324,8 @@ func (c *ClientWithResponses) UpdateTagWithBodyWithResponse(ctx context.Context,
 
 // UpdateTagWithResponse performs a PATCH /api/v1/t/{tenantSlug}/tags/{tagId} (the `UpdateTag` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected tag within the authorized request scope.
 func (c *ClientWithResponses) UpdateTagWithResponse(ctx context.Context, tenantSlug TenantSlug, tagId TagId, params *UpdateTagParams, body UpdateTagJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTagResponse, error) {
 	rsp, err := c.UpdateTag(ctx, tenantSlug, tagId, params, body, reqEditors...)
 	if err != nil {
@@ -28570,6 +31335,8 @@ func (c *ClientWithResponses) UpdateTagWithResponse(ctx context.Context, tenantS
 }
 
 // ListTeamsWithResponse performs a GET /api/v1/t/{tenantSlug}/teams (the `ListTeams` operationId) request.
+//
+// Returns the requested page of teams within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListTeamsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListTeamsParams, reqEditors ...RequestEditorFn) (*ListTeamsResponse, error) {
@@ -28583,6 +31350,8 @@ func (c *ClientWithResponses) ListTeamsWithResponse(ctx context.Context, tenantS
 // CreateTeamWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/teams (the `CreateTeam` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates team within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateTeamWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTeamResponse, error) {
 	rsp, err := c.CreateTeamWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -28594,6 +31363,8 @@ func (c *ClientWithResponses) CreateTeamWithBodyWithResponse(ctx context.Context
 
 // CreateTeamWithResponse performs a POST /api/v1/t/{tenantSlug}/teams (the `CreateTeam` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates team within the authorized request scope.
 func (c *ClientWithResponses) CreateTeamWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTeamResponse, error) {
 	rsp, err := c.CreateTeam(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -28603,6 +31374,8 @@ func (c *ClientWithResponses) CreateTeamWithResponse(ctx context.Context, tenant
 }
 
 // DeleteTeamWithResponse performs a DELETE /api/v1/t/{tenantSlug}/teams/{teamId} (the `DeleteTeam` operationId) request.
+//
+// Deletes the selected team within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteTeamWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *DeleteTeamParams, reqEditors ...RequestEditorFn) (*DeleteTeamResponse, error) {
@@ -28614,6 +31387,8 @@ func (c *ClientWithResponses) DeleteTeamWithResponse(ctx context.Context, tenant
 }
 
 // GetTeamWithResponse performs a GET /api/v1/t/{tenantSlug}/teams/{teamId} (the `GetTeam` operationId) request.
+//
+// Returns the selected team within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetTeamWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, reqEditors ...RequestEditorFn) (*GetTeamResponse, error) {
@@ -28627,6 +31402,8 @@ func (c *ClientWithResponses) GetTeamWithResponse(ctx context.Context, tenantSlu
 // UpdateTeamWithBodyWithResponse performs a PATCH /api/v1/t/{tenantSlug}/teams/{teamId} (the `UpdateTeam` operationId) request,
 // with any type of body and a specified content type.
 //
+// Updates the selected team within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) UpdateTeamWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *UpdateTeamParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTeamResponse, error) {
 	rsp, err := c.UpdateTeamWithBody(ctx, tenantSlug, teamId, params, contentType, body, reqEditors...)
@@ -28638,6 +31415,8 @@ func (c *ClientWithResponses) UpdateTeamWithBodyWithResponse(ctx context.Context
 
 // UpdateTeamWithResponse performs a PATCH /api/v1/t/{tenantSlug}/teams/{teamId} (the `UpdateTeam` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Updates the selected team within the authorized request scope.
 func (c *ClientWithResponses) UpdateTeamWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *UpdateTeamParams, body UpdateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTeamResponse, error) {
 	rsp, err := c.UpdateTeam(ctx, tenantSlug, teamId, params, body, reqEditors...)
 	if err != nil {
@@ -28648,6 +31427,8 @@ func (c *ClientWithResponses) UpdateTeamWithResponse(ctx context.Context, tenant
 
 // ReplaceTeamMembersWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members (the `ReplaceTeamMembers` operationId) request,
 // with any type of body and a specified content type.
+//
+// Replaces the selected team members within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ReplaceTeamMembersWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *ReplaceTeamMembersParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceTeamMembersResponse, error) {
@@ -28660,6 +31441,8 @@ func (c *ClientWithResponses) ReplaceTeamMembersWithBodyWithResponse(ctx context
 
 // ReplaceTeamMembersWithResponse performs a PUT /api/v1/t/{tenantSlug}/teams/{teamId}/members (the `ReplaceTeamMembers` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Replaces the selected team members within the authorized request scope.
 func (c *ClientWithResponses) ReplaceTeamMembersWithResponse(ctx context.Context, tenantSlug TenantSlug, teamId TeamId, params *ReplaceTeamMembersParams, body ReplaceTeamMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceTeamMembersResponse, error) {
 	rsp, err := c.ReplaceTeamMembers(ctx, tenantSlug, teamId, params, body, reqEditors...)
 	if err != nil {
@@ -28669,6 +31452,8 @@ func (c *ClientWithResponses) ReplaceTeamMembersWithResponse(ctx context.Context
 }
 
 // ListTokensWithResponse performs a GET /api/v1/t/{tenantSlug}/tokens (the `ListTokens` operationId) request.
+//
+// Returns the requested page of tokens within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListTokensWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListTokensParams, reqEditors ...RequestEditorFn) (*ListTokensResponse, error) {
@@ -28682,6 +31467,8 @@ func (c *ClientWithResponses) ListTokensWithResponse(ctx context.Context, tenant
 // CreateTokenWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/tokens (the `CreateToken` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates token within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateTokenWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error) {
 	rsp, err := c.CreateTokenWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -28693,6 +31480,8 @@ func (c *ClientWithResponses) CreateTokenWithBodyWithResponse(ctx context.Contex
 
 // CreateTokenWithResponse performs a POST /api/v1/t/{tenantSlug}/tokens (the `CreateToken` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates token within the authorized request scope.
 func (c *ClientWithResponses) CreateTokenWithResponse(ctx context.Context, tenantSlug TenantSlug, body CreateTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error) {
 	rsp, err := c.CreateToken(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -28702,6 +31491,8 @@ func (c *ClientWithResponses) CreateTokenWithResponse(ctx context.Context, tenan
 }
 
 // RevokeTokenWithResponse performs a DELETE /api/v1/t/{tenantSlug}/tokens/{tokenId} (the `RevokeToken` operationId) request.
+//
+// Performs the revoke token workflow within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) RevokeTokenWithResponse(ctx context.Context, tenantSlug TenantSlug, tokenId TokenId, reqEditors ...RequestEditorFn) (*RevokeTokenResponse, error) {
@@ -28715,6 +31506,8 @@ func (c *ClientWithResponses) RevokeTokenWithResponse(ctx context.Context, tenan
 // CreateDiffUploadWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/uploads (the `CreateDiffUpload` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates diff upload within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) CreateDiffUploadWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDiffUploadResponse, error) {
 	rsp, err := c.CreateDiffUploadWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -28726,6 +31519,8 @@ func (c *ClientWithResponses) CreateDiffUploadWithBodyWithResponse(ctx context.C
 
 // ListViewOverridesWithResponse performs a GET /api/v1/t/{tenantSlug}/view-overrides (the `ListViewOverrides` operationId) request.
 //
+// Returns the requested page of view overrides within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListViewOverridesWithResponse(ctx context.Context, tenantSlug TenantSlug, reqEditors ...RequestEditorFn) (*ListViewOverridesResponse, error) {
 	rsp, err := c.ListViewOverrides(ctx, tenantSlug, reqEditors...)
@@ -28736,6 +31531,8 @@ func (c *ClientWithResponses) ListViewOverridesWithResponse(ctx context.Context,
 }
 
 // DeleteViewOverrideWithResponse performs a DELETE /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `DeleteViewOverride` operationId) request.
+//
+// Deletes the selected view override within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteViewOverrideWithResponse(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *DeleteViewOverrideParams, reqEditors ...RequestEditorFn) (*DeleteViewOverrideResponse, error) {
@@ -28749,6 +31546,8 @@ func (c *ClientWithResponses) DeleteViewOverrideWithResponse(ctx context.Context
 // PutViewOverrideWithBodyWithResponse performs a PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `PutViewOverride` operationId) request,
 // with any type of body and a specified content type.
 //
+// Creates or replaces the selected view override within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) PutViewOverrideWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *PutViewOverrideParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutViewOverrideResponse, error) {
 	rsp, err := c.PutViewOverrideWithBody(ctx, tenantSlug, viewId, params, contentType, body, reqEditors...)
@@ -28760,6 +31559,8 @@ func (c *ClientWithResponses) PutViewOverrideWithBodyWithResponse(ctx context.Co
 
 // PutViewOverrideWithResponse performs a PUT /api/v1/t/{tenantSlug}/view-overrides/{viewId} (the `PutViewOverride` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Creates or replaces the selected view override within the authorized request scope.
 func (c *ClientWithResponses) PutViewOverrideWithResponse(ctx context.Context, tenantSlug TenantSlug, viewId ViewId, params *PutViewOverrideParams, body PutViewOverrideJSONRequestBody, reqEditors ...RequestEditorFn) (*PutViewOverrideResponse, error) {
 	rsp, err := c.PutViewOverride(ctx, tenantSlug, viewId, params, body, reqEditors...)
 	if err != nil {
@@ -28769,6 +31570,8 @@ func (c *ClientWithResponses) PutViewOverrideWithResponse(ctx context.Context, t
 }
 
 // ListViewsWithResponse performs a GET /api/v1/t/{tenantSlug}/views (the `ListViews` operationId) request.
+//
+// Returns the requested page of views within the authorized request scope.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListViewsWithResponse(ctx context.Context, tenantSlug TenantSlug, params *ListViewsParams, reqEditors ...RequestEditorFn) (*ListViewsResponse, error) {
@@ -28782,6 +31585,8 @@ func (c *ClientWithResponses) ListViewsWithResponse(ctx context.Context, tenantS
 // ResolveViewWithBodyWithResponse performs a POST /api/v1/t/{tenantSlug}/views:resolve (the `ResolveView` operationId) request,
 // with any type of body and a specified content type.
 //
+// Resolves view within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ResolveViewWithBodyWithResponse(ctx context.Context, tenantSlug TenantSlug, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResolveViewResponse, error) {
 	rsp, err := c.ResolveViewWithBody(ctx, tenantSlug, contentType, body, reqEditors...)
@@ -28793,6 +31598,8 @@ func (c *ClientWithResponses) ResolveViewWithBodyWithResponse(ctx context.Contex
 
 // ResolveViewWithResponse performs a POST /api/v1/t/{tenantSlug}/views:resolve (the `ResolveView` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Resolves view within the authorized request scope.
 func (c *ClientWithResponses) ResolveViewWithResponse(ctx context.Context, tenantSlug TenantSlug, body ResolveViewJSONRequestBody, reqEditors ...RequestEditorFn) (*ResolveViewResponse, error) {
 	rsp, err := c.ResolveView(ctx, tenantSlug, body, reqEditors...)
 	if err != nil {
@@ -28802,6 +31609,8 @@ func (c *ClientWithResponses) ResolveViewWithResponse(ctx context.Context, tenan
 }
 
 // GetVersionWithResponse performs a GET /api/v1/version (the `GetVersion` operationId) request.
+//
+// Returns the server build, API, and contract versions.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVersionResponse, error) {
@@ -28815,6 +31624,8 @@ func (c *ClientWithResponses) GetVersionWithResponse(ctx context.Context, reqEdi
 // ReceiveGitWebhookWithBodyWithResponse performs a POST /api/v1/webhooks/git/{repositoryId} (the `ReceiveGitWebhook` operationId) request,
 // with any type of body and a specified content type.
 //
+// Performs the receive git webhook workflow within the authorized request scope.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ReceiveGitWebhookWithBodyWithResponse(ctx context.Context, repositoryId RepositoryId, params *ReceiveGitWebhookParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReceiveGitWebhookResponse, error) {
 	rsp, err := c.ReceiveGitWebhookWithBody(ctx, repositoryId, params, contentType, body, reqEditors...)
@@ -28826,6 +31637,8 @@ func (c *ClientWithResponses) ReceiveGitWebhookWithBodyWithResponse(ctx context.
 
 // ReceiveGitWebhookWithResponse performs a POST /api/v1/webhooks/git/{repositoryId} (the `ReceiveGitWebhook` operationId) request.
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Performs the receive git webhook workflow within the authorized request scope.
 func (c *ClientWithResponses) ReceiveGitWebhookWithResponse(ctx context.Context, repositoryId RepositoryId, params *ReceiveGitWebhookParams, body ReceiveGitWebhookJSONRequestBody, reqEditors ...RequestEditorFn) (*ReceiveGitWebhookResponse, error) {
 	rsp, err := c.ReceiveGitWebhook(ctx, repositoryId, params, body, reqEditors...)
 	if err != nil {
@@ -28835,6 +31648,8 @@ func (c *ClientWithResponses) ReceiveGitWebhookWithResponse(ctx context.Context,
 }
 
 // HealthzWithResponse performs a GET /healthz (the `Healthz` operationId) request.
+//
+// Reports whether the Meridian process is alive.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) HealthzWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*HealthzResponse, error) {
@@ -28847,6 +31662,8 @@ func (c *ClientWithResponses) HealthzWithResponse(ctx context.Context, reqEditor
 
 // MetricsWithResponse performs a GET /metrics (the `Metrics` operationId) request.
 //
+// Returns deployment metrics in Prometheus text exposition format.
+//
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) MetricsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*MetricsResponse, error) {
 	rsp, err := c.Metrics(ctx, reqEditors...)
@@ -28857,6 +31674,8 @@ func (c *ClientWithResponses) MetricsWithResponse(ctx context.Context, reqEditor
 }
 
 // ReadyzWithResponse performs a GET /readyz (the `Readyz` operationId) request.
+//
+// Reports whether Meridian dependencies are ready to serve traffic.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ReadyzWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadyzResponse, error) {

@@ -9,7 +9,11 @@ import type { ContentType } from './contentType.ts';
 import type { LayerRevisionCreateRequestScopeType } from './layerRevisionCreateRequestScopeType.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface LayerRevisionCreateRequest {
+  /** specifies the scope type associated with this layer revision create request. */
   scopeType: LayerRevisionCreateRequestScopeType;
   /**
      * '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
@@ -17,11 +21,20 @@ export interface LayerRevisionCreateRequest {
      * @maxLength 260
      */
   scopeKey: string;
+  /** specifies the expected effective revision id associated with this layer revision create request. */
   expectedEffectiveRevisionId: Uuid | null;
-  /** @maxLength 1048576 */
+  /**
+     * specifies the content associated with this layer revision create request.
+     * @maxLength 1048576
+     */
   content: string;
+  /** contains the content type associated with this layer revision create request. */
   contentType: ContentType;
-  /** @nullable */
+  /**
+     * specifies the dialect associated with this layer revision create request.
+     * @nullable
+     */
   dialect?: string | null;
+  /** indicates whether submit for review applies to this layer revision create request. */
   submitForReview?: boolean;
 }

@@ -7,9 +7,14 @@
  */
 import type { Slug } from './slug.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface TeamCreateRequest {
+  /** contains the slug associated with this team create request. */
   slug: Slug;
   /**
+     * specifies the display name associated with this team create request.
      * @minLength 1
      * @maxLength 128
      */

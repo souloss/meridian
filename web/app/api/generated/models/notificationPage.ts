@@ -8,8 +8,15 @@
 import type { Notification } from './notification.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of notification records.
+ */
 export type NotificationPage = PageInfo & {
+  /** contains the ordered items associated with this notification page. */
   items: Notification[];
-  /** @minimum 0 */
+  /**
+     * specifies the unread count associated with this notification page.
+     * @minimum 0
+     */
   unreadCount: number;
 };

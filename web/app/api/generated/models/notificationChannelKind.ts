@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported notification channel kind value.
+ */
 export type NotificationChannelKind = typeof NotificationChannelKind[keyof typeof NotificationChannelKind];
 
 
+/** NotificationChannelKind is generated from the Meridian OpenAPI contract for notification channel kind. */
 export const NotificationChannelKind = {
   in_app: 'in_app',
   webhook: 'webhook',

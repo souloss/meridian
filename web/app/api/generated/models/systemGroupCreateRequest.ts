@@ -8,18 +8,26 @@
 import type { Slug } from './slug.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface SystemGroupCreateRequest {
+  /** contains the slug associated with this system group create request. */
   slug: Slug;
   /**
+     * specifies the display name associated with this system group create request.
      * @minLength 1
      * @maxLength 128
      */
   displayName: string;
   /**
+     * specifies the description associated with this system group create request.
      * @maxLength 2000
      * @nullable
      */
   description?: string | null;
+  /** specifies the parent id associated with this system group create request. */
   parentId?: Uuid | null;
+  /** contains the ordered service ids associated with this system group create request. */
   serviceIds?: Uuid[];
 }

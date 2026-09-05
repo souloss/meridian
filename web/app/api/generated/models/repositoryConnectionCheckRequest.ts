@@ -8,7 +8,11 @@
 import type { GitRemoteUrl } from './gitRemoteUrl.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface RepositoryConnectionCheckRequest {
+  /** contains the git remote url associated with this repository connection check request. */
   url: GitRemoteUrl;
   /** Tenant-visible credential ID; may identify a tenant credential or a global credential. Null means public access. */
   credentialId?: Uuid | null;

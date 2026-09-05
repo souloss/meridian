@@ -9,17 +9,21 @@ import type { PageParameter } from './pageParameter.ts';
 import type { PageSizeParameter } from './pageSizeParameter.ts';
 import type { QueryParameter } from './queryParameter.ts';
 
+/** SearchTenantUsersParams contains parameters accepted by its generated OpenAPI operation. */
 export type SearchTenantUsersParams = {
 /**
+ * identifies or filters the q value in the query.
  * @minLength 1
  * @maxLength 200
  */
 q?: QueryParameter;
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */

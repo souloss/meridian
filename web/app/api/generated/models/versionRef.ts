@@ -8,8 +8,14 @@
 import type { Lifecycle } from './lifecycle.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents version ref data exchanged through the Meridian API.
+ */
 export interface VersionRef {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** specifies the version associated with this version ref. */
   version: string;
+  /** contains the lifecycle associated with this version ref. */
   lifecycle: Lifecycle;
 }

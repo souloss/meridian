@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the options schema associated with this view definition.
+ */
 export type ViewDefinitionOptionsSchema = { [key: string]: unknown };

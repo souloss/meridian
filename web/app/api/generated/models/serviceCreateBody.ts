@@ -7,4 +7,5 @@
  */
 import type { ServiceCreateRequest } from './serviceCreateRequest.ts';
 
+/** ServiceCreateBody is the request body type for its generated OpenAPI operation. */
 export type ServiceCreateBody = ServiceCreateRequest;

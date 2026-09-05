@@ -7,4 +7,5 @@
  */
 import type { SubscriptionPutRequest } from './subscriptionPutRequest.ts';
 
+/** SubscriptionPutBody is the request body type for its generated OpenAPI operation. */
 export type SubscriptionPutBody = SubscriptionPutRequest;

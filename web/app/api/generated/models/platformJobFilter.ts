@@ -10,10 +10,18 @@ import type { JobStatus } from './jobStatus.ts';
 import type { JobType } from './jobType.ts';
 import type { Slug } from './slug.ts';
 
+/**
+ * defines supported filters for selecting platform job records.
+ */
 export interface PlatformJobFilter {
+  /** contains the ordered types associated with this platform job filter. */
   types?: JobType[];
+  /** contains the ordered statuses associated with this platform job filter. */
   statuses?: JobStatus[];
+  /** contains the job scope type associated with this platform job filter. */
   scopeType?: JobScopeType;
+  /** specifies the scope id associated with this platform job filter. */
   scopeId?: string;
+  /** contains the slug associated with this platform job filter. */
   tenantSlug?: Slug;
 }

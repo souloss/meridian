@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the query associated with this view definition.
+ */
 export type ViewDefinitionQuery = { [key: string]: unknown };

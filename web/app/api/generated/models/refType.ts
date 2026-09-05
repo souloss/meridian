@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported ref type value.
+ */
 export type RefType = typeof RefType[keyof typeof RefType];
 
 
+/** RefType is generated from the Meridian OpenAPI contract for ref type. */
 export const RefType = {
   branch: 'branch',
   tag: 'tag',

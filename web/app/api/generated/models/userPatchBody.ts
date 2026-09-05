@@ -7,4 +7,5 @@
  */
 import type { UserPatchRequest } from './userPatchRequest.ts';
 
+/** UserPatchBody is the request body type for its generated OpenAPI operation. */
 export type UserPatchBody = UserPatchRequest;

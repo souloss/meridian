@@ -13,17 +13,25 @@ import type { ShareLinkCreateRequestOptions } from './shareLinkCreateRequestOpti
  * Creates a view share. The server resolves all ref selectors to immutable version IDs, freezes scope membership and options, and allowlists only the resulting artifacts. Diff snapshots use the dedicated diff-snapshot share operation.
  */
 export interface ShareLinkCreateRequest {
+  /** specifies the resource type associated with this share link create request. */
   resourceType: 'view';
   /**
+     * specifies the view id associated with this share link create request.
      * @minLength 1
      * @maxLength 64
      */
   viewId: string;
-  /** @maxItems 50 */
+  /**
+     * contains the ordered inputs associated with this share link create request.
+     * @maxItems 50
+     */
   inputs?: DocumentSelector[];
+  /** specifies the scope associated with this share link create request. */
   scope?: ScopeSelector | null;
+  /** specifies the options associated with this share link create request. */
   options?: ShareLinkCreateRequestOptions;
   /**
+     * specifies the expires in seconds associated with this share link create request.
      * @minimum 300
      * @maximum 2592000
      */

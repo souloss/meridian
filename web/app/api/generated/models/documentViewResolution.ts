@@ -8,8 +8,14 @@
 import type { ArtifactLink } from './artifactLink.ts';
 import type { ViewDefinition } from './viewDefinition.ts';
 
+/**
+ * represents document view resolution data exchanged through the Meridian API.
+ */
 export interface DocumentViewResolution {
+  /** specifies the kind associated with this document view resolution. */
   kind: 'document';
+  /** contains the view definition associated with this document view resolution. */
   view: ViewDefinition;
+  /** contains the artifact link associated with this document view resolution. */
   document: ArtifactLink;
 }

@@ -8,11 +8,16 @@
 import type { CandidateOverride } from './candidateOverride.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface CandidatesAcceptRequest {
   /**
+     * indicates whether candidate ids applies to this candidates accept request.
      * @minItems 1
      * @maxItems 100
      */
   candidateIds: Uuid[];
+  /** contains the ordered overrides associated with this candidates accept request. */
   overrides?: CandidateOverride[];
 }

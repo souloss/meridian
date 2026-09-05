@@ -9,15 +9,30 @@ import type { CapabilityList } from './capabilityList.ts';
 import type { ETag } from './eTag.ts';
 import type { KindId } from './kindId.ts';
 
+/**
+ * represents asset kind data exchanged through the Meridian API.
+ */
 export interface AssetKind {
+  /** uniquely identifies this resource. */
   id: KindId;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** indicates whether enabled applies to this asset kind. */
   enabled: boolean;
-  /** @pattern ^M[0-9]+$ */
+  /**
+     * specifies the milestone associated with this asset kind.
+     * @pattern ^M[0-9]+$
+     */
   milestone: string;
+  /** contains the ordered accepted media types associated with this asset kind. */
   acceptedMediaTypes: string[];
+  /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
+  /** contains the ordered default views associated with this asset kind. */
   defaultViews: string[];
-  /** @minimum 1 */
+  /**
+     * specifies the schema version associated with this asset kind.
+     * @minimum 1
+     */
   schemaVersion: number;
 }

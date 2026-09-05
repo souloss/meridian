@@ -6,9 +6,18 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * carries write-only SSH private key material for encryption at rest.
+ */
 export interface SshSecretInput {
-  /** @minLength 32 */
+  /**
+     * is the write-only PEM-encoded SSH private key and must never be logged.
+     * @minLength 32
+     */
   privateKeyPem: string;
-  /** @nullable */
+  /**
+     * unlocks the private key when encrypted and must never be logged.
+     * @nullable
+     */
   passphrase?: string | null;
 }

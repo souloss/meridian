@@ -7,23 +7,37 @@
  */
 import type { FetchConfigKnownHostPolicy } from './fetchConfigKnownHostPolicy.ts';
 
+/**
+ * represents fetch config data exchanged through the Meridian API.
+ */
 export interface FetchConfig {
+  /** indicates whether shallow applies to this fetch config. */
   shallow: boolean;
   /**
+     * specifies the depth associated with this fetch config.
      * @minimum 1
      * @maximum 10000
      * @nullable
      */
   depth?: number | null;
+  /** indicates whether submodules applies to this fetch config. */
   submodules: boolean;
   /**
+     * specifies the proxy associated with this fetch config.
      * @maxLength 2048
      * @nullable
      */
   proxy?: string | null;
-  /** @items.maxLength 512 */
+  /**
+     * contains the ordered path allow associated with this fetch config.
+     * @items.maxLength 512
+     */
   pathAllow: string[];
-  /** @items.maxLength 512 */
+  /**
+     * contains the ordered path ignore associated with this fetch config.
+     * @items.maxLength 512
+     */
   pathIgnore: string[];
+  /** specifies the known host policy associated with this fetch config. */
   knownHostPolicy: FetchConfigKnownHostPolicy;
 }

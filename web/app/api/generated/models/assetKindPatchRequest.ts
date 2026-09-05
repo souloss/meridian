@@ -6,6 +6,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface AssetKindPatchRequest {
+  /** indicates whether enabled applies to this asset kind patch request. */
   enabled: boolean;
 }

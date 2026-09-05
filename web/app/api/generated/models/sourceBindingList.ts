@@ -7,6 +7,10 @@
  */
 import type { SourceBinding } from './sourceBinding.ts';
 
+/**
+ * contains an ordered collection of source binding values.
+ */
 export interface SourceBindingList {
+  /** contains the ordered items associated with this source binding list. */
   items: SourceBinding[];
 }

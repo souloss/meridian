@@ -10,22 +10,33 @@ import type { KnownHostSource } from './knownHostSource.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents known host data exchanged through the Meridian API.
+ */
 export interface KnownHost {
+  /** uniquely identifies this resource. */
   id: Uuid;
   /**
+     * specifies the host associated with this known host.
      * @minLength 1
      * @maxLength 255
      */
   host: string;
   /**
+     * specifies the port associated with this known host.
      * @minimum 1
      * @maximum 65535
      */
   port: number;
   /** SSH public-key algorithm parsed from the stored RFC4253 blob. */
   keyType: KnownHostKeyType;
-  /** @pattern ^SHA256:[A-Za-z0-9+/]{43}$ */
+  /**
+     * specifies the fingerprint associated with this known host.
+     * @pattern ^SHA256:[A-Za-z0-9+/]{43}$
+     */
   fingerprint: string;
+  /** specifies the source associated with this known host. */
   source: KnownHostSource;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
 }

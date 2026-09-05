@@ -7,4 +7,5 @@
  */
 import type { PlatformJobFilter } from './platformJobFilter.ts';
 
+/** PlatformJobFiltersParameter is generated from the Meridian OpenAPI contract for platform job filters parameter. */
 export type PlatformJobFiltersParameter = PlatformJobFilter;

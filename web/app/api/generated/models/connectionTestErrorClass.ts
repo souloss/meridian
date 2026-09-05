@@ -7,11 +7,13 @@
  */
 
 /**
+ * specifies the error class associated with this connection test.
  * @nullable
  */
 export type ConnectionTestErrorClass = typeof ConnectionTestErrorClass[keyof typeof ConnectionTestErrorClass] | null;
 
 
+/** ConnectionTestErrorClass is generated from the Meridian OpenAPI contract for connection test error class. */
 export const ConnectionTestErrorClass = {
   dns: 'dns',
   auth: 'auth',

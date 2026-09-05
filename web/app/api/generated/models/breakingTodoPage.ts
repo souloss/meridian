@@ -8,6 +8,10 @@
 import type { BreakingTodo } from './breakingTodo.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of breaking todo records.
+ */
 export type BreakingTodoPage = PageInfo & {
+  /** contains the ordered items associated with this breaking todo page. */
   items: BreakingTodo[];
 };

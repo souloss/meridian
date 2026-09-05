@@ -9,17 +9,29 @@ import type { KindId } from './kindId.ts';
 import type { ViewInputSpecMode } from './viewInputSpecMode.ts';
 import type { ViewInputSpecScopesItem } from './viewInputSpecScopesItem.ts';
 
+/**
+ * represents view input spec data exchanged through the Meridian API.
+ */
 export interface ViewInputSpec {
+  /** specifies the mode associated with this view input spec. */
   mode: ViewInputSpecMode;
+  /** specifies the kinds associated with this view input spec. */
   kinds: '*' | KindId[];
+  /** contains the ordered scopes associated with this view input spec. */
   scopes?: ViewInputSpecScopesItem[];
-  /** @minimum 1 */
+  /**
+     * specifies the min docs associated with this view input spec.
+     * @minimum 1
+     */
   minDocs?: number;
   /**
+     * specifies the max docs associated with this view input spec.
      * @minimum 1
      * @maximum 50
      */
   maxDocs?: number;
+  /** indicates whether same kind applies to this view input spec. */
   sameKind?: boolean;
+  /** indicates whether same asset applies to this view input spec. */
   sameAsset?: boolean;
 }

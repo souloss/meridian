@@ -7,4 +7,5 @@
  */
 import type { ServiceAiGenerateRequest } from './serviceAiGenerateRequest.ts';
 
+/** ServiceAiGenerateBody is the request body type for its generated OpenAPI operation. */
 export type ServiceAiGenerateBody = ServiceAiGenerateRequest;

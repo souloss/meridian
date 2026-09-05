@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * represents subscription scope constraints data exchanged through the Meridian API.
+ */
 export type SubscriptionScopeConstraints = unknown & unknown & unknown;

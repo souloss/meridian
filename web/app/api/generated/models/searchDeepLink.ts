@@ -7,9 +7,17 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents search deep link data exchanged through the Meridian API.
+ */
 export interface SearchDeepLink {
+  /** identifies the asset associated with this resource. */
   assetId: Uuid;
+  /** identifies the asset version associated with this resource. */
   versionId: Uuid;
-  /** @nullable */
+  /**
+     * specifies the item key associated with this search deep link.
+     * @nullable
+     */
   itemKey: string | null;
 }

@@ -8,12 +8,18 @@
 import type { CredentialPatchRequestSharedScope } from './credentialPatchRequestSharedScope.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface CredentialPatchRequest {
   /**
+     * specifies the name associated with this credential patch request.
      * @minLength 1
      * @maxLength 64
      */
   name?: string;
+  /** specifies the shared scope associated with this credential patch request. */
   sharedScope?: CredentialPatchRequestSharedScope;
+  /** contains the ordered team ids associated with this credential patch request. */
   teamIds?: Uuid[];
 }

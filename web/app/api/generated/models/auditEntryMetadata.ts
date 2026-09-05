@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the metadata associated with this audit entry.
+ */
 export type AuditEntryMetadata = { [key: string]: unknown };

@@ -10,12 +10,20 @@ import type { RefName } from './refName.ts';
 import type { RefType } from './refType.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface MergePreviewRequest {
+  /** identifies the asset associated with this resource. */
   assetId: Uuid;
+  /** contains the ref type associated with this merge preview request. */
   refType?: RefType;
+  /** contains the ref name associated with this merge preview request. */
   ref: RefName;
+  /** contains the ordered layers associated with this merge preview request. */
   layers?: MergeLayerInput[];
   /**
+     * specifies the override content associated with this merge preview request.
      * @maxLength 1048576
      * @nullable
      */

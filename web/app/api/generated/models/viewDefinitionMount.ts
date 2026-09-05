@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the mount associated with this view definition.
+ */
 export type ViewDefinitionMount = typeof ViewDefinitionMount[keyof typeof ViewDefinitionMount];
 
 
+/** ViewDefinitionMount is generated from the Meridian OpenAPI contract for view definition mount. */
 export const ViewDefinitionMount = {
   component: 'component',
   iframe: 'iframe',

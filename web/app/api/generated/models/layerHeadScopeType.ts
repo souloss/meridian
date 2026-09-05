@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the scope type associated with this layer head.
+ */
 export type LayerHeadScopeType = typeof LayerHeadScopeType[keyof typeof LayerHeadScopeType];
 
 
+/** LayerHeadScopeType is generated from the Meridian OpenAPI contract for layer head scope type. */
 export const LayerHeadScopeType = {
   ref: 'ref',
   global: 'global',

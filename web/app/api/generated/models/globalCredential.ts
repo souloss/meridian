@@ -11,20 +11,35 @@ import type { ETag } from './eTag.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents global credential data exchanged through the Meridian API.
+ */
 export interface GlobalCredential {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
   /**
+     * specifies the name associated with this global credential.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** contains the credential kind associated with this global credential. */
   kind: CredentialKind;
+  /** contains the credential fingerprint associated with this global credential. */
   fingerprint: CredentialFingerprint;
+  /** contains the uuid associated with this global credential. */
   createdBy: Uuid;
+  /** specifies the last used at associated with this global credential. */
   lastUsedAt: Timestamp | null;
-  /** @minimum 1 */
+  /**
+     * is the monotonic optimistic-concurrency version of this resource.
+     * @minimum 1
+     */
   revision: number;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

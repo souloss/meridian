@@ -7,7 +7,12 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents merge layer input data exchanged through the Meridian API.
+ */
 export interface MergeLayerInput {
+  /** contains the uuid associated with this merge layer input. */
   layerId: Uuid;
+  /** contains the uuid associated with this merge layer input. */
   revisionId: Uuid;
 }

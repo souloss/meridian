@@ -13,21 +13,30 @@ import type { ProducerProfileKind } from './producerProfileKind.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents producer profile data exchanged through the Meridian API.
+ */
 export interface ProducerProfile {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
   /**
+     * specifies the name associated with this producer profile.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** contains the producer profile kind associated with this producer profile. */
   kind: ProducerProfileKind;
   /**
+     * specifies the executable associated with this producer profile.
      * @maxLength 512
      * @pattern ^/
      */
   executable: string;
   /**
+     * contains the ordered args associated with this producer profile.
      * @maxItems 64
      * @items.maxLength 512
      */
@@ -37,36 +46,55 @@ export interface ProducerProfile {
      * @items.pattern ^[A-Z][A-Z0-9_]*$
      */
   envAllowlist: string[];
-  /** @minItems 1 */
+  /**
+     * contains the ordered supported kinds associated with this producer profile.
+     * @minItems 1
+     */
   supportedKinds: KindId[];
+  /** indicates whether replay safe applies to this producer profile. */
   replaySafe: boolean;
+  /** contains the producer network mode associated with this producer profile. */
   network: ProducerNetworkMode;
   /**
+     * specifies the timeout sec associated with this producer profile.
      * @minimum 10
      * @maximum 3600
      */
   timeoutSec: number;
   /**
+     * specifies the memory mi b associated with this producer profile.
      * @minimum 64
      * @maximum 16384
      */
   memoryMiB: number;
   /**
+     * specifies the cpu seconds associated with this producer profile.
      * @minimum 1
      * @maximum 3600
      */
   cpuSeconds: number;
   /**
+     * specifies the pids associated with this producer profile.
      * @minimum 1
      * @maximum 1024
      */
   pids: number;
+  /** indicates whether enabled applies to this producer profile. */
   enabled: boolean;
+  /** contains the producer dependency status associated with this producer profile. */
   dependencyStatus: ProducerDependencyStatus;
-  /** @nullable */
+  /**
+     * specifies the unavailable reason associated with this producer profile.
+     * @nullable
+     */
   unavailableReason: string | null;
-  /** @minimum 1 */
+  /**
+     * is the monotonic optimistic-concurrency version of this resource.
+     * @minimum 1
+     */
   revision: number;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

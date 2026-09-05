@@ -6,13 +6,28 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * represents quota data exchanged through the Meridian API.
+ */
 export interface Quota {
-  /** @minimum 0 */
+  /**
+     * specifies the max repositories associated with this quota.
+     * @minimum 0
+     */
   maxRepositories: number;
-  /** @minimum 0 */
+  /**
+     * specifies the max services associated with this quota.
+     * @minimum 0
+     */
   maxServices: number;
-  /** @minimum 0 */
+  /**
+     * specifies the max storage bytes associated with this quota.
+     * @minimum 0
+     */
   maxStorageBytes: number;
-  /** @minimum 1 */
+  /**
+     * specifies the max collect concurrency associated with this quota.
+     * @minimum 1
+     */
   maxCollectConcurrency: number;
 }

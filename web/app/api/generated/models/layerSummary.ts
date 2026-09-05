@@ -10,11 +10,21 @@ import type { LayerOrigin } from './layerOrigin.ts';
 import type { LayerRole } from './layerRole.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents layer summary data exchanged through the Meridian API.
+ */
 export interface LayerSummary {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the layer role associated with this layer summary. */
   role: LayerRole;
+  /** contains the layer origin associated with this layer summary. */
   origin: LayerOrigin;
-  /** @minimum 0 */
+  /**
+     * specifies the ord associated with this layer summary.
+     * @minimum 0
+     */
   ord: number;
+  /** contains the ordered heads associated with this layer summary. */
   heads: LayerHead[];
 }

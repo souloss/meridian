@@ -6,6 +6,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * represents star state data exchanged through the Meridian API.
+ */
 export interface StarState {
+  /** indicates whether starred applies to this star state. */
   starred: boolean;
 }

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the type associated with this search hit.
+ */
 export type SearchHitType = typeof SearchHitType[keyof typeof SearchHitType];
 
 
+/** SearchHitType is generated from the Meridian OpenAPI contract for search hit type. */
 export const SearchHitType = {
   repository: 'repository',
   service: 'service',

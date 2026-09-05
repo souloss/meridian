@@ -9,6 +9,7 @@
 export type OrderParameter = typeof OrderParameter[keyof typeof OrderParameter];
 
 
+/** OrderParameter is generated from the Meridian OpenAPI contract for order parameter. */
 export const OrderParameter = {
   asc: 'asc',
   desc: 'desc',

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the resolution associated with this drift resolution request.
+ */
 export type DriftResolutionRequestResolution = typeof DriftResolutionRequestResolution[keyof typeof DriftResolutionRequestResolution];
 
 
+/** DriftResolutionRequestResolution is generated from the Meridian OpenAPI contract for drift resolution request resolution. */
 export const DriftResolutionRequestResolution = {
   keep_db: 'keep_db',
   take_file: 'take_file',

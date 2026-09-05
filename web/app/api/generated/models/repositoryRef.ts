@@ -8,7 +8,12 @@
 import type { RefName } from './refName.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents repository ref data exchanged through the Meridian API.
+ */
 export interface RepositoryRef {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the ref name associated with this repository ref. */
   defaultBranch: RefName;
 }

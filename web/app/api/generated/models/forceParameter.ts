@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies or filters the force value in the query.
+ */
 export type ForceParameter = boolean;

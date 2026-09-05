@@ -19,12 +19,22 @@ import type { Tag } from './tag.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents service data exchanged through the Meridian API.
+ */
 export interface Service {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the slug associated with this service. */
   slug: Slug;
+  /** specifies the display name associated with this service. */
   displayName: string;
-  /** @nullable */
+  /**
+     * specifies the description associated with this service.
+     * @nullable
+     */
   description: string | null;
   /**
      * Empty string means repository root.
@@ -32,25 +42,39 @@ export interface Service {
      */
   rootDir: string;
   /**
+     * specifies the language associated with this service.
      * @maxLength 64
      * @nullable
      */
   language: string | null;
   /**
+     * specifies the framework associated with this service.
      * @maxLength 64
      * @nullable
      */
   framework: string | null;
+  /** contains the service visibility associated with this service. */
   visibility: ServiceVisibility;
+  /** contains the lifecycle associated with this service. */
   lifecycle: Lifecycle;
+  /** contains the repository ref associated with this service. */
   repository: RepositoryRef;
+  /** contains the owner refs associated with this service. */
   owners: OwnerRefs;
+  /** contains the ordered tags associated with this service. */
   tags: Tag[];
+  /** contains the ordered assets associated with this service. */
   assets: AssetSummary[];
+  /** contains the ordered missing kinds associated with this service. */
   missingKinds: MissingKind[];
+  /** contains the drift info associated with this service. */
   drift: DriftInfo;
+  /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
+  /** indicates whether starred applies to this service. */
   starred: boolean;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

@@ -11,12 +11,19 @@ import type { GitRemoteUrl } from './gitRemoteUrl.ts';
 import type { RefName } from './refName.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface RepositoryCreateRequest {
+  /** contains the git remote url associated with this repository create request. */
   url: GitRemoteUrl;
   /** Tenant-visible credential ID; may identify a tenant credential or a global credential. Null means public access. */
   credentialId?: Uuid | null;
+  /** contains the ref name associated with this repository create request. */
   defaultBranch: RefName;
+  /** contains the branch policy associated with this repository create request. */
   branchPolicy?: BranchPolicy;
+  /** contains the fetch config associated with this repository create request. */
   fetchConfig?: FetchConfig;
   /**
      * Standard five-field cron in UTC; null disables schedule
@@ -25,6 +32,7 @@ export interface RepositoryCreateRequest {
      */
   syncCron?: string | null;
   /**
+     * specifies the note associated with this repository create request.
      * @maxLength 500
      * @nullable
      */

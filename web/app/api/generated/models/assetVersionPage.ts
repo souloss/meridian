@@ -8,6 +8,10 @@
 import type { AssetVersion } from './assetVersion.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of asset version records.
+ */
 export type AssetVersionPage = PageInfo & {
+  /** contains the ordered items associated with this asset version page. */
   items: AssetVersion[];
 };

@@ -7,6 +7,10 @@
  */
 import type { DiffRuleSet } from './diffRuleSet.ts';
 
+/**
+ * contains an ordered collection of diff rule set values.
+ */
 export interface DiffRuleSetList {
+  /** contains the ordered items associated with this diff rule set list. */
   items: DiffRuleSet[];
 }

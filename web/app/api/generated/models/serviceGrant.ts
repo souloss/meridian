@@ -10,9 +10,16 @@ import type { ServiceGrantPrincipalType } from './serviceGrantPrincipalType.ts';
 import type { ServiceRole } from './serviceRole.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents service grant data exchanged through the Meridian API.
+ */
 export interface ServiceGrant {
+  /** specifies the principal type associated with this service grant. */
   principalType: ServiceGrantPrincipalType;
+  /** contains the uuid associated with this service grant. */
   principalId: Uuid;
+  /** contains the service role associated with this service grant. */
   role: ServiceRole;
+  /** contains the ordered permissions associated with this service grant. */
   permissions: ServiceGrantPermissionsItem[];
 }

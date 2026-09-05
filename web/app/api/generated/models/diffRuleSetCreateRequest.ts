@@ -8,12 +8,18 @@
 import type { DiffRule } from './diffRule.ts';
 import type { KindId } from './kindId.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface DiffRuleSetCreateRequest {
   /**
+     * specifies the name associated with this diff rule set create request.
      * @minLength 1
      * @maxLength 128
      */
   name: string;
+  /** contains the kind id associated with this diff rule set create request. */
   kind: KindId;
+  /** contains the ordered rules associated with this diff rule set create request. */
   rules: DiffRule[];
 }

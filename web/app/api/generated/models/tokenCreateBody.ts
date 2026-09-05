@@ -7,4 +7,5 @@
  */
 import type { TokenCreateRequest } from './tokenCreateRequest.ts';
 
+/** TokenCreateBody is the request body type for its generated OpenAPI operation. */
 export type TokenCreateBody = TokenCreateRequest;

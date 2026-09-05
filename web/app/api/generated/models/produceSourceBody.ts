@@ -7,4 +7,5 @@
  */
 import type { ProduceSourceRequest } from './produceSourceRequest.ts';
 
+/** ProduceSourceBody is the request body type for its generated OpenAPI operation. */
 export type ProduceSourceBody = ProduceSourceRequest;

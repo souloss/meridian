@@ -7,6 +7,10 @@
  */
 import type { SourceSpec } from './sourceSpec.ts';
 
+/**
+ * contains an ordered collection of source spec values.
+ */
 export interface SourceSpecList {
+  /** contains the ordered items associated with this source spec list. */
   items: SourceSpec[];
 }

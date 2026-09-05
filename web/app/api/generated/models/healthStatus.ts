@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * is ok when the requested health check succeeds.
+ */
 export type HealthStatus = typeof HealthStatus[keyof typeof HealthStatus];
 
 
+/** HealthStatus is generated from the Meridian OpenAPI contract for health status. */
 export const HealthStatus = {
   ok: 'ok',
 } as const;

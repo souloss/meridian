@@ -7,7 +7,12 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents owner refs data exchanged through the Meridian API.
+ */
 export interface OwnerRefs {
+  /** contains the ordered user ids associated with this owner refs. */
   userIds: Uuid[];
+  /** contains the ordered team ids associated with this owner refs. */
   teamIds: Uuid[];
 }

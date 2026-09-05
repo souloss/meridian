@@ -8,6 +8,10 @@
 import type { GlobalCredential } from './globalCredential.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of global credential records.
+ */
 export type GlobalCredentialPage = PageInfo & {
+  /** contains the ordered items associated with this global credential page. */
   items: GlobalCredential[];
 };

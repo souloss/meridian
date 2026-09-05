@@ -7,4 +7,5 @@
  */
 import type { ServicePatchRequest } from './servicePatchRequest.ts';
 
+/** ServicePatchBody is the request body type for its generated OpenAPI operation. */
 export type ServicePatchBody = ServicePatchRequest;

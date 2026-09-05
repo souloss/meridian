@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { Service } from './service.ts';
 
+/**
+ * contains one paginated page of service records.
+ */
 export type ServicePage = PageInfo & {
+  /** contains the ordered items associated with this service page. */
   items: Service[];
 };

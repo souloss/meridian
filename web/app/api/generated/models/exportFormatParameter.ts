@@ -9,6 +9,7 @@
 export type ExportFormatParameter = typeof ExportFormatParameter[keyof typeof ExportFormatParameter];
 
 
+/** ExportFormatParameter is generated from the Meridian OpenAPI contract for export format parameter. */
 export const ExportFormatParameter = {
   json: 'json',
   markdown: 'markdown',

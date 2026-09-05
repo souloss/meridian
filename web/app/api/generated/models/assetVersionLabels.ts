@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the labels associated with this asset version.
+ */
 export type AssetVersionLabels = {[key: string]: string};

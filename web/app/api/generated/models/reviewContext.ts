@@ -9,9 +9,16 @@ import type { DiffResult } from './diffResult.ts';
 import type { LayerRevision } from './layerRevision.ts';
 import type { User } from './user.ts';
 
+/**
+ * represents review context data exchanged through the Meridian API.
+ */
 export interface ReviewContext {
+  /** is the monotonic optimistic-concurrency version of this resource. */
   revision: LayerRevision;
+  /** specifies the current effective revision associated with this review context. */
   currentEffectiveRevision: LayerRevision | null;
+  /** contains the diff result associated with this review context. */
   diff: DiffResult;
+  /** specifies the author associated with this review context. */
   author: User | null;
 }

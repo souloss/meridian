@@ -10,9 +10,16 @@ import type { UserPreferencesDefaultViews } from './userPreferencesDefaultViews.
 import type { UserPreferencesLocale } from './userPreferencesLocale.ts';
 import type { UserPreferencesTheme } from './userPreferencesTheme.ts';
 
+/**
+ * represents user preferences data exchanged through the Meridian API.
+ */
 export interface UserPreferences {
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** specifies the locale associated with this user preferences. */
   locale: UserPreferencesLocale;
+  /** specifies the theme associated with this user preferences. */
   theme: UserPreferencesTheme;
+  /** specifies the default views associated with this user preferences. */
   defaultViews: UserPreferencesDefaultViews;
 }

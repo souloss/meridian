@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported overlay dialect value.
+ */
 export type OverlayDialect = typeof OverlayDialect[keyof typeof OverlayDialect];
 
 
+/** OverlayDialect is generated from the Meridian OpenAPI contract for overlay dialect. */
 export const OverlayDialect = {
   none: 'none',
   'oas-overlay-10': 'oas-overlay-1.0',

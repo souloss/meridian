@@ -7,4 +7,5 @@
  */
 import type { TeamPatchRequest } from './teamPatchRequest.ts';
 
+/** TeamPatchBody is the request body type for its generated OpenAPI operation. */
 export type TeamPatchBody = TeamPatchRequest;

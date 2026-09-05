@@ -7,4 +7,5 @@
  */
 import type { RefType } from './refType.ts';
 
+/** RefTypeParameter is generated from the Meridian OpenAPI contract for ref type parameter. */
 export type RefTypeParameter = RefType;

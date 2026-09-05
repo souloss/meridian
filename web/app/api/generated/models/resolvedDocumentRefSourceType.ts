@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the source type associated with this resolved document ref.
+ */
 export type ResolvedDocumentRefSourceType = typeof ResolvedDocumentRefSourceType[keyof typeof ResolvedDocumentRefSourceType];
 
 
+/** ResolvedDocumentRefSourceType is generated from the Meridian OpenAPI contract for resolved document ref source type. */
 export const ResolvedDocumentRefSourceType = {
   version: 'version',
   upload: 'upload',

@@ -7,4 +7,5 @@
  */
 import type { SystemGroupMembersReplaceRequest } from './systemGroupMembersReplaceRequest.ts';
 
+/** SystemGroupMembersReplaceBody is the request body type for its generated OpenAPI operation. */
 export type SystemGroupMembersReplaceBody = SystemGroupMembersReplaceRequest;

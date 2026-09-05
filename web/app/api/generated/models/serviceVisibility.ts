@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported service visibility value.
+ */
 export type ServiceVisibility = typeof ServiceVisibility[keyof typeof ServiceVisibility];
 
 
+/** ServiceVisibility is generated from the Meridian OpenAPI contract for service visibility. */
 export const ServiceVisibility = {
   private: 'private',
   internal: 'internal',

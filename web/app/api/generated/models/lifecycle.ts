@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported lifecycle value.
+ */
 export type Lifecycle = typeof Lifecycle[keyof typeof Lifecycle];
 
 
+/** Lifecycle is generated from the Meridian OpenAPI contract for lifecycle. */
 export const Lifecycle = {
   draft: 'draft',
   published: 'published',

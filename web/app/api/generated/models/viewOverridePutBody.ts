@@ -7,4 +7,5 @@
  */
 import type { ViewOverridePutRequest } from './viewOverridePutRequest.ts';
 
+/** ViewOverridePutBody is the request body type for its generated OpenAPI operation. */
 export type ViewOverridePutBody = ViewOverridePutRequest;

@@ -7,4 +7,5 @@
  */
 import type { UserCreateRequest } from './userCreateRequest.ts';
 
+/** UserCreateBodyBody is the request body type for its generated OpenAPI operation. */
 export type UserCreateBodyBody = UserCreateRequest;

@@ -9,9 +9,16 @@ import type { Slug } from './slug.ts';
 import type { TenantRole } from './tenantRole.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * identifies one tenant the current user may enter and the user's role there.
+ */
 export interface TenantMembershipRef {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the slug associated with this tenant membership ref. */
   slug: Slug;
+  /** specifies the display name associated with this tenant membership ref. */
   displayName: string;
+  /** contains the tenant role associated with this tenant membership ref. */
   role: TenantRole;
 }

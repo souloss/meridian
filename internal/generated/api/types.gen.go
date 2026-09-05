@@ -2115,1103 +2115,1715 @@ func (e ReceiveGitWebhookParamsXMeridianEvent) Valid() bool {
 	}
 }
 
-// AiGenerationAccepted defines model for AiGenerationAccepted.
+// AiGenerationAccepted represents ai generation accepted data exchanged through the Meridian API.
 type AiGenerationAccepted struct {
-	// AssetId UUID v7
-	AssetId      Uuid `json:"assetId"`
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
+
+	// Deduplicated indicates whether deduplicated applies to this ai generation accepted.
 	Deduplicated bool `json:"deduplicated"`
 
-	// JobId UUID v7
+	// JobId identifies the asynchronous job associated with this resource.
 	JobId Uuid `json:"jobId"`
 
-	// SourceId UUID v7
+	// SourceId identifies the source associated with this resource.
 	SourceId Uuid `json:"sourceId"`
 }
 
-// ApiToken defines model for ApiToken.
+// ApiToken exposes PAT metadata without returning the bearer token or stored token hash.
 type ApiToken struct {
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
+
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
 	ExpiresAt Timestamp `json:"expiresAt"`
 
-	// Id UUID v7
-	Id         Uuid         `json:"id"`
-	LastUsedAt Timestamp    `json:"lastUsedAt"`
-	Name       string       `json:"name"`
-	RevokedAt  Timestamp    `json:"revokedAt"`
-	Scopes     []TokenScope `json:"scopes"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// LastUsedAt is the most recent successful authentication instant, or null when unused.
+	LastUsedAt Timestamp `json:"lastUsedAt"`
+
+	// Name specifies the name associated with this api token.
+	Name string `json:"name"`
+
+	// RevokedAt is the revocation instant, or null while the token remains active.
+	RevokedAt Timestamp `json:"revokedAt"`
+
+	// Scopes lists the explicit capabilities granted to this token.
+	Scopes []TokenScope `json:"scopes"`
 }
 
-// ArtifactLink defines model for ArtifactLink.
+// ArtifactLink represents artifact link data exchanged through the Meridian API.
 type ArtifactLink struct {
-	// ExpiresAt RFC 3339 UTC
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
 	ExpiresAt Timestamp `json:"expiresAt"`
-	Url       string    `json:"url"`
+
+	// Url specifies the url associated with this artifact link.
+	Url string `json:"url"`
 }
 
-// Asset defines model for Asset.
+// Asset represents asset data exchanged through the Meridian API.
 type Asset struct {
+	// Capabilities lists actions the authenticated principal may perform on this resource.
 	Capabilities CapabilityList `json:"capabilities"`
 
-	// CreatedAt RFC 3339 UTC
-	CreatedAt      Timestamp  `json:"createdAt"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
+
+	// CurrentVersion specifies the current version associated with this asset.
 	CurrentVersion VersionRef `json:"currentVersion"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag   ETag        `json:"etag"`
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Health specifies the health associated with this asset.
 	Health AssetHealth `json:"health"`
 
-	// Id UUID v7
-	Id            Uuid           `json:"id"`
-	Kind          KindId         `json:"kind"`
-	LatestVersion VersionRef     `json:"latestVersion"`
-	Layers        []LayerSummary `json:"layers"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
 
-	// Lifecycle Lifecycle of currentVersion, otherwise latestVersion, otherwise draft for the selected ref Track.
-	Lifecycle    Lifecycle `json:"lifecycle"`
-	Name         AssetName `json:"name"`
-	QualityScore int       `json:"qualityScore"`
-	Ref          RefName   `json:"ref"`
-	RefType      RefType   `json:"refType"`
+	// Kind contains the kind id associated with this asset.
+	Kind KindId `json:"kind"`
 
-	// ServiceId UUID v7
+	// LatestVersion specifies the latest version associated with this asset.
+	LatestVersion VersionRef `json:"latestVersion"`
+
+	// Layers contains the ordered layers associated with this asset.
+	Layers []LayerSummary `json:"layers"`
+
+	// Lifecycle of currentVersion, otherwise latestVersion, otherwise draft for the selected ref Track.
+	Lifecycle Lifecycle `json:"lifecycle"`
+
+	// Name contains the asset name associated with this asset.
+	Name AssetName `json:"name"`
+
+	// QualityScore specifies the quality score associated with this asset.
+	QualityScore int `json:"qualityScore"`
+
+	// Ref contains the ref name associated with this asset.
+	Ref RefName `json:"ref"`
+
+	// RefType contains the ref type associated with this asset.
+	RefType RefType `json:"refType"`
+
+	// ServiceId identifies the service associated with this resource.
 	ServiceId Uuid `json:"serviceId"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// AssetHealth defines model for Asset.Health.
+// AssetHealth specifies the health associated with this asset.
 type AssetHealth string
 
-// AssetAiGenerateRequest defines model for AssetAiGenerateRequest.
+// AssetAiGenerateRequest defines validated input for the corresponding Meridian API operation.
 type AssetAiGenerateRequest struct {
+	// Hint specifies the hint associated with this asset ai generate request.
 	Hint string `json:"hint,omitempty"`
 
-	// ProducerProfileId UUID v7
-	ProducerProfileId Uuid    `json:"producerProfileId,omitempty"`
-	Ref               RefName `json:"ref,omitempty"`
-	RefType           RefType `json:"refType,omitempty"`
-	SourceId          Uuid    `json:"sourceId,omitempty"`
+	// ProducerProfileId contains the uuid associated with this asset ai generate request.
+	ProducerProfileId Uuid `json:"producerProfileId,omitempty"`
+
+	// Ref contains the ref name associated with this asset ai generate request.
+	Ref RefName `json:"ref,omitempty"`
+
+	// RefType contains the ref type associated with this asset ai generate request.
+	RefType RefType `json:"refType,omitempty"`
+
+	// SourceId identifies the source associated with this resource.
+	SourceId Uuid `json:"sourceId,omitempty"`
 }
 
-// AssetItem defines model for AssetItem.
+// AssetItem represents asset item data exchanged through the Meridian API.
 type AssetItem struct {
-	Display    map[string]interface{} `json:"display"`
-	ItemType   string                 `json:"itemType"`
-	Key        string                 `json:"key"`
-	Provenance []ProvenanceEntry      `json:"provenance"`
+	// Display specifies the display associated with this asset item.
+	Display map[string]interface{} `json:"display"`
+
+	// ItemType specifies the item type associated with this asset item.
+	ItemType string `json:"itemType"`
+
+	// Key specifies the key associated with this asset item.
+	Key string `json:"key"`
+
+	// Provenance contains the ordered provenance associated with this asset item.
+	Provenance []ProvenanceEntry `json:"provenance"`
 }
 
-// AssetItemPage defines model for AssetItemPage.
+// AssetItemPage contains one paginated page of asset item records.
 type AssetItemPage struct {
-	Items    []AssetItem `json:"items"`
-	Page     int         `json:"page"`
-	PageSize int         `json:"pageSize"`
-	Total    int         `json:"total"`
+	// Items contains the ordered items associated with this asset item page.
+	Items []AssetItem `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// AssetKind defines model for AssetKind.
+// AssetKind represents asset kind data exchanged through the Meridian API.
 type AssetKind struct {
-	AcceptedMediaTypes []string       `json:"acceptedMediaTypes"`
-	Capabilities       CapabilityList `json:"capabilities"`
-	DefaultViews       []string       `json:"defaultViews"`
-	Enabled            bool           `json:"enabled"`
+	// AcceptedMediaTypes contains the ordered accepted media types associated with this asset kind.
+	AcceptedMediaTypes []string `json:"acceptedMediaTypes"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag          ETag   `json:"etag"`
-	Id            KindId `json:"id"`
-	Milestone     string `json:"milestone"`
-	SchemaVersion int    `json:"schemaVersion"`
+	// Capabilities lists actions the authenticated principal may perform on this resource.
+	Capabilities CapabilityList `json:"capabilities"`
+
+	// DefaultViews contains the ordered default views associated with this asset kind.
+	DefaultViews []string `json:"defaultViews"`
+
+	// Enabled indicates whether enabled applies to this asset kind.
+	Enabled bool `json:"enabled"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Id uniquely identifies this resource.
+	Id KindId `json:"id"`
+
+	// Milestone specifies the milestone associated with this asset kind.
+	Milestone string `json:"milestone"`
+
+	// SchemaVersion specifies the schema version associated with this asset kind.
+	SchemaVersion int `json:"schemaVersion"`
 }
 
-// AssetKindList defines model for AssetKindList.
+// AssetKindList contains an ordered collection of asset kind values.
 type AssetKindList struct {
+	// Items contains the ordered items associated with this asset kind list.
 	Items []AssetKind `json:"items"`
 }
 
-// AssetKindPatchRequest defines model for AssetKindPatchRequest.
+// AssetKindPatchRequest defines validated input for the corresponding Meridian API operation.
 type AssetKindPatchRequest struct {
+	// Enabled indicates whether enabled applies to this asset kind patch request.
 	Enabled bool `json:"enabled"`
 }
 
-// AssetName defines model for AssetName.
+// AssetName is a stable lowercase asset identifier within one service and kind.
 type AssetName = string
 
-// AssetNameTemplate defines model for AssetNameTemplate.
+// AssetNameTemplate represents asset name template data exchanged through the Meridian API.
 type AssetNameTemplate = string
 
-// AssetPushRequest defines model for AssetPushRequest.
+// AssetPushRequest defines validated input for the corresponding Meridian API operation.
 type AssetPushRequest struct {
-	Content         string      `json:"content"`
-	ContentType     ContentType `json:"contentType"`
-	CreateIfMissing bool        `json:"createIfMissing,omitempty"`
-	Dialect         string      `json:"dialect,omitempty"`
-	Kind            KindId      `json:"kind"`
-	Name            AssetName   `json:"name"`
-	Ref             RefName     `json:"ref"`
-	RefType         RefType     `json:"refType,omitempty"`
-	Role            LayerRole   `json:"role,omitempty"`
-	ServiceSlug     Slug        `json:"serviceSlug"`
-	SourceCommit    string      `json:"sourceCommit,omitempty"`
-	SourceSystem    string      `json:"sourceSystem"`
+	// Content specifies the content associated with this asset push request.
+	Content string `json:"content"`
+
+	// ContentType contains the content type associated with this asset push request.
+	ContentType ContentType `json:"contentType"`
+
+	// CreateIfMissing indicates whether create if missing applies to this asset push request.
+	CreateIfMissing bool `json:"createIfMissing,omitempty"`
+
+	// Dialect specifies the dialect associated with this asset push request.
+	Dialect string `json:"dialect,omitempty"`
+
+	// Kind contains the kind id associated with this asset push request.
+	Kind KindId `json:"kind"`
+
+	// Name contains the asset name associated with this asset push request.
+	Name AssetName `json:"name"`
+
+	// Ref contains the ref name associated with this asset push request.
+	Ref RefName `json:"ref"`
+
+	// RefType contains the ref type associated with this asset push request.
+	RefType RefType `json:"refType,omitempty"`
+
+	// Role specifies the role associated with this asset push request.
+	Role LayerRole `json:"role,omitempty"`
+
+	// ServiceSlug contains the slug associated with this asset push request.
+	ServiceSlug Slug `json:"serviceSlug"`
+
+	// SourceCommit specifies the source commit associated with this asset push request.
+	SourceCommit string `json:"sourceCommit,omitempty"`
+
+	// SourceSystem specifies the source system associated with this asset push request.
+	SourceSystem string `json:"sourceSystem"`
 }
 
-// AssetPushResult defines model for AssetPushResult.
+// AssetPushResult reports the result of the corresponding Meridian operation.
 type AssetPushResult struct {
-	// AssetId UUID v7
-	AssetId      Uuid `json:"assetId"`
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
+
+	// Deduplicated indicates whether deduplicated applies to this asset push result.
 	Deduplicated bool `json:"deduplicated"`
 
-	// JobId UUID v7
+	// JobId identifies the asynchronous job associated with this resource.
 	JobId Uuid `json:"jobId"`
 
-	// LayerId UUID v7
+	// LayerId contains the uuid associated with this asset push result.
 	LayerId Uuid `json:"layerId"`
 
-	// RevisionId UUID v7
+	// RevisionId contains the uuid associated with this asset push result.
 	RevisionId Uuid `json:"revisionId"`
 }
 
-// AssetSummary defines model for AssetSummary.
+// AssetSummary represents asset summary data exchanged through the Meridian API.
 type AssetSummary struct {
-	CurrentVersion VersionRef         `json:"currentVersion"`
-	Health         AssetSummaryHealth `json:"health"`
+	// CurrentVersion specifies the current version associated with this asset summary.
+	CurrentVersion VersionRef `json:"currentVersion"`
 
-	// Id UUID v7
-	Id            Uuid       `json:"id"`
-	Kind          KindId     `json:"kind"`
+	// Health specifies the health associated with this asset summary.
+	Health AssetSummaryHealth `json:"health"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Kind contains the kind id associated with this asset summary.
+	Kind KindId `json:"kind"`
+
+	// LatestVersion specifies the latest version associated with this asset summary.
 	LatestVersion VersionRef `json:"latestVersion"`
 
-	// Lifecycle Lifecycle of currentVersion, otherwise latestVersion, otherwise draft for the repository default Track.
+	// Lifecycle of currentVersion, otherwise latestVersion, otherwise draft for the repository default Track.
 	Lifecycle Lifecycle `json:"lifecycle"`
-	Name      AssetName `json:"name"`
-	Ref       RefName   `json:"ref"`
-	RefType   RefType   `json:"refType"`
+
+	// Name contains the asset name associated with this asset summary.
+	Name AssetName `json:"name"`
+
+	// Ref contains the ref name associated with this asset summary.
+	Ref RefName `json:"ref"`
+
+	// RefType contains the ref type associated with this asset summary.
+	RefType RefType `json:"refType"`
 }
 
-// AssetSummaryHealth defines model for AssetSummary.Health.
+// AssetSummaryHealth specifies the health associated with this asset summary.
 type AssetSummaryHealth string
 
-// AssetVersion defines model for AssetVersion.
+// AssetVersion represents asset version data exchanged through the Meridian API.
 type AssetVersion struct {
-	// AssetId UUID v7
-	AssetId           Uuid           `json:"assetId"`
-	BaselineVersionId Uuid           `json:"baselineVersionId"`
-	Capabilities      CapabilityList `json:"capabilities"`
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
 
-	// CreatedAt RFC 3339 UTC
-	CreatedAt   Timestamp         `json:"createdAt"`
-	DiffSummary DiffCounts        `json:"diffSummary"`
-	Downloads   map[string]string `json:"downloads"`
+	// BaselineVersionId specifies the baseline version id associated with this asset version.
+	BaselineVersionId Uuid `json:"baselineVersionId"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag ETag `json:"etag"`
+	// Capabilities lists actions the authenticated principal may perform on this resource.
+	Capabilities CapabilityList `json:"capabilities"`
 
-	// Id UUID v7
-	Id                     Uuid                    `json:"id"`
-	IndexedAt              Timestamp               `json:"indexedAt"`
-	InputFingerprint       string                  `json:"inputFingerprint"`
-	KindPluginVersion      string                  `json:"kindPluginVersion"`
-	Labels                 map[string]string       `json:"labels"`
-	LayerManifest          []LayerManifestEntry    `json:"layerManifest"`
-	Lifecycle              Lifecycle               `json:"lifecycle"`
-	MergeEngineVersion     string                  `json:"mergeEngineVersion"`
-	MergedHash             string                  `json:"mergedHash"`
-	NormalizerVersion      string                  `json:"normalizerVersion"`
-	OverlayCompilerVersion string                  `json:"overlayCompilerVersion"`
-	OverlayMode            AssetVersionOverlayMode `json:"overlayMode"`
-	QualityScore           int                     `json:"qualityScore"`
-	Ref                    RefName                 `json:"ref"`
-	RefType                RefType                 `json:"refType"`
-	SequenceNo             int                     `json:"sequenceNo"`
-	SourceCommit           string                  `json:"sourceCommit"`
-	Version                string                  `json:"version"`
-}
-
-// AssetVersionOverlayMode defines model for AssetVersion.OverlayMode.
-type AssetVersionOverlayMode string
-
-// AssetVersionPage defines model for AssetVersionPage.
-type AssetVersionPage struct {
-	Items    []AssetVersion `json:"items"`
-	Page     int            `json:"page"`
-	PageSize int            `json:"pageSize"`
-	Total    int            `json:"total"`
-}
-
-// AuditEntry defines model for AuditEntry.
-type AuditEntry struct {
-	Action  string `json:"action"`
-	ActorId Uuid   `json:"actorId"`
-
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
-	// Id UUID v7
-	Id           Uuid                   `json:"id"`
-	Metadata     map[string]interface{} `json:"metadata"`
-	RequestId    string                 `json:"requestId"`
-	ResourceId   string                 `json:"resourceId"`
-	ResourceType string                 `json:"resourceType"`
-	TenantSlug   Slug                   `json:"tenantSlug"`
+	// DiffSummary specifies the diff summary associated with this asset version.
+	DiffSummary DiffCounts `json:"diffSummary"`
+
+	// Downloads specifies the downloads associated with this asset version.
+	Downloads map[string]string `json:"downloads"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// IndexedAt specifies the indexed at associated with this asset version.
+	IndexedAt Timestamp `json:"indexedAt"`
+
+	// InputFingerprint specifies the input fingerprint associated with this asset version.
+	InputFingerprint string `json:"inputFingerprint"`
+
+	// KindPluginVersion specifies the kind plugin version associated with this asset version.
+	KindPluginVersion string `json:"kindPluginVersion"`
+
+	// Labels specifies the labels associated with this asset version.
+	Labels map[string]string `json:"labels"`
+
+	// LayerManifest contains the ordered layer manifest associated with this asset version.
+	LayerManifest []LayerManifestEntry `json:"layerManifest"`
+
+	// Lifecycle contains the lifecycle associated with this asset version.
+	Lifecycle Lifecycle `json:"lifecycle"`
+
+	// MergeEngineVersion specifies the merge engine version associated with this asset version.
+	MergeEngineVersion string `json:"mergeEngineVersion"`
+
+	// MergedHash specifies the merged hash associated with this asset version.
+	MergedHash string `json:"mergedHash"`
+
+	// NormalizerVersion specifies the normalizer version associated with this asset version.
+	NormalizerVersion string `json:"normalizerVersion"`
+
+	// OverlayCompilerVersion specifies the overlay compiler version associated with this asset version.
+	OverlayCompilerVersion string `json:"overlayCompilerVersion"`
+
+	// OverlayMode specifies the overlay mode associated with this asset version.
+	OverlayMode AssetVersionOverlayMode `json:"overlayMode"`
+
+	// QualityScore specifies the quality score associated with this asset version.
+	QualityScore int `json:"qualityScore"`
+
+	// Ref contains the ref name associated with this asset version.
+	Ref RefName `json:"ref"`
+
+	// RefType contains the ref type associated with this asset version.
+	RefType RefType `json:"refType"`
+
+	// SequenceNo specifies the sequence no associated with this asset version.
+	SequenceNo int `json:"sequenceNo"`
+
+	// SourceCommit specifies the source commit associated with this asset version.
+	SourceCommit string `json:"sourceCommit"`
+
+	// Version specifies the version associated with this asset version.
+	Version string `json:"version"`
 }
 
-// AuditFilter defines model for AuditFilter.
+// AssetVersionOverlayMode specifies the overlay mode associated with this asset version.
+type AssetVersionOverlayMode string
+
+// AssetVersionPage contains one paginated page of asset version records.
+type AssetVersionPage struct {
+	// Items contains the ordered items associated with this asset version page.
+	Items []AssetVersion `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
+}
+
+// AuditEntry represents audit entry data exchanged through the Meridian API.
+type AuditEntry struct {
+	// Action specifies the action associated with this audit entry.
+	Action string `json:"action"`
+
+	// ActorId specifies the actor id associated with this audit entry.
+	ActorId Uuid `json:"actorId"`
+
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Metadata specifies the metadata associated with this audit entry.
+	Metadata map[string]interface{} `json:"metadata"`
+
+	// RequestId correlates this result with server logs and audit records.
+	RequestId string `json:"requestId"`
+
+	// ResourceId specifies the resource id associated with this audit entry.
+	ResourceId string `json:"resourceId"`
+
+	// ResourceType specifies the resource type associated with this audit entry.
+	ResourceType string `json:"resourceType"`
+
+	// TenantSlug specifies the tenant slug associated with this audit entry.
+	TenantSlug Slug `json:"tenantSlug"`
+}
+
+// AuditFilter defines supported filters for selecting audit records.
 type AuditFilter struct {
+	// Actions contains the ordered actions associated with this audit filter.
 	Actions []string `json:"actions,omitempty"`
 
-	// ActorId UUID v7
+	// ActorId contains the uuid associated with this audit filter.
 	ActorId Uuid `json:"actorId,omitempty"`
 
-	// From RFC 3339 UTC
-	From         Timestamp `json:"from,omitempty"`
-	ResourceId   string    `json:"resourceId,omitempty"`
-	ResourceType string    `json:"resourceType,omitempty"`
+	// From contains the timestamp associated with this audit filter.
+	From Timestamp `json:"from,omitempty"`
 
-	// To RFC 3339 UTC
+	// ResourceId specifies the resource id associated with this audit filter.
+	ResourceId string `json:"resourceId,omitempty"`
+
+	// ResourceType specifies the resource type associated with this audit filter.
+	ResourceType string `json:"resourceType,omitempty"`
+
+	// To contains the timestamp associated with this audit filter.
 	To Timestamp `json:"to,omitempty"`
 }
 
-// AuditLogPage defines model for AuditLogPage.
+// AuditLogPage contains one paginated page of audit log records.
 type AuditLogPage struct {
-	Items    []AuditEntry `json:"items"`
-	Page     int          `json:"page"`
-	PageSize int          `json:"pageSize"`
-	Total    int          `json:"total"`
+	// Items contains the ordered items associated with this audit log page.
+	Items []AuditEntry `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// BranchPolicy defines model for BranchPolicy.
+// BranchPolicy represents branch policy data exchanged through the Meridian API.
 type BranchPolicy struct {
+	// BranchPatterns contains the ordered branch patterns associated with this branch policy.
 	BranchPatterns []RefGlob `json:"branchPatterns"`
-	TagPatterns    []RefGlob `json:"tagPatterns"`
+
+	// TagPatterns contains the ordered tag patterns associated with this branch policy.
+	TagPatterns []RefGlob `json:"tagPatterns"`
 }
 
-// BreakingTodo defines model for BreakingTodo.
+// BreakingTodo represents breaking todo data exchanged through the Meridian API.
 type BreakingTodo struct {
+	// AcknowledgedAt specifies the acknowledged at associated with this breaking todo.
 	AcknowledgedAt Timestamp `json:"acknowledgedAt"`
 
-	// AssetVersionId UUID v7
+	// AssetVersionId contains the uuid associated with this breaking todo.
 	AssetVersionId Uuid `json:"assetVersionId"`
 
-	// AssigneeId UUID v7
-	AssigneeId Uuid   `json:"assigneeId"`
-	Comment    string `json:"comment"`
+	// AssigneeId contains the uuid associated with this breaking todo.
+	AssigneeId Uuid `json:"assigneeId"`
 
-	// CreatedAt RFC 3339 UTC
+	// Comment specifies the comment associated with this breaking todo.
+	Comment string `json:"comment"`
+
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
-	// Id UUID v7
-	Id      Uuid       `json:"id"`
-	Status  TodoStatus `json:"status"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Status is the current lifecycle or processing state.
+	Status TodoStatus `json:"status"`
+
+	// Summary contains the diff counts associated with this breaking todo.
 	Summary DiffCounts `json:"summary"`
 }
 
-// BreakingTodoAcknowledgeRequest defines model for BreakingTodoAcknowledgeRequest.
+// BreakingTodoAcknowledgeRequest defines validated input for the corresponding Meridian API operation.
 type BreakingTodoAcknowledgeRequest struct {
+	// Comment specifies the comment associated with this breaking todo acknowledge request.
 	Comment string `json:"comment,omitempty"`
 }
 
-// BreakingTodoPage defines model for BreakingTodoPage.
+// BreakingTodoPage contains one paginated page of breaking todo records.
 type BreakingTodoPage struct {
-	Items    []BreakingTodo `json:"items"`
-	Page     int            `json:"page"`
-	PageSize int            `json:"pageSize"`
-	Total    int            `json:"total"`
+	// Items contains the ordered items associated with this breaking todo page.
+	Items []BreakingTodo `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// CandidateOverride defines model for CandidateOverride.
+// CandidateOverride represents candidate override data exchanged through the Meridian API.
 type CandidateOverride struct {
-	// CandidateId UUID v7
-	CandidateId Uuid              `json:"candidateId"`
-	DisplayName string            `json:"displayName,omitempty"`
-	Slug        Slug              `json:"slug,omitempty"`
-	Visibility  ServiceVisibility `json:"visibility,omitempty"`
+	// CandidateId contains the uuid associated with this candidate override.
+	CandidateId Uuid `json:"candidateId"`
+
+	// DisplayName specifies the display name associated with this candidate override.
+	DisplayName string `json:"displayName,omitempty"`
+
+	// Slug contains the slug associated with this candidate override.
+	Slug Slug `json:"slug,omitempty"`
+
+	// Visibility contains the service visibility associated with this candidate override.
+	Visibility ServiceVisibility `json:"visibility,omitempty"`
 }
 
-// CandidatePage defines model for CandidatePage.
+// CandidatePage contains one paginated page of candidate records.
 type CandidatePage struct {
-	Items    []DiscoveryCandidate `json:"items"`
-	Page     int                  `json:"page"`
-	PageSize int                  `json:"pageSize"`
-	Total    int                  `json:"total"`
+	// Items contains the ordered items associated with this candidate page.
+	Items []DiscoveryCandidate `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// CandidatesAcceptRequest defines model for CandidatesAcceptRequest.
+// CandidatesAcceptRequest defines validated input for the corresponding Meridian API operation.
 type CandidatesAcceptRequest struct {
-	CandidateIds []Uuid              `json:"candidateIds"`
-	Overrides    []CandidateOverride `json:"overrides,omitempty"`
+	// CandidateIds indicates whether candidate ids applies to this candidates accept request.
+	CandidateIds []Uuid `json:"candidateIds"`
+
+	// Overrides contains the ordered overrides associated with this candidates accept request.
+	Overrides []CandidateOverride `json:"overrides,omitempty"`
 }
 
-// CapabilityList defines model for CapabilityList.
+// CapabilityList contains an ordered collection of capability values.
 type CapabilityList = []string
 
-// Comment defines model for Comment.
+// Comment represents comment data exchanged through the Meridian API.
 type Comment struct {
-	Author User   `json:"author"`
-	Body   string `json:"body"`
+	// Author contains the user associated with this comment.
+	Author User `json:"author"`
 
-	// CreatedAt RFC 3339 UTC
+	// Body specifies the body associated with this comment.
+	Body string `json:"body"`
+
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
-	// Id UUID v7
+	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
 
-	// ServiceId UUID v7
+	// ServiceId identifies the service associated with this resource.
 	ServiceId Uuid `json:"serviceId"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// CommentCreateRequest defines model for CommentCreateRequest.
+// CommentCreateRequest defines validated input for the corresponding Meridian API operation.
 type CommentCreateRequest struct {
+	// Body specifies the body associated with this comment create request.
 	Body string `json:"body"`
 }
 
-// CommentPage defines model for CommentPage.
+// CommentPage contains one paginated page of comment records.
 type CommentPage struct {
-	Items    []Comment `json:"items"`
-	Page     int       `json:"page"`
-	PageSize int       `json:"pageSize"`
-	Total    int       `json:"total"`
+	// Items contains the ordered items associated with this comment page.
+	Items []Comment `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// ConfigFieldDiff defines model for ConfigFieldDiff.
+// ConfigFieldDiff represents config field diff data exchanged through the Meridian API.
 type ConfigFieldDiff struct {
-	DatabaseValue interface{}  `json:"databaseValue"`
-	FileValue     interface{}  `json:"fileValue"`
-	Pointer       string       `json:"pointer"`
-	Source        ConfigSource `json:"source"`
+	// DatabaseValue specifies the database value associated with this config field diff.
+	DatabaseValue interface{} `json:"databaseValue"`
+
+	// FileValue specifies the file value associated with this config field diff.
+	FileValue interface{} `json:"fileValue"`
+
+	// Pointer specifies the pointer associated with this config field diff.
+	Pointer string `json:"pointer"`
+
+	// Source contains the config source associated with this config field diff.
+	Source ConfigSource `json:"source"`
 }
 
-// ConfigImportApplyRequest defines model for ConfigImportApplyRequest.
+// ConfigImportApplyRequest defines validated input for the corresponding Meridian API operation.
 type ConfigImportApplyRequest struct {
-	ConfigDigest      string                                              `json:"configDigest"`
-	DefaultResolution ConfigImportApplyRequestDefaultResolution           `json:"defaultResolution"`
-	FieldResolutions  map[string]ConfigImportApplyRequestFieldResolutions `json:"fieldResolutions,omitempty"`
+	// ConfigDigest is the lowercase SHA-256 digest of the normalized configuration.
+	ConfigDigest string `json:"configDigest"`
+
+	// DefaultResolution specifies the default resolution associated with this config import apply request.
+	DefaultResolution ConfigImportApplyRequestDefaultResolution `json:"defaultResolution"`
+
+	// FieldResolutions specifies the field resolutions associated with this config import apply request.
+	FieldResolutions map[string]ConfigImportApplyRequestFieldResolutions `json:"fieldResolutions,omitempty"`
 
 	// ReplaceAiBases Explicitly applies the domain baseReplacement transaction for matching repository bases.
 	ReplaceAiBases bool `json:"replaceAiBases,omitempty"`
 }
 
-// ConfigImportApplyRequestDefaultResolution defines model for ConfigImportApplyRequest.DefaultResolution.
+// ConfigImportApplyRequestDefaultResolution specifies the default resolution associated with this config import apply request.
 type ConfigImportApplyRequestDefaultResolution string
 
 // ConfigImportApplyRequestFieldResolutions defines model for ConfigImportApplyRequest.FieldResolutions.
 type ConfigImportApplyRequestFieldResolutions string
 
-// ConfigImportPreview defines model for ConfigImportPreview.
+// ConfigImportPreview represents config import preview data exchanged through the Meridian API.
 type ConfigImportPreview struct {
-	Commit       string            `json:"commit"`
-	ConfigDigest string            `json:"configDigest"`
-	Drift        []ConfigFieldDiff `json:"drift"`
+	// Commit specifies the commit associated with this config import preview.
+	Commit string `json:"commit"`
 
-	// ExpiresAt RFC 3339 UTC
+	// ConfigDigest is the lowercase SHA-256 digest of the normalized configuration.
+	ConfigDigest string `json:"configDigest"`
+
+	// Drift contains the ordered drift associated with this config import preview.
+	Drift []ConfigFieldDiff `json:"drift"`
+
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
 	ExpiresAt Timestamp `json:"expiresAt"`
 
-	// PreviewId UUID v7
+	// PreviewId contains the uuid associated with this config import preview.
 	PreviewId Uuid `json:"previewId"`
 
-	// RepositoryId UUID v7
-	RepositoryId Uuid         `json:"repositoryId"`
-	Services     []Service    `json:"services"`
-	Sources      []SourceSpec `json:"sources"`
+	// RepositoryId identifies the repository associated with this resource.
+	RepositoryId Uuid `json:"repositoryId"`
+
+	// Services contains the ordered services associated with this config import preview.
+	Services []Service `json:"services"`
+
+	// Sources contains the ordered sources associated with this config import preview.
+	Sources []SourceSpec `json:"sources"`
 }
 
-// ConfigImportPreviewRequest defines model for ConfigImportPreviewRequest.
+// ConfigImportPreviewRequest defines validated input for the corresponding Meridian API operation.
 type ConfigImportPreviewRequest struct {
-	Ref     RefName `json:"ref,omitempty"`
+	// Ref contains the ref name associated with this config import preview request.
+	Ref RefName `json:"ref,omitempty"`
+
+	// RefType contains the ref type associated with this config import preview request.
 	RefType RefType `json:"refType,omitempty"`
 }
 
-// ConfigImportResult defines model for ConfigImportResult.
+// ConfigImportResult reports the result of the corresponding Meridian operation.
 type ConfigImportResult struct {
-	Commit            string `json:"commit"`
-	ConfigDigest      string `json:"configDigest"`
+	// Commit specifies the commit associated with this config import result.
+	Commit string `json:"commit"`
+
+	// ConfigDigest is the lowercase SHA-256 digest of the normalized configuration.
+	ConfigDigest string `json:"configDigest"`
+
+	// CreatedServiceIds contains the ordered created service ids associated with this config import result.
 	CreatedServiceIds []Uuid `json:"createdServiceIds"`
 
-	// RepositoryId UUID v7
-	RepositoryId      Uuid   `json:"repositoryId"`
-	SourceSpecIds     []Uuid `json:"sourceSpecIds"`
+	// RepositoryId identifies the repository associated with this resource.
+	RepositoryId Uuid `json:"repositoryId"`
+
+	// SourceSpecIds contains the ordered source spec ids associated with this config import result.
+	SourceSpecIds []Uuid `json:"sourceSpecIds"`
+
+	// UpdatedServiceIds contains the ordered updated service ids associated with this config import result.
 	UpdatedServiceIds []Uuid `json:"updatedServiceIds"`
 }
 
-// ConfigSource defines model for ConfigSource.
+// ConfigSource identifies one supported config source value.
 type ConfigSource string
 
-// ConnectionTest defines model for ConnectionTest.
+// ConnectionTest represents connection test data exchanged through the Meridian API.
 type ConnectionTest struct {
-	ErrorClass       ConnectionTestErrorClass `json:"errorClass"`
-	HostKeyCandidate KnownHostCandidate       `json:"hostKeyCandidate"`
-	Message          string                   `json:"message"`
-	Ok               bool                     `json:"ok"`
+	// ErrorClass specifies the error class associated with this connection test.
+	ErrorClass ConnectionTestErrorClass `json:"errorClass"`
+
+	// HostKeyCandidate specifies the host key candidate associated with this connection test.
+	HostKeyCandidate KnownHostCandidate `json:"hostKeyCandidate"`
+
+	// Message specifies the message associated with this connection test.
+	Message string `json:"message"`
+
+	// Ok indicates whether ok applies to this connection test.
+	Ok bool `json:"ok"`
 }
 
-// ConnectionTestErrorClass defines model for ConnectionTest.ErrorClass.
+// ConnectionTestErrorClass specifies the error class associated with this connection test.
 type ConnectionTestErrorClass string
 
-// ConnectionTestRequest defines model for ConnectionTestRequest.
+// ConnectionTestRequest defines validated input for the corresponding Meridian API operation.
 type ConnectionTestRequest struct {
-	// RepositoryUrl HTTPS URL, ssh:// URL, or SCP-like user@host:path
+	// RepositoryUrl contains the git remote url associated with this connection test request.
 	RepositoryUrl GitRemoteUrl `json:"repositoryUrl"`
 }
 
-// ContentType defines model for ContentType.
+// ContentType identifies one supported content type value.
 type ContentType string
 
-// Credential defines model for Credential.
+// Credential exposes encrypted-secret metadata and fingerprint only; plaintext secret material is never returned.
 type Credential struct {
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
-	// CreatedBy UUID v7
+	// CreatedBy identifies the user who created the credential.
 	CreatedBy Uuid `json:"createdBy"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Fingerprint SSH uses the OpenSSH SHA256 public-key fingerprint; HTTP tokens use the keyed fingerprint defined in domain.yaml; both encode 32 digest bytes without padding.
+	// Fingerprint contains the credential fingerprint associated with this credential.
 	Fingerprint CredentialFingerprint `json:"fingerprint"`
 
-	// Id UUID v7
-	Id          Uuid                  `json:"id"`
-	IsGlobal    bool                  `json:"isGlobal"`
-	Kind        CredentialKind        `json:"kind"`
-	LastUsedAt  Timestamp             `json:"lastUsedAt"`
-	Name        string                `json:"name"`
-	SharedScope CredentialSharedScope `json:"sharedScope"`
-	TeamIds     []Uuid                `json:"teamIds"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
 
-	// UpdatedAt RFC 3339 UTC
+	// IsGlobal indicates whether a platform administrator owns this credential outside any tenant.
+	IsGlobal bool `json:"isGlobal"`
+
+	// Kind contains the credential kind associated with this credential.
+	Kind CredentialKind `json:"kind"`
+
+	// LastUsedAt is the most recent successful credential use, or null when unused.
+	LastUsedAt Timestamp `json:"lastUsedAt"`
+
+	// Name specifies the name associated with this credential.
+	Name string `json:"name"`
+
+	// SharedScope controls whether only the creator, selected teams, or the whole tenant may use the credential.
+	SharedScope CredentialSharedScope `json:"sharedScope"`
+
+	// TeamIds lists teams allowed to use a team-scoped credential and is empty for other scopes.
+	TeamIds []Uuid `json:"teamIds"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// CredentialSharedScope defines model for Credential.SharedScope.
+// CredentialSharedScope controls whether only the creator, selected teams, or the whole tenant may use the credential.
 type CredentialSharedScope string
 
-// CredentialCreateRequest defines model for CredentialCreateRequest.
+// CredentialCreateRequest supplies exactly one SSH or HTTP secret and its authorized sharing scope.
 type CredentialCreateRequest struct {
 	union json.RawMessage
 }
 
 // CredentialCreateRequest0 defines model for CredentialCreateRequest.0.
 type CredentialCreateRequest0 struct {
-	Kind        CredentialCreateRequest0Kind        `json:"kind"`
-	Name        string                              `json:"name"`
+	// Kind specifies the kind associated with this credential create request.
+	Kind CredentialCreateRequest0Kind `json:"kind"`
+
+	// Name specifies the name associated with this credential create request.
+	Name string `json:"name"`
+
+	// SharedScope specifies the shared scope associated with this credential create request.
 	SharedScope CredentialCreateRequest0SharedScope `json:"sharedScope,omitempty"`
-	SshKey      SshSecretInput                      `json:"sshKey"`
-	TeamIds     []Uuid                              `json:"teamIds,omitempty"`
+
+	// SshKey contains the ssh secret input associated with this credential create request.
+	SshKey SshSecretInput `json:"sshKey"`
+
+	// TeamIds contains the ordered team ids associated with this credential create request.
+	TeamIds []Uuid `json:"teamIds,omitempty"`
 }
 
-// CredentialCreateRequest0Kind defines model for CredentialCreateRequest.0.Kind.
+// CredentialCreateRequest0Kind specifies the kind associated with this credential create request.
 type CredentialCreateRequest0Kind string
 
-// CredentialCreateRequest0SharedScope defines model for CredentialCreateRequest.0.SharedScope.
+// CredentialCreateRequest0SharedScope specifies the shared scope associated with this credential create request.
 type CredentialCreateRequest0SharedScope string
 
 // CredentialCreateRequest1 defines model for CredentialCreateRequest.1.
 type CredentialCreateRequest1 struct {
-	HttpToken   HttpSecretInput                     `json:"httpToken"`
-	Kind        CredentialCreateRequest1Kind        `json:"kind"`
-	Name        string                              `json:"name"`
+	// HttpToken contains the http secret input associated with this credential create request.
+	HttpToken HttpSecretInput `json:"httpToken"`
+
+	// Kind specifies the kind associated with this credential create request.
+	Kind CredentialCreateRequest1Kind `json:"kind"`
+
+	// Name specifies the name associated with this credential create request.
+	Name string `json:"name"`
+
+	// SharedScope specifies the shared scope associated with this credential create request.
 	SharedScope CredentialCreateRequest1SharedScope `json:"sharedScope,omitempty"`
-	TeamIds     []Uuid                              `json:"teamIds,omitempty"`
+
+	// TeamIds contains the ordered team ids associated with this credential create request.
+	TeamIds []Uuid `json:"teamIds,omitempty"`
 }
 
-// CredentialCreateRequest1Kind defines model for CredentialCreateRequest.1.Kind.
+// CredentialCreateRequest1Kind specifies the kind associated with this credential create request.
 type CredentialCreateRequest1Kind string
 
-// CredentialCreateRequest1SharedScope defines model for CredentialCreateRequest.1.SharedScope.
+// CredentialCreateRequest1SharedScope specifies the shared scope associated with this credential create request.
 type CredentialCreateRequest1SharedScope string
 
 // CredentialFingerprint SSH uses the OpenSSH SHA256 public-key fingerprint; HTTP tokens use the keyed fingerprint defined in domain.yaml; both encode 32 digest bytes without padding.
 type CredentialFingerprint = string
 
-// CredentialKind defines model for CredentialKind.
+// CredentialKind identifies one supported credential kind value.
 type CredentialKind string
 
-// CredentialPage defines model for CredentialPage.
+// CredentialPage contains one paginated page of credential records.
 type CredentialPage struct {
-	Items    []Credential `json:"items"`
-	Page     int          `json:"page"`
-	PageSize int          `json:"pageSize"`
-	Total    int          `json:"total"`
+	// Items contains the ordered items associated with this credential page.
+	Items []Credential `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// CredentialPatchRequest defines model for CredentialPatchRequest.
+// CredentialPatchRequest defines validated input for the corresponding Meridian API operation.
 type CredentialPatchRequest struct {
-	Name        string                            `json:"name,omitempty"`
+	// Name specifies the name associated with this credential patch request.
+	Name string `json:"name,omitempty"`
+
+	// SharedScope specifies the shared scope associated with this credential patch request.
 	SharedScope CredentialPatchRequestSharedScope `json:"sharedScope,omitempty"`
-	TeamIds     []Uuid                            `json:"teamIds,omitempty"`
+
+	// TeamIds contains the ordered team ids associated with this credential patch request.
+	TeamIds []Uuid `json:"teamIds,omitempty"`
 }
 
-// CredentialPatchRequestSharedScope defines model for CredentialPatchRequest.SharedScope.
+// CredentialPatchRequestSharedScope specifies the shared scope associated with this credential patch request.
 type CredentialPatchRequestSharedScope string
 
-// CredentialRotateRequest defines model for CredentialRotateRequest.
+// CredentialRotateRequest defines validated input for the corresponding Meridian API operation.
 type CredentialRotateRequest struct {
 	// ResyncRepositories Omitted means false. When true, enqueue one default-branch sync for every non-deleted repository referencing this credential.
-	ResyncRepositories bool                           `json:"resyncRepositories,omitempty"`
-	Secret             CredentialRotateRequest_Secret `json:"secret"`
+	ResyncRepositories bool `json:"resyncRepositories,omitempty"`
+
+	// Secret is write-only secret material and must never be returned by the API.
+	Secret CredentialRotateRequest_Secret `json:"secret"`
 }
 
-// CredentialRotateRequest_Secret defines model for CredentialRotateRequest.Secret.
+// CredentialRotateRequest_Secret is write-only secret material and must never be returned by the API.
 type CredentialRotateRequest_Secret struct {
 	union json.RawMessage
 }
 
-// CredentialRotationResult defines model for CredentialRotationResult.
+// CredentialRotationResult reports the result of the corresponding Meridian operation.
 type CredentialRotationResult struct {
+	// Credential contains the credential associated with this credential rotation result.
 	Credential Credential `json:"credential"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag     ETag                `json:"etag"`
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// SyncJobs contains the ordered sync jobs associated with this credential rotation result.
 	SyncJobs []CredentialSyncJob `json:"syncJobs"`
 }
 
-// CredentialSyncJob defines model for CredentialSyncJob.
+// CredentialSyncJob represents credential sync job data exchanged through the Meridian API.
 type CredentialSyncJob struct {
+	// Deduplicated indicates whether deduplicated applies to this credential sync job.
 	Deduplicated bool `json:"deduplicated"`
 
-	// JobId UUID v7
+	// JobId identifies the asynchronous job associated with this resource.
 	JobId Uuid `json:"jobId"`
 
-	// RepositoryId UUID v7
+	// RepositoryId identifies the repository associated with this resource.
 	RepositoryId Uuid `json:"repositoryId"`
-	TenantSlug   Slug `json:"tenantSlug"`
+
+	// TenantSlug contains the slug associated with this credential sync job.
+	TenantSlug Slug `json:"tenantSlug"`
 }
 
-// CsrfToken defines model for CsrfToken.
+// CsrfToken carries the anti-forgery token bound to the current cookie session.
 type CsrfToken struct {
+	// CsrfToken binds a state-changing browser request to the current session.
 	CsrfToken string `json:"csrfToken"`
 }
 
-// DashboardViewResolution defines model for DashboardViewResolution.
+// DashboardViewResolution represents dashboard view resolution data exchanged through the Meridian API.
 type DashboardViewResolution struct {
-	Kind    DashboardViewResolutionKind `json:"kind"`
-	Metrics map[string]interface{}      `json:"metrics"`
-	View    ViewDefinition              `json:"view"`
+	// Kind specifies the kind associated with this dashboard view resolution.
+	Kind DashboardViewResolutionKind `json:"kind"`
+
+	// Metrics specifies the metrics associated with this dashboard view resolution.
+	Metrics map[string]interface{} `json:"metrics"`
+
+	// View contains the view definition associated with this dashboard view resolution.
+	View ViewDefinition `json:"view"`
 }
 
-// DashboardViewResolutionKind defines model for DashboardViewResolution.Kind.
+// DashboardViewResolutionKind specifies the kind associated with this dashboard view resolution.
 type DashboardViewResolutionKind string
 
-// DefaultNotificationChannelTemplate defines model for DefaultNotificationChannelTemplate.
+// DefaultNotificationChannelTemplate represents default notification channel template data exchanged through the Meridian API.
 type DefaultNotificationChannelTemplate struct {
-	Enabled bool                                   `json:"enabled"`
-	Key     Slug                                   `json:"key"`
-	Kind    DefaultNotificationChannelTemplateKind `json:"kind"`
-	Name    string                                 `json:"name"`
+	// Enabled indicates whether enabled applies to this default notification channel template.
+	Enabled bool `json:"enabled"`
+
+	// Key contains the slug associated with this default notification channel template.
+	Key Slug `json:"key"`
+
+	// Kind specifies the kind associated with this default notification channel template.
+	Kind DefaultNotificationChannelTemplateKind `json:"kind"`
+
+	// Name specifies the name associated with this default notification channel template.
+	Name string `json:"name"`
 }
 
-// DefaultNotificationChannelTemplateKind defines model for DefaultNotificationChannelTemplate.Kind.
+// DefaultNotificationChannelTemplateKind specifies the kind associated with this default notification channel template.
 type DefaultNotificationChannelTemplateKind string
 
-// DiffChange defines model for DiffChange.
+// DiffChange represents diff change data exchanged through the Meridian API.
 type DiffChange struct {
-	After   interface{} `json:"after"`
-	Before  interface{} `json:"before"`
-	Code    string      `json:"code"`
-	Id      string      `json:"id"`
-	Level   DiffLevel   `json:"level"`
-	Path    string      `json:"path"`
-	Summary string      `json:"summary"`
+	// After specifies the after associated with this diff change.
+	After interface{} `json:"after"`
+
+	// Before specifies the before associated with this diff change.
+	Before interface{} `json:"before"`
+
+	// Code specifies the code associated with this diff change.
+	Code string `json:"code"`
+
+	// Id uniquely identifies this resource.
+	Id string `json:"id"`
+
+	// Level contains the diff level associated with this diff change.
+	Level DiffLevel `json:"level"`
+
+	// Path specifies the path associated with this diff change.
+	Path string `json:"path"`
+
+	// Summary specifies the summary associated with this diff change.
+	Summary string `json:"summary"`
 }
 
-// DiffCounts defines model for DiffCounts.
+// DiffCounts represents diff counts data exchanged through the Meridian API.
 type DiffCounts struct {
-	Added         int `json:"added"`
-	Breaking      int `json:"breaking"`
+	// Added specifies the added associated with this diff counts.
+	Added int `json:"added"`
+
+	// Breaking specifies the breaking associated with this diff counts.
+	Breaking int `json:"breaking"`
+
+	// Informational specifies the informational associated with this diff counts.
 	Informational int `json:"informational"`
-	Modified      int `json:"modified"`
-	NonBreaking   int `json:"nonBreaking"`
-	Removed       int `json:"removed"`
-	Risky         int `json:"risky"`
+
+	// Modified specifies the modified associated with this diff counts.
+	Modified int `json:"modified"`
+
+	// NonBreaking specifies the non breaking associated with this diff counts.
+	NonBreaking int `json:"nonBreaking"`
+
+	// Removed specifies the removed associated with this diff counts.
+	Removed int `json:"removed"`
+
+	// Risky specifies the risky associated with this diff counts.
+	Risky int `json:"risky"`
 }
 
-// DiffCreateRequest defines model for DiffCreateRequest.
+// DiffCreateRequest defines validated input for the corresponding Meridian API operation.
 type DiffCreateRequest struct {
-	Left      DocumentSelector `json:"left"`
-	Persist   bool             `json:"persist,omitempty"`
-	Right     DocumentSelector `json:"right"`
-	RuleSetId Uuid             `json:"ruleSetId,omitempty"`
+	// Left contains the document selector associated with this diff create request.
+	Left DocumentSelector `json:"left"`
+
+	// Persist indicates whether persist applies to this diff create request.
+	Persist bool `json:"persist,omitempty"`
+
+	// Right contains the document selector associated with this diff create request.
+	Right DocumentSelector `json:"right"`
+
+	// RuleSetId specifies the rule set id associated with this diff create request.
+	RuleSetId Uuid `json:"ruleSetId,omitempty"`
 }
 
-// DiffLevel defines model for DiffLevel.
+// DiffLevel identifies one supported diff level value.
 type DiffLevel string
 
-// DiffResult defines model for DiffResult.
+// DiffResult reports the result of the corresponding Meridian operation.
 type DiffResult struct {
+	// Changes contains the ordered changes associated with this diff result.
 	Changes []DiffChange `json:"changes"`
 
-	// GeneratedAt RFC 3339 UTC
+	// GeneratedAt contains the timestamp associated with this diff result.
 	GeneratedAt Timestamp `json:"generatedAt"`
-	Kind        KindId    `json:"kind"`
 
-	// Left Immutable resolution. version requires assetId/versionId and upload requires uploadId; requestedRef fields are informational and never re-resolved.
+	// Kind contains the kind id associated with this diff result.
+	Kind KindId `json:"kind"`
+
+	// Left contains the resolved document ref associated with this diff result.
 	Left ResolvedDocumentRef `json:"left"`
 
-	// Right Immutable resolution. version requires assetId/versionId and upload requires uploadId; requestedRef fields are informational and never re-resolved.
+	// Right contains the resolved document ref associated with this diff result.
 	Right ResolvedDocumentRef `json:"right"`
 
 	// SnapshotId Non-null exactly when DiffCreateRequest.persist is true.
-	SnapshotId Uuid       `json:"snapshotId"`
-	Summary    DiffCounts `json:"summary"`
+	SnapshotId Uuid `json:"snapshotId"`
+
+	// Summary contains the diff counts associated with this diff result.
+	Summary DiffCounts `json:"summary"`
 }
 
-// DiffRule defines model for DiffRule.
+// DiffRule represents diff rule data exchanged through the Meridian API.
 type DiffRule struct {
-	Code    string    `json:"code"`
-	Enabled bool      `json:"enabled"`
-	Level   DiffLevel `json:"level"`
+	// Code specifies the code associated with this diff rule.
+	Code string `json:"code"`
+
+	// Enabled indicates whether enabled applies to this diff rule.
+	Enabled bool `json:"enabled"`
+
+	// Level contains the diff level associated with this diff rule.
+	Level DiffLevel `json:"level"`
 }
 
-// DiffRuleSet defines model for DiffRuleSet.
+// DiffRuleSet represents diff rule set data exchanged through the Meridian API.
 type DiffRuleSet struct {
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Id UUID v7
-	Id    Uuid       `json:"id"`
-	Kind  KindId     `json:"kind"`
-	Name  string     `json:"name"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Kind contains the kind id associated with this diff rule set.
+	Kind KindId `json:"kind"`
+
+	// Name specifies the name associated with this diff rule set.
+	Name string `json:"name"`
+
+	// Rules contains the ordered rules associated with this diff rule set.
 	Rules []DiffRule `json:"rules"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
-	Version   int       `json:"version"`
+
+	// Version specifies the version associated with this diff rule set.
+	Version int `json:"version"`
 }
 
-// DiffRuleSetCreateRequest defines model for DiffRuleSetCreateRequest.
+// DiffRuleSetCreateRequest defines validated input for the corresponding Meridian API operation.
 type DiffRuleSetCreateRequest struct {
-	Kind  KindId     `json:"kind"`
-	Name  string     `json:"name"`
+	// Kind contains the kind id associated with this diff rule set create request.
+	Kind KindId `json:"kind"`
+
+	// Name specifies the name associated with this diff rule set create request.
+	Name string `json:"name"`
+
+	// Rules contains the ordered rules associated with this diff rule set create request.
 	Rules []DiffRule `json:"rules"`
 }
 
-// DiffRuleSetList defines model for DiffRuleSetList.
+// DiffRuleSetList contains an ordered collection of diff rule set values.
 type DiffRuleSetList struct {
+	// Items contains the ordered items associated with this diff rule set list.
 	Items []DiffRuleSet `json:"items"`
 }
 
-// DiffRuleSetPatchRequest defines model for DiffRuleSetPatchRequest.
+// DiffRuleSetPatchRequest defines validated input for the corresponding Meridian API operation.
 type DiffRuleSetPatchRequest struct {
-	Name  string     `json:"name,omitempty"`
+	// Name specifies the name associated with this diff rule set patch request.
+	Name string `json:"name,omitempty"`
+
+	// Rules contains the ordered rules associated with this diff rule set patch request.
 	Rules []DiffRule `json:"rules,omitempty"`
 }
 
-// DiffSnapshot defines model for DiffSnapshot.
+// DiffSnapshot represents diff snapshot data exchanged through the Meridian API.
 type DiffSnapshot struct {
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
-	// CreatedBy UUID v7
+	// CreatedBy contains the uuid associated with this diff snapshot.
 	CreatedBy Uuid `json:"createdBy"`
 
-	// Id UUID v7
-	Id     Uuid       `json:"id"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Result contains the diff result associated with this diff snapshot.
 	Result DiffResult `json:"result"`
 }
 
-// DiffSnapshotPage defines model for DiffSnapshotPage.
+// DiffSnapshotPage contains one paginated page of diff snapshot records.
 type DiffSnapshotPage struct {
-	Items    []DiffSnapshot `json:"items"`
-	Page     int            `json:"page"`
-	PageSize int            `json:"pageSize"`
-	Total    int            `json:"total"`
+	// Items contains the ordered items associated with this diff snapshot page.
+	Items []DiffSnapshot `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// DiffSnapshotShareRequest defines model for DiffSnapshotShareRequest.
+// DiffSnapshotShareRequest defines validated input for the corresponding Meridian API operation.
 type DiffSnapshotShareRequest struct {
+	// ExpiresInSeconds specifies the expires in seconds associated with this diff snapshot share request.
 	ExpiresInSeconds int `json:"expiresInSeconds"`
 }
 
-// DiscoveryCandidate defines model for DiscoveryCandidate.
+// DiscoveryCandidate represents discovery candidate data exchanged through the Meridian API.
 type DiscoveryCandidate struct {
-	Confidence    float32  `json:"confidence"`
+	// Confidence specifies the confidence associated with this discovery candidate.
+	Confidence float32 `json:"confidence"`
+
+	// DetectedKinds contains the ordered detected kinds associated with this discovery candidate.
 	DetectedKinds []KindId `json:"detectedKinds"`
 
-	// DiscoveredAt RFC 3339 UTC
+	// DiscoveredAt contains the timestamp associated with this discovery candidate.
 	DiscoveredAt Timestamp `json:"discoveredAt"`
-	DisplayName  string    `json:"displayName"`
 
-	// Id UUID v7
-	Id            Uuid                     `json:"id"`
-	Path          string                   `json:"path"`
-	Status        DiscoveryCandidateStatus `json:"status"`
-	SuggestedSlug Slug                     `json:"suggestedSlug"`
+	// DisplayName specifies the display name associated with this discovery candidate.
+	DisplayName string `json:"displayName"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Path specifies the path associated with this discovery candidate.
+	Path string `json:"path"`
+
+	// Status is the current lifecycle or processing state.
+	Status DiscoveryCandidateStatus `json:"status"`
+
+	// SuggestedSlug contains the slug associated with this discovery candidate.
+	SuggestedSlug Slug `json:"suggestedSlug"`
 }
 
-// DiscoveryCandidateStatus defines model for DiscoveryCandidate.Status.
+// DiscoveryCandidateStatus is the current lifecycle or processing state.
 type DiscoveryCandidateStatus string
 
-// DocumentSelector defines model for DocumentSelector.
+// DocumentSelector identifies the document selected by a request.
 type DocumentSelector struct {
 	union json.RawMessage
 }
 
-// DocumentViewResolution defines model for DocumentViewResolution.
+// DocumentViewResolution represents document view resolution data exchanged through the Meridian API.
 type DocumentViewResolution struct {
-	Document ArtifactLink               `json:"document"`
-	Kind     DocumentViewResolutionKind `json:"kind"`
-	View     ViewDefinition             `json:"view"`
+	// Document contains the artifact link associated with this document view resolution.
+	Document ArtifactLink `json:"document"`
+
+	// Kind specifies the kind associated with this document view resolution.
+	Kind DocumentViewResolutionKind `json:"kind"`
+
+	// View contains the view definition associated with this document view resolution.
+	View ViewDefinition `json:"view"`
 }
 
-// DocumentViewResolutionKind defines model for DocumentViewResolution.Kind.
+// DocumentViewResolutionKind specifies the kind associated with this document view resolution.
 type DocumentViewResolutionKind string
 
-// DomainEventType defines model for DomainEventType.
+// DomainEventType identifies one supported domain event type value.
 type DomainEventType string
 
-// DriftInfo defines model for DriftInfo.
+// DriftInfo represents drift info data exchanged through the Meridian API.
 type DriftInfo struct {
-	Fields     []FieldSource `json:"fields"`
-	FileCommit string        `json:"fileCommit"`
-	HasDrift   bool          `json:"hasDrift"`
+	// Fields contains the ordered fields associated with this drift info.
+	Fields []FieldSource `json:"fields"`
+
+	// FileCommit specifies the file commit associated with this drift info.
+	FileCommit string `json:"fileCommit"`
+
+	// HasDrift indicates whether drift applies to this drift info.
+	HasDrift bool `json:"hasDrift"`
 }
 
-// DriftResolutionRequest defines model for DriftResolutionRequest.
+// DriftResolutionRequest defines validated input for the corresponding Meridian API operation.
 type DriftResolutionRequest struct {
-	ConfigDigest string                                  `json:"configDigest"`
-	Fields       map[string]DriftResolutionRequestFields `json:"fields,omitempty"`
-	Resolution   DriftResolutionRequestResolution        `json:"resolution"`
+	// ConfigDigest is the lowercase SHA-256 digest of the normalized configuration.
+	ConfigDigest string `json:"configDigest"`
+
+	// Fields specifies the fields associated with this drift resolution request.
+	Fields map[string]DriftResolutionRequestFields `json:"fields,omitempty"`
+
+	// Resolution specifies the resolution associated with this drift resolution request.
+	Resolution DriftResolutionRequestResolution `json:"resolution"`
 }
 
 // DriftResolutionRequestFields defines model for DriftResolutionRequest.Fields.
 type DriftResolutionRequestFields string
 
-// DriftResolutionRequestResolution defines model for DriftResolutionRequest.Resolution.
+// DriftResolutionRequestResolution specifies the resolution associated with this drift resolution request.
 type DriftResolutionRequestResolution string
 
 // ETag Opaque HTTP entity tag including quotes
 type ETag = string
 
-// ErrorCode defines model for ErrorCode.
+// ErrorCode identifies one supported error code value.
 type ErrorCode string
 
-// ErrorResponse defines model for ErrorResponse.
+// ErrorResponse is the stable machine-readable failure envelope returned by every JSON API error.
 type ErrorResponse struct {
-	Code      ErrorCode              `json:"code"`
-	Details   map[string]interface{} `json:"details,omitempty"`
-	Message   string                 `json:"message"`
-	RequestId string                 `json:"requestId"`
+	// Code identifies the stable error category clients may branch on.
+	Code ErrorCode `json:"code"`
+
+	// Details contains error-code-specific structured diagnostics, or null when no detail is available.
+	Details map[string]interface{} `json:"details,omitempty"`
+
+	// Message is a safe human-readable explanation and never contains a stack trace or secret.
+	Message string `json:"message"`
+
+	// RequestId correlates this result with server logs and audit records.
+	RequestId string `json:"requestId"`
 }
 
-// ExternalRevisionTrustMode defines model for ExternalRevisionTrustMode.
+// ExternalRevisionTrustMode identifies one supported external revision trust mode value.
 type ExternalRevisionTrustMode string
 
-// FetchConfig defines model for FetchConfig.
+// FetchConfig represents fetch config data exchanged through the Meridian API.
 type FetchConfig struct {
-	Depth           int                        `json:"depth,omitempty"`
+	// Depth specifies the depth associated with this fetch config.
+	Depth int `json:"depth,omitempty"`
+
+	// KnownHostPolicy specifies the known host policy associated with this fetch config.
 	KnownHostPolicy FetchConfigKnownHostPolicy `json:"knownHostPolicy"`
-	PathAllow       []string                   `json:"pathAllow"`
-	PathIgnore      []string                   `json:"pathIgnore"`
-	Proxy           string                     `json:"proxy,omitempty"`
-	Shallow         bool                       `json:"shallow"`
-	Submodules      bool                       `json:"submodules"`
+
+	// PathAllow contains the ordered path allow associated with this fetch config.
+	PathAllow []string `json:"pathAllow"`
+
+	// PathIgnore contains the ordered path ignore associated with this fetch config.
+	PathIgnore []string `json:"pathIgnore"`
+
+	// Proxy specifies the proxy associated with this fetch config.
+	Proxy string `json:"proxy,omitempty"`
+
+	// Shallow indicates whether shallow applies to this fetch config.
+	Shallow bool `json:"shallow"`
+
+	// Submodules indicates whether submodules applies to this fetch config.
+	Submodules bool `json:"submodules"`
 }
 
-// FetchConfigKnownHostPolicy defines model for FetchConfig.KnownHostPolicy.
+// FetchConfigKnownHostPolicy specifies the known host policy associated with this fetch config.
 type FetchConfigKnownHostPolicy string
 
-// FieldError defines model for FieldError.
+// FieldError represents field error data exchanged through the Meridian API.
 type FieldError struct {
+	// Message specifies the message associated with this field error.
 	Message string `json:"message"`
-	Path    string `json:"path"`
-	Rule    string `json:"rule,omitempty"`
+
+	// Path specifies the path associated with this field error.
+	Path string `json:"path"`
+
+	// Rule specifies the rule associated with this field error.
+	Rule string `json:"rule,omitempty"`
 }
 
-// FieldSource defines model for FieldSource.
+// FieldSource represents field source data exchanged through the Meridian API.
 type FieldSource struct {
-	Pointer string       `json:"pointer"`
-	Source  ConfigSource `json:"source"`
+	// Pointer specifies the pointer associated with this field source.
+	Pointer string `json:"pointer"`
+
+	// Source contains the config source associated with this field source.
+	Source ConfigSource `json:"source"`
 }
 
 // GitPushWebhook afterCommit is null exactly when deleted is true; beforeCommit may be null for a new ref.
 type GitPushWebhook struct {
-	AfterCommit  string  `json:"afterCommit"`
-	BeforeCommit string  `json:"beforeCommit"`
-	Deleted      bool    `json:"deleted"`
-	Ref          RefName `json:"ref"`
-	RefType      RefType `json:"refType"`
+	// AfterCommit specifies the after commit associated with this git push webhook.
+	AfterCommit string `json:"afterCommit"`
+
+	// BeforeCommit specifies the before commit associated with this git push webhook.
+	BeforeCommit string `json:"beforeCommit"`
+
+	// Deleted indicates whether deleted applies to this git push webhook.
+	Deleted bool `json:"deleted"`
+
+	// Ref contains the ref name associated with this git push webhook.
+	Ref RefName `json:"ref"`
+
+	// RefType contains the ref type associated with this git push webhook.
+	RefType RefType `json:"refType"`
 }
 
 // GitRemoteUrl HTTPS URL, ssh:// URL, or SCP-like user@host:path
 type GitRemoteUrl = string
 
-// GlobalCredential defines model for GlobalCredential.
+// GlobalCredential represents global credential data exchanged through the Meridian API.
 type GlobalCredential struct {
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
-	// CreatedBy UUID v7
+	// CreatedBy contains the uuid associated with this global credential.
 	CreatedBy Uuid `json:"createdBy"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Fingerprint SSH uses the OpenSSH SHA256 public-key fingerprint; HTTP tokens use the keyed fingerprint defined in domain.yaml; both encode 32 digest bytes without padding.
+	// Fingerprint contains the credential fingerprint associated with this global credential.
 	Fingerprint CredentialFingerprint `json:"fingerprint"`
 
-	// Id UUID v7
-	Id         Uuid           `json:"id"`
-	Kind       CredentialKind `json:"kind"`
-	LastUsedAt Timestamp      `json:"lastUsedAt"`
-	Name       string         `json:"name"`
-	Revision   int            `json:"revision"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
 
-	// UpdatedAt RFC 3339 UTC
+	// Kind contains the credential kind associated with this global credential.
+	Kind CredentialKind `json:"kind"`
+
+	// LastUsedAt specifies the last used at associated with this global credential.
+	LastUsedAt Timestamp `json:"lastUsedAt"`
+
+	// Name specifies the name associated with this global credential.
+	Name string `json:"name"`
+
+	// Revision is the monotonic optimistic-concurrency version of this resource.
+	Revision int `json:"revision"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// GlobalCredentialCreateRequest defines model for GlobalCredentialCreateRequest.
+// GlobalCredentialCreateRequest defines validated input for the corresponding Meridian API operation.
 type GlobalCredentialCreateRequest struct {
 	union json.RawMessage
 }
 
 // GlobalCredentialCreateRequest0 defines model for GlobalCredentialCreateRequest.0.
 type GlobalCredentialCreateRequest0 struct {
-	Kind   GlobalCredentialCreateRequest0Kind `json:"kind"`
-	Name   string                             `json:"name"`
-	SshKey SshSecretInput                     `json:"sshKey"`
+	// Kind specifies the kind associated with this global credential create request.
+	Kind GlobalCredentialCreateRequest0Kind `json:"kind"`
+
+	// Name specifies the name associated with this global credential create request.
+	Name string `json:"name"`
+
+	// SshKey contains the ssh secret input associated with this global credential create request.
+	SshKey SshSecretInput `json:"sshKey"`
 }
 
-// GlobalCredentialCreateRequest0Kind defines model for GlobalCredentialCreateRequest.0.Kind.
+// GlobalCredentialCreateRequest0Kind specifies the kind associated with this global credential create request.
 type GlobalCredentialCreateRequest0Kind string
 
 // GlobalCredentialCreateRequest1 defines model for GlobalCredentialCreateRequest.1.
 type GlobalCredentialCreateRequest1 struct {
-	HttpToken HttpSecretInput                    `json:"httpToken"`
-	Kind      GlobalCredentialCreateRequest1Kind `json:"kind"`
-	Name      string                             `json:"name"`
-}
+	// HttpToken contains the http secret input associated with this global credential create request.
+	HttpToken HttpSecretInput `json:"httpToken"`
 
-// GlobalCredentialCreateRequest1Kind defines model for GlobalCredentialCreateRequest.1.Kind.
-type GlobalCredentialCreateRequest1Kind string
+	// Kind specifies the kind associated with this global credential create request.
+	Kind GlobalCredentialCreateRequest1Kind `json:"kind"`
 
-// GlobalCredentialPage defines model for GlobalCredentialPage.
-type GlobalCredentialPage struct {
-	Items    []GlobalCredential `json:"items"`
-	Page     int                `json:"page"`
-	PageSize int                `json:"pageSize"`
-	Total    int                `json:"total"`
-}
-
-// GlobalCredentialPatchRequest defines model for GlobalCredentialPatchRequest.
-type GlobalCredentialPatchRequest struct {
+	// Name specifies the name associated with this global credential create request.
 	Name string `json:"name"`
 }
 
-// GlobalCredentialRotationResult defines model for GlobalCredentialRotationResult.
+// GlobalCredentialCreateRequest1Kind specifies the kind associated with this global credential create request.
+type GlobalCredentialCreateRequest1Kind string
+
+// GlobalCredentialPage contains one paginated page of global credential records.
+type GlobalCredentialPage struct {
+	// Items contains the ordered items associated with this global credential page.
+	Items []GlobalCredential `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
+}
+
+// GlobalCredentialPatchRequest defines validated input for the corresponding Meridian API operation.
+type GlobalCredentialPatchRequest struct {
+	// Name specifies the name associated with this global credential patch request.
+	Name string `json:"name"`
+}
+
+// GlobalCredentialRotationResult reports the result of the corresponding Meridian operation.
 type GlobalCredentialRotationResult struct {
+	// Credential contains the global credential associated with this global credential rotation result.
 	Credential GlobalCredential `json:"credential"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag     ETag                `json:"etag"`
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// SyncJobs contains the ordered sync jobs associated with this global credential rotation result.
 	SyncJobs []CredentialSyncJob `json:"syncJobs"`
 }
 
-// GraphEdge defines model for GraphEdge.
+// GraphEdge represents graph edge data exchanged through the Meridian API.
 type GraphEdge struct {
+	// Details specifies the details associated with this graph edge.
 	Details map[string]interface{} `json:"details"`
-	From    string                 `json:"from"`
-	Id      string                 `json:"id"`
-	To      string                 `json:"to"`
+
+	// From specifies the from associated with this graph edge.
+	From string `json:"from"`
+
+	// Id uniquely identifies this resource.
+	Id string `json:"id"`
+
+	// To specifies the to associated with this graph edge.
+	To string `json:"to"`
 }
 
-// GraphNode defines model for GraphNode.
+// GraphNode represents graph node data exchanged through the Meridian API.
 type GraphNode struct {
-	Id    string `json:"id"`
+	// Id uniquely identifies this resource.
+	Id string `json:"id"`
+
+	// Label specifies the label associated with this graph node.
 	Label string `json:"label"`
 
-	// ServiceId UUID v7
+	// ServiceId identifies the service associated with this resource.
 	ServiceId Uuid `json:"serviceId"`
 }
 
-// GraphViewResolution defines model for GraphViewResolution.
+// GraphViewResolution represents graph view resolution data exchanged through the Meridian API.
 type GraphViewResolution struct {
-	Edges     []GraphEdge             `json:"edges"`
-	Kind      GraphViewResolutionKind `json:"kind"`
-	Nodes     []GraphNode             `json:"nodes"`
-	Truncated bool                    `json:"truncated"`
-	View      ViewDefinition          `json:"view"`
+	// Edges contains the ordered edges associated with this graph view resolution.
+	Edges []GraphEdge `json:"edges"`
+
+	// Kind specifies the kind associated with this graph view resolution.
+	Kind GraphViewResolutionKind `json:"kind"`
+
+	// Nodes contains the ordered nodes associated with this graph view resolution.
+	Nodes []GraphNode `json:"nodes"`
+
+	// Truncated indicates whether truncated applies to this graph view resolution.
+	Truncated bool `json:"truncated"`
+
+	// View contains the view definition associated with this graph view resolution.
+	View ViewDefinition `json:"view"`
 }
 
-// GraphViewResolutionKind defines model for GraphViewResolution.Kind.
+// GraphViewResolutionKind specifies the kind associated with this graph view resolution.
 type GraphViewResolutionKind string
 
-// Health defines model for Health.
+// Health reports successful liveness or readiness evaluation.
 type Health struct {
+	// Status is ok when the requested health check succeeds.
 	Status HealthStatus `json:"status"`
 }
 
-// HealthStatus defines model for Health.Status.
+// HealthStatus is ok when the requested health check succeeds.
 type HealthStatus string
 
-// HttpSecretInput defines model for HttpSecretInput.
+// HttpSecretInput carries write-only HTTP basic or token credentials for encryption at rest.
 type HttpSecretInput struct {
-	Token    string `json:"token,omitempty"`
+	// Token is secret bearer material and must never be logged or persisted as plaintext.
+	Token string `json:"token,omitempty"`
+
+	// Username specifies the username associated with this http secret input.
 	Username string `json:"username"`
 }
 
-// ItemsViewResolution defines model for ItemsViewResolution.
+// ItemsViewResolution represents items view resolution data exchanged through the Meridian API.
 type ItemsViewResolution struct {
-	Items []AssetItem             `json:"items"`
-	Kind  ItemsViewResolutionKind `json:"kind"`
-	View  ViewDefinition          `json:"view"`
+	// Items contains the ordered items associated with this items view resolution.
+	Items []AssetItem `json:"items"`
+
+	// Kind specifies the kind associated with this items view resolution.
+	Kind ItemsViewResolutionKind `json:"kind"`
+
+	// View contains the view definition associated with this items view resolution.
+	View ViewDefinition `json:"view"`
 }
 
-// ItemsViewResolutionKind defines model for ItemsViewResolution.Kind.
+// ItemsViewResolutionKind specifies the kind associated with this items view resolution.
 type ItemsViewResolutionKind string
 
-// Job defines model for Job.
+// Job represents job data exchanged through the Meridian API.
 type Job struct {
-	Attempt      int               `json:"attempt"`
-	Attempts     []JobStageAttempt `json:"attempts"`
-	Capabilities CapabilityList    `json:"capabilities"`
+	// Attempt specifies the attempt associated with this job.
+	Attempt int `json:"attempt"`
 
-	// CreatedAt RFC 3339 UTC
-	CreatedAt  Timestamp     `json:"createdAt"`
-	Dirty      bool          `json:"dirty"`
-	Error      ErrorResponse `json:"error"`
-	FinishedAt Timestamp     `json:"finishedAt"`
+	// Attempts contains the ordered attempts associated with this job.
+	Attempts []JobStageAttempt `json:"attempts"`
 
-	// Id UUID v7
-	Id            Uuid      `json:"id"`
-	MaxAttempts   int       `json:"maxAttempts"`
+	// Capabilities lists actions the authenticated principal may perform on this resource.
+	Capabilities CapabilityList `json:"capabilities"`
+
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
+
+	// Dirty indicates whether dirty applies to this job.
+	Dirty bool `json:"dirty"`
+
+	// Error specifies the error associated with this job.
+	Error ErrorResponse `json:"error"`
+
+	// FinishedAt is the RFC 3339 UTC instant when processing reached a terminal state.
+	FinishedAt Timestamp `json:"finishedAt"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// MaxAttempts specifies the max attempts associated with this job.
+	MaxAttempts int `json:"maxAttempts"`
+
+	// NextAttemptAt specifies the next attempt at associated with this job.
 	NextAttemptAt Timestamp `json:"nextAttemptAt"`
-	Progress      int       `json:"progress"`
-	Ref           RefName   `json:"ref"`
-	RefType       RefType   `json:"refType"`
+
+	// Progress specifies the progress associated with this job.
+	Progress int `json:"progress"`
+
+	// Ref specifies the ref associated with this job.
+	Ref RefName `json:"ref"`
+
+	// RefType specifies the ref type associated with this job.
+	RefType RefType `json:"refType"`
 
 	// Result Operation-specific non-secret result identifiers and counters.
-	Result       map[string]interface{} `json:"result"`
-	RetryOfJobId Uuid                   `json:"retryOfJobId"`
-	ScopeId      string                 `json:"scopeId"`
-	ScopeType    JobScopeType           `json:"scopeType"`
-	Stage        PipelineStage          `json:"stage"`
-	StartedAt    Timestamp              `json:"startedAt"`
-	Status       JobStatus              `json:"status"`
-	TenantSlug   Slug                   `json:"tenantSlug"`
-	Trigger      JobTrigger             `json:"trigger"`
-	Type         JobType                `json:"type"`
+	Result map[string]interface{} `json:"result"`
+
+	// RetryOfJobId specifies the retry of job id associated with this job.
+	RetryOfJobId Uuid `json:"retryOfJobId"`
+
+	// ScopeId specifies the scope id associated with this job.
+	ScopeId string `json:"scopeId"`
+
+	// ScopeType contains the job scope type associated with this job.
+	ScopeType JobScopeType `json:"scopeType"`
+
+	// Stage specifies the stage associated with this job.
+	Stage PipelineStage `json:"stage"`
+
+	// StartedAt is the RFC 3339 UTC instant when processing began.
+	StartedAt Timestamp `json:"startedAt"`
+
+	// Status is the current lifecycle or processing state.
+	Status JobStatus `json:"status"`
+
+	// TenantSlug contains the slug associated with this job.
+	TenantSlug Slug `json:"tenantSlug"`
+
+	// Trigger contains the job trigger associated with this job.
+	Trigger JobTrigger `json:"trigger"`
+
+	// Type contains the job type associated with this job.
+	Type JobType `json:"type"`
 }
 
-// JobAccepted defines model for JobAccepted.
+// JobAccepted represents job accepted data exchanged through the Meridian API.
 type JobAccepted struct {
+	// Deduplicated indicates whether deduplicated applies to this job accepted.
 	Deduplicated bool `json:"deduplicated"`
 
-	// JobId UUID v7
+	// JobId identifies the asynchronous job associated with this resource.
 	JobId Uuid `json:"jobId"`
 }
 
-// JobFilter defines model for JobFilter.
+// JobFilter defines supported filters for selecting job records.
 type JobFilter struct {
-	ScopeId   string       `json:"scopeId,omitempty"`
+	// ScopeId specifies the scope id associated with this job filter.
+	ScopeId string `json:"scopeId,omitempty"`
+
+	// ScopeType contains the job scope type associated with this job filter.
 	ScopeType JobScopeType `json:"scopeType,omitempty"`
-	Statuses  []JobStatus  `json:"statuses,omitempty"`
-	Types     []JobType    `json:"types,omitempty"`
+
+	// Statuses contains the ordered statuses associated with this job filter.
+	Statuses []JobStatus `json:"statuses,omitempty"`
+
+	// Types contains the ordered types associated with this job filter.
+	Types []JobType `json:"types,omitempty"`
 }
 
-// JobLogEvent defines model for JobLogEvent.
+// JobLogEvent represents a job log event emitted by Meridian.
 type JobLogEvent struct {
-	// At RFC 3339 UTC
-	At      Timestamp        `json:"at"`
-	Event   JobLogEventEvent `json:"event"`
-	Id      string           `json:"id"`
-	Message string           `json:"message"`
-	Stage   PipelineStage    `json:"stage,omitempty"`
+	// At contains the timestamp associated with this job log event.
+	At Timestamp `json:"at"`
+
+	// Event specifies the event associated with this job log event.
+	Event JobLogEventEvent `json:"event"`
+
+	// Id uniquely identifies this resource.
+	Id string `json:"id"`
+
+	// Message specifies the message associated with this job log event.
+	Message string `json:"message"`
+
+	// Stage specifies the stage associated with this job log event.
+	Stage PipelineStage `json:"stage,omitempty"`
 }
 
-// JobLogEventEvent defines model for JobLogEvent.Event.
+// JobLogEventEvent specifies the event associated with this job log event.
 type JobLogEventEvent string
 
-// JobPage defines model for JobPage.
+// JobPage contains one paginated page of job records.
 type JobPage struct {
-	Items    []Job `json:"items"`
-	Page     int   `json:"page"`
-	PageSize int   `json:"pageSize"`
-	Total    int   `json:"total"`
+	// Items contains the ordered items associated with this job page.
+	Items []Job `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// JobScopeType defines model for JobScopeType.
+// JobScopeType identifies one supported job scope type value.
 type JobScopeType string
 
-// JobSseEvent defines model for JobSseEvent.
+// JobSseEvent represents a job sse event emitted by Meridian.
 type JobSseEvent struct {
 	union json.RawMessage
 }
 
-// JobStageAttempt defines model for JobStageAttempt.
+// JobStageAttempt represents job stage attempt data exchanged through the Meridian API.
 type JobStageAttempt struct {
-	Attempt    int           `json:"attempt"`
-	Error      ErrorResponse `json:"error"`
-	FinishedAt Timestamp     `json:"finishedAt"`
-	Stage      PipelineStage `json:"stage"`
-	StartedAt  Timestamp     `json:"startedAt"`
-	Status     JobStatus     `json:"status"`
+	// Attempt specifies the attempt associated with this job stage attempt.
+	Attempt int `json:"attempt"`
+
+	// Error specifies the error associated with this job stage attempt.
+	Error ErrorResponse `json:"error"`
+
+	// FinishedAt is the RFC 3339 UTC instant when processing reached a terminal state.
+	FinishedAt Timestamp `json:"finishedAt"`
+
+	// Stage contains the pipeline stage associated with this job stage attempt.
+	Stage PipelineStage `json:"stage"`
+
+	// StartedAt is the RFC 3339 UTC instant when processing began.
+	StartedAt Timestamp `json:"startedAt"`
+
+	// Status is the current lifecycle or processing state.
+	Status JobStatus `json:"status"`
 }
 
-// JobStateEvent defines model for JobStateEvent.
+// JobStateEvent represents a job state event emitted by Meridian.
 type JobStateEvent struct {
-	// At RFC 3339 UTC
-	At       Timestamp          `json:"at"`
-	Event    JobStateEventEvent `json:"event"`
-	Id       string             `json:"id"`
-	Progress int                `json:"progress"`
-	Status   JobStatus          `json:"status"`
+	// At contains the timestamp associated with this job state event.
+	At Timestamp `json:"at"`
+
+	// Event specifies the event associated with this job state event.
+	Event JobStateEventEvent `json:"event"`
+
+	// Id uniquely identifies this resource.
+	Id string `json:"id"`
+
+	// Progress specifies the progress associated with this job state event.
+	Progress int `json:"progress"`
+
+	// Status is the current lifecycle or processing state.
+	Status JobStatus `json:"status"`
 }
 
-// JobStateEventEvent defines model for JobStateEvent.Event.
+// JobStateEventEvent specifies the event associated with this job state event.
 type JobStateEventEvent string
 
-// JobStatus defines model for JobStatus.
+// JobStatus identifies one supported job status value.
 type JobStatus string
 
-// JobTrigger defines model for JobTrigger.
+// JobTrigger identifies one supported job trigger value.
 type JobTrigger string
 
-// JobType defines model for JobType.
+// JobType identifies one supported job type value.
 type JobType string
 
-// KindId defines model for KindId.
+// KindId identifies an asset kind registered in contracts/kinds.yaml.
 type KindId = string
 
-// KnownHost defines model for KnownHost.
+// KnownHost represents known host data exchanged through the Meridian API.
 type KnownHost struct {
-	// CreatedAt RFC 3339 UTC
-	CreatedAt   Timestamp `json:"createdAt"`
-	Fingerprint string    `json:"fingerprint"`
-	Host        string    `json:"host"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
 
-	// Id UUID v7
+	// Fingerprint specifies the fingerprint associated with this known host.
+	Fingerprint string `json:"fingerprint"`
+
+	// Host specifies the host associated with this known host.
+	Host string `json:"host"`
+
+	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
 
 	// KeyType SSH public-key algorithm parsed from the stored RFC4253 blob.
 	KeyType KnownHostKeyType `json:"keyType"`
-	Port    int              `json:"port"`
-	Source  KnownHostSource  `json:"source"`
+
+	// Port specifies the port associated with this known host.
+	Port int `json:"port"`
+
+	// Source specifies the source associated with this known host.
+	Source KnownHostSource `json:"source"`
 }
 
 // KnownHostKeyType SSH public-key algorithm parsed from the stored RFC4253 blob.
 type KnownHostKeyType string
 
-// KnownHostSource defines model for KnownHost.Source.
+// KnownHostSource specifies the source associated with this known host.
 type KnownHostSource string
 
-// KnownHostCandidate defines model for KnownHostCandidate.
+// KnownHostCandidate represents known host candidate data exchanged through the Meridian API.
 type KnownHostCandidate struct {
 	// Fingerprint SHA256 fingerprint of the RFC4253 public-key blob, standard base64 without padding.
 	Fingerprint string `json:"fingerprint"`
-	Host        string `json:"host"`
+
+	// Host specifies the host associated with this known host candidate.
+	Host string `json:"host"`
 
 	// KeyType SSH public-key algorithm parsed from the RFC4253 blob.
 	KeyType KnownHostCandidateKeyType `json:"keyType"`
-	Port    int                       `json:"port"`
+
+	// Port specifies the port associated with this known host candidate.
+	Port int `json:"port"`
 
 	// PublicKey Base64 RFC4253 public-key blob; safe to return in an unknown-host candidate.
 	PublicKey string `json:"publicKey"`
@@ -3220,1241 +3832,1992 @@ type KnownHostCandidate struct {
 // KnownHostCandidateKeyType SSH public-key algorithm parsed from the RFC4253 blob.
 type KnownHostCandidateKeyType string
 
-// KnownHostCreateRequest defines model for KnownHostCreateRequest.
+// KnownHostCreateRequest defines validated input for the corresponding Meridian API operation.
 type KnownHostCreateRequest struct {
+	// Host specifies the host associated with this known host create request.
 	Host string `json:"host"`
-	Port int    `json:"port,omitempty"`
+
+	// Port specifies the port associated with this known host create request.
+	Port int `json:"port,omitempty"`
 
 	// PublicKey Base64 RFC4253 public-key blob. The server derives and validates keyType and fingerprint; clients cannot submit either field.
 	PublicKey string `json:"publicKey"`
 }
 
-// KnownHostPage defines model for KnownHostPage.
+// KnownHostPage contains one paginated page of known host records.
 type KnownHostPage struct {
-	Items    []KnownHost `json:"items"`
-	Page     int         `json:"page"`
-	PageSize int         `json:"pageSize"`
-	Total    int         `json:"total"`
+	// Items contains the ordered items associated with this known host page.
+	Items []KnownHost `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// Layer defines model for Layer.
+// Layer represents layer data exchanged through the Meridian API.
 type Layer struct {
-	// AssetId UUID v7
-	AssetId      Uuid           `json:"assetId"`
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
+
+	// Capabilities lists actions the authenticated principal may perform on this resource.
 	Capabilities CapabilityList `json:"capabilities"`
 
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
-	Dialect   string    `json:"dialect"`
-	Enabled   bool      `json:"enabled"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag  ETag        `json:"etag"`
+	// Dialect specifies the dialect associated with this layer.
+	Dialect string `json:"dialect"`
+
+	// Enabled indicates whether enabled applies to this layer.
+	Enabled bool `json:"enabled"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Heads contains the ordered heads associated with this layer.
 	Heads []LayerHead `json:"heads"`
 
-	// Id UUID v7
-	Id           Uuid        `json:"id"`
-	Ord          int         `json:"ord"`
-	Origin       LayerOrigin `json:"origin"`
-	Role         LayerRole   `json:"role"`
-	SourceSpecId Uuid        `json:"sourceSpecId"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
 
-	// UpdatedAt RFC 3339 UTC
+	// Ord specifies the ord associated with this layer.
+	Ord int `json:"ord"`
+
+	// Origin contains the layer origin associated with this layer.
+	Origin LayerOrigin `json:"origin"`
+
+	// Role contains the layer role associated with this layer.
+	Role LayerRole `json:"role"`
+
+	// SourceSpecId specifies the source spec id associated with this layer.
+	SourceSpecId Uuid `json:"sourceSpecId"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// LayerHead defines model for LayerHead.
+// LayerHead represents layer head data exchanged through the Meridian API.
 type LayerHead struct {
+	// CandidateRevisionId indicates whether candidate revision id applies to this layer head.
 	CandidateRevisionId Uuid `json:"candidateRevisionId"`
+
+	// EffectiveRevisionId specifies the effective revision id associated with this layer head.
 	EffectiveRevisionId Uuid `json:"effectiveRevisionId"`
-	Generation          int  `json:"generation"`
-	LatestRevisionId    Uuid `json:"latestRevisionId"`
+
+	// Generation specifies the generation associated with this layer head.
+	Generation int `json:"generation"`
+
+	// LatestRevisionId specifies the latest revision id associated with this layer head.
+	LatestRevisionId Uuid `json:"latestRevisionId"`
 
 	// ScopeKey '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
-	ScopeKey  string             `json:"scopeKey"`
+	ScopeKey string `json:"scopeKey"`
+
+	// ScopeType specifies the scope type associated with this layer head.
 	ScopeType LayerHeadScopeType `json:"scopeType"`
 }
 
-// LayerHeadScopeType defines model for LayerHead.ScopeType.
+// LayerHeadScopeType specifies the scope type associated with this layer head.
 type LayerHeadScopeType string
 
-// LayerList defines model for LayerList.
+// LayerList contains an ordered collection of layer values.
 type LayerList struct {
-	// Etag Opaque HTTP entity tag including quotes
-	Etag  ETag    `json:"etag"`
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Items contains the ordered items associated with this layer list.
 	Items []Layer `json:"items"`
 }
 
-// LayerManifestEntry defines model for LayerManifestEntry.
+// LayerManifestEntry represents layer manifest entry data exchanged through the Meridian API.
 type LayerManifestEntry struct {
+	// ContentHash specifies the content hash associated with this layer manifest entry.
 	ContentHash string `json:"contentHash"`
 
-	// LayerId UUID v7
-	LayerId      Uuid           `json:"layerId"`
-	Ord          int            `json:"ord"`
-	Origin       LayerOrigin    `json:"origin"`
+	// LayerId contains the uuid associated with this layer manifest entry.
+	LayerId Uuid `json:"layerId"`
+
+	// Ord specifies the ord associated with this layer manifest entry.
+	Ord int `json:"ord"`
+
+	// Origin contains the layer origin associated with this layer manifest entry.
+	Origin LayerOrigin `json:"origin"`
+
+	// ReviewStatus contains the revision status associated with this layer manifest entry.
 	ReviewStatus RevisionStatus `json:"reviewStatus"`
 
-	// RevisionId UUID v7
-	RevisionId Uuid      `json:"revisionId"`
-	Role       LayerRole `json:"role"`
+	// RevisionId contains the uuid associated with this layer manifest entry.
+	RevisionId Uuid `json:"revisionId"`
+
+	// Role contains the layer role associated with this layer manifest entry.
+	Role LayerRole `json:"role"`
 
 	// ScopeKey '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
-	ScopeKey  string                      `json:"scopeKey"`
+	ScopeKey string `json:"scopeKey"`
+
+	// ScopeType specifies the scope type associated with this layer manifest entry.
 	ScopeType LayerManifestEntryScopeType `json:"scopeType"`
 }
 
-// LayerManifestEntryScopeType defines model for LayerManifestEntry.ScopeType.
+// LayerManifestEntryScopeType specifies the scope type associated with this layer manifest entry.
 type LayerManifestEntryScopeType string
 
-// LayerOrderReplaceRequest defines model for LayerOrderReplaceRequest.
+// LayerOrderReplaceRequest defines validated input for the corresponding Meridian API operation.
 type LayerOrderReplaceRequest struct {
+	// LayerIds contains the ordered layer ids associated with this layer order replace request.
 	LayerIds []Uuid `json:"layerIds"`
 }
 
-// LayerOrigin defines model for LayerOrigin.
+// LayerOrigin identifies one supported layer origin value.
 type LayerOrigin string
 
-// LayerPatchRequest defines model for LayerPatchRequest.
+// LayerPatchRequest defines validated input for the corresponding Meridian API operation.
 type LayerPatchRequest struct {
-	Dialect string    `json:"dialect,omitempty"`
-	Enabled bool      `json:"enabled,omitempty"`
-	Role    LayerRole `json:"role,omitempty"`
+	// Dialect specifies the dialect associated with this layer patch request.
+	Dialect string `json:"dialect,omitempty"`
+
+	// Enabled indicates whether enabled applies to this layer patch request.
+	Enabled bool `json:"enabled,omitempty"`
+
+	// Role contains the layer role associated with this layer patch request.
+	Role LayerRole `json:"role,omitempty"`
 }
 
-// LayerRevision defines model for LayerRevision.
+// LayerRevision represents layer revision data exchanged through the Meridian API.
 type LayerRevision struct {
-	AiMeta      map[string]interface{} `json:"aiMeta"`
-	ContentHash string                 `json:"contentHash"`
-	ContentType ContentType            `json:"contentType"`
-	ContentUrl  string                 `json:"contentUrl,omitempty"`
+	// AiMeta specifies the ai meta associated with this layer revision.
+	AiMeta map[string]interface{} `json:"aiMeta"`
 
-	// CreatedAt RFC 3339 UTC
+	// ContentHash specifies the content hash associated with this layer revision.
+	ContentHash string `json:"contentHash"`
+
+	// ContentType contains the content type associated with this layer revision.
+	ContentType ContentType `json:"contentType"`
+
+	// ContentUrl specifies the content url associated with this layer revision.
+	ContentUrl string `json:"contentUrl,omitempty"`
+
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
-	CreatedBy Uuid      `json:"createdBy"`
-	Dialect   string    `json:"dialect"`
-	GitCommit string    `json:"gitCommit"`
 
-	// Id UUID v7
+	// CreatedBy specifies the created by associated with this layer revision.
+	CreatedBy Uuid `json:"createdBy"`
+
+	// Dialect specifies the dialect associated with this layer revision.
+	Dialect string `json:"dialect"`
+
+	// GitCommit specifies the git commit associated with this layer revision.
+	GitCommit string `json:"gitCommit"`
+
+	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
 
-	// LayerId UUID v7
-	LayerId       Uuid           `json:"layerId"`
-	ReviewComment string         `json:"reviewComment"`
-	ReviewStatus  RevisionStatus `json:"reviewStatus"`
+	// LayerId contains the uuid associated with this layer revision.
+	LayerId Uuid `json:"layerId"`
+
+	// ReviewComment specifies the review comment associated with this layer revision.
+	ReviewComment string `json:"reviewComment"`
+
+	// ReviewStatus contains the revision status associated with this layer revision.
+	ReviewStatus RevisionStatus `json:"reviewStatus"`
 
 	// ScopeKey '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
-	ScopeKey     string                 `json:"scopeKey"`
-	ScopeType    LayerRevisionScopeType `json:"scopeType"`
-	SourceBranch string                 `json:"sourceBranch"`
+	ScopeKey string `json:"scopeKey"`
+
+	// ScopeType specifies the scope type associated with this layer revision.
+	ScopeType LayerRevisionScopeType `json:"scopeType"`
+
+	// SourceBranch specifies the source branch associated with this layer revision.
+	SourceBranch string `json:"sourceBranch"`
 }
 
-// LayerRevisionScopeType defines model for LayerRevision.ScopeType.
+// LayerRevisionScopeType specifies the scope type associated with this layer revision.
 type LayerRevisionScopeType string
 
-// LayerRevisionCreateRequest defines model for LayerRevisionCreateRequest.
+// LayerRevisionCreateRequest defines validated input for the corresponding Meridian API operation.
 type LayerRevisionCreateRequest struct {
-	Content                     string      `json:"content"`
-	ContentType                 ContentType `json:"contentType"`
-	Dialect                     string      `json:"dialect,omitempty"`
-	ExpectedEffectiveRevisionId Uuid        `json:"expectedEffectiveRevisionId"`
+	// Content specifies the content associated with this layer revision create request.
+	Content string `json:"content"`
 
-	// ScopeKey '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
-	ScopeKey        string                              `json:"scopeKey"`
-	ScopeType       LayerRevisionCreateRequestScopeType `json:"scopeType"`
-	SubmitForReview bool                                `json:"submitForReview,omitempty"`
-}
+	// ContentType contains the content type associated with this layer revision create request.
+	ContentType ContentType `json:"contentType"`
 
-// LayerRevisionCreateRequestScopeType defines model for LayerRevisionCreateRequest.ScopeType.
-type LayerRevisionCreateRequestScopeType string
+	// Dialect specifies the dialect associated with this layer revision create request.
+	Dialect string `json:"dialect,omitempty"`
 
-// LayerRevisionPage defines model for LayerRevisionPage.
-type LayerRevisionPage struct {
-	Items    []LayerRevision `json:"items"`
-	Page     int             `json:"page"`
-	PageSize int             `json:"pageSize"`
-	Total    int             `json:"total"`
-}
-
-// LayerRevisionSubmission defines model for LayerRevisionSubmission.
-type LayerRevisionSubmission struct {
-	Deduplicated bool `json:"deduplicated"`
-
-	// JobId UUID v7
-	JobId    Uuid          `json:"jobId"`
-	Revision LayerRevision `json:"revision"`
-}
-
-// LayerRole defines model for LayerRole.
-type LayerRole string
-
-// LayerRollbackRequest defines model for LayerRollbackRequest.
-type LayerRollbackRequest struct {
+	// ExpectedEffectiveRevisionId specifies the expected effective revision id associated with this layer revision create request.
 	ExpectedEffectiveRevisionId Uuid `json:"expectedEffectiveRevisionId"`
 
 	// ScopeKey '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
-	ScopeKey  string                        `json:"scopeKey"`
+	ScopeKey string `json:"scopeKey"`
+
+	// ScopeType specifies the scope type associated with this layer revision create request.
+	ScopeType LayerRevisionCreateRequestScopeType `json:"scopeType"`
+
+	// SubmitForReview indicates whether submit for review applies to this layer revision create request.
+	SubmitForReview bool `json:"submitForReview,omitempty"`
+}
+
+// LayerRevisionCreateRequestScopeType specifies the scope type associated with this layer revision create request.
+type LayerRevisionCreateRequestScopeType string
+
+// LayerRevisionPage contains one paginated page of layer revision records.
+type LayerRevisionPage struct {
+	// Items contains the ordered items associated with this layer revision page.
+	Items []LayerRevision `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
+}
+
+// LayerRevisionSubmission represents layer revision submission data exchanged through the Meridian API.
+type LayerRevisionSubmission struct {
+	// Deduplicated indicates whether deduplicated applies to this layer revision submission.
+	Deduplicated bool `json:"deduplicated"`
+
+	// JobId identifies the asynchronous job associated with this resource.
+	JobId Uuid `json:"jobId"`
+
+	// Revision is the monotonic optimistic-concurrency version of this resource.
+	Revision LayerRevision `json:"revision"`
+}
+
+// LayerRole identifies one supported layer role value.
+type LayerRole string
+
+// LayerRollbackRequest defines validated input for the corresponding Meridian API operation.
+type LayerRollbackRequest struct {
+	// ExpectedEffectiveRevisionId specifies the expected effective revision id associated with this layer rollback request.
+	ExpectedEffectiveRevisionId Uuid `json:"expectedEffectiveRevisionId"`
+
+	// ScopeKey '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
+	ScopeKey string `json:"scopeKey"`
+
+	// ScopeType specifies the scope type associated with this layer rollback request.
 	ScopeType LayerRollbackRequestScopeType `json:"scopeType"`
 
-	// TargetRevisionId UUID v7
+	// TargetRevisionId contains the uuid associated with this layer rollback request.
 	TargetRevisionId Uuid `json:"targetRevisionId"`
 }
 
-// LayerRollbackRequestScopeType defines model for LayerRollbackRequest.ScopeType.
+// LayerRollbackRequestScopeType specifies the scope type associated with this layer rollback request.
 type LayerRollbackRequestScopeType string
 
-// LayerSummary defines model for LayerSummary.
+// LayerSummary represents layer summary data exchanged through the Meridian API.
 type LayerSummary struct {
+	// Heads contains the ordered heads associated with this layer summary.
 	Heads []LayerHead `json:"heads"`
 
-	// Id UUID v7
-	Id     Uuid        `json:"id"`
-	Ord    int         `json:"ord"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Ord specifies the ord associated with this layer summary.
+	Ord int `json:"ord"`
+
+	// Origin contains the layer origin associated with this layer summary.
 	Origin LayerOrigin `json:"origin"`
-	Role   LayerRole   `json:"role"`
+
+	// Role contains the layer role associated with this layer summary.
+	Role LayerRole `json:"role"`
 }
 
-// Lifecycle defines model for Lifecycle.
+// Lifecycle identifies one supported lifecycle value.
 type Lifecycle string
 
-// LoginRequest defines model for LoginRequest.
+// LoginRequest contains local credentials used to create a browser session.
 type LoginRequest struct {
+	// Password is the write-only plaintext password supplied for authentication.
 	Password string `json:"password,omitempty"`
+
+	// Username specifies the username associated with this login request.
 	Username string `json:"username"`
 }
 
-// LoginResult defines model for LoginResult.
+// LoginResult returns the authenticated principal and the initial session-bound CSRF token.
 type LoginResult struct {
+	// CsrfToken binds a state-changing browser request to the current session.
 	CsrfToken string `json:"csrfToken"`
-	Me        Me     `json:"me"`
+
+	// Me contains the authenticated user, memberships, and platform role.
+	Me Me `json:"me"`
 }
 
-// Me defines model for Me.
+// Me describes the authenticated user and every tenant context available to that user.
 type Me struct {
-	IsPlatformAdmin bool                  `json:"isPlatformAdmin"`
-	Tenants         []TenantMembershipRef `json:"tenants"`
-	User            User                  `json:"user"`
+	// IsPlatformAdmin indicates whether the user may access platform administration operations.
+	IsPlatformAdmin bool `json:"isPlatformAdmin"`
+
+	// Tenants lists tenant contexts the authenticated user may access.
+	Tenants []TenantMembershipRef `json:"tenants"`
+
+	// User is the authenticated local identity.
+	User User `json:"user"`
 }
 
-// Member defines model for Member.
+// Member represents member data exchanged through the Meridian API.
 type Member struct {
-	// JoinedAt RFC 3339 UTC
-	JoinedAt Timestamp  `json:"joinedAt"`
-	Role     TenantRole `json:"role"`
-	User     User       `json:"user"`
+	// JoinedAt contains the timestamp associated with this member.
+	JoinedAt Timestamp `json:"joinedAt"`
+
+	// Role contains the tenant role associated with this member.
+	Role TenantRole `json:"role"`
+
+	// User contains the user associated with this member.
+	User User `json:"user"`
 }
 
-// MemberPage defines model for MemberPage.
+// MemberPage contains one paginated page of member records.
 type MemberPage struct {
-	Items    []Member `json:"items"`
-	Page     int      `json:"page"`
-	PageSize int      `json:"pageSize"`
-	Total    int      `json:"total"`
+	// Items contains the ordered items associated with this member page.
+	Items []Member `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// MemberPutRequest defines model for MemberPutRequest.
+// MemberPutRequest defines validated input for the corresponding Meridian API operation.
 type MemberPutRequest struct {
+	// Role contains the tenant role associated with this member put request.
 	Role TenantRole `json:"role"`
 }
 
-// MergeLayerInput defines model for MergeLayerInput.
+// MergeLayerInput represents merge layer input data exchanged through the Meridian API.
 type MergeLayerInput struct {
-	// LayerId UUID v7
+	// LayerId contains the uuid associated with this merge layer input.
 	LayerId Uuid `json:"layerId"`
 
-	// RevisionId UUID v7
+	// RevisionId contains the uuid associated with this merge layer input.
 	RevisionId Uuid `json:"revisionId"`
 }
 
-// MergePreview defines model for MergePreview.
+// MergePreview represents merge preview data exchanged through the Meridian API.
 type MergePreview struct {
-	Content          string            `json:"content"`
-	ContentType      ContentType       `json:"contentType"`
-	InputFingerprint string            `json:"inputFingerprint"`
-	Provenance       []ProvenanceEntry `json:"provenance"`
-	Validation       []ValidationIssue `json:"validation"`
+	// Content specifies the content associated with this merge preview.
+	Content string `json:"content"`
+
+	// ContentType contains the content type associated with this merge preview.
+	ContentType ContentType `json:"contentType"`
+
+	// InputFingerprint specifies the input fingerprint associated with this merge preview.
+	InputFingerprint string `json:"inputFingerprint"`
+
+	// Provenance contains the ordered provenance associated with this merge preview.
+	Provenance []ProvenanceEntry `json:"provenance"`
+
+	// Validation contains the ordered validation associated with this merge preview.
+	Validation []ValidationIssue `json:"validation"`
 }
 
-// MergePreviewRequest defines model for MergePreviewRequest.
+// MergePreviewRequest defines validated input for the corresponding Meridian API operation.
 type MergePreviewRequest struct {
-	// AssetId UUID v7
-	AssetId         Uuid              `json:"assetId"`
-	Layers          []MergeLayerInput `json:"layers,omitempty"`
-	OverrideContent string            `json:"overrideContent,omitempty"`
-	Ref             RefName           `json:"ref"`
-	RefType         RefType           `json:"refType,omitempty"`
-}
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
 
-// MissingKind defines model for MissingKind.
-type MissingKind struct {
-	CanConfigure      bool   `json:"canConfigure"`
-	CanGenerateWithAi bool   `json:"canGenerateWithAi"`
-	Kind              KindId `json:"kind"`
-}
+	// Layers contains the ordered layers associated with this merge preview request.
+	Layers []MergeLayerInput `json:"layers,omitempty"`
 
-// Notification defines model for Notification.
-type Notification struct {
-	Body string `json:"body"`
+	// OverrideContent specifies the override content associated with this merge preview request.
+	OverrideContent string `json:"overrideContent,omitempty"`
 
-	// CreatedAt RFC 3339 UTC
-	CreatedAt Timestamp       `json:"createdAt"`
-	EventType DomainEventType `json:"eventType"`
+	// Ref contains the ref name associated with this merge preview request.
+	Ref RefName `json:"ref"`
 
-	// Id UUID v7
-	Id          Uuid      `json:"id"`
-	ReadAt      Timestamp `json:"readAt"`
-	ResourceUrl string    `json:"resourceUrl"`
-	Title       string    `json:"title"`
-}
-
-// NotificationChannel defines model for NotificationChannel.
-type NotificationChannel struct {
-	// CreatedAt RFC 3339 UTC
-	CreatedAt Timestamp `json:"createdAt"`
-	Enabled   bool      `json:"enabled"`
-	Endpoint  string    `json:"endpoint"`
-
-	// Etag Opaque HTTP entity tag including quotes
-	Etag ETag `json:"etag"`
-
-	// Id UUID v7
-	Id               Uuid                    `json:"id"`
-	Kind             NotificationChannelKind `json:"kind"`
-	Name             string                  `json:"name"`
-	SecretConfigured bool                    `json:"secretConfigured"`
-
-	// UpdatedAt RFC 3339 UTC
-	UpdatedAt Timestamp `json:"updatedAt"`
-}
-
-// NotificationChannelCreateRequest defines model for NotificationChannelCreateRequest.
-type NotificationChannelCreateRequest struct {
-	Enabled  bool                    `json:"enabled"`
-	Endpoint string                  `json:"endpoint,omitempty"`
-	Kind     NotificationChannelKind `json:"kind"`
-	Name     string                  `json:"name"`
-	Secret   string                  `json:"secret,omitempty"`
-}
-
-// NotificationChannelKind defines model for NotificationChannelKind.
-type NotificationChannelKind string
-
-// NotificationChannelList defines model for NotificationChannelList.
-type NotificationChannelList struct {
-	Items []NotificationChannel `json:"items"`
-}
-
-// NotificationChannelPatchRequest defines model for NotificationChannelPatchRequest.
-type NotificationChannelPatchRequest struct {
-	Enabled  bool   `json:"enabled,omitempty"`
-	Endpoint string `json:"endpoint,omitempty"`
-	Name     string `json:"name,omitempty"`
-}
-
-// NotificationChannelRotateRequest defines model for NotificationChannelRotateRequest.
-type NotificationChannelRotateRequest struct {
-	Secret string `json:"secret,omitempty"`
-}
-
-// NotificationPage defines model for NotificationPage.
-type NotificationPage struct {
-	Items       []Notification `json:"items"`
-	Page        int            `json:"page"`
-	PageSize    int            `json:"pageSize"`
-	Total       int            `json:"total"`
-	UnreadCount int            `json:"unreadCount"`
-}
-
-// OverlayDialect defines model for OverlayDialect.
-type OverlayDialect string
-
-// OwnerRefs defines model for OwnerRefs.
-type OwnerRefs struct {
-	TeamIds []Uuid `json:"teamIds"`
-	UserIds []Uuid `json:"userIds"`
-}
-
-// PageInfo defines model for PageInfo.
-type PageInfo struct {
-	Page     int `json:"page"`
-	PageSize int `json:"pageSize"`
-	Total    int `json:"total"`
-}
-
-// PipelineStage defines model for PipelineStage.
-type PipelineStage string
-
-// PlatformAuditFilter defines model for PlatformAuditFilter.
-type PlatformAuditFilter struct {
-	Actions []string `json:"actions,omitempty"`
-
-	// ActorId UUID v7
-	ActorId Uuid `json:"actorId,omitempty"`
-
-	// From RFC 3339 UTC
-	From         Timestamp `json:"from,omitempty"`
-	ResourceId   string    `json:"resourceId,omitempty"`
-	ResourceType string    `json:"resourceType,omitempty"`
-	TenantSlug   Slug      `json:"tenantSlug,omitempty"`
-
-	// To RFC 3339 UTC
-	To Timestamp `json:"to,omitempty"`
-}
-
-// PlatformJob defines model for PlatformJob.
-type PlatformJob struct {
-	// CreatedAt RFC 3339 UTC
-	CreatedAt  Timestamp `json:"createdAt"`
-	FinishedAt Timestamp `json:"finishedAt"`
-
-	// Id UUID v7
-	Id Uuid `json:"id"`
-
-	// ScopeId Exposed only for tenant or repository scope; null for service, asset, version, layer, and other business scopes.
-	ScopeId    string        `json:"scopeId"`
-	ScopeType  JobScopeType  `json:"scopeType"`
-	Stage      PipelineStage `json:"stage"`
-	StartedAt  Timestamp     `json:"startedAt"`
-	Status     JobStatus     `json:"status"`
-	TenantSlug Slug          `json:"tenantSlug"`
-	Trigger    JobTrigger    `json:"trigger"`
-	Type       JobType       `json:"type"`
-}
-
-// PlatformJobFilter defines model for PlatformJobFilter.
-type PlatformJobFilter struct {
-	ScopeId    string       `json:"scopeId,omitempty"`
-	ScopeType  JobScopeType `json:"scopeType,omitempty"`
-	Statuses   []JobStatus  `json:"statuses,omitempty"`
-	TenantSlug Slug         `json:"tenantSlug,omitempty"`
-	Types      []JobType    `json:"types,omitempty"`
-}
-
-// PlatformJobPage defines model for PlatformJobPage.
-type PlatformJobPage struct {
-	Items    []PlatformJob `json:"items"`
-	Page     int           `json:"page"`
-	PageSize int           `json:"pageSize"`
-	Total    int           `json:"total"`
-}
-
-// PlatformSettings defines model for PlatformSettings.
-type PlatformSettings struct {
-	DefaultNotificationChannels []DefaultNotificationChannelTemplate `json:"defaultNotificationChannels"`
-	DefaultQuota                Quota                                `json:"defaultQuota"`
-	DefaultTenantSettings       TenantSettingsTemplate               `json:"defaultTenantSettings"`
-	DefaultViewOverrides        map[string]ViewOverrideValue         `json:"defaultViewOverrides"`
-
-	// Etag Opaque HTTP entity tag including quotes
-	Etag ETag `json:"etag"`
-}
-
-// PlatformSettingsPatchRequest defines model for PlatformSettingsPatchRequest.
-type PlatformSettingsPatchRequest struct {
-	DefaultNotificationChannels []DefaultNotificationChannelTemplate `json:"defaultNotificationChannels,omitempty"`
-	DefaultQuota                Quota                                `json:"defaultQuota,omitempty"`
-	DefaultTenantSettings       TenantSettingsTemplate               `json:"defaultTenantSettings,omitempty"`
-	DefaultViewOverrides        map[string]ViewOverrideValue         `json:"defaultViewOverrides,omitempty"`
-}
-
-// ProduceSourceRequest defines model for ProduceSourceRequest.
-type ProduceSourceRequest struct {
-	Force   bool    `json:"force,omitempty"`
-	Ref     RefName `json:"ref,omitempty"`
+	// RefType contains the ref type associated with this merge preview request.
 	RefType RefType `json:"refType,omitempty"`
 }
 
-// ProducerDependencyStatus defines model for ProducerDependencyStatus.
+// MissingKind represents missing kind data exchanged through the Meridian API.
+type MissingKind struct {
+	// CanConfigure indicates whether configure applies to this missing kind.
+	CanConfigure bool `json:"canConfigure"`
+
+	// CanGenerateWithAi indicates whether generate with ai applies to this missing kind.
+	CanGenerateWithAi bool `json:"canGenerateWithAi"`
+
+	// Kind contains the kind id associated with this missing kind.
+	Kind KindId `json:"kind"`
+}
+
+// Notification represents notification data exchanged through the Meridian API.
+type Notification struct {
+	// Body specifies the body associated with this notification.
+	Body string `json:"body"`
+
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
+
+	// EventType contains the domain event type associated with this notification.
+	EventType DomainEventType `json:"eventType"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// ReadAt specifies the read at associated with this notification.
+	ReadAt Timestamp `json:"readAt"`
+
+	// ResourceUrl specifies the resource url associated with this notification.
+	ResourceUrl string `json:"resourceUrl"`
+
+	// Title specifies the title associated with this notification.
+	Title string `json:"title"`
+}
+
+// NotificationChannel represents notification channel data exchanged through the Meridian API.
+type NotificationChannel struct {
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
+
+	// Enabled indicates whether enabled applies to this notification channel.
+	Enabled bool `json:"enabled"`
+
+	// Endpoint specifies the endpoint associated with this notification channel.
+	Endpoint string `json:"endpoint"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Kind contains the notification channel kind associated with this notification channel.
+	Kind NotificationChannelKind `json:"kind"`
+
+	// Name specifies the name associated with this notification channel.
+	Name string `json:"name"`
+
+	// SecretConfigured indicates whether secret configured applies to this notification channel.
+	SecretConfigured bool `json:"secretConfigured"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
+	UpdatedAt Timestamp `json:"updatedAt"`
+}
+
+// NotificationChannelCreateRequest defines validated input for the corresponding Meridian API operation.
+type NotificationChannelCreateRequest struct {
+	// Enabled indicates whether enabled applies to this notification channel create request.
+	Enabled bool `json:"enabled"`
+
+	// Endpoint specifies the endpoint associated with this notification channel create request.
+	Endpoint string `json:"endpoint,omitempty"`
+
+	// Kind contains the notification channel kind associated with this notification channel create request.
+	Kind NotificationChannelKind `json:"kind"`
+
+	// Name specifies the name associated with this notification channel create request.
+	Name string `json:"name"`
+
+	// Secret is write-only secret material and must never be returned by the API.
+	Secret string `json:"secret,omitempty"`
+}
+
+// NotificationChannelKind identifies one supported notification channel kind value.
+type NotificationChannelKind string
+
+// NotificationChannelList contains an ordered collection of notification channel values.
+type NotificationChannelList struct {
+	// Items contains the ordered items associated with this notification channel list.
+	Items []NotificationChannel `json:"items"`
+}
+
+// NotificationChannelPatchRequest defines validated input for the corresponding Meridian API operation.
+type NotificationChannelPatchRequest struct {
+	// Enabled indicates whether enabled applies to this notification channel patch request.
+	Enabled bool `json:"enabled,omitempty"`
+
+	// Endpoint specifies the endpoint associated with this notification channel patch request.
+	Endpoint string `json:"endpoint,omitempty"`
+
+	// Name specifies the name associated with this notification channel patch request.
+	Name string `json:"name,omitempty"`
+}
+
+// NotificationChannelRotateRequest defines validated input for the corresponding Meridian API operation.
+type NotificationChannelRotateRequest struct {
+	// Secret is write-only secret material and must never be returned by the API.
+	Secret string `json:"secret,omitempty"`
+}
+
+// NotificationPage contains one paginated page of notification records.
+type NotificationPage struct {
+	// Items contains the ordered items associated with this notification page.
+	Items []Notification `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
+
+	// UnreadCount specifies the unread count associated with this notification page.
+	UnreadCount int `json:"unreadCount"`
+}
+
+// OverlayDialect identifies one supported overlay dialect value.
+type OverlayDialect string
+
+// OwnerRefs represents owner refs data exchanged through the Meridian API.
+type OwnerRefs struct {
+	// TeamIds contains the ordered team ids associated with this owner refs.
+	TeamIds []Uuid `json:"teamIds"`
+
+	// UserIds contains the ordered user ids associated with this owner refs.
+	UserIds []Uuid `json:"userIds"`
+}
+
+// PageInfo represents page info data exchanged through the Meridian API.
+type PageInfo struct {
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
+}
+
+// PipelineStage identifies one supported pipeline stage value.
+type PipelineStage string
+
+// PlatformAuditFilter defines supported filters for selecting platform audit records.
+type PlatformAuditFilter struct {
+	// Actions contains the ordered actions associated with this platform audit filter.
+	Actions []string `json:"actions,omitempty"`
+
+	// ActorId contains the uuid associated with this platform audit filter.
+	ActorId Uuid `json:"actorId,omitempty"`
+
+	// From contains the timestamp associated with this platform audit filter.
+	From Timestamp `json:"from,omitempty"`
+
+	// ResourceId specifies the resource id associated with this platform audit filter.
+	ResourceId string `json:"resourceId,omitempty"`
+
+	// ResourceType specifies the resource type associated with this platform audit filter.
+	ResourceType string `json:"resourceType,omitempty"`
+
+	// TenantSlug contains the slug associated with this platform audit filter.
+	TenantSlug Slug `json:"tenantSlug,omitempty"`
+
+	// To contains the timestamp associated with this platform audit filter.
+	To Timestamp `json:"to,omitempty"`
+}
+
+// PlatformJob represents platform job data exchanged through the Meridian API.
+type PlatformJob struct {
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
+
+	// FinishedAt is the RFC 3339 UTC instant when processing reached a terminal state.
+	FinishedAt Timestamp `json:"finishedAt"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// ScopeId Exposed only for tenant or repository scope; null for service, asset, version, layer, and other business scopes.
+	ScopeId string `json:"scopeId"`
+
+	// ScopeType contains the job scope type associated with this platform job.
+	ScopeType JobScopeType `json:"scopeType"`
+
+	// Stage specifies the stage associated with this platform job.
+	Stage PipelineStage `json:"stage"`
+
+	// StartedAt is the RFC 3339 UTC instant when processing began.
+	StartedAt Timestamp `json:"startedAt"`
+
+	// Status is the current lifecycle or processing state.
+	Status JobStatus `json:"status"`
+
+	// TenantSlug contains the slug associated with this platform job.
+	TenantSlug Slug `json:"tenantSlug"`
+
+	// Trigger contains the job trigger associated with this platform job.
+	Trigger JobTrigger `json:"trigger"`
+
+	// Type contains the job type associated with this platform job.
+	Type JobType `json:"type"`
+}
+
+// PlatformJobFilter defines supported filters for selecting platform job records.
+type PlatformJobFilter struct {
+	// ScopeId specifies the scope id associated with this platform job filter.
+	ScopeId string `json:"scopeId,omitempty"`
+
+	// ScopeType contains the job scope type associated with this platform job filter.
+	ScopeType JobScopeType `json:"scopeType,omitempty"`
+
+	// Statuses contains the ordered statuses associated with this platform job filter.
+	Statuses []JobStatus `json:"statuses,omitempty"`
+
+	// TenantSlug contains the slug associated with this platform job filter.
+	TenantSlug Slug `json:"tenantSlug,omitempty"`
+
+	// Types contains the ordered types associated with this platform job filter.
+	Types []JobType `json:"types,omitempty"`
+}
+
+// PlatformJobPage contains one paginated page of platform job records.
+type PlatformJobPage struct {
+	// Items contains the ordered items associated with this platform job page.
+	Items []PlatformJob `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
+}
+
+// PlatformSettings represents platform settings data exchanged through the Meridian API.
+type PlatformSettings struct {
+	// DefaultNotificationChannels contains the ordered default notification channels associated with this platform settings.
+	DefaultNotificationChannels []DefaultNotificationChannelTemplate `json:"defaultNotificationChannels"`
+
+	// DefaultQuota contains the quota associated with this platform settings.
+	DefaultQuota Quota `json:"defaultQuota"`
+
+	// DefaultTenantSettings contains the tenant settings template associated with this platform settings.
+	DefaultTenantSettings TenantSettingsTemplate `json:"defaultTenantSettings"`
+
+	// DefaultViewOverrides specifies the default view overrides associated with this platform settings.
+	DefaultViewOverrides map[string]ViewOverrideValue `json:"defaultViewOverrides"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+}
+
+// PlatformSettingsPatchRequest defines validated input for the corresponding Meridian API operation.
+type PlatformSettingsPatchRequest struct {
+	// DefaultNotificationChannels contains the ordered default notification channels associated with this platform settings patch request.
+	DefaultNotificationChannels []DefaultNotificationChannelTemplate `json:"defaultNotificationChannels,omitempty"`
+
+	// DefaultQuota contains the quota associated with this platform settings patch request.
+	DefaultQuota Quota `json:"defaultQuota,omitempty"`
+
+	// DefaultTenantSettings contains the tenant settings template associated with this platform settings patch request.
+	DefaultTenantSettings TenantSettingsTemplate `json:"defaultTenantSettings,omitempty"`
+
+	// DefaultViewOverrides specifies the default view overrides associated with this platform settings patch request.
+	DefaultViewOverrides map[string]ViewOverrideValue `json:"defaultViewOverrides,omitempty"`
+}
+
+// ProduceSourceRequest defines validated input for the corresponding Meridian API operation.
+type ProduceSourceRequest struct {
+	// Force indicates whether force applies to this produce source request.
+	Force bool `json:"force,omitempty"`
+
+	// Ref contains the ref name associated with this produce source request.
+	Ref RefName `json:"ref,omitempty"`
+
+	// RefType contains the ref type associated with this produce source request.
+	RefType RefType `json:"refType,omitempty"`
+}
+
+// ProducerDependencyStatus identifies one supported producer dependency status value.
 type ProducerDependencyStatus string
 
-// ProducerNetworkMode defines model for ProducerNetworkMode.
+// ProducerNetworkMode identifies one supported producer network mode value.
 type ProducerNetworkMode string
 
-// ProducerProfile defines model for ProducerProfile.
+// ProducerProfile represents producer profile data exchanged through the Meridian API.
 type ProducerProfile struct {
-	Args       []string `json:"args"`
-	CpuSeconds int      `json:"cpuSeconds"`
+	// Args contains the ordered args associated with this producer profile.
+	Args []string `json:"args"`
 
-	// CreatedAt RFC 3339 UTC
-	CreatedAt        Timestamp                `json:"createdAt"`
+	// CpuSeconds specifies the cpu seconds associated with this producer profile.
+	CpuSeconds int `json:"cpuSeconds"`
+
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
+
+	// DependencyStatus contains the producer dependency status associated with this producer profile.
 	DependencyStatus ProducerDependencyStatus `json:"dependencyStatus"`
-	Enabled          bool                     `json:"enabled"`
+
+	// Enabled indicates whether enabled applies to this producer profile.
+	Enabled bool `json:"enabled"`
 
 	// EnvAllowlist Names only; every name must be in the deployment PRODUCER_ENV_ALLOWLIST. Values are never stored or returned.
 	EnvAllowlist []string `json:"envAllowlist"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag       ETag   `json:"etag"`
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Executable specifies the executable associated with this producer profile.
 	Executable string `json:"executable"`
 
-	// Id UUID v7
-	Id                Uuid                `json:"id"`
-	Kind              ProducerProfileKind `json:"kind"`
-	MemoryMiB         int                 `json:"memoryMiB"`
-	Name              string              `json:"name"`
-	Network           ProducerNetworkMode `json:"network"`
-	Pids              int                 `json:"pids"`
-	ReplaySafe        bool                `json:"replaySafe"`
-	Revision          int                 `json:"revision"`
-	SupportedKinds    []KindId            `json:"supportedKinds"`
-	TimeoutSec        int                 `json:"timeoutSec"`
-	UnavailableReason string              `json:"unavailableReason"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
 
-	// UpdatedAt RFC 3339 UTC
+	// Kind contains the producer profile kind associated with this producer profile.
+	Kind ProducerProfileKind `json:"kind"`
+
+	// MemoryMiB specifies the memory mi b associated with this producer profile.
+	MemoryMiB int `json:"memoryMiB"`
+
+	// Name specifies the name associated with this producer profile.
+	Name string `json:"name"`
+
+	// Network contains the producer network mode associated with this producer profile.
+	Network ProducerNetworkMode `json:"network"`
+
+	// Pids specifies the pids associated with this producer profile.
+	Pids int `json:"pids"`
+
+	// ReplaySafe indicates whether replay safe applies to this producer profile.
+	ReplaySafe bool `json:"replaySafe"`
+
+	// Revision is the monotonic optimistic-concurrency version of this resource.
+	Revision int `json:"revision"`
+
+	// SupportedKinds contains the ordered supported kinds associated with this producer profile.
+	SupportedKinds []KindId `json:"supportedKinds"`
+
+	// TimeoutSec specifies the timeout sec associated with this producer profile.
+	TimeoutSec int `json:"timeoutSec"`
+
+	// UnavailableReason specifies the unavailable reason associated with this producer profile.
+	UnavailableReason string `json:"unavailableReason"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// ProducerProfileCreateRequest defines model for ProducerProfileCreateRequest.
+// ProducerProfileCreateRequest defines validated input for the corresponding Meridian API operation.
 type ProducerProfileCreateRequest struct {
-	Args       []string `json:"args"`
-	CpuSeconds int      `json:"cpuSeconds"`
-	Enabled    bool     `json:"enabled"`
+	// Args contains the ordered args associated with this producer profile create request.
+	Args []string `json:"args"`
+
+	// CpuSeconds specifies the cpu seconds associated with this producer profile create request.
+	CpuSeconds int `json:"cpuSeconds"`
+
+	// Enabled indicates whether enabled applies to this producer profile create request.
+	Enabled bool `json:"enabled"`
 
 	// EnvAllowlist Names only; must be a subset of the deployment producer environment allowlist.
-	EnvAllowlist   []string            `json:"envAllowlist"`
-	Executable     string              `json:"executable"`
-	Kind           ProducerProfileKind `json:"kind"`
-	MemoryMiB      int                 `json:"memoryMiB"`
-	Name           string              `json:"name"`
-	Network        ProducerNetworkMode `json:"network"`
-	Pids           int                 `json:"pids"`
-	ReplaySafe     bool                `json:"replaySafe"`
-	SupportedKinds []KindId            `json:"supportedKinds"`
+	EnvAllowlist []string `json:"envAllowlist"`
+
+	// Executable specifies the executable associated with this producer profile create request.
+	Executable string `json:"executable"`
+
+	// Kind contains the producer profile kind associated with this producer profile create request.
+	Kind ProducerProfileKind `json:"kind"`
+
+	// MemoryMiB specifies the memory mi b associated with this producer profile create request.
+	MemoryMiB int `json:"memoryMiB"`
+
+	// Name specifies the name associated with this producer profile create request.
+	Name string `json:"name"`
+
+	// Network contains the producer network mode associated with this producer profile create request.
+	Network ProducerNetworkMode `json:"network"`
+
+	// Pids specifies the pids associated with this producer profile create request.
+	Pids int `json:"pids"`
+
+	// ReplaySafe indicates whether replay safe applies to this producer profile create request.
+	ReplaySafe bool `json:"replaySafe"`
+
+	// SupportedKinds contains the ordered supported kinds associated with this producer profile create request.
+	SupportedKinds []KindId `json:"supportedKinds"`
 
 	// TimeoutSec Omitted values default to 300 seconds for command profiles and 600 seconds for ai profiles, as defined in domain.yaml.
 	TimeoutSec int `json:"timeoutSec,omitempty"`
 }
 
-// ProducerProfileKind defines model for ProducerProfileKind.
+// ProducerProfileKind identifies one supported producer profile kind value.
 type ProducerProfileKind string
 
-// ProducerProfileOption defines model for ProducerProfileOption.
+// ProducerProfileOption represents producer profile option data exchanged through the Meridian API.
 type ProducerProfileOption struct {
+	// DependencyStatus contains the producer dependency status associated with this producer profile option.
 	DependencyStatus ProducerDependencyStatus `json:"dependencyStatus"`
 
-	// Id UUID v7
-	Id                Uuid                `json:"id"`
-	Kind              ProducerProfileKind `json:"kind"`
-	Name              string              `json:"name"`
-	Network           ProducerNetworkMode `json:"network"`
-	SupportedKinds    []KindId            `json:"supportedKinds"`
-	UnavailableReason string              `json:"unavailableReason"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Kind contains the producer profile kind associated with this producer profile option.
+	Kind ProducerProfileKind `json:"kind"`
+
+	// Name specifies the name associated with this producer profile option.
+	Name string `json:"name"`
+
+	// Network contains the producer network mode associated with this producer profile option.
+	Network ProducerNetworkMode `json:"network"`
+
+	// SupportedKinds contains the ordered supported kinds associated with this producer profile option.
+	SupportedKinds []KindId `json:"supportedKinds"`
+
+	// UnavailableReason specifies the unavailable reason associated with this producer profile option.
+	UnavailableReason string `json:"unavailableReason"`
 }
 
-// ProducerProfileOptionList defines model for ProducerProfileOptionList.
+// ProducerProfileOptionList contains an ordered collection of producer profile option values.
 type ProducerProfileOptionList struct {
+	// Items contains the ordered items associated with this producer profile option list.
 	Items []ProducerProfileOption `json:"items"`
 }
 
-// ProducerProfilePage defines model for ProducerProfilePage.
+// ProducerProfilePage contains one paginated page of producer profile records.
 type ProducerProfilePage struct {
-	Items    []ProducerProfile `json:"items"`
-	Page     int               `json:"page"`
-	PageSize int               `json:"pageSize"`
-	Total    int               `json:"total"`
+	// Items contains the ordered items associated with this producer profile page.
+	Items []ProducerProfile `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// ProducerProfilePatchRequest defines model for ProducerProfilePatchRequest.
+// ProducerProfilePatchRequest defines validated input for the corresponding Meridian API operation.
 type ProducerProfilePatchRequest struct {
-	Args       []string `json:"args,omitempty"`
-	CpuSeconds int      `json:"cpuSeconds,omitempty"`
-	Enabled    bool     `json:"enabled,omitempty"`
+	// Args contains the ordered args associated with this producer profile patch request.
+	Args []string `json:"args,omitempty"`
+
+	// CpuSeconds specifies the cpu seconds associated with this producer profile patch request.
+	CpuSeconds int `json:"cpuSeconds,omitempty"`
+
+	// Enabled indicates whether enabled applies to this producer profile patch request.
+	Enabled bool `json:"enabled,omitempty"`
 
 	// EnvAllowlist Names only; must be a subset of the deployment producer environment allowlist.
-	EnvAllowlist   []string            `json:"envAllowlist,omitempty"`
-	Executable     string              `json:"executable,omitempty"`
-	MemoryMiB      int                 `json:"memoryMiB,omitempty"`
-	Name           string              `json:"name,omitempty"`
-	Network        ProducerNetworkMode `json:"network,omitempty"`
-	Pids           int                 `json:"pids,omitempty"`
-	ReplaySafe     bool                `json:"replaySafe,omitempty"`
-	SupportedKinds []KindId            `json:"supportedKinds,omitempty"`
-	TimeoutSec     int                 `json:"timeoutSec,omitempty"`
+	EnvAllowlist []string `json:"envAllowlist,omitempty"`
+
+	// Executable specifies the executable associated with this producer profile patch request.
+	Executable string `json:"executable,omitempty"`
+
+	// MemoryMiB specifies the memory mi b associated with this producer profile patch request.
+	MemoryMiB int `json:"memoryMiB,omitempty"`
+
+	// Name specifies the name associated with this producer profile patch request.
+	Name string `json:"name,omitempty"`
+
+	// Network contains the producer network mode associated with this producer profile patch request.
+	Network ProducerNetworkMode `json:"network,omitempty"`
+
+	// Pids specifies the pids associated with this producer profile patch request.
+	Pids int `json:"pids,omitempty"`
+
+	// ReplaySafe indicates whether replay safe applies to this producer profile patch request.
+	ReplaySafe bool `json:"replaySafe,omitempty"`
+
+	// SupportedKinds contains the ordered supported kinds associated with this producer profile patch request.
+	SupportedKinds []KindId `json:"supportedKinds,omitempty"`
+
+	// TimeoutSec specifies the timeout sec associated with this producer profile patch request.
+	TimeoutSec int `json:"timeoutSec,omitempty"`
 }
 
-// ProvenanceEntry defines model for ProvenanceEntry.
+// ProvenanceEntry represents provenance entry data exchanged through the Meridian API.
 type ProvenanceEntry struct {
-	// LayerId UUID v7
-	LayerId Uuid   `json:"layerId"`
+	// LayerId contains the uuid associated with this provenance entry.
+	LayerId Uuid `json:"layerId"`
+
+	// Pointer specifies the pointer associated with this provenance entry.
 	Pointer string `json:"pointer"`
 
-	// RevisionId UUID v7
+	// RevisionId contains the uuid associated with this provenance entry.
 	RevisionId Uuid `json:"revisionId"`
 }
 
-// ProvenanceList defines model for ProvenanceList.
+// ProvenanceList contains an ordered collection of provenance values.
 type ProvenanceList struct {
+	// Items contains the ordered items associated with this provenance list.
 	Items []ProvenanceEntry `json:"items"`
 }
 
-// PublicAsset defines model for PublicAsset.
+// PublicAsset represents public asset data exchanged through the Meridian API.
 type PublicAsset struct {
-	ContentUrl     string     `json:"contentUrl"`
+	// ContentUrl specifies the content url associated with this public asset.
+	ContentUrl string `json:"contentUrl"`
+
+	// CurrentVersion contains the version ref associated with this public asset.
 	CurrentVersion VersionRef `json:"currentVersion"`
-	Kind           KindId     `json:"kind"`
-	Lifecycle      Lifecycle  `json:"lifecycle"`
-	Name           AssetName  `json:"name"`
 
-	// UpdatedAt RFC 3339 UTC
+	// Kind contains the kind id associated with this public asset.
+	Kind KindId `json:"kind"`
+
+	// Lifecycle contains the lifecycle associated with this public asset.
+	Lifecycle Lifecycle `json:"lifecycle"`
+
+	// Name contains the asset name associated with this public asset.
+	Name AssetName `json:"name"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// PublicService defines model for PublicService.
+// PublicService represents public service data exchanged through the Meridian API.
 type PublicService struct {
-	Assets      []AssetSummary `json:"assets"`
-	Description string         `json:"description"`
-	DisplayName string         `json:"displayName"`
-	Lifecycle   Lifecycle      `json:"lifecycle"`
-	Slug        Slug           `json:"slug"`
-	Tags        []string       `json:"tags"`
+	// Assets contains the ordered assets associated with this public service.
+	Assets []AssetSummary `json:"assets"`
 
-	// UpdatedAt RFC 3339 UTC
+	// Description specifies the description associated with this public service.
+	Description string `json:"description"`
+
+	// DisplayName specifies the display name associated with this public service.
+	DisplayName string `json:"displayName"`
+
+	// Lifecycle contains the lifecycle associated with this public service.
+	Lifecycle Lifecycle `json:"lifecycle"`
+
+	// Slug contains the slug associated with this public service.
+	Slug Slug `json:"slug"`
+
+	// Tags contains the ordered tags associated with this public service.
+	Tags []string `json:"tags"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// PublicViewResolveRequest defines model for PublicViewResolveRequest.
+// PublicViewResolveRequest defines validated input for the corresponding Meridian API operation.
 type PublicViewResolveRequest struct {
-	AssetName AssetName                      `json:"assetName"`
-	Kind      KindId                         `json:"kind"`
-	Options   map[string]interface{}         `json:"options,omitempty"`
-	ViewId    PublicViewResolveRequestViewId `json:"viewId"`
+	// AssetName contains the asset name associated with this public view resolve request.
+	AssetName AssetName `json:"assetName"`
+
+	// Kind contains the kind id associated with this public view resolve request.
+	Kind KindId `json:"kind"`
+
+	// Options specifies the options associated with this public view resolve request.
+	Options map[string]interface{} `json:"options,omitempty"`
+
+	// ViewId specifies the view id associated with this public view resolve request.
+	ViewId PublicViewResolveRequestViewId `json:"viewId"`
 }
 
-// PublicViewResolveRequestViewId defines model for PublicViewResolveRequest.ViewId.
+// PublicViewResolveRequestViewId specifies the view id associated with this public view resolve request.
 type PublicViewResolveRequestViewId string
 
-// Quota defines model for Quota.
+// Quota represents quota data exchanged through the Meridian API.
 type Quota struct {
+	// MaxCollectConcurrency specifies the max collect concurrency associated with this quota.
 	MaxCollectConcurrency int `json:"maxCollectConcurrency"`
-	MaxRepositories       int `json:"maxRepositories"`
-	MaxServices           int `json:"maxServices"`
-	MaxStorageBytes       int `json:"maxStorageBytes"`
+
+	// MaxRepositories specifies the max repositories associated with this quota.
+	MaxRepositories int `json:"maxRepositories"`
+
+	// MaxServices specifies the max services associated with this quota.
+	MaxServices int `json:"maxServices"`
+
+	// MaxStorageBytes specifies the max storage bytes associated with this quota.
+	MaxStorageBytes int `json:"maxStorageBytes"`
 }
 
-// RefGlob defines model for RefGlob.
+// RefGlob represents ref glob data exchanged through the Meridian API.
 type RefGlob = string
 
-// RefName defines model for RefName.
+// RefName is a validated Git branch or tag name without a refs prefix.
 type RefName = string
 
-// RefSelector defines model for RefSelector.
+// RefSelector identifies the ref selected by a request.
 type RefSelector struct {
-	// AssetId UUID v7
-	AssetId Uuid            `json:"assetId"`
-	Ref     RefName         `json:"ref"`
-	RefType RefType         `json:"refType"`
-	Type    RefSelectorType `json:"type"`
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
+
+	// Ref contains the ref name associated with this ref selector.
+	Ref RefName `json:"ref"`
+
+	// RefType contains the ref type associated with this ref selector.
+	RefType RefType `json:"refType"`
+
+	// Type specifies the type associated with this ref selector.
+	Type RefSelectorType `json:"type"`
 }
 
-// RefSelectorType defines model for RefSelector.Type.
+// RefSelectorType specifies the type associated with this ref selector.
 type RefSelectorType string
 
-// RefType defines model for RefType.
+// RefType identifies one supported ref type value.
 type RefType string
 
-// Repository defines model for Repository.
+// Repository represents repository data exchanged through the Meridian API.
 type Repository struct {
-	BranchPolicy BranchPolicy   `json:"branchPolicy"`
+	// BranchPolicy contains the branch policy associated with this repository.
+	BranchPolicy BranchPolicy `json:"branchPolicy"`
+
+	// Capabilities lists actions the authenticated principal may perform on this resource.
 	Capabilities CapabilityList `json:"capabilities"`
 
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
 	// CredentialId Tenant-visible credential ID; may identify a tenant credential or a global credential. Null means public access.
-	CredentialId  Uuid    `json:"credentialId"`
+	CredentialId Uuid `json:"credentialId"`
+
+	// DefaultBranch contains the ref name associated with this repository.
 	DefaultBranch RefName `json:"defaultBranch"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag        ETag             `json:"etag"`
-	FetchConfig FetchConfig      `json:"fetchConfig"`
-	Health      RepositoryHealth `json:"health"`
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
 
-	// Id UUID v7
-	Id   Uuid   `json:"id"`
+	// FetchConfig contains the fetch config associated with this repository.
+	FetchConfig FetchConfig `json:"fetchConfig"`
+
+	// Health contains the repository health associated with this repository.
+	Health RepositoryHealth `json:"health"`
+
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Note specifies the note associated with this repository.
 	Note string `json:"note"`
 
 	// SyncCron Standard five-field cron in UTC; null disables schedule
 	SyncCron string `json:"syncCron"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 
-	// Url HTTPS URL, ssh:// URL, or SCP-like user@host:path
+	// Url contains the git remote url associated with this repository.
 	Url GitRemoteUrl `json:"url"`
 }
 
-// RepositoryConnectionCheckRequest defines model for RepositoryConnectionCheckRequest.
+// RepositoryConnectionCheckRequest defines validated input for the corresponding Meridian API operation.
 type RepositoryConnectionCheckRequest struct {
 	// CredentialId Tenant-visible credential ID; may identify a tenant credential or a global credential. Null means public access.
 	CredentialId Uuid `json:"credentialId,omitempty"`
 
-	// Url HTTPS URL, ssh:// URL, or SCP-like user@host:path
+	// Url contains the git remote url associated with this repository connection check request.
 	Url GitRemoteUrl `json:"url"`
 }
 
-// RepositoryCreateRequest defines model for RepositoryCreateRequest.
+// RepositoryCreateRequest defines validated input for the corresponding Meridian API operation.
 type RepositoryCreateRequest struct {
+	// BranchPolicy contains the branch policy associated with this repository create request.
 	BranchPolicy BranchPolicy `json:"branchPolicy,omitempty"`
 
 	// CredentialId Tenant-visible credential ID; may identify a tenant credential or a global credential. Null means public access.
-	CredentialId  Uuid        `json:"credentialId,omitempty"`
-	DefaultBranch RefName     `json:"defaultBranch"`
-	FetchConfig   FetchConfig `json:"fetchConfig,omitempty"`
-	Note          string      `json:"note,omitempty"`
+	CredentialId Uuid `json:"credentialId,omitempty"`
 
-	// SyncCron Standard five-field cron in UTC; null disables schedule
-	SyncCron string `json:"syncCron,omitempty"`
-
-	// Url HTTPS URL, ssh:// URL, or SCP-like user@host:path
-	Url GitRemoteUrl `json:"url"`
-}
-
-// RepositoryDiscoverRequest defines model for RepositoryDiscoverRequest.
-type RepositoryDiscoverRequest struct {
-	PathPrefixes []string `json:"pathPrefixes,omitempty"`
-	Ref          RefName  `json:"ref,omitempty"`
-	RefType      RefType  `json:"refType,omitempty"`
-}
-
-// RepositoryError defines model for RepositoryError.
-type RepositoryError struct {
-	Class   RepositoryErrorClass `json:"class"`
-	Message string               `json:"message"`
-}
-
-// RepositoryErrorClass defines model for RepositoryError.Class.
-type RepositoryErrorClass string
-
-// RepositoryHealth defines model for RepositoryHealth.
-type RepositoryHealth struct {
-	DurationMs int             `json:"durationMs"`
-	FailStreak int             `json:"failStreak"`
-	LastCommit string          `json:"lastCommit"`
-	LastError  RepositoryError `json:"lastError"`
-	LastSyncAt Timestamp       `json:"lastSyncAt"`
-}
-
-// RepositoryPage defines model for RepositoryPage.
-type RepositoryPage struct {
-	Items    []Repository `json:"items"`
-	Page     int          `json:"page"`
-	PageSize int          `json:"pageSize"`
-	Total    int          `json:"total"`
-}
-
-// RepositoryPatchRequest defines model for RepositoryPatchRequest.
-type RepositoryPatchRequest struct {
-	BranchPolicy BranchPolicy `json:"branchPolicy,omitempty"`
-
-	// CredentialId Tenant-visible credential ID; may identify a tenant credential or a global credential. Null means public access.
-	CredentialId  Uuid        `json:"credentialId,omitempty"`
-	DefaultBranch RefName     `json:"defaultBranch,omitempty"`
-	FetchConfig   FetchConfig `json:"fetchConfig,omitempty"`
-	Note          string      `json:"note,omitempty"`
-
-	// SyncCron Standard five-field cron in UTC; null disables schedule
-	SyncCron string `json:"syncCron,omitempty"`
-}
-
-// RepositoryRef defines model for RepositoryRef.
-type RepositoryRef struct {
+	// DefaultBranch contains the ref name associated with this repository create request.
 	DefaultBranch RefName `json:"defaultBranch"`
 
-	// Id UUID v7
+	// FetchConfig contains the fetch config associated with this repository create request.
+	FetchConfig FetchConfig `json:"fetchConfig,omitempty"`
+
+	// Note specifies the note associated with this repository create request.
+	Note string `json:"note,omitempty"`
+
+	// SyncCron Standard five-field cron in UTC; null disables schedule
+	SyncCron string `json:"syncCron,omitempty"`
+
+	// Url contains the git remote url associated with this repository create request.
+	Url GitRemoteUrl `json:"url"`
+}
+
+// RepositoryDiscoverRequest defines validated input for the corresponding Meridian API operation.
+type RepositoryDiscoverRequest struct {
+	// PathPrefixes contains the ordered path prefixes associated with this repository discover request.
+	PathPrefixes []string `json:"pathPrefixes,omitempty"`
+
+	// Ref contains the ref name associated with this repository discover request.
+	Ref RefName `json:"ref,omitempty"`
+
+	// RefType contains the ref type associated with this repository discover request.
+	RefType RefType `json:"refType,omitempty"`
+}
+
+// RepositoryError represents repository error data exchanged through the Meridian API.
+type RepositoryError struct {
+	// Class specifies the class associated with this repository error.
+	Class RepositoryErrorClass `json:"class"`
+
+	// Message specifies the message associated with this repository error.
+	Message string `json:"message"`
+}
+
+// RepositoryErrorClass specifies the class associated with this repository error.
+type RepositoryErrorClass string
+
+// RepositoryHealth represents repository health data exchanged through the Meridian API.
+type RepositoryHealth struct {
+	// DurationMs specifies the duration ms associated with this repository health.
+	DurationMs int `json:"durationMs"`
+
+	// FailStreak specifies the fail streak associated with this repository health.
+	FailStreak int `json:"failStreak"`
+
+	// LastCommit specifies the last commit associated with this repository health.
+	LastCommit string `json:"lastCommit"`
+
+	// LastError specifies the last error associated with this repository health.
+	LastError RepositoryError `json:"lastError"`
+
+	// LastSyncAt specifies the last sync at associated with this repository health.
+	LastSyncAt Timestamp `json:"lastSyncAt"`
+}
+
+// RepositoryPage contains one paginated page of repository records.
+type RepositoryPage struct {
+	// Items contains the ordered items associated with this repository page.
+	Items []Repository `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
+}
+
+// RepositoryPatchRequest defines validated input for the corresponding Meridian API operation.
+type RepositoryPatchRequest struct {
+	// BranchPolicy contains the branch policy associated with this repository patch request.
+	BranchPolicy BranchPolicy `json:"branchPolicy,omitempty"`
+
+	// CredentialId Tenant-visible credential ID; may identify a tenant credential or a global credential. Null means public access.
+	CredentialId Uuid `json:"credentialId,omitempty"`
+
+	// DefaultBranch contains the ref name associated with this repository patch request.
+	DefaultBranch RefName `json:"defaultBranch,omitempty"`
+
+	// FetchConfig contains the fetch config associated with this repository patch request.
+	FetchConfig FetchConfig `json:"fetchConfig,omitempty"`
+
+	// Note specifies the note associated with this repository patch request.
+	Note string `json:"note,omitempty"`
+
+	// SyncCron Standard five-field cron in UTC; null disables schedule
+	SyncCron string `json:"syncCron,omitempty"`
+}
+
+// RepositoryRef represents repository ref data exchanged through the Meridian API.
+type RepositoryRef struct {
+	// DefaultBranch contains the ref name associated with this repository ref.
+	DefaultBranch RefName `json:"defaultBranch"`
+
+	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
 }
 
-// RepositorySyncRequest defines model for RepositorySyncRequest.
+// RepositorySyncRequest defines validated input for the corresponding Meridian API operation.
 type RepositorySyncRequest struct {
-	Force   bool    `json:"force,omitempty"`
-	Ref     RefName `json:"ref,omitempty"`
+	// Force indicates whether force applies to this repository sync request.
+	Force bool `json:"force,omitempty"`
+
+	// Ref contains the ref name associated with this repository sync request.
+	Ref RefName `json:"ref,omitempty"`
+
+	// RefType contains the ref type associated with this repository sync request.
 	RefType RefType `json:"refType,omitempty"`
 }
 
 // ResolvedDocumentRef Immutable resolution. version requires assetId/versionId and upload requires uploadId; requestedRef fields are informational and never re-resolved.
 type ResolvedDocumentRef struct {
-	AssetId          Uuid                          `json:"assetId"`
-	ContentHash      string                        `json:"contentHash"`
-	Kind             KindId                        `json:"kind"`
-	RequestedRef     RefName                       `json:"requestedRef"`
-	RequestedRefType RefType                       `json:"requestedRefType"`
-	SourceType       ResolvedDocumentRefSourceType `json:"sourceType"`
-	UploadId         Uuid                          `json:"uploadId"`
-	VersionId        Uuid                          `json:"versionId"`
-}
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
 
-// ResolvedDocumentRefSourceType defines model for ResolvedDocumentRef.SourceType.
-type ResolvedDocumentRefSourceType string
+	// ContentHash specifies the content hash associated with this resolved document ref.
+	ContentHash string `json:"contentHash"`
 
-// RetentionSettings defines model for RetentionSettings.
-type RetentionSettings struct {
-	ArchivedRevisionsDays int `json:"archivedRevisionsDays"`
-	JobLogsDays           int `json:"jobLogsDays"`
-}
+	// Kind contains the kind id associated with this resolved document ref.
+	Kind KindId `json:"kind"`
 
-// ReviewContext defines model for ReviewContext.
-type ReviewContext struct {
-	Author                   User          `json:"author"`
-	CurrentEffectiveRevision LayerRevision `json:"currentEffectiveRevision"`
-	Diff                     DiffResult    `json:"diff"`
-	Revision                 LayerRevision `json:"revision"`
-}
+	// RequestedRef specifies the requested ref associated with this resolved document ref.
+	RequestedRef RefName `json:"requestedRef"`
 
-// ReviewFilter defines model for ReviewFilter.
-type ReviewFilter struct {
-	// AuthorId UUID v7
-	AuthorId Uuid        `json:"authorId,omitempty"`
-	Kind     KindId      `json:"kind,omitempty"`
-	Origin   LayerOrigin `json:"origin,omitempty"`
+	// RequestedRefType specifies the requested ref type associated with this resolved document ref.
+	RequestedRefType RefType `json:"requestedRefType"`
 
-	// ServiceId UUID v7
-	ServiceId Uuid             `json:"serviceId,omitempty"`
-	Status    []RevisionStatus `json:"status,omitempty"`
-}
+	// SourceType specifies the source type associated with this resolved document ref.
+	SourceType ResolvedDocumentRefSourceType `json:"sourceType"`
 
-// ReviewPage defines model for ReviewPage.
-type ReviewPage struct {
-	Items    []ReviewContext `json:"items"`
-	Page     int             `json:"page"`
-	PageSize int             `json:"pageSize"`
-	Total    int             `json:"total"`
-}
+	// UploadId specifies the upload id associated with this resolved document ref.
+	UploadId Uuid `json:"uploadId"`
 
-// RevisionApproveRequest defines model for RevisionApproveRequest.
-type RevisionApproveRequest struct {
-	Comment string `json:"comment,omitempty"`
-}
-
-// RevisionRejectRequest defines model for RevisionRejectRequest.
-type RevisionRejectRequest struct {
-	Comment string `json:"comment"`
-}
-
-// RevisionReviewResult defines model for RevisionReviewResult.
-type RevisionReviewResult struct {
-	Deduplicated          bool          `json:"deduplicated"`
-	EffectiveRevisionId   Uuid          `json:"effectiveRevisionId"`
-	MergeJobId            Uuid          `json:"mergeJobId"`
-	Revision              LayerRevision `json:"revision"`
-	SupersededRevisionIds []Uuid        `json:"supersededRevisionIds"`
-}
-
-// RevisionStatus defines model for RevisionStatus.
-type RevisionStatus string
-
-// ScopeSelector defines model for ScopeSelector.
-type ScopeSelector struct {
-	// Id Must be null for tenant and non-null for service or system_group.
-	Id   Uuid              `json:"id"`
-	Type ScopeSelectorType `json:"type"`
-}
-
-// ScopeSelectorType defines model for ScopeSelector.Type.
-type ScopeSelectorType string
-
-// SearchDeepLink defines model for SearchDeepLink.
-type SearchDeepLink struct {
-	// AssetId UUID v7
-	AssetId Uuid   `json:"assetId"`
-	ItemKey string `json:"itemKey"`
-
-	// VersionId UUID v7
+	// VersionId identifies the asset version associated with this resource.
 	VersionId Uuid `json:"versionId"`
 }
 
-// SearchFacetBucket defines model for SearchFacetBucket.
+// ResolvedDocumentRefSourceType specifies the source type associated with this resolved document ref.
+type ResolvedDocumentRefSourceType string
+
+// RetentionSettings represents retention settings data exchanged through the Meridian API.
+type RetentionSettings struct {
+	// ArchivedRevisionsDays specifies the archived revisions days associated with this retention settings.
+	ArchivedRevisionsDays int `json:"archivedRevisionsDays"`
+
+	// JobLogsDays specifies the job logs days associated with this retention settings.
+	JobLogsDays int `json:"jobLogsDays"`
+}
+
+// ReviewContext represents review context data exchanged through the Meridian API.
+type ReviewContext struct {
+	// Author specifies the author associated with this review context.
+	Author User `json:"author"`
+
+	// CurrentEffectiveRevision specifies the current effective revision associated with this review context.
+	CurrentEffectiveRevision LayerRevision `json:"currentEffectiveRevision"`
+
+	// Diff contains the diff result associated with this review context.
+	Diff DiffResult `json:"diff"`
+
+	// Revision is the monotonic optimistic-concurrency version of this resource.
+	Revision LayerRevision `json:"revision"`
+}
+
+// ReviewFilter defines supported filters for selecting review records.
+type ReviewFilter struct {
+	// AuthorId contains the uuid associated with this review filter.
+	AuthorId Uuid `json:"authorId,omitempty"`
+
+	// Kind contains the kind id associated with this review filter.
+	Kind KindId `json:"kind,omitempty"`
+
+	// Origin contains the layer origin associated with this review filter.
+	Origin LayerOrigin `json:"origin,omitempty"`
+
+	// ServiceId identifies the service associated with this resource.
+	ServiceId Uuid `json:"serviceId,omitempty"`
+
+	// Status is the current lifecycle or processing state.
+	Status []RevisionStatus `json:"status,omitempty"`
+}
+
+// ReviewPage contains one paginated page of review records.
+type ReviewPage struct {
+	// Items contains the ordered items associated with this review page.
+	Items []ReviewContext `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
+}
+
+// RevisionApproveRequest defines validated input for the corresponding Meridian API operation.
+type RevisionApproveRequest struct {
+	// Comment specifies the comment associated with this revision approve request.
+	Comment string `json:"comment,omitempty"`
+}
+
+// RevisionRejectRequest defines validated input for the corresponding Meridian API operation.
+type RevisionRejectRequest struct {
+	// Comment specifies the comment associated with this revision reject request.
+	Comment string `json:"comment"`
+}
+
+// RevisionReviewResult reports the result of the corresponding Meridian operation.
+type RevisionReviewResult struct {
+	// Deduplicated indicates whether deduplicated applies to this revision review result.
+	Deduplicated bool `json:"deduplicated"`
+
+	// EffectiveRevisionId specifies the effective revision id associated with this revision review result.
+	EffectiveRevisionId Uuid `json:"effectiveRevisionId"`
+
+	// MergeJobId specifies the merge job id associated with this revision review result.
+	MergeJobId Uuid `json:"mergeJobId"`
+
+	// Revision is the monotonic optimistic-concurrency version of this resource.
+	Revision LayerRevision `json:"revision"`
+
+	// SupersededRevisionIds contains the ordered superseded revision ids associated with this revision review result.
+	SupersededRevisionIds []Uuid `json:"supersededRevisionIds"`
+}
+
+// RevisionStatus identifies one supported revision status value.
+type RevisionStatus string
+
+// ScopeSelector identifies the scope selected by a request.
+type ScopeSelector struct {
+	// Id Must be null for tenant and non-null for service or system_group.
+	Id Uuid `json:"id"`
+
+	// Type specifies the type associated with this scope selector.
+	Type ScopeSelectorType `json:"type"`
+}
+
+// ScopeSelectorType specifies the type associated with this scope selector.
+type ScopeSelectorType string
+
+// SearchDeepLink represents search deep link data exchanged through the Meridian API.
+type SearchDeepLink struct {
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
+
+	// ItemKey specifies the item key associated with this search deep link.
+	ItemKey string `json:"itemKey"`
+
+	// VersionId identifies the asset version associated with this resource.
+	VersionId Uuid `json:"versionId"`
+}
+
+// SearchFacetBucket represents search facet bucket data exchanged through the Meridian API.
 type SearchFacetBucket struct {
-	Count int    `json:"count"`
+	// Count specifies the count associated with this search facet bucket.
+	Count int `json:"count"`
+
+	// Value specifies the value associated with this search facet bucket.
 	Value string `json:"value"`
 }
 
-// SearchFacetSet defines model for SearchFacetSet.
+// SearchFacetSet represents search facet set data exchanged through the Meridian API.
 type SearchFacetSet struct {
-	Groups             []SearchFacetBucket `json:"groups"`
-	HasAiLayer         []SearchFacetBucket `json:"hasAiLayer"`
+	// Groups contains the ordered groups associated with this search facet set.
+	Groups []SearchFacetBucket `json:"groups"`
+
+	// HasAiLayer indicates whether ai layer applies to this search facet set.
+	HasAiLayer []SearchFacetBucket `json:"hasAiLayer"`
+
+	// HasBreakingChanges indicates whether breaking changes applies to this search facet set.
 	HasBreakingChanges []SearchFacetBucket `json:"hasBreakingChanges"`
-	ItemTypes          []SearchFacetBucket `json:"itemTypes"`
-	Kinds              []SearchFacetBucket `json:"kinds"`
-	Languages          []SearchFacetBucket `json:"languages"`
-	Lifecycles         []SearchFacetBucket `json:"lifecycles"`
-	Repositories       []SearchFacetBucket `json:"repositories"`
-	Tags               []SearchFacetBucket `json:"tags"`
-	Teams              []SearchFacetBucket `json:"teams"`
+
+	// ItemTypes contains the ordered item types associated with this search facet set.
+	ItemTypes []SearchFacetBucket `json:"itemTypes"`
+
+	// Kinds contains the ordered kinds associated with this search facet set.
+	Kinds []SearchFacetBucket `json:"kinds"`
+
+	// Languages contains the ordered languages associated with this search facet set.
+	Languages []SearchFacetBucket `json:"languages"`
+
+	// Lifecycles contains the ordered lifecycles associated with this search facet set.
+	Lifecycles []SearchFacetBucket `json:"lifecycles"`
+
+	// Repositories contains the ordered repositories associated with this search facet set.
+	Repositories []SearchFacetBucket `json:"repositories"`
+
+	// Tags contains the ordered tags associated with this search facet set.
+	Tags []SearchFacetBucket `json:"tags"`
+
+	// Teams contains the ordered teams associated with this search facet set.
+	Teams []SearchFacetBucket `json:"teams"`
 }
 
-// SearchFilter defines model for SearchFilter.
+// SearchFilter defines supported filters for selecting search records.
 type SearchFilter struct {
-	GroupIds           []Uuid      `json:"groupIds,omitempty"`
-	HasAiLayer         bool        `json:"hasAiLayer,omitempty"`
-	HasBreakingChanges bool        `json:"hasBreakingChanges,omitempty"`
-	ItemTypes          []string    `json:"itemTypes,omitempty"`
-	Kinds              []KindId    `json:"kinds,omitempty"`
-	Languages          []string    `json:"languages,omitempty"`
-	Lifecycles         []Lifecycle `json:"lifecycles,omitempty"`
-	RepositoryIds      []Uuid      `json:"repositoryIds,omitempty"`
-	ServiceIds         []Uuid      `json:"serviceIds,omitempty"`
-	TagIds             []Uuid      `json:"tagIds,omitempty"`
-	TeamIds            []Uuid      `json:"teamIds,omitempty"`
+	// GroupIds contains the ordered group ids associated with this search filter.
+	GroupIds []Uuid `json:"groupIds,omitempty"`
+
+	// HasAiLayer indicates whether ai layer applies to this search filter.
+	HasAiLayer bool `json:"hasAiLayer,omitempty"`
+
+	// HasBreakingChanges indicates whether breaking changes applies to this search filter.
+	HasBreakingChanges bool `json:"hasBreakingChanges,omitempty"`
+
+	// ItemTypes contains the ordered item types associated with this search filter.
+	ItemTypes []string `json:"itemTypes,omitempty"`
+
+	// Kinds contains the ordered kinds associated with this search filter.
+	Kinds []KindId `json:"kinds,omitempty"`
+
+	// Languages contains the ordered languages associated with this search filter.
+	Languages []string `json:"languages,omitempty"`
+
+	// Lifecycles contains the ordered lifecycles associated with this search filter.
+	Lifecycles []Lifecycle `json:"lifecycles,omitempty"`
+
+	// RepositoryIds contains the ordered repository ids associated with this search filter.
+	RepositoryIds []Uuid `json:"repositoryIds,omitempty"`
+
+	// ServiceIds contains the ordered service ids associated with this search filter.
+	ServiceIds []Uuid `json:"serviceIds,omitempty"`
+
+	// TagIds contains the ordered tag ids associated with this search filter.
+	TagIds []Uuid `json:"tagIds,omitempty"`
+
+	// TeamIds contains the ordered team ids associated with this search filter.
+	TeamIds []Uuid `json:"teamIds,omitempty"`
 }
 
-// SearchHit defines model for SearchHit.
+// SearchHit represents search hit data exchanged through the Meridian API.
 type SearchHit struct {
 	// DeepLink Required for asset and item hits; null for repository and service hits.
-	DeepLink   SearchDeepLink      `json:"deepLink"`
+	DeepLink SearchDeepLink `json:"deepLink"`
+
+	// Highlights specifies the highlights associated with this search hit.
 	Highlights map[string][]string `json:"highlights"`
-	Id         string              `json:"id"`
-	Kind       KindId              `json:"kind"`
+
+	// Id uniquely identifies this resource.
+	Id string `json:"id"`
+
+	// Kind specifies the kind associated with this search hit.
+	Kind KindId `json:"kind"`
 
 	// Repository Non-null for every hit; repository hits use this as their owning resource.
 	Repository RepositoryRef `json:"repository"`
-	Score      float32       `json:"score"`
+
+	// Score specifies the score associated with this search hit.
+	Score float32 `json:"score"`
 
 	// Service Null only for repository hits.
-	Service  ServiceRef    `json:"service"`
-	Subtitle string        `json:"subtitle"`
-	Title    string        `json:"title"`
-	Type     SearchHitType `json:"type"`
+	Service ServiceRef `json:"service"`
+
+	// Subtitle specifies the subtitle associated with this search hit.
+	Subtitle string `json:"subtitle"`
+
+	// Title specifies the title associated with this search hit.
+	Title string `json:"title"`
+
+	// Type specifies the type associated with this search hit.
+	Type SearchHitType `json:"type"`
 }
 
-// SearchHitType defines model for SearchHit.Type.
+// SearchHitType specifies the type associated with this search hit.
 type SearchHitType string
 
-// SearchResult defines model for SearchResult.
+// SearchResult reports the result of the corresponding Meridian operation.
 type SearchResult struct {
-	Facets   SearchFacetSet `json:"facets"`
-	Items    []SearchHit    `json:"items"`
-	Page     int            `json:"page"`
-	PageSize int            `json:"pageSize"`
-	Total    int            `json:"total"`
+	// Facets contains the search facet set associated with this search result.
+	Facets SearchFacetSet `json:"facets"`
+
+	// Items contains the ordered items associated with this search result.
+	Items []SearchHit `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// Service defines model for Service.
+// Service represents service data exchanged through the Meridian API.
 type Service struct {
-	Assets       []AssetSummary `json:"assets"`
+	// Assets contains the ordered assets associated with this service.
+	Assets []AssetSummary `json:"assets"`
+
+	// Capabilities lists actions the authenticated principal may perform on this resource.
 	Capabilities CapabilityList `json:"capabilities"`
 
-	// CreatedAt RFC 3339 UTC
-	CreatedAt   Timestamp `json:"createdAt"`
-	Description string    `json:"description"`
-	DisplayName string    `json:"displayName"`
-	Drift       DriftInfo `json:"drift"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag      ETag   `json:"etag"`
+	// Description specifies the description associated with this service.
+	Description string `json:"description"`
+
+	// DisplayName specifies the display name associated with this service.
+	DisplayName string `json:"displayName"`
+
+	// Drift contains the drift info associated with this service.
+	Drift DriftInfo `json:"drift"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Framework specifies the framework associated with this service.
 	Framework string `json:"framework"`
 
-	// Id UUID v7
-	Id           Uuid          `json:"id"`
-	Language     string        `json:"language"`
-	Lifecycle    Lifecycle     `json:"lifecycle"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Language specifies the language associated with this service.
+	Language string `json:"language"`
+
+	// Lifecycle contains the lifecycle associated with this service.
+	Lifecycle Lifecycle `json:"lifecycle"`
+
+	// MissingKinds contains the ordered missing kinds associated with this service.
 	MissingKinds []MissingKind `json:"missingKinds"`
-	Owners       OwnerRefs     `json:"owners"`
-	Repository   RepositoryRef `json:"repository"`
+
+	// Owners contains the owner refs associated with this service.
+	Owners OwnerRefs `json:"owners"`
+
+	// Repository contains the repository ref associated with this service.
+	Repository RepositoryRef `json:"repository"`
 
 	// RootDir Empty string means repository root.
 	RootDir string `json:"rootDir"`
-	Slug    Slug   `json:"slug"`
-	Starred bool   `json:"starred"`
-	Tags    []Tag  `json:"tags"`
 
-	// UpdatedAt RFC 3339 UTC
-	UpdatedAt  Timestamp         `json:"updatedAt"`
+	// Slug contains the slug associated with this service.
+	Slug Slug `json:"slug"`
+
+	// Starred indicates whether starred applies to this service.
+	Starred bool `json:"starred"`
+
+	// Tags contains the ordered tags associated with this service.
+	Tags []Tag `json:"tags"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
+	UpdatedAt Timestamp `json:"updatedAt"`
+
+	// Visibility contains the service visibility associated with this service.
 	Visibility ServiceVisibility `json:"visibility"`
 }
 
-// ServiceAccess defines model for ServiceAccess.
+// ServiceAccess represents service access data exchanged through the Meridian API.
 type ServiceAccess struct {
+	// Grants contains the ordered grants associated with this service access.
 	Grants []ServiceGrant `json:"grants"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// ServiceAccessPutRequest defines model for ServiceAccessPutRequest.
+// ServiceAccessPutRequest defines validated input for the corresponding Meridian API operation.
 type ServiceAccessPutRequest struct {
+	// Grants contains the ordered grants associated with this service access put request.
 	Grants []ServiceGrant `json:"grants"`
 }
 
-// ServiceAiGenerateRequest defines model for ServiceAiGenerateRequest.
+// ServiceAiGenerateRequest defines validated input for the corresponding Meridian API operation.
 type ServiceAiGenerateRequest struct {
-	Hint string    `json:"hint,omitempty"`
-	Kind KindId    `json:"kind"`
+	// Hint specifies the hint associated with this service ai generate request.
+	Hint string `json:"hint,omitempty"`
+
+	// Kind contains the kind id associated with this service ai generate request.
+	Kind KindId `json:"kind"`
+
+	// Name contains the asset name associated with this service ai generate request.
 	Name AssetName `json:"name"`
 
-	// ProducerProfileId UUID v7
-	ProducerProfileId Uuid    `json:"producerProfileId,omitempty"`
-	Ref               RefName `json:"ref,omitempty"`
-	RefType           RefType `json:"refType,omitempty"`
+	// ProducerProfileId contains the uuid associated with this service ai generate request.
+	ProducerProfileId Uuid `json:"producerProfileId,omitempty"`
+
+	// Ref contains the ref name associated with this service ai generate request.
+	Ref RefName `json:"ref,omitempty"`
+
+	// RefType contains the ref type associated with this service ai generate request.
+	RefType RefType `json:"refType,omitempty"`
 }
 
-// ServiceCreateRequest defines model for ServiceCreateRequest.
+// ServiceCreateRequest defines validated input for the corresponding Meridian API operation.
 type ServiceCreateRequest struct {
-	Description string    `json:"description,omitempty"`
-	DisplayName string    `json:"displayName"`
-	Owners      OwnerRefs `json:"owners,omitempty"`
+	// Description specifies the description associated with this service create request.
+	Description string `json:"description,omitempty"`
+
+	// DisplayName specifies the display name associated with this service create request.
+	DisplayName string `json:"displayName"`
+
+	// Owners contains the owner refs associated with this service create request.
+	Owners OwnerRefs `json:"owners,omitempty"`
 
 	// Path Null or omitted means repository root and is stored as an empty rootDir.
-	Path       string            `json:"path,omitempty"`
-	Slug       Slug              `json:"slug"`
-	TagIds     []Uuid            `json:"tagIds,omitempty"`
+	Path string `json:"path,omitempty"`
+
+	// Slug contains the slug associated with this service create request.
+	Slug Slug `json:"slug"`
+
+	// TagIds contains the ordered tag ids associated with this service create request.
+	TagIds []Uuid `json:"tagIds,omitempty"`
+
+	// Visibility specifies the visibility associated with this service create request.
 	Visibility ServiceVisibility `json:"visibility,omitempty"`
 }
 
-// ServiceGrant defines model for ServiceGrant.
+// ServiceGrant represents service grant data exchanged through the Meridian API.
 type ServiceGrant struct {
+	// Permissions contains the ordered permissions associated with this service grant.
 	Permissions []ServiceGrantPermissions `json:"permissions"`
 
-	// PrincipalId UUID v7
-	PrincipalId   Uuid                      `json:"principalId"`
+	// PrincipalId contains the uuid associated with this service grant.
+	PrincipalId Uuid `json:"principalId"`
+
+	// PrincipalType specifies the principal type associated with this service grant.
 	PrincipalType ServiceGrantPrincipalType `json:"principalType"`
-	Role          ServiceRole               `json:"role"`
+
+	// Role contains the service role associated with this service grant.
+	Role ServiceRole `json:"role"`
 }
 
 // ServiceGrantPermissions defines model for ServiceGrant.Permissions.
 type ServiceGrantPermissions string
 
-// ServiceGrantPrincipalType defines model for ServiceGrant.PrincipalType.
+// ServiceGrantPrincipalType specifies the principal type associated with this service grant.
 type ServiceGrantPrincipalType string
 
-// ServiceGrantList defines model for ServiceGrantList.
+// ServiceGrantList contains an ordered collection of service grant values.
 type ServiceGrantList struct {
+	// Items contains the ordered items associated with this service grant list.
 	Items []ServiceGrant `json:"items"`
 }
 
-// ServiceList defines model for ServiceList.
+// ServiceList contains an ordered collection of service values.
 type ServiceList struct {
+	// Items contains the ordered items associated with this service list.
 	Items []Service `json:"items"`
 }
 
-// ServicePage defines model for ServicePage.
+// ServicePage contains one paginated page of service records.
 type ServicePage struct {
-	Items    []Service `json:"items"`
-	Page     int       `json:"page"`
-	PageSize int       `json:"pageSize"`
-	Total    int       `json:"total"`
+	// Items contains the ordered items associated with this service page.
+	Items []Service `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// ServicePatchRequest defines model for ServicePatchRequest.
+// ServicePatchRequest defines validated input for the corresponding Meridian API operation.
 type ServicePatchRequest struct {
-	Description string            `json:"description,omitempty"`
-	DisplayName string            `json:"displayName,omitempty"`
-	Lifecycle   Lifecycle         `json:"lifecycle,omitempty"`
-	Owners      OwnerRefs         `json:"owners,omitempty"`
-	TagIds      []Uuid            `json:"tagIds,omitempty"`
-	Visibility  ServiceVisibility `json:"visibility,omitempty"`
+	// Description specifies the description associated with this service patch request.
+	Description string `json:"description,omitempty"`
+
+	// DisplayName specifies the display name associated with this service patch request.
+	DisplayName string `json:"displayName,omitempty"`
+
+	// Lifecycle contains the lifecycle associated with this service patch request.
+	Lifecycle Lifecycle `json:"lifecycle,omitempty"`
+
+	// Owners contains the owner refs associated with this service patch request.
+	Owners OwnerRefs `json:"owners,omitempty"`
+
+	// TagIds contains the ordered tag ids associated with this service patch request.
+	TagIds []Uuid `json:"tagIds,omitempty"`
+
+	// Visibility contains the service visibility associated with this service patch request.
+	Visibility ServiceVisibility `json:"visibility,omitempty"`
 }
 
-// ServiceRef defines model for ServiceRef.
+// ServiceRef represents service ref data exchanged through the Meridian API.
 type ServiceRef struct {
+	// DisplayName specifies the display name associated with this service ref.
 	DisplayName string `json:"displayName"`
 
-	// Id UUID v7
-	Id   Uuid `json:"id"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Slug contains the slug associated with this service ref.
 	Slug Slug `json:"slug"`
 }
 
-// ServiceRole defines model for ServiceRole.
+// ServiceRole identifies one supported service role value.
 type ServiceRole string
 
-// ServiceVisibility defines model for ServiceVisibility.
+// ServiceVisibility identifies one supported service visibility value.
 type ServiceVisibility string
 
-// ShareLink defines model for ShareLink.
+// ShareLink represents share link data exchanged through the Meridian API.
 type ShareLink struct {
-	// CreatedAt RFC 3339 UTC
-	CreatedAt        Timestamp `json:"createdAt"`
-	DescriptorDigest string    `json:"descriptorDigest"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
 
-	// ExpiresAt RFC 3339 UTC
+	// DescriptorDigest specifies the descriptor digest associated with this share link.
+	DescriptorDigest string `json:"descriptorDigest"`
+
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
 	ExpiresAt Timestamp `json:"expiresAt"`
 
-	// Id UUID v7
+	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
 
 	// ResourceId Diff snapshot ID; null for a frozen view descriptor.
-	ResourceId   Uuid                  `json:"resourceId"`
+	ResourceId Uuid `json:"resourceId"`
+
+	// ResourceType specifies the resource type associated with this share link.
 	ResourceType ShareLinkResourceType `json:"resourceType"`
-	RevokedAt    Timestamp             `json:"revokedAt"`
-	Url          string                `json:"url"`
+
+	// RevokedAt specifies the revoked at associated with this share link.
+	RevokedAt Timestamp `json:"revokedAt"`
+
+	// Url specifies the url associated with this share link.
+	Url string `json:"url"`
 }
 
-// ShareLinkResourceType defines model for ShareLink.ResourceType.
+// ShareLinkResourceType specifies the resource type associated with this share link.
 type ShareLinkResourceType string
 
 // ShareLinkCreateRequest Creates a view share. The server resolves all ref selectors to immutable version IDs, freezes scope membership and options, and allowlists only the resulting artifacts. Diff snapshots use the dedicated diff-snapshot share operation.
 type ShareLinkCreateRequest struct {
-	ExpiresInSeconds int                                `json:"expiresInSeconds"`
-	Inputs           []DocumentSelector                 `json:"inputs,omitempty"`
-	Options          map[string]interface{}             `json:"options,omitempty"`
-	ResourceType     ShareLinkCreateRequestResourceType `json:"resourceType"`
-	Scope            ScopeSelector                      `json:"scope,omitempty"`
-	ViewId           string                             `json:"viewId"`
+	// ExpiresInSeconds specifies the expires in seconds associated with this share link create request.
+	ExpiresInSeconds int `json:"expiresInSeconds"`
+
+	// Inputs contains the ordered inputs associated with this share link create request.
+	Inputs []DocumentSelector `json:"inputs,omitempty"`
+
+	// Options specifies the options associated with this share link create request.
+	Options map[string]interface{} `json:"options,omitempty"`
+
+	// ResourceType specifies the resource type associated with this share link create request.
+	ResourceType ShareLinkCreateRequestResourceType `json:"resourceType"`
+
+	// Scope specifies the scope associated with this share link create request.
+	Scope ScopeSelector `json:"scope,omitempty"`
+
+	// ViewId specifies the view id associated with this share link create request.
+	ViewId string `json:"viewId"`
 }
 
-// ShareLinkCreateRequestResourceType defines model for ShareLinkCreateRequest.ResourceType.
+// ShareLinkCreateRequestResourceType specifies the resource type associated with this share link create request.
 type ShareLinkCreateRequestResourceType string
 
-// ShareLinkCreated defines model for ShareLinkCreated.
+// ShareLinkCreated represents share link created data exchanged through the Meridian API.
 type ShareLinkCreated struct {
-	// CreatedAt RFC 3339 UTC
-	CreatedAt        Timestamp `json:"createdAt"`
-	DescriptorDigest string    `json:"descriptorDigest"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
 
-	// ExpiresAt RFC 3339 UTC
+	// DescriptorDigest specifies the descriptor digest associated with this share link created.
+	DescriptorDigest string `json:"descriptorDigest"`
+
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
 	ExpiresAt Timestamp `json:"expiresAt"`
 
-	// Id UUID v7
-	Id           Uuid                         `json:"id"`
-	ResourceId   Uuid                         `json:"resourceId"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// ResourceId specifies the resource id associated with this share link created.
+	ResourceId Uuid `json:"resourceId"`
+
+	// ResourceType specifies the resource type associated with this share link created.
 	ResourceType ShareLinkCreatedResourceType `json:"resourceType"`
-	RevokedAt    Timestamp                    `json:"revokedAt"`
-	Token        string                       `json:"token,omitempty"`
-	Url          string                       `json:"url"`
+
+	// RevokedAt specifies the revoked at associated with this share link created.
+	RevokedAt Timestamp `json:"revokedAt"`
+
+	// Token is secret bearer material and must never be logged or persisted as plaintext.
+	Token string `json:"token,omitempty"`
+
+	// Url specifies the url associated with this share link created.
+	Url string `json:"url"`
 }
 
-// ShareLinkCreatedResourceType defines model for ShareLinkCreated.ResourceType.
+// ShareLinkCreatedResourceType specifies the resource type associated with this share link created.
 type ShareLinkCreatedResourceType string
 
-// ShareLinkPage defines model for ShareLinkPage.
+// ShareLinkPage contains one paginated page of share link records.
 type ShareLinkPage struct {
-	Items    []ShareLink `json:"items"`
-	Page     int         `json:"page"`
-	PageSize int         `json:"pageSize"`
-	Total    int         `json:"total"`
+	// Items contains the ordered items associated with this share link page.
+	Items []ShareLink `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// SharedView defines model for SharedView.
+// SharedView represents shared view data exchanged through the Meridian API.
 type SharedView struct {
-	// ExpiresAt RFC 3339 UTC
-	ExpiresAt    Timestamp              `json:"expiresAt"`
-	Resolution   SharedView_Resolution  `json:"resolution"`
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
+	ExpiresAt Timestamp `json:"expiresAt"`
+
+	// Resolution specifies the resolution associated with this shared view.
+	Resolution SharedView_Resolution `json:"resolution"`
+
+	// ResourceType specifies the resource type associated with this shared view.
 	ResourceType SharedViewResourceType `json:"resourceType"`
 }
 
-// SharedView_Resolution defines model for SharedView.Resolution.
+// SharedView_Resolution specifies the resolution associated with this shared view.
 type SharedView_Resolution struct {
 	union json.RawMessage
 }
 
-// SharedViewResourceType defines model for SharedView.ResourceType.
+// SharedViewResourceType specifies the resource type associated with this shared view.
 type SharedViewResourceType string
 
-// Slug defines model for Slug.
+// Slug is a stable lowercase URL identifier containing letters, digits, and hyphens.
 type Slug = string
 
-// SourceBinding defines model for SourceBinding.
+// SourceBinding represents source binding data exchanged through the Meridian API.
 type SourceBinding struct {
-	// AssetId UUID v7
-	AssetId      Uuid   `json:"assetId"`
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
+
+	// ExpansionKey specifies the expansion key associated with this source binding.
 	ExpansionKey string `json:"expansionKey"`
 
-	// Id UUID v7
+	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
 
 	// LastSeenCommit Null for global non-Git materializations.
 	LastSeenCommit string `json:"lastSeenCommit"`
 
-	// LayerId UUID v7
+	// LayerId contains the uuid associated with this source binding.
 	LayerId Uuid `json:"layerId"`
 
 	// ResolvedPath Null only for push/manual sources with no repository file. A previously resolved repository path is retained when a file disappears and the binding becomes stale.
 	ResolvedPath string `json:"resolvedPath"`
 
 	// ScopeKey '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
-	ScopeKey  string                 `json:"scopeKey"`
+	ScopeKey string `json:"scopeKey"`
+
+	// ScopeType specifies the scope type associated with this source binding.
 	ScopeType SourceBindingScopeType `json:"scopeType"`
 
-	// SourceSpecId UUID v7
-	SourceSpecId Uuid               `json:"sourceSpecId"`
-	State        SourceBindingState `json:"state"`
+	// SourceSpecId contains the uuid associated with this source binding.
+	SourceSpecId Uuid `json:"sourceSpecId"`
+
+	// State specifies the state associated with this source binding.
+	State SourceBindingState `json:"state"`
 }
 
-// SourceBindingScopeType defines model for SourceBinding.ScopeType.
+// SourceBindingScopeType specifies the scope type associated with this source binding.
 type SourceBindingScopeType string
 
-// SourceBindingState defines model for SourceBinding.State.
+// SourceBindingState specifies the state associated with this source binding.
 type SourceBindingState string
 
-// SourceBindingList defines model for SourceBindingList.
+// SourceBindingList contains an ordered collection of source binding values.
 type SourceBindingList struct {
+	// Items contains the ordered items associated with this source binding list.
 	Items []SourceBinding `json:"items"`
 }
 
-// SourceMode defines model for SourceMode.
+// SourceMode identifies one supported source mode value.
 type SourceMode string
 
-// SourceRunSummary defines model for SourceRunSummary.
+// SourceRunSummary represents source run summary data exchanged through the Meridian API.
 type SourceRunSummary struct {
+	// FinishedAt is the RFC 3339 UTC instant when processing reached a terminal state.
 	FinishedAt Timestamp `json:"finishedAt"`
 
-	// JobId UUID v7
-	JobId   Uuid    `json:"jobId"`
-	Ref     RefName `json:"ref"`
+	// JobId identifies the asynchronous job associated with this resource.
+	JobId Uuid `json:"jobId"`
+
+	// Ref contains the ref name associated with this source run summary.
+	Ref RefName `json:"ref"`
+
+	// RefType contains the ref type associated with this source run summary.
 	RefType RefType `json:"refType"`
 
-	// StartedAt RFC 3339 UTC
+	// StartedAt is the RFC 3339 UTC instant when processing began.
 	StartedAt Timestamp `json:"startedAt"`
-	Status    JobStatus `json:"status"`
+
+	// Status is the current lifecycle or processing state.
+	Status JobStatus `json:"status"`
 }
 
-// SourceSpec defines model for SourceSpec.
+// SourceSpec represents source spec data exchanged through the Meridian API.
 type SourceSpec struct {
-	AssetNameTemplate  AssetNameTemplate `json:"assetNameTemplate"`
-	BindingsCount      int               `json:"bindingsCount"`
-	BranchPatterns     []RefGlob         `json:"branchPatterns"`
-	ConfigFieldSources []FieldSource     `json:"configFieldSources"`
-	ConfigOrigin       ConfigSource      `json:"configOrigin"`
+	// AssetNameTemplate contains the asset name template associated with this source spec.
+	AssetNameTemplate AssetNameTemplate `json:"assetNameTemplate"`
 
-	// CreatedAt RFC 3339 UTC
+	// BindingsCount specifies the bindings count associated with this source spec.
+	BindingsCount int `json:"bindingsCount"`
+
+	// BranchPatterns contains the ordered branch patterns associated with this source spec.
+	BranchPatterns []RefGlob `json:"branchPatterns"`
+
+	// ConfigFieldSources contains the ordered config field sources associated with this source spec.
+	ConfigFieldSources []FieldSource `json:"configFieldSources"`
+
+	// ConfigOrigin contains the config source associated with this source spec.
+	ConfigOrigin ConfigSource `json:"configOrigin"`
+
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
-	Enabled   bool      `json:"enabled"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// Enabled indicates whether enabled applies to this source spec.
+	Enabled bool `json:"enabled"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Id UUID v7
+	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
 
 	// InitialLayerId Non-null only for a manual SourceSpec. createSourceSpec atomically creates its one global SourceBinding and Layer and returns that Layer ID so the caller can immediately call createLayerRevision. Non-manual specs return null until jobs materialize zero or more bindings.
-	InitialLayerId    Uuid             `json:"initialLayerId"`
-	Kind              KindId           `json:"kind"`
-	LastError         string           `json:"lastError"`
-	LastRun           SourceRunSummary `json:"lastRun"`
-	Mode              SourceMode       `json:"mode"`
-	Ord               int              `json:"ord"`
-	Origin            LayerOrigin      `json:"origin"`
-	Path              string           `json:"path"`
-	ProducerProfileId Uuid             `json:"producerProfileId"`
-	Role              LayerRole        `json:"role"`
+	InitialLayerId Uuid `json:"initialLayerId"`
 
-	// ServiceId UUID v7
+	// Kind contains the kind id associated with this source spec.
+	Kind KindId `json:"kind"`
+
+	// LastError specifies the last error associated with this source spec.
+	LastError string `json:"lastError"`
+
+	// LastRun specifies the last run associated with this source spec.
+	LastRun SourceRunSummary `json:"lastRun"`
+
+	// Mode contains the source mode associated with this source spec.
+	Mode SourceMode `json:"mode"`
+
+	// Ord specifies the ord associated with this source spec.
+	Ord int `json:"ord"`
+
+	// Origin contains the layer origin associated with this source spec.
+	Origin LayerOrigin `json:"origin"`
+
+	// Path specifies the path associated with this source spec.
+	Path string `json:"path"`
+
+	// ProducerProfileId specifies the producer profile id associated with this source spec.
+	ProducerProfileId Uuid `json:"producerProfileId"`
+
+	// Role contains the layer role associated with this source spec.
+	Role LayerRole `json:"role"`
+
+	// ServiceId identifies the service associated with this resource.
 	ServiceId Uuid `json:"serviceId"`
 
 	// TimeoutSec Effective producer timeout is the minimum of this value and the selected producer profile timeout. Mode defaults are defined in domain.yaml.
 	TimeoutSec int `json:"timeoutSec"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// SourceSpecCreateRequest defines model for SourceSpecCreateRequest.
+// SourceSpecCreateRequest defines validated input for the corresponding Meridian API operation.
 type SourceSpecCreateRequest = SourceSpecInput
 
-// SourceSpecInput defines model for SourceSpecInput.
+// SourceSpecInput represents source spec input data exchanged through the Meridian API.
 type SourceSpecInput struct {
+	// AssetNameTemplate specifies the asset name template associated with this source spec input.
 	AssetNameTemplate AssetNameTemplate `json:"assetNameTemplate,omitempty"`
-	BranchPatterns    []RefGlob         `json:"branchPatterns,omitempty"`
-	Enabled           bool              `json:"enabled,omitempty"`
-	Kind              KindId            `json:"kind"`
-	Mode              SourceMode        `json:"mode"`
-	Ord               int               `json:"ord,omitempty"`
-	Origin            LayerOrigin       `json:"origin"`
-	Path              string            `json:"path,omitempty"`
-	ProducerProfileId Uuid              `json:"producerProfileId,omitempty"`
+
+	// BranchPatterns contains the ordered branch patterns associated with this source spec input.
+	BranchPatterns []RefGlob `json:"branchPatterns,omitempty"`
+
+	// Enabled indicates whether enabled applies to this source spec input.
+	Enabled bool `json:"enabled,omitempty"`
+
+	// Kind contains the kind id associated with this source spec input.
+	Kind KindId `json:"kind"`
+
+	// Mode contains the source mode associated with this source spec input.
+	Mode SourceMode `json:"mode"`
+
+	// Ord specifies the ord associated with this source spec input.
+	Ord int `json:"ord,omitempty"`
+
+	// Origin contains the layer origin associated with this source spec input.
+	Origin LayerOrigin `json:"origin"`
+
+	// Path specifies the path associated with this source spec input.
+	Path string `json:"path,omitempty"`
+
+	// ProducerProfileId specifies the producer profile id associated with this source spec input.
+	ProducerProfileId Uuid `json:"producerProfileId,omitempty"`
 
 	// ReplaceAiBase On create only, explicitly archives an existing AI-generated base and its source in the same transaction before creating this repository base. Invalid for other replacements.
-	ReplaceAiBase bool      `json:"replaceAiBase,omitempty"`
-	Role          LayerRole `json:"role"`
+	ReplaceAiBase bool `json:"replaceAiBase,omitempty"`
+
+	// Role contains the layer role associated with this source spec input.
+	Role LayerRole `json:"role"`
 
 	// TargetAssetId Required only for manual mode; the asset must belong to the path service and match kind.
 	TargetAssetId Uuid `json:"targetAssetId,omitempty"`
@@ -4463,553 +5826,851 @@ type SourceSpecInput struct {
 	TimeoutSec int `json:"timeoutSec,omitempty"`
 }
 
-// SourceSpecList defines model for SourceSpecList.
+// SourceSpecList contains an ordered collection of source spec values.
 type SourceSpecList struct {
+	// Items contains the ordered items associated with this source spec list.
 	Items []SourceSpec `json:"items"`
 }
 
 // SourceSpecPatchRequest The server merges this partial document with the stored SourceSpec and validates the complete resulting aggregate against sourceCompatibility.
 type SourceSpecPatchRequest struct {
+	// AssetNameTemplate contains the asset name template associated with this source spec patch request.
 	AssetNameTemplate AssetNameTemplate `json:"assetNameTemplate,omitempty"`
-	BranchPatterns    []RefGlob         `json:"branchPatterns,omitempty"`
-	Enabled           bool              `json:"enabled,omitempty"`
-	Mode              SourceMode        `json:"mode,omitempty"`
-	Ord               int               `json:"ord,omitempty"`
-	Origin            LayerOrigin       `json:"origin,omitempty"`
-	Path              string            `json:"path,omitempty"`
-	ProducerProfileId Uuid              `json:"producerProfileId,omitempty"`
-	Role              LayerRole         `json:"role,omitempty"`
-	TimeoutSec        int               `json:"timeoutSec,omitempty"`
+
+	// BranchPatterns contains the ordered branch patterns associated with this source spec patch request.
+	BranchPatterns []RefGlob `json:"branchPatterns,omitempty"`
+
+	// Enabled indicates whether enabled applies to this source spec patch request.
+	Enabled bool `json:"enabled,omitempty"`
+
+	// Mode contains the source mode associated with this source spec patch request.
+	Mode SourceMode `json:"mode,omitempty"`
+
+	// Ord specifies the ord associated with this source spec patch request.
+	Ord int `json:"ord,omitempty"`
+
+	// Origin contains the layer origin associated with this source spec patch request.
+	Origin LayerOrigin `json:"origin,omitempty"`
+
+	// Path specifies the path associated with this source spec patch request.
+	Path string `json:"path,omitempty"`
+
+	// ProducerProfileId specifies the producer profile id associated with this source spec patch request.
+	ProducerProfileId Uuid `json:"producerProfileId,omitempty"`
+
+	// Role contains the layer role associated with this source spec patch request.
+	Role LayerRole `json:"role,omitempty"`
+
+	// TimeoutSec specifies the timeout sec associated with this source spec patch request.
+	TimeoutSec int `json:"timeoutSec,omitempty"`
 }
 
-// SshSecretInput defines model for SshSecretInput.
+// SshSecretInput carries write-only SSH private key material for encryption at rest.
 type SshSecretInput struct {
-	Passphrase    string `json:"passphrase,omitempty"`
+	// Passphrase unlocks the private key when encrypted and must never be logged.
+	Passphrase string `json:"passphrase,omitempty"`
+
+	// PrivateKeyPem is the write-only PEM-encoded SSH private key and must never be logged.
 	PrivateKeyPem string `json:"privateKeyPem,omitempty"`
 }
 
-// StarState defines model for StarState.
+// StarState represents star state data exchanged through the Meridian API.
 type StarState struct {
+	// Starred indicates whether starred applies to this star state.
 	Starred bool `json:"starred"`
 }
 
-// Subscription defines model for Subscription.
+// Subscription represents subscription data exchanged through the Meridian API.
 type Subscription struct {
+	// ChannelIds contains the ordered channel ids associated with this subscription.
 	ChannelIds []Uuid `json:"channelIds"`
 
-	// CreatedAt RFC 3339 UTC
-	CreatedAt  Timestamp         `json:"createdAt"`
-	Enabled    bool              `json:"enabled"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
+
+	// Enabled indicates whether enabled applies to this subscription.
+	Enabled bool `json:"enabled"`
+
+	// EventTypes contains the ordered event types associated with this subscription.
 	EventTypes []DomainEventType `json:"eventTypes"`
 
-	// Id UUID v7
-	Id        Uuid                  `json:"id"`
-	ScopeId   Subscription_ScopeId  `json:"scopeId"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// ScopeId specifies the scope id associated with this subscription.
+	ScopeId Subscription_ScopeId `json:"scopeId"`
+
+	// ScopeType contains the subscription scope type associated with this subscription.
 	ScopeType SubscriptionScopeType `json:"scopeType"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// Subscription_ScopeId defines model for Subscription.ScopeId.
+// Subscription_ScopeId specifies the scope id associated with this subscription.
 type Subscription_ScopeId struct {
 	union json.RawMessage
 }
 
-// SubscriptionList defines model for SubscriptionList.
+// SubscriptionList contains an ordered collection of subscription values.
 type SubscriptionList struct {
+	// Items contains the ordered items associated with this subscription list.
 	Items []Subscription `json:"items"`
 }
 
-// SubscriptionPutRequest defines model for SubscriptionPutRequest.
+// SubscriptionPutRequest defines validated input for the corresponding Meridian API operation.
 type SubscriptionPutRequest struct {
-	ChannelIds []Uuid                         `json:"channelIds"`
-	Enabled    bool                           `json:"enabled"`
-	EventTypes []DomainEventType              `json:"eventTypes"`
-	ScopeId    SubscriptionPutRequest_ScopeId `json:"scopeId"`
-	ScopeType  SubscriptionScopeType          `json:"scopeType"`
+	// ChannelIds contains the ordered channel ids associated with this subscription put request.
+	ChannelIds []Uuid `json:"channelIds"`
+
+	// Enabled indicates whether enabled applies to this subscription put request.
+	Enabled bool `json:"enabled"`
+
+	// EventTypes contains the ordered event types associated with this subscription put request.
+	EventTypes []DomainEventType `json:"eventTypes"`
+
+	// ScopeId specifies the scope id associated with this subscription put request.
+	ScopeId SubscriptionPutRequest_ScopeId `json:"scopeId"`
+
+	// ScopeType contains the subscription scope type associated with this subscription put request.
+	ScopeType SubscriptionScopeType `json:"scopeType"`
 }
 
-// SubscriptionPutRequest_ScopeId defines model for SubscriptionPutRequest.ScopeId.
+// SubscriptionPutRequest_ScopeId specifies the scope id associated with this subscription put request.
 type SubscriptionPutRequest_ScopeId struct {
 	union json.RawMessage
 }
 
-// SubscriptionScopeConstraints defines model for SubscriptionScopeConstraints.
+// SubscriptionScopeConstraints represents subscription scope constraints data exchanged through the Meridian API.
 type SubscriptionScopeConstraints = interface{}
 
-// SubscriptionScopeType defines model for SubscriptionScopeType.
+// SubscriptionScopeType identifies one supported subscription scope type value.
 type SubscriptionScopeType string
 
-// SystemGroup defines model for SystemGroup.
+// SystemGroup represents system group data exchanged through the Meridian API.
 type SystemGroup struct {
+	// Capabilities lists actions the authenticated principal may perform on this resource.
 	Capabilities CapabilityList `json:"capabilities"`
 
-	// CreatedAt RFC 3339 UTC
-	CreatedAt   Timestamp `json:"createdAt"`
-	Description string    `json:"description"`
-	DisplayName string    `json:"displayName"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// Description specifies the description associated with this system group.
+	Description string `json:"description"`
+
+	// DisplayName specifies the display name associated with this system group.
+	DisplayName string `json:"displayName"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Id UUID v7
-	Id         Uuid   `json:"id"`
-	ParentId   Uuid   `json:"parentId"`
-	ServiceIds []Uuid `json:"serviceIds"`
-	Slug       Slug   `json:"slug"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
 
-	// UpdatedAt RFC 3339 UTC
+	// ParentId specifies the parent id associated with this system group.
+	ParentId Uuid `json:"parentId"`
+
+	// ServiceIds contains the ordered service ids associated with this system group.
+	ServiceIds []Uuid `json:"serviceIds"`
+
+	// Slug contains the slug associated with this system group.
+	Slug Slug `json:"slug"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// SystemGroupCreateRequest defines model for SystemGroupCreateRequest.
+// SystemGroupCreateRequest defines validated input for the corresponding Meridian API operation.
 type SystemGroupCreateRequest struct {
+	// Description specifies the description associated with this system group create request.
 	Description string `json:"description,omitempty"`
+
+	// DisplayName specifies the display name associated with this system group create request.
 	DisplayName string `json:"displayName"`
-	ParentId    Uuid   `json:"parentId,omitempty"`
-	ServiceIds  []Uuid `json:"serviceIds,omitempty"`
-	Slug        Slug   `json:"slug"`
+
+	// ParentId specifies the parent id associated with this system group create request.
+	ParentId Uuid `json:"parentId,omitempty"`
+
+	// ServiceIds contains the ordered service ids associated with this system group create request.
+	ServiceIds []Uuid `json:"serviceIds,omitempty"`
+
+	// Slug contains the slug associated with this system group create request.
+	Slug Slug `json:"slug"`
 }
 
-// SystemGroupList defines model for SystemGroupList.
+// SystemGroupList contains an ordered collection of system group values.
 type SystemGroupList struct {
+	// Items contains the ordered items associated with this system group list.
 	Items []SystemGroup `json:"items"`
 }
 
-// SystemGroupMembersReplaceRequest defines model for SystemGroupMembersReplaceRequest.
+// SystemGroupMembersReplaceRequest defines validated input for the corresponding Meridian API operation.
 type SystemGroupMembersReplaceRequest struct {
+	// ServiceIds contains the ordered service ids associated with this system group members replace request.
 	ServiceIds []Uuid `json:"serviceIds"`
 }
 
-// SystemGroupPatchRequest defines model for SystemGroupPatchRequest.
+// SystemGroupPatchRequest defines validated input for the corresponding Meridian API operation.
 type SystemGroupPatchRequest struct {
+	// Description specifies the description associated with this system group patch request.
 	Description string `json:"description,omitempty"`
+
+	// DisplayName specifies the display name associated with this system group patch request.
 	DisplayName string `json:"displayName,omitempty"`
-	ParentId    Uuid   `json:"parentId,omitempty"`
+
+	// ParentId specifies the parent id associated with this system group patch request.
+	ParentId Uuid `json:"parentId,omitempty"`
 }
 
-// Tag defines model for Tag.
+// Tag represents tag data exchanged through the Meridian API.
 type Tag struct {
+	// Color specifies the color associated with this tag.
 	Color string `json:"color"`
 
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Id UUID v7
-	Id   Uuid   `json:"id"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Name specifies the name associated with this tag.
 	Name string `json:"name"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// TagCreateRequest defines model for TagCreateRequest.
+// TagCreateRequest defines validated input for the corresponding Meridian API operation.
 type TagCreateRequest struct {
+	// Color specifies the color associated with this tag create request.
 	Color string `json:"color,omitempty"`
-	Name  string `json:"name"`
+
+	// Name specifies the name associated with this tag create request.
+	Name string `json:"name"`
 }
 
-// TagList defines model for TagList.
+// TagList contains an ordered collection of tag values.
 type TagList = []Tag
 
-// TagPatchRequest defines model for TagPatchRequest.
+// TagPatchRequest defines validated input for the corresponding Meridian API operation.
 type TagPatchRequest struct {
+	// Color specifies the color associated with this tag patch request.
 	Color string `json:"color,omitempty"`
-	Name  string `json:"name,omitempty"`
+
+	// Name specifies the name associated with this tag patch request.
+	Name string `json:"name,omitempty"`
 }
 
-// Team defines model for Team.
+// Team represents team data exchanged through the Meridian API.
 type Team struct {
-	// CreatedAt RFC 3339 UTC
-	CreatedAt   Timestamp `json:"createdAt"`
-	DisplayName string    `json:"displayName"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// DisplayName specifies the display name associated with this team.
+	DisplayName string `json:"displayName"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Id UUID v7
-	Id        Uuid   `json:"id"`
-	MemberIds []Uuid `json:"memberIds"`
-	Slug      Slug   `json:"slug"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
 
-	// UpdatedAt RFC 3339 UTC
+	// MemberIds contains the ordered member ids associated with this team.
+	MemberIds []Uuid `json:"memberIds"`
+
+	// Slug contains the slug associated with this team.
+	Slug Slug `json:"slug"`
+
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// TeamCreateRequest defines model for TeamCreateRequest.
+// TeamCreateRequest defines validated input for the corresponding Meridian API operation.
 type TeamCreateRequest struct {
+	// DisplayName specifies the display name associated with this team create request.
 	DisplayName string `json:"displayName"`
-	Slug        Slug   `json:"slug"`
+
+	// Slug contains the slug associated with this team create request.
+	Slug Slug `json:"slug"`
 }
 
-// TeamMembersReplaceRequest defines model for TeamMembersReplaceRequest.
+// TeamMembersReplaceRequest defines validated input for the corresponding Meridian API operation.
 type TeamMembersReplaceRequest struct {
+	// UserIds contains the ordered user ids associated with this team members replace request.
 	UserIds []Uuid `json:"userIds"`
 }
 
-// TeamPage defines model for TeamPage.
+// TeamPage contains one paginated page of team records.
 type TeamPage struct {
-	Items    []Team `json:"items"`
-	Page     int    `json:"page"`
-	PageSize int    `json:"pageSize"`
-	Total    int    `json:"total"`
+	// Items contains the ordered items associated with this team page.
+	Items []Team `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// TeamPatchRequest defines model for TeamPatchRequest.
+// TeamPatchRequest defines validated input for the corresponding Meridian API operation.
 type TeamPatchRequest struct {
+	// DisplayName specifies the display name associated with this team patch request.
 	DisplayName string `json:"displayName,omitempty"`
 }
 
-// Tenant defines model for Tenant.
+// Tenant represents tenant data exchanged through the Meridian API.
 type Tenant struct {
-	// CreatedAt RFC 3339 UTC
-	CreatedAt   Timestamp `json:"createdAt"`
-	DisplayName string    `json:"displayName"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// DisplayName specifies the display name associated with this tenant.
+	DisplayName string `json:"displayName"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Id UUID v7
-	Id     Uuid         `json:"id"`
-	Quota  Quota        `json:"quota"`
-	Slug   Slug         `json:"slug"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Quota contains the quota associated with this tenant.
+	Quota Quota `json:"quota"`
+
+	// Slug contains the slug associated with this tenant.
+	Slug Slug `json:"slug"`
+
+	// Status is the current lifecycle or processing state.
 	Status TenantStatus `json:"status"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
-// TenantCreateRequest defines model for TenantCreateRequest.
+// TenantCreateRequest defines validated input for the corresponding Meridian API operation.
 type TenantCreateRequest struct {
+	// DisplayName specifies the display name associated with this tenant create request.
 	DisplayName string `json:"displayName"`
-	Quota       Quota  `json:"quota,omitempty"`
-	Slug        Slug   `json:"slug"`
+
+	// Quota contains the quota associated with this tenant create request.
+	Quota Quota `json:"quota,omitempty"`
+
+	// Slug contains the slug associated with this tenant create request.
+	Slug Slug `json:"slug"`
 }
 
-// TenantDeleteRequest defines model for TenantDeleteRequest.
+// TenantDeleteRequest defines validated input for the corresponding Meridian API operation.
 type TenantDeleteRequest struct {
-	ConfirmationSlug Slug   `json:"confirmationSlug"`
-	CurrentPassword  string `json:"currentPassword,omitempty"`
+	// ConfirmationSlug contains the slug associated with this tenant delete request.
+	ConfirmationSlug Slug `json:"confirmationSlug"`
+
+	// CurrentPassword specifies the current password associated with this tenant delete request.
+	CurrentPassword string `json:"currentPassword,omitempty"`
 }
 
-// TenantDeletionAccepted defines model for TenantDeletionAccepted.
+// TenantDeletionAccepted represents tenant deletion accepted data exchanged through the Meridian API.
 type TenantDeletionAccepted struct {
+	// Deduplicated indicates whether deduplicated applies to this tenant deletion accepted.
 	Deduplicated bool `json:"deduplicated"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// JobId UUID v7
+	// JobId identifies the asynchronous job associated with this resource.
 	JobId Uuid `json:"jobId"`
 }
 
-// TenantMembershipRef defines model for TenantMembershipRef.
+// TenantMembershipRef identifies one tenant the current user may enter and the user's role there.
 type TenantMembershipRef struct {
+	// DisplayName specifies the display name associated with this tenant membership ref.
 	DisplayName string `json:"displayName"`
 
-	// Id UUID v7
-	Id   Uuid       `json:"id"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Role contains the tenant role associated with this tenant membership ref.
 	Role TenantRole `json:"role"`
-	Slug Slug       `json:"slug"`
+
+	// Slug contains the slug associated with this tenant membership ref.
+	Slug Slug `json:"slug"`
 }
 
-// TenantPage defines model for TenantPage.
+// TenantPage contains one paginated page of tenant records.
 type TenantPage struct {
-	Items    []Tenant `json:"items"`
-	Page     int      `json:"page"`
-	PageSize int      `json:"pageSize"`
-	Total    int      `json:"total"`
+	// Items contains the ordered items associated with this tenant page.
+	Items []Tenant `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// TenantPatchRequest defines model for TenantPatchRequest.
+// TenantPatchRequest defines validated input for the corresponding Meridian API operation.
 type TenantPatchRequest struct {
-	DisplayName string       `json:"displayName,omitempty"`
-	Quota       Quota        `json:"quota,omitempty"`
-	Status      TenantStatus `json:"status,omitempty"`
+	// DisplayName specifies the display name associated with this tenant patch request.
+	DisplayName string `json:"displayName,omitempty"`
+
+	// Quota contains the quota associated with this tenant patch request.
+	Quota Quota `json:"quota,omitempty"`
+
+	// Status is the current lifecycle or processing state.
+	Status TenantStatus `json:"status,omitempty"`
 }
 
-// TenantRole defines model for TenantRole.
+// TenantRole identifies one supported tenant role value.
 type TenantRole string
 
-// TenantSettings defines model for TenantSettings.
+// TenantSettings represents tenant settings data exchanged through the Meridian API.
 type TenantSettings struct {
-	AutoPublish                bool                        `json:"autoPublish"`
-	DefaultAiProducerProfileId openapi_types.UUID          `json:"defaultAiProducerProfileId"`
-	DefaultLocale              TenantSettingsDefaultLocale `json:"defaultLocale"`
+	// AutoPublish indicates whether auto publish applies to this tenant settings.
+	AutoPublish bool `json:"autoPublish"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag                      ETag                      `json:"etag"`
+	// DefaultAiProducerProfileId specifies the default ai producer profile id associated with this tenant settings.
+	DefaultAiProducerProfileId openapi_types.UUID `json:"defaultAiProducerProfileId"`
+
+	// DefaultLocale specifies the default locale associated with this tenant settings.
+	DefaultLocale TenantSettingsDefaultLocale `json:"defaultLocale"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// ExternalRevisionTrustMode contains the external revision trust mode associated with this tenant settings.
 	ExternalRevisionTrustMode ExternalRevisionTrustMode `json:"externalRevisionTrustMode"`
-	Retention                 RetentionSettings         `json:"retention"`
+
+	// Retention contains the retention settings associated with this tenant settings.
+	Retention RetentionSettings `json:"retention"`
 }
 
-// TenantSettingsDefaultLocale defines model for TenantSettings.DefaultLocale.
+// TenantSettingsDefaultLocale specifies the default locale associated with this tenant settings.
 type TenantSettingsDefaultLocale string
 
-// TenantSettingsPatchRequest defines model for TenantSettingsPatchRequest.
+// TenantSettingsPatchRequest defines validated input for the corresponding Meridian API operation.
 type TenantSettingsPatchRequest struct {
-	AutoPublish                bool                                    `json:"autoPublish,omitempty"`
-	DefaultAiProducerProfileId openapi_types.UUID                      `json:"defaultAiProducerProfileId,omitempty"`
-	DefaultLocale              TenantSettingsPatchRequestDefaultLocale `json:"defaultLocale,omitempty"`
-	ExternalRevisionTrustMode  ExternalRevisionTrustMode               `json:"externalRevisionTrustMode,omitempty"`
-	Retention                  RetentionSettings                       `json:"retention,omitempty"`
+	// AutoPublish indicates whether auto publish applies to this tenant settings patch request.
+	AutoPublish bool `json:"autoPublish,omitempty"`
+
+	// DefaultAiProducerProfileId specifies the default ai producer profile id associated with this tenant settings patch request.
+	DefaultAiProducerProfileId openapi_types.UUID `json:"defaultAiProducerProfileId,omitempty"`
+
+	// DefaultLocale specifies the default locale associated with this tenant settings patch request.
+	DefaultLocale TenantSettingsPatchRequestDefaultLocale `json:"defaultLocale,omitempty"`
+
+	// ExternalRevisionTrustMode contains the external revision trust mode associated with this tenant settings patch request.
+	ExternalRevisionTrustMode ExternalRevisionTrustMode `json:"externalRevisionTrustMode,omitempty"`
+
+	// Retention contains the retention settings associated with this tenant settings patch request.
+	Retention RetentionSettings `json:"retention,omitempty"`
 }
 
-// TenantSettingsPatchRequestDefaultLocale defines model for TenantSettingsPatchRequest.DefaultLocale.
+// TenantSettingsPatchRequestDefaultLocale specifies the default locale associated with this tenant settings patch request.
 type TenantSettingsPatchRequestDefaultLocale string
 
-// TenantSettingsTemplate defines model for TenantSettingsTemplate.
+// TenantSettingsTemplate represents tenant settings template data exchanged through the Meridian API.
 type TenantSettingsTemplate struct {
-	AutoPublish                bool                                `json:"autoPublish"`
-	DefaultAiProducerProfileId openapi_types.UUID                  `json:"defaultAiProducerProfileId"`
-	DefaultLocale              TenantSettingsTemplateDefaultLocale `json:"defaultLocale"`
-	ExternalRevisionTrustMode  ExternalRevisionTrustMode           `json:"externalRevisionTrustMode"`
-	Retention                  RetentionSettings                   `json:"retention"`
+	// AutoPublish indicates whether auto publish applies to this tenant settings template.
+	AutoPublish bool `json:"autoPublish"`
+
+	// DefaultAiProducerProfileId specifies the default ai producer profile id associated with this tenant settings template.
+	DefaultAiProducerProfileId openapi_types.UUID `json:"defaultAiProducerProfileId"`
+
+	// DefaultLocale specifies the default locale associated with this tenant settings template.
+	DefaultLocale TenantSettingsTemplateDefaultLocale `json:"defaultLocale"`
+
+	// ExternalRevisionTrustMode contains the external revision trust mode associated with this tenant settings template.
+	ExternalRevisionTrustMode ExternalRevisionTrustMode `json:"externalRevisionTrustMode"`
+
+	// Retention contains the retention settings associated with this tenant settings template.
+	Retention RetentionSettings `json:"retention"`
 }
 
-// TenantSettingsTemplateDefaultLocale defines model for TenantSettingsTemplate.DefaultLocale.
+// TenantSettingsTemplateDefaultLocale specifies the default locale associated with this tenant settings template.
 type TenantSettingsTemplateDefaultLocale string
 
-// TenantStatus defines model for TenantStatus.
+// TenantStatus identifies one supported tenant status value.
 type TenantStatus string
 
 // Timestamp RFC 3339 UTC
 type Timestamp = time.Time
 
-// TodoStatus defines model for TodoStatus.
+// TodoStatus identifies one supported todo status value.
 type TodoStatus string
 
-// TokenCreateRequest defines model for TokenCreateRequest.
+// TokenCreateRequest defines the name, least-privilege scopes, and optional expiry of a new PAT.
 type TokenCreateRequest struct {
-	ExpiresAt Timestamp    `json:"expiresAt,omitempty"`
-	Name      string       `json:"name"`
-	Scopes    []TokenScope `json:"scopes"`
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
+	ExpiresAt Timestamp `json:"expiresAt,omitempty"`
+
+	// Name specifies the name associated with this token create request.
+	Name string `json:"name"`
+
+	// Scopes contains the ordered scopes associated with this token create request.
+	Scopes []TokenScope `json:"scopes"`
 }
 
-// TokenCreated defines model for TokenCreated.
+// TokenCreated returns PAT metadata plus the bearer token exactly once at creation time.
 type TokenCreated struct {
-	// CreatedAt RFC 3339 UTC
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
+
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
 	ExpiresAt Timestamp `json:"expiresAt"`
 
-	// Id UUID v7
-	Id         Uuid         `json:"id"`
-	LastUsedAt Timestamp    `json:"lastUsedAt"`
-	Name       string       `json:"name"`
-	RevokedAt  Timestamp    `json:"revokedAt"`
-	Scopes     []TokenScope `json:"scopes"`
-	Token      string       `json:"token,omitempty"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// LastUsedAt specifies the last used at associated with this token created.
+	LastUsedAt Timestamp `json:"lastUsedAt"`
+
+	// Name specifies the name associated with this token created.
+	Name string `json:"name"`
+
+	// RevokedAt specifies the revoked at associated with this token created.
+	RevokedAt Timestamp `json:"revokedAt"`
+
+	// Scopes contains the ordered scopes associated with this token created.
+	Scopes []TokenScope `json:"scopes"`
+
+	// Token is secret bearer material and must never be logged or persisted as plaintext.
+	Token string `json:"token,omitempty"`
 }
 
-// TokenPage defines model for TokenPage.
+// TokenPage contains one paginated page of token records.
 type TokenPage struct {
-	Items    []ApiToken `json:"items"`
-	Page     int        `json:"page"`
-	PageSize int        `json:"pageSize"`
-	Total    int        `json:"total"`
+	// Items contains the ordered items associated with this token page.
+	Items []ApiToken `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// TokenScope defines model for TokenScope.
+// TokenScope identifies one supported token scope value.
 type TokenScope string
 
-// Upload defines model for Upload.
+// Upload represents upload data exchanged through the Meridian API.
 type Upload struct {
+	// ContentType contains the content type associated with this upload.
 	ContentType ContentType `json:"contentType"`
-	Digest      string      `json:"digest"`
 
-	// ExpiresAt RFC 3339 UTC
+	// Digest specifies the digest associated with this upload.
+	Digest string `json:"digest"`
+
+	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
 	ExpiresAt Timestamp `json:"expiresAt"`
 
-	// Id UUID v7
-	Id        Uuid   `json:"id"`
-	Kind      KindId `json:"kind"`
-	SizeBytes int    `json:"sizeBytes"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Kind contains the kind id associated with this upload.
+	Kind KindId `json:"kind"`
+
+	// SizeBytes specifies the size bytes associated with this upload.
+	SizeBytes int `json:"sizeBytes"`
 }
 
-// UploadRequest defines model for UploadRequest.
+// UploadRequest defines validated input for the corresponding Meridian API operation.
 type UploadRequest struct {
-	ContentType ContentType        `json:"contentType"`
-	File        openapi_types.File `json:"file"`
-	Kind        KindId             `json:"kind"`
+	// ContentType contains the content type associated with this upload request.
+	ContentType ContentType `json:"contentType"`
+
+	// File specifies the file associated with this upload request.
+	File openapi_types.File `json:"file"`
+
+	// Kind contains the kind id associated with this upload request.
+	Kind KindId `json:"kind"`
 }
 
-// UploadSelector defines model for UploadSelector.
+// UploadSelector identifies the upload selected by a request.
 type UploadSelector struct {
+	// Type specifies the type associated with this upload selector.
 	Type UploadSelectorType `json:"type"`
 
-	// UploadId UUID v7
+	// UploadId contains the uuid associated with this upload selector.
 	UploadId Uuid `json:"uploadId"`
 }
 
-// UploadSelectorType defines model for UploadSelector.Type.
+// UploadSelectorType specifies the type associated with this upload selector.
 type UploadSelectorType string
 
-// User defines model for User.
+// User is a local Meridian identity; password hashes and session secrets are never exposed.
 type User struct {
-	// CreatedAt RFC 3339 UTC
-	CreatedAt   Timestamp           `json:"createdAt"`
-	DisplayName string              `json:"displayName"`
-	Email       openapi_types.Email `json:"email"`
+	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
+	CreatedAt Timestamp `json:"createdAt"`
 
-	// Etag Opaque HTTP entity tag including quotes
+	// DisplayName specifies the display name associated with this user.
+	DisplayName string `json:"displayName"`
+
+	// Email specifies the email associated with this user.
+	Email openapi_types.Email `json:"email"`
+
+	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
-	// Id UUID v7
-	Id     Uuid       `json:"id"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Status is the current lifecycle or processing state.
 	Status UserStatus `json:"status"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
-	Username  string    `json:"username"`
+
+	// Username specifies the username associated with this user.
+	Username string `json:"username"`
 }
 
-// UserStatus defines model for User.Status.
+// UserStatus is the current lifecycle or processing state.
 type UserStatus string
 
-// UserCreateRequest defines model for UserCreateRequest.
+// UserCreateRequest defines validated input for the corresponding Meridian API operation.
 type UserCreateRequest struct {
-	DisplayName string              `json:"displayName"`
-	Email       openapi_types.Email `json:"email,omitempty"`
-	Password    string              `json:"password,omitempty"`
-	Username    string              `json:"username"`
+	// DisplayName specifies the display name associated with this user create request.
+	DisplayName string `json:"displayName"`
+
+	// Email specifies the email associated with this user create request.
+	Email openapi_types.Email `json:"email,omitempty"`
+
+	// Password is the write-only plaintext password supplied for authentication.
+	Password string `json:"password,omitempty"`
+
+	// Username specifies the username associated with this user create request.
+	Username string `json:"username"`
 }
 
-// UserPage defines model for UserPage.
+// UserPage contains one paginated page of user records.
 type UserPage struct {
-	Items    []User `json:"items"`
-	Page     int    `json:"page"`
-	PageSize int    `json:"pageSize"`
-	Total    int    `json:"total"`
+	// Items contains the ordered items associated with this user page.
+	Items []User `json:"items"`
+
+	// Page is the one-based page number.
+	Page int `json:"page"`
+
+	// PageSize is the maximum number of records returned on one page.
+	PageSize int `json:"pageSize"`
+
+	// Total is the number of matching records across all pages.
+	Total int `json:"total"`
 }
 
-// UserPatchRequest defines model for UserPatchRequest.
+// UserPatchRequest defines validated input for the corresponding Meridian API operation.
 type UserPatchRequest struct {
-	DisplayName string                 `json:"displayName,omitempty"`
-	Email       openapi_types.Email    `json:"email,omitempty"`
-	Password    string                 `json:"password,omitempty"`
-	Status      UserPatchRequestStatus `json:"status,omitempty"`
+	// DisplayName specifies the display name associated with this user patch request.
+	DisplayName string `json:"displayName,omitempty"`
+
+	// Email specifies the email associated with this user patch request.
+	Email openapi_types.Email `json:"email,omitempty"`
+
+	// Password is the write-only plaintext password supplied for authentication.
+	Password string `json:"password,omitempty"`
+
+	// Status is the current lifecycle or processing state.
+	Status UserPatchRequestStatus `json:"status,omitempty"`
 }
 
-// UserPatchRequestStatus defines model for UserPatchRequest.Status.
+// UserPatchRequestStatus is the current lifecycle or processing state.
 type UserPatchRequestStatus string
 
-// UserPreferences defines model for UserPreferences.
+// UserPreferences represents user preferences data exchanged through the Meridian API.
 type UserPreferences struct {
+	// DefaultViews specifies the default views associated with this user preferences.
 	DefaultViews map[string]string `json:"defaultViews"`
 
-	// Etag Opaque HTTP entity tag including quotes
-	Etag   ETag                  `json:"etag"`
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Locale specifies the locale associated with this user preferences.
 	Locale UserPreferencesLocale `json:"locale"`
-	Theme  UserPreferencesTheme  `json:"theme"`
+
+	// Theme specifies the theme associated with this user preferences.
+	Theme UserPreferencesTheme `json:"theme"`
 }
 
-// UserPreferencesLocale defines model for UserPreferences.Locale.
+// UserPreferencesLocale specifies the locale associated with this user preferences.
 type UserPreferencesLocale string
 
-// UserPreferencesTheme defines model for UserPreferences.Theme.
+// UserPreferencesTheme specifies the theme associated with this user preferences.
 type UserPreferencesTheme string
 
-// UserPreferencesPatchRequest defines model for UserPreferencesPatchRequest.
+// UserPreferencesPatchRequest defines validated input for the corresponding Meridian API operation.
 type UserPreferencesPatchRequest struct {
-	DefaultViews map[string]string                 `json:"defaultViews,omitempty"`
-	Locale       UserPreferencesPatchRequestLocale `json:"locale,omitempty"`
-	Theme        UserPreferencesPatchRequestTheme  `json:"theme,omitempty"`
+	// DefaultViews specifies the default views associated with this user preferences patch request.
+	DefaultViews map[string]string `json:"defaultViews,omitempty"`
+
+	// Locale specifies the locale associated with this user preferences patch request.
+	Locale UserPreferencesPatchRequestLocale `json:"locale,omitempty"`
+
+	// Theme specifies the theme associated with this user preferences patch request.
+	Theme UserPreferencesPatchRequestTheme `json:"theme,omitempty"`
 }
 
-// UserPreferencesPatchRequestLocale defines model for UserPreferencesPatchRequest.Locale.
+// UserPreferencesPatchRequestLocale specifies the locale associated with this user preferences patch request.
 type UserPreferencesPatchRequestLocale string
 
-// UserPreferencesPatchRequestTheme defines model for UserPreferencesPatchRequest.Theme.
+// UserPreferencesPatchRequestTheme specifies the theme associated with this user preferences patch request.
 type UserPreferencesPatchRequestTheme string
 
 // Uuid UUID v7
 type Uuid = openapi_types.UUID
 
-// ValidationIssue defines model for ValidationIssue.
+// ValidationIssue represents validation issue data exchanged through the Meridian API.
 type ValidationIssue struct {
-	Code     string                  `json:"code"`
-	Message  string                  `json:"message"`
-	Pointer  string                  `json:"pointer"`
+	// Code specifies the code associated with this validation issue.
+	Code string `json:"code"`
+
+	// Message specifies the message associated with this validation issue.
+	Message string `json:"message"`
+
+	// Pointer specifies the pointer associated with this validation issue.
+	Pointer string `json:"pointer"`
+
+	// Severity specifies the severity associated with this validation issue.
 	Severity ValidationIssueSeverity `json:"severity"`
 }
 
-// ValidationIssueSeverity defines model for ValidationIssue.Severity.
+// ValidationIssueSeverity specifies the severity associated with this validation issue.
 type ValidationIssueSeverity string
 
-// VersionInfo defines model for VersionInfo.
+// VersionInfo identifies the running server build and its public API contract.
 type VersionInfo struct {
-	ApiVersion      VersionInfoApiVersion      `json:"apiVersion"`
-	BuildCommit     string                     `json:"buildCommit"`
+	// ApiVersion is the HTTP route major implemented by this server.
+	ApiVersion VersionInfoApiVersion `json:"apiVersion"`
+
+	// BuildCommit is the source revision embedded at build time or unknown when unset.
+	BuildCommit string `json:"buildCommit"`
+
+	// ContractVersion is the frozen OpenAPI contract version embedded in this build.
 	ContractVersion VersionInfoContractVersion `json:"contractVersion"`
-	ServerVersion   string                     `json:"serverVersion"`
+
+	// ServerVersion is the semantic release version or dev for a local build.
+	ServerVersion string `json:"serverVersion"`
 }
 
-// VersionInfoApiVersion defines model for VersionInfo.ApiVersion.
+// VersionInfoApiVersion is the HTTP route major implemented by this server.
 type VersionInfoApiVersion string
 
-// VersionInfoContractVersion defines model for VersionInfo.ContractVersion.
+// VersionInfoContractVersion is the frozen OpenAPI contract version embedded in this build.
 type VersionInfoContractVersion string
 
-// VersionPublishRequest defines model for VersionPublishRequest.
+// VersionPublishRequest defines validated input for the corresponding Meridian API operation.
 type VersionPublishRequest struct {
-	Labels  map[string]string `json:"labels,omitempty"`
-	Version string            `json:"version,omitempty"`
+	// Labels specifies the labels associated with this version publish request.
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// Version specifies the version associated with this version publish request.
+	Version string `json:"version,omitempty"`
 }
 
-// VersionRef defines model for VersionRef.
+// VersionRef represents version ref data exchanged through the Meridian API.
 type VersionRef struct {
-	// Id UUID v7
-	Id        Uuid      `json:"id"`
+	// Id uniquely identifies this resource.
+	Id Uuid `json:"id"`
+
+	// Lifecycle contains the lifecycle associated with this version ref.
 	Lifecycle Lifecycle `json:"lifecycle"`
-	Version   string    `json:"version"`
+
+	// Version specifies the version associated with this version ref.
+	Version string `json:"version"`
 }
 
-// VersionSelector defines model for VersionSelector.
+// VersionSelector identifies the version selected by a request.
 type VersionSelector struct {
+	// Type specifies the type associated with this version selector.
 	Type VersionSelectorType `json:"type"`
 
-	// VersionId UUID v7
+	// VersionId identifies the asset version associated with this resource.
 	VersionId Uuid `json:"versionId"`
 }
 
-// VersionSelectorType defines model for VersionSelector.Type.
+// VersionSelectorType specifies the type associated with this version selector.
 type VersionSelectorType string
 
-// ViewDefinition defines model for ViewDefinition.
+// ViewDefinition represents view definition data exchanged through the Meridian API.
 type ViewDefinition struct {
-	Columns         []map[string]interface{} `json:"columns,omitempty"`
-	ColumnsSource   string                   `json:"columnsSource,omitempty"`
-	Component       string                   `json:"component,omitempty"`
-	DefaultOptions  map[string]interface{}   `json:"defaultOptions"`
-	Entrypoint      string                   `json:"entrypoint,omitempty"`
-	ExternalUrl     string                   `json:"externalUrl,omitempty"`
+	// Columns contains the ordered columns associated with this view definition.
+	Columns []map[string]interface{} `json:"columns,omitempty"`
+
+	// ColumnsSource specifies the columns source associated with this view definition.
+	ColumnsSource string `json:"columnsSource,omitempty"`
+
+	// Component specifies the component associated with this view definition.
+	Component string `json:"component,omitempty"`
+
+	// DefaultOptions specifies the default options associated with this view definition.
+	DefaultOptions map[string]interface{} `json:"defaultOptions"`
+
+	// Entrypoint specifies the entrypoint associated with this view definition.
+	Entrypoint string `json:"entrypoint,omitempty"`
+
+	// ExternalUrl specifies the external url associated with this view definition.
+	ExternalUrl string `json:"externalUrl,omitempty"`
+
+	// FallbackColumns contains the ordered fallback columns associated with this view definition.
 	FallbackColumns []map[string]interface{} `json:"fallbackColumns,omitempty"`
-	Id              string                   `json:"id"`
-	Input           ViewInputSpec            `json:"input"`
-	ItemTypes       []string                 `json:"itemTypes,omitempty"`
-	Milestone       string                   `json:"milestone"`
-	Mount           ViewDefinitionMount      `json:"mount"`
-	NameKey         string                   `json:"nameKey"`
-	OptionsSchema   map[string]interface{}   `json:"optionsSchema"`
-	Query           map[string]interface{}   `json:"query,omitempty"`
+
+	// Id uniquely identifies this resource.
+	Id string `json:"id"`
+
+	// Input contains the view input spec associated with this view definition.
+	Input ViewInputSpec `json:"input"`
+
+	// ItemTypes contains the ordered item types associated with this view definition.
+	ItemTypes []string `json:"itemTypes,omitempty"`
+
+	// Milestone specifies the milestone associated with this view definition.
+	Milestone string `json:"milestone"`
+
+	// Mount specifies the mount associated with this view definition.
+	Mount ViewDefinitionMount `json:"mount"`
+
+	// NameKey specifies the name key associated with this view definition.
+	NameKey string `json:"nameKey"`
+
+	// OptionsSchema specifies the options schema associated with this view definition.
+	OptionsSchema map[string]interface{} `json:"optionsSchema"`
+
+	// Query specifies the query associated with this view definition.
+	Query map[string]interface{} `json:"query,omitempty"`
 }
 
-// ViewDefinitionMount defines model for ViewDefinition.Mount.
+// ViewDefinitionMount specifies the mount associated with this view definition.
 type ViewDefinitionMount string
 
-// ViewInputSpec defines model for ViewInputSpec.
+// ViewInputSpec represents view input spec data exchanged through the Meridian API.
 type ViewInputSpec struct {
-	Kinds     ViewInputSpec_Kinds   `json:"kinds"`
-	MaxDocs   int                   `json:"maxDocs,omitempty"`
-	MinDocs   int                   `json:"minDocs,omitempty"`
-	Mode      ViewInputSpecMode     `json:"mode"`
-	SameAsset bool                  `json:"sameAsset,omitempty"`
-	SameKind  bool                  `json:"sameKind,omitempty"`
-	Scopes    []ViewInputSpecScopes `json:"scopes,omitempty"`
+	// Kinds specifies the kinds associated with this view input spec.
+	Kinds ViewInputSpec_Kinds `json:"kinds"`
+
+	// MaxDocs specifies the max docs associated with this view input spec.
+	MaxDocs int `json:"maxDocs,omitempty"`
+
+	// MinDocs specifies the min docs associated with this view input spec.
+	MinDocs int `json:"minDocs,omitempty"`
+
+	// Mode specifies the mode associated with this view input spec.
+	Mode ViewInputSpecMode `json:"mode"`
+
+	// SameAsset indicates whether same asset applies to this view input spec.
+	SameAsset bool `json:"sameAsset,omitempty"`
+
+	// SameKind indicates whether same kind applies to this view input spec.
+	SameKind bool `json:"sameKind,omitempty"`
+
+	// Scopes contains the ordered scopes associated with this view input spec.
+	Scopes []ViewInputSpecScopes `json:"scopes,omitempty"`
 }
 
 // ViewInputSpecKinds0 defines model for ViewInputSpec.Kinds.0.
@@ -5018,48 +6679,57 @@ type ViewInputSpecKinds0 string
 // ViewInputSpecKinds1 defines model for ViewInputSpec.Kinds.1.
 type ViewInputSpecKinds1 = []KindId
 
-// ViewInputSpec_Kinds defines model for ViewInputSpec.Kinds.
+// ViewInputSpec_Kinds specifies the kinds associated with this view input spec.
 type ViewInputSpec_Kinds struct {
 	union json.RawMessage
 }
 
-// ViewInputSpecMode defines model for ViewInputSpec.Mode.
+// ViewInputSpecMode specifies the mode associated with this view input spec.
 type ViewInputSpecMode string
 
 // ViewInputSpecScopes defines model for ViewInputSpec.Scopes.
 type ViewInputSpecScopes string
 
-// ViewList defines model for ViewList.
+// ViewList contains an ordered collection of view values.
 type ViewList struct {
+	// Items contains the ordered items associated with this view list.
 	Items []ViewDefinition `json:"items"`
 }
 
-// ViewOverride defines model for ViewOverride.
+// ViewOverride represents view override data exchanged through the Meridian API.
 type ViewOverride struct {
-	// Etag Opaque HTTP entity tag including quotes
-	Etag     ETag              `json:"etag"`
+	// Etag is the opaque entity tag required for optimistic concurrency control.
+	Etag ETag `json:"etag"`
+
+	// Override contains the view override value associated with this view override.
 	Override ViewOverrideValue `json:"override"`
 
-	// UpdatedAt RFC 3339 UTC
+	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
 	UpdatedAt Timestamp `json:"updatedAt"`
-	ViewId    string    `json:"viewId"`
+
+	// ViewId specifies the view id associated with this view override.
+	ViewId string `json:"viewId"`
 }
 
-// ViewOverrideList defines model for ViewOverrideList.
+// ViewOverrideList contains an ordered collection of view override values.
 type ViewOverrideList struct {
+	// Items contains the ordered items associated with this view override list.
 	Items []ViewOverride `json:"items"`
 }
 
-// ViewOverridePutRequest defines model for ViewOverridePutRequest.
+// ViewOverridePutRequest defines validated input for the corresponding Meridian API operation.
 type ViewOverridePutRequest = ViewOverrideValue
 
-// ViewOverrideValue defines model for ViewOverrideValue.
+// ViewOverrideValue represents view override value data exchanged through the Meridian API.
 type ViewOverrideValue struct {
+	// DefaultOptions specifies the default options associated with this view override value.
 	DefaultOptions map[string]interface{} `json:"defaultOptions,omitempty"`
-	Enabled        bool                   `json:"enabled,omitempty"`
+
+	// Enabled indicates whether enabled applies to this view override value.
+	Enabled bool `json:"enabled,omitempty"`
 }
 
-// ViewResolution defines model for ViewResolution.
+// ViewResolution represents view resolution data exchanged through the Meridian API.
 type ViewResolution struct {
 	union json.RawMessage
 }
@@ -5067,18 +6737,22 @@ type ViewResolution struct {
 // ViewResolveRequest Input arity and kind constraints are validated from the selected entry in views.yaml.
 type ViewResolveRequest struct {
 	// Inputs Required by single, versions and collection views; omitted for scope views.
-	Inputs  []DocumentSelector     `json:"inputs,omitempty"`
+	Inputs []DocumentSelector `json:"inputs,omitempty"`
+
+	// Options specifies the options associated with this view resolve request.
 	Options map[string]interface{} `json:"options,omitempty"`
 
 	// Scope Required by scope views; omitted for document-input views.
-	Scope  ScopeSelector `json:"scope,omitempty"`
-	ViewId string        `json:"viewId"`
+	Scope ScopeSelector `json:"scope,omitempty"`
+
+	// ViewId specifies the view id associated with this view resolve request.
+	ViewId string `json:"viewId"`
 }
 
 // AssetId UUID v7
 type AssetId = Uuid
 
-// AuditFilters defines model for AuditFilters.
+// AuditFilters defines supported filters for selecting audit records.
 type AuditFilters = AuditFilter
 
 // CandidateId UUID v7
@@ -5108,13 +6782,13 @@ type IdempotencyKey = openapi_types.UUID
 // IfMatch Opaque HTTP entity tag including quotes
 type IfMatch = ETag
 
-// JobFilters defines model for JobFilters.
+// JobFilters defines supported filters for selecting job records.
 type JobFilters = JobFilter
 
 // JobId UUID v7
 type JobId = Uuid
 
-// KindFilter defines model for KindFilter.
+// KindFilter identifies an asset kind registered in contracts/kinds.yaml.
 type KindFilter = KindId
 
 // LastEventId defines model for LastEventId.
@@ -5138,10 +6812,10 @@ type Page = int
 // PageSize defines model for PageSize.
 type PageSize = int
 
-// PlatformAuditFilters defines model for PlatformAuditFilters.
+// PlatformAuditFilters defines supported filters for selecting platform audit records.
 type PlatformAuditFilters = PlatformAuditFilter
 
-// PlatformJobFilters defines model for PlatformJobFilters.
+// PlatformJobFilters defines supported filters for selecting platform job records.
 type PlatformJobFilters = PlatformJobFilter
 
 // PreviewId UUID v7
@@ -5159,7 +6833,7 @@ type RepositoryId = Uuid
 // RequiredQuery defines model for RequiredQuery.
 type RequiredQuery = string
 
-// ReviewFilters defines model for ReviewFilters.
+// ReviewFilters defines supported filters for selecting review records.
 type ReviewFilters = ReviewFilter
 
 // RevisionId UUID v7
@@ -5168,10 +6842,10 @@ type RevisionId = Uuid
 // RuleSetId UUID v7
 type RuleSetId = Uuid
 
-// SearchFacets defines model for SearchFacets.
+// SearchFacets defines supported filters for selecting search records.
 type SearchFacets = SearchFilter
 
-// ServiceSlug defines model for ServiceSlug.
+// ServiceSlug is a stable lowercase URL identifier containing letters, digits, and hyphens.
 type ServiceSlug = Slug
 
 // ShareLinkId UUID v7
@@ -5195,13 +6869,13 @@ type TagId = Uuid
 // TeamId UUID v7
 type TeamId = Uuid
 
-// TenantSlug defines model for TenantSlug.
+// TenantSlug is a stable lowercase URL identifier containing letters, digits, and hyphens.
 type TenantSlug = Slug
 
 // TodoId UUID v7
 type TodoId = Uuid
 
-// TodoStatusFilter defines model for TodoStatusFilter.
+// TodoStatusFilter identifies one supported todo status value.
 type TodoStatusFilter = TodoStatus
 
 // TokenId UUID v7
@@ -5228,277 +6902,277 @@ type WebhookEvent string
 // WebhookSignature defines model for WebhookSignature.
 type WebhookSignature = string
 
-// BaseLayerExists defines model for BaseLayerExists.
+// BaseLayerExists is the stable machine-readable failure envelope returned by every JSON API error.
 type BaseLayerExists = ErrorResponse
 
-// Candidate defines model for Candidate.
+// Candidate represents discovery candidate data exchanged through the Meridian API.
 type Candidate = DiscoveryCandidate
 
-// ConfigImportConflict defines model for ConfigImportConflict.
+// ConfigImportConflict is the stable machine-readable failure envelope returned by every JSON API error.
 type ConfigImportConflict = ErrorResponse
 
-// Conflict defines model for Conflict.
+// Conflict is the stable machine-readable failure envelope returned by every JSON API error.
 type Conflict = ErrorResponse
 
-// ContentTooLarge defines model for ContentTooLarge.
+// ContentTooLarge is the stable machine-readable failure envelope returned by every JSON API error.
 type ContentTooLarge = ErrorResponse
 
-// CredentialInUse defines model for CredentialInUse.
+// CredentialInUse is the stable machine-readable failure envelope returned by every JSON API error.
 type CredentialInUse = ErrorResponse
 
-// CredentialRotation defines model for CredentialRotation.
+// CredentialRotation reports the result of the corresponding Meridian operation.
 type CredentialRotation = CredentialRotationResult
 
-// Duplicate defines model for Duplicate.
+// Duplicate is the stable machine-readable failure envelope returned by every JSON API error.
 type Duplicate = ErrorResponse
 
-// GlobalCredentialRotation defines model for GlobalCredentialRotation.
+// GlobalCredentialRotation reports the result of the corresponding Meridian operation.
 type GlobalCredentialRotation = GlobalCredentialRotationResult
 
-// InputSpecMismatch defines model for InputSpecMismatch.
+// InputSpecMismatch is the stable machine-readable failure envelope returned by every JSON API error.
 type InputSpecMismatch = ErrorResponse
 
-// InternalError defines model for InternalError.
+// InternalError is the stable machine-readable failure envelope returned by every JSON API error.
 type InternalError = ErrorResponse
 
-// InvalidState defines model for InvalidState.
+// InvalidState is the stable machine-readable failure envelope returned by every JSON API error.
 type InvalidState = ErrorResponse
 
-// JobNotCancellable defines model for JobNotCancellable.
+// JobNotCancellable is the stable machine-readable failure envelope returned by every JSON API error.
 type JobNotCancellable = ErrorResponse
 
-// LastAdmin defines model for LastAdmin.
+// LastAdmin is the stable machine-readable failure envelope returned by every JSON API error.
 type LastAdmin = ErrorResponse
 
-// NestingTooDeep defines model for NestingTooDeep.
+// NestingTooDeep is the stable machine-readable failure envelope returned by every JSON API error.
 type NestingTooDeep = ErrorResponse
 
-// NotFound defines model for NotFound.
+// NotFound is the stable machine-readable failure envelope returned by every JSON API error.
 type NotFound = ErrorResponse
 
-// OverlayInvalid defines model for OverlayInvalid.
+// OverlayInvalid is the stable machine-readable failure envelope returned by every JSON API error.
 type OverlayInvalid = ErrorResponse
 
-// PreconditionFailed defines model for PreconditionFailed.
+// PreconditionFailed is the stable machine-readable failure envelope returned by every JSON API error.
 type PreconditionFailed = ErrorResponse
 
-// ProducerProfileUnavailable defines model for ProducerProfileUnavailable.
+// ProducerProfileUnavailable is the stable machine-readable failure envelope returned by every JSON API error.
 type ProducerProfileUnavailable = ErrorResponse
 
-// QuotaExceeded defines model for QuotaExceeded.
+// QuotaExceeded is the stable machine-readable failure envelope returned by every JSON API error.
 type QuotaExceeded = ErrorResponse
 
-// RateLimited defines model for RateLimited.
+// RateLimited is the stable machine-readable failure envelope returned by every JSON API error.
 type RateLimited = ErrorResponse
 
-// Unauthenticated defines model for Unauthenticated.
+// Unauthenticated is the stable machine-readable failure envelope returned by every JSON API error.
 type Unauthenticated = ErrorResponse
 
-// ValidationError defines model for ValidationError.
+// ValidationError is the stable machine-readable failure envelope returned by every JSON API error.
 type ValidationError = ErrorResponse
 
-// VersionNotPublishable defines model for VersionNotPublishable.
+// VersionNotPublishable is the stable machine-readable failure envelope returned by every JSON API error.
 type VersionNotPublishable = ErrorResponse
 
-// AssetAiGenerate defines model for AssetAiGenerate.
+// AssetAiGenerate defines validated input for the corresponding Meridian API operation.
 type AssetAiGenerate = AssetAiGenerateRequest
 
-// AssetKindPatch defines model for AssetKindPatch.
+// AssetKindPatch defines validated input for the corresponding Meridian API operation.
 type AssetKindPatch = AssetKindPatchRequest
 
-// AssetPush defines model for AssetPush.
+// AssetPush defines validated input for the corresponding Meridian API operation.
 type AssetPush = AssetPushRequest
 
-// BreakingTodoAcknowledge defines model for BreakingTodoAcknowledge.
+// BreakingTodoAcknowledge defines validated input for the corresponding Meridian API operation.
 type BreakingTodoAcknowledge = BreakingTodoAcknowledgeRequest
 
-// CandidatesAccept defines model for CandidatesAccept.
+// CandidatesAccept defines validated input for the corresponding Meridian API operation.
 type CandidatesAccept = CandidatesAcceptRequest
 
-// CommentCreate defines model for CommentCreate.
+// CommentCreate defines validated input for the corresponding Meridian API operation.
 type CommentCreate = CommentCreateRequest
 
-// ConfigImportApply defines model for ConfigImportApply.
+// ConfigImportApply defines validated input for the corresponding Meridian API operation.
 type ConfigImportApply = ConfigImportApplyRequest
 
-// ConfigImportPreviewRequestBody defines model for ConfigImportPreview.
+// ConfigImportPreviewRequestBody defines validated input for the corresponding Meridian API operation.
 type ConfigImportPreviewRequestBody = ConfigImportPreviewRequest
 
-// ConnectionTestRequestBody defines model for ConnectionTest.
+// ConnectionTestRequestBody defines validated input for the corresponding Meridian API operation.
 type ConnectionTestRequestBody = ConnectionTestRequest
 
-// CredentialCreate defines model for CredentialCreate.
+// CredentialCreate supplies exactly one SSH or HTTP secret and its authorized sharing scope.
 type CredentialCreate = CredentialCreateRequest
 
-// CredentialPatch defines model for CredentialPatch.
+// CredentialPatch defines validated input for the corresponding Meridian API operation.
 type CredentialPatch = CredentialPatchRequest
 
-// CredentialRotate defines model for CredentialRotate.
+// CredentialRotate defines validated input for the corresponding Meridian API operation.
 type CredentialRotate = CredentialRotateRequest
 
-// DiffCreate defines model for DiffCreate.
+// DiffCreate defines validated input for the corresponding Meridian API operation.
 type DiffCreate = DiffCreateRequest
 
-// DiffRuleSetCreate defines model for DiffRuleSetCreate.
+// DiffRuleSetCreate defines validated input for the corresponding Meridian API operation.
 type DiffRuleSetCreate = DiffRuleSetCreateRequest
 
-// DiffRuleSetPatch defines model for DiffRuleSetPatch.
+// DiffRuleSetPatch defines validated input for the corresponding Meridian API operation.
 type DiffRuleSetPatch = DiffRuleSetPatchRequest
 
-// DiffSnapshotShare defines model for DiffSnapshotShare.
+// DiffSnapshotShare defines validated input for the corresponding Meridian API operation.
 type DiffSnapshotShare = DiffSnapshotShareRequest
 
-// DriftResolution defines model for DriftResolution.
+// DriftResolution defines validated input for the corresponding Meridian API operation.
 type DriftResolution = DriftResolutionRequest
 
-// GlobalCredentialCreate defines model for GlobalCredentialCreate.
+// GlobalCredentialCreate defines validated input for the corresponding Meridian API operation.
 type GlobalCredentialCreate = GlobalCredentialCreateRequest
 
-// GlobalCredentialPatch defines model for GlobalCredentialPatch.
+// GlobalCredentialPatch defines validated input for the corresponding Meridian API operation.
 type GlobalCredentialPatch = GlobalCredentialPatchRequest
 
-// KnownHostCreate defines model for KnownHostCreate.
+// KnownHostCreate defines validated input for the corresponding Meridian API operation.
 type KnownHostCreate = KnownHostCreateRequest
 
-// LayerOrderReplace defines model for LayerOrderReplace.
+// LayerOrderReplace defines validated input for the corresponding Meridian API operation.
 type LayerOrderReplace = LayerOrderReplaceRequest
 
-// LayerPatch defines model for LayerPatch.
+// LayerPatch defines validated input for the corresponding Meridian API operation.
 type LayerPatch = LayerPatchRequest
 
-// LayerRevisionCreate defines model for LayerRevisionCreate.
+// LayerRevisionCreate defines validated input for the corresponding Meridian API operation.
 type LayerRevisionCreate = LayerRevisionCreateRequest
 
-// LayerRollback defines model for LayerRollback.
+// LayerRollback defines validated input for the corresponding Meridian API operation.
 type LayerRollback = LayerRollbackRequest
 
-// MemberPut defines model for MemberPut.
+// MemberPut defines validated input for the corresponding Meridian API operation.
 type MemberPut = MemberPutRequest
 
-// MergePreviewRequestBody defines model for MergePreview.
+// MergePreviewRequestBody defines validated input for the corresponding Meridian API operation.
 type MergePreviewRequestBody = MergePreviewRequest
 
-// NotificationChannelCreate defines model for NotificationChannelCreate.
+// NotificationChannelCreate defines validated input for the corresponding Meridian API operation.
 type NotificationChannelCreate = NotificationChannelCreateRequest
 
-// NotificationChannelPatch defines model for NotificationChannelPatch.
+// NotificationChannelPatch defines validated input for the corresponding Meridian API operation.
 type NotificationChannelPatch = NotificationChannelPatchRequest
 
-// NotificationChannelRotate defines model for NotificationChannelRotate.
+// NotificationChannelRotate defines validated input for the corresponding Meridian API operation.
 type NotificationChannelRotate = NotificationChannelRotateRequest
 
-// PlatformSettingsPatch defines model for PlatformSettingsPatch.
+// PlatformSettingsPatch defines validated input for the corresponding Meridian API operation.
 type PlatformSettingsPatch = PlatformSettingsPatchRequest
 
-// ProduceSource defines model for ProduceSource.
+// ProduceSource defines validated input for the corresponding Meridian API operation.
 type ProduceSource = ProduceSourceRequest
 
-// ProducerProfileCreate defines model for ProducerProfileCreate.
+// ProducerProfileCreate defines validated input for the corresponding Meridian API operation.
 type ProducerProfileCreate = ProducerProfileCreateRequest
 
-// ProducerProfilePatch defines model for ProducerProfilePatch.
+// ProducerProfilePatch defines validated input for the corresponding Meridian API operation.
 type ProducerProfilePatch = ProducerProfilePatchRequest
 
-// PublicViewResolve defines model for PublicViewResolve.
+// PublicViewResolve defines validated input for the corresponding Meridian API operation.
 type PublicViewResolve = PublicViewResolveRequest
 
-// RepositoryConnectionCheck defines model for RepositoryConnectionCheck.
+// RepositoryConnectionCheck defines validated input for the corresponding Meridian API operation.
 type RepositoryConnectionCheck = RepositoryConnectionCheckRequest
 
-// RepositoryCreate defines model for RepositoryCreate.
+// RepositoryCreate defines validated input for the corresponding Meridian API operation.
 type RepositoryCreate = RepositoryCreateRequest
 
-// RepositoryDiscover defines model for RepositoryDiscover.
+// RepositoryDiscover defines validated input for the corresponding Meridian API operation.
 type RepositoryDiscover = RepositoryDiscoverRequest
 
-// RepositoryPatch defines model for RepositoryPatch.
+// RepositoryPatch defines validated input for the corresponding Meridian API operation.
 type RepositoryPatch = RepositoryPatchRequest
 
-// RepositorySync defines model for RepositorySync.
+// RepositorySync defines validated input for the corresponding Meridian API operation.
 type RepositorySync = RepositorySyncRequest
 
-// RevisionApprove defines model for RevisionApprove.
+// RevisionApprove defines validated input for the corresponding Meridian API operation.
 type RevisionApprove = RevisionApproveRequest
 
-// RevisionReject defines model for RevisionReject.
+// RevisionReject defines validated input for the corresponding Meridian API operation.
 type RevisionReject = RevisionRejectRequest
 
-// ServiceAccessPut defines model for ServiceAccessPut.
+// ServiceAccessPut defines validated input for the corresponding Meridian API operation.
 type ServiceAccessPut = ServiceAccessPutRequest
 
-// ServiceAiGenerate defines model for ServiceAiGenerate.
+// ServiceAiGenerate defines validated input for the corresponding Meridian API operation.
 type ServiceAiGenerate = ServiceAiGenerateRequest
 
-// ServiceCreate defines model for ServiceCreate.
+// ServiceCreate defines validated input for the corresponding Meridian API operation.
 type ServiceCreate = ServiceCreateRequest
 
-// ServicePatch defines model for ServicePatch.
+// ServicePatch defines validated input for the corresponding Meridian API operation.
 type ServicePatch = ServicePatchRequest
 
 // ShareLinkCreate Creates a view share. The server resolves all ref selectors to immutable version IDs, freezes scope membership and options, and allowlists only the resulting artifacts. Diff snapshots use the dedicated diff-snapshot share operation.
 type ShareLinkCreate = ShareLinkCreateRequest
 
-// SourceSpecCreate defines model for SourceSpecCreate.
+// SourceSpecCreate defines validated input for the corresponding Meridian API operation.
 type SourceSpecCreate = SourceSpecCreateRequest
 
 // SourceSpecPatch The server merges this partial document with the stored SourceSpec and validates the complete resulting aggregate against sourceCompatibility.
 type SourceSpecPatch = SourceSpecPatchRequest
 
-// SubscriptionPut defines model for SubscriptionPut.
+// SubscriptionPut defines validated input for the corresponding Meridian API operation.
 type SubscriptionPut = SubscriptionPutRequest
 
-// SystemGroupCreate defines model for SystemGroupCreate.
+// SystemGroupCreate defines validated input for the corresponding Meridian API operation.
 type SystemGroupCreate = SystemGroupCreateRequest
 
-// SystemGroupMembersReplace defines model for SystemGroupMembersReplace.
+// SystemGroupMembersReplace defines validated input for the corresponding Meridian API operation.
 type SystemGroupMembersReplace = SystemGroupMembersReplaceRequest
 
-// SystemGroupPatch defines model for SystemGroupPatch.
+// SystemGroupPatch defines validated input for the corresponding Meridian API operation.
 type SystemGroupPatch = SystemGroupPatchRequest
 
-// TagCreate defines model for TagCreate.
+// TagCreate defines validated input for the corresponding Meridian API operation.
 type TagCreate = TagCreateRequest
 
-// TagPatch defines model for TagPatch.
+// TagPatch defines validated input for the corresponding Meridian API operation.
 type TagPatch = TagPatchRequest
 
-// TeamCreate defines model for TeamCreate.
+// TeamCreate defines validated input for the corresponding Meridian API operation.
 type TeamCreate = TeamCreateRequest
 
-// TeamMembersReplace defines model for TeamMembersReplace.
+// TeamMembersReplace defines validated input for the corresponding Meridian API operation.
 type TeamMembersReplace = TeamMembersReplaceRequest
 
-// TeamPatch defines model for TeamPatch.
+// TeamPatch defines validated input for the corresponding Meridian API operation.
 type TeamPatch = TeamPatchRequest
 
-// TenantCreate defines model for TenantCreate.
+// TenantCreate defines validated input for the corresponding Meridian API operation.
 type TenantCreate = TenantCreateRequest
 
-// TenantDelete defines model for TenantDelete.
+// TenantDelete defines validated input for the corresponding Meridian API operation.
 type TenantDelete = TenantDeleteRequest
 
-// TenantPatch defines model for TenantPatch.
+// TenantPatch defines validated input for the corresponding Meridian API operation.
 type TenantPatch = TenantPatchRequest
 
-// TenantSettingsPatch defines model for TenantSettingsPatch.
+// TenantSettingsPatch defines validated input for the corresponding Meridian API operation.
 type TenantSettingsPatch = TenantSettingsPatchRequest
 
-// TokenCreate defines model for TokenCreate.
+// TokenCreate defines the name, least-privilege scopes, and optional expiry of a new PAT.
 type TokenCreate = TokenCreateRequest
 
-// UserCreateBody defines model for UserCreate.
+// UserCreateBody defines validated input for the corresponding Meridian API operation.
 type UserCreateBody = UserCreateRequest
 
-// UserPatch defines model for UserPatch.
+// UserPatch defines validated input for the corresponding Meridian API operation.
 type UserPatch = UserPatchRequest
 
-// UserPreferencesPatch defines model for UserPreferencesPatch.
+// UserPreferencesPatch defines validated input for the corresponding Meridian API operation.
 type UserPreferencesPatch = UserPreferencesPatchRequest
 
-// VersionPublish defines model for VersionPublish.
+// VersionPublish defines validated input for the corresponding Meridian API operation.
 type VersionPublish = VersionPublishRequest
 
-// ViewOverridePut defines model for ViewOverridePut.
+// ViewOverridePut defines validated input for the corresponding Meridian API operation.
 type ViewOverridePut = ViewOverridePutRequest
 
 // ViewResolve Input arity and kind constraints are validated from the selected entry in views.yaml.
@@ -5506,30 +7180,43 @@ type ViewResolve = ViewResolveRequest
 
 // ListPlatformAuditLogsParams defines parameters for ListPlatformAuditLogs.
 type ListPlatformAuditLogsParams struct {
-	Page     Page                 `form:"page,omitempty" json:"page,omitempty"`
-	PageSize PageSize             `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Filter   PlatformAuditFilters `json:"filter,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Filter identifies or filters the filter value in the query.
+	Filter PlatformAuditFilters `json:"filter,omitempty"`
 }
 
 // ListGlobalCredentialsParams defines parameters for ListGlobalCredentials.
 type ListGlobalCredentialsParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // DeleteGlobalCredentialParams defines parameters for DeleteGlobalCredential.
 type DeleteGlobalCredentialParams struct {
-	Force   Force   `form:"force,omitempty" json:"force,omitempty"`
+	// Force identifies or filters the force value in the query.
+	Force Force `form:"force,omitempty" json:"force,omitempty"`
+
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateGlobalCredentialParams defines parameters for UpdateGlobalCredential.
 type UpdateGlobalCredentialParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // RotateGlobalCredentialParams defines parameters for RotateGlobalCredential.
 type RotateGlobalCredentialParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 
 	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
@@ -5538,80 +7225,112 @@ type RotateGlobalCredentialParams struct {
 
 // ListPlatformJobsParams defines parameters for ListPlatformJobs.
 type ListPlatformJobsParams struct {
-	Page     Page               `form:"page,omitempty" json:"page,omitempty"`
-	PageSize PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Filter   PlatformJobFilters `json:"filter,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Filter identifies or filters the filter value in the query.
+	Filter PlatformJobFilters `json:"filter,omitempty"`
 }
 
 // ListProducerProfilesParams defines parameters for ListProducerProfiles.
 type ListProducerProfilesParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // DeleteProducerProfileParams defines parameters for DeleteProducerProfile.
 type DeleteProducerProfileParams struct {
-	Force   Force   `form:"force,omitempty" json:"force,omitempty"`
+	// Force identifies or filters the force value in the query.
+	Force Force `form:"force,omitempty" json:"force,omitempty"`
+
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateProducerProfileParams defines parameters for UpdateProducerProfile.
 type UpdateProducerProfileParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdatePlatformSettingsParams defines parameters for UpdatePlatformSettings.
 type UpdatePlatformSettingsParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListTenantsParams defines parameters for ListTenants.
 type ListTenantsParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // DeleteTenantParams defines parameters for DeleteTenant.
 type DeleteTenantParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateTenantParams defines parameters for UpdateTenant.
 type UpdateTenantParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListUsersParams defines parameters for ListUsers.
 type ListUsersParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Q        Query    `form:"q,omitempty" json:"q,omitempty"`
+
+	// Q identifies or filters the q value in the query.
+	Q Query `form:"q,omitempty" json:"q,omitempty"`
 }
 
 // UpdateUserParams defines parameters for UpdateUser.
 type UpdateUserParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateMyPreferencesParams defines parameters for UpdateMyPreferences.
 type UpdateMyPreferencesParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateAssetKindStateParams defines parameters for UpdateAssetKindState.
 type UpdateAssetKindStateParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListAssetVersionItemsParams defines parameters for ListAssetVersionItems.
 type ListAssetVersionItemsParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Q        Query    `form:"q,omitempty" json:"q,omitempty"`
+
+	// Q identifies or filters the q value in the query.
+	Q Query `form:"q,omitempty" json:"q,omitempty"`
 }
 
 // DeprecateAssetVersionParams defines parameters for DeprecateAssetVersion.
 type DeprecateAssetVersionParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 
 	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
@@ -5620,6 +7339,7 @@ type DeprecateAssetVersionParams struct {
 
 // PublishAssetVersionParams defines parameters for PublishAssetVersion.
 type PublishAssetVersionParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 
 	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
@@ -5628,6 +7348,7 @@ type PublishAssetVersionParams struct {
 
 // RetireAssetVersionParams defines parameters for RetireAssetVersion.
 type RetireAssetVersionParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 
 	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
@@ -5636,20 +7357,31 @@ type RetireAssetVersionParams struct {
 
 // GetAssetParams defines parameters for GetAsset.
 type GetAssetParams struct {
+	// RefType identifies or filters the ref type value in the query.
 	RefType RefType `form:"refType,omitempty" json:"refType,omitempty"`
-	Ref     RefName `form:"ref,omitempty" json:"ref,omitempty"`
+
+	// Ref identifies or filters the ref value in the query.
+	Ref RefName `form:"ref,omitempty" json:"ref,omitempty"`
 }
 
 // ReorderAssetLayersParams defines parameters for ReorderAssetLayers.
 type ReorderAssetLayersParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListAssetVersionsParams defines parameters for ListAssetVersions.
 type ListAssetVersionsParams struct {
-	RefType  RefType  `form:"refType,omitempty" json:"refType,omitempty"`
-	Ref      RefName  `form:"ref,omitempty" json:"ref,omitempty"`
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// RefType identifies or filters the ref type value in the query.
+	RefType RefType `form:"refType,omitempty" json:"refType,omitempty"`
+
+	// Ref identifies or filters the ref value in the query.
+	Ref RefName `form:"ref,omitempty" json:"ref,omitempty"`
+
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
@@ -5667,37 +7399,55 @@ type PushAssetRevisionParams struct {
 
 // ListAuditLogsParams defines parameters for ListAuditLogs.
 type ListAuditLogsParams struct {
-	Page     Page         `form:"page,omitempty" json:"page,omitempty"`
-	PageSize PageSize     `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Filter   AuditFilters `json:"filter,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Filter identifies or filters the filter value in the query.
+	Filter AuditFilters `json:"filter,omitempty"`
 }
 
 // ListBreakingTodosParams defines parameters for ListBreakingTodos.
 type ListBreakingTodosParams struct {
-	Page     Page             `form:"page,omitempty" json:"page,omitempty"`
-	PageSize PageSize         `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Status   TodoStatusFilter `form:"status,omitempty" json:"status,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Status identifies or filters the status value in the query.
+	Status TodoStatusFilter `form:"status,omitempty" json:"status,omitempty"`
 }
 
 // ListCredentialsParams defines parameters for ListCredentials.
 type ListCredentialsParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // DeleteCredentialParams defines parameters for DeleteCredential.
 type DeleteCredentialParams struct {
-	Force   Force   `form:"force,omitempty" json:"force,omitempty"`
+	// Force identifies or filters the force value in the query.
+	Force Force `form:"force,omitempty" json:"force,omitempty"`
+
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateCredentialParams defines parameters for UpdateCredential.
 type UpdateCredentialParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // RotateCredentialParams defines parameters for RotateCredential.
 type RotateCredentialParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 
 	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
@@ -5706,22 +7456,28 @@ type RotateCredentialParams struct {
 
 // DeleteDiffRuleSetParams defines parameters for DeleteDiffRuleSet.
 type DeleteDiffRuleSetParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateDiffRuleSetParams defines parameters for UpdateDiffRuleSet.
 type UpdateDiffRuleSetParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListDiffSnapshotsParams defines parameters for ListDiffSnapshots.
 type ListDiffSnapshotsParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // ExportDiffSnapshotParams defines parameters for ExportDiffSnapshot.
 type ExportDiffSnapshotParams struct {
+	// Format identifies or filters the format value in the query.
 	Format ExportDiffSnapshotParamsFormat `form:"format" json:"format"`
 }
 
@@ -5730,8 +7486,13 @@ type ExportDiffSnapshotParamsFormat string
 
 // SearchTenantUsersParams defines parameters for SearchTenantUsers.
 type SearchTenantUsersParams struct {
-	Q        Query    `form:"q,omitempty" json:"q,omitempty"`
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Q identifies or filters the q value in the query.
+	Q Query `form:"q,omitempty" json:"q,omitempty"`
+
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
@@ -5743,13 +7504,19 @@ type CreateTenantExportParams struct {
 
 // ListJobsParams defines parameters for ListJobs.
 type ListJobsParams struct {
-	Page     Page       `form:"page,omitempty" json:"page,omitempty"`
-	PageSize PageSize   `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Filter   JobFilters `json:"filter,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Filter identifies or filters the filter value in the query.
+	Filter JobFilters `json:"filter,omitempty"`
 }
 
 // StreamJobLogsParams defines parameters for StreamJobLogs.
 type StreamJobLogsParams struct {
+	// LastEventID resumes an event stream after the last received sequence.
 	LastEventID LastEventId `json:"Last-Event-ID,omitempty"`
 }
 
@@ -5761,7 +7528,10 @@ type RetryJobParams struct {
 
 // ListKnownHostsParams defines parameters for ListKnownHosts.
 type ListKnownHostsParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
@@ -5779,20 +7549,31 @@ type RejectLayerRevisionParams struct {
 
 // GetLayerParams defines parameters for GetLayer.
 type GetLayerParams struct {
+	// RefType identifies or filters the ref type value in the query.
 	RefType RefType `form:"refType,omitempty" json:"refType,omitempty"`
-	Ref     RefName `form:"ref,omitempty" json:"ref,omitempty"`
+
+	// Ref identifies or filters the ref value in the query.
+	Ref RefName `form:"ref,omitempty" json:"ref,omitempty"`
 }
 
 // UpdateLayerParams defines parameters for UpdateLayer.
 type UpdateLayerParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListLayerRevisionsParams defines parameters for ListLayerRevisions.
 type ListLayerRevisionsParams struct {
-	RefType  RefType  `form:"refType,omitempty" json:"refType,omitempty"`
-	Ref      RefName  `form:"ref,omitempty" json:"ref,omitempty"`
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// RefType identifies or filters the ref type value in the query.
+	RefType RefType `form:"refType,omitempty" json:"refType,omitempty"`
+
+	// Ref identifies or filters the ref value in the query.
+	Ref RefName `form:"ref,omitempty" json:"ref,omitempty"`
+
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
@@ -5810,22 +7591,28 @@ type RollbackLayerParams struct {
 
 // ListTenantMembersParams defines parameters for ListTenantMembers.
 type ListTenantMembersParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // DeleteNotificationChannelParams defines parameters for DeleteNotificationChannel.
 type DeleteNotificationChannelParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateNotificationChannelParams defines parameters for UpdateNotificationChannel.
 type UpdateNotificationChannelParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // RotateNotificationChannelSecretParams defines parameters for RotateNotificationChannelSecret.
 type RotateNotificationChannelSecretParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 
 	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
@@ -5834,31 +7621,46 @@ type RotateNotificationChannelSecretParams struct {
 
 // ListNotificationsParams defines parameters for ListNotifications.
 type ListNotificationsParams struct {
-	Page     Page         `form:"page,omitempty" json:"page,omitempty"`
-	PageSize PageSize     `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Unread   UnreadFilter `form:"unread,omitempty" json:"unread,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Unread identifies or filters the unread value in the query.
+	Unread UnreadFilter `form:"unread,omitempty" json:"unread,omitempty"`
 }
 
 // ListRepositoriesParams defines parameters for ListRepositories.
 type ListRepositoriesParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Q        Query    `form:"q,omitempty" json:"q,omitempty"`
+
+	// Q identifies or filters the q value in the query.
+	Q Query `form:"q,omitempty" json:"q,omitempty"`
 }
 
 // DeleteRepositoryParams defines parameters for DeleteRepository.
 type DeleteRepositoryParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateRepositoryParams defines parameters for UpdateRepository.
 type UpdateRepositoryParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListDiscoveryCandidatesParams defines parameters for ListDiscoveryCandidates.
 type ListDiscoveryCandidatesParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
@@ -5894,42 +7696,79 @@ type SyncRepositoryParams struct {
 
 // ListReviewsParams defines parameters for ListReviews.
 type ListReviewsParams struct {
-	Page     Page          `form:"page,omitempty" json:"page,omitempty"`
-	PageSize PageSize      `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Filter   ReviewFilters `json:"filter,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Filter identifies or filters the filter value in the query.
+	Filter ReviewFilters `json:"filter,omitempty"`
 }
 
 // SearchParams defines parameters for Search.
 type SearchParams struct {
-	Q        RequiredQuery `form:"q" json:"q"`
-	Page     Page          `form:"page,omitempty" json:"page,omitempty"`
-	PageSize PageSize      `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Filter   SearchFacets  `json:"filter,omitempty"`
+	// Q identifies or filters the q value in the query.
+	Q RequiredQuery `form:"q" json:"q"`
+
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Filter identifies or filters the filter value in the query.
+	Filter SearchFacets `json:"filter,omitempty"`
 }
 
 // ListServicesParams defines parameters for ListServices.
 type ListServicesParams struct {
-	Page      Page               `form:"page,omitempty" json:"page,omitempty"`
-	PageSize  PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-	Q         Query              `form:"q,omitempty" json:"q,omitempty"`
-	Sort      Sort               `form:"sort,omitempty" json:"sort,omitempty"`
-	GroupId   openapi_types.UUID `form:"groupId,omitempty" json:"groupId,omitempty"`
-	Tag       string             `form:"tag,omitempty" json:"tag,omitempty"`
-	Team      string             `form:"team,omitempty" json:"team,omitempty"`
-	Lifecycle Lifecycle          `form:"lifecycle,omitempty" json:"lifecycle,omitempty"`
-	Language  string             `form:"language,omitempty" json:"language,omitempty"`
-	Kind      string             `form:"kind,omitempty" json:"kind,omitempty"`
-	Starred   bool               `form:"starred,omitempty" json:"starred,omitempty"`
-	Mine      bool               `form:"mine,omitempty" json:"mine,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
+	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Q identifies or filters the q value in the query.
+	Q Query `form:"q,omitempty" json:"q,omitempty"`
+
+	// Sort identifies or filters the sort value in the query.
+	Sort Sort `form:"sort,omitempty" json:"sort,omitempty"`
+
+	// GroupId identifies or filters the group id value in the query.
+	GroupId openapi_types.UUID `form:"groupId,omitempty" json:"groupId,omitempty"`
+
+	// Tag identifies or filters the tag value in the query.
+	Tag string `form:"tag,omitempty" json:"tag,omitempty"`
+
+	// Team identifies or filters the team value in the query.
+	Team string `form:"team,omitempty" json:"team,omitempty"`
+
+	// Lifecycle identifies or filters the lifecycle value in the query.
+	Lifecycle Lifecycle `form:"lifecycle,omitempty" json:"lifecycle,omitempty"`
+
+	// Language identifies or filters the language value in the query.
+	Language string `form:"language,omitempty" json:"language,omitempty"`
+
+	// Kind identifies or filters the kind value in the query.
+	Kind string `form:"kind,omitempty" json:"kind,omitempty"`
+
+	// Starred identifies or filters the starred value in the query.
+	Starred bool `form:"starred,omitempty" json:"starred,omitempty"`
+
+	// Mine identifies or filters the mine value in the query.
+	Mine bool `form:"mine,omitempty" json:"mine,omitempty"`
 }
 
 // DeleteServiceParams defines parameters for DeleteService.
 type DeleteServiceParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateServiceParams defines parameters for UpdateService.
 type UpdateServiceParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
@@ -5941,7 +7780,10 @@ type GenerateMissingAssetWithAiParams struct {
 
 // ListServiceCommentsParams defines parameters for ListServiceComments.
 type ListServiceCommentsParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
@@ -5953,28 +7795,37 @@ type ResolveServiceDriftParams struct {
 
 // ListRecentServicesParams defines parameters for ListRecentServices.
 type ListRecentServicesParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // UpdateTenantSettingsParams defines parameters for UpdateTenantSettings.
 type UpdateTenantSettingsParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListShareLinksParams defines parameters for ListShareLinks.
 type ListShareLinksParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // DeleteSourceSpecParams defines parameters for DeleteSourceSpec.
 type DeleteSourceSpecParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateSourceSpecParams defines parameters for UpdateSourceSpec.
 type UpdateSourceSpecParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
@@ -5986,76 +7837,98 @@ type ProduceSourceParams struct {
 
 // DeleteSystemGroupParams defines parameters for DeleteSystemGroup.
 type DeleteSystemGroupParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateSystemGroupParams defines parameters for UpdateSystemGroup.
 type UpdateSystemGroupParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // PutSystemGroupMembersParams defines parameters for PutSystemGroupMembers.
 type PutSystemGroupMembersParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // DeleteTagParams defines parameters for DeleteTag.
 type DeleteTagParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateTagParams defines parameters for UpdateTag.
 type UpdateTagParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListTeamsParams defines parameters for ListTeams.
 type ListTeamsParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // DeleteTeamParams defines parameters for DeleteTeam.
 type DeleteTeamParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // UpdateTeamParams defines parameters for UpdateTeam.
 type UpdateTeamParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ReplaceTeamMembersParams defines parameters for ReplaceTeamMembers.
 type ReplaceTeamMembersParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListTokensParams defines parameters for ListTokens.
 type ListTokensParams struct {
-	Page     Page     `form:"page,omitempty" json:"page,omitempty"`
+	// Page selects a one-based result page.
+	Page Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize limits the number of records returned on one page.
 	PageSize PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 }
 
 // DeleteViewOverrideParams defines parameters for DeleteViewOverride.
 type DeleteViewOverrideParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // PutViewOverrideParams defines parameters for PutViewOverride.
 type PutViewOverrideParams struct {
+	// IfMatch carries the current ETag required for a conditional mutation.
 	IfMatch IfMatch `json:"If-Match"`
 }
 
 // ListViewsParams defines parameters for ListViews.
 type ListViewsParams struct {
+	// Kind identifies or filters the kind value in the query.
 	Kind KindFilter `form:"kind,omitempty" json:"kind,omitempty"`
 }
 
 // ReceiveGitWebhookParams defines parameters for ReceiveGitWebhook.
 type ReceiveGitWebhookParams struct {
-	XMeridianDelivery     WebhookDelivery                       `json:"X-Meridian-Delivery"`
-	XMeridianEvent        ReceiveGitWebhookParamsXMeridianEvent `json:"X-Meridian-Event"`
-	XMeridianSignature256 WebhookSignature                      `json:"X-Meridian-Signature-256"`
+	// XMeridianDelivery identifies or filters the x meridian delivery value in the header.
+	XMeridianDelivery WebhookDelivery `json:"X-Meridian-Delivery"`
+
+	// XMeridianEvent identifies or filters the x meridian event value in the header.
+	XMeridianEvent ReceiveGitWebhookParamsXMeridianEvent `json:"X-Meridian-Event"`
+
+	// XMeridianSignature256 identifies or filters the x meridian signature 256 value in the header.
+	XMeridianSignature256 WebhookSignature `json:"X-Meridian-Signature-256"`
 }
 
 // ReceiveGitWebhookParamsXMeridianEvent defines parameters for ReceiveGitWebhook.
@@ -6335,11 +8208,13 @@ func (t *CredentialCreateRequest) MergeCredentialCreateRequest1(v CredentialCrea
 	return err
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t CredentialCreateRequest) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *CredentialCreateRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6397,11 +8272,13 @@ func (t *CredentialRotateRequest_Secret) MergeHttpSecretInput(v HttpSecretInput)
 	return err
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t CredentialRotateRequest_Secret) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *CredentialRotateRequest_Secret) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6509,6 +8386,7 @@ func (t *DocumentSelector) MergeUploadSelector(v UploadSelector) error {
 	return err
 }
 
+// Discriminator implements generated transport behavior for the Meridian OpenAPI contract.
 func (t DocumentSelector) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"type"`
@@ -6517,6 +8395,7 @@ func (t DocumentSelector) Discriminator() (string, error) {
 	return discriminator.Discriminator, err
 }
 
+// ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
 func (t DocumentSelector) ValueByDiscriminator() (interface{}, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
@@ -6534,11 +8413,13 @@ func (t DocumentSelector) ValueByDiscriminator() (interface{}, error) {
 	}
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t DocumentSelector) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *DocumentSelector) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6596,11 +8477,13 @@ func (t *GlobalCredentialCreateRequest) MergeGlobalCredentialCreateRequest1(v Gl
 	return err
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t GlobalCredentialCreateRequest) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *GlobalCredentialCreateRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6674,6 +8557,7 @@ func (t *JobSseEvent) MergeJobStateEvent(v JobStateEvent) error {
 	return err
 }
 
+// Discriminator implements generated transport behavior for the Meridian OpenAPI contract.
 func (t JobSseEvent) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"event"`
@@ -6682,6 +8566,7 @@ func (t JobSseEvent) Discriminator() (string, error) {
 	return discriminator.Discriminator, err
 }
 
+// ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
 func (t JobSseEvent) ValueByDiscriminator() (interface{}, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
@@ -6697,11 +8582,13 @@ func (t JobSseEvent) ValueByDiscriminator() (interface{}, error) {
 	}
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t JobSseEvent) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *JobSseEvent) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6759,11 +8646,13 @@ func (t *SharedView_Resolution) MergeDiffSnapshot(v DiffSnapshot) error {
 	return err
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t SharedView_Resolution) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *SharedView_Resolution) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6821,11 +8710,13 @@ func (t *Subscription_ScopeId) MergeKindId(v KindId) error {
 	return err
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t Subscription_ScopeId) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *Subscription_ScopeId) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6883,11 +8774,13 @@ func (t *SubscriptionPutRequest_ScopeId) MergeKindId(v KindId) error {
 	return err
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t SubscriptionPutRequest_ScopeId) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *SubscriptionPutRequest_ScopeId) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6945,11 +8838,13 @@ func (t *ViewInputSpec_Kinds) MergeViewInputSpecKinds1(v ViewInputSpecKinds1) er
 	return err
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t ViewInputSpec_Kinds) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *ViewInputSpec_Kinds) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -7091,6 +8986,7 @@ func (t *ViewResolution) MergeDashboardViewResolution(v DashboardViewResolution)
 	return err
 }
 
+// Discriminator implements generated transport behavior for the Meridian OpenAPI contract.
 func (t ViewResolution) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"kind"`
@@ -7099,6 +8995,7 @@ func (t ViewResolution) Discriminator() (string, error) {
 	return discriminator.Discriminator, err
 }
 
+// ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
 func (t ViewResolution) ValueByDiscriminator() (interface{}, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
@@ -7118,11 +9015,13 @@ func (t ViewResolution) ValueByDiscriminator() (interface{}, error) {
 	}
 }
 
+// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t ViewResolution) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
+// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
 func (t *ViewResolution) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err

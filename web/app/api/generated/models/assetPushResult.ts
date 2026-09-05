@@ -7,10 +7,18 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * reports the result of the corresponding Meridian operation.
+ */
 export interface AssetPushResult {
+  /** identifies the asset associated with this resource. */
   assetId: Uuid;
+  /** contains the uuid associated with this asset push result. */
   layerId: Uuid;
+  /** contains the uuid associated with this asset push result. */
   revisionId: Uuid;
+  /** identifies the asynchronous job associated with this resource. */
   jobId: Uuid;
+  /** indicates whether deduplicated applies to this asset push result. */
   deduplicated: boolean;
 }

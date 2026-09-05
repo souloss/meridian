@@ -7,10 +7,19 @@
  */
 import type { ValidationIssueSeverity } from './validationIssueSeverity.ts';
 
+/**
+ * represents validation issue data exchanged through the Meridian API.
+ */
 export interface ValidationIssue {
+  /** specifies the severity associated with this validation issue. */
   severity: ValidationIssueSeverity;
+  /** specifies the code associated with this validation issue. */
   code: string;
+  /** specifies the message associated with this validation issue. */
   message: string;
-  /** @nullable */
+  /**
+     * specifies the pointer associated with this validation issue.
+     * @nullable
+     */
   pointer: string | null;
 }

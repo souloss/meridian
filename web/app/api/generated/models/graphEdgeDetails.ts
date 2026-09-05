@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the details associated with this graph edge.
+ */
 export type GraphEdgeDetails = { [key: string]: unknown };

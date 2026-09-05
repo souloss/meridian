@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the default options associated with this view override value.
+ */
 export type ViewOverrideValueDefaultOptions = { [key: string]: unknown };

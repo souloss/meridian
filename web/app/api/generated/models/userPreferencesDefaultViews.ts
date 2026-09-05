@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the default views associated with this user preferences.
+ */
 export type UserPreferencesDefaultViews = {[key: string]: string};

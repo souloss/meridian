@@ -6,9 +6,16 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies the running server build and its public API contract.
+ */
 export interface VersionInfo {
+  /** is the semantic release version or dev for a local build. */
   serverVersion: string;
+  /** is the HTTP route major implemented by this server. */
   apiVersion: 'v1';
+  /** is the frozen OpenAPI contract version embedded in this build. */
   contractVersion: '1.0.0';
+  /** is the source revision embedded at build time or unknown when unset. */
   buildCommit: string;
 }

@@ -7,4 +7,5 @@
  */
 import type { SystemGroupCreateRequest } from './systemGroupCreateRequest.ts';
 
+/** SystemGroupCreateBody is the request body type for its generated OpenAPI operation. */
 export type SystemGroupCreateBody = SystemGroupCreateRequest;

@@ -7,4 +7,5 @@
  */
 import type { TenantPatchRequest } from './tenantPatchRequest.ts';
 
+/** TenantPatchBody is the request body type for its generated OpenAPI operation. */
 export type TenantPatchBody = TenantPatchRequest;

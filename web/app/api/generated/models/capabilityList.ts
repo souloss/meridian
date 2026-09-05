@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * contains an ordered collection of capability values.
+ */
 export type CapabilityList = string[];

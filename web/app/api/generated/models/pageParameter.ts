@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * selects a one-based result page.
+ */
 export type PageParameter = number;

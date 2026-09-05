@@ -11,12 +11,21 @@ import type { LayerRole } from './layerRole.ts';
 import type { RevisionStatus } from './revisionStatus.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents layer manifest entry data exchanged through the Meridian API.
+ */
 export interface LayerManifestEntry {
+  /** contains the uuid associated with this layer manifest entry. */
   layerId: Uuid;
+  /** contains the uuid associated with this layer manifest entry. */
   revisionId: Uuid;
+  /** contains the layer role associated with this layer manifest entry. */
   role: LayerRole;
+  /** contains the layer origin associated with this layer manifest entry. */
   origin: LayerOrigin;
+  /** contains the revision status associated with this layer manifest entry. */
   reviewStatus: RevisionStatus;
+  /** specifies the scope type associated with this layer manifest entry. */
   scopeType: LayerManifestEntryScopeType;
   /**
      * '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
@@ -24,7 +33,11 @@ export interface LayerManifestEntry {
      * @maxLength 260
      */
   scopeKey: string;
-  /** @minimum 0 */
+  /**
+     * specifies the ord associated with this layer manifest entry.
+     * @minimum 0
+     */
   ord: number;
+  /** specifies the content hash associated with this layer manifest entry. */
   contentHash: string;
 }

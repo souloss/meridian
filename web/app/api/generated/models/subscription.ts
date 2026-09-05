@@ -12,15 +12,30 @@ import type { SubscriptionScopeType } from './subscriptionScopeType.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents subscription data exchanged through the Meridian API.
+ */
 export type Subscription = SubscriptionScopeConstraints & ({
+  /** uniquely identifies this resource. */
   id: Uuid;
-  /** @minItems 1 */
+  /**
+     * contains the ordered event types associated with this subscription.
+     * @minItems 1
+     */
   eventTypes: DomainEventType[];
+  /** contains the subscription scope type associated with this subscription. */
   scopeType: SubscriptionScopeType;
+  /** specifies the scope id associated with this subscription. */
   scopeId: Uuid | KindId | null;
-  /** @minItems 1 */
+  /**
+     * contains the ordered channel ids associated with this subscription.
+     * @minItems 1
+     */
   channelIds: Uuid[];
+  /** indicates whether enabled applies to this subscription. */
   enabled: boolean;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 });

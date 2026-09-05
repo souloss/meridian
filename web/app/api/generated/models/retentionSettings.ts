@@ -6,13 +6,18 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * represents retention settings data exchanged through the Meridian API.
+ */
 export interface RetentionSettings {
   /**
+     * specifies the job logs days associated with this retention settings.
      * @minimum 1
      * @maximum 3650
      */
   jobLogsDays: number;
   /**
+     * specifies the archived revisions days associated with this retention settings.
      * @minimum 1
      * @maximum 3650
      */

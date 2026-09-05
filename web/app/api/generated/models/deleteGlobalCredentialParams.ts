@@ -7,6 +7,10 @@
  */
 import type { ForceParameter } from './forceParameter.ts';
 
+/** DeleteGlobalCredentialParams contains parameters accepted by its generated OpenAPI operation. */
 export type DeleteGlobalCredentialParams = {
+/**
+ * identifies or filters the force value in the query.
+ */
 force?: ForceParameter;
 };

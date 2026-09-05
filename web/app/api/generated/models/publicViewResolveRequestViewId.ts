@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the view id associated with this public view resolve request.
+ */
 export type PublicViewResolveRequestViewId = typeof PublicViewResolveRequestViewId[keyof typeof PublicViewResolveRequestViewId];
 
 
+/** PublicViewResolveRequestViewId is generated from the Meridian OpenAPI contract for public view resolve request view id. */
 export const PublicViewResolveRequestViewId = {
   'swagger-ui': 'swagger-ui',
   redoc: 'redoc',

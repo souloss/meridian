@@ -18,22 +18,38 @@ import type { SourceRunSummary } from './sourceRunSummary.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents source spec data exchanged through the Meridian API.
+ */
 export interface SourceSpec {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** identifies the service associated with this resource. */
   serviceId: Uuid;
+  /** contains the kind id associated with this source spec. */
   kind: KindId;
+  /** contains the asset name template associated with this source spec. */
   assetNameTemplate: AssetNameTemplate;
+  /** contains the layer role associated with this source spec. */
   role: LayerRole;
+  /** contains the layer origin associated with this source spec. */
   origin: LayerOrigin;
+  /** contains the source mode associated with this source spec. */
   mode: SourceMode;
   /**
+     * specifies the path associated with this source spec.
      * @maxLength 512
      * @nullable
      */
   path: string | null;
+  /** specifies the producer profile id associated with this source spec. */
   producerProfileId: Uuid | null;
-  /** @minimum 0 */
+  /**
+     * specifies the ord associated with this source spec.
+     * @minimum 0
+     */
   ord: number;
   /**
      * Effective producer timeout is the minimum of this value and the selected producer profile timeout. Mode defaults are defined in domain.yaml.
@@ -41,18 +57,33 @@ export interface SourceSpec {
      * @maximum 3600
      */
   timeoutSec: number;
-  /** @minItems 1 */
+  /**
+     * contains the ordered branch patterns associated with this source spec.
+     * @minItems 1
+     */
   branchPatterns: RefGlob[];
+  /** indicates whether enabled applies to this source spec. */
   enabled: boolean;
+  /** contains the config source associated with this source spec. */
   configOrigin: ConfigSource;
+  /** contains the ordered config field sources associated with this source spec. */
   configFieldSources: FieldSource[];
-  /** @nullable */
+  /**
+     * specifies the last error associated with this source spec.
+     * @nullable
+     */
   lastError: string | null;
+  /** specifies the last run associated with this source spec. */
   lastRun: SourceRunSummary | null;
-  /** @minimum 0 */
+  /**
+     * specifies the bindings count associated with this source spec.
+     * @minimum 0
+     */
   bindingsCount: number;
   /** Non-null only for a manual SourceSpec. createSourceSpec atomically creates its one global SourceBinding and Layer and returns that Layer ID so the caller can immediately call createLayerRevision. Non-manual specs return null until jobs materialize zero or more bindings. */
   initialLayerId: Uuid | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

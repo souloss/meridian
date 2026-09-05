@@ -7,4 +7,5 @@
  */
 import type { ConfigImportPreviewRequest } from './configImportPreviewRequest.ts';
 
+/** ConfigImportPreviewBody is the request body type for its generated OpenAPI operation. */
 export type ConfigImportPreviewBody = ConfigImportPreviewRequest;

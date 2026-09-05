@@ -7,7 +7,12 @@
  */
 import type { ConfigSource } from './configSource.ts';
 
+/**
+ * represents field source data exchanged through the Meridian API.
+ */
 export interface FieldSource {
+  /** specifies the pointer associated with this field source. */
   pointer: string;
+  /** contains the config source associated with this field source. */
   source: ConfigSource;
 }

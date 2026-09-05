@@ -7,6 +7,7 @@
  */
 
 /**
+ * is a validated Git branch or tag name without a refs prefix.
  * @minLength 1
  * @maxLength 255
  * @pattern ^[A-Za-z0-9._/-]+$

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported job status value.
+ */
 export type JobStatus = typeof JobStatus[keyof typeof JobStatus];
 
 
+/** JobStatus is generated from the Meridian OpenAPI contract for job status. */
 export const JobStatus = {
   pending: 'pending',
   running: 'running',

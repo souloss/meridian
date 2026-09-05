@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface CommentCreateRequest {
   /**
+     * specifies the body associated with this comment create request.
      * @minLength 1
      * @maxLength 2000
      */

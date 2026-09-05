@@ -7,6 +7,10 @@
  */
 import type { ServiceGrant } from './serviceGrant.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface ServiceAccessPutRequest {
+  /** contains the ordered grants associated with this service access put request. */
   grants: ServiceGrant[];
 }

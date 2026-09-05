@@ -8,6 +8,10 @@
 import type { AssetItem } from './assetItem.ts';
 import type { PageInfo } from './pageInfo.ts';
 
+/**
+ * contains one paginated page of asset item records.
+ */
 export type AssetItemPage = PageInfo & {
+  /** contains the ordered items associated with this asset item page. */
   items: AssetItem[];
 };

@@ -18,36 +18,68 @@ import type { RefType } from './refType.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents asset version data exchanged through the Meridian API.
+ */
 export interface AssetVersion {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** identifies the asset associated with this resource. */
   assetId: Uuid;
+  /** contains the ref type associated with this asset version. */
   refType: RefType;
+  /** contains the ref name associated with this asset version. */
   ref: RefName;
-  /** @minimum 1 */
+  /**
+     * specifies the sequence no associated with this asset version.
+     * @minimum 1
+     */
   sequenceNo: number;
+  /** specifies the version associated with this asset version. */
   version: string;
+  /** contains the lifecycle associated with this asset version. */
   lifecycle: Lifecycle;
   /**
+     * specifies the quality score associated with this asset version.
      * @minimum 0
      * @maximum 100
      */
   qualityScore: number;
+  /** specifies the merge engine version associated with this asset version. */
   mergeEngineVersion: string;
+  /** specifies the overlay compiler version associated with this asset version. */
   overlayCompilerVersion: string;
+  /** specifies the overlay mode associated with this asset version. */
   overlayMode: AssetVersionOverlayMode;
+  /** specifies the normalizer version associated with this asset version. */
   normalizerVersion: string;
+  /** specifies the kind plugin version associated with this asset version. */
   kindPluginVersion: string;
+  /** specifies the input fingerprint associated with this asset version. */
   inputFingerprint: string;
+  /** specifies the merged hash associated with this asset version. */
   mergedHash: string;
+  /** contains the ordered layer manifest associated with this asset version. */
   layerManifest: LayerManifestEntry[];
-  /** @nullable */
+  /**
+     * specifies the source commit associated with this asset version.
+     * @nullable
+     */
   sourceCommit: string | null;
+  /** specifies the baseline version id associated with this asset version. */
   baselineVersionId: Uuid | null;
+  /** specifies the diff summary associated with this asset version. */
   diffSummary: DiffCounts | null;
+  /** specifies the labels associated with this asset version. */
   labels: AssetVersionLabels;
+  /** specifies the downloads associated with this asset version. */
   downloads: AssetVersionDownloads;
+  /** specifies the indexed at associated with this asset version. */
   indexedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
 }

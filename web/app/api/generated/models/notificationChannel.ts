@@ -10,15 +10,29 @@ import type { NotificationChannelKind } from './notificationChannelKind.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents notification channel data exchanged through the Meridian API.
+ */
 export interface NotificationChannel {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** specifies the name associated with this notification channel. */
   name: string;
+  /** contains the notification channel kind associated with this notification channel. */
   kind: NotificationChannelKind;
+  /** indicates whether enabled applies to this notification channel. */
   enabled: boolean;
-  /** @nullable */
+  /**
+     * specifies the endpoint associated with this notification channel.
+     * @nullable
+     */
   endpoint: string | null;
+  /** indicates whether secret configured applies to this notification channel. */
   secretConfigured: boolean;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

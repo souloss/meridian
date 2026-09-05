@@ -8,12 +8,18 @@
 import type { Quota } from './quota.ts';
 import type { Slug } from './slug.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface TenantCreateRequest {
+  /** contains the slug associated with this tenant create request. */
   slug: Slug;
   /**
+     * specifies the display name associated with this tenant create request.
      * @minLength 1
      * @maxLength 128
      */
   displayName: string;
+  /** contains the quota associated with this tenant create request. */
   quota?: Quota;
 }

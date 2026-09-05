@@ -7,6 +7,7 @@
  */
 
 /**
+ * is a stable lowercase URL identifier containing letters, digits, and hyphens.
  * @pattern ^[a-z0-9][a-z0-9-]{0,63}$
  */
 export type Slug = string;

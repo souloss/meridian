@@ -7,8 +7,15 @@
  */
 import type { RefGlob } from './refGlob.ts';
 
+/**
+ * represents branch policy data exchanged through the Meridian API.
+ */
 export interface BranchPolicy {
-  /** @minItems 1 */
+  /**
+     * contains the ordered branch patterns associated with this branch policy.
+     * @minItems 1
+     */
   branchPatterns: RefGlob[];
+  /** contains the ordered tag patterns associated with this branch policy. */
   tagPatterns: RefGlob[];
 }

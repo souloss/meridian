@@ -7,7 +7,12 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * identifies the version selected by a request.
+ */
 export interface VersionSelector {
+  /** specifies the type associated with this version selector. */
   type: 'version';
+  /** identifies the asset version associated with this resource. */
   versionId: Uuid;
 }

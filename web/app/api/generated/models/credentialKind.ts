@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported credential kind value.
+ */
 export type CredentialKind = typeof CredentialKind[keyof typeof CredentialKind];
 
 
+/** CredentialKind is generated from the Meridian OpenAPI contract for credential kind. */
 export const CredentialKind = {
   ssh_key: 'ssh_key',
   http_token: 'http_token',

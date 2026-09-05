@@ -9,7 +9,12 @@ import type { PageInfo } from './pageInfo.ts';
 import type { SearchFacetSet } from './searchFacetSet.ts';
 import type { SearchHit } from './searchHit.ts';
 
+/**
+ * reports the result of the corresponding Meridian operation.
+ */
 export type SearchResult = PageInfo & {
+  /** contains the ordered items associated with this search result. */
   items: SearchHit[];
+  /** contains the search facet set associated with this search result. */
   facets: SearchFacetSet;
 };

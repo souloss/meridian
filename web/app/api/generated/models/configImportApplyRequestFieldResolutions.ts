@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the field resolutions associated with this config import apply request.
+ */
 export type ConfigImportApplyRequestFieldResolutions = {[key: string]: 'keep_db' | 'take_file'};

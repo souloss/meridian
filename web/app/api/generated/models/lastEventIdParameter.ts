@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * resumes an event stream after the last received sequence.
+ */
 export type LastEventIdParameter = string;

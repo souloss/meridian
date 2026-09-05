@@ -66,40 +66,61 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
+/** reorderAssetLayersResponse200 represents a declared HTTP response from the reorder asset layers response200 operation. */
 export type reorderAssetLayersResponse200 = {
+  /** Data contains the decoded response payload. */
   data: LayerListResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** reorderAssetLayersResponse404 represents a declared HTTP response from the reorder asset layers response404 operation. */
 export type reorderAssetLayersResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** reorderAssetLayersResponse409 represents a declared HTTP response from the reorder asset layers response409 operation. */
 export type reorderAssetLayersResponse409 = {
+  /** Data contains the decoded response payload. */
   data: InvalidStateResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** reorderAssetLayersResponse412 represents a declared HTTP response from the reorder asset layers response412 operation. */
 export type reorderAssetLayersResponse412 = {
+  /** Data contains the decoded response payload. */
   data: PreconditionFailedResponse
+  /** Status is the HTTP response status code. */
   status: 412
 }
 
+/** reorderAssetLayersResponse422 represents a declared HTTP response from the reorder asset layers response422 operation. */
 export type reorderAssetLayersResponse422 = {
+  /** Data contains the decoded response payload. */
   data: ValidationErrorResponse
+  /** Status is the HTTP response status code. */
   status: 422
 }
 
+/** reorderAssetLayersResponseSuccess represents a declared HTTP response from the reorder asset layers response success operation. */
 export type reorderAssetLayersResponseSuccess = (reorderAssetLayersResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** reorderAssetLayersResponseError represents a declared HTTP response from the reorder asset layers response error operation. */
 export type reorderAssetLayersResponseError = (reorderAssetLayersResponse404 | reorderAssetLayersResponse409 | reorderAssetLayersResponse412 | reorderAssetLayersResponse422) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** reorderAssetLayersResponse represents a declared HTTP response from the reorder asset layers response operation. */
 export type reorderAssetLayersResponse = (reorderAssetLayersResponseSuccess | reorderAssetLayersResponseError)
 
+/** getReorderAssetLayersUrl builds the relative URL for its OpenAPI operation. */
 export const getReorderAssetLayersUrl = (tenantSlug: string,
     assetId: string,) => {
 
@@ -107,6 +128,9 @@ export const getReorderAssetLayersUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/assets/${assetId}/layers/order`
 }
 
+/**
+ * Performs the reorder asset layers workflow within the authorized request scope.
+ */
 export const reorderAssetLayers = async (tenantSlug: string,
     assetId: string,
     layerOrderReplaceBody: LayerOrderReplaceBody, options?: Parameters<typeof meridianFetch>[1]): Promise<reorderAssetLayersResponse> => {
@@ -130,8 +154,10 @@ return meridianFetch<reorderAssetLayersResponse>(getReorderAssetLayersUrl(tenant
 
 
 
+/** getReorderAssetLayersMutationKey is generated from the Meridian OpenAPI contract for get reorder asset layers mutation key. */
 export const getReorderAssetLayersMutationKey = () => ['reorderAssetLayers'] as const;
 
+/** getReorderAssetLayersMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getReorderAssetLayersMutationOptions = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reorderAssetLayers>>, TError,ReorderAssetLayersMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof reorderAssetLayers>>, TError,ReorderAssetLayersMutationVariables, TContext> => {
@@ -159,11 +185,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** ReorderAssetLayersMutationResult is generated from the Meridian OpenAPI contract for reorder asset layers mutation result. */
     export type ReorderAssetLayersMutationResult = NonNullable<Awaited<ReturnType<typeof reorderAssetLayers>>>
+    /** ReorderAssetLayersMutationBody is the request body type for its generated OpenAPI operation. */
     export type ReorderAssetLayersMutationBody = LayerOrderReplaceBody
+    /** ReorderAssetLayersMutationError is generated from the Meridian OpenAPI contract for reorder asset layers mutation error. */
     export type ReorderAssetLayersMutationError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse
-    export type ReorderAssetLayersMutationVariables = {tenantSlug: string;assetId: string;data: LayerOrderReplaceBody}
+    /** ReorderAssetLayersMutationVariables is generated from the Meridian OpenAPI contract for reorder asset layers mutation variables. */
+    export type ReorderAssetLayersMutationVariables = {/** TenantSlug carries the tenant slug value for ReorderAssetLayersMutationVariables. */ tenantSlug: string;/** AssetId carries the asset id value for ReorderAssetLayersMutationVariables. */ assetId: string;/** Data contains the decoded response payload. */ data: LayerOrderReplaceBody}
 
+    /** useReorderAssetLayers executes its OpenAPI operation through TanStack Vue Query. */
     export const useReorderAssetLayers = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reorderAssetLayers>>, TError,ReorderAssetLayersMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -174,25 +205,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getReorderAssetLayersMutationOptions(options), queryClient);
     }
+    /** getLayerResponse200 represents a declared HTTP response from the get layer response200 operation. */
     export type getLayerResponse200 = {
+  /** Data contains the decoded response payload. */
   data: LayerResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** getLayerResponse404 represents a declared HTTP response from the get layer response404 operation. */
 export type getLayerResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** getLayerResponseSuccess represents a declared HTTP response from the get layer response success operation. */
 export type getLayerResponseSuccess = (getLayerResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** getLayerResponseError represents a declared HTTP response from the get layer response error operation. */
 export type getLayerResponseError = (getLayerResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** getLayerResponse represents a declared HTTP response from the get layer response operation. */
 export type getLayerResponse = (getLayerResponseSuccess | getLayerResponseError)
 
+/** getGetLayerUrl builds the relative URL for its OpenAPI operation. */
 export const getGetLayerUrl = (tenantSlug: string,
     layerId: string,
     params?: GetLayerParams,) => {
@@ -201,6 +244,9 @@ export const getGetLayerUrl = (tenantSlug: string,
   return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/layers/${layerId}?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/layers/${layerId}`
 }
 
+/**
+ * Returns the selected layer within the authorized request scope.
+ */
 export const getLayer = async (tenantSlug: string,
     layerId: string,
     params?: GetLayerParams, options?: Parameters<typeof meridianFetch>[1]): Promise<getLayerResponse> => {
@@ -218,6 +264,7 @@ export const getLayer = async (tenantSlug: string,
 
 
 
+/** getGetLayerQueryKey is generated from the Meridian OpenAPI contract for get get layer query key. */
 export const getGetLayerQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     layerId: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<GetLayerParams>,) => {
@@ -227,6 +274,7 @@ export const getGetLayerQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     }
 
 
+/** getGetLayerQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getGetLayerQueryOptions = <TData = Awaited<ReturnType<typeof getLayer>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     layerId: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<GetLayerParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLayer>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -247,11 +295,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(layerId) !== null && toValue(layerId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLayer>>, TError, TData>
 }
 
+/** GetLayerQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetLayerQueryResult = NonNullable<Awaited<ReturnType<typeof getLayer>>>
+/** GetLayerQueryError is the error type returned by its generated Vue Query hook. */
 export type GetLayerQueryError = NotFoundResponse
 
 
 
+/** useGetLayer executes its OpenAPI operation through TanStack Vue Query. */
 export function useGetLayer<TData = Awaited<ReturnType<typeof getLayer>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     layerId: MaybeRefOrGetter<string>,
@@ -273,40 +324,61 @@ export function useGetLayer<TData = Awaited<ReturnType<typeof getLayer>>, TError
 
 
 
+/** updateLayerResponse200 represents a declared HTTP response from the update layer response200 operation. */
 export type updateLayerResponse200 = {
+  /** Data contains the decoded response payload. */
   data: LayerResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** updateLayerResponse404 represents a declared HTTP response from the update layer response404 operation. */
 export type updateLayerResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** updateLayerResponse409 represents a declared HTTP response from the update layer response409 operation. */
 export type updateLayerResponse409 = {
+  /** Data contains the decoded response payload. */
   data: InvalidStateResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** updateLayerResponse412 represents a declared HTTP response from the update layer response412 operation. */
 export type updateLayerResponse412 = {
+  /** Data contains the decoded response payload. */
   data: PreconditionFailedResponse
+  /** Status is the HTTP response status code. */
   status: 412
 }
 
+/** updateLayerResponse422 represents a declared HTTP response from the update layer response422 operation. */
 export type updateLayerResponse422 = {
+  /** Data contains the decoded response payload. */
   data: ValidationErrorResponse
+  /** Status is the HTTP response status code. */
   status: 422
 }
 
+/** updateLayerResponseSuccess represents a declared HTTP response from the update layer response success operation. */
 export type updateLayerResponseSuccess = (updateLayerResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** updateLayerResponseError represents a declared HTTP response from the update layer response error operation. */
 export type updateLayerResponseError = (updateLayerResponse404 | updateLayerResponse409 | updateLayerResponse412 | updateLayerResponse422) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** updateLayerResponse represents a declared HTTP response from the update layer response operation. */
 export type updateLayerResponse = (updateLayerResponseSuccess | updateLayerResponseError)
 
+/** getUpdateLayerUrl builds the relative URL for its OpenAPI operation. */
 export const getUpdateLayerUrl = (tenantSlug: string,
     layerId: string,) => {
 
@@ -314,6 +386,9 @@ export const getUpdateLayerUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/layers/${layerId}`
 }
 
+/**
+ * Updates the selected layer within the authorized request scope.
+ */
 export const updateLayer = async (tenantSlug: string,
     layerId: string,
     layerPatchBody: LayerPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateLayerResponse> => {
@@ -337,8 +412,10 @@ return meridianFetch<updateLayerResponse>(getUpdateLayerUrl(tenantSlug,layerId),
 
 
 
+/** getUpdateLayerMutationKey is generated from the Meridian OpenAPI contract for get update layer mutation key. */
 export const getUpdateLayerMutationKey = () => ['updateLayer'] as const;
 
+/** getUpdateLayerMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getUpdateLayerMutationOptions = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLayer>>, TError,UpdateLayerMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateLayer>>, TError,UpdateLayerMutationVariables, TContext> => {
@@ -366,11 +443,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** UpdateLayerMutationResult is generated from the Meridian OpenAPI contract for update layer mutation result. */
     export type UpdateLayerMutationResult = NonNullable<Awaited<ReturnType<typeof updateLayer>>>
+    /** UpdateLayerMutationBody is the request body type for its generated OpenAPI operation. */
     export type UpdateLayerMutationBody = LayerPatchBody
+    /** UpdateLayerMutationError is generated from the Meridian OpenAPI contract for update layer mutation error. */
     export type UpdateLayerMutationError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse
-    export type UpdateLayerMutationVariables = {tenantSlug: string;layerId: string;data: LayerPatchBody}
+    /** UpdateLayerMutationVariables is generated from the Meridian OpenAPI contract for update layer mutation variables. */
+    export type UpdateLayerMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateLayerMutationVariables. */ tenantSlug: string;/** LayerId carries the layer id value for UpdateLayerMutationVariables. */ layerId: string;/** Data contains the decoded response payload. */ data: LayerPatchBody}
 
+    /** useUpdateLayer executes its OpenAPI operation through TanStack Vue Query. */
     export const useUpdateLayer = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLayer>>, TError,UpdateLayerMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -381,25 +463,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdateLayerMutationOptions(options), queryClient);
     }
+    /** listLayerRevisionsResponse200 represents a declared HTTP response from the list layer revisions response200 operation. */
     export type listLayerRevisionsResponse200 = {
+  /** Data contains the decoded response payload. */
   data: LayerRevisionPageResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** listLayerRevisionsResponse404 represents a declared HTTP response from the list layer revisions response404 operation. */
 export type listLayerRevisionsResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** listLayerRevisionsResponseSuccess represents a declared HTTP response from the list layer revisions response success operation. */
 export type listLayerRevisionsResponseSuccess = (listLayerRevisionsResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** listLayerRevisionsResponseError represents a declared HTTP response from the list layer revisions response error operation. */
 export type listLayerRevisionsResponseError = (listLayerRevisionsResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** listLayerRevisionsResponse represents a declared HTTP response from the list layer revisions response operation. */
 export type listLayerRevisionsResponse = (listLayerRevisionsResponseSuccess | listLayerRevisionsResponseError)
 
+/** getListLayerRevisionsUrl builds the relative URL for its OpenAPI operation. */
 export const getListLayerRevisionsUrl = (tenantSlug: string,
     layerId: string,
     params?: ListLayerRevisionsParams,) => {
@@ -408,6 +502,9 @@ export const getListLayerRevisionsUrl = (tenantSlug: string,
   return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/layers/${layerId}/revisions?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/layers/${layerId}/revisions`
 }
 
+/**
+ * Returns the requested page of layer revisions within the authorized request scope.
+ */
 export const listLayerRevisions = async (tenantSlug: string,
     layerId: string,
     params?: ListLayerRevisionsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listLayerRevisionsResponse> => {
@@ -425,6 +522,7 @@ export const listLayerRevisions = async (tenantSlug: string,
 
 
 
+/** getListLayerRevisionsQueryKey is generated from the Meridian OpenAPI contract for get list layer revisions query key. */
 export const getListLayerRevisionsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     layerId: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListLayerRevisionsParams>,) => {
@@ -434,6 +532,7 @@ export const getListLayerRevisionsQueryKey = (tenantSlug: MaybeRefOrGetter<strin
     }
 
 
+/** getListLayerRevisionsQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getListLayerRevisionsQueryOptions = <TData = Awaited<ReturnType<typeof listLayerRevisions>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     layerId: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListLayerRevisionsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLayerRevisions>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -454,11 +553,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(layerId) !== null && toValue(layerId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listLayerRevisions>>, TError, TData>
 }
 
+/** ListLayerRevisionsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListLayerRevisionsQueryResult = NonNullable<Awaited<ReturnType<typeof listLayerRevisions>>>
+/** ListLayerRevisionsQueryError is the error type returned by its generated Vue Query hook. */
 export type ListLayerRevisionsQueryError = NotFoundResponse
 
 
 
+/** useListLayerRevisions executes its OpenAPI operation through TanStack Vue Query. */
 export function useListLayerRevisions<TData = Awaited<ReturnType<typeof listLayerRevisions>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     layerId: MaybeRefOrGetter<string>,
@@ -480,45 +582,69 @@ export function useListLayerRevisions<TData = Awaited<ReturnType<typeof listLaye
 
 
 
+/** createLayerRevisionResponse200 represents a declared HTTP response from the create layer revision response200 operation. */
 export type createLayerRevisionResponse200 = {
+  /** Data contains the decoded response payload. */
   data: LayerRevisionSubmissionResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** createLayerRevisionResponse201 represents a declared HTTP response from the create layer revision response201 operation. */
 export type createLayerRevisionResponse201 = {
+  /** Data contains the decoded response payload. */
   data: LayerRevisionSubmissionResponse
+  /** Status is the HTTP response status code. */
   status: 201
 }
 
+/** createLayerRevisionResponse404 represents a declared HTTP response from the create layer revision response404 operation. */
 export type createLayerRevisionResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** createLayerRevisionResponse409 represents a declared HTTP response from the create layer revision response409 operation. */
 export type createLayerRevisionResponse409 = {
+  /** Data contains the decoded response payload. */
   data: ConflictResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** createLayerRevisionResponse413 represents a declared HTTP response from the create layer revision response413 operation. */
 export type createLayerRevisionResponse413 = {
+  /** Data contains the decoded response payload. */
   data: ContentTooLargeResponse
+  /** Status is the HTTP response status code. */
   status: 413
 }
 
+/** createLayerRevisionResponse422 represents a declared HTTP response from the create layer revision response422 operation. */
 export type createLayerRevisionResponse422 = {
+  /** Data contains the decoded response payload. */
   data: OverlayInvalidResponse
+  /** Status is the HTTP response status code. */
   status: 422
 }
 
+/** createLayerRevisionResponseSuccess represents a declared HTTP response from the create layer revision response success operation. */
 export type createLayerRevisionResponseSuccess = (createLayerRevisionResponse200 | createLayerRevisionResponse201) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** createLayerRevisionResponseError represents a declared HTTP response from the create layer revision response error operation. */
 export type createLayerRevisionResponseError = (createLayerRevisionResponse404 | createLayerRevisionResponse409 | createLayerRevisionResponse413 | createLayerRevisionResponse422) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** createLayerRevisionResponse represents a declared HTTP response from the create layer revision response operation. */
 export type createLayerRevisionResponse = (createLayerRevisionResponseSuccess | createLayerRevisionResponseError)
 
+/** getCreateLayerRevisionUrl builds the relative URL for its OpenAPI operation. */
 export const getCreateLayerRevisionUrl = (tenantSlug: string,
     layerId: string,) => {
 
@@ -526,6 +652,9 @@ export const getCreateLayerRevisionUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/layers/${layerId}/revisions`
 }
 
+/**
+ * Creates layer revision within the authorized request scope.
+ */
 export const createLayerRevision = async (tenantSlug: string,
     layerId: string,
     layerRevisionCreateBody: LayerRevisionCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createLayerRevisionResponse> => {
@@ -549,8 +678,10 @@ return meridianFetch<createLayerRevisionResponse>(getCreateLayerRevisionUrl(tena
 
 
 
+/** getCreateLayerRevisionMutationKey is generated from the Meridian OpenAPI contract for get create layer revision mutation key. */
 export const getCreateLayerRevisionMutationKey = () => ['createLayerRevision'] as const;
 
+/** getCreateLayerRevisionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getCreateLayerRevisionMutationOptions = <TError = NotFoundResponse | ConflictResponse | ContentTooLargeResponse | OverlayInvalidResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLayerRevision>>, TError,CreateLayerRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createLayerRevision>>, TError,CreateLayerRevisionMutationVariables, TContext> => {
@@ -578,11 +709,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** CreateLayerRevisionMutationResult is generated from the Meridian OpenAPI contract for create layer revision mutation result. */
     export type CreateLayerRevisionMutationResult = NonNullable<Awaited<ReturnType<typeof createLayerRevision>>>
+    /** CreateLayerRevisionMutationBody is the request body type for its generated OpenAPI operation. */
     export type CreateLayerRevisionMutationBody = LayerRevisionCreateBody
+    /** CreateLayerRevisionMutationError is generated from the Meridian OpenAPI contract for create layer revision mutation error. */
     export type CreateLayerRevisionMutationError = NotFoundResponse | ConflictResponse | ContentTooLargeResponse | OverlayInvalidResponse
-    export type CreateLayerRevisionMutationVariables = {tenantSlug: string;layerId: string;data: LayerRevisionCreateBody}
+    /** CreateLayerRevisionMutationVariables is generated from the Meridian OpenAPI contract for create layer revision mutation variables. */
+    export type CreateLayerRevisionMutationVariables = {/** TenantSlug carries the tenant slug value for CreateLayerRevisionMutationVariables. */ tenantSlug: string;/** LayerId carries the layer id value for CreateLayerRevisionMutationVariables. */ layerId: string;/** Data contains the decoded response payload. */ data: LayerRevisionCreateBody}
 
+    /** useCreateLayerRevision executes its OpenAPI operation through TanStack Vue Query. */
     export const useCreateLayerRevision = <TError = NotFoundResponse | ConflictResponse | ContentTooLargeResponse | OverlayInvalidResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLayerRevision>>, TError,CreateLayerRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -593,30 +729,45 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateLayerRevisionMutationOptions(options), queryClient);
     }
+    /** rollbackLayerResponse202 represents a declared HTTP response from the rollback layer response202 operation. */
     export type rollbackLayerResponse202 = {
+  /** Data contains the decoded response payload. */
   data: JobAcceptedResponse
+  /** Status is the HTTP response status code. */
   status: 202
 }
 
+/** rollbackLayerResponse404 represents a declared HTTP response from the rollback layer response404 operation. */
 export type rollbackLayerResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** rollbackLayerResponse409 represents a declared HTTP response from the rollback layer response409 operation. */
 export type rollbackLayerResponse409 = {
+  /** Data contains the decoded response payload. */
   data: ConflictResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** rollbackLayerResponseSuccess represents a declared HTTP response from the rollback layer response success operation. */
 export type rollbackLayerResponseSuccess = (rollbackLayerResponse202) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** rollbackLayerResponseError represents a declared HTTP response from the rollback layer response error operation. */
 export type rollbackLayerResponseError = (rollbackLayerResponse404 | rollbackLayerResponse409) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** rollbackLayerResponse represents a declared HTTP response from the rollback layer response operation. */
 export type rollbackLayerResponse = (rollbackLayerResponseSuccess | rollbackLayerResponseError)
 
+/** getRollbackLayerUrl builds the relative URL for its OpenAPI operation. */
 export const getRollbackLayerUrl = (tenantSlug: string,
     layerId: string,) => {
 
@@ -624,6 +775,9 @@ export const getRollbackLayerUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/layers/${layerId}:rollback`
 }
 
+/**
+ * Performs the rollback layer workflow within the authorized request scope.
+ */
 export const rollbackLayer = async (tenantSlug: string,
     layerId: string,
     layerRollbackBody: LayerRollbackBody, options?: Parameters<typeof meridianFetch>[1]): Promise<rollbackLayerResponse> => {
@@ -647,8 +801,10 @@ return meridianFetch<rollbackLayerResponse>(getRollbackLayerUrl(tenantSlug,layer
 
 
 
+/** getRollbackLayerMutationKey is generated from the Meridian OpenAPI contract for get rollback layer mutation key. */
 export const getRollbackLayerMutationKey = () => ['rollbackLayer'] as const;
 
+/** getRollbackLayerMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getRollbackLayerMutationOptions = <TError = NotFoundResponse | ConflictResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rollbackLayer>>, TError,RollbackLayerMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof rollbackLayer>>, TError,RollbackLayerMutationVariables, TContext> => {
@@ -676,11 +832,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** RollbackLayerMutationResult is generated from the Meridian OpenAPI contract for rollback layer mutation result. */
     export type RollbackLayerMutationResult = NonNullable<Awaited<ReturnType<typeof rollbackLayer>>>
+    /** RollbackLayerMutationBody is the request body type for its generated OpenAPI operation. */
     export type RollbackLayerMutationBody = LayerRollbackBody
+    /** RollbackLayerMutationError is generated from the Meridian OpenAPI contract for rollback layer mutation error. */
     export type RollbackLayerMutationError = NotFoundResponse | ConflictResponse
-    export type RollbackLayerMutationVariables = {tenantSlug: string;layerId: string;data: LayerRollbackBody}
+    /** RollbackLayerMutationVariables is generated from the Meridian OpenAPI contract for rollback layer mutation variables. */
+    export type RollbackLayerMutationVariables = {/** TenantSlug carries the tenant slug value for RollbackLayerMutationVariables. */ tenantSlug: string;/** LayerId carries the layer id value for RollbackLayerMutationVariables. */ layerId: string;/** Data contains the decoded response payload. */ data: LayerRollbackBody}
 
+    /** useRollbackLayer executes its OpenAPI operation through TanStack Vue Query. */
     export const useRollbackLayer = <TError = NotFoundResponse | ConflictResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rollbackLayer>>, TError,RollbackLayerMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -691,25 +852,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRollbackLayerMutationOptions(options), queryClient);
     }
+    /** getLayerRevisionResponse200 represents a declared HTTP response from the get layer revision response200 operation. */
     export type getLayerRevisionResponse200 = {
+  /** Data contains the decoded response payload. */
   data: LayerRevisionResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** getLayerRevisionResponse404 represents a declared HTTP response from the get layer revision response404 operation. */
 export type getLayerRevisionResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** getLayerRevisionResponseSuccess represents a declared HTTP response from the get layer revision response success operation. */
 export type getLayerRevisionResponseSuccess = (getLayerRevisionResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** getLayerRevisionResponseError represents a declared HTTP response from the get layer revision response error operation. */
 export type getLayerRevisionResponseError = (getLayerRevisionResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** getLayerRevisionResponse represents a declared HTTP response from the get layer revision response operation. */
 export type getLayerRevisionResponse = (getLayerRevisionResponseSuccess | getLayerRevisionResponseError)
 
+/** getGetLayerRevisionUrl builds the relative URL for its OpenAPI operation. */
 export const getGetLayerRevisionUrl = (tenantSlug: string,
     revisionId: string,) => {
 
@@ -717,6 +890,9 @@ export const getGetLayerRevisionUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/layer-revisions/${revisionId}`
 }
 
+/**
+ * Returns the selected layer revision within the authorized request scope.
+ */
 export const getLayerRevision = async (tenantSlug: string,
     revisionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getLayerRevisionResponse> => {
 
@@ -733,6 +909,7 @@ export const getLayerRevision = async (tenantSlug: string,
 
 
 
+/** getGetLayerRevisionQueryKey is generated from the Meridian OpenAPI contract for get get layer revision query key. */
 export const getGetLayerRevisionQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     revisionId: MaybeRefOrGetter<string>,) => {
     return [
@@ -741,6 +918,7 @@ export const getGetLayerRevisionQueryKey = (tenantSlug: MaybeRefOrGetter<string>
     }
 
 
+/** getGetLayerRevisionQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getGetLayerRevisionQueryOptions = <TData = Awaited<ReturnType<typeof getLayerRevision>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     revisionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLayerRevision>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -760,11 +938,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(revisionId) !== null && toValue(revisionId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLayerRevision>>, TError, TData>
 }
 
+/** GetLayerRevisionQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetLayerRevisionQueryResult = NonNullable<Awaited<ReturnType<typeof getLayerRevision>>>
+/** GetLayerRevisionQueryError is the error type returned by its generated Vue Query hook. */
 export type GetLayerRevisionQueryError = NotFoundResponse
 
 
 
+/** useGetLayerRevision executes its OpenAPI operation through TanStack Vue Query. */
 export function useGetLayerRevision<TData = Awaited<ReturnType<typeof getLayerRevision>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     revisionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLayerRevision>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -785,30 +966,45 @@ export function useGetLayerRevision<TData = Awaited<ReturnType<typeof getLayerRe
 
 
 
+/** getReviewContextResponse200 represents a declared HTTP response from the get review context response200 operation. */
 export type getReviewContextResponse200 = {
+  /** Data contains the decoded response payload. */
   data: ReviewContextResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** getReviewContextResponse404 represents a declared HTTP response from the get review context response404 operation. */
 export type getReviewContextResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** getReviewContextResponse409 represents a declared HTTP response from the get review context response409 operation. */
 export type getReviewContextResponse409 = {
+  /** Data contains the decoded response payload. */
   data: InvalidStateResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** getReviewContextResponseSuccess represents a declared HTTP response from the get review context response success operation. */
 export type getReviewContextResponseSuccess = (getReviewContextResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** getReviewContextResponseError represents a declared HTTP response from the get review context response error operation. */
 export type getReviewContextResponseError = (getReviewContextResponse404 | getReviewContextResponse409) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** getReviewContextResponse represents a declared HTTP response from the get review context response operation. */
 export type getReviewContextResponse = (getReviewContextResponseSuccess | getReviewContextResponseError)
 
+/** getGetReviewContextUrl builds the relative URL for its OpenAPI operation. */
 export const getGetReviewContextUrl = (tenantSlug: string,
     revisionId: string,) => {
 
@@ -816,6 +1012,9 @@ export const getGetReviewContextUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/layer-revisions/${revisionId}/review-context`
 }
 
+/**
+ * Returns the selected review context within the authorized request scope.
+ */
 export const getReviewContext = async (tenantSlug: string,
     revisionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getReviewContextResponse> => {
 
@@ -832,6 +1031,7 @@ export const getReviewContext = async (tenantSlug: string,
 
 
 
+/** getGetReviewContextQueryKey is generated from the Meridian OpenAPI contract for get get review context query key. */
 export const getGetReviewContextQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     revisionId: MaybeRefOrGetter<string>,) => {
     return [
@@ -840,6 +1040,7 @@ export const getGetReviewContextQueryKey = (tenantSlug: MaybeRefOrGetter<string>
     }
 
 
+/** getGetReviewContextQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getGetReviewContextQueryOptions = <TData = Awaited<ReturnType<typeof getReviewContext>>, TError = NotFoundResponse | InvalidStateResponse>(tenantSlug: MaybeRefOrGetter<string>,
     revisionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReviewContext>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -859,11 +1060,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(revisionId) !== null && toValue(revisionId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReviewContext>>, TError, TData>
 }
 
+/** GetReviewContextQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetReviewContextQueryResult = NonNullable<Awaited<ReturnType<typeof getReviewContext>>>
+/** GetReviewContextQueryError is the error type returned by its generated Vue Query hook. */
 export type GetReviewContextQueryError = NotFoundResponse | InvalidStateResponse
 
 
 
+/** useGetReviewContext executes its OpenAPI operation through TanStack Vue Query. */
 export function useGetReviewContext<TData = Awaited<ReturnType<typeof getReviewContext>>, TError = NotFoundResponse | InvalidStateResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     revisionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReviewContext>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -884,30 +1088,45 @@ export function useGetReviewContext<TData = Awaited<ReturnType<typeof getReviewC
 
 
 
+/** approveLayerRevisionResponse200 represents a declared HTTP response from the approve layer revision response200 operation. */
 export type approveLayerRevisionResponse200 = {
+  /** Data contains the decoded response payload. */
   data: RevisionReviewResultResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** approveLayerRevisionResponse404 represents a declared HTTP response from the approve layer revision response404 operation. */
 export type approveLayerRevisionResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** approveLayerRevisionResponse409 represents a declared HTTP response from the approve layer revision response409 operation. */
 export type approveLayerRevisionResponse409 = {
+  /** Data contains the decoded response payload. */
   data: ConflictResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** approveLayerRevisionResponseSuccess represents a declared HTTP response from the approve layer revision response success operation. */
 export type approveLayerRevisionResponseSuccess = (approveLayerRevisionResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** approveLayerRevisionResponseError represents a declared HTTP response from the approve layer revision response error operation. */
 export type approveLayerRevisionResponseError = (approveLayerRevisionResponse404 | approveLayerRevisionResponse409) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** approveLayerRevisionResponse represents a declared HTTP response from the approve layer revision response operation. */
 export type approveLayerRevisionResponse = (approveLayerRevisionResponseSuccess | approveLayerRevisionResponseError)
 
+/** getApproveLayerRevisionUrl builds the relative URL for its OpenAPI operation. */
 export const getApproveLayerRevisionUrl = (tenantSlug: string,
     revisionId: string,) => {
 
@@ -915,6 +1134,9 @@ export const getApproveLayerRevisionUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/layer-revisions/${revisionId}:approve`
 }
 
+/**
+ * Performs the approve layer revision workflow within the authorized request scope.
+ */
 export const approveLayerRevision = async (tenantSlug: string,
     revisionId: string,
     revisionApproveBody?: RevisionApproveBody, options?: Parameters<typeof meridianFetch>[1]): Promise<approveLayerRevisionResponse> => {
@@ -938,8 +1160,10 @@ return meridianFetch<approveLayerRevisionResponse>(getApproveLayerRevisionUrl(te
 
 
 
+/** getApproveLayerRevisionMutationKey is generated from the Meridian OpenAPI contract for get approve layer revision mutation key. */
 export const getApproveLayerRevisionMutationKey = () => ['approveLayerRevision'] as const;
 
+/** getApproveLayerRevisionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getApproveLayerRevisionMutationOptions = <TError = NotFoundResponse | ConflictResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveLayerRevision>>, TError,ApproveLayerRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof approveLayerRevision>>, TError,ApproveLayerRevisionMutationVariables, TContext> => {
@@ -967,11 +1191,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** ApproveLayerRevisionMutationResult is generated from the Meridian OpenAPI contract for approve layer revision mutation result. */
     export type ApproveLayerRevisionMutationResult = NonNullable<Awaited<ReturnType<typeof approveLayerRevision>>>
+    /** ApproveLayerRevisionMutationBody is the request body type for its generated OpenAPI operation. */
     export type ApproveLayerRevisionMutationBody = RevisionApproveBody | undefined
+    /** ApproveLayerRevisionMutationError is generated from the Meridian OpenAPI contract for approve layer revision mutation error. */
     export type ApproveLayerRevisionMutationError = NotFoundResponse | ConflictResponse
-    export type ApproveLayerRevisionMutationVariables = {tenantSlug: string;revisionId: string;data?: RevisionApproveBody}
+    /** ApproveLayerRevisionMutationVariables is generated from the Meridian OpenAPI contract for approve layer revision mutation variables. */
+    export type ApproveLayerRevisionMutationVariables = {/** TenantSlug carries the tenant slug value for ApproveLayerRevisionMutationVariables. */ tenantSlug: string;/** RevisionId carries the revision id value for ApproveLayerRevisionMutationVariables. */ revisionId: string;/** Data contains the decoded response payload. */ data?: RevisionApproveBody}
 
+    /** useApproveLayerRevision executes its OpenAPI operation through TanStack Vue Query. */
     export const useApproveLayerRevision = <TError = NotFoundResponse | ConflictResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveLayerRevision>>, TError,ApproveLayerRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -982,35 +1211,53 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getApproveLayerRevisionMutationOptions(options), queryClient);
     }
+    /** rejectLayerRevisionResponse200 represents a declared HTTP response from the reject layer revision response200 operation. */
     export type rejectLayerRevisionResponse200 = {
+  /** Data contains the decoded response payload. */
   data: RevisionReviewResultResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** rejectLayerRevisionResponse404 represents a declared HTTP response from the reject layer revision response404 operation. */
 export type rejectLayerRevisionResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** rejectLayerRevisionResponse409 represents a declared HTTP response from the reject layer revision response409 operation. */
 export type rejectLayerRevisionResponse409 = {
+  /** Data contains the decoded response payload. */
   data: ConflictResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** rejectLayerRevisionResponse422 represents a declared HTTP response from the reject layer revision response422 operation. */
 export type rejectLayerRevisionResponse422 = {
+  /** Data contains the decoded response payload. */
   data: ValidationErrorResponse
+  /** Status is the HTTP response status code. */
   status: 422
 }
 
+/** rejectLayerRevisionResponseSuccess represents a declared HTTP response from the reject layer revision response success operation. */
 export type rejectLayerRevisionResponseSuccess = (rejectLayerRevisionResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** rejectLayerRevisionResponseError represents a declared HTTP response from the reject layer revision response error operation. */
 export type rejectLayerRevisionResponseError = (rejectLayerRevisionResponse404 | rejectLayerRevisionResponse409 | rejectLayerRevisionResponse422) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** rejectLayerRevisionResponse represents a declared HTTP response from the reject layer revision response operation. */
 export type rejectLayerRevisionResponse = (rejectLayerRevisionResponseSuccess | rejectLayerRevisionResponseError)
 
+/** getRejectLayerRevisionUrl builds the relative URL for its OpenAPI operation. */
 export const getRejectLayerRevisionUrl = (tenantSlug: string,
     revisionId: string,) => {
 
@@ -1018,6 +1265,9 @@ export const getRejectLayerRevisionUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/layer-revisions/${revisionId}:reject`
 }
 
+/**
+ * Performs the reject layer revision workflow within the authorized request scope.
+ */
 export const rejectLayerRevision = async (tenantSlug: string,
     revisionId: string,
     revisionRejectBody: RevisionRejectBody, options?: Parameters<typeof meridianFetch>[1]): Promise<rejectLayerRevisionResponse> => {
@@ -1041,8 +1291,10 @@ return meridianFetch<rejectLayerRevisionResponse>(getRejectLayerRevisionUrl(tena
 
 
 
+/** getRejectLayerRevisionMutationKey is generated from the Meridian OpenAPI contract for get reject layer revision mutation key. */
 export const getRejectLayerRevisionMutationKey = () => ['rejectLayerRevision'] as const;
 
+/** getRejectLayerRevisionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getRejectLayerRevisionMutationOptions = <TError = NotFoundResponse | ConflictResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectLayerRevision>>, TError,RejectLayerRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof rejectLayerRevision>>, TError,RejectLayerRevisionMutationVariables, TContext> => {
@@ -1070,11 +1322,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** RejectLayerRevisionMutationResult is generated from the Meridian OpenAPI contract for reject layer revision mutation result. */
     export type RejectLayerRevisionMutationResult = NonNullable<Awaited<ReturnType<typeof rejectLayerRevision>>>
+    /** RejectLayerRevisionMutationBody is the request body type for its generated OpenAPI operation. */
     export type RejectLayerRevisionMutationBody = RevisionRejectBody
+    /** RejectLayerRevisionMutationError is generated from the Meridian OpenAPI contract for reject layer revision mutation error. */
     export type RejectLayerRevisionMutationError = NotFoundResponse | ConflictResponse | ValidationErrorResponse
-    export type RejectLayerRevisionMutationVariables = {tenantSlug: string;revisionId: string;data: RevisionRejectBody}
+    /** RejectLayerRevisionMutationVariables is generated from the Meridian OpenAPI contract for reject layer revision mutation variables. */
+    export type RejectLayerRevisionMutationVariables = {/** TenantSlug carries the tenant slug value for RejectLayerRevisionMutationVariables. */ tenantSlug: string;/** RevisionId carries the revision id value for RejectLayerRevisionMutationVariables. */ revisionId: string;/** Data contains the decoded response payload. */ data: RevisionRejectBody}
 
+    /** useRejectLayerRevision executes its OpenAPI operation through TanStack Vue Query. */
     export const useRejectLayerRevision = <TError = NotFoundResponse | ConflictResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectLayerRevision>>, TError,RejectLayerRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -1085,25 +1342,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRejectLayerRevisionMutationOptions(options), queryClient);
     }
+    /** listReviewsResponse200 represents a declared HTTP response from the list reviews response200 operation. */
     export type listReviewsResponse200 = {
+  /** Data contains the decoded response payload. */
   data: ReviewPageResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** listReviewsResponse404 represents a declared HTTP response from the list reviews response404 operation. */
 export type listReviewsResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** listReviewsResponseSuccess represents a declared HTTP response from the list reviews response success operation. */
 export type listReviewsResponseSuccess = (listReviewsResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** listReviewsResponseError represents a declared HTTP response from the list reviews response error operation. */
 export type listReviewsResponseError = (listReviewsResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** listReviewsResponse represents a declared HTTP response from the list reviews response operation. */
 export type listReviewsResponse = (listReviewsResponseSuccess | listReviewsResponseError)
 
+/** getListReviewsUrl builds the relative URL for its OpenAPI operation. */
 export const getListReviewsUrl = (tenantSlug: string,
     params?: ListReviewsParams,) => {
   const stringifiedParams = serializeQueryParams(params);
@@ -1111,6 +1380,9 @@ export const getListReviewsUrl = (tenantSlug: string,
   return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/reviews?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/reviews`
 }
 
+/**
+ * Returns the requested page of reviews within the authorized request scope.
+ */
 export const listReviews = async (tenantSlug: string,
     params?: ListReviewsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listReviewsResponse> => {
 
@@ -1127,6 +1399,7 @@ export const listReviews = async (tenantSlug: string,
 
 
 
+/** getListReviewsQueryKey is generated from the Meridian OpenAPI contract for get list reviews query key. */
 export const getListReviewsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListReviewsParams>,) => {
     return [
@@ -1135,6 +1408,7 @@ export const getListReviewsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     }
 
 
+/** getListReviewsQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getListReviewsQueryOptions = <TData = Awaited<ReturnType<typeof listReviews>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListReviewsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listReviews>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -1154,11 +1428,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listReviews>>, TError, TData>
 }
 
+/** ListReviewsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListReviewsQueryResult = NonNullable<Awaited<ReturnType<typeof listReviews>>>
+/** ListReviewsQueryError is the error type returned by its generated Vue Query hook. */
 export type ListReviewsQueryError = NotFoundResponse
 
 
 
+/** useListReviews executes its OpenAPI operation through TanStack Vue Query. */
 export function useListReviews<TData = Awaited<ReturnType<typeof listReviews>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListReviewsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listReviews>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}

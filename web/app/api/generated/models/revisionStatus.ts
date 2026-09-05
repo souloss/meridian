@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported revision status value.
+ */
 export type RevisionStatus = typeof RevisionStatus[keyof typeof RevisionStatus];
 
 
+/** RevisionStatus is generated from the Meridian OpenAPI contract for revision status. */
 export const RevisionStatus = {
   not_required: 'not_required',
   pending_review: 'pending_review',

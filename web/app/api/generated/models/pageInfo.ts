@@ -6,12 +6,22 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * represents page info data exchanged through the Meridian API.
+ */
 export interface PageInfo {
-  /** @minimum 0 */
+  /**
+     * is the number of matching records across all pages.
+     * @minimum 0
+     */
   total: number;
-  /** @minimum 1 */
+  /**
+     * is the one-based page number.
+     * @minimum 1
+     */
   page: number;
   /**
+     * is the maximum number of records returned on one page.
      * @minimum 1
      * @maximum 100
      */

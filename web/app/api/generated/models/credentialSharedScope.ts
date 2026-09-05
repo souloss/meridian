@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * controls whether only the creator, selected teams, or the whole tenant may use the credential.
+ */
 export type CredentialSharedScope = typeof CredentialSharedScope[keyof typeof CredentialSharedScope];
 
 
+/** CredentialSharedScope is generated from the Meridian OpenAPI contract for credential shared scope. */
 export const CredentialSharedScope = {
   private: 'private',
   team: 'team',

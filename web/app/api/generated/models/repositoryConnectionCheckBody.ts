@@ -7,4 +7,5 @@
  */
 import type { RepositoryConnectionCheckRequest } from './repositoryConnectionCheckRequest.ts';
 
+/** RepositoryConnectionCheckBody is the request body type for its generated OpenAPI operation. */
 export type RepositoryConnectionCheckBody = RepositoryConnectionCheckRequest;

@@ -12,17 +12,28 @@ import type { TenantStatus } from './tenantStatus.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents tenant data exchanged through the Meridian API.
+ */
 export interface Tenant {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the slug associated with this tenant. */
   slug: Slug;
   /**
+     * specifies the display name associated with this tenant.
      * @minLength 1
      * @maxLength 128
      */
   displayName: string;
+  /** is the current lifecycle or processing state. */
   status: TenantStatus;
+  /** contains the quota associated with this tenant. */
   quota: Quota;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

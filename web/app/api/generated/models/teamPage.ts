@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { Team } from './team.ts';
 
+/**
+ * contains one paginated page of team records.
+ */
 export type TeamPage = PageInfo & {
+  /** contains the ordered items associated with this team page. */
   items: Team[];
 };

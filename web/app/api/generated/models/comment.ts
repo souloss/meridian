@@ -9,11 +9,20 @@ import type { Timestamp } from './timestamp.ts';
 import type { User } from './user.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents comment data exchanged through the Meridian API.
+ */
 export interface Comment {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** identifies the service associated with this resource. */
   serviceId: Uuid;
+  /** contains the user associated with this comment. */
   author: User;
+  /** specifies the body associated with this comment. */
   body: string;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

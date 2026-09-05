@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported job scope type value.
+ */
 export type JobScopeType = typeof JobScopeType[keyof typeof JobScopeType];
 
 
+/** JobScopeType is generated from the Meridian OpenAPI contract for job scope type. */
 export const JobScopeType = {
   tenant: 'tenant',
   repository: 'repository',

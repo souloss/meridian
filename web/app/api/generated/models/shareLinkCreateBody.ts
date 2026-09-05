@@ -7,4 +7,5 @@
  */
 import type { ShareLinkCreateRequest } from './shareLinkCreateRequest.ts';
 
+/** ShareLinkCreateBody is the request body type for its generated OpenAPI operation. */
 export type ShareLinkCreateBody = ShareLinkCreateRequest;

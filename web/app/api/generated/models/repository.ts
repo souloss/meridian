@@ -15,14 +15,23 @@ import type { RepositoryHealth } from './repositoryHealth.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents repository data exchanged through the Meridian API.
+ */
 export interface Repository {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** contains the git remote url associated with this repository. */
   url: GitRemoteUrl;
   /** Tenant-visible credential ID; may identify a tenant credential or a global credential. Null means public access. */
   credentialId: Uuid | null;
+  /** contains the ref name associated with this repository. */
   defaultBranch: RefName;
+  /** contains the branch policy associated with this repository. */
   branchPolicy: BranchPolicy;
+  /** contains the fetch config associated with this repository. */
   fetchConfig: FetchConfig;
   /**
      * Standard five-field cron in UTC; null disables schedule
@@ -31,12 +40,17 @@ export interface Repository {
      */
   syncCron: string | null;
   /**
+     * specifies the note associated with this repository.
      * @maxLength 500
      * @nullable
      */
   note: string | null;
+  /** contains the repository health associated with this repository. */
   health: RepositoryHealth;
+  /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

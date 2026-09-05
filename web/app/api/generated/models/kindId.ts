@@ -7,6 +7,7 @@
  */
 
 /**
+ * identifies an asset kind registered in contracts/kinds.yaml.
  * @pattern ^[a-z][a-z0-9_]{0,63}$
  */
 export type KindId = string;

@@ -8,8 +8,14 @@
 import type { LayerRevision } from './layerRevision.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents layer revision submission data exchanged through the Meridian API.
+ */
 export interface LayerRevisionSubmission {
+  /** is the monotonic optimistic-concurrency version of this resource. */
   revision: LayerRevision;
+  /** identifies the asynchronous job associated with this resource. */
   jobId: Uuid;
+  /** indicates whether deduplicated applies to this layer revision submission. */
   deduplicated: boolean;
 }

@@ -7,16 +7,22 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface SystemGroupPatchRequest {
   /**
+     * specifies the display name associated with this system group patch request.
      * @minLength 1
      * @maxLength 128
      */
   displayName?: string;
   /**
+     * specifies the description associated with this system group patch request.
      * @maxLength 2000
      * @nullable
      */
   description?: string | null;
+  /** specifies the parent id associated with this system group patch request. */
   parentId?: Uuid | null;
 }

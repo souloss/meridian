@@ -7,6 +7,10 @@
  */
 import type { ViewDefinition } from './viewDefinition.ts';
 
+/**
+ * contains an ordered collection of view values.
+ */
 export interface ViewList {
+  /** contains the ordered items associated with this view list. */
   items: ViewDefinition[];
 }

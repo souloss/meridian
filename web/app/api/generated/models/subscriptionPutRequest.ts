@@ -11,12 +11,24 @@ import type { SubscriptionScopeConstraints } from './subscriptionScopeConstraint
 import type { SubscriptionScopeType } from './subscriptionScopeType.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export type SubscriptionPutRequest = SubscriptionScopeConstraints & ({
-  /** @minItems 1 */
+  /**
+     * contains the ordered event types associated with this subscription put request.
+     * @minItems 1
+     */
   eventTypes: DomainEventType[];
+  /** contains the subscription scope type associated with this subscription put request. */
   scopeType: SubscriptionScopeType;
+  /** specifies the scope id associated with this subscription put request. */
   scopeId: Uuid | KindId | null;
-  /** @minItems 1 */
+  /**
+     * contains the ordered channel ids associated with this subscription put request.
+     * @minItems 1
+     */
   channelIds: Uuid[];
+  /** indicates whether enabled applies to this subscription put request. */
   enabled: boolean;
 });

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported tenant status value.
+ */
 export type TenantStatus = typeof TenantStatus[keyof typeof TenantStatus];
 
 
+/** TenantStatus is generated from the Meridian OpenAPI contract for tenant status. */
 export const TenantStatus = {
   active: 'active',
   disabled: 'disabled',

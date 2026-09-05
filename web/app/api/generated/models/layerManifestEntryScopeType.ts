@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the scope type associated with this layer manifest entry.
+ */
 export type LayerManifestEntryScopeType = typeof LayerManifestEntryScopeType[keyof typeof LayerManifestEntryScopeType];
 
 
+/** LayerManifestEntryScopeType is generated from the Meridian OpenAPI contract for layer manifest entry scope type. */
 export const LayerManifestEntryScopeType = {
   ref: 'ref',
   global: 'global',

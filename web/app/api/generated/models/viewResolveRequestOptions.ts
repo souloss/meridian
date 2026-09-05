@@ -6,4 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the options associated with this view resolve request.
+ */
 export type ViewResolveRequestOptions = { [key: string]: unknown };

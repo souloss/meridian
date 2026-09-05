@@ -11,16 +11,31 @@ import type { Slug } from './slug.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents system group data exchanged through the Meridian API.
+ */
 export interface SystemGroup {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
+  /** specifies the parent id associated with this system group. */
   parentId: Uuid | null;
+  /** contains the slug associated with this system group. */
   slug: Slug;
+  /** specifies the display name associated with this system group. */
   displayName: string;
-  /** @nullable */
+  /**
+     * specifies the description associated with this system group.
+     * @nullable
+     */
   description: string | null;
+  /** contains the ordered service ids associated with this system group. */
   serviceIds: Uuid[];
+  /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the overlay mode associated with this asset version.
+ */
 export type AssetVersionOverlayMode = typeof AssetVersionOverlayMode[keyof typeof AssetVersionOverlayMode];
 
 
+/** AssetVersionOverlayMode is generated from the Meridian OpenAPI contract for asset version overlay mode. */
 export const AssetVersionOverlayMode = {
   lenient: 'lenient',
   strict: 'strict',

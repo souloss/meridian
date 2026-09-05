@@ -7,4 +7,5 @@
  */
 import type { ServiceAccessPutRequest } from './serviceAccessPutRequest.ts';
 
+/** ServiceAccessPutBody is the request body type for its generated OpenAPI operation. */
 export type ServiceAccessPutBody = ServiceAccessPutRequest;

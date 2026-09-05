@@ -9,14 +9,24 @@ import type { ShareLinkResourceType } from './shareLinkResourceType.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents share link data exchanged through the Meridian API.
+ */
 export interface ShareLink {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** specifies the resource type associated with this share link. */
   resourceType: ShareLinkResourceType;
   /** Diff snapshot ID; null for a frozen view descriptor. */
   resourceId: Uuid | null;
+  /** specifies the descriptor digest associated with this share link. */
   descriptorDigest: string;
+  /** specifies the url associated with this share link. */
   url: string;
+  /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp;
+  /** specifies the revoked at associated with this share link. */
   revokedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
 }

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * is the current lifecycle or processing state.
+ */
 export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
 
 
+/** UserStatus is generated from the Meridian OpenAPI contract for user status. */
 export const UserStatus = {
   active: 'active',
   disabled: 'disabled',

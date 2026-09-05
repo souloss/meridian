@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported service role value.
+ */
 export type ServiceRole = typeof ServiceRole[keyof typeof ServiceRole];
 
 
+/** ServiceRole is generated from the Meridian OpenAPI contract for service role. */
 export const ServiceRole = {
   owner: 'owner',
   maintainer: 'maintainer',

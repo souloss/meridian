@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * specifies the type associated with this scope selector.
+ */
 export type ScopeSelectorType = typeof ScopeSelectorType[keyof typeof ScopeSelectorType];
 
 
+/** ScopeSelectorType is generated from the Meridian OpenAPI contract for scope selector type. */
 export const ScopeSelectorType = {
   service: 'service',
   system_group: 'system_group',

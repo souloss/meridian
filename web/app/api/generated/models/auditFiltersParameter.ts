@@ -7,4 +7,5 @@
  */
 import type { AuditFilter } from './auditFilter.ts';
 
+/** AuditFiltersParameter is generated from the Meridian OpenAPI contract for audit filters parameter. */
 export type AuditFiltersParameter = AuditFilter;

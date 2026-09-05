@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * identifies one supported producer dependency status value.
+ */
 export type ProducerDependencyStatus = typeof ProducerDependencyStatus[keyof typeof ProducerDependencyStatus];
 
 
+/** ProducerDependencyStatus is generated from the Meridian OpenAPI contract for producer dependency status. */
 export const ProducerDependencyStatus = {
   available: 'available',
   unavailable: 'unavailable',

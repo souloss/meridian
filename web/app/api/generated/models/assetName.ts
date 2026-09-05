@@ -7,6 +7,7 @@
  */
 
 /**
+ * is a stable lowercase asset identifier within one service and kind.
  * @pattern ^[a-z0-9][a-z0-9-]{0,63}$
  */
 export type AssetName = string;

@@ -8,12 +8,15 @@
 import type { PageParameter } from './pageParameter.ts';
 import type { PageSizeParameter } from './pageSizeParameter.ts';
 
+/** ListTeamsParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListTeamsParams = {
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */

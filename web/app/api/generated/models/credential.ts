@@ -12,21 +12,36 @@ import type { ETag } from './eTag.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * exposes encrypted-secret metadata and fingerprint only; plaintext secret material is never returned.
+ */
 export interface Credential {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
   /**
+     * specifies the name associated with this credential.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
+  /** contains the credential kind associated with this credential. */
   kind: CredentialKind;
+  /** contains the credential fingerprint associated with this credential. */
   fingerprint: CredentialFingerprint;
+  /** controls whether only the creator, selected teams, or the whole tenant may use the credential. */
   sharedScope: CredentialSharedScope;
+  /** lists teams allowed to use a team-scoped credential and is empty for other scopes. */
   teamIds: Uuid[];
+  /** indicates whether a platform administrator owns this credential outside any tenant. */
   isGlobal: boolean;
+  /** identifies the user who created the credential. */
   createdBy: Uuid;
+  /** is the most recent successful credential use, or null when unused. */
   lastUsedAt: Timestamp | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

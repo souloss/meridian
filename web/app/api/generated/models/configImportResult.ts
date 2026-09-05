@@ -7,11 +7,20 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * reports the result of the corresponding Meridian operation.
+ */
 export interface ConfigImportResult {
+  /** identifies the repository associated with this resource. */
   repositoryId: Uuid;
+  /** specifies the commit associated with this config import result. */
   commit: string;
+  /** is the lowercase SHA-256 digest of the normalized configuration. */
   configDigest: string;
+  /** contains the ordered created service ids associated with this config import result. */
   createdServiceIds: Uuid[];
+  /** contains the ordered updated service ids associated with this config import result. */
   updatedServiceIds: Uuid[];
+  /** contains the ordered source spec ids associated with this config import result. */
   sourceSpecIds: Uuid[];
 }

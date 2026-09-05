@@ -7,7 +7,12 @@
  */
 import type { Uuid } from './uuid.ts';
 
+/**
+ * identifies the upload selected by a request.
+ */
 export interface UploadSelector {
+  /** specifies the type associated with this upload selector. */
   type: 'upload';
+  /** contains the uuid associated with this upload selector. */
   uploadId: Uuid;
 }

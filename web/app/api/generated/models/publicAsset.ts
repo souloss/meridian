@@ -11,11 +11,20 @@ import type { Lifecycle } from './lifecycle.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { VersionRef } from './versionRef.ts';
 
+/**
+ * represents public asset data exchanged through the Meridian API.
+ */
 export interface PublicAsset {
+  /** contains the kind id associated with this public asset. */
   kind: KindId;
+  /** contains the asset name associated with this public asset. */
   name: AssetName;
+  /** contains the lifecycle associated with this public asset. */
   lifecycle: Lifecycle;
+  /** contains the version ref associated with this public asset. */
   currentVersion: VersionRef;
+  /** specifies the content url associated with this public asset. */
   contentUrl: string;
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

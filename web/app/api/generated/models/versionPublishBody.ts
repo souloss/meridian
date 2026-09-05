@@ -7,4 +7,5 @@
  */
 import type { VersionPublishRequest } from './versionPublishRequest.ts';
 
+/** VersionPublishBody is the request body type for its generated OpenAPI operation. */
 export type VersionPublishBody = VersionPublishRequest;

@@ -8,8 +8,14 @@
 import type { TenantMembershipRef } from './tenantMembershipRef.ts';
 import type { User } from './user.ts';
 
+/**
+ * describes the authenticated user and every tenant context available to that user.
+ */
 export interface Me {
+  /** is the authenticated local identity. */
   user: User;
+  /** lists tenant contexts the authenticated user may access. */
   tenants: TenantMembershipRef[];
+  /** indicates whether the user may access platform administration operations. */
   isPlatformAdmin: boolean;
 }

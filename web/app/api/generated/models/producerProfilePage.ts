@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { ProducerProfile } from './producerProfile.ts';
 
+/**
+ * contains one paginated page of producer profile records.
+ */
 export type ProducerProfilePage = PageInfo & {
+  /** contains the ordered items associated with this producer profile page. */
   items: ProducerProfile[];
 };

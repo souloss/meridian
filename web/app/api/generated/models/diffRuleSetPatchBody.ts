@@ -7,4 +7,5 @@
  */
 import type { DiffRuleSetPatchRequest } from './diffRuleSetPatchRequest.ts';
 
+/** DiffRuleSetPatchBody is the request body type for its generated OpenAPI operation. */
 export type DiffRuleSetPatchBody = DiffRuleSetPatchRequest;

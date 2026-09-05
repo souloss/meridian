@@ -9,4 +9,7 @@ import type { RefSelector } from './refSelector.ts';
 import type { UploadSelector } from './uploadSelector.ts';
 import type { VersionSelector } from './versionSelector.ts';
 
+/**
+ * identifies the document selected by a request.
+ */
 export type DocumentSelector = VersionSelector | RefSelector | UploadSelector;

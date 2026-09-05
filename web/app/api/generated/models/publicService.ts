@@ -10,13 +10,25 @@ import type { Lifecycle } from './lifecycle.ts';
 import type { Slug } from './slug.ts';
 import type { Timestamp } from './timestamp.ts';
 
+/**
+ * represents public service data exchanged through the Meridian API.
+ */
 export interface PublicService {
+  /** contains the slug associated with this public service. */
   slug: Slug;
+  /** specifies the display name associated with this public service. */
   displayName: string;
-  /** @nullable */
+  /**
+     * specifies the description associated with this public service.
+     * @nullable
+     */
   description: string | null;
+  /** contains the lifecycle associated with this public service. */
   lifecycle: Lifecycle;
+  /** contains the ordered tags associated with this public service. */
   tags: string[];
+  /** contains the ordered assets associated with this public service. */
   assets: AssetSummary[];
+  /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }

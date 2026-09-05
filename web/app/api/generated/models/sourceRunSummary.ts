@@ -11,11 +11,20 @@ import type { RefType } from './refType.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents source run summary data exchanged through the Meridian API.
+ */
 export interface SourceRunSummary {
+  /** identifies the asynchronous job associated with this resource. */
   jobId: Uuid;
+  /** contains the ref type associated with this source run summary. */
   refType: RefType;
+  /** contains the ref name associated with this source run summary. */
   ref: RefName;
+  /** is the current lifecycle or processing state. */
   status: JobStatus;
+  /** is the RFC 3339 UTC instant when processing began. */
   startedAt: Timestamp;
+  /** is the RFC 3339 UTC instant when processing reached a terminal state. */
   finishedAt: Timestamp | null;
 }

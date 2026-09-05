@@ -12,9 +12,15 @@ import type { RevisionStatus } from './revisionStatus.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
 
+/**
+ * represents layer revision data exchanged through the Meridian API.
+ */
 export interface LayerRevision {
+  /** uniquely identifies this resource. */
   id: Uuid;
+  /** contains the uuid associated with this layer revision. */
   layerId: Uuid;
+  /** specifies the scope type associated with this layer revision. */
   scopeType: LayerRevisionScopeType;
   /**
      * '*' for global, otherwise 'branch:<name>' or 'tag:<name>'
@@ -22,20 +28,41 @@ export interface LayerRevision {
      * @maxLength 260
      */
   scopeKey: string;
+  /** specifies the content hash associated with this layer revision. */
   contentHash: string;
+  /** contains the content type associated with this layer revision. */
   contentType: ContentType;
+  /** specifies the content url associated with this layer revision. */
   contentUrl?: string;
-  /** @nullable */
+  /**
+     * specifies the dialect associated with this layer revision.
+     * @nullable
+     */
   dialect: string | null;
-  /** @nullable */
+  /**
+     * specifies the source branch associated with this layer revision.
+     * @nullable
+     */
   sourceBranch: string | null;
-  /** @nullable */
+  /**
+     * specifies the git commit associated with this layer revision.
+     * @nullable
+     */
   gitCommit: string | null;
+  /** specifies the created by associated with this layer revision. */
   createdBy: Uuid | null;
-  /** @nullable */
+  /**
+     * specifies the ai meta associated with this layer revision.
+     * @nullable
+     */
   aiMeta: LayerRevisionAiMeta;
+  /** contains the revision status associated with this layer revision. */
   reviewStatus: RevisionStatus;
-  /** @nullable */
+  /**
+     * specifies the review comment associated with this layer revision.
+     * @nullable
+     */
   reviewComment: string | null;
+  /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
 }

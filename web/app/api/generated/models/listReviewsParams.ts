@@ -10,15 +10,21 @@ import type { PageSizeParameter } from './pageSizeParameter.ts';
 import type { ReviewFilter } from './reviewFilter.ts';
 import type { ReviewFiltersParameter } from './reviewFiltersParameter.ts';
 
+/** ListReviewsParams contains parameters accepted by its generated OpenAPI operation. */
 export type ListReviewsParams = {
 /**
+ * selects a one-based result page.
  * @minimum 1
  */
 page?: PageParameter;
 /**
+ * limits the number of records returned on one page.
  * @minimum 1
  * @maximum 100
  */
 pageSize?: PageSizeParameter;
+/**
+ * defines supported filters for selecting review records.
+ */
 filter?: ReviewFiltersParameter;
 };

@@ -7,11 +7,16 @@
  */
 import type { VersionPublishRequestLabels } from './versionPublishRequestLabels.ts';
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface VersionPublishRequest {
   /**
+     * specifies the version associated with this version publish request.
      * @maxLength 128
      * @nullable
      */
   version?: string | null;
+  /** specifies the labels associated with this version publish request. */
   labels?: VersionPublishRequestLabels;
 }

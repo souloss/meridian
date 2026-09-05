@@ -6,13 +6,18 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * defines validated input for the corresponding Meridian API operation.
+ */
 export interface TagPatchRequest {
   /**
+     * specifies the name associated with this tag patch request.
      * @minLength 1
      * @maxLength 64
      */
   name?: string;
   /**
+     * specifies the color associated with this tag patch request.
      * @nullable
      * @pattern ^#[0-9A-Fa-f]{6}$
      */

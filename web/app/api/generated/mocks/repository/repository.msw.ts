@@ -44,49 +44,71 @@ import type {
 } from '../../models';
 
 
+/** getCheckRepositoryConnectionResponseKnownHostCandidateMock provides generated MSW behavior for contract tests. */
 export const getCheckRepositoryConnectionResponseKnownHostCandidateMock = (overrideResponse: Partial<KnownHostCandidate> = {}): KnownHostCandidate => ({...{host: faker.string.alpha({length: {min: 1, max: 255}}), port: faker.number.int({min: 1, max: 65535}), keyType: faker.helpers.arrayElement(['ssh-ed25519','ssh-rsa'] as const), publicKey: faker.helpers.fromRegExp("^[A-Za-z0-9+/]+={0,2}$"), fingerprint: faker.helpers.fromRegExp("^SHA256:[A-Za-z0-9+/]{43}$")}, ...overrideResponse});
 
+/** getCheckRepositoryConnectionResponseMock provides generated MSW behavior for contract tests. */
 export const getCheckRepositoryConnectionResponseMock = (overrideResponse: Partial<Extract<ConnectionTestResponse, object>> = {}): ConnectionTestResponse => ({ok: faker.datatype.boolean(), errorClass: faker.helpers.arrayElement([faker.helpers.arrayElement(['dns','auth','host_key','timeout','other'] as const), null]), message: faker.string.alpha({length: {min: 10, max: 20}}), hostKeyCandidate: faker.helpers.arrayElement([{...getCheckRepositoryConnectionResponseKnownHostCandidateMock()},null,]), ...overrideResponse})
 
+/** getListRepositoriesResponseRepositoryErrorMock provides generated MSW behavior for contract tests. */
 export const getListRepositoriesResponseRepositoryErrorMock = (overrideResponse: Partial<RepositoryError> = {}): RepositoryError => ({...{class: faker.helpers.arrayElement(['dns','auth','host_key','timeout','invalid_config','other'] as const), message: faker.string.alpha({length: {min: 10, max: 20}})}, ...overrideResponse});
 
+/** getListRepositoriesResponseMock provides generated MSW behavior for contract tests. */
 export const getListRepositoriesResponseMock = (): RepositoryPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), url: faker.string.alpha({length: {min: 1, max: 2048}}), credentialId: faker.helpers.arrayElement([faker.string.uuid(),null,]), defaultBranch: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), branchPolicy: {branchPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$"))), tagPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$")))}, fetchConfig: {shallow: faker.datatype.boolean(), depth: faker.helpers.arrayElement([faker.number.int({min: 1, max: 10000}), null]), submodules: faker.datatype.boolean(), proxy: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2048}}), null]), undefined]), pathAllow: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), pathIgnore: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), knownHostPolicy: faker.helpers.arrayElement(['strict','accept_new'] as const)}, syncCron: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), note: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), health: {lastSyncAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), lastCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), lastError: faker.helpers.arrayElement([{...getListRepositoriesResponseRepositoryErrorMock()},null,]), failStreak: faker.number.int({min: 0}), durationMs: faker.helpers.arrayElement([faker.number.int({min: 0}), null])}, capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
 
+/** getCreateRepositoryResponseRepositoryErrorMock provides generated MSW behavior for contract tests. */
 export const getCreateRepositoryResponseRepositoryErrorMock = (overrideResponse: Partial<RepositoryError> = {}): RepositoryError => ({...{class: faker.helpers.arrayElement(['dns','auth','host_key','timeout','invalid_config','other'] as const), message: faker.string.alpha({length: {min: 10, max: 20}})}, ...overrideResponse});
 
+/** getCreateRepositoryResponseMock provides generated MSW behavior for contract tests. */
 export const getCreateRepositoryResponseMock = (overrideResponse: Partial<Extract<RepositoryResponse, object>> = {}): RepositoryResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), url: faker.string.alpha({length: {min: 1, max: 2048}}), credentialId: faker.helpers.arrayElement([faker.string.uuid(),null,]), defaultBranch: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), branchPolicy: {branchPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$"))), tagPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$")))}, fetchConfig: {shallow: faker.datatype.boolean(), depth: faker.helpers.arrayElement([faker.number.int({min: 1, max: 10000}), null]), submodules: faker.datatype.boolean(), proxy: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2048}}), null]), undefined]), pathAllow: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), pathIgnore: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), knownHostPolicy: faker.helpers.arrayElement(['strict','accept_new'] as const)}, syncCron: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), note: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), health: {lastSyncAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), lastCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), lastError: faker.helpers.arrayElement([{...getCreateRepositoryResponseRepositoryErrorMock()},null,]), failStreak: faker.number.int({min: 0}), durationMs: faker.helpers.arrayElement([faker.number.int({min: 0}), null])}, capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getGetRepositoryResponseRepositoryErrorMock provides generated MSW behavior for contract tests. */
 export const getGetRepositoryResponseRepositoryErrorMock = (overrideResponse: Partial<RepositoryError> = {}): RepositoryError => ({...{class: faker.helpers.arrayElement(['dns','auth','host_key','timeout','invalid_config','other'] as const), message: faker.string.alpha({length: {min: 10, max: 20}})}, ...overrideResponse});
 
+/** getGetRepositoryResponseMock provides generated MSW behavior for contract tests. */
 export const getGetRepositoryResponseMock = (overrideResponse: Partial<Extract<RepositoryResponse, object>> = {}): RepositoryResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), url: faker.string.alpha({length: {min: 1, max: 2048}}), credentialId: faker.helpers.arrayElement([faker.string.uuid(),null,]), defaultBranch: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), branchPolicy: {branchPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$"))), tagPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$")))}, fetchConfig: {shallow: faker.datatype.boolean(), depth: faker.helpers.arrayElement([faker.number.int({min: 1, max: 10000}), null]), submodules: faker.datatype.boolean(), proxy: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2048}}), null]), undefined]), pathAllow: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), pathIgnore: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), knownHostPolicy: faker.helpers.arrayElement(['strict','accept_new'] as const)}, syncCron: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), note: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), health: {lastSyncAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), lastCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), lastError: faker.helpers.arrayElement([{...getGetRepositoryResponseRepositoryErrorMock()},null,]), failStreak: faker.number.int({min: 0}), durationMs: faker.helpers.arrayElement([faker.number.int({min: 0}), null])}, capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getUpdateRepositoryResponseRepositoryErrorMock provides generated MSW behavior for contract tests. */
 export const getUpdateRepositoryResponseRepositoryErrorMock = (overrideResponse: Partial<RepositoryError> = {}): RepositoryError => ({...{class: faker.helpers.arrayElement(['dns','auth','host_key','timeout','invalid_config','other'] as const), message: faker.string.alpha({length: {min: 10, max: 20}})}, ...overrideResponse});
 
+/** getUpdateRepositoryResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateRepositoryResponseMock = (overrideResponse: Partial<Extract<RepositoryResponse, object>> = {}): RepositoryResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), url: faker.string.alpha({length: {min: 1, max: 2048}}), credentialId: faker.helpers.arrayElement([faker.string.uuid(),null,]), defaultBranch: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), branchPolicy: {branchPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$"))), tagPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$")))}, fetchConfig: {shallow: faker.datatype.boolean(), depth: faker.helpers.arrayElement([faker.number.int({min: 1, max: 10000}), null]), submodules: faker.datatype.boolean(), proxy: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2048}}), null]), undefined]), pathAllow: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), pathIgnore: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 512}}))), knownHostPolicy: faker.helpers.arrayElement(['strict','accept_new'] as const)}, syncCron: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), note: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), health: {lastSyncAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), lastCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), lastError: faker.helpers.arrayElement([{...getUpdateRepositoryResponseRepositoryErrorMock()},null,]), failStreak: faker.number.int({min: 0}), durationMs: faker.helpers.arrayElement([faker.number.int({min: 0}), null])}, capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getSyncRepositoryResponseMock provides generated MSW behavior for contract tests. */
 export const getSyncRepositoryResponseMock = (overrideResponse: Partial<Extract<JobAcceptedResponse, object>> = {}): JobAcceptedResponse => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
+/** getDiscoverRepositoryResponseMock provides generated MSW behavior for contract tests. */
 export const getDiscoverRepositoryResponseMock = (overrideResponse: Partial<Extract<JobAcceptedResponse, object>> = {}): JobAcceptedResponse => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
+/** getListDiscoveryCandidatesResponseMock provides generated MSW behavior for contract tests. */
 export const getListDiscoveryCandidatesResponseMock = (): CandidatePageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), path: faker.string.alpha({length: {min: 10, max: 20}}), suggestedSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 10, max: 20}}), confidence: faker.number.float({min: 0, max: 1, fractionDigits: 2}), detectedKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"))), status: faker.helpers.arrayElement(['pending','accepted','dismissed'] as const), discoveredAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
 
+/** getAcceptDiscoveryCandidatesResponseVersionRefMock provides generated MSW behavior for contract tests. */
 export const getAcceptDiscoveryCandidatesResponseVersionRefMock = (overrideResponse: Partial<VersionRef> = {}): VersionRef => ({...{id: faker.string.uuid(), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle))}, ...overrideResponse});
 
+/** getAcceptDiscoveryCandidatesResponseMock provides generated MSW behavior for contract tests. */
 export const getAcceptDiscoveryCandidatesResponseMock = (overrideResponse: Partial<Extract<ServiceListResponse, object>> = {}): ServiceListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), rootDir: faker.string.alpha({length: {min: 10, max: 512}}), language: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), framework: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), visibility: faker.helpers.arrayElement(Object.values(ServiceVisibility)), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), repository: {id: faker.string.uuid(), defaultBranch: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$")}, owners: {userIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid()))}, tags: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), color: faker.helpers.arrayElement([faker.helpers.fromRegExp("^#[0-9A-Fa-f]{6}$"), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), assets: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), name: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), health: faker.helpers.arrayElement(['ok','stale','invalid'] as const), currentVersion: faker.helpers.arrayElement([{...getAcceptDiscoveryCandidatesResponseVersionRefMock()},null,]), latestVersion: faker.helpers.arrayElement([{...getAcceptDiscoveryCandidatesResponseVersionRefMock()},null,]), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$")})), missingKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), canConfigure: faker.datatype.boolean(), canGenerateWithAi: faker.datatype.boolean()})), drift: {hasDrift: faker.datatype.boolean(), fields: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), source: faker.helpers.arrayElement(Object.values(ConfigSource))})), fileCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), starred: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
+/** getDismissDiscoveryCandidateResponseMock provides generated MSW behavior for contract tests. */
 export const getDismissDiscoveryCandidateResponseMock = (overrideResponse: Partial<Extract<CandidateResponse, object>> = {}): CandidateResponse => ({id: faker.string.uuid(), path: faker.string.alpha({length: {min: 10, max: 20}}), suggestedSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 10, max: 20}}), confidence: faker.number.float({min: 0, max: 1, fractionDigits: 2}), detectedKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"))), status: faker.helpers.arrayElement(['pending','accepted','dismissed'] as const), discoveredAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getPreviewRepositoryConfigImportResponseVersionRefMock provides generated MSW behavior for contract tests. */
 export const getPreviewRepositoryConfigImportResponseVersionRefMock = (overrideResponse: Partial<VersionRef> = {}): VersionRef => ({...{id: faker.string.uuid(), version: faker.string.alpha({length: {min: 10, max: 20}}), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle))}, ...overrideResponse});
 
+/** getPreviewRepositoryConfigImportResponseSourceRunSummaryMock provides generated MSW behavior for contract tests. */
 export const getPreviewRepositoryConfigImportResponseSourceRunSummaryMock = (overrideResponse: Partial<SourceRunSummary> = {}): SourceRunSummary => ({...{jobId: faker.string.uuid(), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"), status: faker.helpers.arrayElement(Object.values(JobStatus)), startedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', finishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])}, ...overrideResponse});
 
+/** getPreviewRepositoryConfigImportResponseMock provides generated MSW behavior for contract tests. */
 export const getPreviewRepositoryConfigImportResponseMock = (overrideResponse: Partial<Extract<ConfigImportPreviewResponse, object>> = {}): ConfigImportPreviewResponse => ({previewId: faker.string.uuid(), repositoryId: faker.string.uuid(), commit: faker.string.alpha({length: {min: 10, max: 20}}), configDigest: faker.string.alpha({length: {min: 10, max: 20}}), services: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), rootDir: faker.string.alpha({length: {min: 10, max: 512}}), language: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), framework: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), visibility: faker.helpers.arrayElement(Object.values(ServiceVisibility)), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), repository: {id: faker.string.uuid(), defaultBranch: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$")}, owners: {userIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid()))}, tags: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), color: faker.helpers.arrayElement([faker.helpers.fromRegExp("^#[0-9A-Fa-f]{6}$"), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), assets: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), name: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), lifecycle: faker.helpers.arrayElement(Object.values(Lifecycle)), health: faker.helpers.arrayElement(['ok','stale','invalid'] as const), currentVersion: faker.helpers.arrayElement([{...getPreviewRepositoryConfigImportResponseVersionRefMock()},null,]), latestVersion: faker.helpers.arrayElement([{...getPreviewRepositoryConfigImportResponseVersionRefMock()},null,]), refType: faker.helpers.arrayElement(Object.values(RefType)), ref: faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$")})), missingKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), canConfigure: faker.datatype.boolean(), canGenerateWithAi: faker.datatype.boolean()})), drift: {hasDrift: faker.datatype.boolean(), fields: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), source: faker.helpers.arrayElement(Object.values(ConfigSource))})), fileCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), starred: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), sources: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), serviceId: faker.string.uuid(), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), assetNameTemplate: faker.helpers.fromRegExp("^(?:[a-z0-9-]|\\{file_stem\\}|\\{parent_dir\\})+$"), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), mode: faker.helpers.arrayElement(Object.values(SourceMode)), path: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 512}}), null]), producerProfileId: faker.helpers.arrayElement([faker.string.uuid(),null,]), ord: faker.number.int({min: 0}), timeoutSec: faker.number.int({min: 10, max: 3600}), branchPatterns: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[A-Za-z0-9._/*?-]+$"))), enabled: faker.datatype.boolean(), configOrigin: faker.helpers.arrayElement(Object.values(ConfigSource)), configFieldSources: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), source: faker.helpers.arrayElement(Object.values(ConfigSource))})), lastError: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), lastRun: faker.helpers.arrayElement([{...getPreviewRepositoryConfigImportResponseSourceRunSummaryMock()},null,]), bindingsCount: faker.number.int({min: 0}), initialLayerId: faker.helpers.arrayElement([faker.string.uuid(),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), drift: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({pointer: faker.string.alpha({length: {min: 10, max: 20}}), databaseValue: {}, fileValue: {}, source: faker.helpers.arrayElement(Object.values(ConfigSource))})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+/** getApplyRepositoryConfigImportResponseMock provides generated MSW behavior for contract tests. */
 export const getApplyRepositoryConfigImportResponseMock = (overrideResponse: Partial<Extract<ConfigImportResultResponse, object>> = {}): ConfigImportResultResponse => ({repositoryId: faker.string.uuid(), commit: faker.string.alpha({length: {min: 10, max: 20}}), configDigest: faker.string.alpha({length: {min: 10, max: 20}}), createdServiceIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), updatedServiceIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), sourceSpecIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
 
+/** getReceiveGitWebhookResponseMock provides generated MSW behavior for contract tests. */
 export const getReceiveGitWebhookResponseMock = (overrideResponse: Partial<Extract<JobAcceptedResponse, object>> = {}): JobAcceptedResponse => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
 
 
+/** getCheckRepositoryConnectionMockHandler provides generated MSW behavior for contract tests. */
 export const getCheckRepositoryConnectionMockHandler = (overrideResponse?: ConnectionTestResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ConnectionTestResponse> | ConnectionTestResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/repositories\\:check-connection', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -99,6 +121,7 @@ export const getCheckRepositoryConnectionMockHandler = (overrideResponse?: Conne
   }, options)
 }
 
+/** getListRepositoriesMockHandler provides generated MSW behavior for contract tests. */
 export const getListRepositoriesMockHandler = (overrideResponse?: RepositoryPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<RepositoryPageResponse> | RepositoryPageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/repositories', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -111,6 +134,7 @@ export const getListRepositoriesMockHandler = (overrideResponse?: RepositoryPage
   }, options)
 }
 
+/** getCreateRepositoryMockHandler provides generated MSW behavior for contract tests. */
 export const getCreateRepositoryMockHandler = (overrideResponse?: RepositoryResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<RepositoryResponse> | RepositoryResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/repositories', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -123,6 +147,7 @@ export const getCreateRepositoryMockHandler = (overrideResponse?: RepositoryResp
   }, options)
 }
 
+/** getGetRepositoryMockHandler provides generated MSW behavior for contract tests. */
 export const getGetRepositoryMockHandler = (overrideResponse?: RepositoryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<RepositoryResponse> | RepositoryResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/repositories/:repositoryId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -135,6 +160,7 @@ export const getGetRepositoryMockHandler = (overrideResponse?: RepositoryRespons
   }, options)
 }
 
+/** getUpdateRepositoryMockHandler provides generated MSW behavior for contract tests. */
 export const getUpdateRepositoryMockHandler = (overrideResponse?: RepositoryResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<RepositoryResponse> | RepositoryResponse), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/t/:tenantSlug/repositories/:repositoryId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -147,6 +173,7 @@ export const getUpdateRepositoryMockHandler = (overrideResponse?: RepositoryResp
   }, options)
 }
 
+/** getDeleteRepositoryMockHandler provides generated MSW behavior for contract tests. */
 export const getDeleteRepositoryMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
   return http.delete('*/api/v1/t/:tenantSlug/repositories/:repositoryId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
@@ -157,6 +184,7 @@ export const getDeleteRepositoryMockHandler = (overrideResponse?: void | ((info:
   }, options)
 }
 
+/** getSyncRepositoryMockHandler provides generated MSW behavior for contract tests. */
 export const getSyncRepositoryMockHandler = (overrideResponse?: JobAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAcceptedResponse> | JobAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/repositories/:repositoryId\\:sync', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -169,6 +197,7 @@ export const getSyncRepositoryMockHandler = (overrideResponse?: JobAcceptedRespo
   }, options)
 }
 
+/** getDiscoverRepositoryMockHandler provides generated MSW behavior for contract tests. */
 export const getDiscoverRepositoryMockHandler = (overrideResponse?: JobAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAcceptedResponse> | JobAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/repositories/:repositoryId\\:discover', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -181,6 +210,7 @@ export const getDiscoverRepositoryMockHandler = (overrideResponse?: JobAcceptedR
   }, options)
 }
 
+/** getListDiscoveryCandidatesMockHandler provides generated MSW behavior for contract tests. */
 export const getListDiscoveryCandidatesMockHandler = (overrideResponse?: CandidatePageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CandidatePageResponse> | CandidatePageResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/repositories/:repositoryId/candidates', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -193,6 +223,7 @@ export const getListDiscoveryCandidatesMockHandler = (overrideResponse?: Candida
   }, options)
 }
 
+/** getAcceptDiscoveryCandidatesMockHandler provides generated MSW behavior for contract tests. */
 export const getAcceptDiscoveryCandidatesMockHandler = (overrideResponse?: ServiceListResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ServiceListResponse> | ServiceListResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/repositories/:repositoryId/candidates\\:accept', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -205,6 +236,7 @@ export const getAcceptDiscoveryCandidatesMockHandler = (overrideResponse?: Servi
   }, options)
 }
 
+/** getDismissDiscoveryCandidateMockHandler provides generated MSW behavior for contract tests. */
 export const getDismissDiscoveryCandidateMockHandler = (overrideResponse?: CandidateResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CandidateResponse> | CandidateResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/repositories/:repositoryId/candidates/:candidateId\\:dismiss', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -217,6 +249,7 @@ export const getDismissDiscoveryCandidateMockHandler = (overrideResponse?: Candi
   }, options)
 }
 
+/** getPreviewRepositoryConfigImportMockHandler provides generated MSW behavior for contract tests. */
 export const getPreviewRepositoryConfigImportMockHandler = (overrideResponse?: ConfigImportPreviewResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ConfigImportPreviewResponse> | ConfigImportPreviewResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/repositories/:repositoryId/config-imports', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -229,6 +262,7 @@ export const getPreviewRepositoryConfigImportMockHandler = (overrideResponse?: C
   }, options)
 }
 
+/** getApplyRepositoryConfigImportMockHandler provides generated MSW behavior for contract tests. */
 export const getApplyRepositoryConfigImportMockHandler = (overrideResponse?: ConfigImportResultResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ConfigImportResultResponse> | ConfigImportResultResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/repositories/:repositoryId/config-imports/:previewId\\:apply', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -241,6 +275,7 @@ export const getApplyRepositoryConfigImportMockHandler = (overrideResponse?: Con
   }, options)
 }
 
+/** getReceiveGitWebhookMockHandler provides generated MSW behavior for contract tests. */
 export const getReceiveGitWebhookMockHandler = (overrideResponse?: JobAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAcceptedResponse> | JobAcceptedResponse), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/webhooks/git/:repositoryId', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -252,6 +287,7 @@ export const getReceiveGitWebhookMockHandler = (overrideResponse?: JobAcceptedRe
       })
   }, options)
 }
+/** getRepositoryMock provides generated MSW behavior for contract tests. */
 export const getRepositoryMock = () => [
   getCheckRepositoryConnectionMockHandler(),
   getListRepositoriesMockHandler(),

@@ -64,41 +64,62 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
+/** createDiffUploadResponse201 represents a declared HTTP response from the create diff upload response201 operation. */
 export type createDiffUploadResponse201 = {
+  /** Data contains the decoded response payload. */
   data: UploadResponse
+  /** Status is the HTTP response status code. */
   status: 201
 }
 
+/** createDiffUploadResponse404 represents a declared HTTP response from the create diff upload response404 operation. */
 export type createDiffUploadResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** createDiffUploadResponse413 represents a declared HTTP response from the create diff upload response413 operation. */
 export type createDiffUploadResponse413 = {
+  /** Data contains the decoded response payload. */
   data: ContentTooLargeResponse
+  /** Status is the HTTP response status code. */
   status: 413
 }
 
+/** createDiffUploadResponse422 represents a declared HTTP response from the create diff upload response422 operation. */
 export type createDiffUploadResponse422 = {
+  /** Data contains the decoded response payload. */
   data: ValidationErrorResponse
+  /** Status is the HTTP response status code. */
   status: 422
 }
 
+/** createDiffUploadResponseSuccess represents a declared HTTP response from the create diff upload response success operation. */
 export type createDiffUploadResponseSuccess = (createDiffUploadResponse201) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** createDiffUploadResponseError represents a declared HTTP response from the create diff upload response error operation. */
 export type createDiffUploadResponseError = (createDiffUploadResponse404 | createDiffUploadResponse413 | createDiffUploadResponse422) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** createDiffUploadResponse represents a declared HTTP response from the create diff upload response operation. */
 export type createDiffUploadResponse = (createDiffUploadResponseSuccess | createDiffUploadResponseError)
 
+/** getCreateDiffUploadUrl builds the relative URL for its OpenAPI operation. */
 export const getCreateDiffUploadUrl = (tenantSlug: string,) => {
 
 
   return `/api/v1/t/${tenantSlug}/uploads`
 }
 
+/**
+ * Creates diff upload within the authorized request scope.
+ */
 export const createDiffUpload = async (tenantSlug: string,
     uploadRequest: UploadRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createDiffUploadResponse> => {
     const formData = new FormData();
@@ -119,8 +140,10 @@ formData.append(`contentType`, uploadRequest.contentType);
 
 
 
+/** getCreateDiffUploadMutationKey is generated from the Meridian OpenAPI contract for get create diff upload mutation key. */
 export const getCreateDiffUploadMutationKey = () => ['createDiffUpload'] as const;
 
+/** getCreateDiffUploadMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getCreateDiffUploadMutationOptions = <TError = NotFoundResponse | ContentTooLargeResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDiffUpload>>, TError,CreateDiffUploadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createDiffUpload>>, TError,CreateDiffUploadMutationVariables, TContext> => {
@@ -148,11 +171,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** CreateDiffUploadMutationResult is generated from the Meridian OpenAPI contract for create diff upload mutation result. */
     export type CreateDiffUploadMutationResult = NonNullable<Awaited<ReturnType<typeof createDiffUpload>>>
+    /** CreateDiffUploadMutationBody is the request body type for its generated OpenAPI operation. */
     export type CreateDiffUploadMutationBody = UploadRequest
+    /** CreateDiffUploadMutationError is generated from the Meridian OpenAPI contract for create diff upload mutation error. */
     export type CreateDiffUploadMutationError = NotFoundResponse | ContentTooLargeResponse | ValidationErrorResponse
-    export type CreateDiffUploadMutationVariables = {tenantSlug: string;data: UploadRequest}
+    /** CreateDiffUploadMutationVariables is generated from the Meridian OpenAPI contract for create diff upload mutation variables. */
+    export type CreateDiffUploadMutationVariables = {/** TenantSlug carries the tenant slug value for CreateDiffUploadMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: UploadRequest}
 
+    /** useCreateDiffUpload executes its OpenAPI operation through TanStack Vue Query. */
     export const useCreateDiffUpload = <TError = NotFoundResponse | ContentTooLargeResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDiffUpload>>, TError,CreateDiffUploadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -163,36 +191,54 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateDiffUploadMutationOptions(options), queryClient);
     }
+    /** runDiffResponse200 represents a declared HTTP response from the run diff response200 operation. */
     export type runDiffResponse200 = {
+  /** Data contains the decoded response payload. */
   data: DiffResultResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** runDiffResponse404 represents a declared HTTP response from the run diff response404 operation. */
 export type runDiffResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** runDiffResponse422 represents a declared HTTP response from the run diff response422 operation. */
 export type runDiffResponse422 = {
+  /** Data contains the decoded response payload. */
   data: ValidationErrorResponse
+  /** Status is the HTTP response status code. */
   status: 422
 }
 
+/** runDiffResponseSuccess represents a declared HTTP response from the run diff response success operation. */
 export type runDiffResponseSuccess = (runDiffResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** runDiffResponseError represents a declared HTTP response from the run diff response error operation. */
 export type runDiffResponseError = (runDiffResponse404 | runDiffResponse422) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** runDiffResponse represents a declared HTTP response from the run diff response operation. */
 export type runDiffResponse = (runDiffResponseSuccess | runDiffResponseError)
 
+/** getRunDiffUrl builds the relative URL for its OpenAPI operation. */
 export const getRunDiffUrl = (tenantSlug: string,) => {
 
 
   return `/api/v1/t/${tenantSlug}/diff`
 }
 
+/**
+ * Runs diff within the authorized request scope.
+ */
 export const runDiff = async (tenantSlug: string,
     diffCreateBody: DiffCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<runDiffResponse> => {
 
@@ -215,8 +261,10 @@ return meridianFetch<runDiffResponse>(getRunDiffUrl(tenantSlug),
 
 
 
+/** getRunDiffMutationKey is generated from the Meridian OpenAPI contract for get run diff mutation key. */
 export const getRunDiffMutationKey = () => ['runDiff'] as const;
 
+/** getRunDiffMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getRunDiffMutationOptions = <TError = NotFoundResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runDiff>>, TError,RunDiffMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof runDiff>>, TError,RunDiffMutationVariables, TContext> => {
@@ -244,11 +292,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** RunDiffMutationResult is generated from the Meridian OpenAPI contract for run diff mutation result. */
     export type RunDiffMutationResult = NonNullable<Awaited<ReturnType<typeof runDiff>>>
+    /** RunDiffMutationBody is the request body type for its generated OpenAPI operation. */
     export type RunDiffMutationBody = DiffCreateBody
+    /** RunDiffMutationError is generated from the Meridian OpenAPI contract for run diff mutation error. */
     export type RunDiffMutationError = NotFoundResponse | ValidationErrorResponse
-    export type RunDiffMutationVariables = {tenantSlug: string;data: DiffCreateBody}
+    /** RunDiffMutationVariables is generated from the Meridian OpenAPI contract for run diff mutation variables. */
+    export type RunDiffMutationVariables = {/** TenantSlug carries the tenant slug value for RunDiffMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: DiffCreateBody}
 
+    /** useRunDiff executes its OpenAPI operation through TanStack Vue Query. */
     export const useRunDiff = <TError = NotFoundResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runDiff>>, TError,RunDiffMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -259,25 +312,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRunDiffMutationOptions(options), queryClient);
     }
+    /** listDiffSnapshotsResponse200 represents a declared HTTP response from the list diff snapshots response200 operation. */
     export type listDiffSnapshotsResponse200 = {
+  /** Data contains the decoded response payload. */
   data: DiffSnapshotPageResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** listDiffSnapshotsResponse404 represents a declared HTTP response from the list diff snapshots response404 operation. */
 export type listDiffSnapshotsResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** listDiffSnapshotsResponseSuccess represents a declared HTTP response from the list diff snapshots response success operation. */
 export type listDiffSnapshotsResponseSuccess = (listDiffSnapshotsResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** listDiffSnapshotsResponseError represents a declared HTTP response from the list diff snapshots response error operation. */
 export type listDiffSnapshotsResponseError = (listDiffSnapshotsResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** listDiffSnapshotsResponse represents a declared HTTP response from the list diff snapshots response operation. */
 export type listDiffSnapshotsResponse = (listDiffSnapshotsResponseSuccess | listDiffSnapshotsResponseError)
 
+/** getListDiffSnapshotsUrl builds the relative URL for its OpenAPI operation. */
 export const getListDiffSnapshotsUrl = (tenantSlug: string,
     params?: ListDiffSnapshotsParams,) => {
   const stringifiedParams = serializeQueryParams(params);
@@ -285,6 +350,9 @@ export const getListDiffSnapshotsUrl = (tenantSlug: string,
   return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/diff-snapshots?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/diff-snapshots`
 }
 
+/**
+ * Returns the requested page of diff snapshots within the authorized request scope.
+ */
 export const listDiffSnapshots = async (tenantSlug: string,
     params?: ListDiffSnapshotsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listDiffSnapshotsResponse> => {
 
@@ -301,6 +369,7 @@ export const listDiffSnapshots = async (tenantSlug: string,
 
 
 
+/** getListDiffSnapshotsQueryKey is generated from the Meridian OpenAPI contract for get list diff snapshots query key. */
 export const getListDiffSnapshotsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListDiffSnapshotsParams>,) => {
     return [
@@ -309,6 +378,7 @@ export const getListDiffSnapshotsQueryKey = (tenantSlug: MaybeRefOrGetter<string
     }
 
 
+/** getListDiffSnapshotsQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getListDiffSnapshotsQueryOptions = <TData = Awaited<ReturnType<typeof listDiffSnapshots>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListDiffSnapshotsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDiffSnapshots>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -328,11 +398,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDiffSnapshots>>, TError, TData>
 }
 
+/** ListDiffSnapshotsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListDiffSnapshotsQueryResult = NonNullable<Awaited<ReturnType<typeof listDiffSnapshots>>>
+/** ListDiffSnapshotsQueryError is the error type returned by its generated Vue Query hook. */
 export type ListDiffSnapshotsQueryError = NotFoundResponse
 
 
 
+/** useListDiffSnapshots executes its OpenAPI operation through TanStack Vue Query. */
 export function useListDiffSnapshots<TData = Awaited<ReturnType<typeof listDiffSnapshots>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListDiffSnapshotsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDiffSnapshots>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -353,25 +426,37 @@ export function useListDiffSnapshots<TData = Awaited<ReturnType<typeof listDiffS
 
 
 
+/** getDiffSnapshotResponse200 represents a declared HTTP response from the get diff snapshot response200 operation. */
 export type getDiffSnapshotResponse200 = {
+  /** Data contains the decoded response payload. */
   data: DiffSnapshotResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** getDiffSnapshotResponse404 represents a declared HTTP response from the get diff snapshot response404 operation. */
 export type getDiffSnapshotResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** getDiffSnapshotResponseSuccess represents a declared HTTP response from the get diff snapshot response success operation. */
 export type getDiffSnapshotResponseSuccess = (getDiffSnapshotResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** getDiffSnapshotResponseError represents a declared HTTP response from the get diff snapshot response error operation. */
 export type getDiffSnapshotResponseError = (getDiffSnapshotResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** getDiffSnapshotResponse represents a declared HTTP response from the get diff snapshot response operation. */
 export type getDiffSnapshotResponse = (getDiffSnapshotResponseSuccess | getDiffSnapshotResponseError)
 
+/** getGetDiffSnapshotUrl builds the relative URL for its OpenAPI operation. */
 export const getGetDiffSnapshotUrl = (tenantSlug: string,
     snapshotId: string,) => {
 
@@ -379,6 +464,9 @@ export const getGetDiffSnapshotUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/diff-snapshots/${snapshotId}`
 }
 
+/**
+ * Returns the selected diff snapshot within the authorized request scope.
+ */
 export const getDiffSnapshot = async (tenantSlug: string,
     snapshotId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getDiffSnapshotResponse> => {
 
@@ -395,6 +483,7 @@ export const getDiffSnapshot = async (tenantSlug: string,
 
 
 
+/** getGetDiffSnapshotQueryKey is generated from the Meridian OpenAPI contract for get get diff snapshot query key. */
 export const getGetDiffSnapshotQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     snapshotId: MaybeRefOrGetter<string>,) => {
     return [
@@ -403,6 +492,7 @@ export const getGetDiffSnapshotQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     }
 
 
+/** getGetDiffSnapshotQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getGetDiffSnapshotQueryOptions = <TData = Awaited<ReturnType<typeof getDiffSnapshot>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     snapshotId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDiffSnapshot>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -422,11 +512,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(snapshotId) !== null && toValue(snapshotId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDiffSnapshot>>, TError, TData>
 }
 
+/** GetDiffSnapshotQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetDiffSnapshotQueryResult = NonNullable<Awaited<ReturnType<typeof getDiffSnapshot>>>
+/** GetDiffSnapshotQueryError is the error type returned by its generated Vue Query hook. */
 export type GetDiffSnapshotQueryError = NotFoundResponse
 
 
 
+/** useGetDiffSnapshot executes its OpenAPI operation through TanStack Vue Query. */
 export function useGetDiffSnapshot<TData = Awaited<ReturnType<typeof getDiffSnapshot>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     snapshotId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDiffSnapshot>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -447,25 +540,37 @@ export function useGetDiffSnapshot<TData = Awaited<ReturnType<typeof getDiffSnap
 
 
 
+/** deleteDiffSnapshotResponse204 represents a declared HTTP response from the delete diff snapshot response204 operation. */
 export type deleteDiffSnapshotResponse204 = {
+  /** Data contains the decoded response payload. */
   data: void
+  /** Status is the HTTP response status code. */
   status: 204
 }
 
+/** deleteDiffSnapshotResponse404 represents a declared HTTP response from the delete diff snapshot response404 operation. */
 export type deleteDiffSnapshotResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** deleteDiffSnapshotResponseSuccess represents a declared HTTP response from the delete diff snapshot response success operation. */
 export type deleteDiffSnapshotResponseSuccess = (deleteDiffSnapshotResponse204) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** deleteDiffSnapshotResponseError represents a declared HTTP response from the delete diff snapshot response error operation. */
 export type deleteDiffSnapshotResponseError = (deleteDiffSnapshotResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** deleteDiffSnapshotResponse represents a declared HTTP response from the delete diff snapshot response operation. */
 export type deleteDiffSnapshotResponse = (deleteDiffSnapshotResponseSuccess | deleteDiffSnapshotResponseError)
 
+/** getDeleteDiffSnapshotUrl builds the relative URL for its OpenAPI operation. */
 export const getDeleteDiffSnapshotUrl = (tenantSlug: string,
     snapshotId: string,) => {
 
@@ -473,6 +578,9 @@ export const getDeleteDiffSnapshotUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/diff-snapshots/${snapshotId}`
 }
 
+/**
+ * Deletes the selected diff snapshot within the authorized request scope.
+ */
 export const deleteDiffSnapshot = async (tenantSlug: string,
     snapshotId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteDiffSnapshotResponse> => {
 
@@ -489,8 +597,10 @@ export const deleteDiffSnapshot = async (tenantSlug: string,
 
 
 
+/** getDeleteDiffSnapshotMutationKey is generated from the Meridian OpenAPI contract for get delete diff snapshot mutation key. */
 export const getDeleteDiffSnapshotMutationKey = () => ['deleteDiffSnapshot'] as const;
 
+/** getDeleteDiffSnapshotMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getDeleteDiffSnapshotMutationOptions = <TError = NotFoundResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDiffSnapshot>>, TError,DeleteDiffSnapshotMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteDiffSnapshot>>, TError,DeleteDiffSnapshotMutationVariables, TContext> => {
@@ -518,11 +628,15 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** DeleteDiffSnapshotMutationResult is generated from the Meridian OpenAPI contract for delete diff snapshot mutation result. */
     export type DeleteDiffSnapshotMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDiffSnapshot>>>
 
+    /** DeleteDiffSnapshotMutationError is generated from the Meridian OpenAPI contract for delete diff snapshot mutation error. */
     export type DeleteDiffSnapshotMutationError = NotFoundResponse
-    export type DeleteDiffSnapshotMutationVariables = {tenantSlug: string;snapshotId: string}
+    /** DeleteDiffSnapshotMutationVariables is generated from the Meridian OpenAPI contract for delete diff snapshot mutation variables. */
+    export type DeleteDiffSnapshotMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteDiffSnapshotMutationVariables. */ tenantSlug: string;/** SnapshotId carries the snapshot id value for DeleteDiffSnapshotMutationVariables. */ snapshotId: string}
 
+    /** useDeleteDiffSnapshot executes its OpenAPI operation through TanStack Vue Query. */
     export const useDeleteDiffSnapshot = <TError = NotFoundResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDiffSnapshot>>, TError,DeleteDiffSnapshotMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -533,25 +647,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDeleteDiffSnapshotMutationOptions(options), queryClient);
     }
+    /** exportDiffSnapshotResponse200 represents a declared HTTP response from the export diff snapshot response200 operation. */
     export type exportDiffSnapshotResponse200 = {
+  /** Data contains the decoded response payload. */
   data: ArtifactLinkResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** exportDiffSnapshotResponse404 represents a declared HTTP response from the export diff snapshot response404 operation. */
 export type exportDiffSnapshotResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** exportDiffSnapshotResponseSuccess represents a declared HTTP response from the export diff snapshot response success operation. */
 export type exportDiffSnapshotResponseSuccess = (exportDiffSnapshotResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** exportDiffSnapshotResponseError represents a declared HTTP response from the export diff snapshot response error operation. */
 export type exportDiffSnapshotResponseError = (exportDiffSnapshotResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** exportDiffSnapshotResponse represents a declared HTTP response from the export diff snapshot response operation. */
 export type exportDiffSnapshotResponse = (exportDiffSnapshotResponseSuccess | exportDiffSnapshotResponseError)
 
+/** getExportDiffSnapshotUrl builds the relative URL for its OpenAPI operation. */
 export const getExportDiffSnapshotUrl = (tenantSlug: string,
     snapshotId: string,
     params: ExportDiffSnapshotParams,) => {
@@ -560,6 +686,9 @@ export const getExportDiffSnapshotUrl = (tenantSlug: string,
   return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/diff-snapshots/${snapshotId}/export?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/diff-snapshots/${snapshotId}/export`
 }
 
+/**
+ * Exports diff snapshot within the authorized request scope.
+ */
 export const exportDiffSnapshot = async (tenantSlug: string,
     snapshotId: string,
     params: ExportDiffSnapshotParams, options?: Parameters<typeof meridianFetch>[1]): Promise<exportDiffSnapshotResponse> => {
@@ -577,6 +706,7 @@ export const exportDiffSnapshot = async (tenantSlug: string,
 
 
 
+/** getExportDiffSnapshotQueryKey is generated from the Meridian OpenAPI contract for get export diff snapshot query key. */
 export const getExportDiffSnapshotQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     snapshotId: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ExportDiffSnapshotParams>,) => {
@@ -586,6 +716,7 @@ export const getExportDiffSnapshotQueryKey = (tenantSlug: MaybeRefOrGetter<strin
     }
 
 
+/** getExportDiffSnapshotQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getExportDiffSnapshotQueryOptions = <TData = Awaited<ReturnType<typeof exportDiffSnapshot>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     snapshotId: MaybeRefOrGetter<string>,
     params: MaybeRefOrGetter<ExportDiffSnapshotParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDiffSnapshot>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -606,11 +737,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(snapshotId) !== null && toValue(snapshotId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportDiffSnapshot>>, TError, TData>
 }
 
+/** ExportDiffSnapshotQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ExportDiffSnapshotQueryResult = NonNullable<Awaited<ReturnType<typeof exportDiffSnapshot>>>
+/** ExportDiffSnapshotQueryError is the error type returned by its generated Vue Query hook. */
 export type ExportDiffSnapshotQueryError = NotFoundResponse
 
 
 
+/** useExportDiffSnapshot executes its OpenAPI operation through TanStack Vue Query. */
 export function useExportDiffSnapshot<TData = Awaited<ReturnType<typeof exportDiffSnapshot>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     snapshotId: MaybeRefOrGetter<string>,
@@ -632,25 +766,37 @@ export function useExportDiffSnapshot<TData = Awaited<ReturnType<typeof exportDi
 
 
 
+/** createDiffSnapshotShareLinkResponse201 represents a declared HTTP response from the create diff snapshot share link response201 operation. */
 export type createDiffSnapshotShareLinkResponse201 = {
+  /** Data contains the decoded response payload. */
   data: ShareLinkCreatedResponse
+  /** Status is the HTTP response status code. */
   status: 201
 }
 
+/** createDiffSnapshotShareLinkResponse404 represents a declared HTTP response from the create diff snapshot share link response404 operation. */
 export type createDiffSnapshotShareLinkResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** createDiffSnapshotShareLinkResponseSuccess represents a declared HTTP response from the create diff snapshot share link response success operation. */
 export type createDiffSnapshotShareLinkResponseSuccess = (createDiffSnapshotShareLinkResponse201) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** createDiffSnapshotShareLinkResponseError represents a declared HTTP response from the create diff snapshot share link response error operation. */
 export type createDiffSnapshotShareLinkResponseError = (createDiffSnapshotShareLinkResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** createDiffSnapshotShareLinkResponse represents a declared HTTP response from the create diff snapshot share link response operation. */
 export type createDiffSnapshotShareLinkResponse = (createDiffSnapshotShareLinkResponseSuccess | createDiffSnapshotShareLinkResponseError)
 
+/** getCreateDiffSnapshotShareLinkUrl builds the relative URL for its OpenAPI operation. */
 export const getCreateDiffSnapshotShareLinkUrl = (tenantSlug: string,
     snapshotId: string,) => {
 
@@ -658,6 +804,9 @@ export const getCreateDiffSnapshotShareLinkUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/diff-snapshots/${snapshotId}/share-links`
 }
 
+/**
+ * Creates diff snapshot share link within the authorized request scope.
+ */
 export const createDiffSnapshotShareLink = async (tenantSlug: string,
     snapshotId: string,
     diffSnapshotShareBody: DiffSnapshotShareBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createDiffSnapshotShareLinkResponse> => {
@@ -681,8 +830,10 @@ return meridianFetch<createDiffSnapshotShareLinkResponse>(getCreateDiffSnapshotS
 
 
 
+/** getCreateDiffSnapshotShareLinkMutationKey is generated from the Meridian OpenAPI contract for get create diff snapshot share link mutation key. */
 export const getCreateDiffSnapshotShareLinkMutationKey = () => ['createDiffSnapshotShareLink'] as const;
 
+/** getCreateDiffSnapshotShareLinkMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getCreateDiffSnapshotShareLinkMutationOptions = <TError = NotFoundResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDiffSnapshotShareLink>>, TError,CreateDiffSnapshotShareLinkMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createDiffSnapshotShareLink>>, TError,CreateDiffSnapshotShareLinkMutationVariables, TContext> => {
@@ -710,11 +861,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** CreateDiffSnapshotShareLinkMutationResult is generated from the Meridian OpenAPI contract for create diff snapshot share link mutation result. */
     export type CreateDiffSnapshotShareLinkMutationResult = NonNullable<Awaited<ReturnType<typeof createDiffSnapshotShareLink>>>
+    /** CreateDiffSnapshotShareLinkMutationBody is the request body type for its generated OpenAPI operation. */
     export type CreateDiffSnapshotShareLinkMutationBody = DiffSnapshotShareBody
+    /** CreateDiffSnapshotShareLinkMutationError is generated from the Meridian OpenAPI contract for create diff snapshot share link mutation error. */
     export type CreateDiffSnapshotShareLinkMutationError = NotFoundResponse
-    export type CreateDiffSnapshotShareLinkMutationVariables = {tenantSlug: string;snapshotId: string;data: DiffSnapshotShareBody}
+    /** CreateDiffSnapshotShareLinkMutationVariables is generated from the Meridian OpenAPI contract for create diff snapshot share link mutation variables. */
+    export type CreateDiffSnapshotShareLinkMutationVariables = {/** TenantSlug carries the tenant slug value for CreateDiffSnapshotShareLinkMutationVariables. */ tenantSlug: string;/** SnapshotId carries the snapshot id value for CreateDiffSnapshotShareLinkMutationVariables. */ snapshotId: string;/** Data contains the decoded response payload. */ data: DiffSnapshotShareBody}
 
+    /** useCreateDiffSnapshotShareLink executes its OpenAPI operation through TanStack Vue Query. */
     export const useCreateDiffSnapshotShareLink = <TError = NotFoundResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDiffSnapshotShareLink>>, TError,CreateDiffSnapshotShareLinkMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -725,31 +881,46 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateDiffSnapshotShareLinkMutationOptions(options), queryClient);
     }
+    /** listDiffRuleSetsResponse200 represents a declared HTTP response from the list diff rule sets response200 operation. */
     export type listDiffRuleSetsResponse200 = {
+  /** Data contains the decoded response payload. */
   data: DiffRuleSetListResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** listDiffRuleSetsResponse404 represents a declared HTTP response from the list diff rule sets response404 operation. */
 export type listDiffRuleSetsResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** listDiffRuleSetsResponseSuccess represents a declared HTTP response from the list diff rule sets response success operation. */
 export type listDiffRuleSetsResponseSuccess = (listDiffRuleSetsResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** listDiffRuleSetsResponseError represents a declared HTTP response from the list diff rule sets response error operation. */
 export type listDiffRuleSetsResponseError = (listDiffRuleSetsResponse404) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** listDiffRuleSetsResponse represents a declared HTTP response from the list diff rule sets response operation. */
 export type listDiffRuleSetsResponse = (listDiffRuleSetsResponseSuccess | listDiffRuleSetsResponseError)
 
+/** getListDiffRuleSetsUrl builds the relative URL for its OpenAPI operation. */
 export const getListDiffRuleSetsUrl = (tenantSlug: string,) => {
 
 
   return `/api/v1/t/${tenantSlug}/diff-rule-sets`
 }
 
+/**
+ * Returns the requested page of diff rule sets within the authorized request scope.
+ */
 export const listDiffRuleSets = async (tenantSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listDiffRuleSetsResponse> => {
 
   return meridianFetch<listDiffRuleSetsResponse>(getListDiffRuleSetsUrl(tenantSlug),
@@ -765,6 +936,7 @@ export const listDiffRuleSets = async (tenantSlug: string, options?: Parameters<
 
 
 
+/** getListDiffRuleSetsQueryKey is generated from the Meridian OpenAPI contract for get list diff rule sets query key. */
 export const getListDiffRuleSetsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,) => {
     return [
     'api','v1','t',tenantSlug,'diff-rule-sets'
@@ -772,6 +944,7 @@ export const getListDiffRuleSetsQueryKey = (tenantSlug: MaybeRefOrGetter<string>
     }
 
 
+/** getListDiffRuleSetsQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getListDiffRuleSetsQueryOptions = <TData = Awaited<ReturnType<typeof listDiffRuleSets>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDiffRuleSets>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
@@ -790,11 +963,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDiffRuleSets>>, TError, TData>
 }
 
+/** ListDiffRuleSetsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListDiffRuleSetsQueryResult = NonNullable<Awaited<ReturnType<typeof listDiffRuleSets>>>
+/** ListDiffRuleSetsQueryError is the error type returned by its generated Vue Query hook. */
 export type ListDiffRuleSetsQueryError = NotFoundResponse
 
 
 
+/** useListDiffRuleSets executes its OpenAPI operation through TanStack Vue Query. */
 export function useListDiffRuleSets<TData = Awaited<ReturnType<typeof listDiffRuleSets>>, TError = NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDiffRuleSets>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
@@ -814,36 +990,54 @@ export function useListDiffRuleSets<TData = Awaited<ReturnType<typeof listDiffRu
 
 
 
+/** createDiffRuleSetResponse201 represents a declared HTTP response from the create diff rule set response201 operation. */
 export type createDiffRuleSetResponse201 = {
+  /** Data contains the decoded response payload. */
   data: DiffRuleSetResponse
+  /** Status is the HTTP response status code. */
   status: 201
 }
 
+/** createDiffRuleSetResponse404 represents a declared HTTP response from the create diff rule set response404 operation. */
 export type createDiffRuleSetResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** createDiffRuleSetResponse409 represents a declared HTTP response from the create diff rule set response409 operation. */
 export type createDiffRuleSetResponse409 = {
+  /** Data contains the decoded response payload. */
   data: DuplicateResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** createDiffRuleSetResponseSuccess represents a declared HTTP response from the create diff rule set response success operation. */
 export type createDiffRuleSetResponseSuccess = (createDiffRuleSetResponse201) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** createDiffRuleSetResponseError represents a declared HTTP response from the create diff rule set response error operation. */
 export type createDiffRuleSetResponseError = (createDiffRuleSetResponse404 | createDiffRuleSetResponse409) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** createDiffRuleSetResponse represents a declared HTTP response from the create diff rule set response operation. */
 export type createDiffRuleSetResponse = (createDiffRuleSetResponseSuccess | createDiffRuleSetResponseError)
 
+/** getCreateDiffRuleSetUrl builds the relative URL for its OpenAPI operation. */
 export const getCreateDiffRuleSetUrl = (tenantSlug: string,) => {
 
 
   return `/api/v1/t/${tenantSlug}/diff-rule-sets`
 }
 
+/**
+ * Creates diff rule set within the authorized request scope.
+ */
 export const createDiffRuleSet = async (tenantSlug: string,
     diffRuleSetCreateBody: DiffRuleSetCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createDiffRuleSetResponse> => {
 
@@ -866,8 +1060,10 @@ return meridianFetch<createDiffRuleSetResponse>(getCreateDiffRuleSetUrl(tenantSl
 
 
 
+/** getCreateDiffRuleSetMutationKey is generated from the Meridian OpenAPI contract for get create diff rule set mutation key. */
 export const getCreateDiffRuleSetMutationKey = () => ['createDiffRuleSet'] as const;
 
+/** getCreateDiffRuleSetMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getCreateDiffRuleSetMutationOptions = <TError = NotFoundResponse | DuplicateResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDiffRuleSet>>, TError,CreateDiffRuleSetMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createDiffRuleSet>>, TError,CreateDiffRuleSetMutationVariables, TContext> => {
@@ -895,11 +1091,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** CreateDiffRuleSetMutationResult is generated from the Meridian OpenAPI contract for create diff rule set mutation result. */
     export type CreateDiffRuleSetMutationResult = NonNullable<Awaited<ReturnType<typeof createDiffRuleSet>>>
+    /** CreateDiffRuleSetMutationBody is the request body type for its generated OpenAPI operation. */
     export type CreateDiffRuleSetMutationBody = DiffRuleSetCreateBody
+    /** CreateDiffRuleSetMutationError is generated from the Meridian OpenAPI contract for create diff rule set mutation error. */
     export type CreateDiffRuleSetMutationError = NotFoundResponse | DuplicateResponse
-    export type CreateDiffRuleSetMutationVariables = {tenantSlug: string;data: DiffRuleSetCreateBody}
+    /** CreateDiffRuleSetMutationVariables is generated from the Meridian OpenAPI contract for create diff rule set mutation variables. */
+    export type CreateDiffRuleSetMutationVariables = {/** TenantSlug carries the tenant slug value for CreateDiffRuleSetMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: DiffRuleSetCreateBody}
 
+    /** useCreateDiffRuleSet executes its OpenAPI operation through TanStack Vue Query. */
     export const useCreateDiffRuleSet = <TError = NotFoundResponse | DuplicateResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDiffRuleSet>>, TError,CreateDiffRuleSetMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -910,30 +1111,45 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateDiffRuleSetMutationOptions(options), queryClient);
     }
+    /** updateDiffRuleSetResponse200 represents a declared HTTP response from the update diff rule set response200 operation. */
     export type updateDiffRuleSetResponse200 = {
+  /** Data contains the decoded response payload. */
   data: DiffRuleSetResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** updateDiffRuleSetResponse404 represents a declared HTTP response from the update diff rule set response404 operation. */
 export type updateDiffRuleSetResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** updateDiffRuleSetResponse412 represents a declared HTTP response from the update diff rule set response412 operation. */
 export type updateDiffRuleSetResponse412 = {
+  /** Data contains the decoded response payload. */
   data: PreconditionFailedResponse
+  /** Status is the HTTP response status code. */
   status: 412
 }
 
+/** updateDiffRuleSetResponseSuccess represents a declared HTTP response from the update diff rule set response success operation. */
 export type updateDiffRuleSetResponseSuccess = (updateDiffRuleSetResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** updateDiffRuleSetResponseError represents a declared HTTP response from the update diff rule set response error operation. */
 export type updateDiffRuleSetResponseError = (updateDiffRuleSetResponse404 | updateDiffRuleSetResponse412) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** updateDiffRuleSetResponse represents a declared HTTP response from the update diff rule set response operation. */
 export type updateDiffRuleSetResponse = (updateDiffRuleSetResponseSuccess | updateDiffRuleSetResponseError)
 
+/** getUpdateDiffRuleSetUrl builds the relative URL for its OpenAPI operation. */
 export const getUpdateDiffRuleSetUrl = (tenantSlug: string,
     ruleSetId: string,) => {
 
@@ -941,6 +1157,9 @@ export const getUpdateDiffRuleSetUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/diff-rule-sets/${ruleSetId}`
 }
 
+/**
+ * Updates the selected diff rule set within the authorized request scope.
+ */
 export const updateDiffRuleSet = async (tenantSlug: string,
     ruleSetId: string,
     diffRuleSetPatchBody: DiffRuleSetPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateDiffRuleSetResponse> => {
@@ -964,8 +1183,10 @@ return meridianFetch<updateDiffRuleSetResponse>(getUpdateDiffRuleSetUrl(tenantSl
 
 
 
+/** getUpdateDiffRuleSetMutationKey is generated from the Meridian OpenAPI contract for get update diff rule set mutation key. */
 export const getUpdateDiffRuleSetMutationKey = () => ['updateDiffRuleSet'] as const;
 
+/** getUpdateDiffRuleSetMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getUpdateDiffRuleSetMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDiffRuleSet>>, TError,UpdateDiffRuleSetMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateDiffRuleSet>>, TError,UpdateDiffRuleSetMutationVariables, TContext> => {
@@ -993,11 +1214,16 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** UpdateDiffRuleSetMutationResult is generated from the Meridian OpenAPI contract for update diff rule set mutation result. */
     export type UpdateDiffRuleSetMutationResult = NonNullable<Awaited<ReturnType<typeof updateDiffRuleSet>>>
+    /** UpdateDiffRuleSetMutationBody is the request body type for its generated OpenAPI operation. */
     export type UpdateDiffRuleSetMutationBody = DiffRuleSetPatchBody
+    /** UpdateDiffRuleSetMutationError is generated from the Meridian OpenAPI contract for update diff rule set mutation error. */
     export type UpdateDiffRuleSetMutationError = NotFoundResponse | PreconditionFailedResponse
-    export type UpdateDiffRuleSetMutationVariables = {tenantSlug: string;ruleSetId: string;data: DiffRuleSetPatchBody}
+    /** UpdateDiffRuleSetMutationVariables is generated from the Meridian OpenAPI contract for update diff rule set mutation variables. */
+    export type UpdateDiffRuleSetMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateDiffRuleSetMutationVariables. */ tenantSlug: string;/** RuleSetId carries the rule set id value for UpdateDiffRuleSetMutationVariables. */ ruleSetId: string;/** Data contains the decoded response payload. */ data: DiffRuleSetPatchBody}
 
+    /** useUpdateDiffRuleSet executes its OpenAPI operation through TanStack Vue Query. */
     export const useUpdateDiffRuleSet = <TError = NotFoundResponse | PreconditionFailedResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDiffRuleSet>>, TError,UpdateDiffRuleSetMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -1008,35 +1234,53 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdateDiffRuleSetMutationOptions(options), queryClient);
     }
+    /** deleteDiffRuleSetResponse204 represents a declared HTTP response from the delete diff rule set response204 operation. */
     export type deleteDiffRuleSetResponse204 = {
+  /** Data contains the decoded response payload. */
   data: void
+  /** Status is the HTTP response status code. */
   status: 204
 }
 
+/** deleteDiffRuleSetResponse404 represents a declared HTTP response from the delete diff rule set response404 operation. */
 export type deleteDiffRuleSetResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** deleteDiffRuleSetResponse409 represents a declared HTTP response from the delete diff rule set response409 operation. */
 export type deleteDiffRuleSetResponse409 = {
+  /** Data contains the decoded response payload. */
   data: InvalidStateResponse
+  /** Status is the HTTP response status code. */
   status: 409
 }
 
+/** deleteDiffRuleSetResponse412 represents a declared HTTP response from the delete diff rule set response412 operation. */
 export type deleteDiffRuleSetResponse412 = {
+  /** Data contains the decoded response payload. */
   data: PreconditionFailedResponse
+  /** Status is the HTTP response status code. */
   status: 412
 }
 
+/** deleteDiffRuleSetResponseSuccess represents a declared HTTP response from the delete diff rule set response success operation. */
 export type deleteDiffRuleSetResponseSuccess = (deleteDiffRuleSetResponse204) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** deleteDiffRuleSetResponseError represents a declared HTTP response from the delete diff rule set response error operation. */
 export type deleteDiffRuleSetResponseError = (deleteDiffRuleSetResponse404 | deleteDiffRuleSetResponse409 | deleteDiffRuleSetResponse412) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** deleteDiffRuleSetResponse represents a declared HTTP response from the delete diff rule set response operation. */
 export type deleteDiffRuleSetResponse = (deleteDiffRuleSetResponseSuccess | deleteDiffRuleSetResponseError)
 
+/** getDeleteDiffRuleSetUrl builds the relative URL for its OpenAPI operation. */
 export const getDeleteDiffRuleSetUrl = (tenantSlug: string,
     ruleSetId: string,) => {
 
@@ -1044,6 +1288,9 @@ export const getDeleteDiffRuleSetUrl = (tenantSlug: string,
   return `/api/v1/t/${tenantSlug}/diff-rule-sets/${ruleSetId}`
 }
 
+/**
+ * Deletes the selected diff rule set within the authorized request scope.
+ */
 export const deleteDiffRuleSet = async (tenantSlug: string,
     ruleSetId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteDiffRuleSetResponse> => {
 
@@ -1060,8 +1307,10 @@ export const deleteDiffRuleSet = async (tenantSlug: string,
 
 
 
+/** getDeleteDiffRuleSetMutationKey is generated from the Meridian OpenAPI contract for get delete diff rule set mutation key. */
 export const getDeleteDiffRuleSetMutationKey = () => ['deleteDiffRuleSet'] as const;
 
+/** getDeleteDiffRuleSetMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
 export const getDeleteDiffRuleSetMutationOptions = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDiffRuleSet>>, TError,DeleteDiffRuleSetMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteDiffRuleSet>>, TError,DeleteDiffRuleSetMutationVariables, TContext> => {
@@ -1089,11 +1338,15 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
+    /** DeleteDiffRuleSetMutationResult is generated from the Meridian OpenAPI contract for delete diff rule set mutation result. */
     export type DeleteDiffRuleSetMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDiffRuleSet>>>
 
+    /** DeleteDiffRuleSetMutationError is generated from the Meridian OpenAPI contract for delete diff rule set mutation error. */
     export type DeleteDiffRuleSetMutationError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse
-    export type DeleteDiffRuleSetMutationVariables = {tenantSlug: string;ruleSetId: string}
+    /** DeleteDiffRuleSetMutationVariables is generated from the Meridian OpenAPI contract for delete diff rule set mutation variables. */
+    export type DeleteDiffRuleSetMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteDiffRuleSetMutationVariables. */ tenantSlug: string;/** RuleSetId carries the rule set id value for DeleteDiffRuleSetMutationVariables. */ ruleSetId: string}
 
+    /** useDeleteDiffRuleSet executes its OpenAPI operation through TanStack Vue Query. */
     export const useDeleteDiffRuleSet = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDiffRuleSet>>, TError,DeleteDiffRuleSetMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
@@ -1104,30 +1357,45 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDeleteDiffRuleSetMutationOptions(options), queryClient);
     }
+    /** searchResponse200 represents a declared HTTP response from the search response200 operation. */
     export type searchResponse200 = {
+  /** Data contains the decoded response payload. */
   data: SearchResultResponse
+  /** Status is the HTTP response status code. */
   status: 200
 }
 
+/** searchResponse404 represents a declared HTTP response from the search response404 operation. */
 export type searchResponse404 = {
+  /** Data contains the decoded response payload. */
   data: NotFoundResponse
+  /** Status is the HTTP response status code. */
   status: 404
 }
 
+/** searchResponse422 represents a declared HTTP response from the search response422 operation. */
 export type searchResponse422 = {
+  /** Data contains the decoded response payload. */
   data: ValidationErrorResponse
+  /** Status is the HTTP response status code. */
   status: 422
 }
 
+/** searchResponseSuccess represents a declared HTTP response from the search response success operation. */
 export type searchResponseSuccess = (searchResponse200) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
+/** searchResponseError represents a declared HTTP response from the search response error operation. */
 export type searchResponseError = (searchResponse404 | searchResponse422) & {
+  /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
+/** searchResponse represents a declared HTTP response from the search response operation. */
 export type searchResponse = (searchResponseSuccess | searchResponseError)
 
+/** getSearchUrl builds the relative URL for its OpenAPI operation. */
 export const getSearchUrl = (tenantSlug: string,
     params: SearchParams,) => {
   const stringifiedParams = serializeQueryParams(params);
@@ -1135,6 +1403,9 @@ export const getSearchUrl = (tenantSlug: string,
   return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/search?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/search`
 }
 
+/**
+ * Performs the search workflow within the authorized request scope.
+ */
 export const search = async (tenantSlug: string,
     params: SearchParams, options?: Parameters<typeof meridianFetch>[1]): Promise<searchResponse> => {
 
@@ -1151,6 +1422,7 @@ export const search = async (tenantSlug: string,
 
 
 
+/** getSearchQueryKey is generated from the Meridian OpenAPI contract for get search query key. */
 export const getSearchQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<SearchParams>,) => {
     return [
@@ -1159,6 +1431,7 @@ export const getSearchQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
     }
 
 
+/** getSearchQueryOptions builds TanStack Query options for its OpenAPI operation. */
 export const getSearchQueryOptions = <TData = Awaited<ReturnType<typeof search>>, TError = NotFoundResponse | ValidationErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
     params: MaybeRefOrGetter<SearchParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -1178,11 +1451,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
    return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData>
 }
 
+/** SearchQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type SearchQueryResult = NonNullable<Awaited<ReturnType<typeof search>>>
+/** SearchQueryError is the error type returned by its generated Vue Query hook. */
 export type SearchQueryError = NotFoundResponse | ValidationErrorResponse
 
 
 
+/** useSearch executes its OpenAPI operation through TanStack Vue Query. */
 export function useSearch<TData = Awaited<ReturnType<typeof search>>, TError = NotFoundResponse | ValidationErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     params: MaybeRefOrGetter<SearchParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof search>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}

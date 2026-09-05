@@ -8,6 +8,10 @@
 import type { PageInfo } from './pageInfo.ts';
 import type { Repository } from './repository.ts';
 
+/**
+ * contains one paginated page of repository records.
+ */
 export type RepositoryPage = PageInfo & {
+  /** contains the ordered items associated with this repository page. */
   items: Repository[];
 };
