@@ -150,5 +150,3 @@ git diff --check
 ## 当前阻塞
 
 `M0-AGENT-002` 的声明门禁 `make smoke-m0-credentials` 当前不存在，已按运行手册完成 3 次相同根因失败并转 `needs_human_acceptance`，不能用已有集成测试替代。需要提供该 Make target/对应 Smoke fixture，或由人工更新队列契约；随后必须从该工作项重新领取并重跑全部声明门禁。
-
-没有需要人工决策的阻塞。
