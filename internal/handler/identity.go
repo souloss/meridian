@@ -105,6 +105,33 @@ func (s *Server) CreateUser(ctx context.Context, request api.CreateUserRequestOb
 	}}, nil
 }
 
+// ListUsers returns a paginated platform identity directory without secret fields.
+func (s *Server) ListUsers(ctx context.Context, request api.ListUsersRequestObject) (api.ListUsersResponseObject, error) {
+	if s.identity == nil {
+		return nil, api.ErrStrictOperationNotImplemented
+	}
+	principal, err := principalFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	search := ""
+	if request.Params.Q != nil {
+		search = string(*request.Params.Q)
+	}
+	page, pageSize := pagination(request.Params.Page, request.Params.PageSize)
+	items, total, err := s.identity.ListUsers(ctx, principal, search, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	users := make([]api.User, 0, len(items))
+	for _, item := range items {
+		users = append(users, userResponse(item))
+	}
+	return api.ListUsers200JSONResponse{UserPageJSONResponse: api.UserPageJSONResponse(api.UserPage{
+		Items: users, Page: page, PageSize: pageSize, Total: int(total),
+	})}, nil
+}
+
 // CreateTenant creates a tenant with an atomic snapshot of platform defaults.
 func (s *Server) CreateTenant(ctx context.Context, request api.CreateTenantRequestObject) (api.CreateTenantResponseObject, error) {
 	if s.identity == nil || request.Body == nil {
@@ -127,6 +154,29 @@ func (s *Server) CreateTenant(ctx context.Context, request api.CreateTenantReque
 		Body:    body,
 		Headers: api.TenantResponseHeaders{ETag: new(body.Etag)},
 	}}, nil
+}
+
+// ListTenants returns a paginated platform tenant directory across lifecycle states.
+func (s *Server) ListTenants(ctx context.Context, request api.ListTenantsRequestObject) (api.ListTenantsResponseObject, error) {
+	if s.identity == nil {
+		return nil, api.ErrStrictOperationNotImplemented
+	}
+	principal, err := principalFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	page, pageSize := pagination(request.Params.Page, request.Params.PageSize)
+	items, total, err := s.identity.ListTenants(ctx, principal, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	tenants := make([]api.Tenant, 0, len(items))
+	for _, item := range items {
+		tenants = append(tenants, tenantResponse(item))
+	}
+	return api.ListTenants200JSONResponse{TenantPageJSONResponse: api.TenantPageJSONResponse(api.TenantPage{
+		Items: tenants, Page: page, PageSize: pageSize, Total: int(total),
+	})}, nil
 }
 
 // PutTenantMemberAsPlatformAdmin creates or replaces one tenant role assignment.

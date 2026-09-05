@@ -61,6 +61,10 @@ type Querier interface {
 	// CountTenantUniqueBlobBytes sums each positively referenced global blob once
 	// so repeated revisions of identical content do not consume quota again.
 	CountTenantUniqueBlobBytes(ctx context.Context, tenantID uuid.UUID) (int64, error)
+	// CountTenants returns the number of tenant lifecycle records visible to platform administration.
+	CountTenants(ctx context.Context) (int64, error)
+	// CountUsers returns the number of identities matching one platform search.
+	CountUsers(ctx context.Context, searchQuery string) (int64, error)
 	// CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
 	CreateAPIToken(ctx context.Context, arg CreateAPITokenParams) (ApiToken, error)
 	// CreateBlobMetadata inserts immutable content-addressed metadata and returns
@@ -206,6 +210,11 @@ type Querier interface {
 	// ListTenantJobs returns a newest-first page bounded by one tenant identifier.
 	// Empty filter arrays and strings mean no restriction; execution input and River identifiers remain internal.
 	ListTenantJobs(ctx context.Context, arg ListTenantJobsParams) ([]Job, error)
+	// ListTenants returns all tenant lifecycle records in stable slug and UUID order for platform administration.
+	ListTenants(ctx context.Context, arg ListTenantsParams) ([]ListTenantsRow, error)
+	// ListUsers returns a stable platform-admin page of identities without password or session secrets.
+	// The optional search value is intentionally limited to username and display name.
+	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
 	// LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
 	// The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
 	LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error

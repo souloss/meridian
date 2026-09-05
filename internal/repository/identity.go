@@ -76,6 +76,23 @@ func (store *IdentityStore) UserByID(ctx context.Context, id uuid.UUID) (service
 	return userFromRow(row), nil
 }
 
+// ListUsers returns platform identity metadata without password or session columns.
+func (store *IdentityStore) ListUsers(ctx context.Context, search string, limit, offset int32) ([]service.User, int64, error) {
+	total, err := store.queries.CountUsers(ctx, search)
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	rows, err := store.queries.ListUsers(ctx, generated.ListUsersParams{SearchQuery: search, PageLimit: limit, PageOffset: offset})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	users := make([]service.User, 0, len(rows))
+	for _, row := range rows {
+		users = append(users, userFromListRow(row))
+	}
+	return users, total, nil
+}
+
 // PromotePlatformAdmin grants platform administration to an existing identity.
 func (store *IdentityStore) PromotePlatformAdmin(ctx context.Context, id uuid.UUID, updatedAt time.Time) (service.User, error) {
 	row, err := store.queries.PromoteUserToPlatformAdmin(ctx, generated.PromoteUserToPlatformAdminParams{
@@ -256,6 +273,27 @@ func (store *IdentityStore) TenantBySlug(ctx context.Context, slug string) (serv
 	return tenantFromRow(row)
 }
 
+// ListTenants returns tenant lifecycle metadata in deterministic order.
+func (store *IdentityStore) ListTenants(ctx context.Context, limit, offset int32) ([]service.Tenant, int64, error) {
+	total, err := store.queries.CountTenants(ctx)
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	rows, err := store.queries.ListTenants(ctx, generated.ListTenantsParams{PageLimit: limit, PageOffset: offset})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	tenants := make([]service.Tenant, 0, len(rows))
+	for _, row := range rows {
+		tenant, err := tenantFromListRow(row)
+		if err != nil {
+			return nil, 0, err
+		}
+		tenants = append(tenants, tenant)
+	}
+	return tenants, total, nil
+}
+
 // PutMembership creates or replaces one tenant role assignment.
 func (store *IdentityStore) PutMembership(ctx context.Context, tenantID, userID uuid.UUID, role string, updatedAt time.Time) (service.Membership, error) {
 	row, err := store.queries.UpsertTenantMember(ctx, generated.UpsertTenantMemberParams{
@@ -377,6 +415,14 @@ func userFromRow(row generated.User) service.User {
 	}
 }
 
+func userFromListRow(row generated.ListUsersRow) service.User {
+	return service.User{
+		ID: row.ID, Username: row.Username, DisplayName: row.DisplayName, Email: row.Email,
+		Status: row.Status, IsPlatformAdmin: row.IsPlatformAdmin, Revision: row.Revision,
+		CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
+	}
+}
+
 func tenantFromRow(row generated.Tenant) (service.Tenant, error) {
 	var quota service.Quota
 	if err := json.Unmarshal(row.Quota, &quota); err != nil {
@@ -391,6 +437,17 @@ func tenantFromRow(row generated.Tenant) (service.Tenant, error) {
 		Revision:    row.Revision,
 		CreatedAt:   row.CreatedAt.Time,
 		UpdatedAt:   row.UpdatedAt.Time,
+	}, nil
+}
+
+func tenantFromListRow(row generated.ListTenantsRow) (service.Tenant, error) {
+	var quota service.Quota
+	if err := json.Unmarshal(row.Quota, &quota); err != nil {
+		return service.Tenant{}, fmt.Errorf("decode tenant %s quota: %w", row.ID, err)
+	}
+	return service.Tenant{
+		ID: row.ID, Slug: row.Slug, DisplayName: row.DisplayName, Status: row.Status,
+		Quota: quota, Revision: row.Revision, CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
 	}, nil
 }
 

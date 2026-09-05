@@ -35,6 +35,24 @@ func (q *Queries) CountAPITokensByUser(ctx context.Context, arg CountAPITokensBy
 	return count, err
 }
 
+const countUsers = `-- name: CountUsers :one
+SELECT count(*)::bigint
+FROM users
+WHERE (
+  $1::text = ''
+  OR username ILIKE '%' || $1::text || '%'
+  OR display_name ILIKE '%' || $1::text || '%'
+)
+`
+
+// CountUsers returns the number of identities matching one platform search.
+func (q *Queries) CountUsers(ctx context.Context, searchQuery string) (int64, error) {
+	row := q.db.QueryRow(ctx, countUsers, searchQuery)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const createAPIToken = `-- name: CreateAPIToken :one
 INSERT INTO api_tokens (
   tenant_id,
@@ -508,6 +526,83 @@ func (q *Queries) ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUs
 			&i.ExpiresAt,
 			&i.LastUsedAt,
 			&i.RevokedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUsers = `-- name: ListUsers :many
+SELECT id, username, display_name, email, status, is_platform_admin, revision, created_at, updated_at
+FROM users
+WHERE (
+  $1::text = ''
+  OR username ILIKE '%' || $1::text || '%'
+  OR display_name ILIKE '%' || $1::text || '%'
+)
+ORDER BY username, id
+LIMIT $3
+OFFSET $2
+`
+
+// ListUsersParams contains the strongly typed arguments for the ListUsers query.
+type ListUsersParams struct {
+	// SearchQuery is the search query value supplied to the ListUsers query.
+	SearchQuery string `json:"search_query"`
+	// PageOffset is the page offset value supplied to the ListUsers query.
+	PageOffset int32 `json:"page_offset"`
+	// PageLimit is the page limit value supplied to the ListUsers query.
+	PageLimit int32 `json:"page_limit"`
+}
+
+// ListUsersRow contains the columns returned by the ListUsers query.
+type ListUsersRow struct {
+	// ID is the id value returned by the ListUsers query.
+	ID uuid.UUID `json:"id"`
+	// Username is the username value returned by the ListUsers query.
+	Username string `json:"username"`
+	// DisplayName is the display name value returned by the ListUsers query.
+	DisplayName string `json:"display_name"`
+	// Email is the email value returned by the ListUsers query.
+	Email *string `json:"email"`
+	// Status is the status value returned by the ListUsers query.
+	Status string `json:"status"`
+	// IsPlatformAdmin is the is platform admin value returned by the ListUsers query.
+	IsPlatformAdmin bool `json:"is_platform_admin"`
+	// Revision is the revision value returned by the ListUsers query.
+	Revision int64 `json:"revision"`
+	// CreatedAt is the created at value returned by the ListUsers query.
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the updated at value returned by the ListUsers query.
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// ListUsers returns a stable platform-admin page of identities without password or session secrets.
+// The optional search value is intentionally limited to username and display name.
+func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error) {
+	rows, err := q.db.Query(ctx, listUsers, arg.SearchQuery, arg.PageOffset, arg.PageLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListUsersRow{}
+	for rows.Next() {
+		var i ListUsersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.DisplayName,
+			&i.Email,
+			&i.Status,
+			&i.IsPlatformAdmin,
+			&i.Revision,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

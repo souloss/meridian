@@ -12,6 +12,19 @@ import (
 	"uuid"
 )
 
+const countTenants = `-- name: CountTenants :one
+SELECT count(*)::bigint
+FROM tenants
+`
+
+// CountTenants returns the number of tenant lifecycle records visible to platform administration.
+func (q *Queries) CountTenants(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countTenants)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const createTenant = `-- name: CreateTenant :one
 INSERT INTO tenants (
   id,
@@ -216,6 +229,72 @@ func (q *Queries) ListActiveTenantMemberships(ctx context.Context, userID uuid.U
 			&i.TenantSlug,
 			&i.TenantDisplayName,
 			&i.Role,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTenants = `-- name: ListTenants :many
+SELECT id, slug, display_name, status, quota, revision, created_at, updated_at
+FROM tenants
+ORDER BY slug, id
+LIMIT $2
+OFFSET $1
+`
+
+// ListTenantsParams contains the strongly typed arguments for the ListTenants query.
+type ListTenantsParams struct {
+	// PageOffset is the page offset value supplied to the ListTenants query.
+	PageOffset int32 `json:"page_offset"`
+	// PageLimit is the page limit value supplied to the ListTenants query.
+	PageLimit int32 `json:"page_limit"`
+}
+
+// ListTenantsRow contains the columns returned by the ListTenants query.
+type ListTenantsRow struct {
+	// ID is the id value returned by the ListTenants query.
+	ID uuid.UUID `json:"id"`
+	// Slug is the slug value returned by the ListTenants query.
+	Slug string `json:"slug"`
+	// DisplayName is the display name value returned by the ListTenants query.
+	DisplayName string `json:"display_name"`
+	// Status is the status value returned by the ListTenants query.
+	Status string `json:"status"`
+	// Quota is the quota value returned by the ListTenants query.
+	Quota []byte `json:"quota"`
+	// Revision is the revision value returned by the ListTenants query.
+	Revision int64 `json:"revision"`
+	// CreatedAt is the created at value returned by the ListTenants query.
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the updated at value returned by the ListTenants query.
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// ListTenants returns all tenant lifecycle records in stable slug and UUID order for platform administration.
+func (q *Queries) ListTenants(ctx context.Context, arg ListTenantsParams) ([]ListTenantsRow, error) {
+	rows, err := q.db.Query(ctx, listTenants, arg.PageOffset, arg.PageLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListTenantsRow{}
+	for rows.Next() {
+		var i ListTenantsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Slug,
+			&i.DisplayName,
+			&i.Status,
+			&i.Quota,
+			&i.Revision,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

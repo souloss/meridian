@@ -35,6 +35,30 @@ SELECT *
 FROM users
 WHERE id = sqlc.arg(id);
 
+-- ListUsers returns a stable platform-admin page of identities without password or session secrets.
+-- The optional search value is intentionally limited to username and display name.
+-- name: ListUsers :many
+SELECT id, username, display_name, email, status, is_platform_admin, revision, created_at, updated_at
+FROM users
+WHERE (
+  sqlc.arg(search_query)::text = ''
+  OR username ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  OR display_name ILIKE '%' || sqlc.arg(search_query)::text || '%'
+)
+ORDER BY username, id
+LIMIT sqlc.arg(page_limit)
+OFFSET sqlc.arg(page_offset);
+
+-- CountUsers returns the number of identities matching one platform search.
+-- name: CountUsers :one
+SELECT count(*)::bigint
+FROM users
+WHERE (
+  sqlc.arg(search_query)::text = ''
+  OR username ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  OR display_name ILIKE '%' || sqlc.arg(search_query)::text || '%'
+);
+
 -- PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
 -- name: PromoteUserToPlatformAdmin :one
 UPDATE users

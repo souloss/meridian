@@ -118,6 +118,16 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		"slug": "acme", "displayName": "Acme",
 	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
 	assertStatus(t, createdTenant, http.StatusCreated)
+	listedUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users?q=alice", nil, []*http.Cookie{adminCookie})
+	assertStatus(t, listedUsers, http.StatusOK)
+	if !strings.Contains(listedUsers.Body.String(), `"username":"alice"`) || strings.Contains(listedUsers.Body.String(), "password_hash") {
+		t.Fatalf("platform user directory = %s", listedUsers.Body.String())
+	}
+	listedTenants := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/tenants", nil, []*http.Cookie{adminCookie})
+	assertStatus(t, listedTenants, http.StatusOK)
+	if !strings.Contains(listedTenants.Body.String(), `"slug":"acme"`) || strings.Contains(listedTenants.Body.String(), `"settings"`) {
+		t.Fatalf("platform tenant directory leaked settings or omitted tenant: %s", listedTenants.Body.String())
+	}
 	duplicateTenant := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/tenants", map[string]any{
 		"slug": "acme", "displayName": "Duplicate Acme",
 	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
@@ -136,6 +146,8 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	aliceCookie := responseCookie(t, aliceLogin, sessionCookieName)
 	aliceCSRF := responseString(t, aliceLogin, "csrfToken")
 	assertTenantMembership(t, aliceLogin, "acme", "tenant_admin")
+	forbiddenPlatformUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users", nil, []*http.Cookie{aliceCookie})
+	assertError(t, forbiddenPlatformUsers, http.StatusNotFound, "not_found")
 
 	me := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, []*http.Cookie{aliceCookie})
 	assertStatus(t, me, http.StatusOK)

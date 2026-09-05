@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const route = useRoute()
-const tenantSlug = computed(() => String(route.params.tenant ?? ''))
 const menuOpen = ref(false)
 const { me, refresh, signOut } = useSession()
 
@@ -8,24 +7,17 @@ if (!me.value) {
   await refresh()
 }
 
-const tenant = computed(() => me.value?.tenants.find((item) => item.slug === tenantSlug.value))
-const navItems = computed(() => [
-  { label: '概览', to: `/t/${tenantSlug.value}/dashboard`, icon: 'i-lucide-layout-dashboard' },
-  { label: '仓库', to: `/t/${tenantSlug.value}/repos`, icon: 'i-lucide-git-branch' },
-  { label: '凭据', to: `/t/${tenantSlug.value}/credentials`, icon: 'i-lucide-key-round' },
-  { label: '任务', to: `/t/${tenantSlug.value}/jobs`, icon: 'i-lucide-list-checks' }
-])
+const firstTenant = computed(() => me.value?.tenants[0])
+const navItems = [
+  { label: '平台概览', to: '/admin', icon: 'i-lucide-gauge' },
+  { label: '全局凭据', to: '/admin#credentials', icon: 'i-lucide-key-round' },
+  { label: '平台任务', to: '/admin#jobs', icon: 'i-lucide-list-checks' },
+  { label: '审计日志', to: '/admin#audit', icon: 'i-lucide-scroll-text' }
+]
 
 async function logoutAndRedirect() {
   await signOut()
   await navigateTo({ path: '/login', query: { returnTo: route.fullPath } })
-}
-
-function switchTenant(event: Event) {
-  const value = (event.target as HTMLSelectElement).value
-  if (value) {
-    navigateTo(`/t/${value}/dashboard`)
-  }
 }
 </script>
 
@@ -37,44 +29,36 @@ function switchTenant(event: Event) {
       :class="{ 'translate-x-0': menuOpen }"
     >
       <div class="flex h-20 items-center gap-3 border-b border-slate-200 px-6">
-        <div class="flex size-9 items-center justify-center rounded-lg bg-teal-600 text-sm font-bold text-white">M</div>
+        <div class="flex size-9 items-center justify-center rounded-lg bg-slate-950 text-sm font-bold text-white">M</div>
         <div>
           <p class="text-sm font-semibold tracking-wide text-slate-950">Meridian</p>
-          <p class="text-xs text-slate-600">Asset control plane</p>
+          <p class="text-xs text-slate-600">Platform operations</p>
         </div>
       </div>
       <div class="border-b border-slate-200 p-4">
-        <label class="sr-only" for="tenant-switcher">选择租户</label>
-        <select
-          id="tenant-switcher"
-          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
-          :value="tenantSlug"
-          @change="switchTenant"
-        >
-          <option v-for="item in me?.tenants ?? []" :key="item.id" :value="item.slug">{{ item.displayName }}</option>
-        </select>
-        <p class="mt-2 truncate px-1 text-xs text-slate-600">{{ tenant?.role ?? '成员' }} · {{ tenantSlug }}</p>
+        <UBadge color="warning" variant="subtle" icon="i-lucide-shield-check">平台管理员</UBadge>
+        <p class="mt-2 truncate px-1 text-xs text-slate-600">跨租户脱敏运维视图</p>
       </div>
-      <nav class="flex-1 space-y-1 p-4" aria-label="主导航">
+      <nav class="flex-1 space-y-1 p-4" aria-label="平台导航">
         <NuxtLink
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
           class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-          active-class="bg-teal-50 text-teal-800 ring-1 ring-teal-100"
+          active-class="bg-slate-100 text-slate-950 ring-1 ring-slate-200"
           @click="menuOpen = false"
         >
           <UIcon :name="item.icon" class="size-4" aria-hidden="true" />
           {{ item.label }}
         </NuxtLink>
         <NuxtLink
-          v-if="me?.isPlatformAdmin"
-          to="/admin"
-          class="mt-5 flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
+          v-if="firstTenant"
+          :to="`/t/${firstTenant.slug}/dashboard`"
+          class="mt-5 flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-teal-700 transition hover:bg-teal-50"
           @click="menuOpen = false"
         >
-          <UIcon name="i-lucide-gauge" class="size-4" aria-hidden="true" />
-          平台运维
+          <UIcon name="i-lucide-arrow-left-right" class="size-4" aria-hidden="true" />
+          返回租户工作区
         </NuxtLink>
       </nav>
       <div class="border-t border-slate-200 p-4">
@@ -96,14 +80,11 @@ function switchTenant(event: Event) {
         <div class="flex items-center gap-3">
           <UButton class="lg:hidden" color="neutral" variant="ghost" icon="i-lucide-menu" aria-label="打开导航" @click="menuOpen = true" />
           <div>
-            <p class="text-xs font-medium uppercase tracking-[0.16em] text-teal-700">{{ tenantSlug }}</p>
-            <h1 class="text-base font-semibold text-slate-950">{{ tenant?.displayName ?? '租户控制面' }}</h1>
+            <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-600">ADMIN</p>
+            <h1 class="text-base font-semibold text-slate-950">平台运维</h1>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <UBadge v-if="me?.isPlatformAdmin" color="warning" variant="subtle">平台管理员</UBadge>
-          <UButton color="neutral" variant="ghost" icon="i-lucide-circle-help" aria-label="帮助" />
-        </div>
+        <UBadge color="neutral" variant="subtle">只读脱敏视图</UBadge>
       </header>
       <main class="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
         <slot />

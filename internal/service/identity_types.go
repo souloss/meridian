@@ -34,9 +34,9 @@ type QuotaExceededError struct {
 	// Resource identifies the quota dimension, such as repositories.
 	Resource string
 	// Current is the active resource count before the rejected operation.
-	Current  int64
+	Current int64
 	// Limit is the tenant's configured maximum for the resource.
-	Limit    int64
+	Limit int64
 }
 
 // Error implements error without including tenant identifiers or request secrets.
@@ -206,6 +206,7 @@ type IdentityStore interface {
 	CreateUser(context.Context, NewUser) (User, error)
 	UserByUsername(context.Context, string) (User, string, error)
 	UserByID(context.Context, uuid.UUID) (User, error)
+	ListUsers(context.Context, string, int32, int32) ([]User, int64, error)
 	PromotePlatformAdmin(context.Context, uuid.UUID, time.Time) (User, error)
 	CreateSession(context.Context, NewSession) error
 	SessionPrincipalByDigest(context.Context, []byte, time.Time) (Principal, error)
@@ -216,6 +217,7 @@ type IdentityStore interface {
 	ActiveMembership(context.Context, uuid.UUID, string) (Membership, error)
 	CreateTenant(context.Context, NewTenant) (Tenant, error)
 	TenantBySlug(context.Context, string) (Tenant, error)
+	ListTenants(context.Context, int32, int32) ([]Tenant, int64, error)
 	PutMembership(context.Context, uuid.UUID, uuid.UUID, string, time.Time) (Membership, error)
 	CreateToken(context.Context, NewToken) (Token, error)
 	PATPrincipalByDigest(context.Context, []byte, time.Time) (Principal, error)

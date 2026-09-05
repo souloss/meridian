@@ -83,6 +83,17 @@ func (identity *Identity) CreateUser(ctx context.Context, actor Principal, input
 	return identity.createUser(ctx, input, false)
 }
 
+// ListUsers returns a deterministic platform-only page of redacted identity metadata.
+func (identity *Identity) ListUsers(ctx context.Context, actor Principal, search string, page, pageSize int) ([]User, int64, error) {
+	if !isPlatformAdministrator(actor) {
+		return nil, 0, ErrNotFound
+	}
+	if page < 1 || pageSize < 1 || pageSize > 100 {
+		return nil, 0, ErrValidation
+	}
+	return identity.store.ListUsers(ctx, search, int32(pageSize), int32((page-1)*pageSize))
+}
+
 func (identity *Identity) createUser(ctx context.Context, input CreateUserInput, platformAdmin bool) (User, error) {
 	passwordHash, err := identity.password.Hash(input.Password)
 	if err != nil {
@@ -255,6 +266,17 @@ func (identity *Identity) CreateTenant(ctx context.Context, actor Principal, inp
 		DisplayName: input.DisplayName,
 		Quota:       input.Quota,
 	})
+}
+
+// ListTenants returns a deterministic platform-only page of tenant lifecycle metadata.
+func (identity *Identity) ListTenants(ctx context.Context, actor Principal, page, pageSize int) ([]Tenant, int64, error) {
+	if !isPlatformAdministrator(actor) {
+		return nil, 0, ErrNotFound
+	}
+	if page < 1 || pageSize < 1 || pageSize > 100 {
+		return nil, 0, ErrValidation
+	}
+	return identity.store.ListTenants(ctx, int32(pageSize), int32((page-1)*pageSize))
 }
 
 // PutTenantMembership creates or replaces a role after checking platform-only authorization.

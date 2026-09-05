@@ -145,6 +145,15 @@ async function mockResourceApi(page: Page, requests: Record<string, unknown>) {
   })
 }
 
+async function mockPlatformApi(page: Page) {
+  await page.route('**/api/v1/auth/me', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(me) }))
+  await page.route('**/api/v1/admin/users**', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [me.user], page: 1, pageSize: 20, total: 1 }) }))
+  await page.route('**/api/v1/admin/tenants**', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [{ id: tenant.id, etag: 'v1-tenant', slug: tenant.slug, displayName: tenant.displayName, status: 'active', quota: { maxRepositories: 10, maxServices: 20, maxStorageBytes: 1000000, maxCollectConcurrency: 2 }, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' }], page: 1, pageSize: 20, total: 1 }) }))
+  await page.route('**/api/v1/admin/global-credentials**', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [{ id: credential.id, etag: credential.etag, name: 'platform-deploy', kind: credential.kind, fingerprint: credential.fingerprint, createdBy: me.user.id, lastUsedAt: null, revision: 1, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' }], page: 1, pageSize: 20, total: 1 }) }))
+  await page.route('**/api/v1/admin/jobs**', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [{ id: job.id, tenantSlug: job.tenantSlug, type: job.type, trigger: job.trigger, status: job.status, stage: job.stage, scopeType: job.scopeType, scopeId: job.scopeId, createdAt: job.createdAt, startedAt: job.startedAt, finishedAt: job.finishedAt }], page: 1, pageSize: 20, total: 1 }) }))
+  await page.route('**/api/v1/admin/audit-logs**', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [{ id: '01999c55-8d0c-7c1e-8c2d-000000000050', tenantSlug: tenant.slug, actorId: me.user.id, action: 'repository.created', resourceType: 'repository', resourceId: repository.id, requestId: 'e2e-request', metadata: { source: 'e2e' }, createdAt: '2026-01-01T00:00:00Z' }], page: 1, pageSize: 20, total: 1 }) }))
+}
+
 test('login screen is keyboard reachable and accessible', async ({ page }) => {
   test.setTimeout(60_000)
   await page.route('**/api/v1/auth/me', async (route) => route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ code: 'unauthenticated', message: 'sign in', requestId: 'e2e' }) }))
@@ -164,6 +173,29 @@ test('tenant dashboard renders on desktop with isolated tenant navigation', asyn
   await expect(page.getByText('进行中任务')).toBeVisible()
   const results = await new AxeBuilder({ page }).analyze()
   expect(results.violations).toEqual([])
+})
+
+test('platform admin dashboard renders redacted operations projections', async ({ page }) => {
+  test.setTimeout(60_000)
+  await mockPlatformApi(page)
+  await page.goto('/admin')
+  await expect(page.getByRole('heading', { name: '平台概览' })).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByRole('navigation', { name: '平台导航' })).toContainText('全局凭据')
+  await expect(page.getByRole('main').getByText('Platform Operator')).toBeVisible()
+  await expect(page.getByText('platform-deploy')).toBeVisible()
+  await expect(page.getByText('repository.created')).toBeVisible()
+  await expect(page.getByText('secret-material')).toHaveCount(0)
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+})
+
+test('tenant member is redirected away from platform operations', async ({ page }) => {
+  test.setTimeout(60_000)
+  const tenantMember = { ...me, isPlatformAdmin: false }
+  await page.route('**/api/v1/auth/me', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(tenantMember) }))
+  await page.route('**/api/v1/t/acme/jobs**', async (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], page: 1, pageSize: 20, total: 0 }) }))
+  await page.goto('/admin')
+  await expect(page).toHaveURL(/\/t\/acme\/dashboard$/)
+  await expect(page.getByRole('heading', { name: 'Acme Platform' })).toBeVisible({ timeout: 15_000 })
 })
 
 test('mobile navigation opens without covering the page controls', async ({ page }) => {
@@ -251,6 +283,6 @@ test('credential edits stay secret-free and deletion preserves If-Match', async 
   await page.getByRole('button', { name: '删除凭据' }).click()
   await expect(page.getByRole('heading', { name: '删除凭据' })).toBeVisible()
   await page.getByRole('button', { name: '确认删除' }).click()
-  await expect(page.getByText(credential.name)).toBeHidden()
+  await expect(page.getByText(credential.name, { exact: true })).toBeHidden()
   expect(requests.credentialDeleteIfMatch).toBe(credential.etag)
 })

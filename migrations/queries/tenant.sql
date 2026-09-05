@@ -27,6 +27,19 @@ SELECT *
 FROM tenants
 WHERE slug = sqlc.arg(slug);
 
+-- ListTenants returns all tenant lifecycle records in stable slug and UUID order for platform administration.
+-- name: ListTenants :many
+SELECT id, slug, display_name, status, quota, revision, created_at, updated_at
+FROM tenants
+ORDER BY slug, id
+LIMIT sqlc.arg(page_limit)
+OFFSET sqlc.arg(page_offset);
+
+-- CountTenants returns the number of tenant lifecycle records visible to platform administration.
+-- name: CountTenants :one
+SELECT count(*)::bigint
+FROM tenants;
+
 -- GetActiveTenantBySlug returns only an active tenant for tenant-scoped business access.
 -- name: GetActiveTenantBySlug :one
 SELECT *
