@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// New constructs the Meridian root command and all supported subcommands.
 func New() *cobra.Command {
 	root := &cobra.Command{
 		Use:           "meridian",
@@ -18,10 +19,11 @@ func New() *cobra.Command {
 			DisableDefaultCmd: true,
 		},
 	}
-	root.AddCommand(newServeCommand(), newVersionCommand())
+	root.AddCommand(newMigrateCommand(), newServeCommand(), newVersionCommand())
 	return root
 }
 
+// Execute runs the Meridian command tree with caller-owned I/O streams.
 func Execute(ctx context.Context, stdout, stderr io.Writer) error {
 	root := New()
 	root.SetOut(stdout)

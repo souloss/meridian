@@ -61,6 +61,16 @@ selectorGrammar:
   escaping: ref-name-must-match-openapi-RefName-and-therefore-cannot-contain-colon
 
 commands:
+  migrate:
+    milestone: M0
+    audience: operator
+    authentication: none
+    databaseUrl: {flag: --database-url, environment: MERIDIAN_DATABASE_URL, required: true}
+    startupBehavior: serve-runs-up-before-opening-http-listener
+    subcommands:
+      up: {behavior: apply-river-to-pinned-target-then-all-pending-application-migrations}
+      down: {requiredFlags: [--steps], behavior: explicit-operator-only-never-called-by-serve}
+      status: {output: application-and-river-migration-versions}
   push:
     milestone: M3
     operationId: pushAssetRevision

@@ -1,0 +1,38 @@
+name: meridian
+
+services:
+  postgres:
+    image: postgres:16.15-alpine3.24
+    environment:
+      POSTGRES_DB: meridian
+      POSTGRES_USER: meridian
+      POSTGRES_PASSWORD: meridian
+    ports:
+      - "127.0.0.1:54329:5432"
+    volumes:
+      - meridian-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meridian -d meridian"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  postgres-test:
+    image: postgres:16.15-alpine3.24
+    profiles: [integration]
+    environment:
+      POSTGRES_DB: meridian_test
+      POSTGRES_USER: meridian
+      POSTGRES_PASSWORD: meridian
+    ports:
+      - "127.0.0.1::5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meridian -d meridian_test"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  meridian-postgres:
