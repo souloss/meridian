@@ -17,6 +17,7 @@ import (
 	"github.com/meridian-labs/meridian/internal/handler"
 	"github.com/meridian-labs/meridian/internal/repository"
 	"github.com/meridian-labs/meridian/internal/service"
+	"github.com/meridian-labs/meridian/internal/task"
 	"github.com/spf13/cobra"
 )
 
@@ -63,8 +64,12 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 
 	identityStore := repository.NewIdentityStore(db.Pool)
 	identity := service.NewIdentity(identityStore, digester)
-	credentials := service.NewCredentials(repository.NewCredentialStore(db.Pool), identityStore, keyring)
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
+	runtime, err := task.NewRuntime(db.Pool, repositoryStore, nil, logger)
+	if err != nil {
+		return fmt.Errorf("configure River runtime: %w", err)
+	}
+	credentials := service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), identityStore, keyring)
 	repositories := service.NewRepositories(repositoryStore, identityStore)
 	jobs := service.NewJobs(repositoryStore)
 	server := &http.Server{
@@ -75,6 +80,16 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		WriteTimeout:      30 * time.Second,
 		IdleTimeout:       60 * time.Second,
 	}
+	if err := runtime.Start(ctx); err != nil {
+		return fmt.Errorf("start River runtime: %w", err)
+	}
+	defer func() {
+		stopContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if stopErr := runtime.Stop(stopContext); stopErr != nil && err == nil {
+			err = fmt.Errorf("River runtime shutdown failed: %w", stopErr)
+		}
+	}()
 
 	serverErr := make(chan error, 1)
 	go func() {

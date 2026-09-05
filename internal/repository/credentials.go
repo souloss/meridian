@@ -12,17 +12,27 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	generated "github.com/meridian-labs/meridian/internal/generated/repository"
 	"github.com/meridian-labs/meridian/internal/service"
+	"github.com/meridian-labs/meridian/internal/task"
+	"github.com/riverqueue/river"
 )
 
 // CredentialStore implements credential persistence with explicit transaction boundaries.
 type CredentialStore struct {
-	pool    *pgxpool.Pool
-	queries *generated.Queries
+	pool        *pgxpool.Pool
+	queries     *generated.Queries
+	riverClient *river.Client[pgx.Tx]
 }
 
 // NewCredentialStore binds credential persistence to a native pgx pool.
 func NewCredentialStore(pool *pgxpool.Pool) *CredentialStore {
-	return &CredentialStore{pool: pool, queries: generated.New(pool)}
+	return NewCredentialStoreWithRiver(pool, nil)
+}
+
+// NewCredentialStoreWithRiver binds credential persistence to a River client.
+// When configured, every newly created sync job is inserted into River inside
+// the same PostgreSQL transaction as the credential rotation and domain row.
+func NewCredentialStoreWithRiver(pool *pgxpool.Pool, riverClient *river.Client[pgx.Tx]) *CredentialStore {
+	return &CredentialStore{pool: pool, queries: generated.New(pool), riverClient: riverClient}
 }
 
 // CreateCredential inserts encrypted metadata and all team shares atomically.
@@ -255,7 +265,7 @@ func (store *CredentialStore) RotateCredential(ctx context.Context, input servic
 		if err != nil {
 			return service.CredentialRecord{}, nil, normalizeError(err)
 		}
-		jobs, err = enqueueCredentialSyncJobs(ctx, queries, credentialSyncReferences(references), input.ID)
+		jobs, err = enqueueCredentialSyncJobs(ctx, queries, tx, store.riverClient, credentialSyncReferences(references), input.ID, input.UpdatedAt)
 		if err != nil {
 			return service.CredentialRecord{}, nil, err
 		}
@@ -420,7 +430,7 @@ func (store *CredentialStore) RotateGlobalCredential(ctx context.Context, input 
 		if err != nil {
 			return service.GlobalCredentialRecord{}, nil, normalizeError(err)
 		}
-		jobs, err = enqueueCredentialSyncJobs(ctx, queries, globalCredentialSyncReferences(references), input.ID)
+		jobs, err = enqueueCredentialSyncJobs(ctx, queries, tx, store.riverClient, globalCredentialSyncReferences(references), input.ID, input.UpdatedAt)
 		if err != nil {
 			return service.GlobalCredentialRecord{}, nil, err
 		}
@@ -523,10 +533,10 @@ func globalCredentialSyncReferences(references []generated.ListRepositoriesForGl
 	return converted
 }
 
-func enqueueCredentialSyncJobs(ctx context.Context, queries *generated.Queries, references []credentialSyncReference, credentialID uuid.UUID) ([]service.CredentialSyncJob, error) {
+func enqueueCredentialSyncJobs(ctx context.Context, queries *generated.Queries, tx pgx.Tx, riverClient *river.Client[pgx.Tx], references []credentialSyncReference, credentialID uuid.UUID, updatedAt time.Time) ([]service.CredentialSyncJob, error) {
 	jobs := make([]service.CredentialSyncJob, 0, len(references))
 	for _, reference := range references {
-		job, err := enqueueCredentialSyncJob(ctx, queries, reference.tenantID, reference.tenantSlug, reference.repositoryID, reference.defaultBranch, credentialID)
+		job, err := enqueueCredentialSyncJob(ctx, queries, tx, riverClient, reference.tenantID, reference.tenantSlug, reference.repositoryID, reference.defaultBranch, credentialID, updatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -535,7 +545,7 @@ func enqueueCredentialSyncJobs(ctx context.Context, queries *generated.Queries, 
 	return jobs, nil
 }
 
-func enqueueCredentialSyncJob(ctx context.Context, queries *generated.Queries, tenantID uuid.UUID, tenantSlug string, repositoryID uuid.UUID, refName string, credentialID uuid.UUID) (service.CredentialSyncJob, error) {
+func enqueueCredentialSyncJob(ctx context.Context, queries *generated.Queries, tx pgx.Tx, riverClient *river.Client[pgx.Tx], tenantID uuid.UUID, tenantSlug string, repositoryID uuid.UUID, refName string, credentialID uuid.UUID, updatedAt time.Time) (service.CredentialSyncJob, error) {
 	dedupeKey := "repository:" + repositoryID.String() + ":branch:" + refName
 	jobInput, err := json.Marshal(struct {
 		CredentialID uuid.UUID `json:"credentialId"`
@@ -562,6 +572,21 @@ func enqueueCredentialSyncJob(ctx context.Context, queries *generated.Queries, t
 			DedupeKey: dedupeKey, ActiveGeneration: generation,
 		})
 		if err == nil {
+			if riverClient != nil {
+				result, err := riverClient.InsertTx(ctx, tx, task.CredentialSyncArgs{
+					TenantID: tenantID, JobID: row.ID, RepositoryID: repositoryID, RefName: refName,
+				}, &river.InsertOpts{MaxAttempts: int(row.MaxAttempts)})
+				if err != nil {
+					return service.CredentialSyncJob{}, fmt.Errorf("insert River credential sync job: %w", err)
+				}
+				if changed, err := queries.AttachRiverJobID(ctx, generated.AttachRiverJobIDParams{
+					TenantID: tenantID, ID: row.ID, RiverJobID: new(result.Job.ID), UpdatedAt: timestamp(updatedAt),
+				}); err != nil {
+					return service.CredentialSyncJob{}, normalizeError(err)
+				} else if changed != 1 {
+					return service.CredentialSyncJob{}, fmt.Errorf("attach River job %d to domain job %s: %w", result.Job.ID, row.ID, service.ErrPrecondition)
+				}
+			}
 			return service.CredentialSyncJob{TenantSlug: tenantSlug, RepositoryID: repositoryID, JobID: row.ID, Deduplicated: false}, nil
 		}
 		if !errors.Is(err, pgx.ErrNoRows) {

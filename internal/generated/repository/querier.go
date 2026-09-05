@@ -14,6 +14,11 @@ import (
 type Querier interface {
 	// AddCredentialTeamShare grants one same-tenant team visibility entry.
 	AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error
+	// AppendJobStageLog persists one redacted stage event with its caller-supplied cursor.
+	AppendJobStageLog(ctx context.Context, arg AppendJobStageLogParams) (JobStageLog, error)
+	// AttachRiverJobID links the application UUID job to the internal River sequence
+	// in the same transaction that inserted both rows.
+	AttachRiverJobID(ctx context.Context, arg AttachRiverJobIDParams) (int64, error)
 	// CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
 	CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error)
 	// CountCredentialRepositories counts active repositories referencing a tenant credential.
@@ -74,6 +79,10 @@ type Querier interface {
 	// DeleteRepository soft-deletes a repository and makes its URL/branch reusable only per policy.
 	// Historical job and audit rows remain tenant-scoped after this update.
 	DeleteRepository(ctx context.Context, arg DeleteRepositoryParams) (int64, error)
+	// FinishJobExecution records either a terminal result or a retryable failure.
+	// Retryable failures remain pending for River's next attempt; terminal failures
+	// receive a finished timestamp and a durable failed status.
+	FinishJobExecution(ctx context.Context, arg FinishJobExecutionParams) (Job, error)
 	// GetAPITokenPrincipalByTokenHash authenticates one active PAT whose user, membership, and tenant remain active.
 	GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAPITokenPrincipalByTokenHashParams) (GetAPITokenPrincipalByTokenHashRow, error)
 	// GetActiveTenantBySlug returns only an active tenant for tenant-scoped business access.
@@ -134,12 +143,18 @@ type Querier interface {
 	// LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
 	// The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
 	LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error
+	// LockJobStageSequence serializes the per-job log cursor inside the caller's transaction.
+	// The lock key is derived from tenant and job UUIDs and never contains user content.
+	LockJobStageSequence(ctx context.Context, lockKey string) error
 	// LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
 	// A pending or running row is reused; terminal rows advance active_generation for new work.
 	LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error)
 	// LockRepositoryQuota serializes repository creation against the tenant's repository quota.
 	// The repository adapter holds this row lock while counting and inserting, so concurrent creates cannot oversubscribe a quota.
 	LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
+	// NextJobStageSequence returns the next replay cursor after the caller acquires
+	// the job-specific advisory transaction lock.
+	NextJobStageSequence(ctx context.Context, arg NextJobStageSequenceParams) (int64, error)
 	// PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
 	PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error)
 	// ReplaceCredentialTeamShares removes and recreates the complete team-share projection in one transaction.
@@ -159,6 +174,13 @@ type Querier interface {
 	RotateGlobalCredentialSecret(ctx context.Context, arg RotateGlobalCredentialSecretParams) (GlobalCredential, error)
 	// RotateSessionCSRFHash replaces the keyed CSRF digest for one active browser session.
 	RotateSessionCSRFHash(ctx context.Context, arg RotateSessionCSRFHashParams) (int64, error)
+	// SetJobExecutionStage records the active pipeline stage without changing the
+	// durable lifecycle state. Stage values are constrained by the application DDL.
+	SetJobExecutionStage(ctx context.Context, arg SetJobExecutionStageParams) (int64, error)
+	// StartJobExecution claims a durable Meridian job for one River attempt.
+	// A terminal domain row is intentionally not claimed again; this makes River retries
+	// harmless after a worker already committed a terminal result.
+	StartJobExecution(ctx context.Context, arg StartJobExecutionParams) (Job, error)
 	// TouchAPIToken records the latest successful use of a non-revoked tenant PAT.
 	TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error
 	// TouchSession records the latest accepted request time for a non-revoked browser session.

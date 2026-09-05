@@ -4,16 +4,20 @@ package database
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"log/slog"
 	"os"
 	"testing"
+	"time"
 	"uuid"
 
 	generated "github.com/meridian-labs/meridian/internal/generated/repository"
 	"github.com/meridian-labs/meridian/internal/repository"
 	"github.com/meridian-labs/meridian/internal/service"
+	"github.com/meridian-labs/meridian/internal/task"
+	"github.com/riverqueue/river"
 )
 
 func TestGeneratedRepositoryUsesStandardUUIDAndTransaction(t *testing.T) {
@@ -95,6 +99,9 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE users, tenants CASCADE`); err != nil {
 		t.Fatalf("reset credential fixtures: %v", err)
 	}
+	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE river.river_job CASCADE`); err != nil {
+		t.Fatalf("reset River fixtures: %v", err)
+	}
 
 	userID, tenantID, credentialID, repositoryID := uuid.NewV7(), uuid.NewV7(), uuid.NewV7(), uuid.NewV7()
 	if _, err := db.Pool.Exec(t.Context(), `INSERT INTO users (id, username, password_hash, display_name) VALUES ($1, $2, $3, $4)`, userID, "rotation-test", "fixture-password-hash", "Rotation Test"); err != nil {
@@ -119,7 +126,11 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 		t.Fatalf("create credential fixtures: %v", err)
 	}
 
-	store := repository.NewCredentialStore(db.Pool)
+	riverRuntime, err := task.NewRuntime(db.Pool, repository.NewRepositoryStore(db.Pool), task.UnsupportedSyncRunner{}, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatalf("configure River runtime: %v", err)
+	}
+	store := repository.NewCredentialStoreWithRiver(db.Pool, riverRuntime.Client())
 	idempotencyKey := uuid.NewV7()
 	requestHash := bytes.Repeat([]byte{0x55}, 32)
 	rotated, jobs, err := store.RotateCredential(t.Context(), service.RotateCredential{
@@ -144,6 +155,20 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 	}
 	if jobCount != 1 || jobType != "repo.sync" || trigger != "credential-rotated" || status != "pending" {
 		t.Fatalf("stored job = count %d type %q trigger %q status %q", jobCount, jobType, trigger, status)
+	}
+	var riverJobID *int64
+	if err := db.Pool.QueryRow(t.Context(), `SELECT river_job_id FROM jobs WHERE tenant_id = $1 AND id = $2`, tenantID, jobs[0].JobID).Scan(&riverJobID); err != nil {
+		t.Fatalf("read domain River job id: %v", err)
+	}
+	if riverJobID == nil {
+		t.Fatal("domain sync job has no River job id")
+	}
+	var riverKind string
+	if err := db.Pool.QueryRow(t.Context(), `SELECT kind FROM river.river_job WHERE id = $1`, *riverJobID).Scan(&riverKind); err != nil {
+		t.Fatalf("read River job row: %v", err)
+	}
+	if riverKind != "meridian_repo_sync" {
+		t.Fatalf("River job kind = %q, want meridian_repo_sync", riverKind)
 	}
 
 	replayed, replayJobs, err := store.RotateCredential(t.Context(), service.RotateCredential{
@@ -176,5 +201,96 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 	}
 	if rotatedAgain.Revision != 3 || len(jobsAgain) != 1 || jobsAgain[0].JobID != jobs[0].JobID || !jobsAgain[0].Deduplicated {
 		t.Fatalf("deduplicated rotation = revision %d jobs %#v", rotatedAgain.Revision, jobsAgain)
+	}
+}
+
+func TestRiverWorkerPersistsTerminalFailureAndStageLogs(t *testing.T) {
+	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("MERIDIAN_TEST_DATABASE_URL is not set")
+	}
+
+	db, err := Open(t.Context(), databaseURL, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatalf("open database: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("close database: %v", err)
+		}
+	})
+	if err := db.MigrateUp(t.Context()); err != nil {
+		t.Fatalf("migrate database: %v", err)
+	}
+	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE users, tenants CASCADE`); err != nil {
+		t.Fatalf("reset worker fixtures: %v", err)
+	}
+	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE river.river_job CASCADE`); err != nil {
+		t.Fatalf("reset River worker fixtures: %v", err)
+	}
+	tenantID, jobID, repositoryID := uuid.NewV7(), uuid.NewV7(), uuid.NewV7()
+	if _, err := db.Pool.Exec(t.Context(), `
+		INSERT INTO tenants (id, slug, display_name, quota, settings)
+		VALUES ($1, 'worker-acme', 'Worker Acme', '{}'::jsonb, '{}'::jsonb)
+	`, tenantID); err != nil {
+		t.Fatalf("create worker tenant: %v", err)
+	}
+	if _, err := db.Pool.Exec(t.Context(), `
+		INSERT INTO jobs (tenant_id, id, type, scope_type, scope_id, trigger, input, dedupe_key, replay_safe)
+		VALUES ($1, $2, 'repo.sync', 'repository', $3, 'system', '{}'::jsonb, $4, true)
+	`, tenantID, jobID, repositoryID, "worker:"+jobID.String()); err != nil {
+		t.Fatalf("create worker domain job: %v", err)
+	}
+
+	runtime, err := task.NewRuntime(db.Pool, repository.NewRepositoryStore(db.Pool), task.UnsupportedSyncRunner{}, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatalf("configure River runtime: %v", err)
+	}
+	completed, cancel := runtime.Client().Subscribe(river.EventKindJobCompleted)
+	t.Cleanup(cancel)
+	if err := runtime.Start(t.Context()); err != nil {
+		t.Fatalf("start River runtime: %v", err)
+	}
+	t.Cleanup(func() {
+		stopContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := runtime.Stop(stopContext); err != nil {
+			t.Errorf("stop River runtime: %v", err)
+		}
+	})
+
+	tx, err := db.Pool.Begin(t.Context())
+	if err != nil {
+		t.Fatalf("begin River insert transaction: %v", err)
+	}
+	if _, err := runtime.Client().InsertTx(t.Context(), tx, task.CredentialSyncArgs{
+		TenantID: tenantID, JobID: jobID, RepositoryID: repositoryID, RefName: "main",
+	}, nil); err != nil {
+		_ = tx.Rollback(t.Context())
+		t.Fatalf("insert River job: %v", err)
+	}
+	if err := tx.Commit(t.Context()); err != nil {
+		t.Fatalf("commit River insert: %v", err)
+	}
+	select {
+	case <-completed:
+	case <-time.After(10 * time.Second):
+		t.Fatal("timed out waiting for River worker completion")
+	}
+
+	var status string
+	var stage *string
+	if err := db.Pool.QueryRow(t.Context(), `SELECT status, stage FROM jobs WHERE tenant_id = $1 AND id = $2`, tenantID, jobID).Scan(&status, &stage); err != nil {
+		t.Fatalf("read worker domain state: %v", err)
+	}
+	if status != "failed" || stage == nil || *stage != "resolve" {
+		t.Fatalf("worker domain state = status %q stage %v, want failed/resolve", status, stage)
+	}
+	var logCount int
+	if err := db.Pool.QueryRow(t.Context(), `SELECT count(*) FROM job_stage_logs WHERE tenant_id = $1 AND job_id = $2`, tenantID, jobID).Scan(&logCount); err != nil {
+		t.Fatalf("read worker stage logs: %v", err)
+	}
+	if logCount != 2 {
+		t.Fatalf("worker stage log count = %d, want start and terminal failure", logCount)
 	}
 }

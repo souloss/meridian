@@ -4,7 +4,7 @@
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
 > 最新稳定提交：`b8d2ef6 feat: add redacted platform job queries`
-> 当前开发切片：River Worker 基础与 Job 阶段日志
+> 当前开发切片：River Worker 基础与 Job 阶段日志（待提交）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -50,7 +50,7 @@
 | 全局凭据管理及强制删除 | 部分完成 | CRUD/轮换/删除、引用仓库解绑健康状态和平台 Job 投影已实现；正式 Smoke fixture 仍待统一放行 | `66f473c`、`394ffe7`、`b270b9d`、`b8d2ef6` |
 | Known Host 创建、派生指纹和列表 | 部分完成 | 服务端派生规则已有单测和 handler；SMK-035 独立 API 场景尚未统一放行 | `31e3440`、`66f473c` |
 | 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | 本阶段提交，`internal/handler/identity_integration_test.go` |
-| River Worker 与通用 Job 控制面 | 部分完成 | 平台管理员可读取脱敏 Job 投影；River Worker 编排、阶段日志和持久化状态推进仍待闭环 | `ab1635f`、`394ffe7`、`b8d2ef6` |
+| River Worker 与通用 Job 控制面 | 开发中 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；本切片完整门禁尚未提交 | `ab1635f`、`394ffe7`、`b8d2ef6` |
 | Audit 与 Outbox 事务闭环 | 未开始 | 只有 M0 DDL，尚无业务写入、分发和读取闭环 | `ab1635f` |
 | 本地 SHA-256 CAS Blob 驱动 | 未开始 | 只有 M0 DDL，尚无存储驱动和签名读取闭环 | `ab1635f` |
 | M0 Nuxt 控制面 | 未开始 | 当前只有静态应用壳、生成客户端和 Query 插件；登录、租户壳、凭据/仓库页面及 E2E 未完成 | `b29514f` |
@@ -84,12 +84,19 @@
 - 实际 M0 DDL 列注释审计测试。
 - 平台管理员 Job 列表/详情的脱敏查询、过滤、分页和跨租户拒绝断言；`input`、`result`、`error`、凭据秘密和 River 内部字段不进入响应。
 
+当前未提交的 Worker 切片已通过：
+
+- 凭据轮换事务同时写入 Meridian `jobs`、River `river_job`，并在同一事务回填 `river_job_id`；
+- River worker 启动时按 attempt fencing 抢占 durable job，避免旧 attempt 覆盖新 attempt；
+- `resolve -> discover -> extract -> merge -> normalize -> index` 六阶段均写入带 advisory-lock 序列的 `job_stage_logs`，失败路径只写入脱敏错误；
+- Worker/数据库集成测试验证 terminal failure、阶段日志数量、River kind 和应用状态。
+
 本阶段提交前已通过 `vfox exec golang@1.27.1 -- go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
 
 ## 下一步顺序
 
 1. 用实际仓库绑定闭环全局凭据强制删除后的轮换 Job 数量断言。
-2. 完成 River Worker 基础、事务内入队和 Job 阶段日志。
+2. 提交并保持 River Worker 基础、事务内入队和 Job 阶段日志切片。
 3. 完成 Audit/Outbox 的同事务写入与分发闭环。
 4. 完成本地 SHA-256 CAS Blob 驱动。
 5. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
