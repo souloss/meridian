@@ -43,9 +43,9 @@ WHERE tenant_id = sqlc.arg(tenant_id)
 
 -- AppendJobStageLog persists one redacted stage event with its caller-supplied cursor.
 -- name: AppendJobStageLog :one
-INSERT INTO job_stage_logs (tenant_id, job_id, sequence, stage, level, message, occurred_at)
+INSERT INTO job_stage_logs (tenant_id, job_id, sequence, attempt, stage, level, message, occurred_at)
 VALUES (
-  sqlc.arg(tenant_id), sqlc.arg(job_id), sqlc.arg(sequence), sqlc.arg(stage)::text,
+  sqlc.arg(tenant_id), sqlc.arg(job_id), sqlc.arg(sequence), sqlc.arg(attempt)::integer, sqlc.arg(stage)::text,
   sqlc.arg(level)::text, sqlc.arg(message)::text, sqlc.arg(occurred_at)::timestamptz
 )
 RETURNING *;

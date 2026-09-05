@@ -1165,7 +1165,14 @@ jobs:
     forbiddenSourceStates: [pending, running, succeeded, succeeded_with_warnings, outcome_unknown]
     behavior: create-new-job-with-trigger-retry-and-retryOfJobId
     input: immutable-copy-of-source-job-input
+    equivalentPendingOrRunningJob: conflict
     outcomeUnknownReason: requires-external-reconciliation-and-must-not-be-replayed-by-retry-endpoint
+  progress:
+    pending: 0
+    runningStage: {resolve: 5, discover: 20, extract: 40, merge: 60, normalize: 80, index: 95}
+    succeeded: 100
+    succeeded_with_warnings: 100
+    failedOutcomeUnknownOrCancelled: retain-current-stage-progress-or-zero
   aggregateOutcome:
     allRequiredStagesSucceeded: succeeded
     optionalOrIndependentSourceFailed: succeeded_with_warnings

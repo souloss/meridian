@@ -25,6 +25,8 @@ type Querier interface {
 	// AttachRiverJobID links the application UUID job to the internal River sequence
 	// in the same transaction that inserted both rows.
 	AttachRiverJobID(ctx context.Context, arg AttachRiverJobIDParams) (int64, error)
+	// CancelTenantJob moves only a pending or running tenant job to its durable cancelled terminal state.
+	CancelTenantJob(ctx context.Context, arg CancelTenantJobParams) (Job, error)
 	// ClaimNextOutboxDelivery atomically leases one due delivery with SKIP LOCKED.
 	// A stale delivering row is eligible after its lease expires, providing crash recovery.
 	ClaimNextOutboxDelivery(ctx context.Context, arg ClaimNextOutboxDeliveryParams) (ClaimNextOutboxDeliveryRow, error)
@@ -54,6 +56,8 @@ type Querier interface {
 	CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error)
 	// CountTenantCredentials counts visible tenant-owned and global credentials for one tenant member.
 	CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error)
+	// CountTenantJobs returns the exact total for the predicates used by ListTenantJobs.
+	CountTenantJobs(ctx context.Context, arg CountTenantJobsParams) (int64, error)
 	// CountTenantUniqueBlobBytes sums each positively referenced global blob once
 	// so repeated revisions of identical content do not consume quota again.
 	CountTenantUniqueBlobBytes(ctx context.Context, tenantID uuid.UUID) (int64, error)
@@ -86,6 +90,11 @@ type Querier interface {
 	// CreateRepository persists repository configuration and initializes an empty health summary.
 	// URL fields are credential-free; credentials are referenced only by UUID foreign keys.
 	CreateRepository(ctx context.Context, arg CreateRepositoryParams) (Repository, error)
+	// CreateRetriedTenantJob creates a new pending generation from immutable source execution inputs.
+	// Result, error, stage, attempt, and timestamps are deliberately reset for the independent retry.
+	CreateRetriedTenantJob(ctx context.Context, arg CreateRetriedTenantJobParams) (Job, error)
+	// CreateRetryJobIdempotency stores the exact non-secret 202 response for 24-hour replay.
+	CreateRetryJobIdempotency(ctx context.Context, arg CreateRetryJobIdempotencyParams) error
 	// CreateSession persists keyed session and CSRF digests without storing either plaintext token.
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	// CreateTenant inserts one tenant with explicit quota and settings snapshots copied from platform defaults.
@@ -103,6 +112,8 @@ type Querier interface {
 	// DeleteRepository soft-deletes a repository and makes its URL/branch reusable only per policy.
 	// Historical job and audit rows remain tenant-scoped after this update.
 	DeleteRepository(ctx context.Context, arg DeleteRepositoryParams) (int64, error)
+	// DeleteRetryJobIdempotency removes an expired retry replay record before key reuse.
+	DeleteRetryJobIdempotency(ctx context.Context, arg DeleteRetryJobIdempotencyParams) error
 	// FinishJobExecution records either a terminal result or a retryable failure.
 	// Retryable failures remain pending for River's next attempt; terminal failures
 	// receive a finished timestamp and a durable failed status.
@@ -128,6 +139,8 @@ type Querier interface {
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
 	// GetRepository returns one active repository; soft-deleted rows intentionally appear absent.
 	GetRepository(ctx context.Context, arg GetRepositoryParams) (Repository, error)
+	// GetRetryJobIdempotency returns the retained exact response for a retryJob request.
+	GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error)
 	// GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
 	GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error)
 	// GetTenantBlobReference returns the current count after the caller locks the tenant quota row.
@@ -139,6 +152,11 @@ type Querier interface {
 	// GetTenantCredentialForMutation returns one tenant credential without visibility filtering.
 	// The service has already authorized the tenant operation; this query preserves a 404/412 distinction.
 	GetTenantCredentialForMutation(ctx context.Context, arg GetTenantCredentialForMutationParams) (Credential, error)
+	// GetTenantJob returns one full tenant-visible job row while retaining the tenant predicate.
+	GetTenantJob(ctx context.Context, arg GetTenantJobParams) (Job, error)
+	// GetTenantJobStreamState returns one state row plus the greatest persisted log cursor
+	// from a single PostgreSQL statement so SSE never emits a state ahead of its logs.
+	GetTenantJobStreamState(ctx context.Context, arg GetTenantJobStreamStateParams) (GetTenantJobStreamStateRow, error)
 	// GetTenantSlugForEvent resolves the stable tenant slug embedded in a domain event envelope.
 	GetTenantSlugForEvent(ctx context.Context, tenantID uuid.UUID) (string, error)
 	// GetUserByID returns the global identity matching the supplied UUID.
@@ -180,6 +198,14 @@ type Querier interface {
 	// Team visibility is evaluated by a same-tenant team membership predicate. Global credentials are
 	// appended as tenant-visible records with is_global=true and a tenant-wide sharing projection.
 	ListTenantCredentials(ctx context.Context, arg ListTenantCredentialsParams) ([]ListTenantCredentialsRow, error)
+	// ListTenantJobAttemptLogs batch-loads persisted events for a page of jobs without an N+1 query.
+	// The caller groups rows by job, one-based attempt, and stage to construct the API attempt projection.
+	ListTenantJobAttemptLogs(ctx context.Context, arg ListTenantJobAttemptLogsParams) ([]JobStageLog, error)
+	// ListTenantJobLogsAfter returns bounded SSE replay rows strictly after a persisted sequence cursor.
+	ListTenantJobLogsAfter(ctx context.Context, arg ListTenantJobLogsAfterParams) ([]JobStageLog, error)
+	// ListTenantJobs returns a newest-first page bounded by one tenant identifier.
+	// Empty filter arrays and strings mean no restriction; execution input and River identifiers remain internal.
+	ListTenantJobs(ctx context.Context, arg ListTenantJobsParams) ([]Job, error)
 	// LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
 	// The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
 	LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error
@@ -189,9 +215,15 @@ type Querier interface {
 	// LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
 	// A pending or running row is reused; terminal rows advance active_generation for new work.
 	LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error)
+	// LockLatestTenantJobGeneration returns the newest semantic generation while holding its row lock.
+	LockLatestTenantJobGeneration(ctx context.Context, arg LockLatestTenantJobGenerationParams) (Job, error)
 	// LockRepositoryQuota serializes repository creation against the tenant's repository quota.
 	// The repository adapter holds this row lock while counting and inserting, so concurrent creates cannot oversubscribe a quota.
 	LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
+	// LockRetryJobIdempotency serializes one retry key for an authenticated tenant principal.
+	LockRetryJobIdempotency(ctx context.Context, lockKey string) error
+	// LockTenantJobForControl serializes cancellation and manual retry decisions for one tenant job.
+	LockTenantJobForControl(ctx context.Context, arg LockTenantJobForControlParams) (Job, error)
 	// LockTenantStorageQuota serializes all tenant blob-reference accounting and
 	// returns the frozen unique-byte quota copied into the tenant snapshot.
 	LockTenantStorageQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)

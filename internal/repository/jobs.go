@@ -59,5 +59,3 @@ func optionalText(value string) *string {
 	}
 	return new(value)
 }
-
-var _ service.JobStore = (*RepositoryStore)(nil)

@@ -2125,6 +2125,9 @@ paths:
             text/event-stream with event names log and state. Last-Event-ID resumes
             persisted log sequence values; a state snapshot is sent on connect and
             terminal state closes the stream. Heartbeat comments are sent every 15s.
+          headers:
+            Cache-Control: {required: true, schema: {type: string, const: no-cache}, description: "prevents intermediaries from caching a tenant job event stream."}
+            X-Accel-Buffering: {required: true, schema: {type: string, const: 'no'}, description: "disables reverse-proxy response buffering for incremental events."}
           content: {text/event-stream: {schema: {$ref: '#/components/schemas/JobSseEvent'}}}
         '404': {$ref: '#/components/responses/NotFound'}
   /api/v1/t/{tenantSlug}/jobs/{jobId}:cancel:
@@ -2370,7 +2373,7 @@ components:
     ExportFormat: {name: format, in: query, required: true, schema: {type: string, enum: [json, markdown]}, description: "identifies or filters the format value in the query."}
     UnreadFilter: {name: unread, in: query, schema: {type: boolean}, description: "identifies or filters the unread value in the query."}
     TodoStatusFilter: {name: status, in: query, schema: {$ref: '#/components/schemas/TodoStatus'}, description: "identifies or filters the status value in the query."}
-    LastEventId: {name: Last-Event-ID, in: header, schema: {type: string, maxLength: 128}, description: "resumes an event stream after the last received sequence."}
+    LastEventId: {name: Last-Event-ID, in: header, schema: {type: string, pattern: '^(0|[1-9][0-9]*)$', maxLength: 19}, description: "resumes an event stream strictly after this non-negative persisted log sequence."}
     IdempotencyKey: {name: Idempotency-Key, in: header, required: true, schema: {type: string, format: uuid}, description: Retained for 24 hours; a replay returns the original status and body.}
     WebhookDelivery: {name: X-Meridian-Delivery, in: header, required: true, schema: {type: string, minLength: 1, maxLength: 128}, description: "identifies or filters the x meridian delivery value in the header."}
     WebhookEvent: {name: X-Meridian-Event, in: header, required: true, schema: {type: string, const: push}, description: "identifies or filters the x meridian event value in the header."}

@@ -22086,6 +22086,14 @@ func (r GetJobResponse) ContentType() string {
 	return ""
 }
 
+// StreamJobLogsResponse200Headers the declared response headers of an HTTP 200 response for StreamJobLogs
+type StreamJobLogsResponse200Headers struct {
+	// CacheControl carries the generated cache control value for StreamJobLogsResponse200Headers.
+	CacheControl string
+	// XAccelBuffering carries the generated x accel buffering value for StreamJobLogsResponse200Headers.
+	XAccelBuffering string
+}
+
 // StreamJobLogsResponse404Headers the declared response headers of an HTTP 404 response for StreamJobLogs
 type StreamJobLogsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
@@ -22100,6 +22108,8 @@ type StreamJobLogsResponse struct {
 	HTTPResponse *http.Response
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
+	// Headers200 the parsed response headers for an HTTP 200 response
+	Headers200 *StreamJobLogsResponse200Headers
 	// Headers404 the parsed response headers for an HTTP 404 response
 	Headers404 *StreamJobLogsResponse404Headers
 }
@@ -36825,6 +36835,23 @@ func ParseStreamJobLogsResponse(rsp *http.Response) (*StreamJobLogsResponse, err
 	}
 
 	switch {
+	case rsp.StatusCode == 200:
+		var headers StreamJobLogsResponse200Headers
+		if values := rsp.Header.Values("Cache-Control"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "Cache-Control", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.CacheControl = value
+		}
+		if values := rsp.Header.Values("X-Accel-Buffering"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Accel-Buffering", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XAccelBuffering = value
+		}
+		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
 		var headers StreamJobLogsResponse404Headers
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {

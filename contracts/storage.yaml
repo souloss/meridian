@@ -641,7 +641,7 @@ tables:
   job_stage_logs:
     tenantScoped: true
     primaryKey: [tenant_id, job_id, sequence]
-    fields: [tenant_id, job_id, sequence, stage, level, message, occurred_at]
+    fields: [tenant_id, job_id, sequence, attempt, stage, level, message, occurred_at]
   subscriptions:
     tenantScoped: true
     primaryKey: [tenant_id, id]

@@ -7523,7 +7523,7 @@ type ListJobsParams struct {
 
 // StreamJobLogsParams defines parameters for StreamJobLogs.
 type StreamJobLogsParams struct {
-	// LastEventID resumes an event stream after the last received sequence.
+	// LastEventID resumes an event stream strictly after this non-negative persisted log sequence.
 	LastEventID *LastEventId `json:"Last-Event-ID,omitempty"`
 }
 

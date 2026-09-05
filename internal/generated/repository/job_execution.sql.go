@@ -13,12 +13,12 @@ import (
 )
 
 const appendJobStageLog = `-- name: AppendJobStageLog :one
-INSERT INTO job_stage_logs (tenant_id, job_id, sequence, stage, level, message, occurred_at)
+INSERT INTO job_stage_logs (tenant_id, job_id, sequence, attempt, stage, level, message, occurred_at)
 VALUES (
-  $1, $2, $3, $4::text,
-  $5::text, $6::text, $7::timestamptz
+  $1, $2, $3, $4::integer, $5::text,
+  $6::text, $7::text, $8::timestamptz
 )
-RETURNING tenant_id, job_id, sequence, stage, level, message, occurred_at
+RETURNING tenant_id, job_id, sequence, stage, level, message, occurred_at, attempt
 `
 
 // AppendJobStageLogParams contains the strongly typed arguments for the AppendJobStageLog query.
@@ -29,6 +29,8 @@ type AppendJobStageLogParams struct {
 	JobID uuid.UUID `json:"job_id"`
 	// Sequence is the sequence value supplied to the AppendJobStageLog query.
 	Sequence int64 `json:"sequence"`
+	// Attempt is the attempt value supplied to the AppendJobStageLog query.
+	Attempt int32 `json:"attempt"`
 	// Stage is the stage value supplied to the AppendJobStageLog query.
 	Stage string `json:"stage"`
 	// Level is the level value supplied to the AppendJobStageLog query.
@@ -45,6 +47,7 @@ func (q *Queries) AppendJobStageLog(ctx context.Context, arg AppendJobStageLogPa
 		arg.TenantID,
 		arg.JobID,
 		arg.Sequence,
+		arg.Attempt,
 		arg.Stage,
 		arg.Level,
 		arg.Message,
@@ -59,6 +62,7 @@ func (q *Queries) AppendJobStageLog(ctx context.Context, arg AppendJobStageLogPa
 		&i.Level,
 		&i.Message,
 		&i.OccurredAt,
+		&i.Attempt,
 	)
 	return i, err
 }

@@ -162,6 +162,159 @@ func TestBlobReferenceRegistryEnforcesUniqueByteQuota(t *testing.T) {
 	}
 }
 
+func TestJobControlCoordinatesRiverCancellationRetryAndIdempotency(t *testing.T) {
+	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("MERIDIAN_TEST_DATABASE_URL is not set")
+	}
+	db, err := Open(t.Context(), databaseURL, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatalf("open database: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("close database: %v", err)
+		}
+	})
+	if err := db.MigrateUp(t.Context()); err != nil {
+		t.Fatalf("migrate database: %v", err)
+	}
+	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE users, tenants CASCADE`); err != nil {
+		t.Fatalf("reset job-control fixtures: %v", err)
+	}
+	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE river.river_job CASCADE`); err != nil {
+		t.Fatalf("reset job-control River fixtures: %v", err)
+	}
+	tenantID, repositoryID := uuid.NewV7(), uuid.NewV7()
+	if _, err := db.Pool.Exec(t.Context(), `
+		INSERT INTO tenants (id, slug, display_name, quota, settings)
+		VALUES ($1, 'job-control', 'Job Control', '{}'::jsonb, '{}'::jsonb)
+	`, tenantID); err != nil {
+		t.Fatalf("create job-control tenant: %v", err)
+	}
+	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{}, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatalf("configure job-control River runtime: %v", err)
+	}
+	control := repository.NewJobControlStore(db.Pool, runtime.Client())
+
+	pendingJobID := uuid.NewV7()
+	tx, err := db.Pool.Begin(t.Context())
+	if err != nil {
+		t.Fatalf("begin pending job transaction: %v", err)
+	}
+	if _, err := tx.Exec(t.Context(), `
+		INSERT INTO jobs (
+		  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name,
+		  trigger, input, status, dedupe_key, replay_safe
+		) VALUES ($1, $2, 'repo.sync', 'repository', $3, 'branch', 'main', 'api', '{"reason":"cancel-fixture"}'::jsonb, 'pending', $4, true)
+	`, tenantID, pendingJobID, repositoryID, "cancel:"+pendingJobID.String()); err != nil {
+		_ = tx.Rollback(t.Context())
+		t.Fatalf("create pending domain job: %v", err)
+	}
+	inserted, err := runtime.Client().InsertTx(t.Context(), tx, task.CredentialSyncArgs{
+		TenantID: tenantID, JobID: pendingJobID, RepositoryID: repositoryID, RefName: "main",
+	}, nil)
+	if err != nil {
+		_ = tx.Rollback(t.Context())
+		t.Fatalf("create pending River job: %v", err)
+	}
+	if _, err := tx.Exec(t.Context(), `UPDATE jobs SET river_job_id = $3 WHERE tenant_id = $1 AND id = $2`, tenantID, pendingJobID, inserted.Job.ID); err != nil {
+		_ = tx.Rollback(t.Context())
+		t.Fatalf("attach pending River job: %v", err)
+	}
+	if err := tx.Commit(t.Context()); err != nil {
+		t.Fatalf("commit pending job fixture: %v", err)
+	}
+	if accepted, err := control.CancelTenantJob(t.Context(), tenantID, pendingJobID, time.Now().UTC()); err != nil || accepted.JobID != pendingJobID {
+		t.Fatalf("cancel tenant job = %#v/%v", accepted, err)
+	}
+	var domainStatus, riverStatus string
+	if err := db.Pool.QueryRow(t.Context(), `SELECT status FROM jobs WHERE tenant_id = $1 AND id = $2`, tenantID, pendingJobID).Scan(&domainStatus); err != nil {
+		t.Fatalf("read cancelled domain job: %v", err)
+	}
+	if err := db.Pool.QueryRow(t.Context(), `SELECT state FROM river.river_job WHERE id = $1`, inserted.Job.ID).Scan(&riverStatus); err != nil {
+		t.Fatalf("read cancelled River job: %v", err)
+	}
+	if domainStatus != "cancelled" || riverStatus != "cancelled" {
+		t.Fatalf("cancelled states = domain %q River %q", domainStatus, riverStatus)
+	}
+	if _, err := control.CancelTenantJob(t.Context(), tenantID, pendingJobID, time.Now().UTC()); !errors.Is(err, service.ErrJobNotCancellable) {
+		t.Fatalf("second cancel error = %v, want ErrJobNotCancellable", err)
+	}
+
+	sourceJobID := uuid.NewV7()
+	if _, err := db.Pool.Exec(t.Context(), `
+		INSERT INTO jobs (
+		  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger,
+		  input, status, stage, attempt, max_attempts, dedupe_key, replay_safe, error, started_at, finished_at
+		) VALUES (
+		  $1, $2, 'repo.sync', 'repository', $3, 'branch', 'release', 'api',
+		  '{"reason":"retry-fixture"}'::jsonb, 'failed', 'resolve', 1, 3, $4, true,
+		  '{"code":"internal_error"}'::jsonb, now() - interval '1 minute', now()
+		)
+	`, tenantID, sourceJobID, repositoryID, "retry:"+sourceJobID.String()); err != nil {
+		t.Fatalf("create failed source job: %v", err)
+	}
+	if _, err := db.Pool.Exec(t.Context(), `
+		INSERT INTO job_stage_logs (tenant_id, job_id, sequence, attempt, stage, level, message)
+		VALUES
+		  ($1, $2, 1, 1, 'resolve', 'info', 'pipeline stage started'),
+		  ($1, $2, 2, 1, 'resolve', 'error', 'repository synchronization failed')
+	`, tenantID, sourceJobID); err != nil {
+		t.Fatalf("create retry source stage logs: %v", err)
+	}
+	request := service.RetryJobRequest{
+		TenantID: tenantID, SourceJobID: sourceJobID, PrincipalType: "session", PrincipalID: uuid.NewV7(),
+		IdempotencyKey: uuid.NewV7(), RequestHash: bytes.Repeat([]byte{0x42}, 32), RequestedAt: time.Now().UTC(),
+	}
+	retried, err := control.RetryTenantJob(t.Context(), request)
+	if err != nil {
+		t.Fatalf("retry failed job: %v", err)
+	}
+	var retryOf uuid.UUID
+	var trigger, status string
+	var generation int64
+	var retryRiverJobID *int64
+	var copiedInput []byte
+	if err := db.Pool.QueryRow(t.Context(), `
+		SELECT retry_of_job_id, trigger, status, active_generation, river_job_id, input
+		FROM jobs WHERE tenant_id = $1 AND id = $2
+	`, tenantID, retried.JobID).Scan(&retryOf, &trigger, &status, &generation, &retryRiverJobID, &copiedInput); err != nil {
+		t.Fatalf("read retried domain job: %v", err)
+	}
+	if retryOf != sourceJobID || trigger != "retry" || status != "pending" || generation != 2 || retryRiverJobID == nil || !bytes.Contains(copiedInput, []byte("retry-fixture")) {
+		t.Fatalf("retried job = retryOf %s trigger %q status %q generation %d River %v input %s", retryOf, trigger, status, generation, retryRiverJobID, copiedInput)
+	}
+	if err := db.Pool.QueryRow(t.Context(), `SELECT kind FROM river.river_job WHERE id = $1`, *retryRiverJobID).Scan(&riverStatus); err != nil {
+		t.Fatalf("read retried River job: %v", err)
+	}
+	if riverStatus != (task.CredentialSyncArgs{}).Kind() {
+		t.Fatalf("retried River kind = %q", riverStatus)
+	}
+	replayed, err := control.RetryTenantJob(t.Context(), request)
+	if err != nil || replayed != retried {
+		t.Fatalf("retry replay = %#v/%v, want %#v", replayed, err, retried)
+	}
+	conflicting := request
+	conflicting.RequestHash = bytes.Repeat([]byte{0x43}, 32)
+	if _, err := control.RetryTenantJob(t.Context(), conflicting); !errors.Is(err, service.ErrIdempotencyConflict) {
+		t.Fatalf("retry idempotency conflict error = %v", err)
+	}
+	request.IdempotencyKey = uuid.NewV7()
+	if _, err := control.RetryTenantJob(t.Context(), request); !errors.Is(err, service.ErrJobNotRetryable) {
+		t.Fatalf("retry with equivalent pending generation error = %v, want ErrJobNotRetryable", err)
+	}
+
+	jobs, total, err := control.ListTenantJobs(t.Context(), tenantID, service.JobFilter{Statuses: []string{"failed"}}, 20, 0)
+	if err != nil {
+		t.Fatalf("list tenant failed jobs: %v", err)
+	}
+	if total != 1 || len(jobs) != 1 || jobs[0].ID != sourceJobID || len(jobs[0].Attempts) != 1 || jobs[0].Attempts[0].Attempt != 1 || jobs[0].Attempts[0].Status != "failed" {
+		t.Fatalf("tenant failed job page = total %d items %#v", total, jobs)
+	}
+}
+
 func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")
 	if databaseURL == "" {
@@ -425,7 +578,7 @@ func TestRiverWorkerPersistsTerminalFailureAndStageLogs(t *testing.T) {
 	if err := json.Unmarshal(outboxPayload, &envelope); err != nil {
 		t.Fatalf("decode collect.failed envelope: %v", err)
 	}
-	if (outboxStatus != "pending" && outboxStatus != "delivering" && outboxStatus != "failed") || eventID.String() != envelope.EventID || envelope.EventType != "collect.failed" || envelope.TenantSlug != "worker-acme" || envelope.AggregateType != "job" || envelope.AggregateID != jobID.String() || envelope.AggregateVersion != 1 || aggregateVersion != 1 || envelope.Payload.RepositoryID != repositoryID.String() || envelope.Payload.JobID != jobID.String() || envelope.Payload.Stage != "resolve" || envelope.Payload.ErrorCode != "worker_failed" {
+	if (outboxStatus != "pending" && outboxStatus != "delivering" && outboxStatus != "failed") || eventID.String() != envelope.EventID || envelope.EventType != "collect.failed" || envelope.TenantSlug != "worker-acme" || envelope.AggregateType != "job" || envelope.AggregateID != jobID.String() || envelope.AggregateVersion != 1 || aggregateVersion != 1 || envelope.Payload.RepositoryID != repositoryID.String() || envelope.Payload.JobID != jobID.String() || envelope.Payload.Stage != "resolve" || envelope.Payload.ErrorCode != "internal_error" {
 		t.Fatalf("collect.failed outbox/envelope = %s/%#v", outboxStatus, envelope)
 	}
 	if _, err := runtime.Client().Insert(t.Context(), task.OutboxDispatchArgs{}, nil); err != nil {

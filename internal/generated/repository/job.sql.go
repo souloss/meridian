@@ -12,6 +12,63 @@ import (
 	"uuid"
 )
 
+const cancelTenantJob = `-- name: CancelTenantJob :one
+UPDATE jobs
+SET status = 'cancelled',
+    finished_at = $1::timestamptz,
+    next_attempt_at = NULL,
+    updated_at = $1::timestamptz
+WHERE tenant_id = $2
+  AND id = $3
+  AND status IN ('pending', 'running')
+RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+`
+
+// CancelTenantJobParams contains the strongly typed arguments for the CancelTenantJob query.
+type CancelTenantJobParams struct {
+	// FinishedAt is the finished at value supplied to the CancelTenantJob query.
+	FinishedAt pgtype.Timestamptz `json:"finished_at"`
+	// TenantID is the tenant id value supplied to the CancelTenantJob query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the id value supplied to the CancelTenantJob query.
+	ID uuid.UUID `json:"id"`
+}
+
+// CancelTenantJob moves only a pending or running tenant job to its durable cancelled terminal state.
+func (q *Queries) CancelTenantJob(ctx context.Context, arg CancelTenantJobParams) (Job, error) {
+	row := q.db.QueryRow(ctx, cancelTenantJob, arg.FinishedAt, arg.TenantID, arg.ID)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const countPlatformJobs = `-- name: CountPlatformJobs :one
 SELECT count(*)::bigint
 FROM jobs
@@ -50,6 +107,183 @@ func (q *Queries) CountPlatformJobs(ctx context.Context, arg CountPlatformJobsPa
 	var column_1 int64
 	err := row.Scan(&column_1)
 	return column_1, err
+}
+
+const countTenantJobs = `-- name: CountTenantJobs :one
+SELECT count(*)::bigint
+FROM jobs
+WHERE jobs.tenant_id = $1
+  AND (COALESCE(array_length($2::text[], 1), 0) = 0 OR jobs.type = ANY($2::text[]))
+  AND (COALESCE(array_length($3::text[], 1), 0) = 0 OR jobs.status = ANY($3::text[]))
+  AND ($4::text = '' OR jobs.scope_type = $4::text)
+  AND ($5::text = '' OR jobs.scope_id::text = $5::text)
+`
+
+// CountTenantJobsParams contains the strongly typed arguments for the CountTenantJobs query.
+type CountTenantJobsParams struct {
+	// TenantID is the tenant id value supplied to the CountTenantJobs query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// TypeFilter is the type filter value supplied to the CountTenantJobs query.
+	TypeFilter []string `json:"type_filter"`
+	// StatusFilter is the status filter value supplied to the CountTenantJobs query.
+	StatusFilter []string `json:"status_filter"`
+	// ScopeType is the scope type value supplied to the CountTenantJobs query.
+	ScopeType string `json:"scope_type"`
+	// ScopeID is the scope id value supplied to the CountTenantJobs query.
+	ScopeID string `json:"scope_id"`
+}
+
+// CountTenantJobs returns the exact total for the predicates used by ListTenantJobs.
+func (q *Queries) CountTenantJobs(ctx context.Context, arg CountTenantJobsParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countTenantJobs,
+		arg.TenantID,
+		arg.TypeFilter,
+		arg.StatusFilter,
+		arg.ScopeType,
+		arg.ScopeID,
+	)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const createRetriedTenantJob = `-- name: CreateRetriedTenantJob :one
+INSERT INTO jobs (
+  tenant_id, id, retry_of_job_id, type, scope_type, scope_id, ref_type, ref_name,
+  trigger, input, status, max_attempts, dedupe_key, active_generation, replay_safe
+)
+SELECT
+  source.tenant_id, $1, source.id, source.type, source.scope_type, source.scope_id, source.ref_type, source.ref_name,
+  'retry', source.input, 'pending', source.max_attempts, source.dedupe_key, $2, source.replay_safe
+FROM jobs AS source
+WHERE source.tenant_id = $3
+  AND source.id = $4
+  AND source.status IN ('failed', 'cancelled')
+RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+`
+
+// CreateRetriedTenantJobParams contains the strongly typed arguments for the CreateRetriedTenantJob query.
+type CreateRetriedTenantJobParams struct {
+	// NewJobID is the new job id value supplied to the CreateRetriedTenantJob query.
+	NewJobID uuid.UUID `json:"new_job_id"`
+	// ActiveGeneration is the active generation value supplied to the CreateRetriedTenantJob query.
+	ActiveGeneration int64 `json:"active_generation"`
+	// TenantID is the tenant id value supplied to the CreateRetriedTenantJob query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SourceJobID is the source job id value supplied to the CreateRetriedTenantJob query.
+	SourceJobID uuid.UUID `json:"source_job_id"`
+}
+
+// CreateRetriedTenantJob creates a new pending generation from immutable source execution inputs.
+// Result, error, stage, attempt, and timestamps are deliberately reset for the independent retry.
+func (q *Queries) CreateRetriedTenantJob(ctx context.Context, arg CreateRetriedTenantJobParams) (Job, error) {
+	row := q.db.QueryRow(ctx, createRetriedTenantJob,
+		arg.NewJobID,
+		arg.ActiveGeneration,
+		arg.TenantID,
+		arg.SourceJobID,
+	)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const createRetryJobIdempotency = `-- name: CreateRetryJobIdempotency :exec
+INSERT INTO idempotency_records (
+  tenant_id, principal_type, principal_id, operation_id, idempotency_key,
+  request_hash, response_status, response_body, expires_at
+) VALUES (
+  $1, $2, $3, 'retryJob', $4,
+  $5, 202, $6::jsonb, now() + interval '24 hours'
+)
+`
+
+// CreateRetryJobIdempotencyParams contains the strongly typed arguments for the CreateRetryJobIdempotency query.
+type CreateRetryJobIdempotencyParams struct {
+	// TenantID is the tenant id value supplied to the CreateRetryJobIdempotency query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// PrincipalType is the principal type value supplied to the CreateRetryJobIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the CreateRetryJobIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the CreateRetryJobIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+	// RequestHash is the request hash value supplied to the CreateRetryJobIdempotency query.
+	RequestHash []byte `json:"request_hash"`
+	// ResponseBody is the response body value supplied to the CreateRetryJobIdempotency query.
+	ResponseBody []byte `json:"response_body"`
+}
+
+// CreateRetryJobIdempotency stores the exact non-secret 202 response for 24-hour replay.
+func (q *Queries) CreateRetryJobIdempotency(ctx context.Context, arg CreateRetryJobIdempotencyParams) error {
+	_, err := q.db.Exec(ctx, createRetryJobIdempotency,
+		arg.TenantID,
+		arg.PrincipalType,
+		arg.PrincipalID,
+		arg.IdempotencyKey,
+		arg.RequestHash,
+		arg.ResponseBody,
+	)
+	return err
+}
+
+const deleteRetryJobIdempotency = `-- name: DeleteRetryJobIdempotency :exec
+DELETE FROM idempotency_records
+WHERE tenant_id = $1
+  AND principal_type = $2
+  AND principal_id = $3
+  AND operation_id = 'retryJob'
+  AND idempotency_key = $4
+`
+
+// DeleteRetryJobIdempotencyParams contains the strongly typed arguments for the DeleteRetryJobIdempotency query.
+type DeleteRetryJobIdempotencyParams struct {
+	// TenantID is the tenant id value supplied to the DeleteRetryJobIdempotency query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// PrincipalType is the principal type value supplied to the DeleteRetryJobIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the DeleteRetryJobIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the DeleteRetryJobIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+}
+
+// DeleteRetryJobIdempotency removes an expired retry replay record before key reuse.
+func (q *Queries) DeleteRetryJobIdempotency(ctx context.Context, arg DeleteRetryJobIdempotencyParams) error {
+	_, err := q.db.Exec(ctx, deleteRetryJobIdempotency,
+		arg.TenantID,
+		arg.PrincipalType,
+		arg.PrincipalID,
+		arg.IdempotencyKey,
+	)
+	return err
 }
 
 const getPlatformJob = `-- name: GetPlatformJob :one
@@ -113,6 +347,218 @@ func (q *Queries) GetPlatformJob(ctx context.Context, id uuid.UUID) (GetPlatform
 		&i.CreatedAt,
 		&i.StartedAt,
 		&i.FinishedAt,
+	)
+	return i, err
+}
+
+const getRetryJobIdempotency = `-- name: GetRetryJobIdempotency :one
+SELECT request_hash, response_body, expires_at
+FROM idempotency_records
+WHERE tenant_id = $1
+  AND principal_type = $2
+  AND principal_id = $3
+  AND operation_id = 'retryJob'
+  AND idempotency_key = $4
+FOR UPDATE
+`
+
+// GetRetryJobIdempotencyParams contains the strongly typed arguments for the GetRetryJobIdempotency query.
+type GetRetryJobIdempotencyParams struct {
+	// TenantID is the tenant id value supplied to the GetRetryJobIdempotency query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// PrincipalType is the principal type value supplied to the GetRetryJobIdempotency query.
+	PrincipalType string `json:"principal_type"`
+	// PrincipalID is the principal id value supplied to the GetRetryJobIdempotency query.
+	PrincipalID uuid.UUID `json:"principal_id"`
+	// IdempotencyKey is the idempotency key value supplied to the GetRetryJobIdempotency query.
+	IdempotencyKey uuid.UUID `json:"idempotency_key"`
+}
+
+// GetRetryJobIdempotencyRow contains the columns returned by the GetRetryJobIdempotency query.
+type GetRetryJobIdempotencyRow struct {
+	// RequestHash is the request hash value returned by the GetRetryJobIdempotency query.
+	RequestHash []byte `json:"request_hash"`
+	// ResponseBody is the response body value returned by the GetRetryJobIdempotency query.
+	ResponseBody []byte `json:"response_body"`
+	// ExpiresAt is the expires at value returned by the GetRetryJobIdempotency query.
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+}
+
+// GetRetryJobIdempotency returns the retained exact response for a retryJob request.
+func (q *Queries) GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error) {
+	row := q.db.QueryRow(ctx, getRetryJobIdempotency,
+		arg.TenantID,
+		arg.PrincipalType,
+		arg.PrincipalID,
+		arg.IdempotencyKey,
+	)
+	var i GetRetryJobIdempotencyRow
+	err := row.Scan(&i.RequestHash, &i.ResponseBody, &i.ExpiresAt)
+	return i, err
+}
+
+const getTenantJob = `-- name: GetTenantJob :one
+SELECT tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+FROM jobs
+WHERE tenant_id = $1
+  AND id = $2
+`
+
+// GetTenantJobParams contains the strongly typed arguments for the GetTenantJob query.
+type GetTenantJobParams struct {
+	// TenantID is the tenant id value supplied to the GetTenantJob query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the id value supplied to the GetTenantJob query.
+	ID uuid.UUID `json:"id"`
+}
+
+// GetTenantJob returns one full tenant-visible job row while retaining the tenant predicate.
+func (q *Queries) GetTenantJob(ctx context.Context, arg GetTenantJobParams) (Job, error) {
+	row := q.db.QueryRow(ctx, getTenantJob, arg.TenantID, arg.ID)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getTenantJobStreamState = `-- name: GetTenantJobStreamState :one
+SELECT jobs.tenant_id, jobs.id, jobs.retry_of_job_id, jobs.river_job_id, jobs.type, jobs.scope_type, jobs.scope_id, jobs.ref_type, jobs.ref_name, jobs.trigger, jobs.input, jobs.result, jobs.status, jobs.stage, jobs.attempt, jobs.max_attempts, jobs.next_attempt_at, jobs.dedupe_key, jobs.active_generation, jobs.dirty, jobs.replay_safe, jobs.error, jobs.started_at, jobs.finished_at, jobs.created_at, jobs.updated_at,
+  COALESCE((
+    SELECT MAX(job_stage_logs.sequence)
+    FROM job_stage_logs
+    WHERE job_stage_logs.tenant_id = jobs.tenant_id
+      AND job_stage_logs.job_id = jobs.id
+  ), 0::bigint)::bigint AS log_cursor
+FROM jobs
+WHERE jobs.tenant_id = $1
+  AND jobs.id = $2
+`
+
+// GetTenantJobStreamStateParams contains the strongly typed arguments for the GetTenantJobStreamState query.
+type GetTenantJobStreamStateParams struct {
+	// TenantID is the tenant id value supplied to the GetTenantJobStreamState query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the id value supplied to the GetTenantJobStreamState query.
+	ID uuid.UUID `json:"id"`
+}
+
+// GetTenantJobStreamStateRow contains the columns returned by the GetTenantJobStreamState query.
+type GetTenantJobStreamStateRow struct {
+	// TenantID is the tenant id value returned by the GetTenantJobStreamState query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the id value returned by the GetTenantJobStreamState query.
+	ID uuid.UUID `json:"id"`
+	// RetryOfJobID is the retry of job id value returned by the GetTenantJobStreamState query.
+	RetryOfJobID *uuid.UUID `json:"retry_of_job_id"`
+	// RiverJobID is the river job id value returned by the GetTenantJobStreamState query.
+	RiverJobID *int64 `json:"river_job_id"`
+	// Type is the type value returned by the GetTenantJobStreamState query.
+	Type string `json:"type"`
+	// ScopeType is the scope type value returned by the GetTenantJobStreamState query.
+	ScopeType string `json:"scope_type"`
+	// ScopeID is the scope id value returned by the GetTenantJobStreamState query.
+	ScopeID *uuid.UUID `json:"scope_id"`
+	// RefType is the ref type value returned by the GetTenantJobStreamState query.
+	RefType *string `json:"ref_type"`
+	// RefName is the ref name value returned by the GetTenantJobStreamState query.
+	RefName *string `json:"ref_name"`
+	// Trigger is the trigger value returned by the GetTenantJobStreamState query.
+	Trigger string `json:"trigger"`
+	// Input is the input value returned by the GetTenantJobStreamState query.
+	Input []byte `json:"input"`
+	// Result is the result value returned by the GetTenantJobStreamState query.
+	Result []byte `json:"result"`
+	// Status is the status value returned by the GetTenantJobStreamState query.
+	Status string `json:"status"`
+	// Stage is the stage value returned by the GetTenantJobStreamState query.
+	Stage *string `json:"stage"`
+	// Attempt is the attempt value returned by the GetTenantJobStreamState query.
+	Attempt int32 `json:"attempt"`
+	// MaxAttempts is the max attempts value returned by the GetTenantJobStreamState query.
+	MaxAttempts int32 `json:"max_attempts"`
+	// NextAttemptAt is the next attempt at value returned by the GetTenantJobStreamState query.
+	NextAttemptAt pgtype.Timestamptz `json:"next_attempt_at"`
+	// DedupeKey is the dedupe key value returned by the GetTenantJobStreamState query.
+	DedupeKey string `json:"dedupe_key"`
+	// ActiveGeneration is the active generation value returned by the GetTenantJobStreamState query.
+	ActiveGeneration int64 `json:"active_generation"`
+	// Dirty is the dirty value returned by the GetTenantJobStreamState query.
+	Dirty bool `json:"dirty"`
+	// ReplaySafe is the replay safe value returned by the GetTenantJobStreamState query.
+	ReplaySafe bool `json:"replay_safe"`
+	// Error is the error value returned by the GetTenantJobStreamState query.
+	Error []byte `json:"error"`
+	// StartedAt is the started at value returned by the GetTenantJobStreamState query.
+	StartedAt pgtype.Timestamptz `json:"started_at"`
+	// FinishedAt is the finished at value returned by the GetTenantJobStreamState query.
+	FinishedAt pgtype.Timestamptz `json:"finished_at"`
+	// CreatedAt is the created at value returned by the GetTenantJobStreamState query.
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the updated at value returned by the GetTenantJobStreamState query.
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	// LogCursor is the log cursor value returned by the GetTenantJobStreamState query.
+	LogCursor int64 `json:"log_cursor"`
+}
+
+// GetTenantJobStreamState returns one state row plus the greatest persisted log cursor
+// from a single PostgreSQL statement so SSE never emits a state ahead of its logs.
+func (q *Queries) GetTenantJobStreamState(ctx context.Context, arg GetTenantJobStreamStateParams) (GetTenantJobStreamStateRow, error) {
+	row := q.db.QueryRow(ctx, getTenantJobStreamState, arg.TenantID, arg.ID)
+	var i GetTenantJobStreamStateRow
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LogCursor,
 	)
 	return i, err
 }
@@ -227,4 +673,310 @@ func (q *Queries) ListPlatformJobs(ctx context.Context, arg ListPlatformJobsPara
 		return nil, err
 	}
 	return items, nil
+}
+
+const listTenantJobAttemptLogs = `-- name: ListTenantJobAttemptLogs :many
+SELECT tenant_id, job_id, sequence, stage, level, message, occurred_at, attempt
+FROM job_stage_logs
+WHERE tenant_id = $1
+  AND job_id = ANY($2::uuid[])
+ORDER BY job_id, attempt, sequence
+`
+
+// ListTenantJobAttemptLogsParams contains the strongly typed arguments for the ListTenantJobAttemptLogs query.
+type ListTenantJobAttemptLogsParams struct {
+	// TenantID is the tenant id value supplied to the ListTenantJobAttemptLogs query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// JobIds is the job ids value supplied to the ListTenantJobAttemptLogs query.
+	JobIds []uuid.UUID `json:"job_ids"`
+}
+
+// ListTenantJobAttemptLogs batch-loads persisted events for a page of jobs without an N+1 query.
+// The caller groups rows by job, one-based attempt, and stage to construct the API attempt projection.
+func (q *Queries) ListTenantJobAttemptLogs(ctx context.Context, arg ListTenantJobAttemptLogsParams) ([]JobStageLog, error) {
+	rows, err := q.db.Query(ctx, listTenantJobAttemptLogs, arg.TenantID, arg.JobIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []JobStageLog{}
+	for rows.Next() {
+		var i JobStageLog
+		if err := rows.Scan(
+			&i.TenantID,
+			&i.JobID,
+			&i.Sequence,
+			&i.Stage,
+			&i.Level,
+			&i.Message,
+			&i.OccurredAt,
+			&i.Attempt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTenantJobLogsAfter = `-- name: ListTenantJobLogsAfter :many
+SELECT tenant_id, job_id, sequence, stage, level, message, occurred_at, attempt
+FROM job_stage_logs
+WHERE tenant_id = $1
+  AND job_id = $2
+  AND sequence > $3
+ORDER BY sequence
+LIMIT $4
+`
+
+// ListTenantJobLogsAfterParams contains the strongly typed arguments for the ListTenantJobLogsAfter query.
+type ListTenantJobLogsAfterParams struct {
+	// TenantID is the tenant id value supplied to the ListTenantJobLogsAfter query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// JobID is the job id value supplied to the ListTenantJobLogsAfter query.
+	JobID uuid.UUID `json:"job_id"`
+	// AfterSequence is the after sequence value supplied to the ListTenantJobLogsAfter query.
+	AfterSequence int64 `json:"after_sequence"`
+	// EventLimit is the event limit value supplied to the ListTenantJobLogsAfter query.
+	EventLimit int32 `json:"event_limit"`
+}
+
+// ListTenantJobLogsAfter returns bounded SSE replay rows strictly after a persisted sequence cursor.
+func (q *Queries) ListTenantJobLogsAfter(ctx context.Context, arg ListTenantJobLogsAfterParams) ([]JobStageLog, error) {
+	rows, err := q.db.Query(ctx, listTenantJobLogsAfter,
+		arg.TenantID,
+		arg.JobID,
+		arg.AfterSequence,
+		arg.EventLimit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []JobStageLog{}
+	for rows.Next() {
+		var i JobStageLog
+		if err := rows.Scan(
+			&i.TenantID,
+			&i.JobID,
+			&i.Sequence,
+			&i.Stage,
+			&i.Level,
+			&i.Message,
+			&i.OccurredAt,
+			&i.Attempt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTenantJobs = `-- name: ListTenantJobs :many
+SELECT jobs.tenant_id, jobs.id, jobs.retry_of_job_id, jobs.river_job_id, jobs.type, jobs.scope_type, jobs.scope_id, jobs.ref_type, jobs.ref_name, jobs.trigger, jobs.input, jobs.result, jobs.status, jobs.stage, jobs.attempt, jobs.max_attempts, jobs.next_attempt_at, jobs.dedupe_key, jobs.active_generation, jobs.dirty, jobs.replay_safe, jobs.error, jobs.started_at, jobs.finished_at, jobs.created_at, jobs.updated_at
+FROM jobs
+WHERE jobs.tenant_id = $1
+  AND (COALESCE(array_length($2::text[], 1), 0) = 0 OR jobs.type = ANY($2::text[]))
+  AND (COALESCE(array_length($3::text[], 1), 0) = 0 OR jobs.status = ANY($3::text[]))
+  AND ($4::text = '' OR jobs.scope_type = $4::text)
+  AND ($5::text = '' OR jobs.scope_id::text = $5::text)
+ORDER BY jobs.created_at DESC, jobs.id DESC
+LIMIT $7
+OFFSET $6
+`
+
+// ListTenantJobsParams contains the strongly typed arguments for the ListTenantJobs query.
+type ListTenantJobsParams struct {
+	// TenantID is the tenant id value supplied to the ListTenantJobs query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// TypeFilter is the type filter value supplied to the ListTenantJobs query.
+	TypeFilter []string `json:"type_filter"`
+	// StatusFilter is the status filter value supplied to the ListTenantJobs query.
+	StatusFilter []string `json:"status_filter"`
+	// ScopeType is the scope type value supplied to the ListTenantJobs query.
+	ScopeType string `json:"scope_type"`
+	// ScopeID is the scope id value supplied to the ListTenantJobs query.
+	ScopeID string `json:"scope_id"`
+	// PageOffset is the page offset value supplied to the ListTenantJobs query.
+	PageOffset int32 `json:"page_offset"`
+	// PageLimit is the page limit value supplied to the ListTenantJobs query.
+	PageLimit int32 `json:"page_limit"`
+}
+
+// ListTenantJobs returns a newest-first page bounded by one tenant identifier.
+// Empty filter arrays and strings mean no restriction; execution input and River identifiers remain internal.
+func (q *Queries) ListTenantJobs(ctx context.Context, arg ListTenantJobsParams) ([]Job, error) {
+	rows, err := q.db.Query(ctx, listTenantJobs,
+		arg.TenantID,
+		arg.TypeFilter,
+		arg.StatusFilter,
+		arg.ScopeType,
+		arg.ScopeID,
+		arg.PageOffset,
+		arg.PageLimit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Job{}
+	for rows.Next() {
+		var i Job
+		if err := rows.Scan(
+			&i.TenantID,
+			&i.ID,
+			&i.RetryOfJobID,
+			&i.RiverJobID,
+			&i.Type,
+			&i.ScopeType,
+			&i.ScopeID,
+			&i.RefType,
+			&i.RefName,
+			&i.Trigger,
+			&i.Input,
+			&i.Result,
+			&i.Status,
+			&i.Stage,
+			&i.Attempt,
+			&i.MaxAttempts,
+			&i.NextAttemptAt,
+			&i.DedupeKey,
+			&i.ActiveGeneration,
+			&i.Dirty,
+			&i.ReplaySafe,
+			&i.Error,
+			&i.StartedAt,
+			&i.FinishedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const lockLatestTenantJobGeneration = `-- name: LockLatestTenantJobGeneration :one
+SELECT tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+FROM jobs
+WHERE tenant_id = $1
+  AND dedupe_key = $2
+ORDER BY active_generation DESC
+LIMIT 1
+FOR UPDATE
+`
+
+// LockLatestTenantJobGenerationParams contains the strongly typed arguments for the LockLatestTenantJobGeneration query.
+type LockLatestTenantJobGenerationParams struct {
+	// TenantID is the tenant id value supplied to the LockLatestTenantJobGeneration query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// DedupeKey is the dedupe key value supplied to the LockLatestTenantJobGeneration query.
+	DedupeKey string `json:"dedupe_key"`
+}
+
+// LockLatestTenantJobGeneration returns the newest semantic generation while holding its row lock.
+func (q *Queries) LockLatestTenantJobGeneration(ctx context.Context, arg LockLatestTenantJobGenerationParams) (Job, error) {
+	row := q.db.QueryRow(ctx, lockLatestTenantJobGeneration, arg.TenantID, arg.DedupeKey)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const lockRetryJobIdempotency = `-- name: LockRetryJobIdempotency :exec
+SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
+`
+
+// LockRetryJobIdempotency serializes one retry key for an authenticated tenant principal.
+func (q *Queries) LockRetryJobIdempotency(ctx context.Context, lockKey string) error {
+	_, err := q.db.Exec(ctx, lockRetryJobIdempotency, lockKey)
+	return err
+}
+
+const lockTenantJobForControl = `-- name: LockTenantJobForControl :one
+SELECT tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+FROM jobs
+WHERE tenant_id = $1
+  AND id = $2
+FOR UPDATE
+`
+
+// LockTenantJobForControlParams contains the strongly typed arguments for the LockTenantJobForControl query.
+type LockTenantJobForControlParams struct {
+	// TenantID is the tenant id value supplied to the LockTenantJobForControl query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the id value supplied to the LockTenantJobForControl query.
+	ID uuid.UUID `json:"id"`
+}
+
+// LockTenantJobForControl serializes cancellation and manual retry decisions for one tenant job.
+func (q *Queries) LockTenantJobForControl(ctx context.Context, arg LockTenantJobForControlParams) (Job, error) {
+	row := q.db.QueryRow(ctx, lockTenantJobForControl, arg.TenantID, arg.ID)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

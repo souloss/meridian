@@ -117,6 +117,12 @@ func (s *Server) Handler() http.Handler {
 			case errors.Is(err, service.ErrIdempotencyConflict):
 				writeError(w, r, http.StatusConflict, "idempotency_conflict", "idempotency key was already used for a different request")
 				return
+			case errors.Is(err, service.ErrJobNotCancellable):
+				writeError(w, r, http.StatusConflict, "job_not_cancellable", "job has already reached a terminal state")
+				return
+			case errors.Is(err, service.ErrJobNotRetryable):
+				writeError(w, r, http.StatusConflict, "invalid_state", "job cannot be retried from its current state")
+				return
 			}
 			if errors.Is(err, api.ErrStrictOperationNotImplemented) {
 				writeError(w, r, http.StatusNotImplemented, "internal_error", "operation is not implemented")

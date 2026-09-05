@@ -19,6 +19,7 @@ import (
 	"github.com/meridian-labs/meridian/internal/database"
 	"github.com/meridian-labs/meridian/internal/repository"
 	"github.com/meridian-labs/meridian/internal/service"
+	"github.com/meridian-labs/meridian/internal/task"
 )
 
 const integrationTokenPepper = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -44,6 +45,9 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE users, tenants CASCADE`); err != nil {
 		t.Fatalf("reset identity fixtures: %v", err)
 	}
+	if _, err := db.Pool.Exec(t.Context(), `TRUNCATE river.river_job CASCADE`); err != nil {
+		t.Fatalf("reset identity River fixtures: %v", err)
+	}
 
 	store := repository.NewIdentityStore(db.Pool)
 	digester, err := service.NewTokenDigester(integrationTokenPepper)
@@ -64,10 +68,14 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("bootstrap platform administrator: %v", err)
 	}
-	credentials := service.NewCredentials(repository.NewCredentialStore(db.Pool), store, keyring)
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
+	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{}, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatalf("configure identity River runtime: %v", err)
+	}
+	credentials := service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), store, keyring)
 	repositories := service.NewRepositories(repositoryStore, store)
-	jobs := service.NewJobs(repositoryStore)
+	jobs := service.NewJobs(repository.NewJobControlStore(db.Pool, runtime.Client()), store)
 	audits := service.NewAudits(repositoryStore, store)
 	httpHandler := NewWithRuntimeServices(Dependencies{
 		Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
@@ -384,6 +392,69 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}
 	platformJobAsTenant := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{aliceCookie})
 	assertError(t, platformJobAsTenant, http.StatusNotFound, "not_found")
+	tenantJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs", nil, []*http.Cookie{aliceCookie})
+	assertStatus(t, tenantJobs, http.StatusOK)
+	if !strings.Contains(tenantJobs.Body.String(), globalRotationBody.SyncJobs[0].JobID.String()) || strings.Contains(tenantJobs.Body.String(), `"input"`) || strings.Contains(tenantJobs.Body.String(), `"riverJobId"`) {
+		t.Fatalf("tenant job page omitted job or leaked internals: %s", tenantJobs.Body.String())
+	}
+	tenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{aliceCookie})
+	assertStatus(t, tenantJob, http.StatusOK)
+	if !strings.Contains(tenantJob.Body.String(), `"status":"pending"`) || !strings.Contains(tenantJob.Body.String(), `"capabilities":["job:read","job:run"]`) || strings.Contains(tenantJob.Body.String(), `"input"`) {
+		t.Fatalf("tenant job detail has invalid projection: %s", tenantJob.Body.String())
+	}
+	crossTenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/other/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{aliceCookie})
+	assertError(t, crossTenantJob, http.StatusNotFound, "not_found")
+	jobPAT := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/tokens", map[string]any{
+		"name": "job automation", "scopes": []string{"job:run"},
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	assertStatus(t, jobPAT, http.StatusCreated)
+	jobPATValue := responseString(t, jobPAT, "token")
+	jobViaPAT := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil, map[string]string{
+		"Authorization": "Bearer " + jobPATValue,
+	})
+	assertStatus(t, jobViaPAT, http.StatusOK)
+
+	cancelledJob := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":cancel", nil, []*http.Cookie{aliceCookie}, map[string]string{
+		csrfHeaderName: aliceCSRF,
+	})
+	assertStatus(t, cancelledJob, http.StatusAccepted)
+	if responseString(t, cancelledJob, "jobId") != globalRotationBody.SyncJobs[0].JobID.String() {
+		t.Fatalf("cancelled job response = %s", cancelledJob.Body.String())
+	}
+	cancelledAgain := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":cancel", nil, []*http.Cookie{aliceCookie}, map[string]string{
+		csrfHeaderName: aliceCSRF,
+	})
+	assertError(t, cancelledAgain, http.StatusConflict, "job_not_cancellable")
+	terminalStream := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+"/logs", nil, []*http.Cookie{aliceCookie}, map[string]string{
+		"Last-Event-ID": "0",
+	})
+	assertStatus(t, terminalStream, http.StatusOK)
+	if terminalStream.Header().Get("Cache-Control") != "no-cache" || terminalStream.Header().Get("X-Accel-Buffering") != "no" || !strings.Contains(terminalStream.Body.String(), "event: state") || !strings.Contains(terminalStream.Body.String(), `"status":"cancelled"`) {
+		t.Fatalf("terminal job stream headers/body = %#v/%s", terminalStream.Header(), terminalStream.Body.String())
+	}
+
+	retryKey := uuid.NewV7().String()
+	retryHeaders := map[string]string{csrfHeaderName: aliceCSRF, "Idempotency-Key": retryKey}
+	retriedJob := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":retry", nil, []*http.Cookie{aliceCookie}, retryHeaders)
+	assertStatus(t, retriedJob, http.StatusAccepted)
+	retriedJobID := responseString(t, retriedJob, "jobId")
+	if retriedJobID == globalRotationBody.SyncJobs[0].JobID.String() {
+		t.Fatal("manual retry reused the terminal source job")
+	}
+	retryReplay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":retry", nil, []*http.Cookie{aliceCookie}, retryHeaders)
+	assertStatus(t, retryReplay, http.StatusAccepted)
+	if retryReplay.Body.String() != retriedJob.Body.String() {
+		t.Fatalf("retry replay differs\nfirst: %s\nreplay: %s", retriedJob.Body.String(), retryReplay.Body.String())
+	}
+	retriedDetail := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+retriedJobID, nil, []*http.Cookie{aliceCookie})
+	assertStatus(t, retriedDetail, http.StatusOK)
+	if !strings.Contains(retriedDetail.Body.String(), `"trigger":"retry"`) || !strings.Contains(retriedDetail.Body.String(), `"retryOfJobId":"`+globalRotationBody.SyncJobs[0].JobID.String()+`"`) || !strings.Contains(retriedDetail.Body.String(), `"attempts":[]`) {
+		t.Fatalf("retried job detail = %s", retriedDetail.Body.String())
+	}
+	retryPending := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+retriedJobID+":retry", nil, []*http.Cookie{aliceCookie}, map[string]string{
+		csrfHeaderName: aliceCSRF, "Idempotency-Key": uuid.NewV7().String(),
+	})
+	assertError(t, retryPending, http.StatusConflict, "invalid_state")
 	globalReplay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials/"+globalID.String()+":rotate", map[string]any{
 		"secret": map[string]any{"username": "global-bot", "token": "global-second-token"}, "resyncRepositories": true,
 	}, []*http.Cookie{adminCookie}, globalRotationHeaders)

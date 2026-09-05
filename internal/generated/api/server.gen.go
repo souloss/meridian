@@ -16199,10 +16199,20 @@ type StreamJobLogsResponseObject interface {
 	VisitStreamJobLogsResponse(w http.ResponseWriter) error
 }
 
+// StreamJobLogs200ResponseHeaders contains headers declared by the corresponding OpenAPI response.
+type StreamJobLogs200ResponseHeaders struct {
+	// CacheControl carries the generated cache control value for StreamJobLogs200ResponseHeaders.
+	CacheControl string
+	// XAccelBuffering carries the generated x accel buffering value for StreamJobLogs200ResponseHeaders.
+	XAccelBuffering string
+}
+
 // StreamJobLogs200TexteventStreamResponse contains the raw HTTP response and any decoded response body.
 type StreamJobLogs200TexteventStreamResponse struct {
 	// Body contains the decoded or raw HTTP response body.
 	Body io.Reader
+	// Headers contains the headers declared for this response.
+	Headers StreamJobLogs200ResponseHeaders
 	// ContentLength is the byte length of an unparsed response body.
 	ContentLength int64
 }
@@ -16214,6 +16224,8 @@ func (response StreamJobLogs200TexteventStreamResponse) VisitStreamJobLogsRespon
 	if response.ContentLength != 0 {
 		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
 	}
+	w.Header().Set("Cache-Control", fmt.Sprint(response.Headers.CacheControl))
+	w.Header().Set("X-Accel-Buffering", fmt.Sprint(response.Headers.XAccelBuffering))
 	w.WriteHeader(200)
 
 	if closer, ok := response.Body.(io.ReadCloser); ok {

@@ -90,13 +90,13 @@ func (worker *CredentialSyncWorker) finishFailure(ctx context.Context, args Cred
 	}
 	errorPayload, err := json.Marshal(struct {
 		Code string `json:"code"`
-	}{Code: "worker_failed"})
+	}{Code: "internal_error"})
 	if err != nil {
 		return err
 	}
 	finishErr := worker.store.FinishJob(ctx, FinishInput{
 		TenantID: args.TenantID, JobID: args.JobID, RepositoryID: args.RepositoryID,
-		Status: "failed", Error: errorPayload, ErrorCode: "worker_failed",
+		Status: "failed", Error: errorPayload, ErrorCode: "internal_error",
 		ExpectedAttempt: expectedAttempt,
 		Stage:           StageResolve, Level: "error", Message: message, Terminal: true, FinishedAt: worker.now().UTC(),
 	})

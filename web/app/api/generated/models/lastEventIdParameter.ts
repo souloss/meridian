@@ -7,6 +7,6 @@
  */
 
 /**
- * resumes an event stream after the last received sequence.
+ * resumes an event stream strictly after this non-negative persisted log sequence.
  */
 export type LastEventIdParameter = string;

@@ -41,7 +41,7 @@ var expectedM0Tables = []string{
 	"users",
 }
 
-const expectedApplicationMigrationVersion = 3
+const expectedApplicationMigrationVersion = 4
 
 func TestMigrationLifecycle(t *testing.T) {
 	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")

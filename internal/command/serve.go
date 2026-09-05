@@ -73,7 +73,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	}
 	credentials := service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), identityStore, keyring)
 	repositories := service.NewRepositories(repositoryStore, identityStore)
-	jobs := service.NewJobs(repositoryStore)
+	jobs := service.NewJobs(repository.NewJobControlStore(db.Pool, runtime.Client()), identityStore)
 	audits := service.NewAudits(repositoryStore, identityStore)
 	server := &http.Server{
 		Addr: addr,
@@ -82,7 +82,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      30 * time.Second,
+		WriteTimeout:      0, // SSE responses manage their lifetime through request cancellation.
 		IdleTimeout:       60 * time.Second,
 	}
 	if err := runtime.Start(ctx); err != nil {

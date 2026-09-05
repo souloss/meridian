@@ -389,6 +389,9 @@ type JobStageLog struct {
 	// OccurredAt is the generated occurred at database value for JobStageLog.
 	// UTC transaction timestamp when the event was persisted.
 	OccurredAt pgtype.Timestamptz `json:"occurred_at"`
+	// Attempt is the generated attempt database value for JobStageLog.
+	// One-based River execution attempt that emitted this persisted stage event.
+	Attempt int32 `json:"attempt"`
 }
 
 // KnownHost is the generated PostgreSQL representation of the corresponding Meridian table row.

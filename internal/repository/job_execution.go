@@ -33,7 +33,7 @@ func (store *RepositoryStore) StartJob(ctx context.Context, input task.StartInpu
 		}
 		return task.ClaimResult{}, normalizeError(err)
 	}
-	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.Stage, "info", "pipeline stage started", input.StartedAt); err != nil {
+	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.ExpectedAttempt, input.Stage, "info", "pipeline stage started", input.StartedAt); err != nil {
 		return task.ClaimResult{}, err
 	}
 	if err := tx.Commit(ctx); err != nil {
@@ -60,7 +60,7 @@ func (store *RepositoryStore) SetJobStage(ctx context.Context, input task.StageI
 	if changed != 1 {
 		return serviceErrNotFound()
 	}
-	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.Stage, input.Level, input.Message, input.OccurredAt); err != nil {
+	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.ExpectedAttempt, input.Stage, input.Level, input.Message, input.OccurredAt); err != nil {
 		return err
 	}
 	if err := tx.Commit(ctx); err != nil {
@@ -89,7 +89,7 @@ func (store *RepositoryStore) FinishJob(ctx context.Context, input task.FinishIn
 		}
 		return normalizeError(err)
 	}
-	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.Stage, input.Level, input.Message, input.FinishedAt); err != nil {
+	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.ExpectedAttempt, input.Stage, input.Level, input.Message, input.FinishedAt); err != nil {
 		return err
 	}
 	if input.Terminal && input.Status == "failed" {
@@ -187,7 +187,7 @@ func appendJobFailureFacts(ctx context.Context, queries *generated.Queries, inpu
 	return nil
 }
 
-func appendJobStageLog(ctx context.Context, queries *generated.Queries, tenantID, jobID uuid.UUID, stage task.Stage, level, message string, occurredAt time.Time) error {
+func appendJobStageLog(ctx context.Context, queries *generated.Queries, tenantID, jobID uuid.UUID, attempt int, stage task.Stage, level, message string, occurredAt time.Time) error {
 	lockKey := "job-stage:" + tenantID.String() + ":" + jobID.String()
 	if err := queries.LockJobStageSequence(ctx, lockKey); err != nil {
 		return normalizeError(err)
@@ -197,7 +197,7 @@ func appendJobStageLog(ctx context.Context, queries *generated.Queries, tenantID
 		return normalizeError(err)
 	}
 	if _, err := queries.AppendJobStageLog(ctx, generated.AppendJobStageLogParams{
-		TenantID: tenantID, JobID: jobID, Sequence: int64(sequence), Stage: string(stage),
+		TenantID: tenantID, JobID: jobID, Sequence: int64(sequence), Attempt: int32(attempt), Stage: string(stage),
 		Level: level, Message: message, OccurredAt: timestamp(occurredAt),
 	}); err != nil {
 		return normalizeError(err)

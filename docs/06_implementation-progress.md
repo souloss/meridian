@@ -3,8 +3,8 @@
 > 最后核对：2026-09-05
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`6c79863 feat: add local content-addressed blob foundation`
-> 当前开发切片：租户 Job 查询、取消、重试与 SSE 控制面
+> 最新稳定提交：`6c79863 feat: add local content-addressed blob foundation`（Job 控制面当前切片待提交）
+> 当前开发切片：租户 Job 查询、取消、重试与 SSE 控制面（门禁已通过，待提交）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -50,7 +50,7 @@
 | 全局凭据管理及强制删除 | 部分完成 | CRUD/轮换/删除、引用仓库解绑健康状态和平台 Job 投影已实现；正式 Smoke fixture 仍待统一放行 | `66f473c`、`394ffe7`、`b270b9d`、`b8d2ef6` |
 | Known Host 创建、派生指纹和列表 | 部分完成 | 服务端派生规则已有单测和 handler；SMK-035 独立 API 场景尚未统一放行 | `31e3440`、`66f473c` |
 | 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | `bd954d4`、`internal/handler/identity_integration_test.go` |
-| River Worker 与通用 Job 控制面 | 部分完成 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；租户 Job 查询/取消/重试/SSE 仍属后续切片 | `147b155` |
+| River Worker 与通用 Job 控制面 | 部分完成 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；本切片已完成租户 Job 查询/详情、取消、SSE 重放/心跳/终态关闭、`repo.sync` 手工重试代际和 24 小时幂等；其它 Job 类型的手工重试需等对应 Worker 参数契约 | `147b155`、当前工作区 Job 控制面切片 |
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
 | Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
 | 本地 SHA-256 CAS Blob 驱动 | 已完成 | 流式摘要、排他原子发布、去重、损坏检测、短时内容能力、租户唯一字节配额和真实 PG 覆盖均已通过；内容 HTTP endpoint 按契约在 M1 资产消费者接入 | `6c79863` |
@@ -96,12 +96,17 @@
 - 本地 Blob 以 SHA-256 派生唯一安全路径，采用临时文件、文件 `fsync` 和不覆盖目标的 hard-link 原子发布；重复写和并发写会复核目标摘要，磁盘损坏不会被静默接受。
 - Blob 元数据与租户引用在同一事务内登记；按租户唯一摘要计费并锁定租户配额行，重复引用不重复占用配额，跨租户只复用全局不可变元数据。
 - HMAC-SHA-256 内容能力最长 300 秒，绑定摘要、制品类型、媒体类型、Disposition 和可选分享记录，并支持 active/previous key 平滑轮换；实际内容 endpoint 随 M1 资产读取链路接入。
+- 租户 Job 控制面固定以 `tenant_id` 做数据边界：列表/详情加载阶段日志并返回脱敏错误、阶段 attempt、进度和能力；`job:run` 才能取消或重试，PAT 必须同时具备精确租户绑定和 `job:run` scope。
+- 取消在同一 PostgreSQL 事务内锁定 Meridian Job、调用 River `JobCancelTx` 并写入 `cancelled`；已终态 Job 返回 `job_not_cancellable`，跨租户资源统一表现为 404。
+- 手工重试在同一事务内锁定幂等键、源 Job 和最新 generation，复制不可变 input，创建 `trigger=retry`、`retryOfJobId` 和新 River Job；相同 key/hash 精确重放，不同 hash 返回幂等冲突，存在等价 pending/running generation 返回状态冲突。M0 当前仅允许 `repo.sync`，因为其它 Job 类型尚未有可安全重建的 Worker 参数契约。
+- Job SSE 首先发送当前 state，随后按持久化 sequence 重放日志；`Last-Event-ID` 只接受非负十进制序列，15 秒心跳使用注释帧，响应禁止缓存和代理缓冲，终态发送最终 state 后关闭。
+- 迁移 `00004_job_stage_attempt.sql` 为阶段日志增加一基 attempt，并由 DDL 注释审计覆盖所有 Goose `Up` 迁移（含 `ADD COLUMN`）。
 
-本阶段提交前已通过 `vfox exec golang@1.27.1 -- go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
+本阶段提交前已通过 `go1.27.1` 的 `go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
 
 ## 下一步顺序
 
-1. 补齐租户 Job 查询/取消/重试/SSE 控制面。
+1. 提交并锁定本切片，然后开始 M0 Nuxt 控制面。
 2. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
 3. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
 
