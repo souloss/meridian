@@ -1,0 +1,12 @@
+workItem=M0-AGENT-002
+attempt=2
+toolchain=go1.27.1 node24.20.0 pnpm11.20.0
+command=make smoke-m0-credentials
+exitCode=2
+durationSeconds=0
+stdout=smoke-m0-credentials.log
+failure=missing make target; gate must not be substituted
+command=./scripts/test-integration.sh
+exitCode=0
+durationSeconds=17
+stdout=backend-test-integration.log

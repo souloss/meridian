@@ -72,15 +72,15 @@ items:
     assertions: [SMK-005, SMK-031, SMK-035]
     verify: [smoke-m0-credentials, backend-test-integration]
     owner: coding-agent
-    attempt: 1
+    attempt: 2
     maxAttempts: 3
-    leaseUntil: '2026-09-05T19:31:03Z'
-    startedAt: '2026-09-05T19:01:03Z'
-    baseCommit: e79ecf8bcb677a7359e171c43fc75450ed51fc06
+    leaseUntil: '2026-09-05T19:36:06Z'
+    startedAt: '2026-09-05T19:06:06Z'
+    baseCommit: f76025ac0d9563c5fe87542693538c86966b8e20
     contractDigest: sha256:627bc17f91f02ba5d8bbb4bd8b6bc7071de94e9ca8465b9027be14ca49b14a9a
-    reportPath: artifacts/agent/M0-AGENT-002/20260905T190103Z/report.json
-    lastEvidence: artifacts/agent/M0-AGENT-002/20260905T190103Z/report.json
-    nextAction: investigate missing smoke-m0-credentials gate
+    reportPath: artifacts/agent/M0-AGENT-002/20260905T190606Z/report.json
+    lastEvidence: artifacts/agent/M0-AGENT-002/20260905T190606Z/report.json
+    nextAction: retry attempt 3 after checking gate definition
 
   - id: M0-AGENT-003
     milestone: M0

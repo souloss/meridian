@@ -1,0 +1,25 @@
+{
+  "itemId": "M0-AGENT-002",
+  "workItem": "M0-AGENT-002",
+  "status": "needs_retry",
+  "attempt": 2,
+  "commit": "f76025ac0d9563c5fe87542693538c86966b8e20",
+  "baseCommit": "f76025ac0d9563c5fe87542693538c86966b8e20",
+  "contractDigest": "sha256:627bc17f91f02ba5d8bbb4bd8b6bc7071de94e9ca8465b9027be14ca49b14a9a",
+  "stories": ["US-11"],
+  "assertions": [
+    {"id": "SMK-005", "status": "failed", "evidence": "make smoke-m0-credentials: missing target"},
+    {"id": "SMK-031", "status": "failed", "evidence": "make smoke-m0-credentials: missing target"},
+    {"id": "SMK-035", "status": "failed", "evidence": "make smoke-m0-credentials: missing target"}
+  ],
+  "commands": [
+    {"command": "make smoke-m0-credentials", "exitCode": 2, "durationSeconds": 0},
+    {"command": "./scripts/test-integration.sh", "exitCode": 0, "durationSeconds": 17}
+  ],
+  "changedFiles": [],
+  "deferred": [],
+  "failures": [
+    {"category": "code_failure", "command": "make smoke-m0-credentials", "reason": "Makefile has no smoke-m0-credentials target; the required gate is not executable"}
+  ],
+  "nextAction": "retry attempt 3 only after checking the declared gate definition"
+}

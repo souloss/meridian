@@ -149,6 +149,6 @@ git diff --check
 
 ## 当前阻塞
 
-`M0-AGENT-002` 的声明门禁 `make smoke-m0-credentials` 当前不存在，已按运行手册记录为 `needs_retry`，不能用已有集成测试替代。修复 Make target/对应 Smoke fixture 后，必须从该工作项重新领取并重跑全部声明门禁。
+`M0-AGENT-002` 的声明门禁 `make smoke-m0-credentials` 当前不存在，已按运行手册完成第 2 次 `needs_retry` 记录，不能用已有集成测试替代。修复 Make target/对应 Smoke fixture 后，必须从该工作项重新领取并重跑全部声明门禁；同一根因第 3 次仍失败将转人工验收。
 
 没有需要人工决策的阻塞。
