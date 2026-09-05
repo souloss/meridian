@@ -286,6 +286,9 @@ type Querier interface {
 	// UpdateRepository conditionally updates explicit repository fields and advances its revision.
 	// Set flags preserve the distinction between omitted fields and explicit JSON null values.
 	UpdateRepository(ctx context.Context, arg UpdateRepositoryParams) (Repository, error)
+	// UpdateTenant conditionally updates platform-controlled tenant fields and advances its revision.
+	// Set flags preserve omitted PATCH fields while allowing complete quota replacement.
+	UpdateTenant(ctx context.Context, arg UpdateTenantParams) (Tenant, error)
 	// UpsertTenantMember creates or replaces a tenant role assignment and records the caller-supplied update time.
 	UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error)
 }

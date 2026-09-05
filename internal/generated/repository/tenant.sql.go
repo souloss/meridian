@@ -306,6 +306,70 @@ func (q *Queries) ListTenants(ctx context.Context, arg ListTenantsParams) ([]Lis
 	return items, nil
 }
 
+const updateTenant = `-- name: UpdateTenant :one
+UPDATE tenants
+SET
+  display_name = CASE WHEN $1::boolean THEN $2 ELSE display_name END,
+  status = CASE WHEN $3::boolean THEN $4 ELSE status END,
+  quota = CASE WHEN $5::boolean THEN $6 ELSE quota END,
+  revision = revision + 1,
+  updated_at = $7
+WHERE slug = $8
+  AND revision = $9
+RETURNING id, slug, display_name, status, quota, settings, revision, created_at, updated_at
+`
+
+// UpdateTenantParams contains the strongly typed arguments for the UpdateTenant query.
+type UpdateTenantParams struct {
+	// SetDisplayName is the set display name value supplied to the UpdateTenant query.
+	SetDisplayName bool `json:"set_display_name"`
+	// DisplayName is the display name value supplied to the UpdateTenant query.
+	DisplayName string `json:"display_name"`
+	// SetStatus is the set status value supplied to the UpdateTenant query.
+	SetStatus bool `json:"set_status"`
+	// Status is the status value supplied to the UpdateTenant query.
+	Status string `json:"status"`
+	// SetQuota is the set quota value supplied to the UpdateTenant query.
+	SetQuota bool `json:"set_quota"`
+	// Quota is the quota value supplied to the UpdateTenant query.
+	Quota []byte `json:"quota"`
+	// UpdatedAt is the updated at value supplied to the UpdateTenant query.
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	// Slug is the slug value supplied to the UpdateTenant query.
+	Slug string `json:"slug"`
+	// ExpectedRevision is the expected revision value supplied to the UpdateTenant query.
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// UpdateTenant conditionally updates platform-controlled tenant fields and advances its revision.
+// Set flags preserve omitted PATCH fields while allowing complete quota replacement.
+func (q *Queries) UpdateTenant(ctx context.Context, arg UpdateTenantParams) (Tenant, error) {
+	row := q.db.QueryRow(ctx, updateTenant,
+		arg.SetDisplayName,
+		arg.DisplayName,
+		arg.SetStatus,
+		arg.Status,
+		arg.SetQuota,
+		arg.Quota,
+		arg.UpdatedAt,
+		arg.Slug,
+		arg.ExpectedRevision,
+	)
+	var i Tenant
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.DisplayName,
+		&i.Status,
+		&i.Quota,
+		&i.Settings,
+		&i.Revision,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const upsertTenantMember = `-- name: UpsertTenantMember :one
 INSERT INTO tenant_members (
   tenant_id,

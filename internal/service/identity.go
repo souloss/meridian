@@ -279,6 +279,31 @@ func (identity *Identity) ListTenants(ctx context.Context, actor Principal, page
 	return identity.store.ListTenants(ctx, int32(pageSize), int32((page-1)*pageSize))
 }
 
+// UpdateTenant applies platform-controlled tenant metadata under an If-Match ETag.
+func (identity *Identity) UpdateTenant(ctx context.Context, actor Principal, slug, etag string, patch TenantPatchInput) (Tenant, error) {
+	if !isPlatformAdministrator(actor) {
+		return Tenant{}, ErrNotFound
+	}
+	if patch.DisplayName == nil && patch.Status == nil && patch.Quota == nil {
+		return Tenant{}, ErrValidation
+	}
+	tenant, err := identity.store.TenantBySlug(ctx, slug)
+	if err != nil {
+		return Tenant{}, err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "tenant", tenant.ID)
+	if err != nil {
+		return Tenant{}, ErrPrecondition
+	}
+	if err := validateTenantPatch(patch); err != nil {
+		return Tenant{}, err
+	}
+	return identity.store.UpdateTenant(ctx, UpdateTenant{
+		Slug: slug, ExpectedRevision: expectedRevision, DisplayName: patch.DisplayName,
+		Status: patch.Status, Quota: patch.Quota, UpdatedAt: identity.now().UTC(),
+	})
+}
+
 // PutTenantMembership creates or replaces a role after checking platform-only authorization.
 func (identity *Identity) PutTenantMembership(ctx context.Context, actor Principal, tenantSlug string, userID uuid.UUID, role string) (User, Membership, error) {
 	if !isPlatformAdministrator(actor) || !validTenantRole(role) {
@@ -386,6 +411,21 @@ func validateUserInput(input CreateUserInput) error {
 
 func validQuota(quota *Quota) bool {
 	return quota == nil || (quota.MaxRepositories >= 0 && quota.MaxServices >= 0 && quota.MaxStorageBytes >= 0 && quota.MaxCollectConcurrency >= 1)
+}
+
+func validateTenantPatch(patch TenantPatchInput) error {
+	if patch.DisplayName != nil {
+		if strings.TrimSpace(*patch.DisplayName) == "" || utf8.RuneCountInString(*patch.DisplayName) > 128 {
+			return ErrValidation
+		}
+	}
+	if patch.Status != nil && *patch.Status != "active" && *patch.Status != "disabled" {
+		return ErrValidation
+	}
+	if !validQuota(patch.Quota) {
+		return ErrValidation
+	}
+	return nil
 }
 
 func validOpaqueToken(token, prefix string) bool {

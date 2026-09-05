@@ -168,6 +168,33 @@ type NewTenant struct {
 	Quota       *Quota
 }
 
+// TenantPatchInput contains the platform-controlled fields that may be changed on a tenant.
+// A nil field is omitted from the mutation and therefore retains its current value.
+type TenantPatchInput struct {
+	// DisplayName replaces the tenant display name when supplied.
+	DisplayName *string
+	// Status replaces the tenant lifecycle status when supplied.
+	Status *string
+	// Quota replaces the complete tenant quota when supplied.
+	Quota *Quota
+}
+
+// UpdateTenant contains one optimistic-concurrency tenant mutation.
+type UpdateTenant struct {
+	// Slug identifies the tenant being changed.
+	Slug string
+	// ExpectedRevision is the ETag revision required by the mutation.
+	ExpectedRevision int64
+	// DisplayName is an optional replacement display name.
+	DisplayName *string
+	// Status is an optional replacement lifecycle status.
+	Status *string
+	// Quota is an optional complete replacement quota.
+	Quota *Quota
+	// UpdatedAt is the UTC mutation timestamp.
+	UpdatedAt time.Time
+}
+
 // NewToken contains digest-only PAT persistence inputs.
 type NewToken struct {
 	TenantID  uuid.UUID
@@ -218,6 +245,7 @@ type IdentityStore interface {
 	CreateTenant(context.Context, NewTenant) (Tenant, error)
 	TenantBySlug(context.Context, string) (Tenant, error)
 	ListTenants(context.Context, int32, int32) ([]Tenant, int64, error)
+	UpdateTenant(context.Context, UpdateTenant) (Tenant, error)
 	PutMembership(context.Context, uuid.UUID, uuid.UUID, string, time.Time) (Membership, error)
 	CreateToken(context.Context, NewToken) (Token, error)
 	PATPrincipalByDigest(context.Context, []byte, time.Time) (Principal, error)

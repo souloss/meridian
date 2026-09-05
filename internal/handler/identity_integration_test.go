@@ -118,6 +118,24 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		"slug": "acme", "displayName": "Acme",
 	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
 	assertStatus(t, createdTenant, http.StatusCreated)
+	tenantETag := responseString(t, createdTenant, "etag")
+	updatedTenant := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/admin/tenants/acme", map[string]any{
+		"displayName": "Acme Operations", "quota": map[string]any{
+			"maxRepositories": 50, "maxServices": 200, "maxStorageBytes": 10737418240, "maxCollectConcurrency": 4,
+		},
+	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF, "If-Match": tenantETag})
+	assertStatus(t, updatedTenant, http.StatusOK)
+	if responseString(t, updatedTenant, "displayName") != "Acme Operations" || responseString(t, updatedTenant, "status") != "active" {
+		t.Fatalf("tenant patch response = %s", updatedTenant.Body.String())
+	}
+	updatedTenantETag := responseString(t, updatedTenant, "etag")
+	if updatedTenantETag == tenantETag {
+		t.Fatalf("tenant patch ETag did not advance: %q", updatedTenantETag)
+	}
+	staleTenantUpdate := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/admin/tenants/acme", map[string]any{
+		"displayName": "Stale Update",
+	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF, "If-Match": tenantETag})
+	assertError(t, staleTenantUpdate, http.StatusPreconditionFailed, "precondition_failed")
 	listedUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users?q=alice", nil, []*http.Cookie{adminCookie})
 	assertStatus(t, listedUsers, http.StatusOK)
 	if !strings.Contains(listedUsers.Body.String(), `"username":"alice"`) || strings.Contains(listedUsers.Body.String(), "password_hash") {
@@ -148,6 +166,10 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	assertTenantMembership(t, aliceLogin, "acme", "tenant_admin")
 	forbiddenPlatformUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users", nil, []*http.Cookie{aliceCookie})
 	assertError(t, forbiddenPlatformUsers, http.StatusNotFound, "not_found")
+	forbiddenTenantUpdate := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/admin/tenants/acme", map[string]any{
+		"displayName": "Unauthorized Update",
+	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF, "If-Match": updatedTenantETag})
+	assertError(t, forbiddenTenantUpdate, http.StatusNotFound, "not_found")
 
 	me := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, []*http.Cookie{aliceCookie})
 	assertStatus(t, me, http.StatusOK)

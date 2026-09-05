@@ -294,6 +294,50 @@ func (store *IdentityStore) ListTenants(ctx context.Context, limit, offset int32
 	return tenants, total, nil
 }
 
+// UpdateTenant conditionally updates platform-controlled tenant metadata and advances its revision.
+func (store *IdentityStore) UpdateTenant(ctx context.Context, input service.UpdateTenant) (service.Tenant, error) {
+	quota, err := optionalTenantQuota(input.Quota)
+	if err != nil {
+		return service.Tenant{}, err
+	}
+	var displayName, status string
+	if input.DisplayName != nil {
+		displayName = *input.DisplayName
+	}
+	if input.Status != nil {
+		status = *input.Status
+	}
+	row, err := store.queries.UpdateTenant(ctx, generated.UpdateTenantParams{
+		SetDisplayName:   input.DisplayName != nil,
+		DisplayName:      displayName,
+		SetStatus:        input.Status != nil,
+		Status:           status,
+		SetQuota:         input.Quota != nil,
+		Quota:            quota,
+		UpdatedAt:        timestamp(input.UpdatedAt),
+		Slug:             input.Slug,
+		ExpectedRevision: input.ExpectedRevision,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return service.Tenant{}, service.ErrPrecondition
+		}
+		return service.Tenant{}, normalizeError(err)
+	}
+	return tenantFromRow(row)
+}
+
+func optionalTenantQuota(value *service.Quota) ([]byte, error) {
+	if value == nil {
+		return nil, nil
+	}
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		return nil, fmt.Errorf("encode tenant quota: %w", err)
+	}
+	return encoded, nil
+}
+
 // PutMembership creates or replaces one tenant role assignment.
 func (store *IdentityStore) PutMembership(ctx context.Context, tenantID, userID uuid.UUID, role string, updatedAt time.Time) (service.Membership, error) {
 	row, err := store.queries.UpsertTenantMember(ctx, generated.UpsertTenantMemberParams{

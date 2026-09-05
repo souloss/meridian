@@ -27,6 +27,20 @@ SELECT *
 FROM tenants
 WHERE slug = sqlc.arg(slug);
 
+-- UpdateTenant conditionally updates platform-controlled tenant fields and advances its revision.
+-- Set flags preserve omitted PATCH fields while allowing complete quota replacement.
+-- name: UpdateTenant :one
+UPDATE tenants
+SET
+  display_name = CASE WHEN sqlc.arg(set_display_name)::boolean THEN sqlc.arg(display_name) ELSE display_name END,
+  status = CASE WHEN sqlc.arg(set_status)::boolean THEN sqlc.arg(status) ELSE status END,
+  quota = CASE WHEN sqlc.arg(set_quota)::boolean THEN sqlc.arg(quota) ELSE quota END,
+  revision = revision + 1,
+  updated_at = sqlc.arg(updated_at)
+WHERE slug = sqlc.arg(slug)
+  AND revision = sqlc.arg(expected_revision)
+RETURNING id, slug, display_name, status, quota, settings, revision, created_at, updated_at;
+
 -- ListTenants returns all tenant lifecycle records in stable slug and UUID order for platform administration.
 -- name: ListTenants :many
 SELECT id, slug, display_name, status, quota, revision, created_at, updated_at

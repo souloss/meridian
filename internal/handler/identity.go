@@ -179,6 +179,33 @@ func (s *Server) ListTenants(ctx context.Context, request api.ListTenantsRequest
 	})}, nil
 }
 
+// UpdateTenant applies a platform tenant patch under the caller's ETag.
+func (s *Server) UpdateTenant(ctx context.Context, request api.UpdateTenantRequestObject) (api.UpdateTenantResponseObject, error) {
+	if s.identity == nil || request.Body == nil {
+		return nil, service.ErrValidation
+	}
+	principal, err := principalFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	patch := service.TenantPatchInput{
+		DisplayName: request.Body.DisplayName,
+		Quota:       quotaInput(request.Body.Quota),
+	}
+	if request.Body.Status != nil {
+		status := string(*request.Body.Status)
+		patch.Status = &status
+	}
+	tenant, err := s.identity.UpdateTenant(ctx, principal, request.TenantSlug, request.Params.IfMatch, patch)
+	if err != nil {
+		return nil, err
+	}
+	body := tenantResponse(tenant)
+	return api.UpdateTenant200JSONResponse{TenantJSONResponse: api.TenantJSONResponse{
+		Body: body, Headers: api.TenantResponseHeaders{ETag: new(body.Etag)},
+	}}, nil
+}
+
 // PutTenantMemberAsPlatformAdmin creates or replaces one tenant role assignment.
 func (s *Server) PutTenantMemberAsPlatformAdmin(ctx context.Context, request api.PutTenantMemberAsPlatformAdminRequestObject) (api.PutTenantMemberAsPlatformAdminResponseObject, error) {
 	if s.identity == nil || request.Body == nil {
