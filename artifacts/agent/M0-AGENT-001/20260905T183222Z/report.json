@@ -1,0 +1,44 @@
+{
+  "itemId": "M0-AGENT-001",
+  "workItem": "M0-AGENT-001",
+  "status": "passed",
+  "commit": "ee9fcd930edd87be4efe6508f83c5bc594c4e715",
+  "baseCommit": "43ffa5cc22f99b92d02960c95659a0d80346e26c",
+  "contractDigest": "sha256:627bc17f91f02ba5d8bbb4bd8b6bc7071de94e9ca8465b9027be14ca49b14a9a",
+  "stories": ["US-01"],
+  "assertions": [
+    {
+      "id": "SMK-002",
+      "status": "passed",
+      "evidence": "backend-test-integration.log TestIdentityHTTPWorkflow and e2e-m0-control-plane.log tenant/platform navigation"
+    },
+    {
+      "id": "SMK-003",
+      "status": "passed",
+      "evidence": "backend-test-integration.log platform authorization and cross-tenant 404 checks; full generated matrix remains an M0-AGENT-003 gate"
+    }
+  ],
+  "commands": [
+    {"command": "make contracts-validate", "exitCode": 0, "durationSeconds": 4},
+    {"command": "vfox exec golang@1.27.1 -- go test ./...", "exitCode": 0, "durationSeconds": 1},
+    {"command": "vfox exec nodejs@24.20.0 -- pnpm --dir web typecheck", "exitCode": 0, "durationSeconds": 2},
+    {"command": "CI=1 vfox exec nodejs@24.20.0 -- pnpm --dir web exec playwright test --workers=1 --reporter=line", "exitCode": 0, "durationSeconds": 102},
+    {"command": "./scripts/test-integration.sh", "exitCode": 0, "durationSeconds": 16},
+    {"command": "vfox exec golang@1.27.1 -- go vet ./...", "exitCode": 0, "durationSeconds": 1},
+    {"command": "make contracts-generate-then-git-diff-exit-code", "exitCode": 0, "durationSeconds": 4},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0}
+  ],
+  "changedFiles": [
+    "migrations/queries/tenant.sql",
+    "internal/generated/repository/tenant.sql.go",
+    "internal/generated/repository/querier.go",
+    "internal/service/identity.go",
+    "internal/service/identity_types.go",
+    "internal/repository/identity.go",
+    "internal/handler/identity.go",
+    "internal/handler/identity_integration_test.go"
+  ],
+  "deferred": ["formal SMK-002/SMK-003 smoke entry points remain owned by M0-AGENT-003"],
+  "failures": [],
+  "nextAction": "claim M0-AGENT-002 after clean checkpoint"
+}

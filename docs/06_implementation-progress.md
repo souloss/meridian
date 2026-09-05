@@ -3,10 +3,10 @@
 > 最后核对：2026-09-06
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`c1e6b4e feat: add tenant resource management controls`
-> 当前开发切片：M0 Acceptance/Smoke 与 executable spikes
+> 最新稳定提交：`ee9fcd9 feat(M0-AGENT-001): implement tenant control-plane update`
+> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（待领取）
 
-本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
+本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项和依赖以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 和工作项门禁为准。
 
 ## 状态规则
 
@@ -16,7 +16,12 @@
 | 部分完成 | 已有实现和测试，但对应 Acceptance/Smoke 仍有断言未覆盖 |
 | 开发中 | 工作区存在未提交实现，完整门禁尚未通过 |
 | 未开始 | 只有契约、DDL 或生成的 501 transport stub，没有可用业务实现 |
-| 阻塞 | 继续实施需要产品决策、外部权限或人工提供环境信息 |
+| 失败/待重试 | 门禁或测试失败，尚未达到重试上限 |
+| 技术阻塞 | 同一技术根因连续失败，等待修复或人工介入 |
+| 外部阻塞 | 需要产品决策、外部权限或人工提供环境信息 |
+| 待验收 | 自动门禁通过，等待用户验收 |
+
+技术门禁失败使用 `needs_retry`；连续三次相同根因失败使用 `blocked_technical`；外部依赖使用 `blocked_external`；证据对应的契约或源代码变化后使用 `stale`，不得继续沿用旧证据。
 
 不使用主观完成百分比。只有对应用户故事、Smoke、负向用例和里程碑门禁全部通过，才把里程碑标记为“已完成”。生成代码和数据库表已经存在，也不能单独视为业务能力完成。
 
@@ -54,7 +59,7 @@
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
 | Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
 | 本地 SHA-256 CAS Blob 驱动 | 已完成 | 流式摘要、排他原子发布、去重、损坏检测、短时内容能力、租户唯一字节配额和真实 PG 覆盖均已通过；内容 HTTP endpoint 按契约在 M1 资产消费者接入 | `6c79863` |
-| M0 Nuxt 控制面 | 部分完成 | 登录、租户壳、认证/租户守卫、仓库/凭据查询、创建、编辑、删除、Job 查询/取消/重试/SSE、桌面/移动导航和表单负向校验已实现；平台级管理视图和完整 Smoke fixture 仍未闭环 | `c1e6b4e`、`16af457` |
+| M0 Nuxt 控制面 | 部分完成 | 登录、租户壳、认证/租户守卫、仓库/凭据查询、创建、编辑、删除、Job 查询/取消/重试/SSE、桌面/移动导航和表单负向校验已实现；平台运维脱敏目录、管理员守卫和响应式壳已接入，租户更新 API 已用 ETag 集成验证；平台创建/成员编排 UI 与正式 Smoke fixture 仍待后续工作项 | `ee9fcd9`、`43ffa5c` |
 | M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；Nuxt 类型检查、静态生成、桌面/移动 Playwright 与 axe 已通过；CodeMirror 大文件、Table/Cytoscape 性能 spike 尚未放行 | `c1e6b4e`、[`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
 
 ## M0 验收矩阵
@@ -74,7 +79,7 @@
 
 ## 当前工作区快照
 
-最后稳定基线是 `c1e6b4e`。该提交完成时，Nuxt 资源编辑/删除切片的类型检查、桌面/移动 Playwright、axe、静态生成、生成文档审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
+最后稳定基线是 `ee9fcd9`。该提交完成时，平台租户 PATCH 已实现显式字段更新、平台管理员权限、If-Match 乐观并发控制和 412 陈旧版本响应；对应 PostgreSQL/HTTP 集成断言已通过。提交后的生成无漂移检查、go vet 和 `git diff --check` 随后通过。
 
 2026-09-05 核对时，仓库、平台 Job、River Worker、审计查询、M0 Outbox 与本地 CAS Blob 基础切片已通过门禁，包含：
 
@@ -102,18 +107,18 @@
 - Job SSE 首先发送当前 state，随后按持久化 sequence 重放日志；`Last-Event-ID` 只接受非负十进制序列，15 秒心跳使用注释帧，响应禁止缓存和代理缓冲，终态发送最终 state 后关闭。
 - 迁移 `00004_job_stage_attempt.sql` 为阶段日志增加一基 attempt，并由 DDL 注释审计覆盖所有 Goose `Up` 迁移（含 `ADD COLUMN`）。
 - Nuxt 控制面已接入生成的 API 客户端和 Vue Query：登录/退出、CSRF 会话缓存、租户路由隔离、仓库/凭据只读目录、Job 列表/详情/筛选/取消/重试/SSE 实时状态，以及响应式桌面侧栏和移动抽屉。
-- 前端验证已通过 `vfox exec nodejs@24.20.0 -- pnpm --dir web typecheck`、`pnpm generate`、`pnpm check:generated-docs`；Playwright CI 矩阵为 14 项（13 passed、1 个桌面移动抽屉用例按视口跳过），每个执行项目的 axe 违规均为 0；创建、编辑、删除路径均验证了 Query 刷新、`If-Match`，凭据 secret 不进入更新请求或列表 DOM。
-- 当前前端边界是平台级管理视图和完整 Smoke fixture 尚未接入；租户仓库/凭据控制面已具备创建、编辑、删除和并发更新保护，不以禁用按钮或假成功占位。
+- 平台运维视图已接入生成 API 客户端和 Vue Query：用户/租户脱敏目录、全局凭据/平台 Job/审计投影、平台管理员路由守卫，以及无租户平台管理员的租户业务 404 边界；用户密码哈希、租户 settings、凭据 secret、Job input/result/error 均不进入列表投影。
+- 租户控制面 PATCH 已按契约支持 `displayName`、`status`、完整 `quota` 三态字段更新；仓储 SQL 使用显式 set flag 保留 omitted 语义，服务端校验平台权限和 tenant ETag，陈旧版本统一返回 412。
+- 前端验证已通过 `vfox exec nodejs@24.20.0 -- pnpm --dir web typecheck`、`pnpm generate`、`pnpm check:generated-docs`；Playwright CI 矩阵为 18 项（17 passed、1 个移动导航用例按视口跳过），每个执行项目的 axe 违规均为 0；创建、编辑、删除路径均验证了 Query 刷新、`If-Match`，凭据 secret 不进入更新请求或列表 DOM。
+- 当前前端边界是平台创建用户/租户、成员编排和完整 Smoke fixture 尚未接入；租户仓库/凭据控制面已具备创建、编辑、删除和并发更新保护，不以禁用按钮或假成功占位。
 - Nuxt 创建表单已按 OpenAPI 严格构造 `RepositoryCreateRequest` 与 SSH/HTTP `CredentialCreateRequest` union；默认分支、公开仓库哨兵值、共享范围/团队 UUID、secret 最小长度和备注长度在客户端先校验，服务端 4xx 只展示脱敏错误。
 - 创建成功后只失效当前租户对应的 Query key；E2E 验证幂等键请求、列表刷新、私钥不进入列表 DOM，以及弹窗在桌面/移动视口和 axe 下可用。
 
-本阶段提交前已通过 `go1.27.1` 的 `go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
+本阶段提交前已通过 `go1.27.1` 的 `go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后已再次通过 `make contracts-generate-then-git-diff-exit-code`。
 
 ## 下一步顺序
 
-1. 补齐 M0 Nuxt 平台级控制面和剩余写入路径，并为统一 Smoke fixture 增加契约/负向 E2E。
-2. 完成 CodeMirror 大文件、Table/Cytoscape 性能等剩余 executable spikes。
-3. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
+下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前队列为：`M0-AGENT-001` → `M0-AGENT-002` → `M0-AGENT-003`，完成 M0 放行后进入 M1。每个工作项的命令、断言和报告路径以该文件为准。
 
 ## 更新流程
 
@@ -137,6 +142,8 @@ make contracts-validate
 make contracts-generate-then-git-diff-exit-code
 git diff --check
 ```
+
+每次门禁必须生成工作项证据 JSON；命令失败不得标记“已完成”。前端、迁移、性能和安全附加门禁必须在工作项 `verify` 字段中列出并产生报告。
 
 涉及前端时还必须执行生成、类型检查、Playwright、移动/桌面视口和 axe；涉及迁移时必须额外执行空库 up、显式 down、再次 up 和事务回滚验证。
 

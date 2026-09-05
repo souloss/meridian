@@ -1,0 +1,194 @@
+schemaVersion: 1
+contractId: meridian-work-items-v1
+status: active
+authority: >-
+  This file is the machine-readable queue for autonomous implementation. It
+  references, but never redefines, operationIds, stories, assertions, and
+  domain rules owned by the other contracts.
+
+selection:
+  order: [milestone, dependency-ready, priority, id]
+  onlyStatuses: [ready, in_progress, needs_retry]
+  oneActiveItemPerWorkspace: true
+  neverSkipFailedGate: true
+  requireCleanCheckpointBeforeClaim: true
+
+statuses:
+  - planned
+  - ready
+  - claimed
+  - in_progress
+  - verifying
+  - passed
+  - needs_human_acceptance
+  - accepted
+  - failed
+  - needs_retry
+  - blocked
+  - superseded
+  - cancelled
+
+evidence:
+  requiredFields: [itemId, commit, baseCommit, contractDigest, command, exitCode, startedAt, reportPath, result]
+  resultValues: [pass, fail, stale]
+  staleWhen: contract-or-source-tree-changes-after-command
+
+defaults:
+  owner: coding-agent
+  maxAttempts: 3
+  leaseMinutes: 30
+  evidenceRoot: artifacts/agent
+
+items:
+  - id: M0-AGENT-001
+    milestone: M0
+    priority: P0
+    status: passed
+    title: complete-platform-control-plane
+    dependsOn: []
+    operationIds: [listUsers, createUser, listTenants, createTenant, updateTenant, putTenantMemberAsPlatformAdmin]
+    stories: [US-01]
+    assertions: [SMK-002, SMK-003]
+    verify: [contracts-validate, backend-test, frontend-typecheck, e2e-m0-control-plane]
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    leaseUntil: '2026-09-05T19:02:22Z'
+    startedAt: '2026-09-05T18:32:22Z'
+    baseCommit: 43ffa5cc22f99b92d02960c95659a0d80346e26c
+    contractDigest: sha256:627bc17f91f02ba5d8bbb4bd8b6bc7071de94e9ca8465b9027be14ca49b14a9a
+    reportPath: artifacts/agent/M0-AGENT-001/20260905T183222Z/report.json
+    lastEvidence: artifacts/agent/M0-AGENT-001/20260905T183222Z/report.json
+    nextAction: claim M0-AGENT-002
+
+  - id: M0-AGENT-002
+    milestone: M0
+    priority: P0
+    status: ready
+    title: close-m0-credential-known-host-smoke
+    dependsOn: [M0-AGENT-001]
+    operationIds: [createCredential, rotateCredential, createGlobalCredential, rotateGlobalCredential, deleteGlobalCredential, createKnownHost]
+    stories: [US-11]
+    assertions: [SMK-005, SMK-031, SMK-035]
+    verify: [smoke-m0-credentials, backend-test-integration]
+    reportPath: artifacts/work-items/M0-AGENT-002.json
+
+  - id: M0-AGENT-003
+    milestone: M0
+    priority: P0
+    status: ready
+    title: pass-m0-preflight-spikes-and-gates
+    dependsOn: [M0-AGENT-001, M0-AGENT-002]
+    operationIds: []
+    stories: [US-01, US-11]
+    assertions: [SMK-001, SMK-002, SMK-003, SMK-004, SMK-005]
+    verify: [smoke-all, perf-table-cytoscape, perf-editor, a11y-m0, quality-gate]
+    reportPath: artifacts/work-items/M0-AGENT-003.json
+
+  - id: M1-AGENT-001
+    milestone: M1
+    priority: P0
+    status: ready
+    title: repository-discovery-and-source-bindings
+    dependsOn: [M0-AGENT-003]
+    operationIds: [createRepository, discoverRepository, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
+    stories: [US-02, US-03]
+    assertions: [SMK-006, SMK-008, SMK-009, SMK-032, SMK-034, SMK-037]
+    verify: [smoke-m1-repository]
+    reportPath: artifacts/work-items/M1-AGENT-001.json
+
+  - id: M1-AGENT-002
+    milestone: M1
+    priority: P0
+    status: ready
+    title: openapi-pipeline-viewer-and-public-read
+    dependsOn: [M1-AGENT-001]
+    operationIds: [syncRepository, getService, getAsset, getAssetVersion, listAssetVersionItems, resolveView, getPublicService]
+    stories: [US-02, US-03]
+    assertions: [SMK-006, SMK-007, SMK-008, SMK-010]
+    verify: [smoke-m1-golden-path, perf-openapi-pipeline, e2e-viewer]
+    reportPath: artifacts/work-items/M1-AGENT-002.json
+
+  - id: M1-AGENT-003
+    milestone: M1
+    priority: P0
+    status: ready
+    title: job-recovery-mutex-and-sse-reconnect
+    dependsOn: [M1-AGENT-002]
+    operationIds: [retryJob, getJob, streamJobLogs]
+    stories: [US-12]
+    assertions: [SMK-027, SMK-036]
+    verify: [smoke-m1-concurrency, job-recovery-tests]
+    reportPath: artifacts/work-items/M1-AGENT-003.json
+
+  - id: M2-AGENT-001
+    milestone: M2
+    priority: P0
+    status: ready
+    title: layers-overlay-provenance-and-rollback
+    dependsOn: [M1-AGENT-002]
+    operationIds: [previewMerge, createLayerRevision, getAssetVersionProvenance, reorderAssetLayers, rollbackLayer]
+    stories: [US-04]
+    assertions: [SMK-011, SMK-012, SMK-013, SMK-014]
+    verify: [smoke-m2-overlay, overlay-property-tests]
+    reportPath: artifacts/work-items/M2-AGENT-001.json
+
+  - id: M2-AGENT-002
+    milestone: M2
+    priority: P0
+    status: ready
+    title: gitops-preview-apply-and-drift-resolution
+    dependsOn: [M2-AGENT-001]
+    operationIds: [previewRepositoryConfigImport, applyRepositoryConfigImport, resolveServiceDrift]
+    stories: [US-07]
+    assertions: [SMK-028, SMK-038]
+    verify: [smoke-m2-gitops]
+    reportPath: artifacts/work-items/M2-AGENT-002.json
+
+  - id: M3-AGENT-001
+    milestone: M3
+    priority: P0
+    status: ready
+    title: ai-review-publish-and-minimal-notification
+    dependsOn: [M2-AGENT-001]
+    operationIds: [generateMissingAssetWithAi, getReviewContext, approveLayerRevision, rejectLayerRevision, publishAssetVersion]
+    stories: [US-05]
+    assertions: [SMK-015, SMK-016, SMK-017]
+    verify: [smoke-m3-ai, ai-quality-gate]
+    reportPath: artifacts/work-items/M3-AGENT-001.json
+
+  - id: M3-AGENT-002
+    milestone: M3
+    priority: P0
+    status: ready
+    title: diff-share-todo-and-cli-gate
+    dependsOn: [M3-AGENT-001]
+    operationIds: [runDiff, createDiffSnapshotShareLink, getSharedView, listBreakingTodos, acknowledgeBreakingTodo, pushAssetRevision]
+    stories: [US-06, US-09]
+    assertions: [SMK-018, SMK-019, SMK-020, SMK-021, SMK-026]
+    verify: [smoke-m3-diff-cli, cli-contract-tests]
+    reportPath: artifacts/work-items/M3-AGENT-002.json
+
+  - id: M4-AGENT-001
+    milestone: M4
+    priority: P1
+    status: ready
+    title: dbschema-dependency-search-and-global-views
+    dependsOn: [M3-AGENT-002]
+    operationIds: [createSystemGroup, putSystemGroupMembers, search, resolveView]
+    stories: [US-08]
+    assertions: [SMK-022, SMK-023, SMK-024]
+    verify: [smoke-m4-global-views, perf-search-graph]
+    reportPath: artifacts/work-items/M4-AGENT-001.json
+
+  - id: M5-AGENT-001
+    milestone: M5
+    priority: P1
+    status: ready
+    title: subscriptions-inbox-webhook-and-operations-hardening
+    dependsOn: [M4-AGENT-001]
+    operationIds: [putSubscription, markNotificationRead, testNotificationChannel, rotateNotificationChannelSecret]
+    stories: [US-10]
+    assertions: [SMK-025]
+    verify: [smoke-m5-notifications, backup-restore-gate, security-gate]
+    reportPath: artifacts/work-items/M5-AGENT-001.json
