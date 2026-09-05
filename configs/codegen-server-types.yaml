@@ -5,4 +5,4 @@ generate:
 output: internal/generated/api/types.gen.go
 output-options:
   skip-prune: true
-  prefer-skip-optional-pointer: true
+  nullable-type: true

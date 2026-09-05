@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/meridian-labs/meridian/internal/service"
 )
 
 func TestHandlerHealthAndStaticFallback(t *testing.T) {
@@ -33,6 +35,37 @@ func TestHandlerHealthAndStaticFallback(t *testing.T) {
 				t.Fatalf("status = %d, want %d", response.Code, test.want)
 			}
 		})
+	}
+}
+
+func TestOpenAPIOperationsHaveAuthenticationPolicies(t *testing.T) {
+	t.Parallel()
+
+	policies := authPolicies()
+	if len(policies) == 0 {
+		t.Fatal("no authentication policies were derived from OpenAPI")
+	}
+	for _, operation := range []string{"Healthz", "Login", "GetMe", "CreateToken", "ReceiveGitWebhook"} {
+		if _, ok := policies[operation]; !ok {
+			t.Errorf("authentication policy for %s is missing", operation)
+		}
+	}
+	if policies["Healthz"].required || policies["Login"].required || policies["ReceiveGitWebhook"].required {
+		t.Fatal("a contract-public operation requires authentication")
+	}
+	if !policies["GetMe"].required || !policies["GetMe"].allowCookie || policies["GetMe"].allowPAT {
+		t.Fatalf("GetMe policy = %#v", policies["GetMe"])
+	}
+}
+
+func TestProtectedOperationRejectsAnonymousRequestBeforeHandler(t *testing.T) {
+	t.Parallel()
+
+	request := httptest.NewRequest(http.MethodGet, "/api/v1/admin/users", nil)
+	response := httptest.NewRecorder()
+	NewWithIdentity(&service.Identity{}, false).Handler().ServeHTTP(response, request)
+	if response.Code != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want %d; body = %s", response.Code, http.StatusUnauthorized, response.Body.String())
 	}
 }
 

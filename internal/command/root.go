@@ -19,7 +19,7 @@ func New() *cobra.Command {
 			DisableDefaultCmd: true,
 		},
 	}
-	root.AddCommand(newMigrateCommand(), newServeCommand(), newVersionCommand())
+	root.AddCommand(newAdminCommand(), newMigrateCommand(), newServeCommand(), newVersionCommand())
 	return root
 }
 

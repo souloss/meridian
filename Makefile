@@ -1,4 +1,5 @@
 MERIDIAN_DEV_DATABASE_URL ?= postgres://meridian:meridian@127.0.0.1:54329/meridian?sslmode=disable
+MERIDIAN_DEV_TOKEN_PEPPER ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 .PHONY: all build generate backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint
 
@@ -20,7 +21,7 @@ backend-test-integration:
 	./scripts/test-integration.sh
 
 backend-run: database-up
-	MERIDIAN_DATABASE_URL=$(MERIDIAN_DEV_DATABASE_URL) vfox exec golang@1.27.1 -- go run ./cmd/meridian serve
+	MERIDIAN_DATABASE_URL=$(MERIDIAN_DEV_DATABASE_URL) MERIDIAN_TOKEN_PEPPER=$(MERIDIAN_DEV_TOKEN_PEPPER) vfox exec golang@1.27.1 -- go run ./cmd/meridian serve --addr 127.0.0.1:8080 --insecure-cookies
 
 database-up:
 	docker compose up --detach --wait postgres

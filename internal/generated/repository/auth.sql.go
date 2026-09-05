@@ -12,6 +12,29 @@ import (
 	"uuid"
 )
 
+const countAPITokensByUser = `-- name: CountAPITokensByUser :one
+SELECT count(*)
+FROM api_tokens
+WHERE tenant_id = $1
+  AND user_id = $2
+`
+
+// CountAPITokensByUserParams contains the strongly typed arguments for the CountAPITokensByUser query.
+type CountAPITokensByUserParams struct {
+	// TenantID is the tenant id value supplied to the CountAPITokensByUser query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// UserID is the user id value supplied to the CountAPITokensByUser query.
+	UserID uuid.UUID `json:"user_id"`
+}
+
+// CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
+func (q *Queries) CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countAPITokensByUser, arg.TenantID, arg.UserID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createAPIToken = `-- name: CreateAPIToken :one
 INSERT INTO api_tokens (
   tenant_id,
@@ -226,7 +249,13 @@ SELECT
   api_tokens.expires_at,
   users.username,
   users.display_name,
-  users.email
+	users.email,
+	users.status AS user_status,
+	users.revision AS user_revision,
+	users.created_at AS user_created_at,
+	users.updated_at AS user_updated_at,
+	tenant_members.role,
+	tenants.slug AS tenant_slug
 FROM api_tokens
 JOIN users ON users.id = api_tokens.user_id
 JOIN tenant_members
@@ -266,6 +295,18 @@ type GetAPITokenPrincipalByTokenHashRow struct {
 	DisplayName string `json:"display_name"`
 	// Email is the email value returned by the GetAPITokenPrincipalByTokenHash query.
 	Email *string `json:"email"`
+	// UserStatus is the user status value returned by the GetAPITokenPrincipalByTokenHash query.
+	UserStatus string `json:"user_status"`
+	// UserRevision is the user revision value returned by the GetAPITokenPrincipalByTokenHash query.
+	UserRevision int64 `json:"user_revision"`
+	// UserCreatedAt is the user created at value returned by the GetAPITokenPrincipalByTokenHash query.
+	UserCreatedAt pgtype.Timestamptz `json:"user_created_at"`
+	// UserUpdatedAt is the user updated at value returned by the GetAPITokenPrincipalByTokenHash query.
+	UserUpdatedAt pgtype.Timestamptz `json:"user_updated_at"`
+	// Role is the role value returned by the GetAPITokenPrincipalByTokenHash query.
+	Role string `json:"role"`
+	// TenantSlug is the tenant slug value returned by the GetAPITokenPrincipalByTokenHash query.
+	TenantSlug string `json:"tenant_slug"`
 }
 
 // GetAPITokenPrincipalByTokenHash authenticates one active PAT whose user, membership, and tenant remain active.
@@ -281,6 +322,12 @@ func (q *Queries) GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAP
 		&i.Username,
 		&i.DisplayName,
 		&i.Email,
+		&i.UserStatus,
+		&i.UserRevision,
+		&i.UserCreatedAt,
+		&i.UserUpdatedAt,
+		&i.Role,
+		&i.TenantSlug,
 	)
 	return i, err
 }
@@ -294,7 +341,11 @@ SELECT
   users.username,
   users.display_name,
   users.email,
-  users.is_platform_admin
+	users.status AS user_status,
+	users.is_platform_admin,
+	users.revision AS user_revision,
+	users.created_at AS user_created_at,
+	users.updated_at AS user_updated_at
 FROM sessions
 JOIN users ON users.id = sessions.user_id
 WHERE sessions.token_hash = $1
@@ -327,8 +378,16 @@ type GetSessionPrincipalByTokenHashRow struct {
 	DisplayName string `json:"display_name"`
 	// Email is the email value returned by the GetSessionPrincipalByTokenHash query.
 	Email *string `json:"email"`
+	// UserStatus is the user status value returned by the GetSessionPrincipalByTokenHash query.
+	UserStatus string `json:"user_status"`
 	// IsPlatformAdmin is the is platform admin value returned by the GetSessionPrincipalByTokenHash query.
 	IsPlatformAdmin bool `json:"is_platform_admin"`
+	// UserRevision is the user revision value returned by the GetSessionPrincipalByTokenHash query.
+	UserRevision int64 `json:"user_revision"`
+	// UserCreatedAt is the user created at value returned by the GetSessionPrincipalByTokenHash query.
+	UserCreatedAt pgtype.Timestamptz `json:"user_created_at"`
+	// UserUpdatedAt is the user updated at value returned by the GetSessionPrincipalByTokenHash query.
+	UserUpdatedAt pgtype.Timestamptz `json:"user_updated_at"`
 }
 
 // GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
@@ -343,7 +402,11 @@ func (q *Queries) GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSes
 		&i.Username,
 		&i.DisplayName,
 		&i.Email,
+		&i.UserStatus,
 		&i.IsPlatformAdmin,
+		&i.UserRevision,
+		&i.UserCreatedAt,
+		&i.UserUpdatedAt,
 	)
 	return i, err
 }
@@ -404,6 +467,8 @@ FROM api_tokens
 WHERE tenant_id = $1
   AND user_id = $2
 ORDER BY created_at DESC, id DESC
+LIMIT $4
+OFFSET $3
 `
 
 // ListAPITokensByUserParams contains the strongly typed arguments for the ListAPITokensByUser query.
@@ -412,11 +477,20 @@ type ListAPITokensByUserParams struct {
 	TenantID uuid.UUID `json:"tenant_id"`
 	// UserID is the user id value supplied to the ListAPITokensByUser query.
 	UserID uuid.UUID `json:"user_id"`
+	// PageOffset is the page offset value supplied to the ListAPITokensByUser query.
+	PageOffset int32 `json:"page_offset"`
+	// PageLimit is the page limit value supplied to the ListAPITokensByUser query.
+	PageLimit int32 `json:"page_limit"`
 }
 
-// ListAPITokensByUser returns PAT metadata for one user inside one explicit tenant boundary.
+// ListAPITokensByUser returns one stable page of PAT metadata for one user inside one explicit tenant boundary.
 func (q *Queries) ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUserParams) ([]ApiToken, error) {
-	rows, err := q.db.Query(ctx, listAPITokensByUser, arg.TenantID, arg.UserID)
+	rows, err := q.db.Query(ctx, listAPITokensByUser,
+		arg.TenantID,
+		arg.UserID,
+		arg.PageOffset,
+		arg.PageLimit,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -484,15 +558,15 @@ func (q *Queries) PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUse
 	return i, err
 }
 
-const revokeAPIToken = `-- name: RevokeAPIToken :execrows
+const revokeAPIToken = `-- name: RevokeAPIToken :one
 UPDATE api_tokens
 SET
-  revoked_at = $1,
-  updated_at = $1
+  revoked_at = COALESCE(revoked_at, $1),
+  updated_at = CASE WHEN revoked_at IS NULL THEN $1 ELSE updated_at END
 WHERE tenant_id = $2
   AND id = $3
   AND user_id = $4
-  AND revoked_at IS NULL
+RETURNING id
 `
 
 // RevokeAPITokenParams contains the strongly typed arguments for the RevokeAPIToken query.
@@ -507,18 +581,18 @@ type RevokeAPITokenParams struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// RevokeAPIToken atomically revokes a PAT owned by one user in one tenant and reports whether a row changed.
-func (q *Queries) RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (int64, error) {
-	result, err := q.db.Exec(ctx, revokeAPIToken,
+// RevokeAPIToken idempotently revokes a PAT owned by one user in one tenant and returns its identifier.
+// Returning an already-revoked matching row preserves idempotency while an absent or foreign row remains not found.
+func (q *Queries) RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, revokeAPIToken,
 		arg.RevokedAt,
 		arg.TenantID,
 		arg.ID,
 		arg.UserID,
 	)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected(), nil
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const revokeSession = `-- name: RevokeSession :execrows
@@ -541,6 +615,35 @@ type RevokeSessionParams struct {
 // RevokeSession atomically revokes one active browser session and reports whether a row changed.
 func (q *Queries) RevokeSession(ctx context.Context, arg RevokeSessionParams) (int64, error) {
 	result, err := q.db.Exec(ctx, revokeSession, arg.RevokedAt, arg.ID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const rotateSessionCSRFHash = `-- name: RotateSessionCSRFHash :execrows
+UPDATE sessions
+SET
+  csrf_hash = $1,
+  updated_at = $2
+WHERE id = $3
+  AND revoked_at IS NULL
+  AND expires_at > $2
+`
+
+// RotateSessionCSRFHashParams contains the strongly typed arguments for the RotateSessionCSRFHash query.
+type RotateSessionCSRFHashParams struct {
+	// CsrfHash is the csrf hash value supplied to the RotateSessionCSRFHash query.
+	CsrfHash []byte `json:"csrf_hash"`
+	// UpdatedAt is the updated at value supplied to the RotateSessionCSRFHash query.
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	// ID is the id value supplied to the RotateSessionCSRFHash query.
+	ID uuid.UUID `json:"id"`
+}
+
+// RotateSessionCSRFHash replaces the keyed CSRF digest for one active browser session.
+func (q *Queries) RotateSessionCSRFHash(ctx context.Context, arg RotateSessionCSRFHashParams) (int64, error) {
+	result, err := q.db.Exec(ctx, rotateSessionCSRFHash, arg.CsrfHash, arg.UpdatedAt, arg.ID)
 	if err != nil {
 		return 0, err
 	}

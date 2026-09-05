@@ -6,33 +6,46 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/meridian-labs/meridian/internal/handler"
+	"github.com/meridian-labs/meridian/internal/repository"
+	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/spf13/cobra"
 )
 
 func newServeCommand() *cobra.Command {
 	var addr string
 	var databaseURL string
+	var insecureCookies bool
 
 	command := &cobra.Command{
 		Use:   "serve",
 		Short: "Start the Meridian HTTP server",
 		Args:  cobra.NoArgs,
 		RunE: func(command *cobra.Command, _ []string) error {
-			return runServer(command.Context(), addr, databaseURL, command.ErrOrStderr())
+			return runServer(command.Context(), addr, databaseURL, os.Getenv("MERIDIAN_TOKEN_PEPPER"), !insecureCookies, command.ErrOrStderr())
 		},
 	}
 	command.Flags().StringVar(&addr, "addr", ":8080", "HTTP listen address")
 	command.Flags().StringVar(&databaseURL, "database-url", os.Getenv("MERIDIAN_DATABASE_URL"), "PostgreSQL connection URL (or MERIDIAN_DATABASE_URL)")
+	command.Flags().BoolVar(&insecureCookies, "insecure-cookies", false, "allow session cookies over HTTP for loopback development")
 	return command
 }
 
-func runServer(ctx context.Context, addr, databaseURL string, output io.Writer) (err error) {
+func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, secureCookies bool, output io.Writer) (err error) {
 	logger := slog.New(slog.NewJSONHandler(output, nil))
+	if !secureCookies && !isLoopbackAddress(addr) {
+		return errors.New("--insecure-cookies requires an explicit loopback --addr")
+	}
+	digester, err := service.NewTokenDigester(encodedPepper)
+	if err != nil {
+		return err
+	}
 	db, err := openDatabase(ctx, databaseURL, output)
 	if err != nil {
 		return err
@@ -43,8 +56,11 @@ func runServer(ctx context.Context, addr, databaseURL string, output io.Writer) 
 	}
 
 	server := &http.Server{
-		Addr:              addr,
-		Handler:           handler.New().Handler(),
+		Addr: addr,
+		Handler: handler.NewWithIdentity(
+			service.NewIdentity(repository.NewIdentityStore(db.Pool), digester),
+			secureCookies,
+		).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
 		WriteTimeout:      30 * time.Second,
@@ -71,4 +87,16 @@ func runServer(ctx context.Context, addr, databaseURL string, output io.Writer) 
 		}
 		return nil
 	}
+}
+
+func isLoopbackAddress(addr string) bool {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return false
+	}
+	if strings.EqualFold(host, "localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }

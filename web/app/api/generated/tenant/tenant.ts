@@ -41,6 +41,7 @@ import type {
   CredentialResponse,
   CredentialRotateBody,
   CredentialRotationResponse,
+  CsrfInvalidResponse,
   DeleteCredentialParams,
   DuplicateResponse,
   JobAcceptedResponse,
@@ -74,6 +75,7 @@ import type {
   TokenCreateBody,
   TokenCreatedResponse,
   TokenPageResponse,
+  UnauthenticatedResponse,
   UserPageResponse,
   ValidationErrorResponse
 } from '../models';
@@ -899,6 +901,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   status: 200
 }
 
+/** listTokensResponse401 represents a declared HTTP response from the list tokens response401 operation. */
+export type listTokensResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: UnauthenticatedResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
 /** listTokensResponse404 represents a declared HTTP response from the list tokens response404 operation. */
 export type listTokensResponse404 = {
   /** Data contains the decoded response payload. */
@@ -913,7 +923,7 @@ export type listTokensResponseSuccess = (listTokensResponse200) & {
   headers: Headers;
 };
 /** listTokensResponseError represents a declared HTTP response from the list tokens response error operation. */
-export type listTokensResponseError = (listTokensResponse404) & {
+export type listTokensResponseError = (listTokensResponse401 | listTokensResponse404) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
@@ -958,7 +968,7 @@ export const getListTokensQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
 
 
 /** getListTokensQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListTokensQueryOptions = <TData = Awaited<ReturnType<typeof listTokens>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
+export const getListTokensQueryOptions = <TData = Awaited<ReturnType<typeof listTokens>>, TError = UnauthenticatedResponse | NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListTokensParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTokens>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
@@ -980,12 +990,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** ListTokensQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListTokensQueryResult = NonNullable<Awaited<ReturnType<typeof listTokens>>>
 /** ListTokensQueryError is the error type returned by its generated Vue Query hook. */
-export type ListTokensQueryError = NotFoundResponse
+export type ListTokensQueryError = UnauthenticatedResponse | NotFoundResponse
 
 
 
 /** useListTokens executes its OpenAPI operation through TanStack Vue Query. */
-export function useListTokens<TData = Awaited<ReturnType<typeof listTokens>>, TError = NotFoundResponse>(
+export function useListTokens<TData = Awaited<ReturnType<typeof listTokens>>, TError = UnauthenticatedResponse | NotFoundResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListTokensParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTokens>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
@@ -1013,6 +1023,22 @@ export type createTokenResponse201 = {
   status: 201
 }
 
+/** createTokenResponse401 represents a declared HTTP response from the create token response401 operation. */
+export type createTokenResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: UnauthenticatedResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** createTokenResponse403 represents a declared HTTP response from the create token response403 operation. */
+export type createTokenResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: CsrfInvalidResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
 /** createTokenResponse404 represents a declared HTTP response from the create token response404 operation. */
 export type createTokenResponse404 = {
   /** Data contains the decoded response payload. */
@@ -1021,13 +1047,21 @@ export type createTokenResponse404 = {
   status: 404
 }
 
+/** createTokenResponse422 represents a declared HTTP response from the create token response422 operation. */
+export type createTokenResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ValidationErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
 /** createTokenResponseSuccess represents a declared HTTP response from the create token response success operation. */
 export type createTokenResponseSuccess = (createTokenResponse201) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 /** createTokenResponseError represents a declared HTTP response from the create token response error operation. */
-export type createTokenResponseError = (createTokenResponse404) & {
+export type createTokenResponseError = (createTokenResponse401 | createTokenResponse403 | createTokenResponse404 | createTokenResponse422) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
@@ -1071,7 +1105,7 @@ return meridianFetch<createTokenResponse>(getCreateTokenUrl(tenantSlug),
 export const getCreateTokenMutationKey = () => ['createToken'] as const;
 
 /** getCreateTokenMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateTokenMutationOptions = <TError = NotFoundResponse,
+export const getCreateTokenMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createToken>>, TError,CreateTokenMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createToken>>, TError,CreateTokenMutationVariables, TContext> => {
 
@@ -1103,12 +1137,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateTokenMutationBody is the request body type for its generated OpenAPI operation. */
     export type CreateTokenMutationBody = TokenCreateBody
     /** CreateTokenMutationError is generated from the Meridian OpenAPI contract for create token mutation error. */
-    export type CreateTokenMutationError = NotFoundResponse
+    export type CreateTokenMutationError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | ValidationErrorResponse
     /** CreateTokenMutationVariables is generated from the Meridian OpenAPI contract for create token mutation variables. */
     export type CreateTokenMutationVariables = {/** TenantSlug carries the tenant slug value for CreateTokenMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: TokenCreateBody}
 
     /** useCreateToken executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateToken = <TError = NotFoundResponse,
+    export const useCreateToken = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createToken>>, TError,CreateTokenMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createToken>>,
@@ -1126,6 +1160,22 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   status: 204
 }
 
+/** revokeTokenResponse401 represents a declared HTTP response from the revoke token response401 operation. */
+export type revokeTokenResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: UnauthenticatedResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** revokeTokenResponse403 represents a declared HTTP response from the revoke token response403 operation. */
+export type revokeTokenResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: CsrfInvalidResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
 /** revokeTokenResponse404 represents a declared HTTP response from the revoke token response404 operation. */
 export type revokeTokenResponse404 = {
   /** Data contains the decoded response payload. */
@@ -1140,7 +1190,7 @@ export type revokeTokenResponseSuccess = (revokeTokenResponse204) & {
   headers: Headers;
 };
 /** revokeTokenResponseError represents a declared HTTP response from the revoke token response error operation. */
-export type revokeTokenResponseError = (revokeTokenResponse404) & {
+export type revokeTokenResponseError = (revokeTokenResponse401 | revokeTokenResponse403 | revokeTokenResponse404) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
@@ -1179,7 +1229,7 @@ export const revokeToken = async (tenantSlug: string,
 export const getRevokeTokenMutationKey = () => ['revokeToken'] as const;
 
 /** getRevokeTokenMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getRevokeTokenMutationOptions = <TError = NotFoundResponse,
+export const getRevokeTokenMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeToken>>, TError,RevokeTokenMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof revokeToken>>, TError,RevokeTokenMutationVariables, TContext> => {
 
@@ -1210,12 +1260,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RevokeTokenMutationResult = NonNullable<Awaited<ReturnType<typeof revokeToken>>>
 
     /** RevokeTokenMutationError is generated from the Meridian OpenAPI contract for revoke token mutation error. */
-    export type RevokeTokenMutationError = NotFoundResponse
+    export type RevokeTokenMutationError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse
     /** RevokeTokenMutationVariables is generated from the Meridian OpenAPI contract for revoke token mutation variables. */
     export type RevokeTokenMutationVariables = {/** TenantSlug carries the tenant slug value for RevokeTokenMutationVariables. */ tenantSlug: string;/** TokenId carries the token id value for RevokeTokenMutationVariables. */ tokenId: string}
 
     /** useRevokeToken executes its OpenAPI operation through TanStack Vue Query. */
-    export const useRevokeToken = <TError = NotFoundResponse,
+    export const useRevokeToken = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeToken>>, TError,RevokeTokenMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof revokeToken>>,

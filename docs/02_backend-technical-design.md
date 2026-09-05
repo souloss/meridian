@@ -57,9 +57,9 @@ internal/storage           本地 CAS blob 与签名下载
 migrations                 goose SQL 与 sqlc 查询源
 ```
 
-依赖方向固定为 `cmd -> command -> handler -> service -> domain`；handler 只把 `internal/generated/api` DTO 映射到用例输入，service 通过接口调用 repository/provider，具体适配器在装配点注入。事务由 service 层开启；domain 不依赖数据库、HTTP、生成 DTO 或任务实现。外部工具、Git、对象存储、AI producer 都通过端口适配器接入。
+依赖方向固定为 `cmd -> command -> handler -> service`，repository 实现 service 声明的持久化端口；handler 只把 `internal/generated/api` DTO 映射到用例输入，具体适配器在 `internal/command` 装配。跨仓储用例事务由 service 通过事务端口编排，单仓储原子写可封装在 repository 内；纯算法包不得依赖数据库、HTTP、生成 DTO 或任务实现。外部工具、Git、对象存储、AI producer 都通过端口适配器接入。
 
-`oapi-codegen` 从同一份 OpenAPI 通过独立配置生成 `types.gen.go`、`server.gen.go`、`client.gen.go` 与 `spec.gen.go`，共用一个 `api` 包和一套 DTO。所有 operation、schema、属性和参数必须在 OpenAPI 提供语义描述；描述直接传播为 GoDoc/JSDoc，生成器自身产生的 transport 包装类型再由确定性后处理补注释。契约测试检查 OpenAPI 描述、全部 Go 导出声明/字段以及 TypeScript 生成物，禁止手改生成文件。M0 仅实现系统端点，未实现 operation 暂由生成的 `Unimplemented` 返回 501；当里程碑覆盖全部 operation 后，装配切换到已生成的 Strict Server 接口。
+`oapi-codegen` 从同一份 OpenAPI 通过独立配置生成 `types.gen.go`、`server.gen.go`、`client.gen.go` 与 `spec.gen.go`，共用一个 `api` 包和一套 DTO。所有 operation、schema、属性和参数必须在 OpenAPI 提供语义描述；描述直接传播为 GoDoc/JSDoc，生成器自身产生的 transport 包装类型再由确定性后处理补注释。契约测试检查 OpenAPI 描述、全部 Go 导出声明/字段以及 TypeScript 生成物，禁止手改生成文件。服务从 M0 起始终装配 Strict Server；确定性生成的 `strict_unimplemented.gen.go` 为尚未进入当前实现阶段的 operation 返回 501，当前阶段实现通过编译期覆盖对应方法。
 
 浏览器静态产物固定从 `web/.output/public` embed 到同一 Go 二进制。Go HTTP 层先匹配 `/api/*`、下载制品和真实静态文件；只对已登记的前端路由回退 `index.html`，不得让 API 404 被 SPA fallback 吞掉。带内容 hash 的资源使用一年 immutable cache，`index.html` 使用 no-cache。
 

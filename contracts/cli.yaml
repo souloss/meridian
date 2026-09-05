@@ -61,6 +61,28 @@ selectorGrammar:
   escaping: ref-name-must-match-openapi-RefName-and-therefore-cannot-contain-colon
 
 commands:
+  serve:
+    milestone: M0
+    audience: operator
+    authentication: none
+    databaseUrl: {flag: --database-url, environment: MERIDIAN_DATABASE_URL, required: true}
+    tokenPepper: {environment: MERIDIAN_TOKEN_PEPPER, encoding: unpadded-base64url-32-bytes, required: true}
+    cookieTransport:
+      default: secure
+      localDevelopmentOptOutFlag: --insecure-cookies
+      optOutAddressRequirement: explicit-loopback-host
+      optOutProductionUse: forbidden
+  admin:
+    milestone: M0
+    audience: operator
+    subcommands:
+      create:
+        behavior: create-or-promote-platform-admin
+        requiredFlags: [--username]
+        databaseUrl: {flag: --database-url, environment: MERIDIAN_DATABASE_URL, required: true}
+        passwordInput: stdin-or---password-file
+        passwordCommandLineFlag: forbidden
+        optionalFlags: [--display-name, --password-file]
   migrate:
     milestone: M0
     audience: operator

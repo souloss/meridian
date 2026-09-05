@@ -4,5 +4,3 @@ generate:
   chi-server: true
   strict-server: true
 output: internal/generated/api/server.gen.go
-output-options:
-  prefer-skip-optional-pointer: true

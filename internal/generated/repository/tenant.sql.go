@@ -138,6 +138,20 @@ func (q *Queries) GetActiveTenantMembership(ctx context.Context, arg GetActiveTe
 	return i, err
 }
 
+const getPlatformSettingsForTenantCreate = `-- name: GetPlatformSettingsForTenantCreate :one
+SELECT settings
+FROM platform_settings
+WHERE id = 'default'
+`
+
+// GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
+func (q *Queries) GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error) {
+	row := q.db.QueryRow(ctx, getPlatformSettingsForTenantCreate)
+	var settings []byte
+	err := row.Scan(&settings)
+	return settings, err
+}
+
 const getTenantBySlug = `-- name: GetTenantBySlug :one
 SELECT id, slug, display_name, status, quota, settings, revision, created_at, updated_at
 FROM tenants

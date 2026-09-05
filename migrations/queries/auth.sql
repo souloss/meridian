@@ -72,7 +72,11 @@ SELECT
   users.username,
   users.display_name,
   users.email,
-  users.is_platform_admin
+	users.status AS user_status,
+	users.is_platform_admin,
+	users.revision AS user_revision,
+	users.created_at AS user_created_at,
+	users.updated_at AS user_updated_at
 FROM sessions
 JOIN users ON users.id = sessions.user_id
 WHERE sessions.token_hash = sqlc.arg(token_hash)
@@ -88,6 +92,16 @@ SET
   updated_at = sqlc.arg(seen_at)
 WHERE id = sqlc.arg(id)
   AND revoked_at IS NULL;
+
+-- RotateSessionCSRFHash replaces the keyed CSRF digest for one active browser session.
+-- name: RotateSessionCSRFHash :execrows
+UPDATE sessions
+SET
+  csrf_hash = sqlc.arg(csrf_hash),
+  updated_at = sqlc.arg(updated_at)
+WHERE id = sqlc.arg(id)
+  AND revoked_at IS NULL
+  AND expires_at > sqlc.arg(updated_at);
 
 -- RevokeSession atomically revokes one active browser session and reports whether a row changed.
 -- name: RevokeSession :execrows
@@ -129,7 +143,13 @@ SELECT
   api_tokens.expires_at,
   users.username,
   users.display_name,
-  users.email
+	users.email,
+	users.status AS user_status,
+	users.revision AS user_revision,
+	users.created_at AS user_created_at,
+	users.updated_at AS user_updated_at,
+	tenant_members.role,
+	tenants.slug AS tenant_slug
 FROM api_tokens
 JOIN users ON users.id = api_tokens.user_id
 JOIN tenant_members
@@ -152,21 +172,31 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND revoked_at IS NULL;
 
--- ListAPITokensByUser returns PAT metadata for one user inside one explicit tenant boundary.
+-- CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
+-- name: CountAPITokensByUser :one
+SELECT count(*)
+FROM api_tokens
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND user_id = sqlc.arg(user_id);
+
+-- ListAPITokensByUser returns one stable page of PAT metadata for one user inside one explicit tenant boundary.
 -- name: ListAPITokensByUser :many
 SELECT *
 FROM api_tokens
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND user_id = sqlc.arg(user_id)
-ORDER BY created_at DESC, id DESC;
+ORDER BY created_at DESC, id DESC
+LIMIT sqlc.arg(page_limit)
+OFFSET sqlc.arg(page_offset);
 
--- RevokeAPIToken atomically revokes a PAT owned by one user in one tenant and reports whether a row changed.
--- name: RevokeAPIToken :execrows
+-- RevokeAPIToken idempotently revokes a PAT owned by one user in one tenant and returns its identifier.
+-- Returning an already-revoked matching row preserves idempotency while an absent or foreign row remains not found.
+-- name: RevokeAPIToken :one
 UPDATE api_tokens
 SET
-  revoked_at = sqlc.arg(revoked_at),
-  updated_at = sqlc.arg(revoked_at)
+  revoked_at = COALESCE(revoked_at, sqlc.arg(revoked_at)),
+  updated_at = CASE WHEN revoked_at IS NULL THEN sqlc.arg(revoked_at) ELSE updated_at END
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND user_id = sqlc.arg(user_id)
-  AND revoked_at IS NULL;
+RETURNING id;

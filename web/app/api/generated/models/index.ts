@@ -107,6 +107,7 @@ export * from './credentialRotationResponse.ts';
 export * from './credentialRotationResult.ts';
 export * from './credentialSharedScope.ts';
 export * from './credentialSyncJob.ts';
+export * from './csrfInvalidResponse.ts';
 export * from './csrfToken.ts';
 export * from './dashboardViewResolution.ts';
 export * from './dashboardViewResolutionMetrics.ts';

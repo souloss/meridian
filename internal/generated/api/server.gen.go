@@ -5128,7 +5128,7 @@ func (siw *ServerInterfaceWrapper) StreamJobLogs(w http.ResponseWriter, r *http.
 			return
 		}
 
-		params.LastEventID = LastEventID
+		params.LastEventID = &LastEventID
 
 	}
 
@@ -10597,7 +10597,7 @@ type ArtifactLinkJSONResponse ArtifactLink
 // AssetResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type AssetResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // AssetJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10615,7 +10615,7 @@ type AssetItemPageJSONResponse AssetItemPage
 // AssetKindResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type AssetKindResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // AssetKindJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10636,7 +10636,7 @@ type AssetPushResultJSONResponse AssetPushResult
 // AssetVersionResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type AssetVersionResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // AssetVersionJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10681,7 +10681,7 @@ type ConfigImportResultJSONResponse ConfigImportResult
 // ConflictResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ConflictResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ConflictJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10699,7 +10699,7 @@ type ConnectionTestJSONResponse ConnectionTest
 // ContentTooLargeResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ContentTooLargeResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ContentTooLargeJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10714,7 +10714,7 @@ type ContentTooLargeJSONResponse struct {
 // CredentialResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type CredentialResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CredentialJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10729,7 +10729,7 @@ type CredentialJSONResponse struct {
 // CredentialInUseResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type CredentialInUseResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CredentialInUseJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10747,7 +10747,7 @@ type CredentialPageJSONResponse CredentialPage
 // CredentialRotationResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type CredentialRotationResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CredentialRotationJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10759,13 +10759,28 @@ type CredentialRotationJSONResponse struct {
 	Headers CredentialRotationResponseHeaders
 }
 
+// CsrfInvalidResponseHeaders contains headers declared by the corresponding OpenAPI response.
+type CsrfInvalidResponseHeaders struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
+// CsrfInvalidJSONResponse contains the raw HTTP response and any decoded response body.
+type CsrfInvalidJSONResponse struct {
+	// Body contains the decoded or raw HTTP response body.
+	Body ErrorResponse
+
+	// Headers contains the headers declared for this response.
+	Headers CsrfInvalidResponseHeaders
+}
+
 // DiffResultJSONResponse contains the raw HTTP response and any decoded response body.
 type DiffResultJSONResponse DiffResult
 
 // DiffRuleSetResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type DiffRuleSetResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // DiffRuleSetJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10789,7 +10804,7 @@ type DiffSnapshotPageJSONResponse DiffSnapshotPage
 // DuplicateResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type DuplicateResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DuplicateJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10804,7 +10819,7 @@ type DuplicateJSONResponse struct {
 // GlobalCredentialResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type GlobalCredentialResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GlobalCredentialJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10822,7 +10837,7 @@ type GlobalCredentialPageJSONResponse GlobalCredentialPage
 // GlobalCredentialRotationResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type GlobalCredentialRotationResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GlobalCredentialRotationJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10840,7 +10855,7 @@ type HealthJSONResponse Health
 // InputSpecMismatchResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type InputSpecMismatchResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // InputSpecMismatchJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10855,7 +10870,7 @@ type InputSpecMismatchJSONResponse struct {
 // InternalErrorResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type InternalErrorResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // InternalErrorJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10870,7 +10885,7 @@ type InternalErrorJSONResponse struct {
 // InvalidStateResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type InvalidStateResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // InvalidStateJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10891,7 +10906,7 @@ type JobAcceptedJSONResponse JobAccepted
 // JobNotCancellableResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type JobNotCancellableResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // JobNotCancellableJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10915,7 +10930,7 @@ type KnownHostPageJSONResponse KnownHostPage
 // LastAdminResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type LastAdminResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // LastAdminJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10930,7 +10945,7 @@ type LastAdminJSONResponse struct {
 // LayerResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type LayerResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // LayerJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10945,7 +10960,7 @@ type LayerJSONResponse struct {
 // LayerListResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type LayerListResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // LayerListJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10978,7 +10993,7 @@ type MergePreviewJSONResponse MergePreview
 // NestingTooDeepResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type NestingTooDeepResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // NestingTooDeepJSONResponse contains the raw HTTP response and any decoded response body.
@@ -10993,7 +11008,7 @@ type NestingTooDeepJSONResponse struct {
 // NotFoundResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type NotFoundResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // NotFoundJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11008,7 +11023,7 @@ type NotFoundJSONResponse struct {
 // NotificationChannelResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type NotificationChannelResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // NotificationChannelJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11029,7 +11044,7 @@ type NotificationPageJSONResponse NotificationPage
 // OverlayInvalidResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type OverlayInvalidResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // OverlayInvalidJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11050,7 +11065,7 @@ type PlatformJobPageJSONResponse PlatformJobPage
 // PlatformSettingsResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type PlatformSettingsResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // PlatformSettingsJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11065,7 +11080,7 @@ type PlatformSettingsJSONResponse struct {
 // PreconditionFailedResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type PreconditionFailedResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PreconditionFailedJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11080,7 +11095,7 @@ type PreconditionFailedJSONResponse struct {
 // ProducerProfileResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ProducerProfileResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // ProducerProfileJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11101,7 +11116,7 @@ type ProducerProfilePageJSONResponse ProducerProfilePage
 // ProducerProfileUnavailableResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ProducerProfileUnavailableResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ProducerProfileUnavailableJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11125,7 +11140,7 @@ type PublicServiceJSONResponse PublicService
 // QuotaExceededResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type QuotaExceededResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // QuotaExceededJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11140,9 +11155,9 @@ type QuotaExceededJSONResponse struct {
 // RateLimitedResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type RateLimitedResponseHeaders struct {
 	// RetryAfter carries the generated retry after value for RateLimitedResponseHeaders.
-	RetryAfter int
+	RetryAfter *int
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RateLimitedJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11157,7 +11172,7 @@ type RateLimitedJSONResponse struct {
 // RepositoryResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type RepositoryResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // RepositoryJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11187,7 +11202,7 @@ type SearchResultJSONResponse SearchResult
 // ServiceResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ServiceResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // ServiceJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11223,7 +11238,7 @@ type SourceBindingListJSONResponse SourceBindingList
 // SourceSpecResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type SourceSpecResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // SourceSpecJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11250,7 +11265,7 @@ type SubscriptionListJSONResponse SubscriptionList
 // SystemGroupResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type SystemGroupResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // SystemGroupJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11268,7 +11283,7 @@ type SystemGroupListJSONResponse SystemGroupList
 // TagResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TagResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // TagJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11286,7 +11301,7 @@ type TagListJSONResponse TagList
 // TeamResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TeamResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // TeamJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11304,7 +11319,7 @@ type TeamPageJSONResponse TeamPage
 // TenantResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TenantResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // TenantJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11319,7 +11334,7 @@ type TenantJSONResponse struct {
 // TenantDeletionAcceptedResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TenantDeletionAcceptedResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // TenantDeletionAcceptedJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11337,7 +11352,7 @@ type TenantPageJSONResponse TenantPage
 // TenantSettingsResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type TenantSettingsResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // TenantSettingsJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11358,7 +11373,7 @@ type TokenPageJSONResponse TokenPage
 // UnauthenticatedResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type UnauthenticatedResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UnauthenticatedJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11376,7 +11391,7 @@ type UploadJSONResponse Upload
 // UserResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type UserResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UserJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11394,7 +11409,7 @@ type UserPageJSONResponse UserPage
 // UserPreferencesResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type UserPreferencesResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UserPreferencesJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11409,7 +11424,7 @@ type UserPreferencesJSONResponse struct {
 // ValidationErrorResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ValidationErrorResponseHeaders struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ValidationErrorJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11427,7 +11442,7 @@ type ViewListJSONResponse ViewList
 // ViewOverrideResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type ViewOverrideResponseHeaders struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // ViewOverrideJSONResponse contains the raw HTTP response and any decoded response body.
@@ -11494,7 +11509,9 @@ func (response ListPlatformAuditLogs404JSONResponse) VisitListPlatformAuditLogsR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11553,7 +11570,9 @@ func (response CreateGlobalCredential201JSONResponse) VisitCreateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11570,7 +11589,9 @@ func (response CreateGlobalCredential409JSONResponse) VisitCreateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11587,7 +11608,9 @@ func (response CreateGlobalCredential422JSONResponse) VisitCreateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11628,7 +11651,9 @@ func (response DeleteGlobalCredential404JSONResponse) VisitDeleteGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11645,7 +11670,9 @@ func (response DeleteGlobalCredential409JSONResponse) VisitDeleteGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11662,7 +11689,9 @@ func (response DeleteGlobalCredential412JSONResponse) VisitDeleteGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11695,7 +11724,9 @@ func (response UpdateGlobalCredential200JSONResponse) VisitUpdateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11712,7 +11743,9 @@ func (response UpdateGlobalCredential404JSONResponse) VisitUpdateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11729,7 +11762,9 @@ func (response UpdateGlobalCredential412JSONResponse) VisitUpdateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11764,7 +11799,9 @@ func (response RotateGlobalCredential200JSONResponse) VisitRotateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11781,7 +11818,9 @@ func (response RotateGlobalCredential404JSONResponse) VisitRotateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11798,7 +11837,9 @@ func (response RotateGlobalCredential409JSONResponse) VisitRotateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11815,7 +11856,9 @@ func (response RotateGlobalCredential412JSONResponse) VisitRotateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11832,7 +11875,9 @@ func (response RotateGlobalCredential422JSONResponse) VisitRotateGlobalCredentia
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11879,7 +11924,9 @@ func (response TestGlobalCredential404JSONResponse) VisitTestGlobalCredentialRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11924,7 +11971,9 @@ func (response ListPlatformJobs404JSONResponse) VisitListPlatformJobsResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -11969,7 +12018,9 @@ func (response GetPlatformJob404JSONResponse) VisitGetPlatformJobResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12028,7 +12079,9 @@ func (response CreateProducerProfile201JSONResponse) VisitCreateProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12045,7 +12098,9 @@ func (response CreateProducerProfile409JSONResponse) VisitCreateProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12062,7 +12117,9 @@ func (response CreateProducerProfile422JSONResponse) VisitCreateProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12103,7 +12160,9 @@ func (response DeleteProducerProfile404JSONResponse) VisitDeleteProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12120,7 +12179,9 @@ func (response DeleteProducerProfile409JSONResponse) VisitDeleteProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12137,7 +12198,9 @@ func (response DeleteProducerProfile412JSONResponse) VisitDeleteProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12166,7 +12229,9 @@ func (response GetProducerProfile200JSONResponse) VisitGetProducerProfileRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12183,7 +12248,9 @@ func (response GetProducerProfile404JSONResponse) VisitGetProducerProfileRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12216,7 +12283,9 @@ func (response UpdateProducerProfile200JSONResponse) VisitUpdateProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12233,7 +12302,9 @@ func (response UpdateProducerProfile404JSONResponse) VisitUpdateProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12250,7 +12321,9 @@ func (response UpdateProducerProfile412JSONResponse) VisitUpdateProducerProfileR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12277,7 +12350,9 @@ func (response GetPlatformSettings200JSONResponse) VisitGetPlatformSettingsRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12308,7 +12383,9 @@ func (response UpdatePlatformSettings200JSONResponse) VisitUpdatePlatformSetting
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12325,7 +12402,9 @@ func (response UpdatePlatformSettings412JSONResponse) VisitUpdatePlatformSetting
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12382,8 +12461,67 @@ func (response CreateTenant201JSONResponse) VisitCreateTenantResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// CreateTenant401JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateTenant401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+// VisitCreateTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateTenant401JSONResponse) VisitCreateTenantResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// CreateTenant403JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateTenant403JSONResponse struct{ CsrfInvalidJSONResponse }
+
+// VisitCreateTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateTenant403JSONResponse) VisitCreateTenantResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// CreateTenant404JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateTenant404JSONResponse struct{ NotFoundJSONResponse }
+
+// VisitCreateTenantResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateTenant404JSONResponse) VisitCreateTenantResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -12399,7 +12537,9 @@ func (response CreateTenant409JSONResponse) VisitCreateTenantResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12434,7 +12574,9 @@ func (response DeleteTenant202JSONResponse) VisitDeleteTenantResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(202)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12451,7 +12593,9 @@ func (response DeleteTenant404JSONResponse) VisitDeleteTenantResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12468,7 +12612,9 @@ func (response DeleteTenant412JSONResponse) VisitDeleteTenantResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12501,7 +12647,9 @@ func (response UpdateTenant200JSONResponse) VisitUpdateTenantResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12518,7 +12666,9 @@ func (response UpdateTenant404JSONResponse) VisitUpdateTenantResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12535,7 +12685,9 @@ func (response UpdateTenant412JSONResponse) VisitUpdateTenantResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12573,6 +12725,44 @@ func (response PutTenantMemberAsPlatformAdmin200JSONResponse) VisitPutTenantMemb
 	return err
 }
 
+// PutTenantMemberAsPlatformAdmin401JSONResponse contains the raw HTTP response and any decoded response body.
+type PutTenantMemberAsPlatformAdmin401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+// VisitPutTenantMemberAsPlatformAdminResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response PutTenantMemberAsPlatformAdmin401JSONResponse) VisitPutTenantMemberAsPlatformAdminResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// PutTenantMemberAsPlatformAdmin403JSONResponse contains the raw HTTP response and any decoded response body.
+type PutTenantMemberAsPlatformAdmin403JSONResponse struct{ CsrfInvalidJSONResponse }
+
+// VisitPutTenantMemberAsPlatformAdminResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response PutTenantMemberAsPlatformAdmin403JSONResponse) VisitPutTenantMemberAsPlatformAdminResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // PutTenantMemberAsPlatformAdmin404JSONResponse contains the raw HTTP response and any decoded response body.
 type PutTenantMemberAsPlatformAdmin404JSONResponse struct{ NotFoundJSONResponse }
 
@@ -12584,7 +12774,9 @@ func (response PutTenantMemberAsPlatformAdmin404JSONResponse) VisitPutTenantMemb
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12629,7 +12821,9 @@ func (response ListUsers404JSONResponse) VisitListUsersResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12658,8 +12852,67 @@ func (response CreateUser201JSONResponse) VisitCreateUserResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// CreateUser401JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateUser401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+// VisitCreateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateUser401JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// CreateUser403JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateUser403JSONResponse struct{ CsrfInvalidJSONResponse }
+
+// VisitCreateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateUser403JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// CreateUser404JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateUser404JSONResponse struct{ NotFoundJSONResponse }
+
+// VisitCreateUserResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateUser404JSONResponse) VisitCreateUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -12675,7 +12928,9 @@ func (response CreateUser409JSONResponse) VisitCreateUserResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12692,7 +12947,9 @@ func (response CreateUser422JSONResponse) VisitCreateUserResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12725,7 +12982,9 @@ func (response UpdateUser200JSONResponse) VisitUpdateUserResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12742,7 +13001,9 @@ func (response UpdateUser404JSONResponse) VisitUpdateUserResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12759,7 +13020,9 @@ func (response UpdateUser412JSONResponse) VisitUpdateUserResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12802,7 +13065,9 @@ func (response GetCsrfToken401JSONResponse) VisitGetCsrfTokenResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12823,7 +13088,7 @@ type LoginResponseObject interface {
 // Login200ResponseHeaders contains headers declared by the corresponding OpenAPI response.
 type Login200ResponseHeaders struct {
 	// SetCookie carries the generated set cookie value for Login200ResponseHeaders.
-	SetCookie string
+	SetCookie *string
 }
 
 // Login200JSONResponse contains the raw HTTP response and any decoded response body.
@@ -12842,7 +13107,9 @@ func (response Login200JSONResponse) VisitLoginResponse(w http.ResponseWriter) e
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
+	if response.Headers.SetCookie != nil {
+		w.Header().Set("Set-Cookie", fmt.Sprint(*response.Headers.SetCookie))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12859,7 +13126,9 @@ func (response Login401JSONResponse) VisitLoginResponse(w http.ResponseWriter) e
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12876,8 +13145,12 @@ func (response Login429JSONResponse) VisitLoginResponse(w http.ResponseWriter) e
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.RetryAfter != nil {
+		w.Header().Set("Retry-After", fmt.Sprint(*response.Headers.RetryAfter))
+	}
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(429)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12893,12 +13166,23 @@ type LogoutResponseObject interface {
 	VisitLogoutResponse(w http.ResponseWriter) error
 }
 
+// Logout204ResponseHeaders contains headers declared by the corresponding OpenAPI response.
+type Logout204ResponseHeaders struct {
+	// SetCookie carries the generated set cookie value for Logout204ResponseHeaders.
+	SetCookie *string
+}
+
 // Logout204Response contains the raw HTTP response and any decoded response body.
 type Logout204Response struct {
+	// Headers contains the headers declared for this response.
+	Headers Logout204ResponseHeaders
 }
 
 // VisitLogoutResponse implements generated transport behavior for the Meridian OpenAPI contract.
 func (response Logout204Response) VisitLogoutResponse(w http.ResponseWriter) error {
+	if response.Headers.SetCookie != nil {
+		w.Header().Set("Set-Cookie", fmt.Sprint(*response.Headers.SetCookie))
+	}
 	w.WriteHeader(204)
 	return nil
 }
@@ -12914,8 +13198,29 @@ func (response Logout401JSONResponse) VisitLogoutResponse(w http.ResponseWriter)
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// Logout403JSONResponse contains the raw HTTP response and any decoded response body.
+type Logout403JSONResponse struct{ CsrfInvalidJSONResponse }
+
+// VisitLogoutResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response Logout403JSONResponse) VisitLogoutResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(403)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -12957,7 +13262,9 @@ func (response GetMe401JSONResponse) VisitGetMeResponse(w http.ResponseWriter) e
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
@@ -12984,7 +13291,9 @@ func (response GetMyPreferences200JSONResponse) VisitGetMyPreferencesResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13015,7 +13324,9 @@ func (response UpdateMyPreferences200JSONResponse) VisitUpdateMyPreferencesRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13032,7 +13343,9 @@ func (response UpdateMyPreferences412JSONResponse) VisitUpdateMyPreferencesRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13049,7 +13362,9 @@ func (response UpdateMyPreferences422JSONResponse) VisitUpdateMyPreferencesRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13102,7 +13417,9 @@ func (response DownloadSignedContent404JSONResponse) VisitDownloadSignedContentR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13183,7 +13500,9 @@ func (response GetPublicService404JSONResponse) VisitGetPublicServiceResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13234,7 +13553,9 @@ func (response GetPublicAsset404JSONResponse) VisitGetPublicAssetResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13281,7 +13602,9 @@ func (response ResolvePublicView404JSONResponse) VisitResolvePublicViewResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13298,7 +13621,9 @@ func (response ResolvePublicView422JSONResponse) VisitResolvePublicViewResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13343,7 +13668,9 @@ func (response GetSharedView404JSONResponse) VisitGetSharedViewResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13388,7 +13715,9 @@ func (response ListAssetKinds404JSONResponse) VisitListAssetKindsResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13423,7 +13752,9 @@ func (response UpdateAssetKindState200JSONResponse) VisitUpdateAssetKindStateRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13440,7 +13771,9 @@ func (response UpdateAssetKindState404JSONResponse) VisitUpdateAssetKindStateRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13457,7 +13790,9 @@ func (response UpdateAssetKindState412JSONResponse) VisitUpdateAssetKindStateRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13488,7 +13823,9 @@ func (response GetAssetVersion200JSONResponse) VisitGetAssetVersionResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13505,7 +13842,9 @@ func (response GetAssetVersion404JSONResponse) VisitGetAssetVersionResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13554,7 +13893,9 @@ func (response ListAssetVersionItems404JSONResponse) VisitListAssetVersionItemsR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13601,7 +13942,9 @@ func (response GetAssetVersionProvenance404JSONResponse) VisitGetAssetVersionPro
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13634,7 +13977,9 @@ func (response DeprecateAssetVersion200JSONResponse) VisitDeprecateAssetVersionR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13651,7 +13996,9 @@ func (response DeprecateAssetVersion404JSONResponse) VisitDeprecateAssetVersionR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13668,7 +14015,9 @@ func (response DeprecateAssetVersion409JSONResponse) VisitDeprecateAssetVersionR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13685,7 +14034,9 @@ func (response DeprecateAssetVersion412JSONResponse) VisitDeprecateAssetVersionR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13720,7 +14071,9 @@ func (response PublishAssetVersion200JSONResponse) VisitPublishAssetVersionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13737,7 +14090,9 @@ func (response PublishAssetVersion404JSONResponse) VisitPublishAssetVersionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13754,7 +14109,9 @@ func (response PublishAssetVersion409JSONResponse) VisitPublishAssetVersionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13771,7 +14128,9 @@ func (response PublishAssetVersion412JSONResponse) VisitPublishAssetVersionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13804,7 +14163,9 @@ func (response RetireAssetVersion200JSONResponse) VisitRetireAssetVersionRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13821,7 +14182,9 @@ func (response RetireAssetVersion404JSONResponse) VisitRetireAssetVersionRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13838,7 +14201,9 @@ func (response RetireAssetVersion409JSONResponse) VisitRetireAssetVersionRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13855,7 +14220,9 @@ func (response RetireAssetVersion412JSONResponse) VisitRetireAssetVersionRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13888,7 +14255,9 @@ func (response GetAsset200JSONResponse) VisitGetAssetResponse(w http.ResponseWri
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13905,7 +14274,9 @@ func (response GetAsset404JSONResponse) VisitGetAssetResponse(w http.ResponseWri
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13940,7 +14311,9 @@ func (response ReorderAssetLayers200JSONResponse) VisitReorderAssetLayersRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13957,7 +14330,9 @@ func (response ReorderAssetLayers404JSONResponse) VisitReorderAssetLayersRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13974,7 +14349,9 @@ func (response ReorderAssetLayers409JSONResponse) VisitReorderAssetLayersRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -13991,7 +14368,9 @@ func (response ReorderAssetLayers412JSONResponse) VisitReorderAssetLayersRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14008,7 +14387,9 @@ func (response ReorderAssetLayers422JSONResponse) VisitReorderAssetLayersRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14057,7 +14438,9 @@ func (response ListAssetVersions404JSONResponse) VisitListAssetVersionsResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14110,7 +14493,9 @@ func (response GenerateAssetWithAi404JSONResponse) VisitGenerateAssetWithAiRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14127,7 +14512,9 @@ func (response GenerateAssetWithAi409JSONResponse) VisitGenerateAssetWithAiRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14146,7 +14533,9 @@ func (response GenerateAssetWithAi422JSONResponse) VisitGenerateAssetWithAiRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14193,7 +14582,9 @@ func (response PreviewMerge404JSONResponse) VisitPreviewMergeResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14210,7 +14601,9 @@ func (response PreviewMerge409JSONResponse) VisitPreviewMergeResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14227,7 +14620,9 @@ func (response PreviewMerge413JSONResponse) VisitPreviewMergeResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(413)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14244,7 +14639,9 @@ func (response PreviewMerge422JSONResponse) VisitPreviewMergeResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14309,7 +14706,9 @@ func (response PushAssetRevision404JSONResponse) VisitPushAssetRevisionResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14326,7 +14725,9 @@ func (response PushAssetRevision409JSONResponse) VisitPushAssetRevisionResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14343,7 +14744,9 @@ func (response PushAssetRevision413JSONResponse) VisitPushAssetRevisionResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(413)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14360,7 +14763,9 @@ func (response PushAssetRevision422JSONResponse) VisitPushAssetRevisionResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14407,7 +14812,9 @@ func (response ListAuditLogs404JSONResponse) VisitListAuditLogsResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14454,7 +14861,9 @@ func (response ListBreakingTodos404JSONResponse) VisitListBreakingTodosResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14503,7 +14912,9 @@ func (response AcknowledgeBreakingTodo404JSONResponse) VisitAcknowledgeBreakingT
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14520,7 +14931,9 @@ func (response AcknowledgeBreakingTodo409JSONResponse) VisitAcknowledgeBreakingT
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14567,7 +14980,9 @@ func (response ListCredentials404JSONResponse) VisitListCredentialsResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14598,7 +15013,9 @@ func (response CreateCredential201JSONResponse) VisitCreateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14615,7 +15032,9 @@ func (response CreateCredential404JSONResponse) VisitCreateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14632,7 +15051,9 @@ func (response CreateCredential422JSONResponse) VisitCreateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14675,7 +15096,9 @@ func (response DeleteCredential404JSONResponse) VisitDeleteCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14692,7 +15115,9 @@ func (response DeleteCredential409JSONResponse) VisitDeleteCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14709,7 +15134,9 @@ func (response DeleteCredential412JSONResponse) VisitDeleteCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14744,7 +15171,9 @@ func (response UpdateCredential200JSONResponse) VisitUpdateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14761,7 +15190,9 @@ func (response UpdateCredential404JSONResponse) VisitUpdateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14778,7 +15209,9 @@ func (response UpdateCredential412JSONResponse) VisitUpdateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14813,7 +15246,9 @@ func (response RotateCredential200JSONResponse) VisitRotateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14830,7 +15265,9 @@ func (response RotateCredential404JSONResponse) VisitRotateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14847,7 +15284,9 @@ func (response RotateCredential409JSONResponse) VisitRotateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14864,7 +15303,9 @@ func (response RotateCredential412JSONResponse) VisitRotateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14881,7 +15322,9 @@ func (response RotateCredential422JSONResponse) VisitRotateCredentialResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14930,7 +15373,9 @@ func (response TestCredential404JSONResponse) VisitTestCredentialResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14977,7 +15422,9 @@ func (response RunDiff404JSONResponse) VisitRunDiffResponse(w http.ResponseWrite
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -14994,7 +15441,9 @@ func (response RunDiff422JSONResponse) VisitRunDiffResponse(w http.ResponseWrite
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15039,7 +15488,9 @@ func (response ListDiffRuleSets404JSONResponse) VisitListDiffRuleSetsResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15070,7 +15521,9 @@ func (response CreateDiffRuleSet201JSONResponse) VisitCreateDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15087,7 +15540,9 @@ func (response CreateDiffRuleSet404JSONResponse) VisitCreateDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15104,7 +15559,9 @@ func (response CreateDiffRuleSet409JSONResponse) VisitCreateDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15147,7 +15604,9 @@ func (response DeleteDiffRuleSet404JSONResponse) VisitDeleteDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15164,7 +15623,9 @@ func (response DeleteDiffRuleSet409JSONResponse) VisitDeleteDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15181,7 +15642,9 @@ func (response DeleteDiffRuleSet412JSONResponse) VisitDeleteDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15216,7 +15679,9 @@ func (response UpdateDiffRuleSet200JSONResponse) VisitUpdateDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15233,7 +15698,9 @@ func (response UpdateDiffRuleSet404JSONResponse) VisitUpdateDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15250,7 +15717,9 @@ func (response UpdateDiffRuleSet412JSONResponse) VisitUpdateDiffRuleSetResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15297,7 +15766,9 @@ func (response ListDiffSnapshots404JSONResponse) VisitListDiffSnapshotsResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15338,7 +15809,9 @@ func (response DeleteDiffSnapshot404JSONResponse) VisitDeleteDiffSnapshotRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15385,7 +15858,9 @@ func (response GetDiffSnapshot404JSONResponse) VisitGetDiffSnapshotResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15434,7 +15909,9 @@ func (response ExportDiffSnapshot404JSONResponse) VisitExportDiffSnapshotRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15483,7 +15960,9 @@ func (response CreateDiffSnapshotShareLink404JSONResponse) VisitCreateDiffSnapsh
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15530,7 +16009,9 @@ func (response SearchTenantUsers404JSONResponse) VisitSearchTenantUsersResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15577,7 +16058,9 @@ func (response CreateTenantExport404JSONResponse) VisitCreateTenantExportRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15594,7 +16077,9 @@ func (response CreateTenantExport409JSONResponse) VisitCreateTenantExportRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15641,7 +16126,9 @@ func (response ListJobs404JSONResponse) VisitListJobsResponse(w http.ResponseWri
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15688,7 +16175,9 @@ func (response GetJob404JSONResponse) VisitGetJobResponse(w http.ResponseWriter)
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15768,7 +16257,9 @@ func (response StreamJobLogs404JSONResponse) VisitStreamJobLogsResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15815,7 +16306,9 @@ func (response CancelJob404JSONResponse) VisitCancelJobResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15832,7 +16325,9 @@ func (response CancelJob409JSONResponse) VisitCancelJobResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15881,7 +16376,9 @@ func (response RetryJob404JSONResponse) VisitRetryJobResponse(w http.ResponseWri
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15898,7 +16395,9 @@ func (response RetryJob409JSONResponse) VisitRetryJobResponse(w http.ResponseWri
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15945,7 +16444,9 @@ func (response ListKnownHosts404JSONResponse) VisitListKnownHostsResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -15992,7 +16493,9 @@ func (response CreateKnownHost404JSONResponse) VisitCreateKnownHostResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16009,7 +16512,9 @@ func (response CreateKnownHost409JSONResponse) VisitCreateKnownHostResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16026,7 +16531,9 @@ func (response CreateKnownHost422JSONResponse) VisitCreateKnownHostResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16073,7 +16580,9 @@ func (response GetLayerRevision404JSONResponse) VisitGetLayerRevisionResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16120,7 +16629,9 @@ func (response GetReviewContext404JSONResponse) VisitGetReviewContextResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16137,7 +16648,9 @@ func (response GetReviewContext409JSONResponse) VisitGetReviewContextResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16190,7 +16703,9 @@ func (response ApproveLayerRevision404JSONResponse) VisitApproveLayerRevisionRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16207,7 +16722,9 @@ func (response ApproveLayerRevision409JSONResponse) VisitApproveLayerRevisionRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16260,7 +16777,9 @@ func (response RejectLayerRevision404JSONResponse) VisitRejectLayerRevisionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16277,7 +16796,9 @@ func (response RejectLayerRevision409JSONResponse) VisitRejectLayerRevisionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16294,7 +16815,9 @@ func (response RejectLayerRevision422JSONResponse) VisitRejectLayerRevisionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16327,7 +16850,9 @@ func (response GetLayer200JSONResponse) VisitGetLayerResponse(w http.ResponseWri
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16344,7 +16869,9 @@ func (response GetLayer404JSONResponse) VisitGetLayerResponse(w http.ResponseWri
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16379,7 +16906,9 @@ func (response UpdateLayer200JSONResponse) VisitUpdateLayerResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16396,7 +16925,9 @@ func (response UpdateLayer404JSONResponse) VisitUpdateLayerResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16413,7 +16944,9 @@ func (response UpdateLayer409JSONResponse) VisitUpdateLayerResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16430,7 +16963,9 @@ func (response UpdateLayer412JSONResponse) VisitUpdateLayerResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16447,7 +16982,9 @@ func (response UpdateLayer422JSONResponse) VisitUpdateLayerResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16496,7 +17033,9 @@ func (response ListLayerRevisions404JSONResponse) VisitListLayerRevisionsRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16565,7 +17104,9 @@ func (response CreateLayerRevision404JSONResponse) VisitCreateLayerRevisionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16582,7 +17123,9 @@ func (response CreateLayerRevision409JSONResponse) VisitCreateLayerRevisionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16599,7 +17142,9 @@ func (response CreateLayerRevision413JSONResponse) VisitCreateLayerRevisionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(413)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16616,7 +17161,9 @@ func (response CreateLayerRevision422JSONResponse) VisitCreateLayerRevisionRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16667,7 +17214,9 @@ func (response RollbackLayer404JSONResponse) VisitRollbackLayerResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16684,7 +17233,9 @@ func (response RollbackLayer409JSONResponse) VisitRollbackLayerResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16731,7 +17282,9 @@ func (response ListTenantMembers404JSONResponse) VisitListTenantMembersResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16772,7 +17325,9 @@ func (response DeleteTenantMember404JSONResponse) VisitDeleteTenantMemberRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16789,7 +17344,9 @@ func (response DeleteTenantMember409JSONResponse) VisitDeleteTenantMemberRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16838,7 +17395,9 @@ func (response PutTenantMember404JSONResponse) VisitPutTenantMemberResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16855,7 +17414,9 @@ func (response PutTenantMember409JSONResponse) VisitPutTenantMemberResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16902,7 +17463,9 @@ func (response ListNotificationChannels404JSONResponse) VisitListNotificationCha
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16935,7 +17498,9 @@ func (response CreateNotificationChannel201JSONResponse) VisitCreateNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16952,7 +17517,9 @@ func (response CreateNotificationChannel404JSONResponse) VisitCreateNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -16969,7 +17536,9 @@ func (response CreateNotificationChannel422JSONResponse) VisitCreateNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17012,7 +17581,9 @@ func (response DeleteNotificationChannel404JSONResponse) VisitDeleteNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17029,7 +17600,9 @@ func (response DeleteNotificationChannel412JSONResponse) VisitDeleteNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17066,7 +17639,9 @@ func (response UpdateNotificationChannel200JSONResponse) VisitUpdateNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17083,7 +17658,9 @@ func (response UpdateNotificationChannel404JSONResponse) VisitUpdateNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17100,7 +17677,9 @@ func (response UpdateNotificationChannel412JSONResponse) VisitUpdateNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17137,7 +17716,9 @@ func (response RotateNotificationChannelSecret200JSONResponse) VisitRotateNotifi
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17154,7 +17735,9 @@ func (response RotateNotificationChannelSecret404JSONResponse) VisitRotateNotifi
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17171,7 +17754,9 @@ func (response RotateNotificationChannelSecret409JSONResponse) VisitRotateNotifi
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17188,7 +17773,9 @@ func (response RotateNotificationChannelSecret412JSONResponse) VisitRotateNotifi
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17205,7 +17792,9 @@ func (response RotateNotificationChannelSecret422JSONResponse) VisitRotateNotifi
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17252,7 +17841,9 @@ func (response TestNotificationChannel404JSONResponse) VisitTestNotificationChan
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17299,7 +17890,9 @@ func (response ListNotifications404JSONResponse) VisitListNotificationsResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17340,7 +17933,9 @@ func (response MarkNotificationRead404JSONResponse) VisitMarkNotificationReadRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17379,7 +17974,9 @@ func (response MarkAllNotificationsRead404JSONResponse) VisitMarkAllNotification
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17426,7 +18023,9 @@ func (response ListAvailableProducerProfiles404JSONResponse) VisitListAvailableP
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17473,7 +18072,9 @@ func (response ListRepositories404JSONResponse) VisitListRepositoriesResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17504,7 +18105,9 @@ func (response CreateRepository201JSONResponse) VisitCreateRepositoryResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17521,7 +18124,9 @@ func (response CreateRepository404JSONResponse) VisitCreateRepositoryResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17538,7 +18143,9 @@ func (response CreateRepository409JSONResponse) VisitCreateRepositoryResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17581,7 +18188,9 @@ func (response DeleteRepository404JSONResponse) VisitDeleteRepositoryResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17598,7 +18207,9 @@ func (response DeleteRepository412JSONResponse) VisitDeleteRepositoryResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17629,7 +18240,9 @@ func (response GetRepository200JSONResponse) VisitGetRepositoryResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17646,7 +18259,9 @@ func (response GetRepository404JSONResponse) VisitGetRepositoryResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17681,7 +18296,9 @@ func (response UpdateRepository200JSONResponse) VisitUpdateRepositoryResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17698,7 +18315,9 @@ func (response UpdateRepository404JSONResponse) VisitUpdateRepositoryResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17715,7 +18334,9 @@ func (response UpdateRepository412JSONResponse) VisitUpdateRepositoryResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17764,7 +18385,9 @@ func (response ListDiscoveryCandidates404JSONResponse) VisitListDiscoveryCandida
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17813,7 +18436,9 @@ func (response DismissDiscoveryCandidate404JSONResponse) VisitDismissDiscoveryCa
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17864,7 +18489,9 @@ func (response AcceptDiscoveryCandidates404JSONResponse) VisitAcceptDiscoveryCan
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17881,7 +18508,9 @@ func (response AcceptDiscoveryCandidates409JSONResponse) VisitAcceptDiscoveryCan
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17934,7 +18563,9 @@ func (response PreviewRepositoryConfigImport404JSONResponse) VisitPreviewReposit
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -17951,7 +18582,9 @@ func (response PreviewRepositoryConfigImport409JSONResponse) VisitPreviewReposit
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18004,7 +18637,9 @@ func (response ApplyRepositoryConfigImport404JSONResponse) VisitApplyRepositoryC
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18021,7 +18656,9 @@ func (response ApplyRepositoryConfigImport409JSONResponse) VisitApplyRepositoryC
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18054,7 +18691,9 @@ func (response CreateServiceInRepository201JSONResponse) VisitCreateServiceInRep
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18071,7 +18710,9 @@ func (response CreateServiceInRepository404JSONResponse) VisitCreateServiceInRep
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18122,7 +18763,9 @@ func (response DiscoverRepository404JSONResponse) VisitDiscoverRepositoryRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18139,7 +18782,9 @@ func (response DiscoverRepository409JSONResponse) VisitDiscoverRepositoryRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18190,7 +18835,9 @@ func (response SyncRepository404JSONResponse) VisitSyncRepositoryResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18207,7 +18854,9 @@ func (response SyncRepository409JSONResponse) VisitSyncRepositoryResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18254,7 +18903,9 @@ func (response CheckRepositoryConnection404JSONResponse) VisitCheckRepositoryCon
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18301,7 +18952,9 @@ func (response ListReviews404JSONResponse) VisitListReviewsResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18348,7 +19001,9 @@ func (response Search404JSONResponse) VisitSearchResponse(w http.ResponseWriter)
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18365,7 +19020,9 @@ func (response Search422JSONResponse) VisitSearchResponse(w http.ResponseWriter)
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18412,7 +19069,9 @@ func (response ListServices404JSONResponse) VisitListServicesResponse(w http.Res
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18455,7 +19114,9 @@ func (response DeleteService404JSONResponse) VisitDeleteServiceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18472,7 +19133,9 @@ func (response DeleteService412JSONResponse) VisitDeleteServiceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18503,7 +19166,9 @@ func (response GetService200JSONResponse) VisitGetServiceResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18520,7 +19185,9 @@ func (response GetService404JSONResponse) VisitGetServiceResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18555,7 +19222,9 @@ func (response UpdateService200JSONResponse) VisitUpdateServiceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18572,7 +19241,9 @@ func (response UpdateService404JSONResponse) VisitUpdateServiceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18589,7 +19260,9 @@ func (response UpdateService409JSONResponse) VisitUpdateServiceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18606,7 +19279,9 @@ func (response UpdateService412JSONResponse) VisitUpdateServiceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18653,7 +19328,9 @@ func (response GetServiceAccess404JSONResponse) VisitGetServiceAccessResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18702,7 +19379,9 @@ func (response PutServiceAccess404JSONResponse) VisitPutServiceAccessResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18719,7 +19398,9 @@ func (response PutServiceAccess409JSONResponse) VisitPutServiceAccessResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18772,7 +19453,9 @@ func (response GenerateMissingAssetWithAi404JSONResponse) VisitGenerateMissingAs
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18789,7 +19472,9 @@ func (response GenerateMissingAssetWithAi409JSONResponse) VisitGenerateMissingAs
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18808,7 +19493,9 @@ func (response GenerateMissingAssetWithAi422JSONResponse) VisitGenerateMissingAs
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18857,7 +19544,9 @@ func (response ListServiceComments404JSONResponse) VisitListServiceCommentsRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18906,7 +19595,9 @@ func (response CreateServiceComment404JSONResponse) VisitCreateServiceCommentRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18953,7 +19644,9 @@ func (response ListSourceSpecs404JSONResponse) VisitListSourceSpecsResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -18986,7 +19679,9 @@ func (response CreateSourceSpec201JSONResponse) VisitCreateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19003,7 +19698,9 @@ func (response CreateSourceSpec404JSONResponse) VisitCreateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19020,7 +19717,9 @@ func (response CreateSourceSpec409JSONResponse) VisitCreateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19037,7 +19736,9 @@ func (response CreateSourceSpec422JSONResponse) VisitCreateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19072,7 +19773,9 @@ func (response ResolveServiceDrift200JSONResponse) VisitResolveServiceDriftRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19089,7 +19792,9 @@ func (response ResolveServiceDrift404JSONResponse) VisitResolveServiceDriftRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19106,7 +19811,9 @@ func (response ResolveServiceDrift409JSONResponse) VisitResolveServiceDriftRespo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19153,7 +19860,9 @@ func (response StarService404JSONResponse) VisitStarServiceResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19200,7 +19909,9 @@ func (response UnstarService404JSONResponse) VisitUnstarServiceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19247,7 +19958,9 @@ func (response ListRecentServices404JSONResponse) VisitListRecentServicesRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19276,7 +19989,9 @@ func (response GetTenantSettings200JSONResponse) VisitGetTenantSettingsResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19293,7 +20008,9 @@ func (response GetTenantSettings404JSONResponse) VisitGetTenantSettingsResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19326,7 +20043,9 @@ func (response UpdateTenantSettings200JSONResponse) VisitUpdateTenantSettingsRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19343,7 +20062,9 @@ func (response UpdateTenantSettings404JSONResponse) VisitUpdateTenantSettingsRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19360,7 +20081,9 @@ func (response UpdateTenantSettings412JSONResponse) VisitUpdateTenantSettingsRes
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19407,7 +20130,9 @@ func (response ListShareLinks404JSONResponse) VisitListShareLinksResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19454,7 +20179,9 @@ func (response CreateShareLink404JSONResponse) VisitCreateShareLinkResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19471,7 +20198,9 @@ func (response CreateShareLink422JSONResponse) VisitCreateShareLinkResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19512,7 +20241,9 @@ func (response RevokeShareLink404JSONResponse) VisitRevokeShareLinkResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19555,7 +20286,9 @@ func (response DeleteSourceSpec404JSONResponse) VisitDeleteSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19572,7 +20305,9 @@ func (response DeleteSourceSpec409JSONResponse) VisitDeleteSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19589,7 +20324,9 @@ func (response DeleteSourceSpec412JSONResponse) VisitDeleteSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19624,7 +20361,9 @@ func (response UpdateSourceSpec200JSONResponse) VisitUpdateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19641,7 +20380,9 @@ func (response UpdateSourceSpec404JSONResponse) VisitUpdateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19658,7 +20399,9 @@ func (response UpdateSourceSpec409JSONResponse) VisitUpdateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19675,7 +20418,9 @@ func (response UpdateSourceSpec412JSONResponse) VisitUpdateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19692,7 +20437,9 @@ func (response UpdateSourceSpec422JSONResponse) VisitUpdateSourceSpecResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19739,7 +20486,9 @@ func (response ListSourceBindings404JSONResponse) VisitListSourceBindingsRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19790,7 +20539,9 @@ func (response ProduceSource404JSONResponse) VisitProduceSourceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19807,7 +20558,9 @@ func (response ProduceSource409JSONResponse) VisitProduceSourceResponse(w http.R
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19852,7 +20605,9 @@ func (response ListSubscriptions404JSONResponse) VisitListSubscriptionsResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19899,7 +20654,9 @@ func (response PutSubscription404JSONResponse) VisitPutSubscriptionResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19944,7 +20701,9 @@ func (response ListSystemGroups404JSONResponse) VisitListSystemGroupsResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19975,7 +20734,9 @@ func (response CreateSystemGroup201JSONResponse) VisitCreateSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -19992,7 +20753,9 @@ func (response CreateSystemGroup404JSONResponse) VisitCreateSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20009,7 +20772,9 @@ func (response CreateSystemGroup422JSONResponse) VisitCreateSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20052,7 +20817,9 @@ func (response DeleteSystemGroup404JSONResponse) VisitDeleteSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20069,7 +20836,9 @@ func (response DeleteSystemGroup412JSONResponse) VisitDeleteSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20100,7 +20869,9 @@ func (response GetSystemGroup200JSONResponse) VisitGetSystemGroupResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20117,7 +20888,9 @@ func (response GetSystemGroup404JSONResponse) VisitGetSystemGroupResponse(w http
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20152,7 +20925,9 @@ func (response UpdateSystemGroup200JSONResponse) VisitUpdateSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20169,7 +20944,9 @@ func (response UpdateSystemGroup404JSONResponse) VisitUpdateSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20186,7 +20963,9 @@ func (response UpdateSystemGroup412JSONResponse) VisitUpdateSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20203,7 +20982,9 @@ func (response UpdateSystemGroup422JSONResponse) VisitUpdateSystemGroupResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20238,7 +21019,9 @@ func (response PutSystemGroupMembers200JSONResponse) VisitPutSystemGroupMembersR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20255,7 +21038,9 @@ func (response PutSystemGroupMembers404JSONResponse) VisitPutSystemGroupMembersR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20272,7 +21057,9 @@ func (response PutSystemGroupMembers412JSONResponse) VisitPutSystemGroupMembersR
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20317,7 +21104,9 @@ func (response ListTags404JSONResponse) VisitListTagsResponse(w http.ResponseWri
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20348,7 +21137,9 @@ func (response CreateTag201JSONResponse) VisitCreateTagResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20365,7 +21156,9 @@ func (response CreateTag404JSONResponse) VisitCreateTagResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20382,7 +21175,9 @@ func (response CreateTag409JSONResponse) VisitCreateTagResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20425,7 +21220,9 @@ func (response DeleteTag404JSONResponse) VisitDeleteTagResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20442,7 +21239,9 @@ func (response DeleteTag412JSONResponse) VisitDeleteTagResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20477,7 +21276,9 @@ func (response UpdateTag200JSONResponse) VisitUpdateTagResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20494,7 +21295,9 @@ func (response UpdateTag404JSONResponse) VisitUpdateTagResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20511,7 +21314,9 @@ func (response UpdateTag412JSONResponse) VisitUpdateTagResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20558,7 +21363,9 @@ func (response ListTeams404JSONResponse) VisitListTeamsResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20589,7 +21396,9 @@ func (response CreateTeam201JSONResponse) VisitCreateTeamResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(201)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20606,7 +21415,9 @@ func (response CreateTeam404JSONResponse) VisitCreateTeamResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20623,7 +21434,9 @@ func (response CreateTeam409JSONResponse) VisitCreateTeamResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20666,7 +21479,9 @@ func (response DeleteTeam404JSONResponse) VisitDeleteTeamResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20683,7 +21498,9 @@ func (response DeleteTeam412JSONResponse) VisitDeleteTeamResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20714,7 +21531,9 @@ func (response GetTeam200JSONResponse) VisitGetTeamResponse(w http.ResponseWrite
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20731,7 +21550,9 @@ func (response GetTeam404JSONResponse) VisitGetTeamResponse(w http.ResponseWrite
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20766,7 +21587,9 @@ func (response UpdateTeam200JSONResponse) VisitUpdateTeamResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20783,7 +21606,9 @@ func (response UpdateTeam404JSONResponse) VisitUpdateTeamResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20800,7 +21625,9 @@ func (response UpdateTeam412JSONResponse) VisitUpdateTeamResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20835,7 +21662,9 @@ func (response ReplaceTeamMembers200JSONResponse) VisitReplaceTeamMembersRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20852,7 +21681,9 @@ func (response ReplaceTeamMembers404JSONResponse) VisitReplaceTeamMembersRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20869,7 +21700,9 @@ func (response ReplaceTeamMembers412JSONResponse) VisitReplaceTeamMembersRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20905,6 +21738,25 @@ func (response ListTokens200JSONResponse) VisitListTokensResponse(w http.Respons
 	return err
 }
 
+// ListTokens401JSONResponse contains the raw HTTP response and any decoded response body.
+type ListTokens401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+// VisitListTokensResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response ListTokens401JSONResponse) VisitListTokensResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // ListTokens404JSONResponse contains the raw HTTP response and any decoded response body.
 type ListTokens404JSONResponse struct{ NotFoundJSONResponse }
 
@@ -20916,7 +21768,9 @@ func (response ListTokens404JSONResponse) VisitListTokensResponse(w http.Respons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -20952,6 +21806,44 @@ func (response CreateToken201JSONResponse) VisitCreateTokenResponse(w http.Respo
 	return err
 }
 
+// CreateToken401JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateToken401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+// VisitCreateTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateToken401JSONResponse) VisitCreateTokenResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// CreateToken403JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateToken403JSONResponse struct{ CsrfInvalidJSONResponse }
+
+// VisitCreateTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateToken403JSONResponse) VisitCreateTokenResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // CreateToken404JSONResponse contains the raw HTTP response and any decoded response body.
 type CreateToken404JSONResponse struct{ NotFoundJSONResponse }
 
@@ -20963,8 +21855,29 @@ func (response CreateToken404JSONResponse) VisitCreateTokenResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// CreateToken422JSONResponse contains the raw HTTP response and any decoded response body.
+type CreateToken422JSONResponse struct{ ValidationErrorJSONResponse }
+
+// VisitCreateTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response CreateToken422JSONResponse) VisitCreateTokenResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -20993,6 +21906,44 @@ func (response RevokeToken204Response) VisitRevokeTokenResponse(w http.ResponseW
 	return nil
 }
 
+// RevokeToken401JSONResponse contains the raw HTTP response and any decoded response body.
+type RevokeToken401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+// VisitRevokeTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response RevokeToken401JSONResponse) VisitRevokeTokenResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// RevokeToken403JSONResponse contains the raw HTTP response and any decoded response body.
+type RevokeToken403JSONResponse struct{ CsrfInvalidJSONResponse }
+
+// VisitRevokeTokenResponse implements generated transport behavior for the Meridian OpenAPI contract.
+func (response RevokeToken403JSONResponse) VisitRevokeTokenResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // RevokeToken404JSONResponse contains the raw HTTP response and any decoded response body.
 type RevokeToken404JSONResponse struct{ NotFoundJSONResponse }
 
@@ -21004,7 +21955,9 @@ func (response RevokeToken404JSONResponse) VisitRevokeTokenResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21051,7 +22004,9 @@ func (response CreateDiffUpload404JSONResponse) VisitCreateDiffUploadResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21068,7 +22023,9 @@ func (response CreateDiffUpload413JSONResponse) VisitCreateDiffUploadResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(413)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21085,7 +22042,9 @@ func (response CreateDiffUpload422JSONResponse) VisitCreateDiffUploadResponse(w 
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21130,7 +22089,9 @@ func (response ListViewOverrides404JSONResponse) VisitListViewOverridesResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21173,7 +22134,9 @@ func (response DeleteViewOverride404JSONResponse) VisitDeleteViewOverrideRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21190,7 +22153,9 @@ func (response DeleteViewOverride412JSONResponse) VisitDeleteViewOverrideRespons
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21225,7 +22190,9 @@ func (response PutViewOverride200JSONResponse) VisitPutViewOverrideResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("ETag", fmt.Sprint(response.Headers.ETag))
+	if response.Headers.ETag != nil {
+		w.Header().Set("ETag", fmt.Sprint(*response.Headers.ETag))
+	}
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21242,7 +22209,9 @@ func (response PutViewOverride404JSONResponse) VisitPutViewOverrideResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21259,7 +22228,9 @@ func (response PutViewOverride412JSONResponse) VisitPutViewOverrideResponse(w ht
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(412)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21306,7 +22277,9 @@ func (response ListViews404JSONResponse) VisitListViewsResponse(w http.ResponseW
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21353,7 +22326,9 @@ func (response ResolveView404JSONResponse) VisitResolveViewResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21370,7 +22345,9 @@ func (response ResolveView422JSONResponse) VisitResolveViewResponse(w http.Respo
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21445,7 +22422,9 @@ func (response ReceiveGitWebhook401JSONResponse) VisitReceiveGitWebhookResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21462,7 +22441,9 @@ func (response ReceiveGitWebhook404JSONResponse) VisitReceiveGitWebhookResponse(
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(404)
 	_, err := buf.WriteTo(w)
 	return err
@@ -21554,7 +22535,9 @@ func (response Readyz503JSONResponse) VisitReadyzResponse(w http.ResponseWriter)
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("X-Request-Id", fmt.Sprint(response.Headers.XRequestId))
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
 	w.WriteHeader(503)
 	_, err := buf.WriteTo(w)
 	return err

@@ -156,18 +156,26 @@ paths:
       description: "Revokes the current browser session and clears its session cookie."
       operationId: logout
       tags: [Auth]
+      security:
+        - cookieSession: []
       x-tenant-scope: identity
       x-permissions: []
       x-idempotency: {mode: optional, ttlHours: 24}
       x-milestone: M0
       responses:
-        '204': {description: Session destroyed}
+        '204':
+          description: Session destroyed and browser cookie cleared
+          headers:
+            Set-Cookie: {schema: {type: string}}
         '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/CsrfInvalid'}
   /api/v1/auth/me:
     get:
       description: "Returns the authenticated principal and tenant memberships."
       operationId: getMe
       tags: [Auth]
+      security:
+        - cookieSession: []
       x-tenant-scope: identity
       x-permissions: []
       x-milestone: M0
@@ -226,6 +234,9 @@ paths:
       requestBody: {$ref: '#/components/requestBodies/UserCreate'}
       responses:
         '201': {$ref: '#/components/responses/User'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/CsrfInvalid'}
+        '404': {$ref: '#/components/responses/NotFound'}
         '409': {$ref: '#/components/responses/Duplicate'}
         '422': {$ref: '#/components/responses/ValidationError'}
   /api/v1/admin/users/{userId}:
@@ -265,6 +276,9 @@ paths:
       requestBody: {$ref: '#/components/requestBodies/TenantCreate'}
       responses:
         '201': {$ref: '#/components/responses/Tenant'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/CsrfInvalid'}
+        '404': {$ref: '#/components/responses/NotFound'}
         '409': {$ref: '#/components/responses/Duplicate'}
   /api/v1/admin/tenants/{tenantSlug}:
     patch:
@@ -308,6 +322,8 @@ paths:
       requestBody: {$ref: '#/components/requestBodies/MemberPut'}
       responses:
         '200': {$ref: '#/components/responses/Member'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/CsrfInvalid'}
         '404': {$ref: '#/components/responses/NotFound'}
   /api/v1/admin/settings:
     get:
@@ -584,6 +600,7 @@ paths:
       parameters: [{$ref: '#/components/parameters/TenantSlug'}, {$ref: '#/components/parameters/Page'}, {$ref: '#/components/parameters/PageSize'}]
       responses:
         '200': {$ref: '#/components/responses/TokenPage'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
         '404': {$ref: '#/components/responses/NotFound'}
     post:
       description: "Creates token within the authorized request scope."
@@ -597,7 +614,10 @@ paths:
       requestBody: {$ref: '#/components/requestBodies/TokenCreate'}
       responses:
         '201': {$ref: '#/components/responses/TokenCreated'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/CsrfInvalid'}
         '404': {$ref: '#/components/responses/NotFound'}
+        '422': {$ref: '#/components/responses/ValidationError'}
   /api/v1/t/{tenantSlug}/tokens/{tokenId}:
     delete:
       description: "Performs the revoke token workflow within the authorized request scope."
@@ -610,6 +630,8 @@ paths:
       parameters: [{$ref: '#/components/parameters/TenantSlug'}, {$ref: '#/components/parameters/TokenId'}]
       responses:
         '204': {description: Token revoked or already revoked}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/CsrfInvalid'}
         '404': {$ref: '#/components/responses/NotFound'}
 
   /api/v1/t/{tenantSlug}/credentials:
@@ -2889,6 +2911,13 @@ components:
     Unauthenticated:
       description: unauthenticated
       x-error-code: unauthenticated
+      headers:
+        X-Request-Id: {schema: {type: string}}
+      content:
+        application/json: {schema: {$ref: '#/components/schemas/ErrorResponse'}}
+    CsrfInvalid:
+      description: csrf_invalid
+      x-error-code: csrf_invalid
       headers:
         X-Request-Id: {schema: {type: string}}
       content:

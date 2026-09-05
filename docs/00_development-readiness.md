@@ -3,6 +3,8 @@
 > 审查日期：2026-09-05
 > 结论：技术栈已完成评估并冻结；业务契约中的上一轮阻塞点已补齐，可开始 M0 编码。机器入口为 [contracts/manifest.yaml](../contracts/manifest.yaml)，完整技术决策见 [05_technology-stack-decision.md](./05_technology-stack-decision.md)。
 
+> 实施状态：M0 正在开发，尚未宣告完成。契约生成、静态单二进制、数据库/River 迁移、强类型 sqlc 仓储以及身份/租户/PAT 主链路已经通过自动化门禁；凭据、仓库连接、job/audit/outbox 和 M0 控制面仍按 `acceptance.yaml` 推进。文档“可开始编码”表示设计无产品决策阻塞，不表示全部 M0 operation 已实现。
+
 ## 技术栈冻结结论
 
 | 领域 | 冻结口径 | 不允许的替代实现 |

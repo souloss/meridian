@@ -1,42 +1,42 @@
 package handler
 
 import (
+	"bytes"
+	"context"
 	"io/fs"
-	"net/http"
 
 	meridian "github.com/meridian-labs/meridian"
 	"github.com/meridian-labs/meridian/internal/buildinfo"
 	"github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-func (s *Server) Healthz(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, api.Health{Status: api.HealthStatusOk})
+func (s *Server) Healthz(context.Context, api.HealthzRequestObject) (api.HealthzResponseObject, error) {
+	return api.Healthz200JSONResponse{HealthJSONResponse: api.HealthJSONResponse(api.Health{Status: api.HealthStatusOk})}, nil
 }
 
-func (s *Server) Readyz(w http.ResponseWriter, r *http.Request) {
+func (s *Server) Readyz(context.Context, api.ReadyzRequestObject) (api.ReadyzResponseObject, error) {
 	if !s.ready.Load() {
-		writeError(w, r, http.StatusServiceUnavailable, "internal_error", "service is not ready")
-		return
+		return api.Readyz503JSONResponse{}, nil
 	}
-	writeJSON(w, http.StatusOK, api.Health{Status: api.HealthStatusOk})
+	return api.Readyz200JSONResponse{HealthJSONResponse: api.HealthJSONResponse(api.Health{Status: api.HealthStatusOk})}, nil
 }
 
-func (s *Server) GetOpenApiContract(w http.ResponseWriter, _ *http.Request) {
+func (s *Server) GetOpenApiContract(context.Context, api.GetOpenApiContractRequestObject) (api.GetOpenApiContractResponseObject, error) {
 	data, err := fs.ReadFile(meridian.OpenAPIContract, "contracts/openapi.yaml")
 	if err != nil {
-		http.Error(w, "contract unavailable", http.StatusInternalServerError)
-		return
+		return nil, err
 	}
-	w.Header().Set("Content-Type", "application/yaml; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(data)
+	return api.GetOpenApiContract200ApplicationyamlResponse{
+		Body:          bytes.NewReader(data),
+		ContentLength: int64(len(data)),
+	}, nil
 }
 
-func (s *Server) GetVersion(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, api.VersionInfo{
+func (s *Server) GetVersion(context.Context, api.GetVersionRequestObject) (api.GetVersionResponseObject, error) {
+	return api.GetVersion200JSONResponse(api.VersionInfo{
 		ServerVersion:   buildinfo.CurrentVersion(),
 		ApiVersion:      api.V1,
 		ContractVersion: api.N100,
 		BuildCommit:     buildinfo.CurrentCommit(),
-	})
+	}), nil
 }

@@ -10,4 +10,4 @@ docker compose --profile integration up --detach --wait postgres-test
 endpoint=$(docker compose port postgres-test 5432)
 port=${endpoint##*:}
 MERIDIAN_TEST_DATABASE_URL="postgres://meridian:meridian@127.0.0.1:${port}/meridian_test?sslmode=disable" \
-  vfox exec golang@1.27.1 -- go test -tags integration ./internal/database
+  vfox exec golang@1.27.1 -- go test -p 1 -tags integration ./internal/database ./internal/handler

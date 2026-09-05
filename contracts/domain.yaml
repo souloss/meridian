@@ -200,6 +200,7 @@ authentication:
   tokenDigest:
     algorithm: hmac-sha256
     secretConfiguration: MERIDIAN_TOKEN_PEPPER
+    secretEncoding: unpadded-base64url-of-exactly-32-random-bytes
     comparison: constant-time
     submittedTokenLogging: forbidden
   browser:
@@ -230,6 +231,9 @@ authentication:
     storage: hmac-digest-only
     csrfRequired: false
     invalidOrExpiredHttpStatus: 401
+  credentialPrecedence:
+    rule: authorization-bearer-when-present-otherwise-browser-cookie
+    invalidBearerFallbackToCookie: forbidden
   platformAdminTenantAccess: >-
     Platform administrator status grants platform metadata administration only.
     Tenant business data is available only when the same user is also an active
@@ -449,6 +453,7 @@ authorization:
         - service:write
         - service:create
         - asset:read
+        - asset:push
         - asset:publish
         - layer:read
         - layer:edit
@@ -456,6 +461,7 @@ authorization:
         - job:run
         - subscription:manage_self
         - todo:read_self
+        - token:manage
     viewer:
       permissions:
         - repository:read
@@ -464,6 +470,7 @@ authorization:
         - layer:read
         - subscription:manage_self
         - todo:read_self
+        - token:manage
   serviceRoles:
     owner:
       permissions:

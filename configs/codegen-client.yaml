@@ -3,5 +3,3 @@ package: api
 generate:
   client: true
 output: internal/generated/api/client.gen.go
-output-options:
-  prefer-skip-optional-pointer: true

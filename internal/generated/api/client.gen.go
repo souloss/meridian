@@ -5322,28 +5322,40 @@ func NewListPlatformAuditLogsRequest(server string, params *ListPlatformAuditLog
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Filter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", *params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -5388,20 +5400,28 @@ func NewListGlobalCredentialsRequest(server string, params *ListGlobalCredential
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -5493,12 +5513,16 @@ func NewDeleteGlobalCredentialRequest(server string, credentialId CredentialId, 
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "force", params.Force, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Force != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "force", *params.Force, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -5732,28 +5756,40 @@ func NewListPlatformJobsRequest(server string, params *ListPlatformJobsParams) (
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Filter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", *params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -5832,20 +5868,28 @@ func NewListProducerProfilesRequest(server string, params *ListProducerProfilesP
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -5937,12 +5981,16 @@ func NewDeleteProducerProfileRequest(server string, producerProfileId ProducerPr
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "force", params.Force, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Force != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "force", *params.Force, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -6174,20 +6222,28 @@ func NewListTenantsRequest(server string, params *ListTenantsParams) (*http.Requ
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -6446,28 +6502,40 @@ func NewListUsersRequest(server string, params *ListUsersParams) (*http.Request,
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Q != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", *params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -7207,28 +7275,40 @@ func NewListAssetVersionItemsRequest(server string, tenantSlug TenantSlug, versi
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Q != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", *params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -7530,20 +7610,28 @@ func NewGetAssetRequest(server string, tenantSlug TenantSlug, assetId AssetId, p
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "refType", params.RefType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.RefType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "refType", *params.RefType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ref", params.Ref, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "git-ref-name"}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Ref != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ref", *params.Ref, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "git-ref-name"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -7669,36 +7757,52 @@ func NewListAssetVersionsRequest(server string, tenantSlug TenantSlug, assetId A
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "refType", params.RefType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.RefType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "refType", *params.RefType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ref", params.Ref, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "git-ref-name"}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Ref != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ref", *params.Ref, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "git-ref-name"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -7924,28 +8028,40 @@ func NewListAuditLogsRequest(server string, tenantSlug TenantSlug, params *ListA
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Filter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", *params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -7997,28 +8113,40 @@ func NewListBreakingTodosRequest(server string, tenantSlug TenantSlug, params *L
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Status != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -8124,20 +8252,28 @@ func NewListCredentialsRequest(server string, tenantSlug TenantSlug, params *Lis
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -8243,12 +8379,16 @@ func NewDeleteCredentialRequest(server string, tenantSlug TenantSlug, credential
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "force", params.Force, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Force != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "force", *params.Force, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -8759,20 +8899,28 @@ func NewListDiffSnapshotsRequest(server string, tenantSlug TenantSlug, params *L
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -9024,28 +9172,40 @@ func NewSearchTenantUsersRequest(server string, tenantSlug TenantSlug, params *S
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Q != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", *params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -9144,28 +9304,40 @@ func NewListJobsRequest(server string, tenantSlug TenantSlug, params *ListJobsPa
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Filter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", *params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -9263,14 +9435,16 @@ func NewStreamJobLogsRequest(server string, tenantSlug TenantSlug, jobId JobId, 
 
 	if params != nil {
 
-		var headerParam0 string
+		if params.LastEventID != nil {
+			var headerParam0 string
 
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Last-Event-ID", params.LastEventID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "Last-Event-ID", *params.LastEventID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("Last-Event-ID", headerParam0)
 		}
-
-		req.Header.Set("Last-Event-ID", headerParam0)
 
 	}
 
@@ -9407,20 +9581,28 @@ func NewListKnownHostsRequest(server string, tenantSlug TenantSlug, params *List
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -9742,20 +9924,28 @@ func NewGetLayerRequest(server string, tenantSlug TenantSlug, layerId LayerId, p
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "refType", params.RefType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.RefType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "refType", *params.RefType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ref", params.Ref, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "git-ref-name"}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Ref != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ref", *params.Ref, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "git-ref-name"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -9881,36 +10071,52 @@ func NewListLayerRevisionsRequest(server string, tenantSlug TenantSlug, layerId 
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "refType", params.RefType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.RefType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "refType", *params.RefType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ref", params.Ref, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "git-ref-name"}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Ref != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "ref", *params.Ref, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "git-ref-name"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -10096,20 +10302,28 @@ func NewListTenantMembersRequest(server string, tenantSlug TenantSlug, params *L
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -10575,28 +10789,40 @@ func NewListNotificationsRequest(server string, tenantSlug TenantSlug, params *L
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "unread", params.Unread, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Unread != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "unread", *params.Unread, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -10757,28 +10983,40 @@ func NewListRepositoriesRequest(server string, tenantSlug TenantSlug, params *Li
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Q != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", *params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -11046,20 +11284,28 @@ func NewListDiscoveryCandidatesRequest(server string, tenantSlug TenantSlug, rep
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -11602,28 +11848,40 @@ func NewListReviewsRequest(server string, tenantSlug TenantSlug, params *ListRev
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Filter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", *params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -11683,28 +11941,40 @@ func NewSearchRequest(server string, tenantSlug TenantSlug, params *SearchParams
 			}
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Filter != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("deepObject", true, "filter", *params.Filter, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "object", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -11756,100 +12026,148 @@ func NewListServicesRequest(server string, tenantSlug TenantSlug, params *ListSe
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Q != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "q", *params.Q, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sort", params.Sort, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Sort != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sort", *params.Sort, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "groupId", params.GroupId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "uuid"}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.GroupId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "groupId", *params.GroupId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "uuid"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tag", params.Tag, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Tag != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tag", *params.Tag, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "team", params.Team, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Team != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "team", *params.Team, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "lifecycle", params.Lifecycle, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Lifecycle != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "lifecycle", *params.Lifecycle, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Language != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "kind", params.Kind, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Kind != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "kind", *params.Kind, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "starred", params.Starred, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Starred != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "starred", *params.Starred, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "mine", params.Mine, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Mine != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "mine", *params.Mine, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "boolean", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -12232,20 +12550,28 @@ func NewListServiceCommentsRequest(server string, tenantSlug TenantSlug, service
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -12595,20 +12921,28 @@ func NewListRecentServicesRequest(server string, tenantSlug TenantSlug, params *
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -12754,20 +13088,28 @@ func NewListShareLinksRequest(server string, tenantSlug TenantSlug, params *List
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -13729,20 +14071,28 @@ func NewListTeamsRequest(server string, tenantSlug TenantSlug, params *ListTeams
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -14070,20 +14420,28 @@ func NewListTokensRequest(server string, tenantSlug TenantSlug, params *ListToke
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "pageSize", *params.PageSize, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -14414,12 +14772,16 @@ func NewListViewsRequest(server string, tenantSlug TenantSlug, params *ListViews
 		// per the OpenAPI spec (e.g. "color=blue,black,brown").
 		var rawQueryFragments []string
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "kind", params.Kind, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else {
-			for _, qp := range strings.Split(queryFrag, "&") {
-				rawQueryFragments = append(rawQueryFragments, qp)
+		if params.Kind != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "kind", *params.Kind, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
 			}
+
 		}
 
 		if encoded := queryValues.Encode(); encoded != "" {
@@ -16433,7 +16795,7 @@ type ClientWithResponsesInterface interface {
 // ListPlatformAuditLogsResponse404Headers the declared response headers of an HTTP 404 response for ListPlatformAuditLogs
 type ListPlatformAuditLogsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListPlatformAuditLogsResponse contains the raw HTTP response and any decoded response body.
@@ -16536,19 +16898,19 @@ func (r ListGlobalCredentialsResponse) ContentType() string {
 // CreateGlobalCredentialResponse201Headers the declared response headers of an HTTP 201 response for CreateGlobalCredential
 type CreateGlobalCredentialResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateGlobalCredentialResponse409Headers the declared response headers of an HTTP 409 response for CreateGlobalCredential
 type CreateGlobalCredentialResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateGlobalCredentialResponse422Headers the declared response headers of an HTTP 422 response for CreateGlobalCredential
 type CreateGlobalCredentialResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -16618,19 +16980,19 @@ func (r CreateGlobalCredentialResponse) ContentType() string {
 // DeleteGlobalCredentialResponse404Headers the declared response headers of an HTTP 404 response for DeleteGlobalCredential
 type DeleteGlobalCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteGlobalCredentialResponse409Headers the declared response headers of an HTTP 409 response for DeleteGlobalCredential
 type DeleteGlobalCredentialResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteGlobalCredentialResponse412Headers the declared response headers of an HTTP 412 response for DeleteGlobalCredential
 type DeleteGlobalCredentialResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -16700,19 +17062,19 @@ func (r DeleteGlobalCredentialResponse) ContentType() string {
 // UpdateGlobalCredentialResponse200Headers the declared response headers of an HTTP 200 response for UpdateGlobalCredential
 type UpdateGlobalCredentialResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateGlobalCredentialResponse404Headers the declared response headers of an HTTP 404 response for UpdateGlobalCredential
 type UpdateGlobalCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateGlobalCredentialResponse412Headers the declared response headers of an HTTP 412 response for UpdateGlobalCredential
 type UpdateGlobalCredentialResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -16782,31 +17144,31 @@ func (r UpdateGlobalCredentialResponse) ContentType() string {
 // RotateGlobalCredentialResponse200Headers the declared response headers of an HTTP 200 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // RotateGlobalCredentialResponse404Headers the declared response headers of an HTTP 404 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateGlobalCredentialResponse409Headers the declared response headers of an HTTP 409 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateGlobalCredentialResponse412Headers the declared response headers of an HTTP 412 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateGlobalCredentialResponse422Headers the declared response headers of an HTTP 422 response for RotateGlobalCredential
 type RotateGlobalCredentialResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -16894,7 +17256,7 @@ func (r RotateGlobalCredentialResponse) ContentType() string {
 // TestGlobalCredentialResponse404Headers the declared response headers of an HTTP 404 response for TestGlobalCredential
 type TestGlobalCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // TestGlobalCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -16953,7 +17315,7 @@ func (r TestGlobalCredentialResponse) ContentType() string {
 // ListPlatformJobsResponse404Headers the declared response headers of an HTTP 404 response for ListPlatformJobs
 type ListPlatformJobsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListPlatformJobsResponse contains the raw HTTP response and any decoded response body.
@@ -17012,7 +17374,7 @@ func (r ListPlatformJobsResponse) ContentType() string {
 // GetPlatformJobResponse404Headers the declared response headers of an HTTP 404 response for GetPlatformJob
 type GetPlatformJobResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetPlatformJobResponse contains the raw HTTP response and any decoded response body.
@@ -17115,19 +17477,19 @@ func (r ListProducerProfilesResponse) ContentType() string {
 // CreateProducerProfileResponse201Headers the declared response headers of an HTTP 201 response for CreateProducerProfile
 type CreateProducerProfileResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateProducerProfileResponse409Headers the declared response headers of an HTTP 409 response for CreateProducerProfile
 type CreateProducerProfileResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateProducerProfileResponse422Headers the declared response headers of an HTTP 422 response for CreateProducerProfile
 type CreateProducerProfileResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateProducerProfileResponse contains the raw HTTP response and any decoded response body.
@@ -17197,19 +17559,19 @@ func (r CreateProducerProfileResponse) ContentType() string {
 // DeleteProducerProfileResponse404Headers the declared response headers of an HTTP 404 response for DeleteProducerProfile
 type DeleteProducerProfileResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteProducerProfileResponse409Headers the declared response headers of an HTTP 409 response for DeleteProducerProfile
 type DeleteProducerProfileResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteProducerProfileResponse412Headers the declared response headers of an HTTP 412 response for DeleteProducerProfile
 type DeleteProducerProfileResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteProducerProfileResponse contains the raw HTTP response and any decoded response body.
@@ -17279,13 +17641,13 @@ func (r DeleteProducerProfileResponse) ContentType() string {
 // GetProducerProfileResponse200Headers the declared response headers of an HTTP 200 response for GetProducerProfile
 type GetProducerProfileResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetProducerProfileResponse404Headers the declared response headers of an HTTP 404 response for GetProducerProfile
 type GetProducerProfileResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetProducerProfileResponse contains the raw HTTP response and any decoded response body.
@@ -17346,19 +17708,19 @@ func (r GetProducerProfileResponse) ContentType() string {
 // UpdateProducerProfileResponse200Headers the declared response headers of an HTTP 200 response for UpdateProducerProfile
 type UpdateProducerProfileResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateProducerProfileResponse404Headers the declared response headers of an HTTP 404 response for UpdateProducerProfile
 type UpdateProducerProfileResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateProducerProfileResponse412Headers the declared response headers of an HTTP 412 response for UpdateProducerProfile
 type UpdateProducerProfileResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateProducerProfileResponse contains the raw HTTP response and any decoded response body.
@@ -17428,7 +17790,7 @@ func (r UpdateProducerProfileResponse) ContentType() string {
 // GetPlatformSettingsResponse200Headers the declared response headers of an HTTP 200 response for GetPlatformSettings
 type GetPlatformSettingsResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetPlatformSettingsResponse contains the raw HTTP response and any decoded response body.
@@ -17480,13 +17842,13 @@ func (r GetPlatformSettingsResponse) ContentType() string {
 // UpdatePlatformSettingsResponse200Headers the declared response headers of an HTTP 200 response for UpdatePlatformSettings
 type UpdatePlatformSettingsResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdatePlatformSettingsResponse412Headers the declared response headers of an HTTP 412 response for UpdatePlatformSettings
 type UpdatePlatformSettingsResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdatePlatformSettingsResponse contains the raw HTTP response and any decoded response body.
@@ -17591,13 +17953,31 @@ func (r ListTenantsResponse) ContentType() string {
 // CreateTenantResponse201Headers the declared response headers of an HTTP 201 response for CreateTenant
 type CreateTenantResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
+}
+
+// CreateTenantResponse401Headers the declared response headers of an HTTP 401 response for CreateTenant
+type CreateTenantResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
+// CreateTenantResponse403Headers the declared response headers of an HTTP 403 response for CreateTenant
+type CreateTenantResponse403Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
+// CreateTenantResponse404Headers the declared response headers of an HTTP 404 response for CreateTenant
+type CreateTenantResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
 }
 
 // CreateTenantResponse409Headers the declared response headers of an HTTP 409 response for CreateTenant
 type CreateTenantResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateTenantResponse contains the raw HTTP response and any decoded response body.
@@ -17608,10 +17988,22 @@ type CreateTenantResponse struct {
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *Tenant
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Unauthenticated
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *CsrfInvalid
+	// JSON404 the response for an HTTP 404 `application/json` response
+	JSON404 *NotFound
 	// JSON409 the response for an HTTP 409 `application/json` response
 	JSON409 *Duplicate
 	// Headers201 the parsed response headers for an HTTP 201 response
 	Headers201 *CreateTenantResponse201Headers
+	// Headers401 the parsed response headers for an HTTP 401 response
+	Headers401 *CreateTenantResponse401Headers
+	// Headers403 the parsed response headers for an HTTP 403 response
+	Headers403 *CreateTenantResponse403Headers
+	// Headers404 the parsed response headers for an HTTP 404 response
+	Headers404 *CreateTenantResponse404Headers
 	// Headers409 the parsed response headers for an HTTP 409 response
 	Headers409 *CreateTenantResponse409Headers
 }
@@ -17619,6 +18011,21 @@ type CreateTenantResponse struct {
 // GetJSON201 returns the response for an HTTP 201 `application/json` response
 func (r CreateTenantResponse) GetJSON201() *Tenant {
 	return r.JSON201
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r CreateTenantResponse) GetJSON401() *Unauthenticated {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r CreateTenantResponse) GetJSON403() *CsrfInvalid {
+	return r.JSON403
+}
+
+// GetJSON404 returns the response for an HTTP 404 `application/json` response
+func (r CreateTenantResponse) GetJSON404() *NotFound {
+	return r.JSON404
 }
 
 // GetJSON409 returns the response for an HTTP 409 `application/json` response
@@ -17658,19 +18065,19 @@ func (r CreateTenantResponse) ContentType() string {
 // DeleteTenantResponse202Headers the declared response headers of an HTTP 202 response for DeleteTenant
 type DeleteTenantResponse202Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // DeleteTenantResponse404Headers the declared response headers of an HTTP 404 response for DeleteTenant
 type DeleteTenantResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteTenantResponse412Headers the declared response headers of an HTTP 412 response for DeleteTenant
 type DeleteTenantResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteTenantResponse contains the raw HTTP response and any decoded response body.
@@ -17740,19 +18147,19 @@ func (r DeleteTenantResponse) ContentType() string {
 // UpdateTenantResponse200Headers the declared response headers of an HTTP 200 response for UpdateTenant
 type UpdateTenantResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateTenantResponse404Headers the declared response headers of an HTTP 404 response for UpdateTenant
 type UpdateTenantResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateTenantResponse412Headers the declared response headers of an HTTP 412 response for UpdateTenant
 type UpdateTenantResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateTenantResponse contains the raw HTTP response and any decoded response body.
@@ -17819,10 +18226,22 @@ func (r UpdateTenantResponse) ContentType() string {
 	return ""
 }
 
+// PutTenantMemberAsPlatformAdminResponse401Headers the declared response headers of an HTTP 401 response for PutTenantMemberAsPlatformAdmin
+type PutTenantMemberAsPlatformAdminResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
+// PutTenantMemberAsPlatformAdminResponse403Headers the declared response headers of an HTTP 403 response for PutTenantMemberAsPlatformAdmin
+type PutTenantMemberAsPlatformAdminResponse403Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
 // PutTenantMemberAsPlatformAdminResponse404Headers the declared response headers of an HTTP 404 response for PutTenantMemberAsPlatformAdmin
 type PutTenantMemberAsPlatformAdminResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutTenantMemberAsPlatformAdminResponse contains the raw HTTP response and any decoded response body.
@@ -17833,8 +18252,16 @@ type PutTenantMemberAsPlatformAdminResponse struct {
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *Member
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Unauthenticated
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *CsrfInvalid
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
+	// Headers401 the parsed response headers for an HTTP 401 response
+	Headers401 *PutTenantMemberAsPlatformAdminResponse401Headers
+	// Headers403 the parsed response headers for an HTTP 403 response
+	Headers403 *PutTenantMemberAsPlatformAdminResponse403Headers
 	// Headers404 the parsed response headers for an HTTP 404 response
 	Headers404 *PutTenantMemberAsPlatformAdminResponse404Headers
 }
@@ -17842,6 +18269,16 @@ type PutTenantMemberAsPlatformAdminResponse struct {
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
 func (r PutTenantMemberAsPlatformAdminResponse) GetJSON200() *Member {
 	return r.JSON200
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r PutTenantMemberAsPlatformAdminResponse) GetJSON401() *Unauthenticated {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r PutTenantMemberAsPlatformAdminResponse) GetJSON403() *CsrfInvalid {
+	return r.JSON403
 }
 
 // GetJSON404 returns the response for an HTTP 404 `application/json` response
@@ -17881,7 +18318,7 @@ func (r PutTenantMemberAsPlatformAdminResponse) ContentType() string {
 // ListUsersResponse404Headers the declared response headers of an HTTP 404 response for ListUsers
 type ListUsersResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListUsersResponse contains the raw HTTP response and any decoded response body.
@@ -17940,19 +18377,37 @@ func (r ListUsersResponse) ContentType() string {
 // CreateUserResponse201Headers the declared response headers of an HTTP 201 response for CreateUser
 type CreateUserResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
+}
+
+// CreateUserResponse401Headers the declared response headers of an HTTP 401 response for CreateUser
+type CreateUserResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
+// CreateUserResponse403Headers the declared response headers of an HTTP 403 response for CreateUser
+type CreateUserResponse403Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
+// CreateUserResponse404Headers the declared response headers of an HTTP 404 response for CreateUser
+type CreateUserResponse404Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
 }
 
 // CreateUserResponse409Headers the declared response headers of an HTTP 409 response for CreateUser
 type CreateUserResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateUserResponse422Headers the declared response headers of an HTTP 422 response for CreateUser
 type CreateUserResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateUserResponse contains the raw HTTP response and any decoded response body.
@@ -17963,12 +18418,24 @@ type CreateUserResponse struct {
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *User
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Unauthenticated
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *CsrfInvalid
+	// JSON404 the response for an HTTP 404 `application/json` response
+	JSON404 *NotFound
 	// JSON409 the response for an HTTP 409 `application/json` response
 	JSON409 *Duplicate
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *ValidationError
 	// Headers201 the parsed response headers for an HTTP 201 response
 	Headers201 *CreateUserResponse201Headers
+	// Headers401 the parsed response headers for an HTTP 401 response
+	Headers401 *CreateUserResponse401Headers
+	// Headers403 the parsed response headers for an HTTP 403 response
+	Headers403 *CreateUserResponse403Headers
+	// Headers404 the parsed response headers for an HTTP 404 response
+	Headers404 *CreateUserResponse404Headers
 	// Headers409 the parsed response headers for an HTTP 409 response
 	Headers409 *CreateUserResponse409Headers
 	// Headers422 the parsed response headers for an HTTP 422 response
@@ -17978,6 +18445,21 @@ type CreateUserResponse struct {
 // GetJSON201 returns the response for an HTTP 201 `application/json` response
 func (r CreateUserResponse) GetJSON201() *User {
 	return r.JSON201
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r CreateUserResponse) GetJSON401() *Unauthenticated {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r CreateUserResponse) GetJSON403() *CsrfInvalid {
+	return r.JSON403
+}
+
+// GetJSON404 returns the response for an HTTP 404 `application/json` response
+func (r CreateUserResponse) GetJSON404() *NotFound {
+	return r.JSON404
 }
 
 // GetJSON409 returns the response for an HTTP 409 `application/json` response
@@ -18022,19 +18504,19 @@ func (r CreateUserResponse) ContentType() string {
 // UpdateUserResponse200Headers the declared response headers of an HTTP 200 response for UpdateUser
 type UpdateUserResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateUserResponse404Headers the declared response headers of an HTTP 404 response for UpdateUser
 type UpdateUserResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateUserResponse412Headers the declared response headers of an HTTP 412 response for UpdateUser
 type UpdateUserResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateUserResponse contains the raw HTTP response and any decoded response body.
@@ -18104,7 +18586,7 @@ func (r UpdateUserResponse) ContentType() string {
 // GetCsrfTokenResponse401Headers the declared response headers of an HTTP 401 response for GetCsrfToken
 type GetCsrfTokenResponse401Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetCsrfTokenResponse contains the raw HTTP response and any decoded response body.
@@ -18163,21 +18645,21 @@ func (r GetCsrfTokenResponse) ContentType() string {
 // LoginResponse200Headers the declared response headers of an HTTP 200 response for Login
 type LoginResponse200Headers struct {
 	// SetCookie carries the generated set cookie value for LoginResponse200Headers.
-	SetCookie string
+	SetCookie *string
 }
 
 // LoginResponse401Headers the declared response headers of an HTTP 401 response for Login
 type LoginResponse401Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // LoginResponse429Headers the declared response headers of an HTTP 429 response for Login
 type LoginResponse429Headers struct {
 	// RetryAfter carries the generated retry after value for LoginResponse429Headers.
-	RetryAfter int
+	RetryAfter *int
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // LoginResponse contains the raw HTTP response and any decoded response body.
@@ -18244,10 +18726,22 @@ func (r LoginResponse) ContentType() string {
 	return ""
 }
 
+// LogoutResponse204Headers the declared response headers of an HTTP 204 response for Logout
+type LogoutResponse204Headers struct {
+	// SetCookie carries the generated set cookie value for LogoutResponse204Headers.
+	SetCookie *string
+}
+
 // LogoutResponse401Headers the declared response headers of an HTTP 401 response for Logout
 type LogoutResponse401Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
+}
+
+// LogoutResponse403Headers the declared response headers of an HTTP 403 response for Logout
+type LogoutResponse403Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
 }
 
 // LogoutResponse contains the raw HTTP response and any decoded response body.
@@ -18258,13 +18752,24 @@ type LogoutResponse struct {
 	HTTPResponse *http.Response
 	// JSON401 the response for an HTTP 401 `application/json` response
 	JSON401 *Unauthenticated
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *CsrfInvalid
+	// Headers204 the parsed response headers for an HTTP 204 response
+	Headers204 *LogoutResponse204Headers
 	// Headers401 the parsed response headers for an HTTP 401 response
 	Headers401 *LogoutResponse401Headers
+	// Headers403 the parsed response headers for an HTTP 403 response
+	Headers403 *LogoutResponse403Headers
 }
 
 // GetJSON401 returns the response for an HTTP 401 `application/json` response
 func (r LogoutResponse) GetJSON401() *Unauthenticated {
 	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r LogoutResponse) GetJSON403() *CsrfInvalid {
+	return r.JSON403
 }
 
 // GetBody returns the raw response body bytes
@@ -18299,7 +18804,7 @@ func (r LogoutResponse) ContentType() string {
 // GetMeResponse401Headers the declared response headers of an HTTP 401 response for GetMe
 type GetMeResponse401Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetMeResponse contains the raw HTTP response and any decoded response body.
@@ -18358,7 +18863,7 @@ func (r GetMeResponse) ContentType() string {
 // GetMyPreferencesResponse200Headers the declared response headers of an HTTP 200 response for GetMyPreferences
 type GetMyPreferencesResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetMyPreferencesResponse contains the raw HTTP response and any decoded response body.
@@ -18410,19 +18915,19 @@ func (r GetMyPreferencesResponse) ContentType() string {
 // UpdateMyPreferencesResponse200Headers the declared response headers of an HTTP 200 response for UpdateMyPreferences
 type UpdateMyPreferencesResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateMyPreferencesResponse412Headers the declared response headers of an HTTP 412 response for UpdateMyPreferences
 type UpdateMyPreferencesResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateMyPreferencesResponse422Headers the declared response headers of an HTTP 422 response for UpdateMyPreferences
 type UpdateMyPreferencesResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateMyPreferencesResponse contains the raw HTTP response and any decoded response body.
@@ -18492,7 +18997,7 @@ func (r UpdateMyPreferencesResponse) ContentType() string {
 // DownloadSignedContentResponse404Headers the declared response headers of an HTTP 404 response for DownloadSignedContent
 type DownloadSignedContentResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DownloadSignedContentResponse contains the raw HTTP response and any decoded response body.
@@ -18588,7 +19093,7 @@ func (r GetOpenApiContractResponse) ContentType() string {
 // GetPublicServiceResponse404Headers the declared response headers of an HTTP 404 response for GetPublicService
 type GetPublicServiceResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetPublicServiceResponse contains the raw HTTP response and any decoded response body.
@@ -18647,7 +19152,7 @@ func (r GetPublicServiceResponse) ContentType() string {
 // GetPublicAssetResponse404Headers the declared response headers of an HTTP 404 response for GetPublicAsset
 type GetPublicAssetResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetPublicAssetResponse contains the raw HTTP response and any decoded response body.
@@ -18706,13 +19211,13 @@ func (r GetPublicAssetResponse) ContentType() string {
 // ResolvePublicViewResponse404Headers the declared response headers of an HTTP 404 response for ResolvePublicView
 type ResolvePublicViewResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ResolvePublicViewResponse422Headers the declared response headers of an HTTP 422 response for ResolvePublicView
 type ResolvePublicViewResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ResolvePublicViewResponse contains the raw HTTP response and any decoded response body.
@@ -18780,7 +19285,7 @@ func (r ResolvePublicViewResponse) ContentType() string {
 // GetSharedViewResponse404Headers the declared response headers of an HTTP 404 response for GetSharedView
 type GetSharedViewResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetSharedViewResponse contains the raw HTTP response and any decoded response body.
@@ -18839,7 +19344,7 @@ func (r GetSharedViewResponse) ContentType() string {
 // ListAssetKindsResponse404Headers the declared response headers of an HTTP 404 response for ListAssetKinds
 type ListAssetKindsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListAssetKindsResponse contains the raw HTTP response and any decoded response body.
@@ -18898,19 +19403,19 @@ func (r ListAssetKindsResponse) ContentType() string {
 // UpdateAssetKindStateResponse200Headers the declared response headers of an HTTP 200 response for UpdateAssetKindState
 type UpdateAssetKindStateResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateAssetKindStateResponse404Headers the declared response headers of an HTTP 404 response for UpdateAssetKindState
 type UpdateAssetKindStateResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateAssetKindStateResponse412Headers the declared response headers of an HTTP 412 response for UpdateAssetKindState
 type UpdateAssetKindStateResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateAssetKindStateResponse contains the raw HTTP response and any decoded response body.
@@ -18980,13 +19485,13 @@ func (r UpdateAssetKindStateResponse) ContentType() string {
 // GetAssetVersionResponse200Headers the declared response headers of an HTTP 200 response for GetAssetVersion
 type GetAssetVersionResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetAssetVersionResponse404Headers the declared response headers of an HTTP 404 response for GetAssetVersion
 type GetAssetVersionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetAssetVersionResponse contains the raw HTTP response and any decoded response body.
@@ -19047,7 +19552,7 @@ func (r GetAssetVersionResponse) ContentType() string {
 // ListAssetVersionItemsResponse404Headers the declared response headers of an HTTP 404 response for ListAssetVersionItems
 type ListAssetVersionItemsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListAssetVersionItemsResponse contains the raw HTTP response and any decoded response body.
@@ -19106,7 +19611,7 @@ func (r ListAssetVersionItemsResponse) ContentType() string {
 // GetAssetVersionProvenanceResponse404Headers the declared response headers of an HTTP 404 response for GetAssetVersionProvenance
 type GetAssetVersionProvenanceResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetAssetVersionProvenanceResponse contains the raw HTTP response and any decoded response body.
@@ -19165,25 +19670,25 @@ func (r GetAssetVersionProvenanceResponse) ContentType() string {
 // DeprecateAssetVersionResponse200Headers the declared response headers of an HTTP 200 response for DeprecateAssetVersion
 type DeprecateAssetVersionResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // DeprecateAssetVersionResponse404Headers the declared response headers of an HTTP 404 response for DeprecateAssetVersion
 type DeprecateAssetVersionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeprecateAssetVersionResponse409Headers the declared response headers of an HTTP 409 response for DeprecateAssetVersion
 type DeprecateAssetVersionResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeprecateAssetVersionResponse412Headers the declared response headers of an HTTP 412 response for DeprecateAssetVersion
 type DeprecateAssetVersionResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeprecateAssetVersionResponse contains the raw HTTP response and any decoded response body.
@@ -19262,25 +19767,25 @@ func (r DeprecateAssetVersionResponse) ContentType() string {
 // PublishAssetVersionResponse200Headers the declared response headers of an HTTP 200 response for PublishAssetVersion
 type PublishAssetVersionResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // PublishAssetVersionResponse404Headers the declared response headers of an HTTP 404 response for PublishAssetVersion
 type PublishAssetVersionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PublishAssetVersionResponse409Headers the declared response headers of an HTTP 409 response for PublishAssetVersion
 type PublishAssetVersionResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PublishAssetVersionResponse412Headers the declared response headers of an HTTP 412 response for PublishAssetVersion
 type PublishAssetVersionResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PublishAssetVersionResponse contains the raw HTTP response and any decoded response body.
@@ -19359,25 +19864,25 @@ func (r PublishAssetVersionResponse) ContentType() string {
 // RetireAssetVersionResponse200Headers the declared response headers of an HTTP 200 response for RetireAssetVersion
 type RetireAssetVersionResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // RetireAssetVersionResponse404Headers the declared response headers of an HTTP 404 response for RetireAssetVersion
 type RetireAssetVersionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RetireAssetVersionResponse409Headers the declared response headers of an HTTP 409 response for RetireAssetVersion
 type RetireAssetVersionResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RetireAssetVersionResponse412Headers the declared response headers of an HTTP 412 response for RetireAssetVersion
 type RetireAssetVersionResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RetireAssetVersionResponse contains the raw HTTP response and any decoded response body.
@@ -19456,13 +19961,13 @@ func (r RetireAssetVersionResponse) ContentType() string {
 // GetAssetResponse200Headers the declared response headers of an HTTP 200 response for GetAsset
 type GetAssetResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetAssetResponse404Headers the declared response headers of an HTTP 404 response for GetAsset
 type GetAssetResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetAssetResponse contains the raw HTTP response and any decoded response body.
@@ -19523,31 +20028,31 @@ func (r GetAssetResponse) ContentType() string {
 // ReorderAssetLayersResponse200Headers the declared response headers of an HTTP 200 response for ReorderAssetLayers
 type ReorderAssetLayersResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // ReorderAssetLayersResponse404Headers the declared response headers of an HTTP 404 response for ReorderAssetLayers
 type ReorderAssetLayersResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReorderAssetLayersResponse409Headers the declared response headers of an HTTP 409 response for ReorderAssetLayers
 type ReorderAssetLayersResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReorderAssetLayersResponse412Headers the declared response headers of an HTTP 412 response for ReorderAssetLayers
 type ReorderAssetLayersResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReorderAssetLayersResponse422Headers the declared response headers of an HTTP 422 response for ReorderAssetLayers
 type ReorderAssetLayersResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReorderAssetLayersResponse contains the raw HTTP response and any decoded response body.
@@ -19635,7 +20140,7 @@ func (r ReorderAssetLayersResponse) ContentType() string {
 // ListAssetVersionsResponse404Headers the declared response headers of an HTTP 404 response for ListAssetVersions
 type ListAssetVersionsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListAssetVersionsResponse contains the raw HTTP response and any decoded response body.
@@ -19694,19 +20199,19 @@ func (r ListAssetVersionsResponse) ContentType() string {
 // GenerateAssetWithAiResponse404Headers the declared response headers of an HTTP 404 response for GenerateAssetWithAi
 type GenerateAssetWithAiResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GenerateAssetWithAiResponse409Headers the declared response headers of an HTTP 409 response for GenerateAssetWithAi
 type GenerateAssetWithAiResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GenerateAssetWithAiResponse422Headers the declared response headers of an HTTP 422 response for GenerateAssetWithAi
 type GenerateAssetWithAiResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GenerateAssetWithAiResponse contains the raw HTTP response and any decoded response body.
@@ -19783,25 +20288,25 @@ func (r GenerateAssetWithAiResponse) ContentType() string {
 // PreviewMergeResponse404Headers the declared response headers of an HTTP 404 response for PreviewMerge
 type PreviewMergeResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PreviewMergeResponse409Headers the declared response headers of an HTTP 409 response for PreviewMerge
 type PreviewMergeResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PreviewMergeResponse413Headers the declared response headers of an HTTP 413 response for PreviewMerge
 type PreviewMergeResponse413Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PreviewMergeResponse422Headers the declared response headers of an HTTP 422 response for PreviewMerge
 type PreviewMergeResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PreviewMergeResponse contains the raw HTTP response and any decoded response body.
@@ -19887,25 +20392,25 @@ func (r PreviewMergeResponse) ContentType() string {
 // PushAssetRevisionResponse404Headers the declared response headers of an HTTP 404 response for PushAssetRevision
 type PushAssetRevisionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PushAssetRevisionResponse409Headers the declared response headers of an HTTP 409 response for PushAssetRevision
 type PushAssetRevisionResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PushAssetRevisionResponse413Headers the declared response headers of an HTTP 413 response for PushAssetRevision
 type PushAssetRevisionResponse413Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PushAssetRevisionResponse422Headers the declared response headers of an HTTP 422 response for PushAssetRevision
 type PushAssetRevisionResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PushAssetRevisionResponse contains the raw HTTP response and any decoded response body.
@@ -19998,7 +20503,7 @@ func (r PushAssetRevisionResponse) ContentType() string {
 // ListAuditLogsResponse404Headers the declared response headers of an HTTP 404 response for ListAuditLogs
 type ListAuditLogsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListAuditLogsResponse contains the raw HTTP response and any decoded response body.
@@ -20057,7 +20562,7 @@ func (r ListAuditLogsResponse) ContentType() string {
 // ListBreakingTodosResponse404Headers the declared response headers of an HTTP 404 response for ListBreakingTodos
 type ListBreakingTodosResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListBreakingTodosResponse contains the raw HTTP response and any decoded response body.
@@ -20116,13 +20621,13 @@ func (r ListBreakingTodosResponse) ContentType() string {
 // AcknowledgeBreakingTodoResponse404Headers the declared response headers of an HTTP 404 response for AcknowledgeBreakingTodo
 type AcknowledgeBreakingTodoResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // AcknowledgeBreakingTodoResponse409Headers the declared response headers of an HTTP 409 response for AcknowledgeBreakingTodo
 type AcknowledgeBreakingTodoResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // AcknowledgeBreakingTodoResponse contains the raw HTTP response and any decoded response body.
@@ -20190,7 +20695,7 @@ func (r AcknowledgeBreakingTodoResponse) ContentType() string {
 // ListCredentialsResponse404Headers the declared response headers of an HTTP 404 response for ListCredentials
 type ListCredentialsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListCredentialsResponse contains the raw HTTP response and any decoded response body.
@@ -20249,19 +20754,19 @@ func (r ListCredentialsResponse) ContentType() string {
 // CreateCredentialResponse201Headers the declared response headers of an HTTP 201 response for CreateCredential
 type CreateCredentialResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateCredentialResponse404Headers the declared response headers of an HTTP 404 response for CreateCredential
 type CreateCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateCredentialResponse422Headers the declared response headers of an HTTP 422 response for CreateCredential
 type CreateCredentialResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -20331,19 +20836,19 @@ func (r CreateCredentialResponse) ContentType() string {
 // DeleteCredentialResponse404Headers the declared response headers of an HTTP 404 response for DeleteCredential
 type DeleteCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteCredentialResponse409Headers the declared response headers of an HTTP 409 response for DeleteCredential
 type DeleteCredentialResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteCredentialResponse412Headers the declared response headers of an HTTP 412 response for DeleteCredential
 type DeleteCredentialResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -20413,19 +20918,19 @@ func (r DeleteCredentialResponse) ContentType() string {
 // UpdateCredentialResponse200Headers the declared response headers of an HTTP 200 response for UpdateCredential
 type UpdateCredentialResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateCredentialResponse404Headers the declared response headers of an HTTP 404 response for UpdateCredential
 type UpdateCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateCredentialResponse412Headers the declared response headers of an HTTP 412 response for UpdateCredential
 type UpdateCredentialResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -20495,31 +21000,31 @@ func (r UpdateCredentialResponse) ContentType() string {
 // RotateCredentialResponse200Headers the declared response headers of an HTTP 200 response for RotateCredential
 type RotateCredentialResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // RotateCredentialResponse404Headers the declared response headers of an HTTP 404 response for RotateCredential
 type RotateCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateCredentialResponse409Headers the declared response headers of an HTTP 409 response for RotateCredential
 type RotateCredentialResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateCredentialResponse412Headers the declared response headers of an HTTP 412 response for RotateCredential
 type RotateCredentialResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateCredentialResponse422Headers the declared response headers of an HTTP 422 response for RotateCredential
 type RotateCredentialResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -20607,7 +21112,7 @@ func (r RotateCredentialResponse) ContentType() string {
 // TestCredentialResponse404Headers the declared response headers of an HTTP 404 response for TestCredential
 type TestCredentialResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // TestCredentialResponse contains the raw HTTP response and any decoded response body.
@@ -20666,13 +21171,13 @@ func (r TestCredentialResponse) ContentType() string {
 // RunDiffResponse404Headers the declared response headers of an HTTP 404 response for RunDiff
 type RunDiffResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RunDiffResponse422Headers the declared response headers of an HTTP 422 response for RunDiff
 type RunDiffResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RunDiffResponse contains the raw HTTP response and any decoded response body.
@@ -20740,7 +21245,7 @@ func (r RunDiffResponse) ContentType() string {
 // ListDiffRuleSetsResponse404Headers the declared response headers of an HTTP 404 response for ListDiffRuleSets
 type ListDiffRuleSetsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListDiffRuleSetsResponse contains the raw HTTP response and any decoded response body.
@@ -20799,19 +21304,19 @@ func (r ListDiffRuleSetsResponse) ContentType() string {
 // CreateDiffRuleSetResponse201Headers the declared response headers of an HTTP 201 response for CreateDiffRuleSet
 type CreateDiffRuleSetResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateDiffRuleSetResponse404Headers the declared response headers of an HTTP 404 response for CreateDiffRuleSet
 type CreateDiffRuleSetResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateDiffRuleSetResponse409Headers the declared response headers of an HTTP 409 response for CreateDiffRuleSet
 type CreateDiffRuleSetResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateDiffRuleSetResponse contains the raw HTTP response and any decoded response body.
@@ -20881,19 +21386,19 @@ func (r CreateDiffRuleSetResponse) ContentType() string {
 // DeleteDiffRuleSetResponse404Headers the declared response headers of an HTTP 404 response for DeleteDiffRuleSet
 type DeleteDiffRuleSetResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteDiffRuleSetResponse409Headers the declared response headers of an HTTP 409 response for DeleteDiffRuleSet
 type DeleteDiffRuleSetResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteDiffRuleSetResponse412Headers the declared response headers of an HTTP 412 response for DeleteDiffRuleSet
 type DeleteDiffRuleSetResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteDiffRuleSetResponse contains the raw HTTP response and any decoded response body.
@@ -20963,19 +21468,19 @@ func (r DeleteDiffRuleSetResponse) ContentType() string {
 // UpdateDiffRuleSetResponse200Headers the declared response headers of an HTTP 200 response for UpdateDiffRuleSet
 type UpdateDiffRuleSetResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateDiffRuleSetResponse404Headers the declared response headers of an HTTP 404 response for UpdateDiffRuleSet
 type UpdateDiffRuleSetResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateDiffRuleSetResponse412Headers the declared response headers of an HTTP 412 response for UpdateDiffRuleSet
 type UpdateDiffRuleSetResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateDiffRuleSetResponse contains the raw HTTP response and any decoded response body.
@@ -21045,7 +21550,7 @@ func (r UpdateDiffRuleSetResponse) ContentType() string {
 // ListDiffSnapshotsResponse404Headers the declared response headers of an HTTP 404 response for ListDiffSnapshots
 type ListDiffSnapshotsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListDiffSnapshotsResponse contains the raw HTTP response and any decoded response body.
@@ -21104,7 +21609,7 @@ func (r ListDiffSnapshotsResponse) ContentType() string {
 // DeleteDiffSnapshotResponse404Headers the declared response headers of an HTTP 404 response for DeleteDiffSnapshot
 type DeleteDiffSnapshotResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteDiffSnapshotResponse contains the raw HTTP response and any decoded response body.
@@ -21156,7 +21661,7 @@ func (r DeleteDiffSnapshotResponse) ContentType() string {
 // GetDiffSnapshotResponse404Headers the declared response headers of an HTTP 404 response for GetDiffSnapshot
 type GetDiffSnapshotResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetDiffSnapshotResponse contains the raw HTTP response and any decoded response body.
@@ -21215,7 +21720,7 @@ func (r GetDiffSnapshotResponse) ContentType() string {
 // ExportDiffSnapshotResponse404Headers the declared response headers of an HTTP 404 response for ExportDiffSnapshot
 type ExportDiffSnapshotResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ExportDiffSnapshotResponse contains the raw HTTP response and any decoded response body.
@@ -21274,7 +21779,7 @@ func (r ExportDiffSnapshotResponse) ContentType() string {
 // CreateDiffSnapshotShareLinkResponse404Headers the declared response headers of an HTTP 404 response for CreateDiffSnapshotShareLink
 type CreateDiffSnapshotShareLinkResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateDiffSnapshotShareLinkResponse contains the raw HTTP response and any decoded response body.
@@ -21333,7 +21838,7 @@ func (r CreateDiffSnapshotShareLinkResponse) ContentType() string {
 // SearchTenantUsersResponse404Headers the declared response headers of an HTTP 404 response for SearchTenantUsers
 type SearchTenantUsersResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // SearchTenantUsersResponse contains the raw HTTP response and any decoded response body.
@@ -21392,13 +21897,13 @@ func (r SearchTenantUsersResponse) ContentType() string {
 // CreateTenantExportResponse404Headers the declared response headers of an HTTP 404 response for CreateTenantExport
 type CreateTenantExportResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateTenantExportResponse409Headers the declared response headers of an HTTP 409 response for CreateTenantExport
 type CreateTenantExportResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateTenantExportResponse contains the raw HTTP response and any decoded response body.
@@ -21466,7 +21971,7 @@ func (r CreateTenantExportResponse) ContentType() string {
 // ListJobsResponse404Headers the declared response headers of an HTTP 404 response for ListJobs
 type ListJobsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListJobsResponse contains the raw HTTP response and any decoded response body.
@@ -21525,7 +22030,7 @@ func (r ListJobsResponse) ContentType() string {
 // GetJobResponse404Headers the declared response headers of an HTTP 404 response for GetJob
 type GetJobResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetJobResponse contains the raw HTTP response and any decoded response body.
@@ -21584,7 +22089,7 @@ func (r GetJobResponse) ContentType() string {
 // StreamJobLogsResponse404Headers the declared response headers of an HTTP 404 response for StreamJobLogs
 type StreamJobLogsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // StreamJobLogsResponse contains the raw HTTP response and any decoded response body.
@@ -21636,13 +22141,13 @@ func (r StreamJobLogsResponse) ContentType() string {
 // CancelJobResponse404Headers the declared response headers of an HTTP 404 response for CancelJob
 type CancelJobResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CancelJobResponse409Headers the declared response headers of an HTTP 409 response for CancelJob
 type CancelJobResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CancelJobResponse contains the raw HTTP response and any decoded response body.
@@ -21710,13 +22215,13 @@ func (r CancelJobResponse) ContentType() string {
 // RetryJobResponse404Headers the declared response headers of an HTTP 404 response for RetryJob
 type RetryJobResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RetryJobResponse409Headers the declared response headers of an HTTP 409 response for RetryJob
 type RetryJobResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RetryJobResponse contains the raw HTTP response and any decoded response body.
@@ -21784,7 +22289,7 @@ func (r RetryJobResponse) ContentType() string {
 // ListKnownHostsResponse404Headers the declared response headers of an HTTP 404 response for ListKnownHosts
 type ListKnownHostsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListKnownHostsResponse contains the raw HTTP response and any decoded response body.
@@ -21843,19 +22348,19 @@ func (r ListKnownHostsResponse) ContentType() string {
 // CreateKnownHostResponse404Headers the declared response headers of an HTTP 404 response for CreateKnownHost
 type CreateKnownHostResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateKnownHostResponse409Headers the declared response headers of an HTTP 409 response for CreateKnownHost
 type CreateKnownHostResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateKnownHostResponse422Headers the declared response headers of an HTTP 422 response for CreateKnownHost
 type CreateKnownHostResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateKnownHostResponse contains the raw HTTP response and any decoded response body.
@@ -21932,7 +22437,7 @@ func (r CreateKnownHostResponse) ContentType() string {
 // GetLayerRevisionResponse404Headers the declared response headers of an HTTP 404 response for GetLayerRevision
 type GetLayerRevisionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetLayerRevisionResponse contains the raw HTTP response and any decoded response body.
@@ -21991,13 +22496,13 @@ func (r GetLayerRevisionResponse) ContentType() string {
 // GetReviewContextResponse404Headers the declared response headers of an HTTP 404 response for GetReviewContext
 type GetReviewContextResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetReviewContextResponse409Headers the declared response headers of an HTTP 409 response for GetReviewContext
 type GetReviewContextResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetReviewContextResponse contains the raw HTTP response and any decoded response body.
@@ -22065,13 +22570,13 @@ func (r GetReviewContextResponse) ContentType() string {
 // ApproveLayerRevisionResponse404Headers the declared response headers of an HTTP 404 response for ApproveLayerRevision
 type ApproveLayerRevisionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ApproveLayerRevisionResponse409Headers the declared response headers of an HTTP 409 response for ApproveLayerRevision
 type ApproveLayerRevisionResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ApproveLayerRevisionResponse contains the raw HTTP response and any decoded response body.
@@ -22139,19 +22644,19 @@ func (r ApproveLayerRevisionResponse) ContentType() string {
 // RejectLayerRevisionResponse404Headers the declared response headers of an HTTP 404 response for RejectLayerRevision
 type RejectLayerRevisionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RejectLayerRevisionResponse409Headers the declared response headers of an HTTP 409 response for RejectLayerRevision
 type RejectLayerRevisionResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RejectLayerRevisionResponse422Headers the declared response headers of an HTTP 422 response for RejectLayerRevision
 type RejectLayerRevisionResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RejectLayerRevisionResponse contains the raw HTTP response and any decoded response body.
@@ -22228,13 +22733,13 @@ func (r RejectLayerRevisionResponse) ContentType() string {
 // GetLayerResponse200Headers the declared response headers of an HTTP 200 response for GetLayer
 type GetLayerResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetLayerResponse404Headers the declared response headers of an HTTP 404 response for GetLayer
 type GetLayerResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetLayerResponse contains the raw HTTP response and any decoded response body.
@@ -22295,31 +22800,31 @@ func (r GetLayerResponse) ContentType() string {
 // UpdateLayerResponse200Headers the declared response headers of an HTTP 200 response for UpdateLayer
 type UpdateLayerResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateLayerResponse404Headers the declared response headers of an HTTP 404 response for UpdateLayer
 type UpdateLayerResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateLayerResponse409Headers the declared response headers of an HTTP 409 response for UpdateLayer
 type UpdateLayerResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateLayerResponse412Headers the declared response headers of an HTTP 412 response for UpdateLayer
 type UpdateLayerResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateLayerResponse422Headers the declared response headers of an HTTP 422 response for UpdateLayer
 type UpdateLayerResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateLayerResponse contains the raw HTTP response and any decoded response body.
@@ -22407,7 +22912,7 @@ func (r UpdateLayerResponse) ContentType() string {
 // ListLayerRevisionsResponse404Headers the declared response headers of an HTTP 404 response for ListLayerRevisions
 type ListLayerRevisionsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListLayerRevisionsResponse contains the raw HTTP response and any decoded response body.
@@ -22466,25 +22971,25 @@ func (r ListLayerRevisionsResponse) ContentType() string {
 // CreateLayerRevisionResponse404Headers the declared response headers of an HTTP 404 response for CreateLayerRevision
 type CreateLayerRevisionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateLayerRevisionResponse409Headers the declared response headers of an HTTP 409 response for CreateLayerRevision
 type CreateLayerRevisionResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateLayerRevisionResponse413Headers the declared response headers of an HTTP 413 response for CreateLayerRevision
 type CreateLayerRevisionResponse413Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateLayerRevisionResponse422Headers the declared response headers of an HTTP 422 response for CreateLayerRevision
 type CreateLayerRevisionResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateLayerRevisionResponse contains the raw HTTP response and any decoded response body.
@@ -22577,13 +23082,13 @@ func (r CreateLayerRevisionResponse) ContentType() string {
 // RollbackLayerResponse404Headers the declared response headers of an HTTP 404 response for RollbackLayer
 type RollbackLayerResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RollbackLayerResponse409Headers the declared response headers of an HTTP 409 response for RollbackLayer
 type RollbackLayerResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RollbackLayerResponse contains the raw HTTP response and any decoded response body.
@@ -22651,7 +23156,7 @@ func (r RollbackLayerResponse) ContentType() string {
 // ListTenantMembersResponse404Headers the declared response headers of an HTTP 404 response for ListTenantMembers
 type ListTenantMembersResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListTenantMembersResponse contains the raw HTTP response and any decoded response body.
@@ -22710,13 +23215,13 @@ func (r ListTenantMembersResponse) ContentType() string {
 // DeleteTenantMemberResponse404Headers the declared response headers of an HTTP 404 response for DeleteTenantMember
 type DeleteTenantMemberResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteTenantMemberResponse409Headers the declared response headers of an HTTP 409 response for DeleteTenantMember
 type DeleteTenantMemberResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteTenantMemberResponse contains the raw HTTP response and any decoded response body.
@@ -22777,13 +23282,13 @@ func (r DeleteTenantMemberResponse) ContentType() string {
 // PutTenantMemberResponse404Headers the declared response headers of an HTTP 404 response for PutTenantMember
 type PutTenantMemberResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutTenantMemberResponse409Headers the declared response headers of an HTTP 409 response for PutTenantMember
 type PutTenantMemberResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutTenantMemberResponse contains the raw HTTP response and any decoded response body.
@@ -22851,7 +23356,7 @@ func (r PutTenantMemberResponse) ContentType() string {
 // ListNotificationChannelsResponse404Headers the declared response headers of an HTTP 404 response for ListNotificationChannels
 type ListNotificationChannelsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListNotificationChannelsResponse contains the raw HTTP response and any decoded response body.
@@ -22910,19 +23415,19 @@ func (r ListNotificationChannelsResponse) ContentType() string {
 // CreateNotificationChannelResponse201Headers the declared response headers of an HTTP 201 response for CreateNotificationChannel
 type CreateNotificationChannelResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateNotificationChannelResponse404Headers the declared response headers of an HTTP 404 response for CreateNotificationChannel
 type CreateNotificationChannelResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateNotificationChannelResponse422Headers the declared response headers of an HTTP 422 response for CreateNotificationChannel
 type CreateNotificationChannelResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateNotificationChannelResponse contains the raw HTTP response and any decoded response body.
@@ -22992,13 +23497,13 @@ func (r CreateNotificationChannelResponse) ContentType() string {
 // DeleteNotificationChannelResponse404Headers the declared response headers of an HTTP 404 response for DeleteNotificationChannel
 type DeleteNotificationChannelResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteNotificationChannelResponse412Headers the declared response headers of an HTTP 412 response for DeleteNotificationChannel
 type DeleteNotificationChannelResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteNotificationChannelResponse contains the raw HTTP response and any decoded response body.
@@ -23059,19 +23564,19 @@ func (r DeleteNotificationChannelResponse) ContentType() string {
 // UpdateNotificationChannelResponse200Headers the declared response headers of an HTTP 200 response for UpdateNotificationChannel
 type UpdateNotificationChannelResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateNotificationChannelResponse404Headers the declared response headers of an HTTP 404 response for UpdateNotificationChannel
 type UpdateNotificationChannelResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateNotificationChannelResponse412Headers the declared response headers of an HTTP 412 response for UpdateNotificationChannel
 type UpdateNotificationChannelResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateNotificationChannelResponse contains the raw HTTP response and any decoded response body.
@@ -23141,31 +23646,31 @@ func (r UpdateNotificationChannelResponse) ContentType() string {
 // RotateNotificationChannelSecretResponse200Headers the declared response headers of an HTTP 200 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // RotateNotificationChannelSecretResponse404Headers the declared response headers of an HTTP 404 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateNotificationChannelSecretResponse409Headers the declared response headers of an HTTP 409 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateNotificationChannelSecretResponse412Headers the declared response headers of an HTTP 412 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateNotificationChannelSecretResponse422Headers the declared response headers of an HTTP 422 response for RotateNotificationChannelSecret
 type RotateNotificationChannelSecretResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RotateNotificationChannelSecretResponse contains the raw HTTP response and any decoded response body.
@@ -23253,7 +23758,7 @@ func (r RotateNotificationChannelSecretResponse) ContentType() string {
 // TestNotificationChannelResponse404Headers the declared response headers of an HTTP 404 response for TestNotificationChannel
 type TestNotificationChannelResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // TestNotificationChannelResponse contains the raw HTTP response and any decoded response body.
@@ -23312,7 +23817,7 @@ func (r TestNotificationChannelResponse) ContentType() string {
 // ListNotificationsResponse404Headers the declared response headers of an HTTP 404 response for ListNotifications
 type ListNotificationsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListNotificationsResponse contains the raw HTTP response and any decoded response body.
@@ -23371,7 +23876,7 @@ func (r ListNotificationsResponse) ContentType() string {
 // MarkNotificationReadResponse404Headers the declared response headers of an HTTP 404 response for MarkNotificationRead
 type MarkNotificationReadResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // MarkNotificationReadResponse contains the raw HTTP response and any decoded response body.
@@ -23423,7 +23928,7 @@ func (r MarkNotificationReadResponse) ContentType() string {
 // MarkAllNotificationsReadResponse404Headers the declared response headers of an HTTP 404 response for MarkAllNotificationsRead
 type MarkAllNotificationsReadResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // MarkAllNotificationsReadResponse contains the raw HTTP response and any decoded response body.
@@ -23475,7 +23980,7 @@ func (r MarkAllNotificationsReadResponse) ContentType() string {
 // ListAvailableProducerProfilesResponse404Headers the declared response headers of an HTTP 404 response for ListAvailableProducerProfiles
 type ListAvailableProducerProfilesResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListAvailableProducerProfilesResponse contains the raw HTTP response and any decoded response body.
@@ -23534,7 +24039,7 @@ func (r ListAvailableProducerProfilesResponse) ContentType() string {
 // ListRepositoriesResponse404Headers the declared response headers of an HTTP 404 response for ListRepositories
 type ListRepositoriesResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListRepositoriesResponse contains the raw HTTP response and any decoded response body.
@@ -23593,19 +24098,19 @@ func (r ListRepositoriesResponse) ContentType() string {
 // CreateRepositoryResponse201Headers the declared response headers of an HTTP 201 response for CreateRepository
 type CreateRepositoryResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateRepositoryResponse404Headers the declared response headers of an HTTP 404 response for CreateRepository
 type CreateRepositoryResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateRepositoryResponse409Headers the declared response headers of an HTTP 409 response for CreateRepository
 type CreateRepositoryResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateRepositoryResponse contains the raw HTTP response and any decoded response body.
@@ -23675,13 +24180,13 @@ func (r CreateRepositoryResponse) ContentType() string {
 // DeleteRepositoryResponse404Headers the declared response headers of an HTTP 404 response for DeleteRepository
 type DeleteRepositoryResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteRepositoryResponse412Headers the declared response headers of an HTTP 412 response for DeleteRepository
 type DeleteRepositoryResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteRepositoryResponse contains the raw HTTP response and any decoded response body.
@@ -23742,13 +24247,13 @@ func (r DeleteRepositoryResponse) ContentType() string {
 // GetRepositoryResponse200Headers the declared response headers of an HTTP 200 response for GetRepository
 type GetRepositoryResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetRepositoryResponse404Headers the declared response headers of an HTTP 404 response for GetRepository
 type GetRepositoryResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetRepositoryResponse contains the raw HTTP response and any decoded response body.
@@ -23809,19 +24314,19 @@ func (r GetRepositoryResponse) ContentType() string {
 // UpdateRepositoryResponse200Headers the declared response headers of an HTTP 200 response for UpdateRepository
 type UpdateRepositoryResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateRepositoryResponse404Headers the declared response headers of an HTTP 404 response for UpdateRepository
 type UpdateRepositoryResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateRepositoryResponse412Headers the declared response headers of an HTTP 412 response for UpdateRepository
 type UpdateRepositoryResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateRepositoryResponse contains the raw HTTP response and any decoded response body.
@@ -23891,7 +24396,7 @@ func (r UpdateRepositoryResponse) ContentType() string {
 // ListDiscoveryCandidatesResponse404Headers the declared response headers of an HTTP 404 response for ListDiscoveryCandidates
 type ListDiscoveryCandidatesResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListDiscoveryCandidatesResponse contains the raw HTTP response and any decoded response body.
@@ -23950,7 +24455,7 @@ func (r ListDiscoveryCandidatesResponse) ContentType() string {
 // DismissDiscoveryCandidateResponse404Headers the declared response headers of an HTTP 404 response for DismissDiscoveryCandidate
 type DismissDiscoveryCandidateResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DismissDiscoveryCandidateResponse contains the raw HTTP response and any decoded response body.
@@ -24009,13 +24514,13 @@ func (r DismissDiscoveryCandidateResponse) ContentType() string {
 // AcceptDiscoveryCandidatesResponse404Headers the declared response headers of an HTTP 404 response for AcceptDiscoveryCandidates
 type AcceptDiscoveryCandidatesResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // AcceptDiscoveryCandidatesResponse409Headers the declared response headers of an HTTP 409 response for AcceptDiscoveryCandidates
 type AcceptDiscoveryCandidatesResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // AcceptDiscoveryCandidatesResponse contains the raw HTTP response and any decoded response body.
@@ -24083,13 +24588,13 @@ func (r AcceptDiscoveryCandidatesResponse) ContentType() string {
 // PreviewRepositoryConfigImportResponse404Headers the declared response headers of an HTTP 404 response for PreviewRepositoryConfigImport
 type PreviewRepositoryConfigImportResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PreviewRepositoryConfigImportResponse409Headers the declared response headers of an HTTP 409 response for PreviewRepositoryConfigImport
 type PreviewRepositoryConfigImportResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PreviewRepositoryConfigImportResponse contains the raw HTTP response and any decoded response body.
@@ -24157,13 +24662,13 @@ func (r PreviewRepositoryConfigImportResponse) ContentType() string {
 // ApplyRepositoryConfigImportResponse404Headers the declared response headers of an HTTP 404 response for ApplyRepositoryConfigImport
 type ApplyRepositoryConfigImportResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ApplyRepositoryConfigImportResponse409Headers the declared response headers of an HTTP 409 response for ApplyRepositoryConfigImport
 type ApplyRepositoryConfigImportResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ApplyRepositoryConfigImportResponse contains the raw HTTP response and any decoded response body.
@@ -24231,13 +24736,13 @@ func (r ApplyRepositoryConfigImportResponse) ContentType() string {
 // CreateServiceInRepositoryResponse201Headers the declared response headers of an HTTP 201 response for CreateServiceInRepository
 type CreateServiceInRepositoryResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateServiceInRepositoryResponse404Headers the declared response headers of an HTTP 404 response for CreateServiceInRepository
 type CreateServiceInRepositoryResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateServiceInRepositoryResponse contains the raw HTTP response and any decoded response body.
@@ -24298,13 +24803,13 @@ func (r CreateServiceInRepositoryResponse) ContentType() string {
 // DiscoverRepositoryResponse404Headers the declared response headers of an HTTP 404 response for DiscoverRepository
 type DiscoverRepositoryResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DiscoverRepositoryResponse409Headers the declared response headers of an HTTP 409 response for DiscoverRepository
 type DiscoverRepositoryResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DiscoverRepositoryResponse contains the raw HTTP response and any decoded response body.
@@ -24372,13 +24877,13 @@ func (r DiscoverRepositoryResponse) ContentType() string {
 // SyncRepositoryResponse404Headers the declared response headers of an HTTP 404 response for SyncRepository
 type SyncRepositoryResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // SyncRepositoryResponse409Headers the declared response headers of an HTTP 409 response for SyncRepository
 type SyncRepositoryResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // SyncRepositoryResponse contains the raw HTTP response and any decoded response body.
@@ -24446,7 +24951,7 @@ func (r SyncRepositoryResponse) ContentType() string {
 // CheckRepositoryConnectionResponse404Headers the declared response headers of an HTTP 404 response for CheckRepositoryConnection
 type CheckRepositoryConnectionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CheckRepositoryConnectionResponse contains the raw HTTP response and any decoded response body.
@@ -24505,7 +25010,7 @@ func (r CheckRepositoryConnectionResponse) ContentType() string {
 // ListReviewsResponse404Headers the declared response headers of an HTTP 404 response for ListReviews
 type ListReviewsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListReviewsResponse contains the raw HTTP response and any decoded response body.
@@ -24564,13 +25069,13 @@ func (r ListReviewsResponse) ContentType() string {
 // SearchResponse404Headers the declared response headers of an HTTP 404 response for Search
 type SearchResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // SearchResponse422Headers the declared response headers of an HTTP 422 response for Search
 type SearchResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // SearchResponse contains the raw HTTP response and any decoded response body.
@@ -24638,7 +25143,7 @@ func (r SearchResponse) ContentType() string {
 // ListServicesResponse404Headers the declared response headers of an HTTP 404 response for ListServices
 type ListServicesResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListServicesResponse contains the raw HTTP response and any decoded response body.
@@ -24697,13 +25202,13 @@ func (r ListServicesResponse) ContentType() string {
 // DeleteServiceResponse404Headers the declared response headers of an HTTP 404 response for DeleteService
 type DeleteServiceResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteServiceResponse412Headers the declared response headers of an HTTP 412 response for DeleteService
 type DeleteServiceResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteServiceResponse contains the raw HTTP response and any decoded response body.
@@ -24764,13 +25269,13 @@ func (r DeleteServiceResponse) ContentType() string {
 // GetServiceResponse200Headers the declared response headers of an HTTP 200 response for GetService
 type GetServiceResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetServiceResponse404Headers the declared response headers of an HTTP 404 response for GetService
 type GetServiceResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetServiceResponse contains the raw HTTP response and any decoded response body.
@@ -24831,25 +25336,25 @@ func (r GetServiceResponse) ContentType() string {
 // UpdateServiceResponse200Headers the declared response headers of an HTTP 200 response for UpdateService
 type UpdateServiceResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateServiceResponse404Headers the declared response headers of an HTTP 404 response for UpdateService
 type UpdateServiceResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateServiceResponse409Headers the declared response headers of an HTTP 409 response for UpdateService
 type UpdateServiceResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateServiceResponse412Headers the declared response headers of an HTTP 412 response for UpdateService
 type UpdateServiceResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateServiceResponse contains the raw HTTP response and any decoded response body.
@@ -24928,7 +25433,7 @@ func (r UpdateServiceResponse) ContentType() string {
 // GetServiceAccessResponse404Headers the declared response headers of an HTTP 404 response for GetServiceAccess
 type GetServiceAccessResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetServiceAccessResponse contains the raw HTTP response and any decoded response body.
@@ -24987,13 +25492,13 @@ func (r GetServiceAccessResponse) ContentType() string {
 // PutServiceAccessResponse404Headers the declared response headers of an HTTP 404 response for PutServiceAccess
 type PutServiceAccessResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutServiceAccessResponse409Headers the declared response headers of an HTTP 409 response for PutServiceAccess
 type PutServiceAccessResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutServiceAccessResponse contains the raw HTTP response and any decoded response body.
@@ -25061,19 +25566,19 @@ func (r PutServiceAccessResponse) ContentType() string {
 // GenerateMissingAssetWithAiResponse404Headers the declared response headers of an HTTP 404 response for GenerateMissingAssetWithAi
 type GenerateMissingAssetWithAiResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GenerateMissingAssetWithAiResponse409Headers the declared response headers of an HTTP 409 response for GenerateMissingAssetWithAi
 type GenerateMissingAssetWithAiResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GenerateMissingAssetWithAiResponse422Headers the declared response headers of an HTTP 422 response for GenerateMissingAssetWithAi
 type GenerateMissingAssetWithAiResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GenerateMissingAssetWithAiResponse contains the raw HTTP response and any decoded response body.
@@ -25150,7 +25655,7 @@ func (r GenerateMissingAssetWithAiResponse) ContentType() string {
 // ListServiceCommentsResponse404Headers the declared response headers of an HTTP 404 response for ListServiceComments
 type ListServiceCommentsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListServiceCommentsResponse contains the raw HTTP response and any decoded response body.
@@ -25209,7 +25714,7 @@ func (r ListServiceCommentsResponse) ContentType() string {
 // CreateServiceCommentResponse404Headers the declared response headers of an HTTP 404 response for CreateServiceComment
 type CreateServiceCommentResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateServiceCommentResponse contains the raw HTTP response and any decoded response body.
@@ -25268,7 +25773,7 @@ func (r CreateServiceCommentResponse) ContentType() string {
 // ListSourceSpecsResponse404Headers the declared response headers of an HTTP 404 response for ListSourceSpecs
 type ListSourceSpecsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListSourceSpecsResponse contains the raw HTTP response and any decoded response body.
@@ -25327,25 +25832,25 @@ func (r ListSourceSpecsResponse) ContentType() string {
 // CreateSourceSpecResponse201Headers the declared response headers of an HTTP 201 response for CreateSourceSpec
 type CreateSourceSpecResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateSourceSpecResponse404Headers the declared response headers of an HTTP 404 response for CreateSourceSpec
 type CreateSourceSpecResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateSourceSpecResponse409Headers the declared response headers of an HTTP 409 response for CreateSourceSpec
 type CreateSourceSpecResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateSourceSpecResponse422Headers the declared response headers of an HTTP 422 response for CreateSourceSpec
 type CreateSourceSpecResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateSourceSpecResponse contains the raw HTTP response and any decoded response body.
@@ -25424,19 +25929,19 @@ func (r CreateSourceSpecResponse) ContentType() string {
 // ResolveServiceDriftResponse200Headers the declared response headers of an HTTP 200 response for ResolveServiceDrift
 type ResolveServiceDriftResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // ResolveServiceDriftResponse404Headers the declared response headers of an HTTP 404 response for ResolveServiceDrift
 type ResolveServiceDriftResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ResolveServiceDriftResponse409Headers the declared response headers of an HTTP 409 response for ResolveServiceDrift
 type ResolveServiceDriftResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ResolveServiceDriftResponse contains the raw HTTP response and any decoded response body.
@@ -25506,7 +26011,7 @@ func (r ResolveServiceDriftResponse) ContentType() string {
 // StarServiceResponse404Headers the declared response headers of an HTTP 404 response for StarService
 type StarServiceResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // StarServiceResponse contains the raw HTTP response and any decoded response body.
@@ -25565,7 +26070,7 @@ func (r StarServiceResponse) ContentType() string {
 // UnstarServiceResponse404Headers the declared response headers of an HTTP 404 response for UnstarService
 type UnstarServiceResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UnstarServiceResponse contains the raw HTTP response and any decoded response body.
@@ -25624,7 +26129,7 @@ func (r UnstarServiceResponse) ContentType() string {
 // ListRecentServicesResponse404Headers the declared response headers of an HTTP 404 response for ListRecentServices
 type ListRecentServicesResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListRecentServicesResponse contains the raw HTTP response and any decoded response body.
@@ -25683,13 +26188,13 @@ func (r ListRecentServicesResponse) ContentType() string {
 // GetTenantSettingsResponse200Headers the declared response headers of an HTTP 200 response for GetTenantSettings
 type GetTenantSettingsResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetTenantSettingsResponse404Headers the declared response headers of an HTTP 404 response for GetTenantSettings
 type GetTenantSettingsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetTenantSettingsResponse contains the raw HTTP response and any decoded response body.
@@ -25750,19 +26255,19 @@ func (r GetTenantSettingsResponse) ContentType() string {
 // UpdateTenantSettingsResponse200Headers the declared response headers of an HTTP 200 response for UpdateTenantSettings
 type UpdateTenantSettingsResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateTenantSettingsResponse404Headers the declared response headers of an HTTP 404 response for UpdateTenantSettings
 type UpdateTenantSettingsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateTenantSettingsResponse412Headers the declared response headers of an HTTP 412 response for UpdateTenantSettings
 type UpdateTenantSettingsResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateTenantSettingsResponse contains the raw HTTP response and any decoded response body.
@@ -25832,7 +26337,7 @@ func (r UpdateTenantSettingsResponse) ContentType() string {
 // ListShareLinksResponse404Headers the declared response headers of an HTTP 404 response for ListShareLinks
 type ListShareLinksResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListShareLinksResponse contains the raw HTTP response and any decoded response body.
@@ -25891,13 +26396,13 @@ func (r ListShareLinksResponse) ContentType() string {
 // CreateShareLinkResponse404Headers the declared response headers of an HTTP 404 response for CreateShareLink
 type CreateShareLinkResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateShareLinkResponse422Headers the declared response headers of an HTTP 422 response for CreateShareLink
 type CreateShareLinkResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateShareLinkResponse contains the raw HTTP response and any decoded response body.
@@ -25965,7 +26470,7 @@ func (r CreateShareLinkResponse) ContentType() string {
 // RevokeShareLinkResponse404Headers the declared response headers of an HTTP 404 response for RevokeShareLink
 type RevokeShareLinkResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RevokeShareLinkResponse contains the raw HTTP response and any decoded response body.
@@ -26017,19 +26522,19 @@ func (r RevokeShareLinkResponse) ContentType() string {
 // DeleteSourceSpecResponse404Headers the declared response headers of an HTTP 404 response for DeleteSourceSpec
 type DeleteSourceSpecResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteSourceSpecResponse409Headers the declared response headers of an HTTP 409 response for DeleteSourceSpec
 type DeleteSourceSpecResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteSourceSpecResponse412Headers the declared response headers of an HTTP 412 response for DeleteSourceSpec
 type DeleteSourceSpecResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteSourceSpecResponse contains the raw HTTP response and any decoded response body.
@@ -26099,31 +26604,31 @@ func (r DeleteSourceSpecResponse) ContentType() string {
 // UpdateSourceSpecResponse200Headers the declared response headers of an HTTP 200 response for UpdateSourceSpec
 type UpdateSourceSpecResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateSourceSpecResponse404Headers the declared response headers of an HTTP 404 response for UpdateSourceSpec
 type UpdateSourceSpecResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateSourceSpecResponse409Headers the declared response headers of an HTTP 409 response for UpdateSourceSpec
 type UpdateSourceSpecResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateSourceSpecResponse412Headers the declared response headers of an HTTP 412 response for UpdateSourceSpec
 type UpdateSourceSpecResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateSourceSpecResponse422Headers the declared response headers of an HTTP 422 response for UpdateSourceSpec
 type UpdateSourceSpecResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateSourceSpecResponse contains the raw HTTP response and any decoded response body.
@@ -26211,7 +26716,7 @@ func (r UpdateSourceSpecResponse) ContentType() string {
 // ListSourceBindingsResponse404Headers the declared response headers of an HTTP 404 response for ListSourceBindings
 type ListSourceBindingsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListSourceBindingsResponse contains the raw HTTP response and any decoded response body.
@@ -26270,13 +26775,13 @@ func (r ListSourceBindingsResponse) ContentType() string {
 // ProduceSourceResponse404Headers the declared response headers of an HTTP 404 response for ProduceSource
 type ProduceSourceResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ProduceSourceResponse409Headers the declared response headers of an HTTP 409 response for ProduceSource
 type ProduceSourceResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ProduceSourceResponse contains the raw HTTP response and any decoded response body.
@@ -26344,7 +26849,7 @@ func (r ProduceSourceResponse) ContentType() string {
 // ListSubscriptionsResponse404Headers the declared response headers of an HTTP 404 response for ListSubscriptions
 type ListSubscriptionsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListSubscriptionsResponse contains the raw HTTP response and any decoded response body.
@@ -26403,7 +26908,7 @@ func (r ListSubscriptionsResponse) ContentType() string {
 // PutSubscriptionResponse404Headers the declared response headers of an HTTP 404 response for PutSubscription
 type PutSubscriptionResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutSubscriptionResponse contains the raw HTTP response and any decoded response body.
@@ -26462,7 +26967,7 @@ func (r PutSubscriptionResponse) ContentType() string {
 // ListSystemGroupsResponse404Headers the declared response headers of an HTTP 404 response for ListSystemGroups
 type ListSystemGroupsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListSystemGroupsResponse contains the raw HTTP response and any decoded response body.
@@ -26521,19 +27026,19 @@ func (r ListSystemGroupsResponse) ContentType() string {
 // CreateSystemGroupResponse201Headers the declared response headers of an HTTP 201 response for CreateSystemGroup
 type CreateSystemGroupResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateSystemGroupResponse404Headers the declared response headers of an HTTP 404 response for CreateSystemGroup
 type CreateSystemGroupResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateSystemGroupResponse422Headers the declared response headers of an HTTP 422 response for CreateSystemGroup
 type CreateSystemGroupResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateSystemGroupResponse contains the raw HTTP response and any decoded response body.
@@ -26603,13 +27108,13 @@ func (r CreateSystemGroupResponse) ContentType() string {
 // DeleteSystemGroupResponse404Headers the declared response headers of an HTTP 404 response for DeleteSystemGroup
 type DeleteSystemGroupResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteSystemGroupResponse412Headers the declared response headers of an HTTP 412 response for DeleteSystemGroup
 type DeleteSystemGroupResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteSystemGroupResponse contains the raw HTTP response and any decoded response body.
@@ -26670,13 +27175,13 @@ func (r DeleteSystemGroupResponse) ContentType() string {
 // GetSystemGroupResponse200Headers the declared response headers of an HTTP 200 response for GetSystemGroup
 type GetSystemGroupResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetSystemGroupResponse404Headers the declared response headers of an HTTP 404 response for GetSystemGroup
 type GetSystemGroupResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetSystemGroupResponse contains the raw HTTP response and any decoded response body.
@@ -26737,25 +27242,25 @@ func (r GetSystemGroupResponse) ContentType() string {
 // UpdateSystemGroupResponse200Headers the declared response headers of an HTTP 200 response for UpdateSystemGroup
 type UpdateSystemGroupResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateSystemGroupResponse404Headers the declared response headers of an HTTP 404 response for UpdateSystemGroup
 type UpdateSystemGroupResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateSystemGroupResponse412Headers the declared response headers of an HTTP 412 response for UpdateSystemGroup
 type UpdateSystemGroupResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateSystemGroupResponse422Headers the declared response headers of an HTTP 422 response for UpdateSystemGroup
 type UpdateSystemGroupResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateSystemGroupResponse contains the raw HTTP response and any decoded response body.
@@ -26834,19 +27339,19 @@ func (r UpdateSystemGroupResponse) ContentType() string {
 // PutSystemGroupMembersResponse200Headers the declared response headers of an HTTP 200 response for PutSystemGroupMembers
 type PutSystemGroupMembersResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // PutSystemGroupMembersResponse404Headers the declared response headers of an HTTP 404 response for PutSystemGroupMembers
 type PutSystemGroupMembersResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutSystemGroupMembersResponse412Headers the declared response headers of an HTTP 412 response for PutSystemGroupMembers
 type PutSystemGroupMembersResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutSystemGroupMembersResponse contains the raw HTTP response and any decoded response body.
@@ -26916,7 +27421,7 @@ func (r PutSystemGroupMembersResponse) ContentType() string {
 // ListTagsResponse404Headers the declared response headers of an HTTP 404 response for ListTags
 type ListTagsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListTagsResponse contains the raw HTTP response and any decoded response body.
@@ -26975,19 +27480,19 @@ func (r ListTagsResponse) ContentType() string {
 // CreateTagResponse201Headers the declared response headers of an HTTP 201 response for CreateTag
 type CreateTagResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateTagResponse404Headers the declared response headers of an HTTP 404 response for CreateTag
 type CreateTagResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateTagResponse409Headers the declared response headers of an HTTP 409 response for CreateTag
 type CreateTagResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateTagResponse contains the raw HTTP response and any decoded response body.
@@ -27057,13 +27562,13 @@ func (r CreateTagResponse) ContentType() string {
 // DeleteTagResponse404Headers the declared response headers of an HTTP 404 response for DeleteTag
 type DeleteTagResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteTagResponse412Headers the declared response headers of an HTTP 412 response for DeleteTag
 type DeleteTagResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteTagResponse contains the raw HTTP response and any decoded response body.
@@ -27124,19 +27629,19 @@ func (r DeleteTagResponse) ContentType() string {
 // UpdateTagResponse200Headers the declared response headers of an HTTP 200 response for UpdateTag
 type UpdateTagResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateTagResponse404Headers the declared response headers of an HTTP 404 response for UpdateTag
 type UpdateTagResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateTagResponse412Headers the declared response headers of an HTTP 412 response for UpdateTag
 type UpdateTagResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateTagResponse contains the raw HTTP response and any decoded response body.
@@ -27206,7 +27711,7 @@ func (r UpdateTagResponse) ContentType() string {
 // ListTeamsResponse404Headers the declared response headers of an HTTP 404 response for ListTeams
 type ListTeamsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListTeamsResponse contains the raw HTTP response and any decoded response body.
@@ -27265,19 +27770,19 @@ func (r ListTeamsResponse) ContentType() string {
 // CreateTeamResponse201Headers the declared response headers of an HTTP 201 response for CreateTeam
 type CreateTeamResponse201Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // CreateTeamResponse404Headers the declared response headers of an HTTP 404 response for CreateTeam
 type CreateTeamResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateTeamResponse409Headers the declared response headers of an HTTP 409 response for CreateTeam
 type CreateTeamResponse409Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateTeamResponse contains the raw HTTP response and any decoded response body.
@@ -27347,13 +27852,13 @@ func (r CreateTeamResponse) ContentType() string {
 // DeleteTeamResponse404Headers the declared response headers of an HTTP 404 response for DeleteTeam
 type DeleteTeamResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteTeamResponse412Headers the declared response headers of an HTTP 412 response for DeleteTeam
 type DeleteTeamResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteTeamResponse contains the raw HTTP response and any decoded response body.
@@ -27414,13 +27919,13 @@ func (r DeleteTeamResponse) ContentType() string {
 // GetTeamResponse200Headers the declared response headers of an HTTP 200 response for GetTeam
 type GetTeamResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // GetTeamResponse404Headers the declared response headers of an HTTP 404 response for GetTeam
 type GetTeamResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // GetTeamResponse contains the raw HTTP response and any decoded response body.
@@ -27481,19 +27986,19 @@ func (r GetTeamResponse) ContentType() string {
 // UpdateTeamResponse200Headers the declared response headers of an HTTP 200 response for UpdateTeam
 type UpdateTeamResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // UpdateTeamResponse404Headers the declared response headers of an HTTP 404 response for UpdateTeam
 type UpdateTeamResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateTeamResponse412Headers the declared response headers of an HTTP 412 response for UpdateTeam
 type UpdateTeamResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // UpdateTeamResponse contains the raw HTTP response and any decoded response body.
@@ -27563,19 +28068,19 @@ func (r UpdateTeamResponse) ContentType() string {
 // ReplaceTeamMembersResponse200Headers the declared response headers of an HTTP 200 response for ReplaceTeamMembers
 type ReplaceTeamMembersResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // ReplaceTeamMembersResponse404Headers the declared response headers of an HTTP 404 response for ReplaceTeamMembers
 type ReplaceTeamMembersResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReplaceTeamMembersResponse412Headers the declared response headers of an HTTP 412 response for ReplaceTeamMembers
 type ReplaceTeamMembersResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReplaceTeamMembersResponse contains the raw HTTP response and any decoded response body.
@@ -27642,10 +28147,16 @@ func (r ReplaceTeamMembersResponse) ContentType() string {
 	return ""
 }
 
+// ListTokensResponse401Headers the declared response headers of an HTTP 401 response for ListTokens
+type ListTokensResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
 // ListTokensResponse404Headers the declared response headers of an HTTP 404 response for ListTokens
 type ListTokensResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListTokensResponse contains the raw HTTP response and any decoded response body.
@@ -27656,8 +28167,12 @@ type ListTokensResponse struct {
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *TokenPage
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Unauthenticated
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
+	// Headers401 the parsed response headers for an HTTP 401 response
+	Headers401 *ListTokensResponse401Headers
 	// Headers404 the parsed response headers for an HTTP 404 response
 	Headers404 *ListTokensResponse404Headers
 }
@@ -27665,6 +28180,11 @@ type ListTokensResponse struct {
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
 func (r ListTokensResponse) GetJSON200() *TokenPage {
 	return r.JSON200
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r ListTokensResponse) GetJSON401() *Unauthenticated {
+	return r.JSON401
 }
 
 // GetJSON404 returns the response for an HTTP 404 `application/json` response
@@ -27701,10 +28221,28 @@ func (r ListTokensResponse) ContentType() string {
 	return ""
 }
 
+// CreateTokenResponse401Headers the declared response headers of an HTTP 401 response for CreateToken
+type CreateTokenResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
+// CreateTokenResponse403Headers the declared response headers of an HTTP 403 response for CreateToken
+type CreateTokenResponse403Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
 // CreateTokenResponse404Headers the declared response headers of an HTTP 404 response for CreateToken
 type CreateTokenResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
+}
+
+// CreateTokenResponse422Headers the declared response headers of an HTTP 422 response for CreateToken
+type CreateTokenResponse422Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
 }
 
 // CreateTokenResponse contains the raw HTTP response and any decoded response body.
@@ -27715,10 +28253,22 @@ type CreateTokenResponse struct {
 	HTTPResponse *http.Response
 	// JSON201 the response for an HTTP 201 `application/json` response
 	JSON201 *TokenCreated
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Unauthenticated
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *CsrfInvalid
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *ValidationError
+	// Headers401 the parsed response headers for an HTTP 401 response
+	Headers401 *CreateTokenResponse401Headers
+	// Headers403 the parsed response headers for an HTTP 403 response
+	Headers403 *CreateTokenResponse403Headers
 	// Headers404 the parsed response headers for an HTTP 404 response
 	Headers404 *CreateTokenResponse404Headers
+	// Headers422 the parsed response headers for an HTTP 422 response
+	Headers422 *CreateTokenResponse422Headers
 }
 
 // GetJSON201 returns the response for an HTTP 201 `application/json` response
@@ -27726,9 +28276,24 @@ func (r CreateTokenResponse) GetJSON201() *TokenCreated {
 	return r.JSON201
 }
 
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r CreateTokenResponse) GetJSON401() *Unauthenticated {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r CreateTokenResponse) GetJSON403() *CsrfInvalid {
+	return r.JSON403
+}
+
 // GetJSON404 returns the response for an HTTP 404 `application/json` response
 func (r CreateTokenResponse) GetJSON404() *NotFound {
 	return r.JSON404
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r CreateTokenResponse) GetJSON422() *ValidationError {
+	return r.JSON422
 }
 
 // GetBody returns the raw response body bytes
@@ -27760,10 +28325,22 @@ func (r CreateTokenResponse) ContentType() string {
 	return ""
 }
 
+// RevokeTokenResponse401Headers the declared response headers of an HTTP 401 response for RevokeToken
+type RevokeTokenResponse401Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
+// RevokeTokenResponse403Headers the declared response headers of an HTTP 403 response for RevokeToken
+type RevokeTokenResponse403Headers struct {
+	// XRequestId correlates the response with server logs and audit records.
+	XRequestId *string
+}
+
 // RevokeTokenResponse404Headers the declared response headers of an HTTP 404 response for RevokeToken
 type RevokeTokenResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // RevokeTokenResponse contains the raw HTTP response and any decoded response body.
@@ -27772,10 +28349,28 @@ type RevokeTokenResponse struct {
 	Body []byte
 	// HTTPResponse is the underlying response returned by net/http.
 	HTTPResponse *http.Response
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Unauthenticated
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *CsrfInvalid
 	// JSON404 the response for an HTTP 404 `application/json` response
 	JSON404 *NotFound
+	// Headers401 the parsed response headers for an HTTP 401 response
+	Headers401 *RevokeTokenResponse401Headers
+	// Headers403 the parsed response headers for an HTTP 403 response
+	Headers403 *RevokeTokenResponse403Headers
 	// Headers404 the parsed response headers for an HTTP 404 response
 	Headers404 *RevokeTokenResponse404Headers
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r RevokeTokenResponse) GetJSON401() *Unauthenticated {
+	return r.JSON401
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r RevokeTokenResponse) GetJSON403() *CsrfInvalid {
+	return r.JSON403
 }
 
 // GetJSON404 returns the response for an HTTP 404 `application/json` response
@@ -27815,19 +28410,19 @@ func (r RevokeTokenResponse) ContentType() string {
 // CreateDiffUploadResponse404Headers the declared response headers of an HTTP 404 response for CreateDiffUpload
 type CreateDiffUploadResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateDiffUploadResponse413Headers the declared response headers of an HTTP 413 response for CreateDiffUpload
 type CreateDiffUploadResponse413Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateDiffUploadResponse422Headers the declared response headers of an HTTP 422 response for CreateDiffUpload
 type CreateDiffUploadResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // CreateDiffUploadResponse contains the raw HTTP response and any decoded response body.
@@ -27904,7 +28499,7 @@ func (r CreateDiffUploadResponse) ContentType() string {
 // ListViewOverridesResponse404Headers the declared response headers of an HTTP 404 response for ListViewOverrides
 type ListViewOverridesResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListViewOverridesResponse contains the raw HTTP response and any decoded response body.
@@ -27963,13 +28558,13 @@ func (r ListViewOverridesResponse) ContentType() string {
 // DeleteViewOverrideResponse404Headers the declared response headers of an HTTP 404 response for DeleteViewOverride
 type DeleteViewOverrideResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteViewOverrideResponse412Headers the declared response headers of an HTTP 412 response for DeleteViewOverride
 type DeleteViewOverrideResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // DeleteViewOverrideResponse contains the raw HTTP response and any decoded response body.
@@ -28030,19 +28625,19 @@ func (r DeleteViewOverrideResponse) ContentType() string {
 // PutViewOverrideResponse200Headers the declared response headers of an HTTP 200 response for PutViewOverride
 type PutViewOverrideResponse200Headers struct {
 	// ETag is the entity tag used for optimistic concurrency control.
-	ETag ETag
+	ETag *ETag
 }
 
 // PutViewOverrideResponse404Headers the declared response headers of an HTTP 404 response for PutViewOverride
 type PutViewOverrideResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutViewOverrideResponse412Headers the declared response headers of an HTTP 412 response for PutViewOverride
 type PutViewOverrideResponse412Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // PutViewOverrideResponse contains the raw HTTP response and any decoded response body.
@@ -28112,7 +28707,7 @@ func (r PutViewOverrideResponse) ContentType() string {
 // ListViewsResponse404Headers the declared response headers of an HTTP 404 response for ListViews
 type ListViewsResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ListViewsResponse contains the raw HTTP response and any decoded response body.
@@ -28171,13 +28766,13 @@ func (r ListViewsResponse) ContentType() string {
 // ResolveViewResponse404Headers the declared response headers of an HTTP 404 response for ResolveView
 type ResolveViewResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ResolveViewResponse422Headers the declared response headers of an HTTP 422 response for ResolveView
 type ResolveViewResponse422Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ResolveViewResponse contains the raw HTTP response and any decoded response body.
@@ -28289,13 +28884,13 @@ func (r GetVersionResponse) ContentType() string {
 // ReceiveGitWebhookResponse401Headers the declared response headers of an HTTP 401 response for ReceiveGitWebhook
 type ReceiveGitWebhookResponse401Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReceiveGitWebhookResponse404Headers the declared response headers of an HTTP 404 response for ReceiveGitWebhook
 type ReceiveGitWebhookResponse404Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReceiveGitWebhookResponse contains the raw HTTP response and any decoded response body.
@@ -28444,7 +29039,7 @@ func (r MetricsResponse) ContentType() string {
 // ReadyzResponse503Headers the declared response headers of an HTTP 503 response for Readyz
 type ReadyzResponse503Headers struct {
 	// XRequestId correlates the response with server logs and audit records.
-	XRequestId string
+	XRequestId *string
 }
 
 // ReadyzResponse contains the raw HTTP response and any decoded response body.
@@ -31724,7 +32319,7 @@ func ParseListPlatformAuditLogsResponse(rsp *http.Response) (*ListPlatformAuditL
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -31803,7 +32398,7 @@ func ParseCreateGlobalCredentialResponse(rsp *http.Response) (*CreateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 409:
@@ -31813,7 +32408,7 @@ func ParseCreateGlobalCredentialResponse(rsp *http.Response) (*CreateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 422:
@@ -31823,7 +32418,7 @@ func ParseCreateGlobalCredentialResponse(rsp *http.Response) (*CreateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -31879,7 +32474,7 @@ func ParseDeleteGlobalCredentialResponse(rsp *http.Response) (*DeleteGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -31889,7 +32484,7 @@ func ParseDeleteGlobalCredentialResponse(rsp *http.Response) (*DeleteGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -31899,7 +32494,7 @@ func ParseDeleteGlobalCredentialResponse(rsp *http.Response) (*DeleteGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -31952,7 +32547,7 @@ func ParseUpdateGlobalCredentialResponse(rsp *http.Response) (*UpdateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -31962,7 +32557,7 @@ func ParseUpdateGlobalCredentialResponse(rsp *http.Response) (*UpdateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -31972,7 +32567,7 @@ func ParseUpdateGlobalCredentialResponse(rsp *http.Response) (*UpdateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -32039,7 +32634,7 @@ func ParseRotateGlobalCredentialResponse(rsp *http.Response) (*RotateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -32049,7 +32644,7 @@ func ParseRotateGlobalCredentialResponse(rsp *http.Response) (*RotateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -32059,7 +32654,7 @@ func ParseRotateGlobalCredentialResponse(rsp *http.Response) (*RotateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -32069,7 +32664,7 @@ func ParseRotateGlobalCredentialResponse(rsp *http.Response) (*RotateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	case rsp.StatusCode == 422:
@@ -32079,7 +32674,7 @@ func ParseRotateGlobalCredentialResponse(rsp *http.Response) (*RotateGlobalCrede
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -32125,7 +32720,7 @@ func ParseTestGlobalCredentialResponse(rsp *http.Response) (*TestGlobalCredentia
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -32171,7 +32766,7 @@ func ParseListPlatformJobsResponse(rsp *http.Response) (*ListPlatformJobsRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -32217,7 +32812,7 @@ func ParseGetPlatformJobResponse(rsp *http.Response) (*GetPlatformJobResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -32296,7 +32891,7 @@ func ParseCreateProducerProfileResponse(rsp *http.Response) (*CreateProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 409:
@@ -32306,7 +32901,7 @@ func ParseCreateProducerProfileResponse(rsp *http.Response) (*CreateProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 422:
@@ -32316,7 +32911,7 @@ func ParseCreateProducerProfileResponse(rsp *http.Response) (*CreateProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -32372,7 +32967,7 @@ func ParseDeleteProducerProfileResponse(rsp *http.Response) (*DeleteProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -32382,7 +32977,7 @@ func ParseDeleteProducerProfileResponse(rsp *http.Response) (*DeleteProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -32392,7 +32987,7 @@ func ParseDeleteProducerProfileResponse(rsp *http.Response) (*DeleteProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -32438,7 +33033,7 @@ func ParseGetProducerProfileResponse(rsp *http.Response) (*GetProducerProfileRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -32448,7 +33043,7 @@ func ParseGetProducerProfileResponse(rsp *http.Response) (*GetProducerProfileRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -32501,7 +33096,7 @@ func ParseUpdateProducerProfileResponse(rsp *http.Response) (*UpdateProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -32511,7 +33106,7 @@ func ParseUpdateProducerProfileResponse(rsp *http.Response) (*UpdateProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -32521,7 +33116,7 @@ func ParseUpdateProducerProfileResponse(rsp *http.Response) (*UpdateProducerProf
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -32560,7 +33155,7 @@ func ParseGetPlatformSettingsResponse(rsp *http.Response) (*GetPlatformSettingsR
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	}
@@ -32606,7 +33201,7 @@ func ParseUpdatePlatformSettingsResponse(rsp *http.Response) (*UpdatePlatformSet
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 412:
@@ -32616,7 +33211,7 @@ func ParseUpdatePlatformSettingsResponse(rsp *http.Response) (*UpdatePlatformSet
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -32671,6 +33266,27 @@ func ParseCreateTenantResponse(rsp *http.Response) (*CreateTenantResponse, error
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthenticated
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest CsrfInvalid
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
 		var dest Duplicate
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -32688,9 +33304,39 @@ func ParseCreateTenantResponse(rsp *http.Response) (*CreateTenantResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
+	case rsp.StatusCode == 401:
+		var headers CreateTenantResponse401Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers401 = &headers
+	case rsp.StatusCode == 403:
+		var headers CreateTenantResponse403Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers403 = &headers
+	case rsp.StatusCode == 404:
+		var headers CreateTenantResponse404Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
 		var headers CreateTenantResponse409Headers
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
@@ -32698,7 +33344,7 @@ func ParseCreateTenantResponse(rsp *http.Response) (*CreateTenantResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -32751,7 +33397,7 @@ func ParseDeleteTenantResponse(rsp *http.Response) (*DeleteTenantResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers202 = &headers
 	case rsp.StatusCode == 404:
@@ -32761,7 +33407,7 @@ func ParseDeleteTenantResponse(rsp *http.Response) (*DeleteTenantResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -32771,7 +33417,7 @@ func ParseDeleteTenantResponse(rsp *http.Response) (*DeleteTenantResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -32824,7 +33470,7 @@ func ParseUpdateTenantResponse(rsp *http.Response) (*UpdateTenantResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -32834,7 +33480,7 @@ func ParseUpdateTenantResponse(rsp *http.Response) (*UpdateTenantResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -32844,7 +33490,7 @@ func ParseUpdateTenantResponse(rsp *http.Response) (*UpdateTenantResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -32873,6 +33519,20 @@ func ParsePutTenantMemberAsPlatformAdminResponse(rsp *http.Response) (*PutTenant
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthenticated
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest CsrfInvalid
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -32883,6 +33543,26 @@ func ParsePutTenantMemberAsPlatformAdminResponse(rsp *http.Response) (*PutTenant
 	}
 
 	switch {
+	case rsp.StatusCode == 401:
+		var headers PutTenantMemberAsPlatformAdminResponse401Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers401 = &headers
+	case rsp.StatusCode == 403:
+		var headers PutTenantMemberAsPlatformAdminResponse403Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers403 = &headers
 	case rsp.StatusCode == 404:
 		var headers PutTenantMemberAsPlatformAdminResponse404Headers
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
@@ -32890,7 +33570,7 @@ func ParsePutTenantMemberAsPlatformAdminResponse(rsp *http.Response) (*PutTenant
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -32936,7 +33616,7 @@ func ParseListUsersResponse(rsp *http.Response) (*ListUsersResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -32965,6 +33645,27 @@ func ParseCreateUserResponse(rsp *http.Response) (*CreateUserResponse, error) {
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthenticated
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest CsrfInvalid
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest NotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
 		var dest Duplicate
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -32989,9 +33690,39 @@ func ParseCreateUserResponse(rsp *http.Response) (*CreateUserResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
+	case rsp.StatusCode == 401:
+		var headers CreateUserResponse401Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers401 = &headers
+	case rsp.StatusCode == 403:
+		var headers CreateUserResponse403Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers403 = &headers
+	case rsp.StatusCode == 404:
+		var headers CreateUserResponse404Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
 		var headers CreateUserResponse409Headers
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
@@ -32999,7 +33730,7 @@ func ParseCreateUserResponse(rsp *http.Response) (*CreateUserResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 422:
@@ -33009,7 +33740,7 @@ func ParseCreateUserResponse(rsp *http.Response) (*CreateUserResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -33062,7 +33793,7 @@ func ParseUpdateUserResponse(rsp *http.Response) (*UpdateUserResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -33072,7 +33803,7 @@ func ParseUpdateUserResponse(rsp *http.Response) (*UpdateUserResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -33082,7 +33813,7 @@ func ParseUpdateUserResponse(rsp *http.Response) (*UpdateUserResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -33128,7 +33859,7 @@ func ParseGetCsrfTokenResponse(rsp *http.Response) (*GetCsrfTokenResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers401 = &headers
 	}
@@ -33181,7 +33912,7 @@ func ParseLoginResponse(rsp *http.Response) (*LoginResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "Set-Cookie", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.SetCookie = value
+			headers.SetCookie = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 401:
@@ -33191,7 +33922,7 @@ func ParseLoginResponse(rsp *http.Response) (*LoginResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers401 = &headers
 	case rsp.StatusCode == 429:
@@ -33201,14 +33932,14 @@ func ParseLoginResponse(rsp *http.Response) (*LoginResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "Retry-After", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "integer", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.RetryAfter = value
+			headers.RetryAfter = &value
 		}
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
 			var value string
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers429 = &headers
 	}
@@ -33240,9 +33971,26 @@ func ParseLogoutResponse(rsp *http.Response) (*LogoutResponse, error) {
 		}
 		response.JSON401 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest CsrfInvalid
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
 	}
 
 	switch {
+	case rsp.StatusCode == 204:
+		var headers LogoutResponse204Headers
+		if values := rsp.Header.Values("Set-Cookie"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "Set-Cookie", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.SetCookie = &value
+		}
+		response.Headers204 = &headers
 	case rsp.StatusCode == 401:
 		var headers LogoutResponse401Headers
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
@@ -33250,9 +33998,19 @@ func ParseLogoutResponse(rsp *http.Response) (*LogoutResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers401 = &headers
+	case rsp.StatusCode == 403:
+		var headers LogoutResponse403Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers403 = &headers
 	}
 
 	return response, nil
@@ -33296,7 +34054,7 @@ func ParseGetMeResponse(rsp *http.Response) (*GetMeResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers401 = &headers
 	}
@@ -33335,7 +34093,7 @@ func ParseGetMyPreferencesResponse(rsp *http.Response) (*GetMyPreferencesRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	}
@@ -33388,7 +34146,7 @@ func ParseUpdateMyPreferencesResponse(rsp *http.Response) (*UpdateMyPreferencesR
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 412:
@@ -33398,7 +34156,7 @@ func ParseUpdateMyPreferencesResponse(rsp *http.Response) (*UpdateMyPreferencesR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	case rsp.StatusCode == 422:
@@ -33408,7 +34166,7 @@ func ParseUpdateMyPreferencesResponse(rsp *http.Response) (*UpdateMyPreferencesR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -33447,7 +34205,7 @@ func ParseDownloadSignedContentResponse(rsp *http.Response) (*DownloadSignedCont
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -33519,7 +34277,7 @@ func ParseGetPublicServiceResponse(rsp *http.Response) (*GetPublicServiceRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -33565,7 +34323,7 @@ func ParseGetPublicAssetResponse(rsp *http.Response) (*GetPublicAssetResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -33618,7 +34376,7 @@ func ParseResolvePublicViewResponse(rsp *http.Response) (*ResolvePublicViewRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 422:
@@ -33628,7 +34386,7 @@ func ParseResolvePublicViewResponse(rsp *http.Response) (*ResolvePublicViewRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -33674,7 +34432,7 @@ func ParseGetSharedViewResponse(rsp *http.Response) (*GetSharedViewResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -33720,7 +34478,7 @@ func ParseListAssetKindsResponse(rsp *http.Response) (*ListAssetKindsResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -33773,7 +34531,7 @@ func ParseUpdateAssetKindStateResponse(rsp *http.Response) (*UpdateAssetKindStat
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -33783,7 +34541,7 @@ func ParseUpdateAssetKindStateResponse(rsp *http.Response) (*UpdateAssetKindStat
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -33793,7 +34551,7 @@ func ParseUpdateAssetKindStateResponse(rsp *http.Response) (*UpdateAssetKindStat
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -33839,7 +34597,7 @@ func ParseGetAssetVersionResponse(rsp *http.Response) (*GetAssetVersionResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -33849,7 +34607,7 @@ func ParseGetAssetVersionResponse(rsp *http.Response) (*GetAssetVersionResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -33895,7 +34653,7 @@ func ParseListAssetVersionItemsResponse(rsp *http.Response) (*ListAssetVersionIt
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -33941,7 +34699,7 @@ func ParseGetAssetVersionProvenanceResponse(rsp *http.Response) (*GetAssetVersio
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -34001,7 +34759,7 @@ func ParseDeprecateAssetVersionResponse(rsp *http.Response) (*DeprecateAssetVers
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -34011,7 +34769,7 @@ func ParseDeprecateAssetVersionResponse(rsp *http.Response) (*DeprecateAssetVers
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -34021,7 +34779,7 @@ func ParseDeprecateAssetVersionResponse(rsp *http.Response) (*DeprecateAssetVers
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -34031,7 +34789,7 @@ func ParseDeprecateAssetVersionResponse(rsp *http.Response) (*DeprecateAssetVers
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -34091,7 +34849,7 @@ func ParsePublishAssetVersionResponse(rsp *http.Response) (*PublishAssetVersionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -34101,7 +34859,7 @@ func ParsePublishAssetVersionResponse(rsp *http.Response) (*PublishAssetVersionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -34111,7 +34869,7 @@ func ParsePublishAssetVersionResponse(rsp *http.Response) (*PublishAssetVersionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -34121,7 +34879,7 @@ func ParsePublishAssetVersionResponse(rsp *http.Response) (*PublishAssetVersionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -34181,7 +34939,7 @@ func ParseRetireAssetVersionResponse(rsp *http.Response) (*RetireAssetVersionRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -34191,7 +34949,7 @@ func ParseRetireAssetVersionResponse(rsp *http.Response) (*RetireAssetVersionRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -34201,7 +34959,7 @@ func ParseRetireAssetVersionResponse(rsp *http.Response) (*RetireAssetVersionRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -34211,7 +34969,7 @@ func ParseRetireAssetVersionResponse(rsp *http.Response) (*RetireAssetVersionRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -34257,7 +35015,7 @@ func ParseGetAssetResponse(rsp *http.Response) (*GetAssetResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -34267,7 +35025,7 @@ func ParseGetAssetResponse(rsp *http.Response) (*GetAssetResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -34334,7 +35092,7 @@ func ParseReorderAssetLayersResponse(rsp *http.Response) (*ReorderAssetLayersRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -34344,7 +35102,7 @@ func ParseReorderAssetLayersResponse(rsp *http.Response) (*ReorderAssetLayersRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -34354,7 +35112,7 @@ func ParseReorderAssetLayersResponse(rsp *http.Response) (*ReorderAssetLayersRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -34364,7 +35122,7 @@ func ParseReorderAssetLayersResponse(rsp *http.Response) (*ReorderAssetLayersRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	case rsp.StatusCode == 422:
@@ -34374,7 +35132,7 @@ func ParseReorderAssetLayersResponse(rsp *http.Response) (*ReorderAssetLayersRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -34420,7 +35178,7 @@ func ParseListAssetVersionsResponse(rsp *http.Response) (*ListAssetVersionsRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -34480,7 +35238,7 @@ func ParseGenerateAssetWithAiResponse(rsp *http.Response) (*GenerateAssetWithAiR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -34490,7 +35248,7 @@ func ParseGenerateAssetWithAiResponse(rsp *http.Response) (*GenerateAssetWithAiR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 422:
@@ -34500,7 +35258,7 @@ func ParseGenerateAssetWithAiResponse(rsp *http.Response) (*GenerateAssetWithAiR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -34567,7 +35325,7 @@ func ParsePreviewMergeResponse(rsp *http.Response) (*PreviewMergeResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -34577,7 +35335,7 @@ func ParsePreviewMergeResponse(rsp *http.Response) (*PreviewMergeResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 413:
@@ -34587,7 +35345,7 @@ func ParsePreviewMergeResponse(rsp *http.Response) (*PreviewMergeResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers413 = &headers
 	case rsp.StatusCode == 422:
@@ -34597,7 +35355,7 @@ func ParsePreviewMergeResponse(rsp *http.Response) (*PreviewMergeResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -34671,7 +35429,7 @@ func ParsePushAssetRevisionResponse(rsp *http.Response) (*PushAssetRevisionRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -34681,7 +35439,7 @@ func ParsePushAssetRevisionResponse(rsp *http.Response) (*PushAssetRevisionRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 413:
@@ -34691,7 +35449,7 @@ func ParsePushAssetRevisionResponse(rsp *http.Response) (*PushAssetRevisionRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers413 = &headers
 	case rsp.StatusCode == 422:
@@ -34701,7 +35459,7 @@ func ParsePushAssetRevisionResponse(rsp *http.Response) (*PushAssetRevisionRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -34747,7 +35505,7 @@ func ParseListAuditLogsResponse(rsp *http.Response) (*ListAuditLogsResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -34793,7 +35551,7 @@ func ParseListBreakingTodosResponse(rsp *http.Response) (*ListBreakingTodosRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -34846,7 +35604,7 @@ func ParseAcknowledgeBreakingTodoResponse(rsp *http.Response) (*AcknowledgeBreak
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -34856,7 +35614,7 @@ func ParseAcknowledgeBreakingTodoResponse(rsp *http.Response) (*AcknowledgeBreak
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -34902,7 +35660,7 @@ func ParseListCredentialsResponse(rsp *http.Response) (*ListCredentialsResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -34955,7 +35713,7 @@ func ParseCreateCredentialResponse(rsp *http.Response) (*CreateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -34965,7 +35723,7 @@ func ParseCreateCredentialResponse(rsp *http.Response) (*CreateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 422:
@@ -34975,7 +35733,7 @@ func ParseCreateCredentialResponse(rsp *http.Response) (*CreateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -35031,7 +35789,7 @@ func ParseDeleteCredentialResponse(rsp *http.Response) (*DeleteCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -35041,7 +35799,7 @@ func ParseDeleteCredentialResponse(rsp *http.Response) (*DeleteCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -35051,7 +35809,7 @@ func ParseDeleteCredentialResponse(rsp *http.Response) (*DeleteCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -35104,7 +35862,7 @@ func ParseUpdateCredentialResponse(rsp *http.Response) (*UpdateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -35114,7 +35872,7 @@ func ParseUpdateCredentialResponse(rsp *http.Response) (*UpdateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -35124,7 +35882,7 @@ func ParseUpdateCredentialResponse(rsp *http.Response) (*UpdateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -35191,7 +35949,7 @@ func ParseRotateCredentialResponse(rsp *http.Response) (*RotateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -35201,7 +35959,7 @@ func ParseRotateCredentialResponse(rsp *http.Response) (*RotateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -35211,7 +35969,7 @@ func ParseRotateCredentialResponse(rsp *http.Response) (*RotateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -35221,7 +35979,7 @@ func ParseRotateCredentialResponse(rsp *http.Response) (*RotateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	case rsp.StatusCode == 422:
@@ -35231,7 +35989,7 @@ func ParseRotateCredentialResponse(rsp *http.Response) (*RotateCredentialRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -35277,7 +36035,7 @@ func ParseTestCredentialResponse(rsp *http.Response) (*TestCredentialResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -35330,7 +36088,7 @@ func ParseRunDiffResponse(rsp *http.Response) (*RunDiffResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 422:
@@ -35340,7 +36098,7 @@ func ParseRunDiffResponse(rsp *http.Response) (*RunDiffResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -35386,7 +36144,7 @@ func ParseListDiffRuleSetsResponse(rsp *http.Response) (*ListDiffRuleSetsRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -35439,7 +36197,7 @@ func ParseCreateDiffRuleSetResponse(rsp *http.Response) (*CreateDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -35449,7 +36207,7 @@ func ParseCreateDiffRuleSetResponse(rsp *http.Response) (*CreateDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -35459,7 +36217,7 @@ func ParseCreateDiffRuleSetResponse(rsp *http.Response) (*CreateDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -35515,7 +36273,7 @@ func ParseDeleteDiffRuleSetResponse(rsp *http.Response) (*DeleteDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -35525,7 +36283,7 @@ func ParseDeleteDiffRuleSetResponse(rsp *http.Response) (*DeleteDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -35535,7 +36293,7 @@ func ParseDeleteDiffRuleSetResponse(rsp *http.Response) (*DeleteDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -35588,7 +36346,7 @@ func ParseUpdateDiffRuleSetResponse(rsp *http.Response) (*UpdateDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -35598,7 +36356,7 @@ func ParseUpdateDiffRuleSetResponse(rsp *http.Response) (*UpdateDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -35608,7 +36366,7 @@ func ParseUpdateDiffRuleSetResponse(rsp *http.Response) (*UpdateDiffRuleSetRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -35654,7 +36412,7 @@ func ParseListDiffSnapshotsResponse(rsp *http.Response) (*ListDiffSnapshotsRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -35696,7 +36454,7 @@ func ParseDeleteDiffSnapshotResponse(rsp *http.Response) (*DeleteDiffSnapshotRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -35742,7 +36500,7 @@ func ParseGetDiffSnapshotResponse(rsp *http.Response) (*GetDiffSnapshotResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -35788,7 +36546,7 @@ func ParseExportDiffSnapshotResponse(rsp *http.Response) (*ExportDiffSnapshotRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -35834,7 +36592,7 @@ func ParseCreateDiffSnapshotShareLinkResponse(rsp *http.Response) (*CreateDiffSn
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -35880,7 +36638,7 @@ func ParseSearchTenantUsersResponse(rsp *http.Response) (*SearchTenantUsersRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -35933,7 +36691,7 @@ func ParseCreateTenantExportResponse(rsp *http.Response) (*CreateTenantExportRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -35943,7 +36701,7 @@ func ParseCreateTenantExportResponse(rsp *http.Response) (*CreateTenantExportRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -35989,7 +36747,7 @@ func ParseListJobsResponse(rsp *http.Response) (*ListJobsResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -36035,7 +36793,7 @@ func ParseGetJobResponse(rsp *http.Response) (*GetJobResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -36074,7 +36832,7 @@ func ParseStreamJobLogsResponse(rsp *http.Response) (*StreamJobLogsResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -36127,7 +36885,7 @@ func ParseCancelJobResponse(rsp *http.Response) (*CancelJobResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36137,7 +36895,7 @@ func ParseCancelJobResponse(rsp *http.Response) (*CancelJobResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -36190,7 +36948,7 @@ func ParseRetryJobResponse(rsp *http.Response) (*RetryJobResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36200,7 +36958,7 @@ func ParseRetryJobResponse(rsp *http.Response) (*RetryJobResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -36246,7 +37004,7 @@ func ParseListKnownHostsResponse(rsp *http.Response) (*ListKnownHostsResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -36306,7 +37064,7 @@ func ParseCreateKnownHostResponse(rsp *http.Response) (*CreateKnownHostResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36316,7 +37074,7 @@ func ParseCreateKnownHostResponse(rsp *http.Response) (*CreateKnownHostResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 422:
@@ -36326,7 +37084,7 @@ func ParseCreateKnownHostResponse(rsp *http.Response) (*CreateKnownHostResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -36372,7 +37130,7 @@ func ParseGetLayerRevisionResponse(rsp *http.Response) (*GetLayerRevisionRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -36425,7 +37183,7 @@ func ParseGetReviewContextResponse(rsp *http.Response) (*GetReviewContextRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36435,7 +37193,7 @@ func ParseGetReviewContextResponse(rsp *http.Response) (*GetReviewContextRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -36488,7 +37246,7 @@ func ParseApproveLayerRevisionResponse(rsp *http.Response) (*ApproveLayerRevisio
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36498,7 +37256,7 @@ func ParseApproveLayerRevisionResponse(rsp *http.Response) (*ApproveLayerRevisio
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -36558,7 +37316,7 @@ func ParseRejectLayerRevisionResponse(rsp *http.Response) (*RejectLayerRevisionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36568,7 +37326,7 @@ func ParseRejectLayerRevisionResponse(rsp *http.Response) (*RejectLayerRevisionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 422:
@@ -36578,7 +37336,7 @@ func ParseRejectLayerRevisionResponse(rsp *http.Response) (*RejectLayerRevisionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -36624,7 +37382,7 @@ func ParseGetLayerResponse(rsp *http.Response) (*GetLayerResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -36634,7 +37392,7 @@ func ParseGetLayerResponse(rsp *http.Response) (*GetLayerResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -36701,7 +37459,7 @@ func ParseUpdateLayerResponse(rsp *http.Response) (*UpdateLayerResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -36711,7 +37469,7 @@ func ParseUpdateLayerResponse(rsp *http.Response) (*UpdateLayerResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36721,7 +37479,7 @@ func ParseUpdateLayerResponse(rsp *http.Response) (*UpdateLayerResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -36731,7 +37489,7 @@ func ParseUpdateLayerResponse(rsp *http.Response) (*UpdateLayerResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	case rsp.StatusCode == 422:
@@ -36741,7 +37499,7 @@ func ParseUpdateLayerResponse(rsp *http.Response) (*UpdateLayerResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -36787,7 +37545,7 @@ func ParseListLayerRevisionsResponse(rsp *http.Response) (*ListLayerRevisionsRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -36861,7 +37619,7 @@ func ParseCreateLayerRevisionResponse(rsp *http.Response) (*CreateLayerRevisionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36871,7 +37629,7 @@ func ParseCreateLayerRevisionResponse(rsp *http.Response) (*CreateLayerRevisionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 413:
@@ -36881,7 +37639,7 @@ func ParseCreateLayerRevisionResponse(rsp *http.Response) (*CreateLayerRevisionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers413 = &headers
 	case rsp.StatusCode == 422:
@@ -36891,7 +37649,7 @@ func ParseCreateLayerRevisionResponse(rsp *http.Response) (*CreateLayerRevisionR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -36944,7 +37702,7 @@ func ParseRollbackLayerResponse(rsp *http.Response) (*RollbackLayerResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -36954,7 +37712,7 @@ func ParseRollbackLayerResponse(rsp *http.Response) (*RollbackLayerResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -37000,7 +37758,7 @@ func ParseListTenantMembersResponse(rsp *http.Response) (*ListTenantMembersRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37049,7 +37807,7 @@ func ParseDeleteTenantMemberResponse(rsp *http.Response) (*DeleteTenantMemberRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -37059,7 +37817,7 @@ func ParseDeleteTenantMemberResponse(rsp *http.Response) (*DeleteTenantMemberRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -37112,7 +37870,7 @@ func ParsePutTenantMemberResponse(rsp *http.Response) (*PutTenantMemberResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -37122,7 +37880,7 @@ func ParsePutTenantMemberResponse(rsp *http.Response) (*PutTenantMemberResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -37168,7 +37926,7 @@ func ParseListNotificationChannelsResponse(rsp *http.Response) (*ListNotificatio
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37221,7 +37979,7 @@ func ParseCreateNotificationChannelResponse(rsp *http.Response) (*CreateNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -37231,7 +37989,7 @@ func ParseCreateNotificationChannelResponse(rsp *http.Response) (*CreateNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 422:
@@ -37241,7 +37999,7 @@ func ParseCreateNotificationChannelResponse(rsp *http.Response) (*CreateNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -37290,7 +38048,7 @@ func ParseDeleteNotificationChannelResponse(rsp *http.Response) (*DeleteNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -37300,7 +38058,7 @@ func ParseDeleteNotificationChannelResponse(rsp *http.Response) (*DeleteNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -37353,7 +38111,7 @@ func ParseUpdateNotificationChannelResponse(rsp *http.Response) (*UpdateNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -37363,7 +38121,7 @@ func ParseUpdateNotificationChannelResponse(rsp *http.Response) (*UpdateNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -37373,7 +38131,7 @@ func ParseUpdateNotificationChannelResponse(rsp *http.Response) (*UpdateNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -37440,7 +38198,7 @@ func ParseRotateNotificationChannelSecretResponse(rsp *http.Response) (*RotateNo
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -37450,7 +38208,7 @@ func ParseRotateNotificationChannelSecretResponse(rsp *http.Response) (*RotateNo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -37460,7 +38218,7 @@ func ParseRotateNotificationChannelSecretResponse(rsp *http.Response) (*RotateNo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -37470,7 +38228,7 @@ func ParseRotateNotificationChannelSecretResponse(rsp *http.Response) (*RotateNo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	case rsp.StatusCode == 422:
@@ -37480,7 +38238,7 @@ func ParseRotateNotificationChannelSecretResponse(rsp *http.Response) (*RotateNo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -37526,7 +38284,7 @@ func ParseTestNotificationChannelResponse(rsp *http.Response) (*TestNotification
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37572,7 +38330,7 @@ func ParseListNotificationsResponse(rsp *http.Response) (*ListNotificationsRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37614,7 +38372,7 @@ func ParseMarkNotificationReadResponse(rsp *http.Response) (*MarkNotificationRea
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37656,7 +38414,7 @@ func ParseMarkAllNotificationsReadResponse(rsp *http.Response) (*MarkAllNotifica
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37702,7 +38460,7 @@ func ParseListAvailableProducerProfilesResponse(rsp *http.Response) (*ListAvaila
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37748,7 +38506,7 @@ func ParseListRepositoriesResponse(rsp *http.Response) (*ListRepositoriesRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37801,7 +38559,7 @@ func ParseCreateRepositoryResponse(rsp *http.Response) (*CreateRepositoryRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -37811,7 +38569,7 @@ func ParseCreateRepositoryResponse(rsp *http.Response) (*CreateRepositoryRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -37821,7 +38579,7 @@ func ParseCreateRepositoryResponse(rsp *http.Response) (*CreateRepositoryRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -37870,7 +38628,7 @@ func ParseDeleteRepositoryResponse(rsp *http.Response) (*DeleteRepositoryRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -37880,7 +38638,7 @@ func ParseDeleteRepositoryResponse(rsp *http.Response) (*DeleteRepositoryRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -37926,7 +38684,7 @@ func ParseGetRepositoryResponse(rsp *http.Response) (*GetRepositoryResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -37936,7 +38694,7 @@ func ParseGetRepositoryResponse(rsp *http.Response) (*GetRepositoryResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -37989,7 +38747,7 @@ func ParseUpdateRepositoryResponse(rsp *http.Response) (*UpdateRepositoryRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -37999,7 +38757,7 @@ func ParseUpdateRepositoryResponse(rsp *http.Response) (*UpdateRepositoryRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -38009,7 +38767,7 @@ func ParseUpdateRepositoryResponse(rsp *http.Response) (*UpdateRepositoryRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -38055,7 +38813,7 @@ func ParseListDiscoveryCandidatesResponse(rsp *http.Response) (*ListDiscoveryCan
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -38101,7 +38859,7 @@ func ParseDismissDiscoveryCandidateResponse(rsp *http.Response) (*DismissDiscove
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -38154,7 +38912,7 @@ func ParseAcceptDiscoveryCandidatesResponse(rsp *http.Response) (*AcceptDiscover
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -38164,7 +38922,7 @@ func ParseAcceptDiscoveryCandidatesResponse(rsp *http.Response) (*AcceptDiscover
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -38217,7 +38975,7 @@ func ParsePreviewRepositoryConfigImportResponse(rsp *http.Response) (*PreviewRep
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -38227,7 +38985,7 @@ func ParsePreviewRepositoryConfigImportResponse(rsp *http.Response) (*PreviewRep
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -38280,7 +39038,7 @@ func ParseApplyRepositoryConfigImportResponse(rsp *http.Response) (*ApplyReposit
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -38290,7 +39048,7 @@ func ParseApplyRepositoryConfigImportResponse(rsp *http.Response) (*ApplyReposit
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -38336,7 +39094,7 @@ func ParseCreateServiceInRepositoryResponse(rsp *http.Response) (*CreateServiceI
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -38346,7 +39104,7 @@ func ParseCreateServiceInRepositoryResponse(rsp *http.Response) (*CreateServiceI
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -38399,7 +39157,7 @@ func ParseDiscoverRepositoryResponse(rsp *http.Response) (*DiscoverRepositoryRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -38409,7 +39167,7 @@ func ParseDiscoverRepositoryResponse(rsp *http.Response) (*DiscoverRepositoryRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -38462,7 +39220,7 @@ func ParseSyncRepositoryResponse(rsp *http.Response) (*SyncRepositoryResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -38472,7 +39230,7 @@ func ParseSyncRepositoryResponse(rsp *http.Response) (*SyncRepositoryResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -38518,7 +39276,7 @@ func ParseCheckRepositoryConnectionResponse(rsp *http.Response) (*CheckRepositor
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -38564,7 +39322,7 @@ func ParseListReviewsResponse(rsp *http.Response) (*ListReviewsResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -38617,7 +39375,7 @@ func ParseSearchResponse(rsp *http.Response) (*SearchResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 422:
@@ -38627,7 +39385,7 @@ func ParseSearchResponse(rsp *http.Response) (*SearchResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -38673,7 +39431,7 @@ func ParseListServicesResponse(rsp *http.Response) (*ListServicesResponse, error
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -38722,7 +39480,7 @@ func ParseDeleteServiceResponse(rsp *http.Response) (*DeleteServiceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -38732,7 +39490,7 @@ func ParseDeleteServiceResponse(rsp *http.Response) (*DeleteServiceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -38778,7 +39536,7 @@ func ParseGetServiceResponse(rsp *http.Response) (*GetServiceResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -38788,7 +39546,7 @@ func ParseGetServiceResponse(rsp *http.Response) (*GetServiceResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -38848,7 +39606,7 @@ func ParseUpdateServiceResponse(rsp *http.Response) (*UpdateServiceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -38858,7 +39616,7 @@ func ParseUpdateServiceResponse(rsp *http.Response) (*UpdateServiceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -38868,7 +39626,7 @@ func ParseUpdateServiceResponse(rsp *http.Response) (*UpdateServiceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -38878,7 +39636,7 @@ func ParseUpdateServiceResponse(rsp *http.Response) (*UpdateServiceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -38924,7 +39682,7 @@ func ParseGetServiceAccessResponse(rsp *http.Response) (*GetServiceAccessRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -38977,7 +39735,7 @@ func ParsePutServiceAccessResponse(rsp *http.Response) (*PutServiceAccessRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -38987,7 +39745,7 @@ func ParsePutServiceAccessResponse(rsp *http.Response) (*PutServiceAccessRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -39047,7 +39805,7 @@ func ParseGenerateMissingAssetWithAiResponse(rsp *http.Response) (*GenerateMissi
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -39057,7 +39815,7 @@ func ParseGenerateMissingAssetWithAiResponse(rsp *http.Response) (*GenerateMissi
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 422:
@@ -39067,7 +39825,7 @@ func ParseGenerateMissingAssetWithAiResponse(rsp *http.Response) (*GenerateMissi
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -39113,7 +39871,7 @@ func ParseListServiceCommentsResponse(rsp *http.Response) (*ListServiceCommentsR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39159,7 +39917,7 @@ func ParseCreateServiceCommentResponse(rsp *http.Response) (*CreateServiceCommen
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39205,7 +39963,7 @@ func ParseListSourceSpecsResponse(rsp *http.Response) (*ListSourceSpecsResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39265,7 +40023,7 @@ func ParseCreateSourceSpecResponse(rsp *http.Response) (*CreateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -39275,7 +40033,7 @@ func ParseCreateSourceSpecResponse(rsp *http.Response) (*CreateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -39285,7 +40043,7 @@ func ParseCreateSourceSpecResponse(rsp *http.Response) (*CreateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 422:
@@ -39295,7 +40053,7 @@ func ParseCreateSourceSpecResponse(rsp *http.Response) (*CreateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -39348,7 +40106,7 @@ func ParseResolveServiceDriftResponse(rsp *http.Response) (*ResolveServiceDriftR
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -39358,7 +40116,7 @@ func ParseResolveServiceDriftResponse(rsp *http.Response) (*ResolveServiceDriftR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -39368,7 +40126,7 @@ func ParseResolveServiceDriftResponse(rsp *http.Response) (*ResolveServiceDriftR
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -39414,7 +40172,7 @@ func ParseStarServiceResponse(rsp *http.Response) (*StarServiceResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39460,7 +40218,7 @@ func ParseUnstarServiceResponse(rsp *http.Response) (*UnstarServiceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39506,7 +40264,7 @@ func ParseListRecentServicesResponse(rsp *http.Response) (*ListRecentServicesRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39552,7 +40310,7 @@ func ParseGetTenantSettingsResponse(rsp *http.Response) (*GetTenantSettingsRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -39562,7 +40320,7 @@ func ParseGetTenantSettingsResponse(rsp *http.Response) (*GetTenantSettingsRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39615,7 +40373,7 @@ func ParseUpdateTenantSettingsResponse(rsp *http.Response) (*UpdateTenantSetting
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -39625,7 +40383,7 @@ func ParseUpdateTenantSettingsResponse(rsp *http.Response) (*UpdateTenantSetting
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -39635,7 +40393,7 @@ func ParseUpdateTenantSettingsResponse(rsp *http.Response) (*UpdateTenantSetting
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -39681,7 +40439,7 @@ func ParseListShareLinksResponse(rsp *http.Response) (*ListShareLinksResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39734,7 +40492,7 @@ func ParseCreateShareLinkResponse(rsp *http.Response) (*CreateShareLinkResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 422:
@@ -39744,7 +40502,7 @@ func ParseCreateShareLinkResponse(rsp *http.Response) (*CreateShareLinkResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -39786,7 +40544,7 @@ func ParseRevokeShareLinkResponse(rsp *http.Response) (*RevokeShareLinkResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -39842,7 +40600,7 @@ func ParseDeleteSourceSpecResponse(rsp *http.Response) (*DeleteSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -39852,7 +40610,7 @@ func ParseDeleteSourceSpecResponse(rsp *http.Response) (*DeleteSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -39862,7 +40620,7 @@ func ParseDeleteSourceSpecResponse(rsp *http.Response) (*DeleteSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -39929,7 +40687,7 @@ func ParseUpdateSourceSpecResponse(rsp *http.Response) (*UpdateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -39939,7 +40697,7 @@ func ParseUpdateSourceSpecResponse(rsp *http.Response) (*UpdateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -39949,7 +40707,7 @@ func ParseUpdateSourceSpecResponse(rsp *http.Response) (*UpdateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	case rsp.StatusCode == 412:
@@ -39959,7 +40717,7 @@ func ParseUpdateSourceSpecResponse(rsp *http.Response) (*UpdateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	case rsp.StatusCode == 422:
@@ -39969,7 +40727,7 @@ func ParseUpdateSourceSpecResponse(rsp *http.Response) (*UpdateSourceSpecRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -40015,7 +40773,7 @@ func ParseListSourceBindingsResponse(rsp *http.Response) (*ListSourceBindingsRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -40068,7 +40826,7 @@ func ParseProduceSourceResponse(rsp *http.Response) (*ProduceSourceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -40078,7 +40836,7 @@ func ParseProduceSourceResponse(rsp *http.Response) (*ProduceSourceResponse, err
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -40124,7 +40882,7 @@ func ParseListSubscriptionsResponse(rsp *http.Response) (*ListSubscriptionsRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -40170,7 +40928,7 @@ func ParsePutSubscriptionResponse(rsp *http.Response) (*PutSubscriptionResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -40216,7 +40974,7 @@ func ParseListSystemGroupsResponse(rsp *http.Response) (*ListSystemGroupsRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -40269,7 +41027,7 @@ func ParseCreateSystemGroupResponse(rsp *http.Response) (*CreateSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -40279,7 +41037,7 @@ func ParseCreateSystemGroupResponse(rsp *http.Response) (*CreateSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 422:
@@ -40289,7 +41047,7 @@ func ParseCreateSystemGroupResponse(rsp *http.Response) (*CreateSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -40338,7 +41096,7 @@ func ParseDeleteSystemGroupResponse(rsp *http.Response) (*DeleteSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -40348,7 +41106,7 @@ func ParseDeleteSystemGroupResponse(rsp *http.Response) (*DeleteSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -40394,7 +41152,7 @@ func ParseGetSystemGroupResponse(rsp *http.Response) (*GetSystemGroupResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -40404,7 +41162,7 @@ func ParseGetSystemGroupResponse(rsp *http.Response) (*GetSystemGroupResponse, e
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -40464,7 +41222,7 @@ func ParseUpdateSystemGroupResponse(rsp *http.Response) (*UpdateSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -40474,7 +41232,7 @@ func ParseUpdateSystemGroupResponse(rsp *http.Response) (*UpdateSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -40484,7 +41242,7 @@ func ParseUpdateSystemGroupResponse(rsp *http.Response) (*UpdateSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	case rsp.StatusCode == 422:
@@ -40494,7 +41252,7 @@ func ParseUpdateSystemGroupResponse(rsp *http.Response) (*UpdateSystemGroupRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -40547,7 +41305,7 @@ func ParsePutSystemGroupMembersResponse(rsp *http.Response) (*PutSystemGroupMemb
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -40557,7 +41315,7 @@ func ParsePutSystemGroupMembersResponse(rsp *http.Response) (*PutSystemGroupMemb
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -40567,7 +41325,7 @@ func ParsePutSystemGroupMembersResponse(rsp *http.Response) (*PutSystemGroupMemb
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -40613,7 +41371,7 @@ func ParseListTagsResponse(rsp *http.Response) (*ListTagsResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -40666,7 +41424,7 @@ func ParseCreateTagResponse(rsp *http.Response) (*CreateTagResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -40676,7 +41434,7 @@ func ParseCreateTagResponse(rsp *http.Response) (*CreateTagResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -40686,7 +41444,7 @@ func ParseCreateTagResponse(rsp *http.Response) (*CreateTagResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -40735,7 +41493,7 @@ func ParseDeleteTagResponse(rsp *http.Response) (*DeleteTagResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -40745,7 +41503,7 @@ func ParseDeleteTagResponse(rsp *http.Response) (*DeleteTagResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -40798,7 +41556,7 @@ func ParseUpdateTagResponse(rsp *http.Response) (*UpdateTagResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -40808,7 +41566,7 @@ func ParseUpdateTagResponse(rsp *http.Response) (*UpdateTagResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -40818,7 +41576,7 @@ func ParseUpdateTagResponse(rsp *http.Response) (*UpdateTagResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -40864,7 +41622,7 @@ func ParseListTeamsResponse(rsp *http.Response) (*ListTeamsResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -40917,7 +41675,7 @@ func ParseCreateTeamResponse(rsp *http.Response) (*CreateTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers201 = &headers
 	case rsp.StatusCode == 404:
@@ -40927,7 +41685,7 @@ func ParseCreateTeamResponse(rsp *http.Response) (*CreateTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 409:
@@ -40937,7 +41695,7 @@ func ParseCreateTeamResponse(rsp *http.Response) (*CreateTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers409 = &headers
 	}
@@ -40986,7 +41744,7 @@ func ParseDeleteTeamResponse(rsp *http.Response) (*DeleteTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -40996,7 +41754,7 @@ func ParseDeleteTeamResponse(rsp *http.Response) (*DeleteTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -41042,7 +41800,7 @@ func ParseGetTeamResponse(rsp *http.Response) (*GetTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -41052,7 +41810,7 @@ func ParseGetTeamResponse(rsp *http.Response) (*GetTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -41105,7 +41863,7 @@ func ParseUpdateTeamResponse(rsp *http.Response) (*UpdateTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -41115,7 +41873,7 @@ func ParseUpdateTeamResponse(rsp *http.Response) (*UpdateTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -41125,7 +41883,7 @@ func ParseUpdateTeamResponse(rsp *http.Response) (*UpdateTeamResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -41178,7 +41936,7 @@ func ParseReplaceTeamMembersResponse(rsp *http.Response) (*ReplaceTeamMembersRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -41188,7 +41946,7 @@ func ParseReplaceTeamMembersResponse(rsp *http.Response) (*ReplaceTeamMembersRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -41198,7 +41956,7 @@ func ParseReplaceTeamMembersResponse(rsp *http.Response) (*ReplaceTeamMembersRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -41227,6 +41985,13 @@ func ParseListTokensResponse(rsp *http.Response) (*ListTokensResponse, error) {
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthenticated
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -41237,6 +42002,16 @@ func ParseListTokensResponse(rsp *http.Response) (*ListTokensResponse, error) {
 	}
 
 	switch {
+	case rsp.StatusCode == 401:
+		var headers ListTokensResponse401Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers401 = &headers
 	case rsp.StatusCode == 404:
 		var headers ListTokensResponse404Headers
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
@@ -41244,7 +42019,7 @@ func ParseListTokensResponse(rsp *http.Response) (*ListTokensResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -41273,6 +42048,20 @@ func ParseCreateTokenResponse(rsp *http.Response) (*CreateTokenResponse, error) 
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthenticated
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest CsrfInvalid
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -41280,9 +42069,36 @@ func ParseCreateTokenResponse(rsp *http.Response) (*CreateTokenResponse, error) 
 		}
 		response.JSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest ValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
 	}
 
 	switch {
+	case rsp.StatusCode == 401:
+		var headers CreateTokenResponse401Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers401 = &headers
+	case rsp.StatusCode == 403:
+		var headers CreateTokenResponse403Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers403 = &headers
 	case rsp.StatusCode == 404:
 		var headers CreateTokenResponse404Headers
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
@@ -41290,9 +42106,19 @@ func ParseCreateTokenResponse(rsp *http.Response) (*CreateTokenResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
+	case rsp.StatusCode == 422:
+		var headers CreateTokenResponse422Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers422 = &headers
 	}
 
 	return response, nil
@@ -41315,6 +42141,20 @@ func ParseRevokeTokenResponse(rsp *http.Response) (*RevokeTokenResponse, error) 
 	case rsp.StatusCode == 204:
 		break // No content-type
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthenticated
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest CsrfInvalid
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest NotFound
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -41325,6 +42165,26 @@ func ParseRevokeTokenResponse(rsp *http.Response) (*RevokeTokenResponse, error) 
 	}
 
 	switch {
+	case rsp.StatusCode == 401:
+		var headers RevokeTokenResponse401Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers401 = &headers
+	case rsp.StatusCode == 403:
+		var headers RevokeTokenResponse403Headers
+		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
+			var value string
+			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			}
+			headers.XRequestId = &value
+		}
+		response.Headers403 = &headers
 	case rsp.StatusCode == 404:
 		var headers RevokeTokenResponse404Headers
 		if values := rsp.Header.Values("X-Request-Id"); len(values) > 0 {
@@ -41332,7 +42192,7 @@ func ParseRevokeTokenResponse(rsp *http.Response) (*RevokeTokenResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -41392,7 +42252,7 @@ func ParseCreateDiffUploadResponse(rsp *http.Response) (*CreateDiffUploadRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 413:
@@ -41402,7 +42262,7 @@ func ParseCreateDiffUploadResponse(rsp *http.Response) (*CreateDiffUploadRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers413 = &headers
 	case rsp.StatusCode == 422:
@@ -41412,7 +42272,7 @@ func ParseCreateDiffUploadResponse(rsp *http.Response) (*CreateDiffUploadRespons
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -41458,7 +42318,7 @@ func ParseListViewOverridesResponse(rsp *http.Response) (*ListViewOverridesRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -41507,7 +42367,7 @@ func ParseDeleteViewOverrideResponse(rsp *http.Response) (*DeleteViewOverrideRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -41517,7 +42377,7 @@ func ParseDeleteViewOverrideResponse(rsp *http.Response) (*DeleteViewOverrideRes
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -41570,7 +42430,7 @@ func ParsePutViewOverrideResponse(rsp *http.Response) (*PutViewOverrideResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "ETag", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.ETag = value
+			headers.ETag = &value
 		}
 		response.Headers200 = &headers
 	case rsp.StatusCode == 404:
@@ -41580,7 +42440,7 @@ func ParsePutViewOverrideResponse(rsp *http.Response) (*PutViewOverrideResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 412:
@@ -41590,7 +42450,7 @@ func ParsePutViewOverrideResponse(rsp *http.Response) (*PutViewOverrideResponse,
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers412 = &headers
 	}
@@ -41636,7 +42496,7 @@ func ParseListViewsResponse(rsp *http.Response) (*ListViewsResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -41689,7 +42549,7 @@ func ParseResolveViewResponse(rsp *http.Response) (*ResolveViewResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	case rsp.StatusCode == 422:
@@ -41699,7 +42559,7 @@ func ParseResolveViewResponse(rsp *http.Response) (*ResolveViewResponse, error) 
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers422 = &headers
 	}
@@ -41778,7 +42638,7 @@ func ParseReceiveGitWebhookResponse(rsp *http.Response) (*ReceiveGitWebhookRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers401 = &headers
 	case rsp.StatusCode == 404:
@@ -41788,7 +42648,7 @@ func ParseReceiveGitWebhookResponse(rsp *http.Response) (*ReceiveGitWebhookRespo
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers404 = &headers
 	}
@@ -41876,7 +42736,7 @@ func ParseReadyzResponse(rsp *http.Response) (*ReadyzResponse, error) {
 			if err := runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", values[0], &value, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""}); err != nil {
 				return nil, err
 			}
-			headers.XRequestId = value
+			headers.XRequestId = &value
 		}
 		response.Headers503 = &headers
 	}

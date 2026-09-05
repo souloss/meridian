@@ -37,6 +37,7 @@ import type {
   ConnectionTestResponse,
   CredentialInUseResponse,
   CredentialRotateBody,
+  CsrfInvalidResponse,
   DeleteGlobalCredentialParams,
   DeleteProducerProfileParams,
   DuplicateResponse,
@@ -70,6 +71,7 @@ import type {
   TenantPageResponse,
   TenantPatchBody,
   TenantResponse,
+  UnauthenticatedResponse,
   UserCreateBodyBody,
   UserPageResponse,
   UserPatchBody,
@@ -202,6 +204,30 @@ export type createUserResponse201 = {
   status: 201
 }
 
+/** createUserResponse401 represents a declared HTTP response from the create user response401 operation. */
+export type createUserResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: UnauthenticatedResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** createUserResponse403 represents a declared HTTP response from the create user response403 operation. */
+export type createUserResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: CsrfInvalidResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
+/** createUserResponse404 represents a declared HTTP response from the create user response404 operation. */
+export type createUserResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: NotFoundResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
 /** createUserResponse409 represents a declared HTTP response from the create user response409 operation. */
 export type createUserResponse409 = {
   /** Data contains the decoded response payload. */
@@ -224,7 +250,7 @@ export type createUserResponseSuccess = (createUserResponse201) & {
   headers: Headers;
 };
 /** createUserResponseError represents a declared HTTP response from the create user response error operation. */
-export type createUserResponseError = (createUserResponse409 | createUserResponse422) & {
+export type createUserResponseError = (createUserResponse401 | createUserResponse403 | createUserResponse404 | createUserResponse409 | createUserResponse422) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
@@ -267,7 +293,7 @@ return meridianFetch<createUserResponse>(getCreateUserUrl(),
 export const getCreateUserMutationKey = () => ['createUser'] as const;
 
 /** getCreateUserMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateUserMutationOptions = <TError = DuplicateResponse | ValidationErrorResponse,
+export const getCreateUserMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext> => {
 
@@ -299,12 +325,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateUserMutationBody is the request body type for its generated OpenAPI operation. */
     export type CreateUserMutationBody = UserCreateBodyBody
     /** CreateUserMutationError is generated from the Meridian OpenAPI contract for create user mutation error. */
-    export type CreateUserMutationError = DuplicateResponse | ValidationErrorResponse
+    export type CreateUserMutationError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse | ValidationErrorResponse
     /** CreateUserMutationVariables is generated from the Meridian OpenAPI contract for create user mutation variables. */
     export type CreateUserMutationVariables = {/** Data contains the decoded response payload. */ data: UserCreateBodyBody}
 
     /** useCreateUser executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateUser = <TError = DuplicateResponse | ValidationErrorResponse,
+    export const useCreateUser = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse | ValidationErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createUser>>,
@@ -540,6 +566,30 @@ export type createTenantResponse201 = {
   status: 201
 }
 
+/** createTenantResponse401 represents a declared HTTP response from the create tenant response401 operation. */
+export type createTenantResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: UnauthenticatedResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** createTenantResponse403 represents a declared HTTP response from the create tenant response403 operation. */
+export type createTenantResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: CsrfInvalidResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
+/** createTenantResponse404 represents a declared HTTP response from the create tenant response404 operation. */
+export type createTenantResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: NotFoundResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
 /** createTenantResponse409 represents a declared HTTP response from the create tenant response409 operation. */
 export type createTenantResponse409 = {
   /** Data contains the decoded response payload. */
@@ -554,7 +604,7 @@ export type createTenantResponseSuccess = (createTenantResponse201) & {
   headers: Headers;
 };
 /** createTenantResponseError represents a declared HTTP response from the create tenant response error operation. */
-export type createTenantResponseError = (createTenantResponse409) & {
+export type createTenantResponseError = (createTenantResponse401 | createTenantResponse403 | createTenantResponse404 | createTenantResponse409) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
@@ -597,7 +647,7 @@ return meridianFetch<createTenantResponse>(getCreateTenantUrl(),
 export const getCreateTenantMutationKey = () => ['createTenant'] as const;
 
 /** getCreateTenantMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateTenantMutationOptions = <TError = DuplicateResponse,
+export const getCreateTenantMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext> => {
 
@@ -629,12 +679,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateTenantMutationBody is the request body type for its generated OpenAPI operation. */
     export type CreateTenantMutationBody = TenantCreateBody
     /** CreateTenantMutationError is generated from the Meridian OpenAPI contract for create tenant mutation error. */
-    export type CreateTenantMutationError = DuplicateResponse
+    export type CreateTenantMutationError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse
     /** CreateTenantMutationVariables is generated from the Meridian OpenAPI contract for create tenant mutation variables. */
     export type CreateTenantMutationVariables = {/** Data contains the decoded response payload. */ data: TenantCreateBody}
 
     /** useCreateTenant executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateTenant = <TError = DuplicateResponse,
+    export const useCreateTenant = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createTenant>>,
@@ -894,6 +944,22 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   status: 200
 }
 
+/** putTenantMemberAsPlatformAdminResponse401 represents a declared HTTP response from the put tenant member as platform admin response401 operation. */
+export type putTenantMemberAsPlatformAdminResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: UnauthenticatedResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** putTenantMemberAsPlatformAdminResponse403 represents a declared HTTP response from the put tenant member as platform admin response403 operation. */
+export type putTenantMemberAsPlatformAdminResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: CsrfInvalidResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
 /** putTenantMemberAsPlatformAdminResponse404 represents a declared HTTP response from the put tenant member as platform admin response404 operation. */
 export type putTenantMemberAsPlatformAdminResponse404 = {
   /** Data contains the decoded response payload. */
@@ -908,7 +974,7 @@ export type putTenantMemberAsPlatformAdminResponseSuccess = (putTenantMemberAsPl
   headers: Headers;
 };
 /** putTenantMemberAsPlatformAdminResponseError represents a declared HTTP response from the put tenant member as platform admin response error operation. */
-export type putTenantMemberAsPlatformAdminResponseError = (putTenantMemberAsPlatformAdminResponse404) & {
+export type putTenantMemberAsPlatformAdminResponseError = (putTenantMemberAsPlatformAdminResponse401 | putTenantMemberAsPlatformAdminResponse403 | putTenantMemberAsPlatformAdminResponse404) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
@@ -954,7 +1020,7 @@ return meridianFetch<putTenantMemberAsPlatformAdminResponse>(getPutTenantMemberA
 export const getPutTenantMemberAsPlatformAdminMutationKey = () => ['putTenantMemberAsPlatformAdmin'] as const;
 
 /** getPutTenantMemberAsPlatformAdminMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPutTenantMemberAsPlatformAdminMutationOptions = <TError = NotFoundResponse,
+export const getPutTenantMemberAsPlatformAdminMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext> => {
 
@@ -986,12 +1052,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** PutTenantMemberAsPlatformAdminMutationBody is the request body type for its generated OpenAPI operation. */
     export type PutTenantMemberAsPlatformAdminMutationBody = MemberPutBody
     /** PutTenantMemberAsPlatformAdminMutationError is generated from the Meridian OpenAPI contract for put tenant member as platform admin mutation error. */
-    export type PutTenantMemberAsPlatformAdminMutationError = NotFoundResponse
+    export type PutTenantMemberAsPlatformAdminMutationError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse
     /** PutTenantMemberAsPlatformAdminMutationVariables is generated from the Meridian OpenAPI contract for put tenant member as platform admin mutation variables. */
     export type PutTenantMemberAsPlatformAdminMutationVariables = {/** TenantSlug carries the tenant slug value for PutTenantMemberAsPlatformAdminMutationVariables. */ tenantSlug: string;/** UserId carries the user id value for PutTenantMemberAsPlatformAdminMutationVariables. */ userId: string;/** Data contains the decoded response payload. */ data: MemberPutBody}
 
     /** usePutTenantMemberAsPlatformAdmin executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePutTenantMemberAsPlatformAdmin = <TError = NotFoundResponse,
+    export const usePutTenantMemberAsPlatformAdmin = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>,

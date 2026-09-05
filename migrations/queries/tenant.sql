@@ -15,6 +15,12 @@ INSERT INTO tenants (
 )
 RETURNING *;
 
+-- GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
+-- name: GetPlatformSettingsForTenantCreate :one
+SELECT settings
+FROM platform_settings
+WHERE id = 'default';
+
 -- GetTenantBySlug returns a tenant in any lifecycle state for platform administration.
 -- name: GetTenantBySlug :one
 SELECT *

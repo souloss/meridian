@@ -12,6 +12,8 @@ import (
 
 // Querier exposes every generated Meridian database query for dependency injection and tests.
 type Querier interface {
+	// CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
+	CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error)
 	// CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
 	CreateAPIToken(ctx context.Context, arg CreateAPITokenParams) (ApiToken, error)
 	// CreateDefaultUserPreferences creates the locale, theme, and view defaults required for a new identity.
@@ -28,6 +30,8 @@ type Querier interface {
 	GetActiveTenantBySlug(ctx context.Context, slug string) (Tenant, error)
 	// GetActiveTenantMembership returns one active tenant membership without revealing disabled tenant records.
 	GetActiveTenantMembership(ctx context.Context, arg GetActiveTenantMembershipParams) (GetActiveTenantMembershipRow, error)
+	// GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
+	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
 	// GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
 	GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error)
 	// GetTenantBySlug returns a tenant in any lifecycle state for platform administration.
@@ -36,16 +40,19 @@ type Querier interface {
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
 	// GetUserByUsername returns the global identity matching the exact unique login name.
 	GetUserByUsername(ctx context.Context, username string) (User, error)
-	// ListAPITokensByUser returns PAT metadata for one user inside one explicit tenant boundary.
+	// ListAPITokensByUser returns one stable page of PAT metadata for one user inside one explicit tenant boundary.
 	ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUserParams) ([]ApiToken, error)
 	// ListActiveTenantMemberships returns a user's active tenant memberships in stable slug and UUID order.
 	ListActiveTenantMemberships(ctx context.Context, userID uuid.UUID) ([]ListActiveTenantMembershipsRow, error)
 	// PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
 	PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error)
-	// RevokeAPIToken atomically revokes a PAT owned by one user in one tenant and reports whether a row changed.
-	RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (int64, error)
+	// RevokeAPIToken idempotently revokes a PAT owned by one user in one tenant and returns its identifier.
+	// Returning an already-revoked matching row preserves idempotency while an absent or foreign row remains not found.
+	RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error)
 	// RevokeSession atomically revokes one active browser session and reports whether a row changed.
 	RevokeSession(ctx context.Context, arg RevokeSessionParams) (int64, error)
+	// RotateSessionCSRFHash replaces the keyed CSRF digest for one active browser session.
+	RotateSessionCSRFHash(ctx context.Context, arg RotateSessionCSRFHashParams) (int64, error)
 	// TouchAPIToken records the latest successful use of a non-revoked tenant PAT.
 	TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error
 	// TouchSession records the latest accepted request time for a non-revoked browser session.

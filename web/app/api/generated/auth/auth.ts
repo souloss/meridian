@@ -26,6 +26,7 @@ import {
 } from 'vue';
 
 import type {
+  CsrfInvalidResponse,
   CsrfToken,
   LoginRequest,
   LoginResult,
@@ -291,13 +292,21 @@ export type logoutResponse401 = {
   status: 401
 }
 
+/** logoutResponse403 represents a declared HTTP response from the logout response403 operation. */
+export type logoutResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: CsrfInvalidResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
 /** logoutResponseSuccess represents a declared HTTP response from the logout response success operation. */
 export type logoutResponseSuccess = (logoutResponse204) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 /** logoutResponseError represents a declared HTTP response from the logout response error operation. */
-export type logoutResponseError = (logoutResponse401) & {
+export type logoutResponseError = (logoutResponse401 | logoutResponse403) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
@@ -334,7 +343,7 @@ export const logout = async ( options?: Parameters<typeof meridianFetch>[1]): Pr
 export const getLogoutMutationKey = () => ['logout'] as const;
 
 /** getLogoutMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getLogoutMutationOptions = <TError = UnauthenticatedResponse,
+export const getLogoutMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext> => {
 
@@ -365,11 +374,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>
 
     /** LogoutMutationError is generated from the Meridian OpenAPI contract for logout mutation error. */
-    export type LogoutMutationError = UnauthenticatedResponse
+    export type LogoutMutationError = UnauthenticatedResponse | CsrfInvalidResponse
 
 
     /** useLogout executes its OpenAPI operation through TanStack Vue Query. */
-    export const useLogout = <TError = UnauthenticatedResponse,
+    export const useLogout = <TError = UnauthenticatedResponse | CsrfInvalidResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof logout>>,
