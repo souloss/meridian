@@ -3,8 +3,8 @@
 > 最后核对：2026-09-05
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`78cbc38 feat: close M0 audit outbox transaction loop`
-> 当前开发切片：本地 SHA-256 CAS Blob 驱动
+> 最新稳定提交：`6c79863 feat: add local content-addressed blob foundation`
+> 当前开发切片：租户 Job 查询、取消、重试与 SSE 控制面
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 为准。
 
@@ -53,7 +53,7 @@
 | River Worker 与通用 Job 控制面 | 部分完成 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；租户 Job 查询/取消/重试/SSE 仍属后续切片 | `147b155` |
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
 | Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
-| 本地 SHA-256 CAS Blob 驱动 | 未开始 | 只有 M0 DDL，尚无存储驱动和签名读取闭环 | `ab1635f` |
+| 本地 SHA-256 CAS Blob 驱动 | 已完成 | 流式摘要、排他原子发布、去重、损坏检测、短时内容能力、租户唯一字节配额和真实 PG 覆盖均已通过；内容 HTTP endpoint 按契约在 M1 资产消费者接入 | `6c79863` |
 | M0 Nuxt 控制面 | 未开始 | 当前只有静态应用壳、生成客户端和 Query 插件；登录、租户壳、凭据/仓库页面及 E2E 未完成 | `b29514f` |
 | M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；CodeMirror 大文件、Table/Cytoscape 性能、桌面/移动端 Playwright 与 axe 尚未放行 | [`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
 
@@ -74,9 +74,9 @@
 
 ## 当前工作区快照
 
-最后稳定基线是 `78cbc38`。该提交完成时，Go 单测、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
+最后稳定基线是 `6c79863`。该提交完成时，Go 单测、竞态测试、`go vet`、数据库/HTTP 集成测试、契约校验、DDL/生成注释审计和 `git diff --check` 均已通过；提交后的生成无漂移检查随后通过。
 
-2026-09-05 核对时，仓库、平台 Job、River Worker、审计查询与 M0 Outbox 基础切片已通过门禁，包含：
+2026-09-05 核对时，仓库、平台 Job、River Worker、审计查询、M0 Outbox 与本地 CAS Blob 基础切片已通过门禁，包含：
 
 - `migrations/queries/repository.sql`；
 - sqlc 生成的 repository 查询代码；
@@ -93,15 +93,17 @@
 - `collect.failed` 完整 AsyncAPI 信封与 terminal Job、阶段日志和 `job.failed` 审计使用同一 PostgreSQL 事务写入；共享 `eventId` 作为接收方去重键。
 - River 启动及每分钟触发有界 Outbox 扫描；领取使用 `FOR UPDATE SKIP LOCKED`，失败只保留稳定错误码，五档退避覆盖六次尝试，过期租约可恢复且旧租约回写被栅栏拒绝。
 - M0 默认没有通知通道；具体订阅匹配、配置解密和 webhook/in-app/email 投递适配保持在 M5，不以假成功冒充分发。
+- 本地 Blob 以 SHA-256 派生唯一安全路径，采用临时文件、文件 `fsync` 和不覆盖目标的 hard-link 原子发布；重复写和并发写会复核目标摘要，磁盘损坏不会被静默接受。
+- Blob 元数据与租户引用在同一事务内登记；按租户唯一摘要计费并锁定租户配额行，重复引用不重复占用配额，跨租户只复用全局不可变元数据。
+- HMAC-SHA-256 内容能力最长 300 秒，绑定摘要、制品类型、媒体类型、Disposition 和可选分享记录，并支持 active/previous key 平滑轮换；实际内容 endpoint 随 M1 资产读取链路接入。
 
 本阶段提交前已通过 `vfox exec golang@1.27.1 -- go test ./...`、`go vet`、sqlc vet、数据库/HTTP 集成、契约校验和 DDL/生成注释审计；提交后必须再次执行生成无漂移门禁。
 
 ## 下一步顺序
 
-1. 完成本地 SHA-256 CAS Blob 驱动。
-2. 补齐租户 Job 查询/取消/重试/SSE 控制面。
-3. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
-4. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
+1. 补齐租户 Job 查询/取消/重试/SSE 控制面。
+2. 完成 M0 Nuxt 控制面和桌面/移动端 E2E、axe 及剩余 executable spikes。
+3. 逐项运行 M0 Acceptance/Smoke；全部通过后才将 M0 标记为完成并开始 M1。
 
 ## 更新流程
 

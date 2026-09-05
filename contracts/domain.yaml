@@ -1226,8 +1226,8 @@ storage:
     writeProtocol:
       - hash-while-streaming-to-a-same-filesystem-temporary-file
       - fsync-file
-      - atomic-rename-to-storage-key
-      - when-target-exists-verify-size-and-digest-then-discard-temporary-file
+      - atomically-publish-with-a-no-replace-same-filesystem-hard-link
+      - when-target-exists-or-wins-a-concurrent-publish-verify-size-and-digest-then-discard-temporary-file
     pathSafety: derive-path-only-from-a-validated-64-character-lowercase-hex-digest
     applicationSupport: single-application-instance-in-v1
     contentDelivery:

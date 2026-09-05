@@ -187,7 +187,7 @@ AI 冷启动是服务级命令，因为此时 Asset 尚不存在。请求包含 
 
 业务写入与 River job 插入使用同一个 `pgx.Tx`；outbox 行也在该事务写入。River worker 的 schema migration 不代替业务 outbox：外部 webhook、通知等仍从 outbox 至少一次投递，而内部异步执行由 River 接管。
 
-MVP blob 实现固定为 `domain.yaml#/storage/blobStore`：`MERIDIAN_BLOB_ROOT` 指向持久卷，key 只由 SHA-256 digest 推导，写入使用同文件系统临时文件、`fsync`、原子 rename。数据库只保存 immutable blob key、hash、size 和 media type。上传校验 MIME、大小和解析结果；应用签发的下载 token 最长 300 秒并绑定 blob/制品类型，分享下载还绑定有效 shareLinkId，分享 token 不能换取其它资源内容。S3-compatible driver 不属于 v1。
+MVP blob 实现固定为 `domain.yaml#/storage/blobStore`：`MERIDIAN_BLOB_ROOT` 指向持久卷，key 只由 SHA-256 digest 推导。写入先在同一文件系统流式计算摘要并写临时文件、执行 `fsync`，再用不替换目标的 hard-link 原子发布；若目标已存在或由并发进程率先发布，必须重新校验目标大小和摘要后丢弃临时文件，绝不覆盖已有 CAS 对象。数据库只保存 immutable blob key、hash、size 和 media type。上传校验 MIME、大小和解析结果；应用签发的下载 token 最长 300 秒并绑定 blob/制品类型，分享下载还绑定有效 shareLinkId，分享 token 不能换取其它资源内容。S3-compatible driver 不属于 v1。
 
 ## 8. HTTP 与生成代码
 
