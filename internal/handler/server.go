@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"bytes"
 	"context"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
+	"io"
 	"io/fs"
 	"net/http"
 	"strings"
@@ -139,7 +143,7 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 	if err != nil {
 		panic("load embedded OpenAPI contract: " + err.Error())
 	}
-	return nethttpmiddleware.OapiRequestValidatorWithOptions(specification, &nethttpmiddleware.Options{
+	validator := nethttpmiddleware.OapiRequestValidatorWithOptions(specification, &nethttpmiddleware.Options{
 		Options: openapi3filter.Options{AuthenticationFunc: openapi3filter.NoopAuthenticationFunc},
 		ErrorHandlerWithOpts: func(_ context.Context, _ error, w http.ResponseWriter, r *http.Request, options nethttpmiddleware.ErrorHandlerOpts) {
 			if options.MatchedRoute == nil {
@@ -158,4 +162,36 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 			return r.URL.Path != "/healthz" && r.URL.Path != "/readyz" && !strings.HasPrefix(r.URL.Path, "/api/")
 		},
 	})
+	return func(next http.Handler) http.Handler {
+		validated := validator(next)
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if isKnownHostCreateRequest(r) && hasDerivedKnownHostFields(r) {
+				writeError(w, r, http.StatusUnprocessableEntity, "validation_error", "request does not satisfy the API contract")
+				return
+			}
+			validated.ServeHTTP(w, r)
+		})
+	}
+}
+
+func isKnownHostCreateRequest(r *http.Request) bool {
+	return r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/api/v1/t/") && strings.HasSuffix(r.URL.Path, "/known-hosts")
+}
+
+func hasDerivedKnownHostFields(r *http.Request) bool {
+	if r.Body == nil {
+		return false
+	}
+	body, err := io.ReadAll(r.Body)
+	r.Body = io.NopCloser(bytes.NewReader(body))
+	if err != nil {
+		return false
+	}
+	var fields map[string]jsontext.Value
+	if err := json.Unmarshal(body, &fields); err != nil {
+		return false
+	}
+	_, hasKeyType := fields["keyType"]
+	_, hasFingerprint := fields["fingerprint"]
+	return hasKeyType || hasFingerprint
 }
