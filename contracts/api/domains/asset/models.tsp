@@ -8,6 +8,82 @@ using TypeSpec.OpenAPI;
 
 namespace MeridianApi;
 
+/** identifies an asset kind registered in contracts/kinds.yaml. */
+@pattern("^[a-z][a-z0-9_]{0,63}$")
+scalar KindId extends string;
+
+/** contains an ordered collection of capability values. */
+model CapabilityList is string[];
+
+/** identifies one supported source mode value. */
+enum SourceMode {
+  builtin,
+  command,
+  push,
+  manual,
+  ai,
+}
+
+/** identifies one supported config source value. */
+enum ConfigSource {
+  db_manual,
+  repo_file,
+  repo_bootstrap,
+}
+
+/** represents field source data exchanged through the Meridian API. */
+model FieldSource {
+  /** specifies the pointer associated with this field source. */
+  pointer: string;
+
+  /** contains the config source associated with this field source. */
+  source: ConfigSource;
+}
+
+/** represents asset kind data exchanged through the Meridian API. */
+model AssetKind {
+  /** uniquely identifies this resource. */
+  id: KindId;
+
+  /** is the opaque entity tag required for optimistic concurrency control. */
+  etag: ETag;
+
+  /** indicates whether enabled applies to this asset kind. */
+  enabled: boolean;
+
+  /** specifies the milestone associated with this asset kind. */
+  @pattern("^M[0-9]+$") milestone: string;
+
+  /** contains the ordered accepted media types associated with this asset kind. */
+  acceptedMediaTypes: string[];
+
+  /** lists actions the authenticated principal may perform on this resource. */
+  capabilities: CapabilityList;
+
+  /** contains the ordered default views associated with this asset kind. */
+  defaultViews: string[];
+
+  /** specifies the schema version associated with this asset kind. */
+  @minValue(1) schemaVersion: integer;
+}
+
+/** contains an ordered collection of asset kind values. */
+model AssetKindList {
+  /** contains the ordered items associated with this asset kind list. */
+  items: AssetKind[];
+}
+
+/** defines validated input for the corresponding Meridian API operation. */
+model AssetKindPatchRequest {
+  /** indicates whether enabled applies to this asset kind patch request. */
+  enabled: boolean;
+}
+
+/** represents asset name template data exchanged through the Meridian API. */
+@maxLength(128)
+@pattern("^(?:[a-z0-9-]|\\{file_stem\\}|\\{parent_dir\\})+$")
+scalar AssetNameTemplate extends string;
+
 /** represents source run summary data exchanged through the Meridian API. */
 model SourceRunSummary {
   /** identifies the asynchronous job associated with this resource. */
@@ -395,18 +471,6 @@ model Asset {
 
   /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
-}
-
-/** represents page info data exchanged through the Meridian API. */
-model PageInfo {
-  /** is the number of matching records across all pages. */
-  @minValue(0) total: integer;
-
-  /** is the one-based page number. */
-  @minValue(1) page: integer;
-
-  /** is the maximum number of records returned on one page. */
-  @minValue(1) @maxValue(100) pageSize: integer;
 }
 
 /** identifies one supported revision status value. */

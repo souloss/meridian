@@ -1,7 +1,7 @@
 # TypeSpec domain sources
 
 Each domain directory owns one API boundary. Its `routes.tsp` imports
-`../../common/models.tsp`, declares routes under `namespace MeridianApi`, and
+`../../models.tsp`, declares routes under `namespace MeridianApi`, and
 keeps operation IDs, tags, authorization decorators and contract extensions
 next to the operation they describe. Add a domain `models.tsp` only for models
 that are genuinely private to that domain; shared wire models stay under

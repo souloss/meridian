@@ -8,6 +8,26 @@ using TypeSpec.OpenAPI;
 
 namespace MeridianApi;
 
+/** represents ref glob data exchanged through the Meridian API. */
+@minLength(1)
+@maxLength(255)
+@pattern("^[A-Za-z0-9._/*?-]+$")
+@format("git-ref-glob")
+scalar RefGlob extends string;
+
+/** is a validated Git branch or tag name without a refs prefix. */
+@minLength(1)
+@maxLength(255)
+@pattern("^[A-Za-z0-9._/-]+$")
+@format("git-ref-name")
+scalar RefName extends string;
+
+/** identifies one supported ref type value. */
+enum RefType {
+  branch,
+  tag,
+}
+
 /** defines supported filters for selecting platform audit records. */
 model PlatformAuditFilter {
   /** contains the uuid associated with this platform audit filter. */

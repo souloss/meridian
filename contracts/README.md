@@ -7,7 +7,7 @@
 | 文件 | 唯一负责内容 |
 | --- | --- |
 | [openapi.yaml](./openapi.yaml) | `contracts/api/` 生成的完整 HTTP canonical bundle，不直接编辑 |
-| [api/](./api/) | TypeSpec 唯一真实源：`main.tsp`、`common/*.tsp` 与 `domains/*/routes.tsp`；构建时生成 build 投影和 canonical `openapi.yaml` |
+| [api/](./api/) | TypeSpec 唯一真实源：`main.tsp`、`models.tsp`、`common/*.tsp` 与 `domains/*/{models,routes}.tsp`；构建时生成 build 投影和 canonical `openapi.yaml` |
 | [domain.yaml](./domain.yaml) | 领域枚举、权限、状态机、限制、默认值、并发与恢复语义 |
 | [storage.yaml](./storage.yaml) | PostgreSQL 表、键、索引、外键策略、事务边界 |
 | [kinds.yaml](./kinds.yaml) | AssetKind 插件接口、内建 kind、内容 schema、breaking 规则 |

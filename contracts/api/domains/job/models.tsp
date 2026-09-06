@@ -8,6 +8,17 @@ using TypeSpec.OpenAPI;
 
 namespace MeridianApi;
 
+/** identifies one supported job status value. */
+enum JobStatus {
+  pending,
+  running,
+  succeeded,
+  succeeded_with_warnings,
+  failed,
+  outcome_unknown,
+  cancelled,
+}
+
 /** identifies one supported job type value. */
 enum JobType {
   `tenant.delete`,

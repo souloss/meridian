@@ -1,7 +1,7 @@
 import "@typespec/http";
 import "@typespec/openapi";
 import "@typespec/openapi3";
-import "./common/models.tsp";
+import "./models.tsp";
 import "./domains/asset/routes.tsp";
 import "./domains/auth/routes.tsp";
 import "./domains/collaboration/routes.tsp";

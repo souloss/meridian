@@ -8,6 +8,20 @@ using TypeSpec.OpenAPI;
 
 namespace MeridianApi;
 
+/** identifies one supported layer role value. */
+enum LayerRole {
+  base,
+  overlay,
+}
+
+/** identifies one supported layer origin value. */
+enum LayerOrigin {
+  repo,
+  third_party,
+  manual,
+  ai_generated,
+}
+
 /** defines validated input for the corresponding Meridian API operation. */
 model LayerOrderReplaceRequest {
   /** contains the ordered layer ids associated with this layer order replace request. */

@@ -39,7 +39,7 @@ def main() -> int:
         ensure_dependencies()
         with tempfile.TemporaryDirectory(prefix="meridian-tsp-") as temporary:
             temporary_root = Path(temporary)
-            common = compile_entry(API_ROOT / "common" / "models.tsp", temporary_root / "common")
+            common = compile_entry(API_ROOT / "models.tsp", temporary_root / "common")
             domain_entries = sorted(DOMAINS_ROOT.glob("*/routes.tsp"))
             domains = {
                 domain.parent.name: compile_entry(domain, temporary_root / "domains" / domain.parent.name)
@@ -390,7 +390,7 @@ def validate_documents(
     if canonical_ids != set(operation_ids):
         raise ContractError("main.tsp operation IDs do not match the domain entry points")
     if not common.get("components", {}).get("schemas"):
-        raise ContractError("common/models.tsp did not produce shared schemas")
+        raise ContractError("models.tsp did not produce shared schemas")
 
 
 def dump_yaml(document: dict[str, Any]) -> str:
