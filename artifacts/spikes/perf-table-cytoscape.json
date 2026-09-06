@@ -1,0 +1,96 @@
+{
+  "id": "perf-table-cytoscape",
+  "status": "passed",
+  "commit": "036c9bcaea05dd6e94e0b16b5accc94427f481d9",
+  "sourceDigest": "sha256:3acfb1bf3604e5a43364a8ec3f3675bd788e0c058f81727ce393be8d1a53c429",
+  "contractDigest": "sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b",
+  "browser": "chromium",
+  "browserVersion": "151.0.7922.34",
+  "project": "desktop",
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "fixture": "web/tests/spikes/harness",
+  "thresholds": {
+    "graphFirstPaintMs": 2000,
+    "maxRenderedRows": 50
+  },
+  "measurements": {
+    "mode": "table-graph",
+    "table": {
+      "ready": true,
+      "rows": 10000,
+      "estimateSize": 44,
+      "overscan": 12
+    },
+    "graph": {
+      "ready": true,
+      "nodes": 500,
+      "edges": 5000,
+      "firstPaintMs": 673.8999999761581,
+      "selected": true,
+      "neighborhood": 40,
+      "destroyed": false
+    },
+    "editor": {
+      "ready": false,
+      "previewCount": 0,
+      "longTasks": []
+    },
+    "renderedTableRows": 23,
+    "paintedPixels": 2716
+  },
+  "assertions": [
+    {
+      "id": "table-model-has-10000-rows",
+      "status": "passed",
+      "actual": 10000,
+      "threshold": 10000
+    },
+    {
+      "id": "table-dom-is-virtualized",
+      "status": "passed",
+      "actual": 23,
+      "threshold": "<=50"
+    },
+    {
+      "id": "graph-has-500-nodes",
+      "status": "passed",
+      "actual": 500,
+      "threshold": 500
+    },
+    {
+      "id": "graph-has-5000-edges",
+      "status": "passed",
+      "actual": 5000,
+      "threshold": 5000
+    },
+    {
+      "id": "graph-first-paint-under-2s",
+      "status": "passed",
+      "actual": 673.8999999761581,
+      "threshold": "<2000ms"
+    },
+    {
+      "id": "graph-canvas-is-painted",
+      "status": "passed",
+      "actual": 2716,
+      "threshold": ">100"
+    },
+    {
+      "id": "graph-selection-and-neighborhood-work",
+      "status": "passed",
+      "actual": {
+        "selected": true,
+        "neighborhood": 40
+      }
+    }
+  ],
+  "tests": {
+    "run": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  }
+}

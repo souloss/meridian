@@ -1,0 +1,60 @@
+{
+  "itemId": "M0-AGENT-003",
+  "workItem": "M0-AGENT-003",
+  "status": "passed",
+  "commit": "036c9bcaea05dd6e94e0b16b5accc94427f481d9",
+  "baseCommit": "c79986ac13a05db5bf3beb13c2a0b3b6461f6667",
+  "contractDigest": "sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b",
+  "sourceDigest": "sha256:e68eb559ba243bb497cb7368b150ceef6a4200af91cb868e6fbb08d4148f0075",
+  "spikeSourceDigest": "sha256:3acfb1bf3604e5a43364a8ec3f3675bd788e0c058f81727ce393be8d1a53c429",
+  "startedAt": "2026-09-06T17:47:58Z",
+  "reportPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/report.json",
+  "stories": ["US-01", "US-11"],
+  "assertions": [
+    {"id": "SMK-001", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T18-22-42-027ZERZD0D/SMK-001.json"},
+    {"id": "SMK-002", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T18-22-42-027ZERZD0D/SMK-002.json"},
+    {"id": "SMK-003", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T18-22-42-027ZERZD0D/SMK-003.json"},
+    {"id": "SMK-004", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T18-22-42-027ZERZD0D/SMK-004.json"},
+    {"id": "SMK-005", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T18-22-42-027ZERZD0D/SMK-005.json"},
+    {"id": "SMK-029", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T18-22-42-027ZERZD0D/SMK-029.json"},
+    {"id": "SMK-031", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T18-22-42-027ZERZD0D/SMK-031.json"},
+    {"id": "SMK-035", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T18-22-42-027ZERZD0D/SMK-035.json"},
+    {"id": "perf-table-cytoscape", "status": "passed", "evidence": "artifacts/spikes/perf-table-cytoscape.json"},
+    {"id": "perf-editor", "status": "passed", "evidence": "artifacts/spikes/perf-editor.json"},
+    {"id": "a11y-m0", "status": "passed", "evidence": "artifacts/spikes/a11y-m0.json"}
+  ],
+  "commands": [
+    {"command": "make smoke-all ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 56.74, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "make perf-table-cytoscape ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 13.99, "stdoutPath": "artifacts/spikes/perf-table-cytoscape.json", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "make perf-editor ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 21.50, "stdoutPath": "artifacts/spikes/perf-editor.json", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "make a11y-m0 ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 18.53, "stdoutPath": "artifacts/spikes/a11y-m0.json", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "make quality-gate ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 112.87, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "make contracts-validate ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 42.66, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "make contracts-generate-then-git-diff-exit-code ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 51.84, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "vfox exec golang@1.27.1 -- go test ./...", "exitCode": 0, "durationSeconds": 0.76, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "vfox exec golang@1.27.1 -- go vet ./...", "exitCode": 0, "durationSeconds": 0.31, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0.01, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T182703Z/commands.log"}
+  ],
+  "changedFiles": [
+    ".gitignore", "Makefile", "contracts/work-items.yaml", "internal/handler/m0_smoke_integration_test.go",
+    "internal/repository/repositories.go", "scripts/smoke-cases.json", "scripts/smoke-runner.test.mjs",
+    "scripts/smoke.mjs", "scripts/write-smoke-report.mjs", "web/package.json", "web/pnpm-lock.yaml",
+    "web/scripts/run-spike.mjs", "web/scripts/serve-spike-harness.mjs", "web/tests/spikes"
+  ],
+  "compatibility": {
+    "api": "unchanged",
+    "repositoryErrors": "missing or cross-tenant repository PATCH/DELETE now return 404; stale ETag on an existing repository remains 412",
+    "acceptance": "M0 SMK-003 covers the implemented repository resource family; full generated tenant resource-ID operation matrix remains M5 SMK-039"
+  },
+  "measurements": {
+    "graphFirstPaintMs": 673.9,
+    "virtualTableRenderedRows": 23,
+    "editorRepeatedLongTasksOver50Ms": 0,
+    "desktopAxeViolations": 0,
+    "mobileAxeViolations": 0
+  },
+  "deferred": ["SMK-039 full tenant resource-ID operation isolation matrix is contractually scheduled for M5 after all operations are implemented"],
+  "failures": [],
+  "failureKind": null,
+  "nextAction": "wait for explicit M0 milestone acceptance before claiming M1-AGENT-001"
+}

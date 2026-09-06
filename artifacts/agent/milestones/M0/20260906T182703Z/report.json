@@ -1,0 +1,54 @@
+{
+  "milestone": "M0",
+  "status": "needs_human_acceptance",
+  "commit": "036c9bcaea05dd6e94e0b16b5accc94427f481d9",
+  "contractDigest": "sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b",
+  "reportPath": "artifacts/agent/milestones/M0/20260906T182703Z/report.json",
+  "desktopEntry": {
+    "bootstrap": "MERIDIAN_DATABASE_URL=postgres://meridian:meridian@127.0.0.1:54329/meridian?sslmode=disable vfox exec golang@1.27.1 -- go run ./cmd/meridian admin create --username padmin",
+    "start": "make backend-run",
+    "url": "http://127.0.0.1:8080/login"
+  },
+  "demoPath": [
+    "bootstrap and sign in as the platform administrator",
+    "create users and tenants, assign tenant membership, and verify a platform admin without membership receives tenant-business 404",
+    "sign in as a tenant administrator and exercise repository, credential, job, and audit control-plane paths",
+    "switch tenant context and verify disabled or unauthorized tenant data is absent"
+  ],
+  "workItems": [
+    {"id": "M0-AGENT-001", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-001/20260905T183222Z/report.json"},
+    {"id": "M0-AGENT-002", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-002/20260906T170406Z/report.json"},
+    {"id": "M0-CONTRACT-001", "status": "passed", "evidence": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/report.json"},
+    {"id": "M0-AGENT-003", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-003/20260906T182703Z/report.json"}
+  ],
+  "stories": [
+    {"id": "US-01", "status": "passed", "evidence": ["M0-AGENT-001", "SMK-002", "SMK-004"]},
+    {"id": "US-11", "status": "passed", "evidence": ["M0-AGENT-002", "SMK-003", "SMK-005", "SMK-031", "SMK-035"]}
+  ],
+  "assertions": [
+    {"id": "SMK-001", "status": "passed", "evidence": "artifacts/smoke/SMK-001.json"},
+    {"id": "SMK-002", "status": "passed", "evidence": "artifacts/smoke/SMK-002.json"},
+    {"id": "SMK-003", "status": "passed", "evidence": "artifacts/smoke/SMK-003.json"},
+    {"id": "SMK-004", "status": "passed", "evidence": "artifacts/smoke/SMK-004.json"},
+    {"id": "SMK-005", "status": "passed", "evidence": "artifacts/smoke/SMK-005.json"},
+    {"id": "SMK-029", "status": "passed", "evidence": "artifacts/smoke/SMK-029.json"},
+    {"id": "SMK-031", "status": "passed", "evidence": "artifacts/smoke/SMK-031.json"},
+    {"id": "SMK-035", "status": "passed", "evidence": "artifacts/smoke/SMK-035.json"},
+    {"id": "perf-table-cytoscape", "status": "passed", "evidence": "artifacts/spikes/perf-table-cytoscape.json"},
+    {"id": "perf-editor", "status": "passed", "evidence": "artifacts/spikes/perf-editor.json"},
+    {"id": "a11y-m0", "status": "passed", "evidence": "artifacts/spikes/a11y-m0.json"}
+  ],
+  "deferred": [
+    {"id": "SMK-039", "milestone": "M5", "reason": "run the full generated tenant resource-ID operation isolation matrix after all M5 operations are implemented"}
+  ],
+  "failures": [],
+  "risks": [
+    "Redocly and TypeSpec emit existing non-blocking warnings while returning a successful contract validation result"
+  ],
+  "humanAcceptance": {
+    "state": "waiting",
+    "focus": ["login and tenant switching", "credential non-disclosure", "cross-tenant 404 behavior", "desktop control-plane primary path"],
+    "requiredResponse": "accepted or changes_requested, with accepter identity, acceptance time, report path, and affected assertion IDs"
+  },
+  "nextAction": "do not claim M1 until this milestone is explicitly accepted"
+}

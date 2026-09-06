@@ -1,10 +1,10 @@
 # Meridian 实施进度
 
-> 最后核对：2026-09-06
+> 最后核对：2026-09-07
 > 当前里程碑：M0（foundation）
-> 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`802e055f289f2da141f69b16da1d9879bb2f9c09 fix(M0-CONTRACT-001): stage isolation coverage by milestone`
-> 当前开发切片：M0-AGENT-003 M0 Smoke 与 executable spikes（待重试，attempt 1）
+> 里程碑状态：自动门禁已通过，等待人工验收
+> 最新稳定提交：`036c9bcaea05dd6e94e0b16b5accc94427f481d9 feat(M0-AGENT-003): add executable smoke and frontend spike gates`
+> 当前开发切片：M0-AGENT-003 已通过（attempt 2）；暂停领取 M1
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 
@@ -29,7 +29,7 @@
 
 | 里程碑 | 交付范围 | 当前状态 |
 | --- | --- | --- |
-| M0 地基 | 契约与生成、迁移、身份/租户/RBAC/PAT、凭据、仓库骨架、Blob、Job、Audit、Outbox、控制面基础 | 进行中 |
+| M0 地基 | 契约与生成、迁移、身份/租户/RBAC/PAT、凭据、仓库骨架、Blob、Job、Audit、Outbox、控制面基础 | 待人工验收 |
 | M1 资产主链路 | Repository/Service/Source、发现与同步、默认分支 Track、OpenAPI normalize/index、Viewer/public read | 未开始业务实现；只有契约和生成接口，M0 仓库骨架除外 |
 | M2 Layer 与 Overlay | LayerHead/Revision、Overlay、人工编辑、Provenance、Rollback、字段级 GitOps | 未开始业务实现 |
 | M3 AI、Diff 与门禁 | AI producer/review、生命周期、分支版本、Diff、分享、Todo、CLI push/diff、最小通知 | 未开始业务实现 |
@@ -38,7 +38,7 @@
 
 `M0-M3` 是 MVP，`M4-M5` 是 v1 扩展；`M6+` 不在 v1 交付范围内。
 
-目前 M0-M5 的 `milestoneGates` 均为 `pending`，没有任何阶段被人工放行。每阶段所有工作项为 `passed` 后，Agent 必须提交独立阶段报告，包含桌面入口、可演示用户主路径、自动门禁和断言证据、延期事项，再转为 `needs_human_acceptance` 等待用户；反馈 `changes_requested` 时先新增本阶段修复项，不能直接跳到下一阶段。
+目前 M0 的 `milestoneGates` 为 `needs_human_acceptance`，M1-M5 仍为 `pending`，没有任何阶段被人工放行。M0 阶段报告位于 `artifacts/agent/milestones/M0/20260906T182703Z/report.json`；反馈 `changes_requested` 时先新增本阶段修复项，不能直接跳到下一阶段。
 
 M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画和细间距可延期到具名后续工作项。功能、权限、错误状态、键盘可用性、A11y 和契约已声明的移动功能不能后置，延期不能减弱验收。
 
@@ -47,43 +47,43 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 | 实施切片 | 实现状态 | 验收状态 | 证据 |
 | --- | --- | --- | --- |
 | Go 1.27.1、Node 24 LTS、pnpm 11 与 vfox 工具链 | 已完成 | 切片门禁已通过 | `b29514f`，`.vfox.toml`、Makefile |
-| `cmd/meridian` 单入口、Nuxt 静态产物嵌入、健康检查和 API/static 404 边界 | 已完成 | 后端自动化覆盖存在；M0 全量前端 Spike 尚未放行 | `b29514f`，`internal/handler/server_test.go` |
+| `cmd/meridian` 单入口、Nuxt 静态产物嵌入、健康检查和 API/static 404 边界 | 已完成 | SMK-001 与 M0 聚合门禁通过 | `b29514f`、`036c9bc`，`internal/handler/m0_smoke_integration_test.go` |
 | OpenAPI canonical bundle、oapi-codegen/Orval 生成和无漂移检查 | 已完成 | 拆分源与 canonical 语义等价；12 个领域 server 包、统一路由装配、公共 models/spec 与前端生成门禁均已接入 | `scripts/bundle-openapi.sh`、`generate.go`、`internal/handler/domain_adapters.gen.go` |
 | 生成 API 导出声明/字段注释与应用 DDL 每列注释 | 已完成 | OpenAPI/生成 Go 导出注释和实际迁移列注释均由契约测试强制 | `5e3a45a`，`internal/contracttest/openapi_documentation_test.go`，`internal/contracttest/storage_documentation_test.go` |
-| Goose 应用迁移、River 迁移及 up/down/up 生命周期 | 已完成 | SMK-001 的数据库主路径已有集成覆盖，里程碑 Smoke 尚未统一放行 | `ab1635f`、`7ef39f8`，`internal/database/database_integration_test.go` |
+| Goose 应用迁移、River 迁移及 up/down/up 生命周期 | 已完成 | SMK-001 独立数据库 Smoke 已通过 up/down/up 与 schema 等价断言 | `ab1635f`、`7ef39f8`、`036c9bc` |
 | sqlc + pgx 强类型持久化基础 | 已完成 | 切片门禁已通过 | `ddeae8d` |
-| 登录、CSRF、用户、租户、成员、RBAC 和 PAT | 已完成 | US-01、SMK-002/003/004 部分覆盖；全租户 operation 隔离矩阵和控制面 E2E 未完成 | `ac8da08`，`internal/handler/identity_integration_test.go` |
-| 凭据加密、服务端指纹和非回显 | 部分完成 | SMK-005、SMK-031、SMK-035 与完整后端集成门禁已通过；对象过滤已按 deepObject 契约生成 | `31e3440`、`d976cde`、`66f473c`、`04554a2`、`5718bdf` |
-| 凭据轮换、原子仓库同步任务投递和幂等重放 | 部分完成 | SMK-005/031 轮换、幂等和同步任务断言已通过；待重跑完整集成门禁 | `394ffe7`、`b270b9d`、`b8d2ef6`、`147b155`、`04554a2` |
-| 租户/全局凭据连接探测和仓库连接预检 | 部分完成 | SMK-005 真实 Git 探测已通过；完整集成门禁仍待重试 | `354af57`、`04554a2` |
-| 全局凭据管理及强制删除 | 部分完成 | SMK-031 生命周期、解绑和平台 Job 投影已通过；完整集成门禁仍待重试 | `66f473c`、`394ffe7`、`b270b9d`、`b8d2ef6`、`04554a2` |
-| Known Host 创建、派生指纹和列表 | 部分完成 | SMK-035 已通过；完整集成门禁仍待重试 | `31e3440`、`66f473c`、`04554a2` |
-| 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | `bd954d4`、`internal/handler/identity_integration_test.go` |
+| 登录、CSRF、用户、租户、成员、RBAC 和 PAT | 已完成 | US-01 与 SMK-002/003/004 已通过；M0 验证 repository 资源族，完整 operation 矩阵由 M5 SMK-039 承接 | `ac8da08`、`036c9bc` |
+| 凭据加密、服务端指纹和非回显 | 已完成 | SMK-005、SMK-031、SMK-035 与完整后端门禁通过；对象过滤按 deepObject 契约生成 | `31e3440`、`66f473c`、`5718bdf`、`036c9bc` |
+| 凭据轮换、原子仓库同步任务投递和幂等重放 | 已完成 | SMK-005/031 轮换、幂等和同步任务断言及聚合门禁通过 | `394ffe7`、`b270b9d`、`b8d2ef6`、`147b155`、`036c9bc` |
+| 租户/全局凭据连接探测和仓库连接预检 | 已完成 | SMK-005 真实 Git 探测与聚合门禁通过 | `354af57`、`036c9bc` |
+| 全局凭据管理及强制删除 | 已完成 | SMK-031 生命周期、解绑和平台 Job 投影与聚合门禁通过 | `66f473c`、`394ffe7`、`036c9bc` |
+| Known Host 创建、派生指纹和列表 | 已完成 | SMK-035 API 正反例与聚合门禁通过 | `31e3440`、`66f473c`、`036c9bc` |
+| 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-003/029/031 独立 Smoke 通过；不存在/跨租户为 404，存在但 ETag 过期为 412 | `bd954d4`、`036c9bc` |
 | River Worker 与通用 Job 控制面 | 部分完成 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；已完成租户 Job 查询/详情、取消、SSE 重放/心跳/终态关闭、`repo.sync` 手工重试代际和 24 小时幂等；其它 Job 类型的手工重试需等对应 Worker 参数契约 | `147b155`、`ea589ad` |
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
 | Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
 | 本地 SHA-256 CAS Blob 驱动 | 已完成 | 流式摘要、排他原子发布、去重、损坏检测、短时内容能力、租户唯一字节配额和真实 PG 覆盖均已通过；内容 HTTP endpoint 按契约在 M1 资产消费者接入 | `6c79863` |
-| M0 Nuxt 控制面 | 部分完成 | 登录、租户壳、认证/租户守卫、仓库/凭据查询、创建、编辑、删除、Job 查询/取消/重试/SSE、桌面/移动导航和表单负向校验已实现；平台运维脱敏目录、管理员守卫和响应式壳已接入，租户更新 API 已用 ETag 集成验证；平台创建/成员编排 UI 与正式 Smoke fixture 仍待后续工作项 | `ee9fcd9`、`43ffa5c` |
-| M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；CodeMirror、Table/Cytoscape 与完整 A11y target 经预检确认缺失，属于 M0-AGENT-003 attempt 2 需补齐的 tooling gap | `c1e6b4e`、`artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json` |
+| M0 Nuxt 控制面 | 已完成 | 登录、租户壳、控制面与响应式主路径已通过 M0-AGENT-001；本轮 production generate 和双视口 a11y 再次通过 | `ee9fcd9`、`43ffa5c`、`036c9bc` |
+| M0 executable spikes | 已完成 | 10k UTable、500 节点/5000 边 Cytoscape、1/5/10 MiB CodeMirror 策略与桌面/移动 axe 门禁全部通过 | `036c9bc`、`artifacts/spikes/` |
 
 ## M0 验收矩阵
 
 | 验收项 | 当前状态 | 未闭环内容 |
 | --- | --- | --- |
-| US-01 | 部分完成 | 平台控制面、完整权限反例和独立 E2E fixture |
-| US-11 | 部分完成 | 全 operation 隔离矩阵和统一 Smoke 仍未完成；仓库绑定后的全局凭据删除与平台 Job 查询已有覆盖 |
-| SMK-001 | 部分完成 | 数据库迁移集成覆盖已有；仍需按 Smoke 入口统一执行 health/readiness/migration 断言 |
-| SMK-002 | 部分完成 | 后端登录/租户切换已有；租户路由及前端缓存隔离未完成 |
-| SMK-003 | 部分完成 | 认证错误和部分跨租户规则已有；尚未生成并执行所有租户资源 operation 的隔离矩阵 |
-| SMK-004 | 部分完成 | PAT 创建、非回显、撤销和撤销后 401 已有集成覆盖；仍需独立 fixture 放行 |
-| SMK-005 | 部分完成 | 加密、指纹、轮换、幂等、连接结果和脱敏已有；仍需完整引用仓库数量及正式连通 fixture |
-| SMK-029 | 部分完成 | 原子配额检查、409 details、计数不变断言和 API 集成测试已覆盖；仍需独立 Smoke fixture 放行 |
-| SMK-031 | 部分完成 | 全局凭据生命周期、绑定仓库解绑/health 和平台 Job 投影已有；仍需正式 Smoke fixture 放行 |
-| SMK-035 | 部分完成 | 派生算法与服务已有；完整 API 正反例 fixture 尚未统一放行 |
+| US-01 | 自动门禁通过 | M0-AGENT-001 控制面证据与本轮 SMK-002/004 独立 fixture 均通过 |
+| US-11 | 自动门禁通过 | M0 repository 代表性隔离与凭据边界通过；完整 operation 矩阵按契约由 M5 SMK-039 执行 |
+| SMK-001 | 通过 | 独立数据库 fixture 验证 health/readiness、up/down/up 和 schema 等价 |
+| SMK-002 | 通过 | 登录、租户/成员、禁用租户排除和无 membership 平台管理员 404 通过 |
+| SMK-003 | 通过 | repository GET/PATCH/DELETE 的匿名、跨租户、缺失资源、viewer mutation 与错误体等价通过 |
+| SMK-004 | 通过 | PAT 创建时单次回显、列表不回显、撤销与撤销后 401 通过 |
+| SMK-005 | 通过 | 加密、指纹、轮换、幂等、连接结果和脱敏 fixture 通过 |
+| SMK-029 | 通过 | 原子配额、409 details 与拒绝后计数不变通过 |
+| SMK-031 | 通过 | 全局凭据生命周期、仓库解绑/health 与平台 Job 投影通过 |
+| SMK-035 | 通过 | Known Host 派生与 API 正反例 fixture 通过 |
 
 ## 当前工作区快照
 
-最后稳定基线是 `5718bdf642308f6388fc104ef30c782b01489acc`。本次提交把共享对象过滤参数的 OpenAPI 投影固定为 `deepObject`，使生成 Go 绑定器正确读取 `filter[tenantSlug]`；提交后的三项 M0 credential Smoke 和完整后端集成门禁均已通过。
+最后稳定源码 checkpoint 是 `036c9bcaea05dd6e94e0b16b5accc94427f481d9`。该提交补齐逐 case 独立数据库 Smoke runner、M0-AGENT-003 的五个 fixture、前端 capability harness 和三类 executable spike；正式报告位于 `artifacts/agent/M0-AGENT-003/20260906T182703Z/report.json`。
 
 2026-09-05 核对时，仓库、平台 Job、River Worker、审计查询、M0 Outbox 与本地 CAS Blob 基础切片已通过门禁，包含：
 
@@ -122,7 +122,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 下一步顺序
 
-下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。`M0-CONTRACT-001` 已按用户决策把 `SMK-003` 固定为 M0 repository 资源族代表性隔离冒烟，并新增 M5 `SMK-039` 承担全部租户资源 operation 的完整矩阵；当前恢复领取 `M0-AGENT-003` attempt 2，补齐独立 Smoke fixture 和 CodeMirror、Table/Cytoscape、A11y executable spike。M0 自动门禁全部通过后仍必须进入人工阶段验收，不能直接越过到 M1。
+M0 自动门禁和阶段报告已完成，当前唯一下一步是等待用户对 `artifacts/agent/milestones/M0/20260906T182703Z/report.json` 明确回复 `accepted` 或 `changes_requested`。M0 未被接受前不得领取 M1-AGENT-001；M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
 
 ## 更新流程
 
@@ -153,6 +153,6 @@ git diff --check
 
 ## 当前阻塞
 
-`M0-AGENT-002` 的声明门禁曾经缺失，属于仓库内 `tooling_gap`，不是外部依赖。本次用户授权补齐可执行入口和真实断言后，attempt=1 已领取并提交 `04554a2`：SMK-005、SMK-031、SMK-035 通过，但 `backend-test-integration` 连续复现 `TestIdentityHTTPWorkflow` 平台审计租户过滤失败，队列已按规则回到 `needs_retry`。下一次 Agent 必须先核对本报告和当前 HEAD，修复或获得该集成失败的新诊断后重新领取；不得复用通过的 Smoke 证据冒充完整门禁通过。历史失败报告保留在 `artifacts/agent/M0-AGENT-002/`，不得改写。
+当前没有自动门禁阻塞。M0-AGENT-002 与 M0-AGENT-003 的历史失败报告继续保留，不复用旧证据；当前状态是里程碑人工验收等待，不是技术失败或外部环境阻塞。
 
 后续阶段尚未实现的 target/fixture 同样属于对应工作项交付物，不能因此反复要求用户提供命令。若实际修复后仍达到重试上限，Agent 应给出明确技术失败报告；只有阶段自动门禁全绿时，才提交成品阶段验收报告。

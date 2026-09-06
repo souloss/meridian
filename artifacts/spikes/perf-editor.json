@@ -1,0 +1,71 @@
+{
+  "id": "perf-editor",
+  "status": "passed",
+  "commit": "036c9bcaea05dd6e94e0b16b5accc94427f481d9",
+  "sourceDigest": "sha256:3acfb1bf3604e5a43364a8ec3f3675bd788e0c058f81727ce393be8d1a53c429",
+  "contractDigest": "sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b",
+  "browser": "chromium",
+  "browserVersion": "151.0.7922.34",
+  "project": "desktop",
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "fixture": "web/tests/spikes/harness",
+  "thresholds": {
+    "maxRepeatedLongTasksOver50Ms": 1
+  },
+  "measurements": {
+    "sizes": [
+      1048576,
+      5242880,
+      10485760
+    ],
+    "editable": [
+      true,
+      false,
+      false
+    ],
+    "previewCount": 1,
+    "longTasks": [],
+    "repeatedLongTasks": 0
+  },
+  "assertions": [
+    {
+      "id": "fixture-byte-sizes-exact",
+      "status": "passed",
+      "actual": [
+        1048576,
+        5242880,
+        10485760
+      ]
+    },
+    {
+      "id": "one-mib-editable-five-ten-readonly",
+      "status": "passed",
+      "actual": [
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "preview-is-debounced-once",
+      "status": "passed",
+      "actual": 1,
+      "threshold": 1
+    },
+    {
+      "id": "no-repeated-long-task-over-50ms",
+      "status": "passed",
+      "actual": 0,
+      "threshold": "<=1"
+    }
+  ],
+  "tests": {
+    "run": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  }
+}

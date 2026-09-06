@@ -1,0 +1,93 @@
+{
+  "id": "a11y-m0",
+  "status": "passed",
+  "commit": "036c9bcaea05dd6e94e0b16b5accc94427f481d9",
+  "sourceDigest": "sha256:3acfb1bf3604e5a43364a8ec3f3675bd788e0c058f81727ce393be8d1a53c429",
+  "contractDigest": "sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b",
+  "browser": "chromium",
+  "browserVersion": "151.0.7922.34",
+  "project": "desktop+mobile",
+  "viewport": [
+    {
+      "width": 1440,
+      "height": 960
+    },
+    {
+      "width": 393,
+      "height": 727
+    }
+  ],
+  "fixture": "web/tests/spikes/harness",
+  "thresholds": {
+    "axeViolations": 0,
+    "horizontalOverflowPx": 0
+  },
+  "measurements": {
+    "desktop": {
+      "axeViolations": 0,
+      "axeRules": [],
+      "axeFindings": [],
+      "overflow": 0,
+      "outOfBounds": 0
+    },
+    "mobile": {
+      "axeViolations": 0,
+      "axeRules": [],
+      "axeFindings": [],
+      "overflow": 0,
+      "outOfBounds": 0
+    }
+  },
+  "assertions": [
+    {
+      "id": "axe-has-no-violations",
+      "status": "passed",
+      "actual": 0,
+      "threshold": 0
+    },
+    {
+      "id": "page-has-no-horizontal-overflow",
+      "status": "passed",
+      "actual": 0,
+      "threshold": "<=0"
+    },
+    {
+      "id": "controls-stay-inside-viewport",
+      "status": "passed",
+      "actual": 0,
+      "threshold": 0
+    },
+    {
+      "id": "keyboard-path-completes",
+      "status": "passed"
+    },
+    {
+      "id": "axe-has-no-violations",
+      "status": "passed",
+      "actual": 0,
+      "threshold": 0
+    },
+    {
+      "id": "page-has-no-horizontal-overflow",
+      "status": "passed",
+      "actual": 0,
+      "threshold": "<=0"
+    },
+    {
+      "id": "controls-stay-inside-viewport",
+      "status": "passed",
+      "actual": 0,
+      "threshold": 0
+    },
+    {
+      "id": "keyboard-path-completes",
+      "status": "passed"
+    }
+  ],
+  "tests": {
+    "run": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0
+  }
+}
