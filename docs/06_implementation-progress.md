@@ -4,7 +4,7 @@
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
 > 最新稳定提交：`5718bdf642308f6388fc104ef30c782b01489acc fix(M0-AGENT-002): align object query filters with deepObject`
-> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（已通过，attempt 2）
+> 当前开发切片：M0-AGENT-003 M0 Smoke 与 executable spikes（因 SMK-003 阶段范围冲突而阻塞）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 
@@ -64,7 +64,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 | Outbox 事务与分发基础 | 已完成 | `collect.failed` 与 Job 终态/审计同事务；周期扫描、SKIP LOCKED、六次尝试、退避、租约回收和旧 Worker 栅栏已有单元及真实 PG/River 覆盖；订阅路由与 webhook/in-app/email 适配按契约属于 M5 | `78cbc38` |
 | 本地 SHA-256 CAS Blob 驱动 | 已完成 | 流式摘要、排他原子发布、去重、损坏检测、短时内容能力、租户唯一字节配额和真实 PG 覆盖均已通过；内容 HTTP endpoint 按契约在 M1 资产消费者接入 | `6c79863` |
 | M0 Nuxt 控制面 | 部分完成 | 登录、租户壳、认证/租户守卫、仓库/凭据查询、创建、编辑、删除、Job 查询/取消/重试/SSE、桌面/移动导航和表单负向校验已实现；平台运维脱敏目录、管理员守卫和响应式壳已接入，租户更新 API 已用 ETag 集成验证；平台创建/成员编排 UI 与正式 Smoke fixture 仍待后续工作项 | `ee9fcd9`、`43ffa5c` |
-| M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；Nuxt 类型检查、静态生成、桌面/移动 Playwright 与 axe 已通过；CodeMirror 大文件、Table/Cytoscape 性能 spike 尚未放行 | `c1e6b4e`、[`05_technology-stack-decision.md`](./05_technology-stack-decision.md) 第 8 节 |
+| M0 executable spikes | 部分完成 | 单二进制、生成和迁移已有基础；CodeMirror、Table/Cytoscape 与完整 A11y target 经预检确认缺失，属于 M0-AGENT-003 的 tooling gap；但实现前先受 SMK-003 阶段范围冲突阻塞 | `c1e6b4e`、`artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json` |
 
 ## M0 验收矩阵
 
@@ -122,7 +122,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 下一步顺序
 
-下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前队列为：`M0-AGENT-001`（passed）→ `M0-AGENT-002`（passed，attempt 2）→ `M0-AGENT-003`（ready）。M0 的八项 Smoke 与全部自动门禁通过后先向用户报告，只有 M0 gate 为 `accepted` 才能进入 M1；M2 首项依赖 M1 最后一项 `M1-AGENT-003`，M3 首项依赖 `M2-AGENT-002`。每个工作项的命令、断言和报告路径以队列为准，SMK-033 属于 M3，SMK-030 体验镜像属于 M5。
+下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前 `M0-AGENT-003` 因 `SMK-003` 同时要求 M0 放行和覆盖 84 个跨 M0-M5 的资源 operation 而阻塞；在人工明确是按里程碑递增覆盖，还是要求 M0 先建设全部未来 operation 的负向隔离行为前，不得弱化断言或越过 M0。决策后先建立独立契约修复工作项，再恢复 M0-AGENT-003 的 Smoke 和 executable spike 实现。
 
 ## 更新流程
 

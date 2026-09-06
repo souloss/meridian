@@ -1,0 +1,41 @@
+{
+  "itemId": "M0-AGENT-003",
+  "workItem": "M0-AGENT-003",
+  "status": "blocked",
+  "commit": "4b5959f9c7896b397d846aab21cfeb608445a655",
+  "baseCommit": "4b5959f9c7896b397d846aab21cfeb608445a655",
+  "contractDigest": "sha256:99ace23f86ecccb7f91c6f268ea737e312de53e1094e7ad8e8e3f2999a0c70b7",
+  "startedAt": "2026-09-06T17:18:00Z",
+  "reportPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json",
+  "stories": ["US-01", "US-11"],
+  "assertions": [
+    {"id": "SMK-001", "status": "failed", "evidence": "artifacts/smoke/2026-09-06T17-20-25-684ZLJ7nz2/SMK-001.json"},
+    {"id": "SMK-002", "status": "failed", "evidence": "artifacts/smoke/2026-09-06T17-20-25-684ZLJ7nz2/SMK-002.json"},
+    {"id": "SMK-003", "status": "not_run", "evidence": "contracts/acceptance.yaml:224-238; 84 resource-ID operations span M0-M5"},
+    {"id": "SMK-004", "status": "failed", "evidence": "artifacts/smoke/2026-09-06T17-20-25-684ZLJ7nz2/SMK-004.json"},
+    {"id": "SMK-005", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T17-20-25-684ZLJ7nz2/SMK-005.json"},
+    {"id": "SMK-029", "status": "failed", "evidence": "artifacts/smoke/2026-09-06T17-20-25-684ZLJ7nz2/SMK-029.json"},
+    {"id": "SMK-031", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T17-20-25-684ZLJ7nz2/SMK-031.json"},
+    {"id": "SMK-035", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T17-20-25-684ZLJ7nz2/SMK-035.json"}
+  ],
+  "commands": [
+    {"command": "make contracts-validate ITEM=M0-AGENT-002", "exitCode": 0, "durationSeconds": 43.1, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log"},
+    {"command": "make -n smoke-all ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 0.0, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log"},
+    {"command": "make -n perf-table-cytoscape ITEM=M0-AGENT-003", "exitCode": 2, "durationSeconds": 0.0, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log"},
+    {"command": "make -n perf-editor ITEM=M0-AGENT-003", "exitCode": 2, "durationSeconds": 0.0, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log"},
+    {"command": "make -n a11y-m0 ITEM=M0-AGENT-003", "exitCode": 2, "durationSeconds": 0.0, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log"},
+    {"command": "make -n quality-gate ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 0.0, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log"},
+    {"command": "make smoke-all ITEM=M0-AGENT-003", "exitCode": 2, "durationSeconds": 12.6, "stdoutPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-003/20260906T172625Z/commands.log"}
+  ],
+  "changedFiles": [],
+  "deferred": ["SMK-001/002/004/029 independent fixtures", "perf-table-cytoscape", "perf-editor", "a11y-m0"],
+  "failures": [
+    {
+      "kind": "product_decision",
+      "summary": "SMK-003 is a frozen M0 assertion over all 84 current resource-ID tenant operations, but later-domain resource stores and handlers are intentionally scheduled in M1-M5.",
+      "requiredDecision": "Choose whether SMK-003 coverage accumulates by milestone or all future-domain negative isolation behavior must be implemented before M0 can pass."
+    }
+  ],
+  "failureKind": "product_decision",
+  "nextAction": "await human decision, create a separate accepted contract repair item, then resume M0-AGENT-003"
+}

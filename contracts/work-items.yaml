@@ -129,14 +129,30 @@ items:
   - id: M0-AGENT-003
     milestone: M0
     priority: P0
-    status: ready
+    status: blocked
     title: pass-m0-preflight-spikes-and-gates
     dependsOn: [M0-AGENT-001, M0-AGENT-002]
     operationIds: []
     stories: [US-01, US-11]
     assertions: [SMK-001, SMK-002, SMK-003, SMK-004, SMK-005, SMK-029, SMK-031, SMK-035]
     verify: [smoke-all, perf-table-cytoscape, perf-editor, a11y-m0, quality-gate]
-    reportPath: null
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    leaseUntil: null
+    failureKind: product_decision
+    blockedReason: >-
+      SMK-003 is assigned to M0 but requires every tenant-scoped operation with a resource ID;
+      the frozen OpenAPI currently contains 84 such operations across M0-M5, while later-domain
+      handlers and persistence are intentionally delivered by M1-M5 work items. Human direction
+      is required to either stage the assertion by milestone or require all negative isolation
+      behavior before later-domain implementation.
+    startedAt: '2026-09-06T17:18:00Z'
+    baseCommit: 4b5959f9c7896b397d846aab21cfeb608445a655
+    contractDigest: sha256:99ace23f86ecccb7f91c6f268ea737e312de53e1094e7ad8e8e3f2999a0c70b7
+    reportPath: artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json
+    lastEvidence: artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json
+    nextAction: await human decision on SMK-003 milestone coverage, then create the required contract repair item
 
   - id: M1-AGENT-001
     milestone: M1
