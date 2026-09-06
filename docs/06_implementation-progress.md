@@ -3,8 +3,8 @@
 > 最后核对：2026-09-06
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`04554a2444dbf2a09753cae1245d7a717e056b84 fix(M0-AGENT-002): reject client-derived known host fields`
-> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（待重试，attempt 1）
+> 最新稳定提交：`5718bdf642308f6388fc104ef30c782b01489acc fix(M0-AGENT-002): align object query filters with deepObject`
+> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（已通过，attempt 2）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 
@@ -53,7 +53,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 | Goose 应用迁移、River 迁移及 up/down/up 生命周期 | 已完成 | SMK-001 的数据库主路径已有集成覆盖，里程碑 Smoke 尚未统一放行 | `ab1635f`、`7ef39f8`，`internal/database/database_integration_test.go` |
 | sqlc + pgx 强类型持久化基础 | 已完成 | 切片门禁已通过 | `ddeae8d` |
 | 登录、CSRF、用户、租户、成员、RBAC 和 PAT | 已完成 | US-01、SMK-002/003/004 部分覆盖；全租户 operation 隔离矩阵和控制面 E2E 未完成 | `ac8da08`，`internal/handler/identity_integration_test.go` |
-| 凭据加密、服务端指纹和非回显 | 部分完成 | SMK-005 已通过；工作项被全量集成门禁中的既有审计过滤断言阻塞 | `31e3440`、`d976cde`、`66f473c`、`04554a2` |
+| 凭据加密、服务端指纹和非回显 | 部分完成 | SMK-005、SMK-031、SMK-035 与完整后端集成门禁已通过；对象过滤已按 deepObject 契约生成 | `31e3440`、`d976cde`、`66f473c`、`04554a2`、`5718bdf` |
 | 凭据轮换、原子仓库同步任务投递和幂等重放 | 部分完成 | SMK-005/031 轮换、幂等和同步任务断言已通过；待重跑完整集成门禁 | `394ffe7`、`b270b9d`、`b8d2ef6`、`147b155`、`04554a2` |
 | 租户/全局凭据连接探测和仓库连接预检 | 部分完成 | SMK-005 真实 Git 探测已通过；完整集成门禁仍待重试 | `354af57`、`04554a2` |
 | 全局凭据管理及强制删除 | 部分完成 | SMK-031 生命周期、解绑和平台 Job 投影已通过；完整集成门禁仍待重试 | `66f473c`、`394ffe7`、`b270b9d`、`b8d2ef6`、`04554a2` |
@@ -83,7 +83,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 当前工作区快照
 
-最后稳定基线是 `04554a2444dbf2a09753cae1245d7a717e056b84`。本次提交补齐 Known Host 创建请求对客户端伪造 `keyType`/`fingerprint` 的 422 校验；提交后的三项 M0 credential Smoke 已通过。`backend-test-integration` 连续执行仍在 `TestIdentityHTTPWorkflow` 的平台审计 `filter[tenantSlug]` 断言失败：未带租户的 `runtime.started` 被返回到 `tenantSlug=acme` 结果中；该诊断不属于本凭据工作项实现范围，保留在待重试报告中。
+最后稳定基线是 `5718bdf642308f6388fc104ef30c782b01489acc`。本次提交把共享对象过滤参数的 OpenAPI 投影固定为 `deepObject`，使生成 Go 绑定器正确读取 `filter[tenantSlug]`；提交后的三项 M0 credential Smoke 和完整后端集成门禁均已通过。
 
 2026-09-05 核对时，仓库、平台 Job、River Worker、审计查询、M0 Outbox 与本地 CAS Blob 基础切片已通过门禁，包含：
 
@@ -122,7 +122,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 下一步顺序
 
-下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前队列为：`M0-AGENT-001`（passed）→ `M0-AGENT-002`（needs_retry，本次用户授权恢复到 attempt=0）→ `M0-AGENT-003`。M0 的八项 Smoke 与全部自动门禁通过后先向用户报告，只有 M0 gate 为 `accepted` 才能进入 M1；M2 首项依赖 M1 最后一项 `M1-AGENT-003`，M3 首项依赖 `M2-AGENT-002`。每个工作项的命令、断言和报告路径以队列为准，SMK-033 属于 M3，SMK-030 体验镜像属于 M5。
+下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前队列为：`M0-AGENT-001`（passed）→ `M0-AGENT-002`（passed，attempt 2）→ `M0-AGENT-003`（ready）。M0 的八项 Smoke 与全部自动门禁通过后先向用户报告，只有 M0 gate 为 `accepted` 才能进入 M1；M2 首项依赖 M1 最后一项 `M1-AGENT-003`，M3 首项依赖 `M2-AGENT-002`。每个工作项的命令、断言和报告路径以队列为准，SMK-033 属于 M3，SMK-030 体验镜像属于 M5。
 
 ## 更新流程
 

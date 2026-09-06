@@ -1,0 +1,45 @@
+{
+  "itemId": "M0-AGENT-002",
+  "workItem": "M0-AGENT-002",
+  "status": "passed",
+  "commit": "5718bdf642308f6388fc104ef30c782b01489acc",
+  "baseCommit": "df5ab8cdb25eb4131bdcfe97cef8e1038a58860c",
+  "contractDigest": "sha256:99ace23f86ecccb7f91c6f268ea737e312de53e1094e7ad8e8e3f2999a0c70b7",
+  "sourceDigest": "sha256:adb431479156da3cf8e2b3142b0c83b30ddaf3b1df54678296d9846d1b1cda92",
+  "startedAt": "2026-09-06T16:35:59Z",
+  "reportPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/report.json",
+  "stories": ["US-11"],
+  "assertions": [
+    {"id": "SMK-005", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T16-59-59-765ZpvMGst/SMK-005.json"},
+    {"id": "SMK-031", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T16-59-59-765ZpvMGst/SMK-031.json"},
+    {"id": "SMK-035", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T16-59-59-765ZpvMGst/SMK-035.json"}
+  ],
+  "commands": [
+    {"command": "make smoke-m0-credentials ITEM=M0-AGENT-002", "exitCode": 0, "durationSeconds": 12.467, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log"},
+    {"command": "make backend-test-integration ITEM=M0-AGENT-002", "exitCode": 0, "durationSeconds": 20.0, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log"},
+    {"command": "make contracts-validate ITEM=M0-AGENT-002", "exitCode": 0, "durationSeconds": 8.0, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log"},
+    {"command": "make contracts-generate-then-git-diff-exit-code ITEM=M0-AGENT-002", "exitCode": 0, "durationSeconds": 15.0, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log"},
+    {"command": "vfox exec golang@1.27.1 -- go test ./...", "exitCode": 0, "durationSeconds": 0.83, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log"},
+    {"command": "vfox exec golang@1.27.1 -- go vet ./...", "exitCode": 0, "durationSeconds": 0.21, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0.0, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T170406Z/commands.log"}
+  ],
+  "changedFiles": [
+    "contracts/openapi.yaml",
+    "internal/generated/api/collaboration/server.gen.go",
+    "internal/generated/api/collaboration/types.gen.go",
+    "internal/generated/api/diff/server.gen.go",
+    "internal/generated/api/diff/types.gen.go",
+    "internal/generated/api/job/server.gen.go",
+    "internal/generated/api/job/types.gen.go",
+    "internal/generated/api/layer/server.gen.go",
+    "internal/generated/api/layer/types.gen.go",
+    "internal/generated/api/platform/server.gen.go",
+    "internal/generated/api/platform/types.gen.go",
+    "internal/generated/api/spec.gen.go",
+    "scripts/sync-openapi.py"
+  ],
+  "deferred": [],
+  "failures": [],
+  "failureKind": null,
+  "nextAction": "claim M0-AGENT-003"
+}

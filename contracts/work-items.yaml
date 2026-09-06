@@ -101,7 +101,7 @@ items:
   - id: M0-AGENT-002
     milestone: M0
     priority: P0
-    status: needs_retry
+    status: passed
     title: close-m0-credential-known-host-smoke
     dependsOn: [M0-AGENT-001]
     operationIds: [createCredential, rotateCredential, createGlobalCredential, rotateGlobalCredential, deleteGlobalCredential, createKnownHost]
@@ -109,22 +109,22 @@ items:
     assertions: [SMK-005, SMK-031, SMK-035]
     verify: [smoke-m0-credentials, backend-test-integration]
     owner: coding-agent
-    attempt: 1
+    attempt: 2
     maxAttempts: 3
     leaseUntil: null
-    failureKind: code_failure
-    startedAt: '2026-09-06T14:13:58Z'
-    baseCommit: 854455c94a6aa4e7bd36184c320c53d460a7b375
-    contractDigest: sha256:a33074aa3d0621b993c96bfa4f4d112e6461a727dc3433e7b2d147405a2a19b7
-    reportPath: artifacts/agent/M0-AGENT-002/20260906T144900Z/report.json
-    lastEvidence: artifacts/agent/M0-AGENT-002/20260906T144900Z/report.json
+    failureKind: null
+    startedAt: '2026-09-06T16:35:59Z'
+    baseCommit: df5ab8cdb25eb4131bdcfe97cef8e1038a58860c
+    contractDigest: sha256:99ace23f86ecccb7f91c6f268ea737e312de53e1094e7ad8e8e3f2999a0c70b7
+    reportPath: artifacts/agent/M0-AGENT-002/20260906T170406Z/report.json
+    lastEvidence: artifacts/agent/M0-AGENT-002/20260906T170406Z/report.json
     recovery:
       authorizedBy: user
       authorizedOn: '2026-09-06'
       previousAttempt: 3
       previousStatus: needs_human_acceptance
       reason: one-time recovery authorized to repair the missing repository smoke gate; preserve historical failures and do not reset again automatically
-    nextAction: fix the reproducible platform audit tenant filter failure, then rerun all declared gates on a new attempt
+    nextAction: claim M0-AGENT-003
 
   - id: M0-AGENT-003
     milestone: M0
