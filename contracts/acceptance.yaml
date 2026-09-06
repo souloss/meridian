@@ -224,13 +224,16 @@ smokeSuite:
     SMK-003:
       milestone: M0
       story: US-11
-      assertion: generated-isolation-matrix
+      assertion: m0-representative-isolation-smoke
       expected:
         matrix:
           crossTenantResourceId: {httpStatus: 404, errorCode: not_found}
           nonexistentResourceId: {httpStatus: 404, errorCode: not_found}
           unauthenticated: {httpStatus: 401, errorCode: unauthenticated}
-          appliesTo: every-tenant-scoped-operation-with-resource-id
+          appliesTo:
+            resourceFamily: repository
+            operations: [getRepository, updateRepository, deleteRepository]
+            rationale: representative-resource-family-implemented-in-M0
         responseComparison:
           crossTenantAndMissing: equal-after-removing-requestId
           leakedTenantFields: false
@@ -889,3 +892,19 @@ smokeSuite:
           httpStatus: 200
           serviceRootDir: ''
         nextSyncDriftForRoot: false
+    SMK-039:
+      milestone: M5
+      story: US-11
+      assertion: complete-generated-isolation-matrix
+      expected:
+        prerequisite: every-frozen-tenant-operation-is-implemented
+        matrix:
+          crossTenantResourceId: {httpStatus: 404, errorCode: not_found}
+          nonexistentResourceId: {httpStatus: 404, errorCode: not_found}
+          unauthenticated: {httpStatus: 401, errorCode: unauthenticated}
+          appliesTo: every-tenant-scoped-operation-with-resource-id
+        responseComparison:
+          crossTenantAndMissing: equal-after-removing-requestId
+          leakedTenantFields: false
+        authorization:
+          viewerBusinessMutation: {httpStatus: 404, errorCode: not_found}

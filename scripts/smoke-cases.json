@@ -36,5 +36,6 @@
   "SMK-035": {"milestone": "M0", "test": "TestM0CredentialSmoke/SMK-035", "fixture": "internal/handler/credential_smoke_integration_test.go"},
   "SMK-036": {"milestone": "M1"},
   "SMK-037": {"milestone": "M1"},
-  "SMK-038": {"milestone": "M2"}
+  "SMK-038": {"milestone": "M2"},
+  "SMK-039": {"milestone": "M5"}
 }
