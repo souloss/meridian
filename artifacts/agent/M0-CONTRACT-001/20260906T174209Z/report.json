@@ -1,0 +1,28 @@
+{
+  "itemId": "M0-CONTRACT-001",
+  "workItem": "M0-CONTRACT-001",
+  "status": "passed",
+  "commit": "802e055f289f2da141f69b16da1d9879bb2f9c09",
+  "baseCommit": "9506f363a8b26f1741f4cd85f66bb6838a70bc04",
+  "contractDigest": "sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b",
+  "startedAt": "2026-09-06T17:30:00Z",
+  "reportPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/report.json",
+  "stories": ["US-11"],
+  "assertions": [
+    {"id": "SMK-003", "status": "passed", "evidence": "contracts/acceptance.yaml M0 representative repository isolation scope"},
+    {"id": "SMK-039", "status": "passed", "evidence": "contracts/acceptance.yaml M5 complete generated isolation matrix and M5-AGENT-001 mapping"}
+  ],
+  "commands": [
+    {"command": "make contracts-validate ITEM=M0-CONTRACT-001", "exitCode": 0, "durationSeconds": 53.0, "stdoutPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log", "stderrPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log"},
+    {"command": "make contracts-generate-then-git-diff-exit-code ITEM=M0-CONTRACT-001", "exitCode": 0, "durationSeconds": 56.8, "stdoutPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log", "stderrPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log"},
+    {"command": "vfox exec golang@1.27.1 -- go test ./...", "exitCode": 0, "durationSeconds": 1.1, "stdoutPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log", "stderrPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log"},
+    {"command": "vfox exec golang@1.27.1 -- go vet ./...", "exitCode": 0, "durationSeconds": 0.2, "stdoutPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log", "stderrPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0.0, "stdoutPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log", "stderrPath": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/commands.log"}
+  ],
+  "changedFiles": ["contracts/acceptance.yaml", "contracts/work-items.yaml", "docs/07_coding-agent-runbook.md", "scripts/smoke-cases.json"],
+  "compatibility": {"api": "unchanged", "acceptance": "M0 scope clarified; additive M5 SMK-039 full regression"},
+  "deferred": [],
+  "failures": [],
+  "failureKind": null,
+  "nextAction": "resume M0-AGENT-003 attempt 2"
+}

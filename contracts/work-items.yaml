@@ -129,7 +129,7 @@ items:
   - id: M0-AGENT-003
     milestone: M0
     priority: P0
-    status: blocked
+    status: needs_retry
     title: pass-m0-preflight-spikes-and-gates
     dependsOn: [M0-AGENT-001, M0-AGENT-002, M0-CONTRACT-001]
     operationIds: []
@@ -140,24 +140,19 @@ items:
     attempt: 1
     maxAttempts: 3
     leaseUntil: null
-    failureKind: product_decision
-    blockedReason: >-
-      SMK-003 is assigned to M0 but requires every tenant-scoped operation with a resource ID;
-      the frozen OpenAPI currently contains 84 such operations across M0-M5, while later-domain
-      handlers and persistence are intentionally delivered by M1-M5 work items. Human direction
-      is required to either stage the assertion by milestone or require all negative isolation
-      behavior before later-domain implementation.
+    failureKind: tooling_gap
+    blockedReason: null
     startedAt: '2026-09-06T17:18:00Z'
     baseCommit: 4b5959f9c7896b397d846aab21cfeb608445a655
     contractDigest: sha256:99ace23f86ecccb7f91c6f268ea737e312de53e1094e7ad8e8e3f2999a0c70b7
     reportPath: artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json
     lastEvidence: artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json
-    nextAction: await human decision on SMK-003 milestone coverage, then create the required contract repair item
+    nextAction: claim attempt 2 and implement the independent M0 fixtures and executable spike targets
 
   - id: M0-CONTRACT-001
     milestone: M0
     priority: P0
-    status: verifying
+    status: passed
     title: stage-tenant-resource-isolation-matrix-by-milestone
     dependsOn: [M0-AGENT-002]
     operationIds: []
@@ -167,13 +162,14 @@ items:
     owner: coding-agent
     attempt: 1
     maxAttempts: 3
-    leaseUntil: '2026-09-06T18:00:00Z'
+    leaseUntil: null
     failureKind: null
     startedAt: '2026-09-06T17:30:00Z'
     baseCommit: 9506f363a8b26f1741f4cd85f66bb6838a70bc04
     contractDigest: sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
-    reportPath: null
-    nextAction: clarify SMK-003 M0 and M5 coverage in the acceptance contract
+    reportPath: artifacts/agent/M0-CONTRACT-001/20260906T174209Z/report.json
+    lastEvidence: artifacts/agent/M0-CONTRACT-001/20260906T174209Z/report.json
+    nextAction: resume M0-AGENT-003
 
   - id: M1-AGENT-001
     milestone: M1
