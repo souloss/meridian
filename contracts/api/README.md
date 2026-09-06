@@ -7,10 +7,15 @@ file.
 | Path | Role |
 | --- | --- |
 | `main.tsp` | Complete service entry point. Imports every domain and defines global API metadata. |
-| `common/models.tsp` | Shared wire models, scalars, errors, security-related inputs and reusable parameter models. |
+| `common/models.tsp` | Stable facade imported by all entries; delegates shared wire models to focused `common/*.tsp` modules. |
 | `domains/<domain>.tsp` | One domain's operations. Each file imports the shared model graph and owns its routes, operation IDs, tags and extensions. |
 | `tspconfig.yaml` | Pinned TypeSpec OpenAPI 3.1 emitter configuration. |
 | `package.json`, `pnpm-lock.yaml` | Exact compiler dependency boundary for reproducible contract builds. |
+
+Only `.tsp` files are contract source. Keep `package.json` and
+`pnpm-lock.yaml` beside the compiler configuration so contract builds remain
+independently reproducible. `node_modules/` is a local, ignored installation
+artifact and must never be committed.
 
 The generated graph is:
 

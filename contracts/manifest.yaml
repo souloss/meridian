@@ -7,7 +7,7 @@ authority:
   ownership:
     manifest.yaml: development-toolchain-version-ranges-code-generation-and-build-gates
     openapi.yaml: generated-http-transport-security-operation-and-wire-schema
-    api/*.tsp: http-transport-security-operation-and-wire-schema-source
+    api/**/*.tsp: http-transport-security-operation-and-wire-schema-source
     storage.yaml: relational-schema-key-index-and-transaction-boundary
     kinds.yaml: asset-kind-plugin-and-content-schema
     views.yaml: built-in-view-registry-and-input-contract
