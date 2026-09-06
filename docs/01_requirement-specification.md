@@ -3,7 +3,7 @@
 > 版本：v1.1（开发基线，2026-09-04）
 > 技术栈：Go 1.27.1（后端）+ Nuxt 4/Vue 3 SPA（前端）+ PostgreSQL 16+（存储）；完整冻结基线见 [05_technology-stack-decision.md](./05_technology-stack-decision.md)
 > 定位：**多租户系统资产目录 + 多源 Overlay 合并引擎 + 插件化多视图门户**
-> 共同契约入口：[contracts/manifest.yaml](../contracts/manifest.yaml)。本文件定义产品意图；接口、枚举、状态机、默认值、存储约束和验收映射以该清单引用的 YAML 为唯一开发口径。
+> 共同契约入口：[contracts/manifest.yaml](../contracts/manifest.yaml)。本文件定义产品意图；接口、枚举、状态机、默认值、存储约束和验收映射以该清单引用的 TypeSpec/OpenAPI 与 YAML 契约为唯一开发口径。
 
 **交付边界已冻结**：`M0-M3` 为 MVP，`M4-M5` 为 v1 扩展，`P2/M6+` 不进入 v1。为保证核心用户故事闭环，AI 待审站内通知、Diff 快照分享、breaking 待办以及 `meridian push/diff` 已纳入 M3；不再受原功能章节的 P1 标签限制。
 

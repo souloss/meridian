@@ -5,7 +5,7 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
-import type { CapabilityList } from './capabilityList.ts';
+import type { CapabilityListItem } from './capabilityListItem.ts';
 import type { ETag } from './eTag.ts';
 import type { LayerHead } from './layerHead.ts';
 import type { LayerOrigin } from './layerOrigin.ts';
@@ -34,17 +34,14 @@ export interface Layer {
      * @minimum 0
      */
   ord: number;
-  /**
-     * specifies the dialect associated with this layer.
-     * @nullable
-     */
+  /** specifies the dialect associated with this layer. */
   dialect: string | null;
   /** indicates whether enabled applies to this layer. */
   enabled: boolean;
   /** contains the ordered heads associated with this layer. */
   heads: LayerHead[];
   /** lists actions the authenticated principal may perform on this resource. */
-  capabilities: CapabilityList;
+  capabilities: CapabilityListItem;
   /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
   /** is the RFC 3339 UTC instant when this resource was last updated. */

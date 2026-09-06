@@ -25,7 +25,6 @@ export interface ServiceCreateRequest {
   /**
      * specifies the description associated with this service create request.
      * @maxLength 2000
-     * @nullable
      */
   description?: string | null;
   /** specifies the visibility associated with this service create request. */
@@ -37,7 +36,6 @@ export interface ServiceCreateRequest {
   /**
      * Null or omitted means repository root and is stored as an empty rootDir.
      * @maxLength 512
-     * @nullable
      */
   path?: string | null;
 }

@@ -22,10 +22,7 @@ export interface TenantSettings {
   autoPublish: boolean;
   /** specifies the default locale associated with this tenant settings. */
   defaultLocale: TenantSettingsDefaultLocale;
-  /**
-     * specifies the default ai producer profile id associated with this tenant settings.
-     * @nullable
-     */
+  /** specifies the default ai producer profile id associated with this tenant settings. */
   defaultAiProducerProfileId: string | null;
   /** contains the retention settings associated with this tenant settings. */
   retention: RetentionSettings;

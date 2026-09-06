@@ -31,32 +31,28 @@ import type {
 } from 'vue';
 
 import type {
-  AuditLogPageResponse,
-  BreakingTodoAcknowledgeBody,
-  BreakingTodoPageResponse,
-  BreakingTodoResponse,
-  CommentCreateBody,
-  CommentPageResponse,
-  CommentResponse,
-  ConflictResponse,
-  InvalidStateResponse,
-  JobAcceptedResponse,
+  AuditLogPage,
+  BreakingTodo,
+  BreakingTodoAcknowledgeRequest,
+  BreakingTodoPage,
+  Comment,
+  CommentCreateRequest,
+  CommentPage,
+  ErrorResponse,
+  JobAccepted,
   ListAuditLogsParams,
   ListBreakingTodosParams,
   ListNotificationsParams,
   ListServiceCommentsParams,
-  NotFoundResponse,
-  NotificationChannelCreateBody,
-  NotificationChannelListResponse,
-  NotificationChannelPatchBody,
-  NotificationChannelResponse,
-  NotificationChannelRotateBody,
-  NotificationPageResponse,
-  PreconditionFailedResponse,
-  SubscriptionListResponse,
-  SubscriptionPutBody,
-  SubscriptionResponse,
-  ValidationErrorResponse
+  NotificationChannel,
+  NotificationChannelCreateRequest,
+  NotificationChannelList,
+  NotificationChannelPatchRequest,
+  NotificationChannelRotateRequest,
+  NotificationPage,
+  Subscription,
+  SubscriptionList,
+  SubscriptionPutRequest
 } from '../models';
 
 import { meridianFetch } from '../../fetcher.ts';
@@ -67,10 +63,361 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-/** listNotificationChannelsResponse200 represents a declared HTTP response from the list notification channels response200 operation. */
-export type listNotificationChannelsResponse200 = {
+/** listAuditLogsResponse200 represents a declared HTTP response from the list audit logs response200 operation. */
+export type listAuditLogsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: NotificationChannelListResponse
+  data: AuditLogPage
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listAuditLogsResponse404 represents a declared HTTP response from the list audit logs response404 operation. */
+export type listAuditLogsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listAuditLogsResponseSuccess represents a declared HTTP response from the list audit logs response success operation. */
+export type listAuditLogsResponseSuccess = (listAuditLogsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listAuditLogsResponseError represents a declared HTTP response from the list audit logs response error operation. */
+export type listAuditLogsResponseError = (listAuditLogsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listAuditLogsResponse represents a declared HTTP response from the list audit logs response operation. */
+export type listAuditLogsResponse = (listAuditLogsResponseSuccess | listAuditLogsResponseError)
+
+/** getListAuditLogsUrl builds the relative URL for its OpenAPI operation. */
+export const getListAuditLogsUrl = (tenantSlug: string,
+    params?: ListAuditLogsParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
+
+  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/audit-logs?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/audit-logs`
+}
+
+/**
+ * Returns the requested page of audit logs within the authorized request scope.
+ */
+export const listAuditLogs = async (tenantSlug: string,
+    params?: ListAuditLogsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listAuditLogsResponse> => {
+
+  return meridianFetch<listAuditLogsResponse>(getListAuditLogsUrl(tenantSlug,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListAuditLogsQueryKey is generated from the Meridian OpenAPI contract for get list audit logs query key. */
+export const getListAuditLogsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAuditLogsParams>,) => {
+    return [
+    'api','v1','t',tenantSlug,'audit-logs', ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+/** getListAuditLogsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListAuditLogsQueryOptions = <TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAuditLogsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListAuditLogsQueryKey(tenantSlug,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAuditLogs>>> = ({ signal }) => listAuditLogs(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>
+}
+
+/** ListAuditLogsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListAuditLogsQueryResult = NonNullable<Awaited<ReturnType<typeof listAuditLogs>>>
+/** ListAuditLogsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListAuditLogsQueryError = ErrorResponse
+
+
+
+/** useListAuditLogs executes its OpenAPI operation through TanStack Vue Query. */
+export function useListAuditLogs<TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAuditLogsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAuditLogsQueryOptions(tenantSlug,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** listBreakingTodosResponse200 represents a declared HTTP response from the list breaking todos response200 operation. */
+export type listBreakingTodosResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: BreakingTodoPage
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listBreakingTodosResponse404 represents a declared HTTP response from the list breaking todos response404 operation. */
+export type listBreakingTodosResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listBreakingTodosResponseSuccess represents a declared HTTP response from the list breaking todos response success operation. */
+export type listBreakingTodosResponseSuccess = (listBreakingTodosResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listBreakingTodosResponseError represents a declared HTTP response from the list breaking todos response error operation. */
+export type listBreakingTodosResponseError = (listBreakingTodosResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listBreakingTodosResponse represents a declared HTTP response from the list breaking todos response operation. */
+export type listBreakingTodosResponse = (listBreakingTodosResponseSuccess | listBreakingTodosResponseError)
+
+/** getListBreakingTodosUrl builds the relative URL for its OpenAPI operation. */
+export const getListBreakingTodosUrl = (tenantSlug: string,
+    params?: ListBreakingTodosParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
+
+  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/breaking-todos?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/breaking-todos`
+}
+
+/**
+ * Returns the requested page of breaking todos within the authorized request scope.
+ */
+export const listBreakingTodos = async (tenantSlug: string,
+    params?: ListBreakingTodosParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listBreakingTodosResponse> => {
+
+  return meridianFetch<listBreakingTodosResponse>(getListBreakingTodosUrl(tenantSlug,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListBreakingTodosQueryKey is generated from the Meridian OpenAPI contract for get list breaking todos query key. */
+export const getListBreakingTodosQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListBreakingTodosParams>,) => {
+    return [
+    'api','v1','t',tenantSlug,'breaking-todos', ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+/** getListBreakingTodosQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListBreakingTodosQueryOptions = <TData = Awaited<ReturnType<typeof listBreakingTodos>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListBreakingTodosParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBreakingTodos>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListBreakingTodosQueryKey(tenantSlug,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBreakingTodos>>> = ({ signal }) => listBreakingTodos(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBreakingTodos>>, TError, TData>
+}
+
+/** ListBreakingTodosQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListBreakingTodosQueryResult = NonNullable<Awaited<ReturnType<typeof listBreakingTodos>>>
+/** ListBreakingTodosQueryError is the error type returned by its generated Vue Query hook. */
+export type ListBreakingTodosQueryError = ErrorResponse
+
+
+
+/** useListBreakingTodos executes its OpenAPI operation through TanStack Vue Query. */
+export function useListBreakingTodos<TData = Awaited<ReturnType<typeof listBreakingTodos>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListBreakingTodosParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBreakingTodos>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListBreakingTodosQueryOptions(tenantSlug,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** acknowledgeBreakingTodoResponse200 represents a declared HTTP response from the acknowledge breaking todo response200 operation. */
+export type acknowledgeBreakingTodoResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: BreakingTodo
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** acknowledgeBreakingTodoResponse404 represents a declared HTTP response from the acknowledge breaking todo response404 operation. */
+export type acknowledgeBreakingTodoResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** acknowledgeBreakingTodoResponse409 represents a declared HTTP response from the acknowledge breaking todo response409 operation. */
+export type acknowledgeBreakingTodoResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** acknowledgeBreakingTodoResponseSuccess represents a declared HTTP response from the acknowledge breaking todo response success operation. */
+export type acknowledgeBreakingTodoResponseSuccess = (acknowledgeBreakingTodoResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** acknowledgeBreakingTodoResponseError represents a declared HTTP response from the acknowledge breaking todo response error operation. */
+export type acknowledgeBreakingTodoResponseError = (acknowledgeBreakingTodoResponse404 | acknowledgeBreakingTodoResponse409) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** acknowledgeBreakingTodoResponse represents a declared HTTP response from the acknowledge breaking todo response operation. */
+export type acknowledgeBreakingTodoResponse = (acknowledgeBreakingTodoResponseSuccess | acknowledgeBreakingTodoResponseError)
+
+/** getAcknowledgeBreakingTodoUrl builds the relative URL for its OpenAPI operation. */
+export const getAcknowledgeBreakingTodoUrl = (tenantSlug: string,
+    todoId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/breaking-todos/${todoId}:ack`
+}
+
+/**
+ * Performs the acknowledge breaking todo workflow within the authorized request scope.
+ */
+export const acknowledgeBreakingTodo = async (tenantSlug: string,
+    todoId: string,
+    breakingTodoAcknowledgeRequest: BreakingTodoAcknowledgeRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<acknowledgeBreakingTodoResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<acknowledgeBreakingTodoResponse>(getAcknowledgeBreakingTodoUrl(tenantSlug,todoId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(breakingTodoAcknowledgeRequest)
+  }
+);}
+
+
+
+
+
+/** getAcknowledgeBreakingTodoMutationKey is generated from the Meridian OpenAPI contract for get acknowledge breaking todo mutation key. */
+export const getAcknowledgeBreakingTodoMutationKey = () => ['acknowledgeBreakingTodo'] as const;
+
+/** getAcknowledgeBreakingTodoMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getAcknowledgeBreakingTodoMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>, TError,AcknowledgeBreakingTodoMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>, TError,AcknowledgeBreakingTodoMutationVariables, TContext> => {
+
+const mutationKey = getAcknowledgeBreakingTodoMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>, AcknowledgeBreakingTodoMutationVariables> = (props) => {
+          const {tenantSlug,todoId,data} = props ?? {};
+
+          return  acknowledgeBreakingTodo(tenantSlug,todoId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** AcknowledgeBreakingTodoMutationResult is generated from the Meridian OpenAPI contract for acknowledge breaking todo mutation result. */
+    export type AcknowledgeBreakingTodoMutationResult = NonNullable<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>>
+    /** AcknowledgeBreakingTodoMutationBody is the request body type for its generated OpenAPI operation. */
+    export type AcknowledgeBreakingTodoMutationBody = BreakingTodoAcknowledgeRequest
+    /** AcknowledgeBreakingTodoMutationError is generated from the Meridian OpenAPI contract for acknowledge breaking todo mutation error. */
+    export type AcknowledgeBreakingTodoMutationError = ErrorResponse
+    /** AcknowledgeBreakingTodoMutationVariables is generated from the Meridian OpenAPI contract for acknowledge breaking todo mutation variables. */
+    export type AcknowledgeBreakingTodoMutationVariables = {/** TenantSlug carries the tenant slug value for AcknowledgeBreakingTodoMutationVariables. */ tenantSlug: string;/** TodoId carries the todo id value for AcknowledgeBreakingTodoMutationVariables. */ todoId: string;/** Data contains the decoded response payload. */ data: BreakingTodoAcknowledgeRequest}
+
+    /** useAcknowledgeBreakingTodo executes its OpenAPI operation through TanStack Vue Query. */
+    export const useAcknowledgeBreakingTodo = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>, TError,AcknowledgeBreakingTodoMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof acknowledgeBreakingTodo>>,
+        TError,
+        AcknowledgeBreakingTodoMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAcknowledgeBreakingTodoMutationOptions(options), queryClient);
+    }
+    /** listNotificationChannelsResponse200 represents a declared HTTP response from the list notification channels response200 operation. */
+    export type listNotificationChannelsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: NotificationChannelList
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -78,7 +425,7 @@ export type listNotificationChannelsResponse200 = {
 /** listNotificationChannelsResponse404 represents a declared HTTP response from the list notification channels response404 operation. */
 export type listNotificationChannelsResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -131,7 +478,7 @@ export const getListNotificationChannelsQueryKey = (tenantSlug: MaybeRefOrGetter
 
 
 /** getListNotificationChannelsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListNotificationChannelsQueryOptions = <TData = Awaited<ReturnType<typeof listNotificationChannels>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotificationChannels>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+export const getListNotificationChannelsQueryOptions = <TData = Awaited<ReturnType<typeof listNotificationChannels>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotificationChannels>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -152,12 +499,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** ListNotificationChannelsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListNotificationChannelsQueryResult = NonNullable<Awaited<ReturnType<typeof listNotificationChannels>>>
 /** ListNotificationChannelsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListNotificationChannelsQueryError = NotFoundResponse
+export type ListNotificationChannelsQueryError = ErrorResponse
 
 
 
 /** useListNotificationChannels executes its OpenAPI operation through TanStack Vue Query. */
-export function useListNotificationChannels<TData = Awaited<ReturnType<typeof listNotificationChannels>>, TError = NotFoundResponse>(
+export function useListNotificationChannels<TData = Awaited<ReturnType<typeof listNotificationChannels>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotificationChannels>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -179,7 +526,7 @@ export function useListNotificationChannels<TData = Awaited<ReturnType<typeof li
 /** createNotificationChannelResponse201 represents a declared HTTP response from the create notification channel response201 operation. */
 export type createNotificationChannelResponse201 = {
   /** Data contains the decoded response payload. */
-  data: NotificationChannelResponse
+  data: NotificationChannel
   /** Status is the HTTP response status code. */
   status: 201
 }
@@ -187,7 +534,7 @@ export type createNotificationChannelResponse201 = {
 /** createNotificationChannelResponse404 represents a declared HTTP response from the create notification channel response404 operation. */
 export type createNotificationChannelResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -195,7 +542,7 @@ export type createNotificationChannelResponse404 = {
 /** createNotificationChannelResponse422 represents a declared HTTP response from the create notification channel response422 operation. */
 export type createNotificationChannelResponse422 = {
   /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
@@ -225,7 +572,7 @@ export const getCreateNotificationChannelUrl = (tenantSlug: string,) => {
  * Creates notification channel within the authorized request scope.
  */
 export const createNotificationChannel = async (tenantSlug: string,
-    notificationChannelCreateBody: NotificationChannelCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createNotificationChannelResponse> => {
+    notificationChannelCreateRequest: NotificationChannelCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createNotificationChannelResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -238,7 +585,7 @@ return meridianFetch<createNotificationChannelResponse>(getCreateNotificationCha
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(notificationChannelCreateBody)
+    body: JSON.stringify(notificationChannelCreateRequest)
   }
 );}
 
@@ -250,7 +597,7 @@ return meridianFetch<createNotificationChannelResponse>(getCreateNotificationCha
 export const getCreateNotificationChannelMutationKey = () => ['createNotificationChannel'] as const;
 
 /** getCreateNotificationChannelMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateNotificationChannelMutationOptions = <TError = NotFoundResponse | ValidationErrorResponse,
+export const getCreateNotificationChannelMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createNotificationChannel>>, TError,CreateNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createNotificationChannel>>, TError,CreateNotificationChannelMutationVariables, TContext> => {
 
@@ -280,14 +627,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateNotificationChannelMutationResult is generated from the Meridian OpenAPI contract for create notification channel mutation result. */
     export type CreateNotificationChannelMutationResult = NonNullable<Awaited<ReturnType<typeof createNotificationChannel>>>
     /** CreateNotificationChannelMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateNotificationChannelMutationBody = NotificationChannelCreateBody
+    export type CreateNotificationChannelMutationBody = NotificationChannelCreateRequest
     /** CreateNotificationChannelMutationError is generated from the Meridian OpenAPI contract for create notification channel mutation error. */
-    export type CreateNotificationChannelMutationError = NotFoundResponse | ValidationErrorResponse
+    export type CreateNotificationChannelMutationError = ErrorResponse
     /** CreateNotificationChannelMutationVariables is generated from the Meridian OpenAPI contract for create notification channel mutation variables. */
-    export type CreateNotificationChannelMutationVariables = {/** TenantSlug carries the tenant slug value for CreateNotificationChannelMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: NotificationChannelCreateBody}
+    export type CreateNotificationChannelMutationVariables = {/** TenantSlug carries the tenant slug value for CreateNotificationChannelMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: NotificationChannelCreateRequest}
 
     /** useCreateNotificationChannel executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateNotificationChannel = <TError = NotFoundResponse | ValidationErrorResponse,
+    export const useCreateNotificationChannel = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createNotificationChannel>>, TError,CreateNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createNotificationChannel>>,
@@ -296,129 +643,6 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getCreateNotificationChannelMutationOptions(options), queryClient);
-    }
-    /** updateNotificationChannelResponse200 represents a declared HTTP response from the update notification channel response200 operation. */
-    export type updateNotificationChannelResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: NotificationChannelResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** updateNotificationChannelResponse404 represents a declared HTTP response from the update notification channel response404 operation. */
-export type updateNotificationChannelResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** updateNotificationChannelResponse412 represents a declared HTTP response from the update notification channel response412 operation. */
-export type updateNotificationChannelResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** updateNotificationChannelResponseSuccess represents a declared HTTP response from the update notification channel response success operation. */
-export type updateNotificationChannelResponseSuccess = (updateNotificationChannelResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** updateNotificationChannelResponseError represents a declared HTTP response from the update notification channel response error operation. */
-export type updateNotificationChannelResponseError = (updateNotificationChannelResponse404 | updateNotificationChannelResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** updateNotificationChannelResponse represents a declared HTTP response from the update notification channel response operation. */
-export type updateNotificationChannelResponse = (updateNotificationChannelResponseSuccess | updateNotificationChannelResponseError)
-
-/** getUpdateNotificationChannelUrl builds the relative URL for its OpenAPI operation. */
-export const getUpdateNotificationChannelUrl = (tenantSlug: string,
-    channelId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/notification-channels/${channelId}`
-}
-
-/**
- * Updates the selected notification channel within the authorized request scope.
- */
-export const updateNotificationChannel = async (tenantSlug: string,
-    channelId: string,
-    notificationChannelPatchBody: NotificationChannelPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateNotificationChannelResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<updateNotificationChannelResponse>(getUpdateNotificationChannelUrl(tenantSlug,channelId),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(notificationChannelPatchBody)
-  }
-);}
-
-
-
-
-
-/** getUpdateNotificationChannelMutationKey is generated from the Meridian OpenAPI contract for get update notification channel mutation key. */
-export const getUpdateNotificationChannelMutationKey = () => ['updateNotificationChannel'] as const;
-
-/** getUpdateNotificationChannelMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateNotificationChannelMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateNotificationChannel>>, TError,UpdateNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateNotificationChannel>>, TError,UpdateNotificationChannelMutationVariables, TContext> => {
-
-const mutationKey = getUpdateNotificationChannelMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateNotificationChannel>>, UpdateNotificationChannelMutationVariables> = (props) => {
-          const {tenantSlug,channelId,data} = props ?? {};
-
-          return  updateNotificationChannel(tenantSlug,channelId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** UpdateNotificationChannelMutationResult is generated from the Meridian OpenAPI contract for update notification channel mutation result. */
-    export type UpdateNotificationChannelMutationResult = NonNullable<Awaited<ReturnType<typeof updateNotificationChannel>>>
-    /** UpdateNotificationChannelMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateNotificationChannelMutationBody = NotificationChannelPatchBody
-    /** UpdateNotificationChannelMutationError is generated from the Meridian OpenAPI contract for update notification channel mutation error. */
-    export type UpdateNotificationChannelMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** UpdateNotificationChannelMutationVariables is generated from the Meridian OpenAPI contract for update notification channel mutation variables. */
-    export type UpdateNotificationChannelMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateNotificationChannelMutationVariables. */ tenantSlug: string;/** ChannelId carries the channel id value for UpdateNotificationChannelMutationVariables. */ channelId: string;/** Data contains the decoded response payload. */ data: NotificationChannelPatchBody}
-
-    /** useUpdateNotificationChannel executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateNotificationChannel = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateNotificationChannel>>, TError,UpdateNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof updateNotificationChannel>>,
-        TError,
-        UpdateNotificationChannelMutationVariables,
-        TContext
-      > => {
-      return useMutation(getUpdateNotificationChannelMutationOptions(options), queryClient);
     }
     /** deleteNotificationChannelResponse204 represents a declared HTTP response from the delete notification channel response204 operation. */
     export type deleteNotificationChannelResponse204 = {
@@ -431,7 +655,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** deleteNotificationChannelResponse404 represents a declared HTTP response from the delete notification channel response404 operation. */
 export type deleteNotificationChannelResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -439,7 +663,7 @@ export type deleteNotificationChannelResponse404 = {
 /** deleteNotificationChannelResponse412 represents a declared HTTP response from the delete notification channel response412 operation. */
 export type deleteNotificationChannelResponse412 = {
   /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 412
 }
@@ -489,7 +713,7 @@ export const deleteNotificationChannel = async (tenantSlug: string,
 export const getDeleteNotificationChannelMutationKey = () => ['deleteNotificationChannel'] as const;
 
 /** getDeleteNotificationChannelMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeleteNotificationChannelMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
+export const getDeleteNotificationChannelMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteNotificationChannel>>, TError,DeleteNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteNotificationChannel>>, TError,DeleteNotificationChannelMutationVariables, TContext> => {
 
@@ -520,12 +744,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DeleteNotificationChannelMutationResult = NonNullable<Awaited<ReturnType<typeof deleteNotificationChannel>>>
 
     /** DeleteNotificationChannelMutationError is generated from the Meridian OpenAPI contract for delete notification channel mutation error. */
-    export type DeleteNotificationChannelMutationError = NotFoundResponse | PreconditionFailedResponse
+    export type DeleteNotificationChannelMutationError = ErrorResponse
     /** DeleteNotificationChannelMutationVariables is generated from the Meridian OpenAPI contract for delete notification channel mutation variables. */
     export type DeleteNotificationChannelMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteNotificationChannelMutationVariables. */ tenantSlug: string;/** ChannelId carries the channel id value for DeleteNotificationChannelMutationVariables. */ channelId: string}
 
     /** useDeleteNotificationChannel executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeleteNotificationChannel = <TError = NotFoundResponse | PreconditionFailedResponse,
+    export const useDeleteNotificationChannel = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteNotificationChannel>>, TError,DeleteNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof deleteNotificationChannel>>,
@@ -535,10 +759,272 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDeleteNotificationChannelMutationOptions(options), queryClient);
     }
+    /** updateNotificationChannelResponse200 represents a declared HTTP response from the update notification channel response200 operation. */
+    export type updateNotificationChannelResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: NotificationChannel
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** updateNotificationChannelResponse404 represents a declared HTTP response from the update notification channel response404 operation. */
+export type updateNotificationChannelResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** updateNotificationChannelResponse412 represents a declared HTTP response from the update notification channel response412 operation. */
+export type updateNotificationChannelResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** updateNotificationChannelResponseSuccess represents a declared HTTP response from the update notification channel response success operation. */
+export type updateNotificationChannelResponseSuccess = (updateNotificationChannelResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** updateNotificationChannelResponseError represents a declared HTTP response from the update notification channel response error operation. */
+export type updateNotificationChannelResponseError = (updateNotificationChannelResponse404 | updateNotificationChannelResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** updateNotificationChannelResponse represents a declared HTTP response from the update notification channel response operation. */
+export type updateNotificationChannelResponse = (updateNotificationChannelResponseSuccess | updateNotificationChannelResponseError)
+
+/** getUpdateNotificationChannelUrl builds the relative URL for its OpenAPI operation. */
+export const getUpdateNotificationChannelUrl = (tenantSlug: string,
+    channelId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/notification-channels/${channelId}`
+}
+
+/**
+ * Updates the selected notification channel within the authorized request scope.
+ */
+export const updateNotificationChannel = async (tenantSlug: string,
+    channelId: string,
+    notificationChannelPatchRequest: NotificationChannelPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateNotificationChannelResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<updateNotificationChannelResponse>(getUpdateNotificationChannelUrl(tenantSlug,channelId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(notificationChannelPatchRequest)
+  }
+);}
+
+
+
+
+
+/** getUpdateNotificationChannelMutationKey is generated from the Meridian OpenAPI contract for get update notification channel mutation key. */
+export const getUpdateNotificationChannelMutationKey = () => ['updateNotificationChannel'] as const;
+
+/** getUpdateNotificationChannelMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getUpdateNotificationChannelMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateNotificationChannel>>, TError,UpdateNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateNotificationChannel>>, TError,UpdateNotificationChannelMutationVariables, TContext> => {
+
+const mutationKey = getUpdateNotificationChannelMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateNotificationChannel>>, UpdateNotificationChannelMutationVariables> = (props) => {
+          const {tenantSlug,channelId,data} = props ?? {};
+
+          return  updateNotificationChannel(tenantSlug,channelId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** UpdateNotificationChannelMutationResult is generated from the Meridian OpenAPI contract for update notification channel mutation result. */
+    export type UpdateNotificationChannelMutationResult = NonNullable<Awaited<ReturnType<typeof updateNotificationChannel>>>
+    /** UpdateNotificationChannelMutationBody is the request body type for its generated OpenAPI operation. */
+    export type UpdateNotificationChannelMutationBody = NotificationChannelPatchRequest
+    /** UpdateNotificationChannelMutationError is generated from the Meridian OpenAPI contract for update notification channel mutation error. */
+    export type UpdateNotificationChannelMutationError = ErrorResponse
+    /** UpdateNotificationChannelMutationVariables is generated from the Meridian OpenAPI contract for update notification channel mutation variables. */
+    export type UpdateNotificationChannelMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateNotificationChannelMutationVariables. */ tenantSlug: string;/** ChannelId carries the channel id value for UpdateNotificationChannelMutationVariables. */ channelId: string;/** Data contains the decoded response payload. */ data: NotificationChannelPatchRequest}
+
+    /** useUpdateNotificationChannel executes its OpenAPI operation through TanStack Vue Query. */
+    export const useUpdateNotificationChannel = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateNotificationChannel>>, TError,UpdateNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof updateNotificationChannel>>,
+        TError,
+        UpdateNotificationChannelMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateNotificationChannelMutationOptions(options), queryClient);
+    }
+    /** rotateNotificationChannelSecretResponse200 represents a declared HTTP response from the rotate notification channel secret response200 operation. */
+    export type rotateNotificationChannelSecretResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: NotificationChannel
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** rotateNotificationChannelSecretResponse404 represents a declared HTTP response from the rotate notification channel secret response404 operation. */
+export type rotateNotificationChannelSecretResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** rotateNotificationChannelSecretResponse409 represents a declared HTTP response from the rotate notification channel secret response409 operation. */
+export type rotateNotificationChannelSecretResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** rotateNotificationChannelSecretResponse412 represents a declared HTTP response from the rotate notification channel secret response412 operation. */
+export type rotateNotificationChannelSecretResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** rotateNotificationChannelSecretResponse422 represents a declared HTTP response from the rotate notification channel secret response422 operation. */
+export type rotateNotificationChannelSecretResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** rotateNotificationChannelSecretResponseSuccess represents a declared HTTP response from the rotate notification channel secret response success operation. */
+export type rotateNotificationChannelSecretResponseSuccess = (rotateNotificationChannelSecretResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** rotateNotificationChannelSecretResponseError represents a declared HTTP response from the rotate notification channel secret response error operation. */
+export type rotateNotificationChannelSecretResponseError = (rotateNotificationChannelSecretResponse404 | rotateNotificationChannelSecretResponse409 | rotateNotificationChannelSecretResponse412 | rotateNotificationChannelSecretResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** rotateNotificationChannelSecretResponse represents a declared HTTP response from the rotate notification channel secret response operation. */
+export type rotateNotificationChannelSecretResponse = (rotateNotificationChannelSecretResponseSuccess | rotateNotificationChannelSecretResponseError)
+
+/** getRotateNotificationChannelSecretUrl builds the relative URL for its OpenAPI operation. */
+export const getRotateNotificationChannelSecretUrl = (tenantSlug: string,
+    channelId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/notification-channels/${channelId}:rotate`
+}
+
+/**
+ * Performs the rotate notification channel secret workflow within the authorized request scope.
+ */
+export const rotateNotificationChannelSecret = async (tenantSlug: string,
+    channelId: string,
+    notificationChannelRotateRequest: NotificationChannelRotateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<rotateNotificationChannelSecretResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<rotateNotificationChannelSecretResponse>(getRotateNotificationChannelSecretUrl(tenantSlug,channelId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(notificationChannelRotateRequest)
+  }
+);}
+
+
+
+
+
+/** getRotateNotificationChannelSecretMutationKey is generated from the Meridian OpenAPI contract for get rotate notification channel secret mutation key. */
+export const getRotateNotificationChannelSecretMutationKey = () => ['rotateNotificationChannelSecret'] as const;
+
+/** getRotateNotificationChannelSecretMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getRotateNotificationChannelSecretMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>, TError,RotateNotificationChannelSecretMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>, TError,RotateNotificationChannelSecretMutationVariables, TContext> => {
+
+const mutationKey = getRotateNotificationChannelSecretMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>, RotateNotificationChannelSecretMutationVariables> = (props) => {
+          const {tenantSlug,channelId,data} = props ?? {};
+
+          return  rotateNotificationChannelSecret(tenantSlug,channelId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** RotateNotificationChannelSecretMutationResult is generated from the Meridian OpenAPI contract for rotate notification channel secret mutation result. */
+    export type RotateNotificationChannelSecretMutationResult = NonNullable<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>>
+    /** RotateNotificationChannelSecretMutationBody is the request body type for its generated OpenAPI operation. */
+    export type RotateNotificationChannelSecretMutationBody = NotificationChannelRotateRequest
+    /** RotateNotificationChannelSecretMutationError is generated from the Meridian OpenAPI contract for rotate notification channel secret mutation error. */
+    export type RotateNotificationChannelSecretMutationError = ErrorResponse
+    /** RotateNotificationChannelSecretMutationVariables is generated from the Meridian OpenAPI contract for rotate notification channel secret mutation variables. */
+    export type RotateNotificationChannelSecretMutationVariables = {/** TenantSlug carries the tenant slug value for RotateNotificationChannelSecretMutationVariables. */ tenantSlug: string;/** ChannelId carries the channel id value for RotateNotificationChannelSecretMutationVariables. */ channelId: string;/** Data contains the decoded response payload. */ data: NotificationChannelRotateRequest}
+
+    /** useRotateNotificationChannelSecret executes its OpenAPI operation through TanStack Vue Query. */
+    export const useRotateNotificationChannelSecret = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>, TError,RotateNotificationChannelSecretMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof rotateNotificationChannelSecret>>,
+        TError,
+        RotateNotificationChannelSecretMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRotateNotificationChannelSecretMutationOptions(options), queryClient);
+    }
     /** testNotificationChannelResponse202 represents a declared HTTP response from the test notification channel response202 operation. */
     export type testNotificationChannelResponse202 = {
   /** Data contains the decoded response payload. */
-  data: JobAcceptedResponse
+  data: JobAccepted
   /** Status is the HTTP response status code. */
   status: 202
 }
@@ -546,7 +1032,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** testNotificationChannelResponse404 represents a declared HTTP response from the test notification channel response404 operation. */
 export type testNotificationChannelResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -596,7 +1082,7 @@ export const testNotificationChannel = async (tenantSlug: string,
 export const getTestNotificationChannelMutationKey = () => ['testNotificationChannel'] as const;
 
 /** getTestNotificationChannelMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getTestNotificationChannelMutationOptions = <TError = NotFoundResponse,
+export const getTestNotificationChannelMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testNotificationChannel>>, TError,TestNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof testNotificationChannel>>, TError,TestNotificationChannelMutationVariables, TContext> => {
 
@@ -627,12 +1113,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type TestNotificationChannelMutationResult = NonNullable<Awaited<ReturnType<typeof testNotificationChannel>>>
 
     /** TestNotificationChannelMutationError is generated from the Meridian OpenAPI contract for test notification channel mutation error. */
-    export type TestNotificationChannelMutationError = NotFoundResponse
+    export type TestNotificationChannelMutationError = ErrorResponse
     /** TestNotificationChannelMutationVariables is generated from the Meridian OpenAPI contract for test notification channel mutation variables. */
     export type TestNotificationChannelMutationVariables = {/** TenantSlug carries the tenant slug value for TestNotificationChannelMutationVariables. */ tenantSlug: string;/** ChannelId carries the channel id value for TestNotificationChannelMutationVariables. */ channelId: string}
 
     /** useTestNotificationChannel executes its OpenAPI operation through TanStack Vue Query. */
-    export const useTestNotificationChannel = <TError = NotFoundResponse,
+    export const useTestNotificationChannel = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testNotificationChannel>>, TError,TestNotificationChannelMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof testNotificationChannel>>,
@@ -642,87 +1128,56 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getTestNotificationChannelMutationOptions(options), queryClient);
     }
-    /** rotateNotificationChannelSecretResponse200 represents a declared HTTP response from the rotate notification channel secret response200 operation. */
-    export type rotateNotificationChannelSecretResponse200 = {
+    /** listNotificationsResponse200 represents a declared HTTP response from the list notifications response200 operation. */
+    export type listNotificationsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: NotificationChannelResponse
+  data: NotificationPage
   /** Status is the HTTP response status code. */
   status: 200
 }
 
-/** rotateNotificationChannelSecretResponse404 represents a declared HTTP response from the rotate notification channel secret response404 operation. */
-export type rotateNotificationChannelSecretResponse404 = {
+/** listNotificationsResponse404 represents a declared HTTP response from the list notifications response404 operation. */
+export type listNotificationsResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
 
-/** rotateNotificationChannelSecretResponse409 represents a declared HTTP response from the rotate notification channel secret response409 operation. */
-export type rotateNotificationChannelSecretResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** rotateNotificationChannelSecretResponse412 represents a declared HTTP response from the rotate notification channel secret response412 operation. */
-export type rotateNotificationChannelSecretResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** rotateNotificationChannelSecretResponse422 represents a declared HTTP response from the rotate notification channel secret response422 operation. */
-export type rotateNotificationChannelSecretResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** rotateNotificationChannelSecretResponseSuccess represents a declared HTTP response from the rotate notification channel secret response success operation. */
-export type rotateNotificationChannelSecretResponseSuccess = (rotateNotificationChannelSecretResponse200) & {
+/** listNotificationsResponseSuccess represents a declared HTTP response from the list notifications response success operation. */
+export type listNotificationsResponseSuccess = (listNotificationsResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** rotateNotificationChannelSecretResponseError represents a declared HTTP response from the rotate notification channel secret response error operation. */
-export type rotateNotificationChannelSecretResponseError = (rotateNotificationChannelSecretResponse404 | rotateNotificationChannelSecretResponse409 | rotateNotificationChannelSecretResponse412 | rotateNotificationChannelSecretResponse422) & {
+/** listNotificationsResponseError represents a declared HTTP response from the list notifications response error operation. */
+export type listNotificationsResponseError = (listNotificationsResponse404) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
-/** rotateNotificationChannelSecretResponse represents a declared HTTP response from the rotate notification channel secret response operation. */
-export type rotateNotificationChannelSecretResponse = (rotateNotificationChannelSecretResponseSuccess | rotateNotificationChannelSecretResponseError)
+/** listNotificationsResponse represents a declared HTTP response from the list notifications response operation. */
+export type listNotificationsResponse = (listNotificationsResponseSuccess | listNotificationsResponseError)
 
-/** getRotateNotificationChannelSecretUrl builds the relative URL for its OpenAPI operation. */
-export const getRotateNotificationChannelSecretUrl = (tenantSlug: string,
-    channelId: string,) => {
+/** getListNotificationsUrl builds the relative URL for its OpenAPI operation. */
+export const getListNotificationsUrl = (tenantSlug: string,
+    params?: ListNotificationsParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
 
-
-  return `/api/v1/t/${tenantSlug}/notification-channels/${channelId}:rotate`
+  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/notifications?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/notifications`
 }
 
 /**
- * Performs the rotate notification channel secret workflow within the authorized request scope.
+ * Returns the requested page of notifications within the authorized request scope.
  */
-export const rotateNotificationChannelSecret = async (tenantSlug: string,
-    channelId: string,
-    notificationChannelRotateBody: NotificationChannelRotateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<rotateNotificationChannelSecretResponse> => {
+export const listNotifications = async (tenantSlug: string,
+    params?: ListNotificationsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listNotificationsResponse> => {
 
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<rotateNotificationChannelSecretResponse>(getRotateNotificationChannelSecretUrl(tenantSlug,channelId),
+  return meridianFetch<listNotificationsResponse>(getListNotificationsUrl(tenantSlug,params),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(notificationChannelRotateBody)
+    method: 'GET'
+
+
   }
 );}
 
@@ -730,15 +1185,129 @@ return meridianFetch<rotateNotificationChannelSecretResponse>(getRotateNotificat
 
 
 
-/** getRotateNotificationChannelSecretMutationKey is generated from the Meridian OpenAPI contract for get rotate notification channel secret mutation key. */
-export const getRotateNotificationChannelSecretMutationKey = () => ['rotateNotificationChannelSecret'] as const;
+/** getListNotificationsQueryKey is generated from the Meridian OpenAPI contract for get list notifications query key. */
+export const getListNotificationsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListNotificationsParams>,) => {
+    return [
+    'api','v1','t',tenantSlug,'notifications', ...(params ? [params] : [])
+    ] as const;
+    }
 
-/** getRotateNotificationChannelSecretMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getRotateNotificationChannelSecretMutationOptions = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>, TError,RotateNotificationChannelSecretMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>, TError,RotateNotificationChannelSecretMutationVariables, TContext> => {
 
-const mutationKey = getRotateNotificationChannelSecretMutationKey();
+/** getListNotificationsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof listNotifications>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListNotificationsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListNotificationsQueryKey(tenantSlug,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listNotifications>>> = ({ signal }) => listNotifications(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>
+}
+
+/** ListNotificationsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof listNotifications>>>
+/** ListNotificationsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListNotificationsQueryError = ErrorResponse
+
+
+
+/** useListNotifications executes its OpenAPI operation through TanStack Vue Query. */
+export function useListNotifications<TData = Awaited<ReturnType<typeof listNotifications>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListNotificationsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListNotificationsQueryOptions(tenantSlug,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** markNotificationReadResponse204 represents a declared HTTP response from the mark notification read response204 operation. */
+export type markNotificationReadResponse204 = {
+  /** Data contains the decoded response payload. */
+  data: void
+  /** Status is the HTTP response status code. */
+  status: 204
+}
+
+/** markNotificationReadResponse404 represents a declared HTTP response from the mark notification read response404 operation. */
+export type markNotificationReadResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** markNotificationReadResponseSuccess represents a declared HTTP response from the mark notification read response success operation. */
+export type markNotificationReadResponseSuccess = (markNotificationReadResponse204) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** markNotificationReadResponseError represents a declared HTTP response from the mark notification read response error operation. */
+export type markNotificationReadResponseError = (markNotificationReadResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** markNotificationReadResponse represents a declared HTTP response from the mark notification read response operation. */
+export type markNotificationReadResponse = (markNotificationReadResponseSuccess | markNotificationReadResponseError)
+
+/** getMarkNotificationReadUrl builds the relative URL for its OpenAPI operation. */
+export const getMarkNotificationReadUrl = (tenantSlug: string,
+    notificationId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/notifications/${notificationId}:read`
+}
+
+/**
+ * Performs the mark notification read workflow within the authorized request scope.
+ */
+export const markNotificationRead = async (tenantSlug: string,
+    notificationId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<markNotificationReadResponse> => {
+
+  return meridianFetch<markNotificationReadResponse>(getMarkNotificationReadUrl(tenantSlug,notificationId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+/** getMarkNotificationReadMutationKey is generated from the Meridian OpenAPI contract for get mark notification read mutation key. */
+export const getMarkNotificationReadMutationKey = () => ['markNotificationRead'] as const;
+
+/** getMarkNotificationReadMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getMarkNotificationReadMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markNotificationRead>>, TError,MarkNotificationReadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof markNotificationRead>>, TError,MarkNotificationReadMutationVariables, TContext> => {
+
+const mutationKey = getMarkNotificationReadMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -748,10 +1317,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>, RotateNotificationChannelSecretMutationVariables> = (props) => {
-          const {tenantSlug,channelId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markNotificationRead>>, MarkNotificationReadMutationVariables> = (props) => {
+          const {tenantSlug,notificationId} = props ?? {};
 
-          return  rotateNotificationChannelSecret(tenantSlug,channelId,data,requestOptions)
+          return  markNotificationRead(tenantSlug,notificationId,requestOptions)
         }
 
 
@@ -761,30 +1330,134 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    /** RotateNotificationChannelSecretMutationResult is generated from the Meridian OpenAPI contract for rotate notification channel secret mutation result. */
-    export type RotateNotificationChannelSecretMutationResult = NonNullable<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>>
-    /** RotateNotificationChannelSecretMutationBody is the request body type for its generated OpenAPI operation. */
-    export type RotateNotificationChannelSecretMutationBody = NotificationChannelRotateBody
-    /** RotateNotificationChannelSecretMutationError is generated from the Meridian OpenAPI contract for rotate notification channel secret mutation error. */
-    export type RotateNotificationChannelSecretMutationError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse | ValidationErrorResponse
-    /** RotateNotificationChannelSecretMutationVariables is generated from the Meridian OpenAPI contract for rotate notification channel secret mutation variables. */
-    export type RotateNotificationChannelSecretMutationVariables = {/** TenantSlug carries the tenant slug value for RotateNotificationChannelSecretMutationVariables. */ tenantSlug: string;/** ChannelId carries the channel id value for RotateNotificationChannelSecretMutationVariables. */ channelId: string;/** Data contains the decoded response payload. */ data: NotificationChannelRotateBody}
+    /** MarkNotificationReadMutationResult is generated from the Meridian OpenAPI contract for mark notification read mutation result. */
+    export type MarkNotificationReadMutationResult = NonNullable<Awaited<ReturnType<typeof markNotificationRead>>>
 
-    /** useRotateNotificationChannelSecret executes its OpenAPI operation through TanStack Vue Query. */
-    export const useRotateNotificationChannelSecret = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rotateNotificationChannelSecret>>, TError,RotateNotificationChannelSecretMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+    /** MarkNotificationReadMutationError is generated from the Meridian OpenAPI contract for mark notification read mutation error. */
+    export type MarkNotificationReadMutationError = ErrorResponse
+    /** MarkNotificationReadMutationVariables is generated from the Meridian OpenAPI contract for mark notification read mutation variables. */
+    export type MarkNotificationReadMutationVariables = {/** TenantSlug carries the tenant slug value for MarkNotificationReadMutationVariables. */ tenantSlug: string;/** NotificationId carries the notification id value for MarkNotificationReadMutationVariables. */ notificationId: string}
+
+    /** useMarkNotificationRead executes its OpenAPI operation through TanStack Vue Query. */
+    export const useMarkNotificationRead = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markNotificationRead>>, TError,MarkNotificationReadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof rotateNotificationChannelSecret>>,
+        Awaited<ReturnType<typeof markNotificationRead>>,
         TError,
-        RotateNotificationChannelSecretMutationVariables,
+        MarkNotificationReadMutationVariables,
         TContext
       > => {
-      return useMutation(getRotateNotificationChannelSecretMutationOptions(options), queryClient);
+      return useMutation(getMarkNotificationReadMutationOptions(options), queryClient);
+    }
+    /** markAllNotificationsReadResponse204 represents a declared HTTP response from the mark all notifications read response204 operation. */
+    export type markAllNotificationsReadResponse204 = {
+  /** Data contains the decoded response payload. */
+  data: void
+  /** Status is the HTTP response status code. */
+  status: 204
+}
+
+/** markAllNotificationsReadResponse404 represents a declared HTTP response from the mark all notifications read response404 operation. */
+export type markAllNotificationsReadResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** markAllNotificationsReadResponseSuccess represents a declared HTTP response from the mark all notifications read response success operation. */
+export type markAllNotificationsReadResponseSuccess = (markAllNotificationsReadResponse204) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** markAllNotificationsReadResponseError represents a declared HTTP response from the mark all notifications read response error operation. */
+export type markAllNotificationsReadResponseError = (markAllNotificationsReadResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** markAllNotificationsReadResponse represents a declared HTTP response from the mark all notifications read response operation. */
+export type markAllNotificationsReadResponse = (markAllNotificationsReadResponseSuccess | markAllNotificationsReadResponseError)
+
+/** getMarkAllNotificationsReadUrl builds the relative URL for its OpenAPI operation. */
+export const getMarkAllNotificationsReadUrl = (tenantSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/notifications:read-all`
+}
+
+/**
+ * Performs the mark all notifications read workflow within the authorized request scope.
+ */
+export const markAllNotificationsRead = async (tenantSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<markAllNotificationsReadResponse> => {
+
+  return meridianFetch<markAllNotificationsReadResponse>(getMarkAllNotificationsReadUrl(tenantSlug),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+/** getMarkAllNotificationsReadMutationKey is generated from the Meridian OpenAPI contract for get mark all notifications read mutation key. */
+export const getMarkAllNotificationsReadMutationKey = () => ['markAllNotificationsRead'] as const;
+
+/** getMarkAllNotificationsReadMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getMarkAllNotificationsReadMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAllNotificationsRead>>, TError,MarkAllNotificationsReadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof markAllNotificationsRead>>, TError,MarkAllNotificationsReadMutationVariables, TContext> => {
+
+const mutationKey = getMarkAllNotificationsReadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markAllNotificationsRead>>, MarkAllNotificationsReadMutationVariables> = (props) => {
+          const {tenantSlug} = props ?? {};
+
+          return  markAllNotificationsRead(tenantSlug,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** MarkAllNotificationsReadMutationResult is generated from the Meridian OpenAPI contract for mark all notifications read mutation result. */
+    export type MarkAllNotificationsReadMutationResult = NonNullable<Awaited<ReturnType<typeof markAllNotificationsRead>>>
+
+    /** MarkAllNotificationsReadMutationError is generated from the Meridian OpenAPI contract for mark all notifications read mutation error. */
+    export type MarkAllNotificationsReadMutationError = ErrorResponse
+    /** MarkAllNotificationsReadMutationVariables is generated from the Meridian OpenAPI contract for mark all notifications read mutation variables. */
+    export type MarkAllNotificationsReadMutationVariables = {/** TenantSlug carries the tenant slug value for MarkAllNotificationsReadMutationVariables. */ tenantSlug: string}
+
+    /** useMarkAllNotificationsRead executes its OpenAPI operation through TanStack Vue Query. */
+    export const useMarkAllNotificationsRead = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAllNotificationsRead>>, TError,MarkAllNotificationsReadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof markAllNotificationsRead>>,
+        TError,
+        MarkAllNotificationsReadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMarkAllNotificationsReadMutationOptions(options), queryClient);
     }
     /** listServiceCommentsResponse200 represents a declared HTTP response from the list service comments response200 operation. */
     export type listServiceCommentsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: CommentPageResponse
+  data: CommentPage
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -792,7 +1465,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** listServiceCommentsResponse404 represents a declared HTTP response from the list service comments response404 operation. */
 export type listServiceCommentsResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -851,7 +1524,7 @@ export const getListServiceCommentsQueryKey = (tenantSlug: MaybeRefOrGetter<stri
 
 
 /** getListServiceCommentsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListServiceCommentsQueryOptions = <TData = Awaited<ReturnType<typeof listServiceComments>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
+export const getListServiceCommentsQueryOptions = <TData = Awaited<ReturnType<typeof listServiceComments>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
     serviceSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListServiceCommentsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listServiceComments>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -874,12 +1547,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** ListServiceCommentsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListServiceCommentsQueryResult = NonNullable<Awaited<ReturnType<typeof listServiceComments>>>
 /** ListServiceCommentsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListServiceCommentsQueryError = NotFoundResponse
+export type ListServiceCommentsQueryError = ErrorResponse
 
 
 
 /** useListServiceComments executes its OpenAPI operation through TanStack Vue Query. */
-export function useListServiceComments<TData = Awaited<ReturnType<typeof listServiceComments>>, TError = NotFoundResponse>(
+export function useListServiceComments<TData = Awaited<ReturnType<typeof listServiceComments>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     serviceSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListServiceCommentsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listServiceComments>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -903,7 +1576,7 @@ export function useListServiceComments<TData = Awaited<ReturnType<typeof listSer
 /** createServiceCommentResponse201 represents a declared HTTP response from the create service comment response201 operation. */
 export type createServiceCommentResponse201 = {
   /** Data contains the decoded response payload. */
-  data: CommentResponse
+  data: Comment
   /** Status is the HTTP response status code. */
   status: 201
 }
@@ -911,7 +1584,7 @@ export type createServiceCommentResponse201 = {
 /** createServiceCommentResponse404 represents a declared HTTP response from the create service comment response404 operation. */
 export type createServiceCommentResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -943,7 +1616,7 @@ export const getCreateServiceCommentUrl = (tenantSlug: string,
  */
 export const createServiceComment = async (tenantSlug: string,
     serviceSlug: string,
-    commentCreateBody: CommentCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createServiceCommentResponse> => {
+    commentCreateRequest: CommentCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createServiceCommentResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -956,7 +1629,7 @@ return meridianFetch<createServiceCommentResponse>(getCreateServiceCommentUrl(te
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(commentCreateBody)
+    body: JSON.stringify(commentCreateRequest)
   }
 );}
 
@@ -968,7 +1641,7 @@ return meridianFetch<createServiceCommentResponse>(getCreateServiceCommentUrl(te
 export const getCreateServiceCommentMutationKey = () => ['createServiceComment'] as const;
 
 /** getCreateServiceCommentMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateServiceCommentMutationOptions = <TError = NotFoundResponse,
+export const getCreateServiceCommentMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createServiceComment>>, TError,CreateServiceCommentMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createServiceComment>>, TError,CreateServiceCommentMutationVariables, TContext> => {
 
@@ -998,14 +1671,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateServiceCommentMutationResult is generated from the Meridian OpenAPI contract for create service comment mutation result. */
     export type CreateServiceCommentMutationResult = NonNullable<Awaited<ReturnType<typeof createServiceComment>>>
     /** CreateServiceCommentMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateServiceCommentMutationBody = CommentCreateBody
+    export type CreateServiceCommentMutationBody = CommentCreateRequest
     /** CreateServiceCommentMutationError is generated from the Meridian OpenAPI contract for create service comment mutation error. */
-    export type CreateServiceCommentMutationError = NotFoundResponse
+    export type CreateServiceCommentMutationError = ErrorResponse
     /** CreateServiceCommentMutationVariables is generated from the Meridian OpenAPI contract for create service comment mutation variables. */
-    export type CreateServiceCommentMutationVariables = {/** TenantSlug carries the tenant slug value for CreateServiceCommentMutationVariables. */ tenantSlug: string;/** ServiceSlug carries the service slug value for CreateServiceCommentMutationVariables. */ serviceSlug: string;/** Data contains the decoded response payload. */ data: CommentCreateBody}
+    export type CreateServiceCommentMutationVariables = {/** TenantSlug carries the tenant slug value for CreateServiceCommentMutationVariables. */ tenantSlug: string;/** ServiceSlug carries the service slug value for CreateServiceCommentMutationVariables. */ serviceSlug: string;/** Data contains the decoded response payload. */ data: CommentCreateRequest}
 
     /** useCreateServiceComment executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateServiceComment = <TError = NotFoundResponse,
+    export const useCreateServiceComment = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createServiceComment>>, TError,CreateServiceCommentMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createServiceComment>>,
@@ -1018,7 +1691,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** listSubscriptionsResponse200 represents a declared HTTP response from the list subscriptions response200 operation. */
     export type listSubscriptionsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: SubscriptionListResponse
+  data: SubscriptionList
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1026,7 +1699,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** listSubscriptionsResponse404 represents a declared HTTP response from the list subscriptions response404 operation. */
 export type listSubscriptionsResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1079,7 +1752,7 @@ export const getListSubscriptionsQueryKey = (tenantSlug: MaybeRefOrGetter<string
 
 
 /** getListSubscriptionsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListSubscriptionsQueryOptions = <TData = Awaited<ReturnType<typeof listSubscriptions>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscriptions>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+export const getListSubscriptionsQueryOptions = <TData = Awaited<ReturnType<typeof listSubscriptions>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscriptions>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1100,12 +1773,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** ListSubscriptionsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListSubscriptionsQueryResult = NonNullable<Awaited<ReturnType<typeof listSubscriptions>>>
 /** ListSubscriptionsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListSubscriptionsQueryError = NotFoundResponse
+export type ListSubscriptionsQueryError = ErrorResponse
 
 
 
 /** useListSubscriptions executes its OpenAPI operation through TanStack Vue Query. */
-export function useListSubscriptions<TData = Awaited<ReturnType<typeof listSubscriptions>>, TError = NotFoundResponse>(
+export function useListSubscriptions<TData = Awaited<ReturnType<typeof listSubscriptions>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscriptions>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -1127,7 +1800,7 @@ export function useListSubscriptions<TData = Awaited<ReturnType<typeof listSubsc
 /** putSubscriptionResponse200 represents a declared HTTP response from the put subscription response200 operation. */
 export type putSubscriptionResponse200 = {
   /** Data contains the decoded response payload. */
-  data: SubscriptionResponse
+  data: Subscription
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1135,7 +1808,7 @@ export type putSubscriptionResponse200 = {
 /** putSubscriptionResponse404 represents a declared HTTP response from the put subscription response404 operation. */
 export type putSubscriptionResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1165,7 +1838,7 @@ export const getPutSubscriptionUrl = (tenantSlug: string,) => {
  * Creates or replaces the selected subscription within the authorized request scope.
  */
 export const putSubscription = async (tenantSlug: string,
-    subscriptionPutBody: SubscriptionPutBody, options?: Parameters<typeof meridianFetch>[1]): Promise<putSubscriptionResponse> => {
+    subscriptionPutRequest: SubscriptionPutRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<putSubscriptionResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1178,7 +1851,7 @@ return meridianFetch<putSubscriptionResponse>(getPutSubscriptionUrl(tenantSlug),
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(subscriptionPutBody)
+    body: JSON.stringify(subscriptionPutRequest)
   }
 );}
 
@@ -1190,7 +1863,7 @@ return meridianFetch<putSubscriptionResponse>(getPutSubscriptionUrl(tenantSlug),
 export const getPutSubscriptionMutationKey = () => ['putSubscription'] as const;
 
 /** getPutSubscriptionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPutSubscriptionMutationOptions = <TError = NotFoundResponse,
+export const getPutSubscriptionMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putSubscription>>, TError,PutSubscriptionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof putSubscription>>, TError,PutSubscriptionMutationVariables, TContext> => {
 
@@ -1220,14 +1893,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** PutSubscriptionMutationResult is generated from the Meridian OpenAPI contract for put subscription mutation result. */
     export type PutSubscriptionMutationResult = NonNullable<Awaited<ReturnType<typeof putSubscription>>>
     /** PutSubscriptionMutationBody is the request body type for its generated OpenAPI operation. */
-    export type PutSubscriptionMutationBody = SubscriptionPutBody
+    export type PutSubscriptionMutationBody = SubscriptionPutRequest
     /** PutSubscriptionMutationError is generated from the Meridian OpenAPI contract for put subscription mutation error. */
-    export type PutSubscriptionMutationError = NotFoundResponse
+    export type PutSubscriptionMutationError = ErrorResponse
     /** PutSubscriptionMutationVariables is generated from the Meridian OpenAPI contract for put subscription mutation variables. */
-    export type PutSubscriptionMutationVariables = {/** TenantSlug carries the tenant slug value for PutSubscriptionMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: SubscriptionPutBody}
+    export type PutSubscriptionMutationVariables = {/** TenantSlug carries the tenant slug value for PutSubscriptionMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: SubscriptionPutRequest}
 
     /** usePutSubscription executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePutSubscription = <TError = NotFoundResponse,
+    export const usePutSubscription = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putSubscription>>, TError,PutSubscriptionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof putSubscription>>,
@@ -1237,680 +1910,3 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getPutSubscriptionMutationOptions(options), queryClient);
     }
-    /** listNotificationsResponse200 represents a declared HTTP response from the list notifications response200 operation. */
-    export type listNotificationsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: NotificationPageResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listNotificationsResponse404 represents a declared HTTP response from the list notifications response404 operation. */
-export type listNotificationsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listNotificationsResponseSuccess represents a declared HTTP response from the list notifications response success operation. */
-export type listNotificationsResponseSuccess = (listNotificationsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listNotificationsResponseError represents a declared HTTP response from the list notifications response error operation. */
-export type listNotificationsResponseError = (listNotificationsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listNotificationsResponse represents a declared HTTP response from the list notifications response operation. */
-export type listNotificationsResponse = (listNotificationsResponseSuccess | listNotificationsResponseError)
-
-/** getListNotificationsUrl builds the relative URL for its OpenAPI operation. */
-export const getListNotificationsUrl = (tenantSlug: string,
-    params?: ListNotificationsParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
-
-  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/notifications?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/notifications`
-}
-
-/**
- * Returns the requested page of notifications within the authorized request scope.
- */
-export const listNotifications = async (tenantSlug: string,
-    params?: ListNotificationsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listNotificationsResponse> => {
-
-  return meridianFetch<listNotificationsResponse>(getListNotificationsUrl(tenantSlug,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListNotificationsQueryKey is generated from the Meridian OpenAPI contract for get list notifications query key. */
-export const getListNotificationsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListNotificationsParams>,) => {
-    return [
-    'api','v1','t',tenantSlug,'notifications', ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-/** getListNotificationsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof listNotifications>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListNotificationsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListNotificationsQueryKey(tenantSlug,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listNotifications>>> = ({ signal }) => listNotifications(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>
-}
-
-/** ListNotificationsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof listNotifications>>>
-/** ListNotificationsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListNotificationsQueryError = NotFoundResponse
-
-
-
-/** useListNotifications executes its OpenAPI operation through TanStack Vue Query. */
-export function useListNotifications<TData = Awaited<ReturnType<typeof listNotifications>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListNotificationsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listNotifications>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListNotificationsQueryOptions(tenantSlug,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** markNotificationReadResponse204 represents a declared HTTP response from the mark notification read response204 operation. */
-export type markNotificationReadResponse204 = {
-  /** Data contains the decoded response payload. */
-  data: void
-  /** Status is the HTTP response status code. */
-  status: 204
-}
-
-/** markNotificationReadResponse404 represents a declared HTTP response from the mark notification read response404 operation. */
-export type markNotificationReadResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** markNotificationReadResponseSuccess represents a declared HTTP response from the mark notification read response success operation. */
-export type markNotificationReadResponseSuccess = (markNotificationReadResponse204) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** markNotificationReadResponseError represents a declared HTTP response from the mark notification read response error operation. */
-export type markNotificationReadResponseError = (markNotificationReadResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** markNotificationReadResponse represents a declared HTTP response from the mark notification read response operation. */
-export type markNotificationReadResponse = (markNotificationReadResponseSuccess | markNotificationReadResponseError)
-
-/** getMarkNotificationReadUrl builds the relative URL for its OpenAPI operation. */
-export const getMarkNotificationReadUrl = (tenantSlug: string,
-    notificationId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/notifications/${notificationId}:read`
-}
-
-/**
- * Performs the mark notification read workflow within the authorized request scope.
- */
-export const markNotificationRead = async (tenantSlug: string,
-    notificationId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<markNotificationReadResponse> => {
-
-  return meridianFetch<markNotificationReadResponse>(getMarkNotificationReadUrl(tenantSlug,notificationId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-
-
-
-/** getMarkNotificationReadMutationKey is generated from the Meridian OpenAPI contract for get mark notification read mutation key. */
-export const getMarkNotificationReadMutationKey = () => ['markNotificationRead'] as const;
-
-/** getMarkNotificationReadMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getMarkNotificationReadMutationOptions = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markNotificationRead>>, TError,MarkNotificationReadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof markNotificationRead>>, TError,MarkNotificationReadMutationVariables, TContext> => {
-
-const mutationKey = getMarkNotificationReadMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markNotificationRead>>, MarkNotificationReadMutationVariables> = (props) => {
-          const {tenantSlug,notificationId} = props ?? {};
-
-          return  markNotificationRead(tenantSlug,notificationId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** MarkNotificationReadMutationResult is generated from the Meridian OpenAPI contract for mark notification read mutation result. */
-    export type MarkNotificationReadMutationResult = NonNullable<Awaited<ReturnType<typeof markNotificationRead>>>
-
-    /** MarkNotificationReadMutationError is generated from the Meridian OpenAPI contract for mark notification read mutation error. */
-    export type MarkNotificationReadMutationError = NotFoundResponse
-    /** MarkNotificationReadMutationVariables is generated from the Meridian OpenAPI contract for mark notification read mutation variables. */
-    export type MarkNotificationReadMutationVariables = {/** TenantSlug carries the tenant slug value for MarkNotificationReadMutationVariables. */ tenantSlug: string;/** NotificationId carries the notification id value for MarkNotificationReadMutationVariables. */ notificationId: string}
-
-    /** useMarkNotificationRead executes its OpenAPI operation through TanStack Vue Query. */
-    export const useMarkNotificationRead = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markNotificationRead>>, TError,MarkNotificationReadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof markNotificationRead>>,
-        TError,
-        MarkNotificationReadMutationVariables,
-        TContext
-      > => {
-      return useMutation(getMarkNotificationReadMutationOptions(options), queryClient);
-    }
-    /** markAllNotificationsReadResponse204 represents a declared HTTP response from the mark all notifications read response204 operation. */
-    export type markAllNotificationsReadResponse204 = {
-  /** Data contains the decoded response payload. */
-  data: void
-  /** Status is the HTTP response status code. */
-  status: 204
-}
-
-/** markAllNotificationsReadResponse404 represents a declared HTTP response from the mark all notifications read response404 operation. */
-export type markAllNotificationsReadResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** markAllNotificationsReadResponseSuccess represents a declared HTTP response from the mark all notifications read response success operation. */
-export type markAllNotificationsReadResponseSuccess = (markAllNotificationsReadResponse204) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** markAllNotificationsReadResponseError represents a declared HTTP response from the mark all notifications read response error operation. */
-export type markAllNotificationsReadResponseError = (markAllNotificationsReadResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** markAllNotificationsReadResponse represents a declared HTTP response from the mark all notifications read response operation. */
-export type markAllNotificationsReadResponse = (markAllNotificationsReadResponseSuccess | markAllNotificationsReadResponseError)
-
-/** getMarkAllNotificationsReadUrl builds the relative URL for its OpenAPI operation. */
-export const getMarkAllNotificationsReadUrl = (tenantSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/notifications:read-all`
-}
-
-/**
- * Performs the mark all notifications read workflow within the authorized request scope.
- */
-export const markAllNotificationsRead = async (tenantSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<markAllNotificationsReadResponse> => {
-
-  return meridianFetch<markAllNotificationsReadResponse>(getMarkAllNotificationsReadUrl(tenantSlug),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-
-
-
-/** getMarkAllNotificationsReadMutationKey is generated from the Meridian OpenAPI contract for get mark all notifications read mutation key. */
-export const getMarkAllNotificationsReadMutationKey = () => ['markAllNotificationsRead'] as const;
-
-/** getMarkAllNotificationsReadMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getMarkAllNotificationsReadMutationOptions = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAllNotificationsRead>>, TError,MarkAllNotificationsReadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof markAllNotificationsRead>>, TError,MarkAllNotificationsReadMutationVariables, TContext> => {
-
-const mutationKey = getMarkAllNotificationsReadMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markAllNotificationsRead>>, MarkAllNotificationsReadMutationVariables> = (props) => {
-          const {tenantSlug} = props ?? {};
-
-          return  markAllNotificationsRead(tenantSlug,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** MarkAllNotificationsReadMutationResult is generated from the Meridian OpenAPI contract for mark all notifications read mutation result. */
-    export type MarkAllNotificationsReadMutationResult = NonNullable<Awaited<ReturnType<typeof markAllNotificationsRead>>>
-
-    /** MarkAllNotificationsReadMutationError is generated from the Meridian OpenAPI contract for mark all notifications read mutation error. */
-    export type MarkAllNotificationsReadMutationError = NotFoundResponse
-    /** MarkAllNotificationsReadMutationVariables is generated from the Meridian OpenAPI contract for mark all notifications read mutation variables. */
-    export type MarkAllNotificationsReadMutationVariables = {/** TenantSlug carries the tenant slug value for MarkAllNotificationsReadMutationVariables. */ tenantSlug: string}
-
-    /** useMarkAllNotificationsRead executes its OpenAPI operation through TanStack Vue Query. */
-    export const useMarkAllNotificationsRead = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAllNotificationsRead>>, TError,MarkAllNotificationsReadMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof markAllNotificationsRead>>,
-        TError,
-        MarkAllNotificationsReadMutationVariables,
-        TContext
-      > => {
-      return useMutation(getMarkAllNotificationsReadMutationOptions(options), queryClient);
-    }
-    /** listBreakingTodosResponse200 represents a declared HTTP response from the list breaking todos response200 operation. */
-    export type listBreakingTodosResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: BreakingTodoPageResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listBreakingTodosResponse404 represents a declared HTTP response from the list breaking todos response404 operation. */
-export type listBreakingTodosResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listBreakingTodosResponseSuccess represents a declared HTTP response from the list breaking todos response success operation. */
-export type listBreakingTodosResponseSuccess = (listBreakingTodosResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listBreakingTodosResponseError represents a declared HTTP response from the list breaking todos response error operation. */
-export type listBreakingTodosResponseError = (listBreakingTodosResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listBreakingTodosResponse represents a declared HTTP response from the list breaking todos response operation. */
-export type listBreakingTodosResponse = (listBreakingTodosResponseSuccess | listBreakingTodosResponseError)
-
-/** getListBreakingTodosUrl builds the relative URL for its OpenAPI operation. */
-export const getListBreakingTodosUrl = (tenantSlug: string,
-    params?: ListBreakingTodosParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
-
-  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/breaking-todos?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/breaking-todos`
-}
-
-/**
- * Returns the requested page of breaking todos within the authorized request scope.
- */
-export const listBreakingTodos = async (tenantSlug: string,
-    params?: ListBreakingTodosParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listBreakingTodosResponse> => {
-
-  return meridianFetch<listBreakingTodosResponse>(getListBreakingTodosUrl(tenantSlug,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListBreakingTodosQueryKey is generated from the Meridian OpenAPI contract for get list breaking todos query key. */
-export const getListBreakingTodosQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListBreakingTodosParams>,) => {
-    return [
-    'api','v1','t',tenantSlug,'breaking-todos', ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-/** getListBreakingTodosQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListBreakingTodosQueryOptions = <TData = Awaited<ReturnType<typeof listBreakingTodos>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListBreakingTodosParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBreakingTodos>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListBreakingTodosQueryKey(tenantSlug,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBreakingTodos>>> = ({ signal }) => listBreakingTodos(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBreakingTodos>>, TError, TData>
-}
-
-/** ListBreakingTodosQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListBreakingTodosQueryResult = NonNullable<Awaited<ReturnType<typeof listBreakingTodos>>>
-/** ListBreakingTodosQueryError is the error type returned by its generated Vue Query hook. */
-export type ListBreakingTodosQueryError = NotFoundResponse
-
-
-
-/** useListBreakingTodos executes its OpenAPI operation through TanStack Vue Query. */
-export function useListBreakingTodos<TData = Awaited<ReturnType<typeof listBreakingTodos>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListBreakingTodosParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBreakingTodos>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListBreakingTodosQueryOptions(tenantSlug,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** acknowledgeBreakingTodoResponse200 represents a declared HTTP response from the acknowledge breaking todo response200 operation. */
-export type acknowledgeBreakingTodoResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: BreakingTodoResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** acknowledgeBreakingTodoResponse404 represents a declared HTTP response from the acknowledge breaking todo response404 operation. */
-export type acknowledgeBreakingTodoResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** acknowledgeBreakingTodoResponse409 represents a declared HTTP response from the acknowledge breaking todo response409 operation. */
-export type acknowledgeBreakingTodoResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: InvalidStateResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** acknowledgeBreakingTodoResponseSuccess represents a declared HTTP response from the acknowledge breaking todo response success operation. */
-export type acknowledgeBreakingTodoResponseSuccess = (acknowledgeBreakingTodoResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** acknowledgeBreakingTodoResponseError represents a declared HTTP response from the acknowledge breaking todo response error operation. */
-export type acknowledgeBreakingTodoResponseError = (acknowledgeBreakingTodoResponse404 | acknowledgeBreakingTodoResponse409) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** acknowledgeBreakingTodoResponse represents a declared HTTP response from the acknowledge breaking todo response operation. */
-export type acknowledgeBreakingTodoResponse = (acknowledgeBreakingTodoResponseSuccess | acknowledgeBreakingTodoResponseError)
-
-/** getAcknowledgeBreakingTodoUrl builds the relative URL for its OpenAPI operation. */
-export const getAcknowledgeBreakingTodoUrl = (tenantSlug: string,
-    todoId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/breaking-todos/${todoId}:ack`
-}
-
-/**
- * Performs the acknowledge breaking todo workflow within the authorized request scope.
- */
-export const acknowledgeBreakingTodo = async (tenantSlug: string,
-    todoId: string,
-    breakingTodoAcknowledgeBody: BreakingTodoAcknowledgeBody, options?: Parameters<typeof meridianFetch>[1]): Promise<acknowledgeBreakingTodoResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<acknowledgeBreakingTodoResponse>(getAcknowledgeBreakingTodoUrl(tenantSlug,todoId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(breakingTodoAcknowledgeBody)
-  }
-);}
-
-
-
-
-
-/** getAcknowledgeBreakingTodoMutationKey is generated from the Meridian OpenAPI contract for get acknowledge breaking todo mutation key. */
-export const getAcknowledgeBreakingTodoMutationKey = () => ['acknowledgeBreakingTodo'] as const;
-
-/** getAcknowledgeBreakingTodoMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getAcknowledgeBreakingTodoMutationOptions = <TError = NotFoundResponse | InvalidStateResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>, TError,AcknowledgeBreakingTodoMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>, TError,AcknowledgeBreakingTodoMutationVariables, TContext> => {
-
-const mutationKey = getAcknowledgeBreakingTodoMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>, AcknowledgeBreakingTodoMutationVariables> = (props) => {
-          const {tenantSlug,todoId,data} = props ?? {};
-
-          return  acknowledgeBreakingTodo(tenantSlug,todoId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** AcknowledgeBreakingTodoMutationResult is generated from the Meridian OpenAPI contract for acknowledge breaking todo mutation result. */
-    export type AcknowledgeBreakingTodoMutationResult = NonNullable<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>>
-    /** AcknowledgeBreakingTodoMutationBody is the request body type for its generated OpenAPI operation. */
-    export type AcknowledgeBreakingTodoMutationBody = BreakingTodoAcknowledgeBody
-    /** AcknowledgeBreakingTodoMutationError is generated from the Meridian OpenAPI contract for acknowledge breaking todo mutation error. */
-    export type AcknowledgeBreakingTodoMutationError = NotFoundResponse | InvalidStateResponse
-    /** AcknowledgeBreakingTodoMutationVariables is generated from the Meridian OpenAPI contract for acknowledge breaking todo mutation variables. */
-    export type AcknowledgeBreakingTodoMutationVariables = {/** TenantSlug carries the tenant slug value for AcknowledgeBreakingTodoMutationVariables. */ tenantSlug: string;/** TodoId carries the todo id value for AcknowledgeBreakingTodoMutationVariables. */ todoId: string;/** Data contains the decoded response payload. */ data: BreakingTodoAcknowledgeBody}
-
-    /** useAcknowledgeBreakingTodo executes its OpenAPI operation through TanStack Vue Query. */
-    export const useAcknowledgeBreakingTodo = <TError = NotFoundResponse | InvalidStateResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acknowledgeBreakingTodo>>, TError,AcknowledgeBreakingTodoMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof acknowledgeBreakingTodo>>,
-        TError,
-        AcknowledgeBreakingTodoMutationVariables,
-        TContext
-      > => {
-      return useMutation(getAcknowledgeBreakingTodoMutationOptions(options), queryClient);
-    }
-    /** listAuditLogsResponse200 represents a declared HTTP response from the list audit logs response200 operation. */
-    export type listAuditLogsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AuditLogPageResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listAuditLogsResponse404 represents a declared HTTP response from the list audit logs response404 operation. */
-export type listAuditLogsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listAuditLogsResponseSuccess represents a declared HTTP response from the list audit logs response success operation. */
-export type listAuditLogsResponseSuccess = (listAuditLogsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listAuditLogsResponseError represents a declared HTTP response from the list audit logs response error operation. */
-export type listAuditLogsResponseError = (listAuditLogsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listAuditLogsResponse represents a declared HTTP response from the list audit logs response operation. */
-export type listAuditLogsResponse = (listAuditLogsResponseSuccess | listAuditLogsResponseError)
-
-/** getListAuditLogsUrl builds the relative URL for its OpenAPI operation. */
-export const getListAuditLogsUrl = (tenantSlug: string,
-    params?: ListAuditLogsParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
-
-  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/audit-logs?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/audit-logs`
-}
-
-/**
- * Returns the requested page of audit logs within the authorized request scope.
- */
-export const listAuditLogs = async (tenantSlug: string,
-    params?: ListAuditLogsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listAuditLogsResponse> => {
-
-  return meridianFetch<listAuditLogsResponse>(getListAuditLogsUrl(tenantSlug,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListAuditLogsQueryKey is generated from the Meridian OpenAPI contract for get list audit logs query key. */
-export const getListAuditLogsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAuditLogsParams>,) => {
-    return [
-    'api','v1','t',tenantSlug,'audit-logs', ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-/** getListAuditLogsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListAuditLogsQueryOptions = <TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAuditLogsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListAuditLogsQueryKey(tenantSlug,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAuditLogs>>> = ({ signal }) => listAuditLogs(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>
-}
-
-/** ListAuditLogsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListAuditLogsQueryResult = NonNullable<Awaited<ReturnType<typeof listAuditLogs>>>
-/** ListAuditLogsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListAuditLogsQueryError = NotFoundResponse
-
-
-
-/** useListAuditLogs executes its OpenAPI operation through TanStack Vue Query. */
-export function useListAuditLogs<TData = Awaited<ReturnType<typeof listAuditLogs>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAuditLogsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListAuditLogsQueryOptions(tenantSlug,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-

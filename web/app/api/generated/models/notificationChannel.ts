@@ -24,10 +24,7 @@ export interface NotificationChannel {
   kind: NotificationChannelKind;
   /** indicates whether enabled applies to this notification channel. */
   enabled: boolean;
-  /**
-     * specifies the endpoint associated with this notification channel.
-     * @nullable
-     */
+  /** specifies the endpoint associated with this notification channel. */
   endpoint: string | null;
   /** indicates whether secret configured applies to this notification channel. */
   secretConfigured: boolean;

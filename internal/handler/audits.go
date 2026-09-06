@@ -6,12 +6,15 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
+	collaboration "github.com/meridian-labs/meridian/internal/generated/api/collaboration"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
+
+	// ListAuditLogs returns one tenant-isolated page of redacted audit metadata.
+	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
 )
 
-// ListAuditLogs returns one tenant-isolated page of redacted audit metadata.
-func (s *Server) ListAuditLogs(ctx context.Context, request api.ListAuditLogsRequestObject) (api.ListAuditLogsResponseObject, error) {
+func (s *Server) ListAuditLogs(ctx context.Context, request collaboration.ListAuditLogsRequestObject) (collaboration.ListAuditLogsResponseObject, error) {
 	if s.audits == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -24,11 +27,11 @@ func (s *Server) ListAuditLogs(ctx context.Context, request api.ListAuditLogsReq
 	if err != nil {
 		return nil, err
 	}
-	return api.ListAuditLogs200JSONResponse{AuditLogPageJSONResponse: api.AuditLogPageJSONResponse(auditPage(items, total, page, pageSize))}, nil
+	return collaboration.ListAuditLogs200JSONResponse(auditPage(items, total, page, pageSize)), nil
 }
 
 // ListPlatformAuditLogs returns one cross-tenant page of redacted audit metadata.
-func (s *Server) ListPlatformAuditLogs(ctx context.Context, request api.ListPlatformAuditLogsRequestObject) (api.ListPlatformAuditLogsResponseObject, error) {
+func (s *Server) ListPlatformAuditLogs(ctx context.Context, request platform.ListPlatformAuditLogsRequestObject) (platform.ListPlatformAuditLogsResponseObject, error) {
 	if s.audits == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -41,7 +44,7 @@ func (s *Server) ListPlatformAuditLogs(ctx context.Context, request api.ListPlat
 	if err != nil {
 		return nil, err
 	}
-	return api.ListPlatformAuditLogs200JSONResponse{AuditLogPageJSONResponse: api.AuditLogPageJSONResponse(auditPage(items, total, page, pageSize))}, nil
+	return platform.ListPlatformAuditLogs200JSONResponse(auditPage(items, total, page, pageSize)), nil
 }
 
 func tenantAuditFilter(value *api.AuditFilters) service.AuditFilter {

@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { ArtifactLink } from './artifactLink.ts';
+import type { DocumentViewResolutionKind } from './documentViewResolutionKind.ts';
 import type { ViewDefinition } from './viewDefinition.ts';
 
 /**
@@ -13,7 +14,7 @@ import type { ViewDefinition } from './viewDefinition.ts';
  */
 export interface DocumentViewResolution {
   /** specifies the kind associated with this document view resolution. */
-  kind: 'document';
+  kind: DocumentViewResolutionKind;
   /** contains the view definition associated with this document view resolution. */
   view: ViewDefinition;
   /** contains the artifact link associated with this document view resolution. */

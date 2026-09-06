@@ -25,7 +25,6 @@ export interface MergePreviewRequest {
   /**
      * specifies the override content associated with this merge preview request.
      * @maxLength 1048576
-     * @nullable
      */
   overrideContent?: string | null;
 }

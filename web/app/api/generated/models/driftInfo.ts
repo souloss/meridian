@@ -15,9 +15,6 @@ export interface DriftInfo {
   hasDrift: boolean;
   /** contains the ordered fields associated with this drift info. */
   fields: FieldSource[];
-  /**
-     * specifies the file commit associated with this drift info.
-     * @nullable
-     */
+  /** specifies the file commit associated with this drift info. */
   fileCommit: string | null;
 }

@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { BranchPolicy } from './branchPolicy.ts';
-import type { CapabilityList } from './capabilityList.ts';
+import type { CapabilityListItem } from './capabilityListItem.ts';
 import type { ETag } from './eTag.ts';
 import type { FetchConfig } from './fetchConfig.ts';
 import type { GitRemoteUrl } from './gitRemoteUrl.ts';
@@ -36,19 +36,17 @@ export interface Repository {
   /**
      * Standard five-field cron in UTC; null disables schedule
      * @maxLength 128
-     * @nullable
      */
   syncCron: string | null;
   /**
      * specifies the note associated with this repository.
      * @maxLength 500
-     * @nullable
      */
   note: string | null;
   /** contains the repository health associated with this repository. */
   health: RepositoryHealth;
   /** lists actions the authenticated principal may perform on this resource. */
-  capabilities: CapabilityList;
+  capabilities: CapabilityListItem;
   /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
   /** is the RFC 3339 UTC instant when this resource was last updated. */

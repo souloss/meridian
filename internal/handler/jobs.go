@@ -8,12 +8,15 @@ import (
 	"strconv"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
+	job "github.com/meridian-labs/meridian/internal/generated/api/job"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
+
+	// ListJobs returns one tenant-scoped page with attempt history and capabilities.
+	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
 )
 
-// ListJobs returns one tenant-scoped page with attempt history and capabilities.
-func (s *Server) ListJobs(ctx context.Context, request api.ListJobsRequestObject) (api.ListJobsResponseObject, error) {
+func (s *Server) ListJobs(ctx context.Context, request job.ListJobsRequestObject) (job.ListJobsResponseObject, error) {
 	if s.jobs == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -30,13 +33,13 @@ func (s *Server) ListJobs(ctx context.Context, request api.ListJobsRequestObject
 	for index, item := range items {
 		responses[index] = tenantJobResponse(item)
 	}
-	return api.ListJobs200JSONResponse{JobPageJSONResponse: api.JobPageJSONResponse(api.JobPage{
+	return job.ListJobs200JSONResponse(api.JobPage{
 		Items: responses, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // GetJob returns one tenant-scoped job with persisted attempt history.
-func (s *Server) GetJob(ctx context.Context, request api.GetJobRequestObject) (api.GetJobResponseObject, error) {
+func (s *Server) GetJob(ctx context.Context, request job.GetJobRequestObject) (job.GetJobResponseObject, error) {
 	if s.jobs == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -48,17 +51,17 @@ func (s *Server) GetJob(ctx context.Context, request api.GetJobRequestObject) (a
 	if err != nil {
 		return nil, err
 	}
-	return api.GetJob200JSONResponse{JobJSONResponse: api.JobJSONResponse(tenantJobResponse(item))}, nil
+	return job.GetJob200JSONResponse(tenantJobResponse(item)), nil
 }
 
 // StreamJobLogs returns a resumable SSE body that closes after a terminal state.
-func (s *Server) StreamJobLogs(ctx context.Context, request api.StreamJobLogsRequestObject) (api.StreamJobLogsResponseObject, error) {
+func (s *Server) StreamJobLogs(ctx context.Context, request job.StreamJobLogsRequestObject) (job.StreamJobLogsResponseObject, error) {
 	if s.jobs == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
 	afterSequence := int64(0)
-	if request.Params.LastEventID != nil {
-		parsed, err := strconv.ParseInt(string(*request.Params.LastEventID), 10, 64)
+	if request.Params.LastEventId != nil {
+		parsed, err := strconv.ParseInt(string(*request.Params.LastEventId), 10, 64)
 		if err != nil || parsed < 0 {
 			return nil, service.ErrValidation
 		}
@@ -77,16 +80,16 @@ func (s *Server) StreamJobLogs(ctx context.Context, request api.StreamJobLogsReq
 		defer writer.Close()
 		_ = stream.Run(ctx, &jobSSEWriter{writer: writer})
 	}()
-	return api.StreamJobLogs200TexteventStreamResponse{
+	return job.StreamJobLogs200TexteventStreamResponse{
 		Body: reader,
-		Headers: api.StreamJobLogs200ResponseHeaders{
+		Headers: job.StreamJobLogs200ResponseHeaders{
 			CacheControl: "no-cache", XAccelBuffering: "no",
 		},
 	}, nil
 }
 
 // CancelJob requests atomic cancellation of a pending or running tenant job.
-func (s *Server) CancelJob(ctx context.Context, request api.CancelJobRequestObject) (api.CancelJobResponseObject, error) {
+func (s *Server) CancelJob(ctx context.Context, request job.CancelJobRequestObject) (job.CancelJobResponseObject, error) {
 	if s.jobs == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -98,11 +101,11 @@ func (s *Server) CancelJob(ctx context.Context, request api.CancelJobRequestObje
 	if err != nil {
 		return nil, err
 	}
-	return api.CancelJob202JSONResponse{JobAcceptedJSONResponse: api.JobAcceptedJSONResponse(jobAcceptedResponse(accepted))}, nil
+	return job.CancelJob202JSONResponse(jobAcceptedResponse(accepted)), nil
 }
 
 // RetryJob creates an independent generation for one failed or cancelled tenant job.
-func (s *Server) RetryJob(ctx context.Context, request api.RetryJobRequestObject) (api.RetryJobResponseObject, error) {
+func (s *Server) RetryJob(ctx context.Context, request job.RetryJobRequestObject) (job.RetryJobResponseObject, error) {
 	if s.jobs == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -116,11 +119,11 @@ func (s *Server) RetryJob(ctx context.Context, request api.RetryJobRequestObject
 	if err != nil {
 		return nil, err
 	}
-	return api.RetryJob202JSONResponse{JobAcceptedJSONResponse: api.JobAcceptedJSONResponse(jobAcceptedResponse(accepted))}, nil
+	return job.RetryJob202JSONResponse(jobAcceptedResponse(accepted)), nil
 }
 
 // ListPlatformJobs returns a paginated redacted job view to platform administrators.
-func (s *Server) ListPlatformJobs(ctx context.Context, request api.ListPlatformJobsRequestObject) (api.ListPlatformJobsResponseObject, error) {
+func (s *Server) ListPlatformJobs(ctx context.Context, request platform.ListPlatformJobsRequestObject) (platform.ListPlatformJobsResponseObject, error) {
 	if s.jobs == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -137,13 +140,13 @@ func (s *Server) ListPlatformJobs(ctx context.Context, request api.ListPlatformJ
 	for _, item := range items {
 		responses = append(responses, platformJobResponse(item))
 	}
-	return api.ListPlatformJobs200JSONResponse{PlatformJobPageJSONResponse: api.PlatformJobPageJSONResponse(api.PlatformJobPage{
+	return platform.ListPlatformJobs200JSONResponse(api.PlatformJobPage{
 		Items: responses, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // GetPlatformJob returns one redacted job view to platform administrators.
-func (s *Server) GetPlatformJob(ctx context.Context, request api.GetPlatformJobRequestObject) (api.GetPlatformJobResponseObject, error) {
+func (s *Server) GetPlatformJob(ctx context.Context, request platform.GetPlatformJobRequestObject) (platform.GetPlatformJobResponseObject, error) {
 	if s.jobs == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -155,7 +158,7 @@ func (s *Server) GetPlatformJob(ctx context.Context, request api.GetPlatformJobR
 	if err != nil {
 		return nil, err
 	}
-	return api.GetPlatformJob200JSONResponse{PlatformJobJSONResponse: api.PlatformJobJSONResponse(platformJobResponse(item))}, nil
+	return platform.GetPlatformJob200JSONResponse(platformJobResponse(item)), nil
 }
 
 func platformJobFilter(value *api.PlatformJobFilters) service.PlatformJobFilter {

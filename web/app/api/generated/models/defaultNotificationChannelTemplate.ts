@@ -5,6 +5,7 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
+import type { DefaultNotificationChannelTemplateKind } from './defaultNotificationChannelTemplateKind.ts';
 import type { Slug } from './slug.ts';
 
 /**
@@ -20,7 +21,7 @@ export interface DefaultNotificationChannelTemplate {
      */
   name: string;
   /** specifies the kind associated with this default notification channel template. */
-  kind: 'in_app';
+  kind: DefaultNotificationChannelTemplateKind;
   /** indicates whether enabled applies to this default notification channel template. */
   enabled: boolean;
 }

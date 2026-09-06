@@ -25,13 +25,11 @@ export interface RepositoryPatchRequest {
   /**
      * Standard five-field cron in UTC; null disables schedule
      * @maxLength 128
-     * @nullable
      */
   syncCron?: string | null;
   /**
      * specifies the note associated with this repository patch request.
      * @maxLength 500
-     * @nullable
      */
   note?: string | null;
 }

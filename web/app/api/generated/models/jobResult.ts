@@ -8,6 +8,5 @@
 
 /**
  * Operation-specific non-secret result identifiers and counters.
- * @nullable
  */
-export type JobResult = { [key: string]: unknown } | null;
+export type JobResult = {[key: string]: unknown} | null;

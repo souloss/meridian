@@ -8,7 +8,6 @@
 
 /**
  * specifies the error class associated with this connection test.
- * @nullable
  */
 export type ConnectionTestErrorClass = typeof ConnectionTestErrorClass[keyof typeof ConnectionTestErrorClass] | null;
 

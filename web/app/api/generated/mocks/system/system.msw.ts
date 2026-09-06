@@ -18,66 +18,43 @@ import type {
 } from 'msw';
 
 import type {
-  HealthResponse,
+  Health,
   VersionInfo
 } from '../../models';
 
 
-/** getHealthzResponseMock provides generated MSW behavior for contract tests. */
-export const getHealthzResponseMock = (overrideResponse: Partial<Extract<HealthResponse, object>> = {}): HealthResponse => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
-
-/** getReadyzResponseMock provides generated MSW behavior for contract tests. */
-export const getReadyzResponseMock = (overrideResponse: Partial<Extract<HealthResponse, object>> = {}): HealthResponse => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
-
-/** getMetricsResponseMock provides generated MSW behavior for contract tests. */
-export const getMetricsResponseMock = (): string => (faker.word.sample())
+/** getDownloadSignedContentResponseMock provides generated MSW behavior for contract tests. */
+export const getDownloadSignedContentResponseMock = (): ArrayBuffer => (new ArrayBuffer(faker.number.int({ min: 1, max: 64 })))
 
 /** getGetOpenApiContractResponseMock provides generated MSW behavior for contract tests. */
 export const getGetOpenApiContractResponseMock = (): string => (faker.word.sample())
 
 /** getGetVersionResponseMock provides generated MSW behavior for contract tests. */
-export const getGetVersionResponseMock = (overrideResponse: Partial<Extract<VersionInfo, object>> = {}): VersionInfo => ({serverVersion: faker.string.alpha({length: {min: 10, max: 20}}), apiVersion: "v1", contractVersion: "1.0.0", buildCommit: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+export const getGetVersionResponseMock = (overrideResponse: Partial<Extract<VersionInfo, object>> = {}): VersionInfo => ({serverVersion: faker.string.alpha({length: {min: 10, max: 20}}), apiVersion: faker.helpers.arrayElement(['v1'] as const), contractVersion: faker.helpers.arrayElement(['1.0.0'] as const), buildCommit: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
-/** getDownloadSignedContentResponseMock provides generated MSW behavior for contract tests. */
-export const getDownloadSignedContentResponseMock = (): ArrayBuffer => (new ArrayBuffer(faker.number.int({ min: 1, max: 64 })))
+/** getHealthzResponseMock provides generated MSW behavior for contract tests. */
+export const getHealthzResponseMock = (overrideResponse: Partial<Extract<Health, object>> = {}): Health => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
+
+/** getMetricsResponseMock provides generated MSW behavior for contract tests. */
+export const getMetricsResponseMock = (): string => (faker.word.sample())
+
+/** getReadyzResponseMock provides generated MSW behavior for contract tests. */
+export const getReadyzResponseMock = (overrideResponse: Partial<Extract<Health, object>> = {}): Health => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
 
-/** getHealthzMockHandler provides generated MSW behavior for contract tests. */
-export const getHealthzMockHandler = (overrideResponse?: HealthResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HealthResponse> | HealthResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/healthz', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+/** getDownloadSignedContentMockHandler provides generated MSW behavior for contract tests. */
+export const getDownloadSignedContentMockHandler = (overrideResponse?: ArrayBuffer | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ArrayBuffer> | ArrayBuffer), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/content/:token', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
-
-    return HttpResponse.json(overrideResponse !== undefined
+  const binaryBody = overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getHealthzResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getReadyzMockHandler provides generated MSW behavior for contract tests. */
-export const getReadyzMockHandler = (overrideResponse?: HealthResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HealthResponse> | HealthResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/readyz', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getReadyzResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getMetricsMockHandler provides generated MSW behavior for contract tests. */
-export const getMetricsMockHandler = (overrideResponse?: string | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<string> | string), options?: RequestHandlerOptions) => {
-  return http.get('*/metrics', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-  const resolvedBody = overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getMetricsResponseMock();
-    const textBody = typeof resolvedBody === 'string' ? resolvedBody : JSON.stringify(resolvedBody ?? null);
-    return HttpResponse.text(textBody,
-      { status: 200
+    : getDownloadSignedContentResponseMock();
+    return HttpResponse.arrayBuffer(
+      binaryBody instanceof ArrayBuffer
+        ? binaryBody
+        : new ArrayBuffer(0),
+      { status: 200,
+        headers: { 'Content-Type': 'application/octet-stream' }
       })
   }, options)
 }
@@ -108,28 +85,51 @@ export const getGetVersionMockHandler = (overrideResponse?: VersionInfo | ((info
   }, options)
 }
 
-/** getDownloadSignedContentMockHandler provides generated MSW behavior for contract tests. */
-export const getDownloadSignedContentMockHandler = (overrideResponse?: ArrayBuffer | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ArrayBuffer> | ArrayBuffer), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/content/:token', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+/** getHealthzMockHandler provides generated MSW behavior for contract tests. */
+export const getHealthzMockHandler = (overrideResponse?: Health | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Health> | Health), options?: RequestHandlerOptions) => {
+  return http.get('*/healthz', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
-  const binaryBody = overrideResponse !== undefined
+
+    return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getDownloadSignedContentResponseMock();
-    return HttpResponse.arrayBuffer(
-      binaryBody instanceof ArrayBuffer
-        ? binaryBody
-        : new ArrayBuffer(0),
-      { status: 200,
-        headers: { 'Content-Type': 'application/octet-stream' }
+    : getHealthzResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getMetricsMockHandler provides generated MSW behavior for contract tests. */
+export const getMetricsMockHandler = (overrideResponse?: string | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<string> | string), options?: RequestHandlerOptions) => {
+  return http.get('*/metrics', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+  const resolvedBody = overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getMetricsResponseMock();
+    const textBody = typeof resolvedBody === 'string' ? resolvedBody : JSON.stringify(resolvedBody ?? null);
+    return HttpResponse.text(textBody,
+      { status: 200
+      })
+  }, options)
+}
+
+/** getReadyzMockHandler provides generated MSW behavior for contract tests. */
+export const getReadyzMockHandler = (overrideResponse?: Health | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Health> | Health), options?: RequestHandlerOptions) => {
+  return http.get('*/readyz', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getReadyzResponseMock(),
+      { status: 200
       })
   }, options)
 }
 /** getSystemMock provides generated MSW behavior for contract tests. */
 export const getSystemMock = () => [
-  getHealthzMockHandler(),
-  getReadyzMockHandler(),
-  getMetricsMockHandler(),
+  getDownloadSignedContentMockHandler(),
   getGetOpenApiContractMockHandler(),
   getGetVersionMockHandler(),
-  getDownloadSignedContentMockHandler()
+  getHealthzMockHandler(),
+  getMetricsMockHandler(),
+  getReadyzMockHandler()
 ]

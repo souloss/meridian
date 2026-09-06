@@ -27,11 +27,7 @@ export interface SearchFilter {
   lifecycles?: Lifecycle[];
   /** contains the ordered tag ids associated with this search filter. */
   tagIds?: Uuid[];
-  /**
-     * contains the ordered languages associated with this search filter.
-     * @items.minLength 1
-     * @items.maxLength 64
-     */
+  /** contains the ordered languages associated with this search filter. */
   languages?: string[];
   /** contains the ordered item types associated with this search filter. */
   itemTypes?: string[];

@@ -6,13 +6,14 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { Uuid } from './uuid.ts';
+import type { VersionSelectorType } from './versionSelectorType.ts';
 
 /**
  * identifies the version selected by a request.
  */
 export interface VersionSelector {
   /** specifies the type associated with this version selector. */
-  type: 'version';
+  type: VersionSelectorType;
   /** identifies the asset version associated with this resource. */
   versionId: Uuid;
 }

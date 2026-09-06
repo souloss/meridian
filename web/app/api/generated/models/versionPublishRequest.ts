@@ -14,7 +14,6 @@ export interface VersionPublishRequest {
   /**
      * specifies the version associated with this version publish request.
      * @maxLength 128
-     * @nullable
      */
   version?: string | null;
   /** specifies the labels associated with this version publish request. */

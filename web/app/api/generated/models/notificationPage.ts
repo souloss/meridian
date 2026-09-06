@@ -6,12 +6,27 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { Notification } from './notification.ts';
-import type { PageInfo } from './pageInfo.ts';
 
 /**
  * contains one paginated page of notification records.
  */
-export type NotificationPage = PageInfo & {
+export interface NotificationPage {
+  /**
+     * is the number of matching records across all pages.
+     * @minimum 0
+     */
+  total: number;
+  /**
+     * is the one-based page number.
+     * @minimum 1
+     */
+  page: number;
+  /**
+     * is the maximum number of records returned on one page.
+     * @minimum 1
+     * @maximum 100
+     */
+  pageSize: number;
   /** contains the ordered items associated with this notification page. */
   items: Notification[];
   /**
@@ -19,4 +34,4 @@ export type NotificationPage = PageInfo & {
      * @minimum 0
      */
   unreadCount: number;
-};
+}

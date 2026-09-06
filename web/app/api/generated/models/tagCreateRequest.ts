@@ -18,7 +18,6 @@ export interface TagCreateRequest {
   name: string;
   /**
      * specifies the color associated with this tag create request.
-     * @nullable
      * @pattern ^#[0-9A-Fa-f]{6}$
      */
   color?: string | null;

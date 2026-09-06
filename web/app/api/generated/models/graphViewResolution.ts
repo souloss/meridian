@@ -7,6 +7,7 @@
  */
 import type { GraphEdge } from './graphEdge.ts';
 import type { GraphNode } from './graphNode.ts';
+import type { GraphViewResolutionKind } from './graphViewResolutionKind.ts';
 import type { ViewDefinition } from './viewDefinition.ts';
 
 /**
@@ -14,7 +15,7 @@ import type { ViewDefinition } from './viewDefinition.ts';
  */
 export interface GraphViewResolution {
   /** specifies the kind associated with this graph view resolution. */
-  kind: 'dep_graph';
+  kind: GraphViewResolutionKind;
   /** contains the view definition associated with this graph view resolution. */
   view: ViewDefinition;
   /** contains the ordered nodes associated with this graph view resolution. */

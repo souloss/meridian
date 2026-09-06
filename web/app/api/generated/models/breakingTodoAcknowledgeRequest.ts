@@ -13,7 +13,6 @@ export interface BreakingTodoAcknowledgeRequest {
   /**
      * specifies the comment associated with this breaking todo acknowledge request.
      * @maxLength 2000
-     * @nullable
      */
   comment?: string | null;
 }

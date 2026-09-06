@@ -22,10 +22,7 @@ export interface SearchHit {
   id: string;
   /** specifies the title associated with this search hit. */
   title: string;
-  /**
-     * specifies the subtitle associated with this search hit.
-     * @nullable
-     */
+  /** specifies the subtitle associated with this search hit. */
   subtitle: string | null;
   /** specifies the score associated with this search hit. */
   score: number;

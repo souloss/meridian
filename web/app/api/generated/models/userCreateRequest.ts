@@ -22,10 +22,7 @@ export interface UserCreateRequest {
      * @maxLength 128
      */
   displayName: string;
-  /**
-     * specifies the email associated with this user create request.
-     * @nullable
-     */
+  /** specifies the email associated with this user create request. */
   email?: string | null;
   /**
      * is the write-only plaintext password supplied for authentication.

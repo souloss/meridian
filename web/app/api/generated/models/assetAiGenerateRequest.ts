@@ -22,7 +22,6 @@ export interface AssetAiGenerateRequest {
   /**
      * specifies the hint associated with this asset ai generate request.
      * @maxLength 500
-     * @nullable
      */
   hint?: string | null;
   /** contains the uuid associated with this asset ai generate request. */

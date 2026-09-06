@@ -7,7 +7,6 @@
  */
 import type { DomainEventType } from './domainEventType.ts';
 import type { KindId } from './kindId.ts';
-import type { SubscriptionScopeConstraints } from './subscriptionScopeConstraints.ts';
 import type { SubscriptionScopeType } from './subscriptionScopeType.ts';
 import type { Timestamp } from './timestamp.ts';
 import type { Uuid } from './uuid.ts';
@@ -15,7 +14,7 @@ import type { Uuid } from './uuid.ts';
 /**
  * represents subscription data exchanged through the Meridian API.
  */
-export type Subscription = SubscriptionScopeConstraints & ({
+export interface Subscription {
   /** uniquely identifies this resource. */
   id: Uuid;
   /**
@@ -38,4 +37,4 @@ export type Subscription = SubscriptionScopeConstraints & ({
   createdAt: Timestamp;
   /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
-});
+}

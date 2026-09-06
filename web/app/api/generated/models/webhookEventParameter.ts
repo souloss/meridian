@@ -6,7 +6,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
-/**
- * identifies or filters the x meridian event value in the header.
- */
-export type WebhookEventParameter = 'push';
+export type WebhookEventParameter = typeof WebhookEventParameter[keyof typeof WebhookEventParameter];
+
+
+/** WebhookEventParameter is generated from the Meridian OpenAPI contract for webhook event parameter. */
+export const WebhookEventParameter = {
+  push: 'push',
+} as const;

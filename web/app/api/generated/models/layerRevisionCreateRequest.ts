@@ -30,10 +30,7 @@ export interface LayerRevisionCreateRequest {
   content: string;
   /** contains the content type associated with this layer revision create request. */
   contentType: ContentType;
-  /**
-     * specifies the dialect associated with this layer revision create request.
-     * @nullable
-     */
+  /** specifies the dialect associated with this layer revision create request. */
   dialect?: string | null;
   /** indicates whether submit for review applies to this layer revision create request. */
   submitForReview?: boolean;

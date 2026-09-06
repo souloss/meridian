@@ -5,6 +5,8 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
+import type { VersionInfoApiVersion } from './versionInfoApiVersion.ts';
+import type { VersionInfoContractVersion } from './versionInfoContractVersion.ts';
 
 /**
  * identifies the running server build and its public API contract.
@@ -13,9 +15,9 @@ export interface VersionInfo {
   /** is the semantic release version or dev for a local build. */
   serverVersion: string;
   /** is the HTTP route major implemented by this server. */
-  apiVersion: 'v1';
+  apiVersion: VersionInfoApiVersion;
   /** is the frozen OpenAPI contract version embedded in this build. */
-  contractVersion: '1.0.0';
+  contractVersion: VersionInfoContractVersion;
   /** is the source revision embedded at build time or unknown when unset. */
   buildCommit: string;
 }

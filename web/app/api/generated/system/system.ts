@@ -27,9 +27,8 @@ import type {
 } from 'vue';
 
 import type {
-  HealthResponse,
-  InternalErrorResponse,
-  NotFoundResponse,
+  ErrorResponse,
+  Health,
   VersionInfo
 } from '../models';
 
@@ -41,37 +40,49 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-/** healthzResponse200 represents a declared HTTP response from the healthz response200 operation. */
-export type healthzResponse200 = {
+/** downloadSignedContentResponse200 represents a declared HTTP response from the download signed content response200 operation. */
+export type downloadSignedContentResponse200 = {
   /** Data contains the decoded response payload. */
-  data: HealthResponse
+  data: Blob
   /** Status is the HTTP response status code. */
   status: 200
 }
 
-/** healthzResponseSuccess represents a declared HTTP response from the healthz response success operation. */
-export type healthzResponseSuccess = (healthzResponse200) & {
+/** downloadSignedContentResponse404 represents a declared HTTP response from the download signed content response404 operation. */
+export type downloadSignedContentResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** downloadSignedContentResponseSuccess represents a declared HTTP response from the download signed content response success operation. */
+export type downloadSignedContentResponseSuccess = (downloadSignedContentResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-;
+/** downloadSignedContentResponseError represents a declared HTTP response from the download signed content response error operation. */
+export type downloadSignedContentResponseError = (downloadSignedContentResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
 
-/** healthzResponse represents a declared HTTP response from the healthz response operation. */
-export type healthzResponse = (healthzResponseSuccess)
+/** downloadSignedContentResponse represents a declared HTTP response from the download signed content response operation. */
+export type downloadSignedContentResponse = (downloadSignedContentResponseSuccess | downloadSignedContentResponseError)
 
-/** getHealthzUrl builds the relative URL for its OpenAPI operation. */
-export const getHealthzUrl = () => {
+/** getDownloadSignedContentUrl builds the relative URL for its OpenAPI operation. */
+export const getDownloadSignedContentUrl = (token: string,) => {
 
 
-  return `/healthz`
+  return `/api/v1/content/${token}`
 }
 
 /**
- * Reports whether the Meridian process is alive.
+ * Downloads signed content within the authorized request scope.
  */
-export const healthz = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<healthzResponse> => {
+export const downloadSignedContent = async (token: string, options?: Parameters<typeof meridianFetch>[1]): Promise<downloadSignedContentResponse> => {
 
-  return meridianFetch<healthzResponse>(getHealthzUrl(),
+  return meridianFetch<downloadSignedContentResponse>(getDownloadSignedContentUrl(token),
   {
     ...options,
     method: 'GET'
@@ -84,253 +95,47 @@ export const healthz = async ( options?: Parameters<typeof meridianFetch>[1]): P
 
 
 
-/** getHealthzQueryKey is generated from the Meridian OpenAPI contract for get healthz query key. */
-export const getHealthzQueryKey = () => {
+/** getDownloadSignedContentQueryKey is generated from the Meridian OpenAPI contract for get download signed content query key. */
+export const getDownloadSignedContentQueryKey = (token: MaybeRefOrGetter<string>,) => {
     return [
-    'healthz'
+    'api','v1','content',token
     ] as const;
     }
 
 
-/** getHealthzQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getHealthzQueryOptions = <TData = Awaited<ReturnType<typeof healthz>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthz>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** getDownloadSignedContentQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getDownloadSignedContentQueryOptions = <TData = Awaited<ReturnType<typeof downloadSignedContent>>, TError = ErrorResponse>(token: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSignedContent>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getHealthzQueryKey();
+  const queryKey =  getDownloadSignedContentQueryKey(token);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof healthz>>> = ({ signal }) => healthz({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadSignedContent>>> = ({ signal }) => downloadSignedContent(toValue(token), { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof healthz>>, TError, TData>
+   return  { queryKey, queryFn, enabled: computed(() => toValue(token) !== null && toValue(token) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadSignedContent>>, TError, TData>
 }
 
-/** HealthzQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type HealthzQueryResult = NonNullable<Awaited<ReturnType<typeof healthz>>>
-/** HealthzQueryError is the error type returned by its generated Vue Query hook. */
-export type HealthzQueryError = unknown
+/** DownloadSignedContentQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type DownloadSignedContentQueryResult = NonNullable<Awaited<ReturnType<typeof downloadSignedContent>>>
+/** DownloadSignedContentQueryError is the error type returned by its generated Vue Query hook. */
+export type DownloadSignedContentQueryError = ErrorResponse
 
 
 
-/** useHealthz executes its OpenAPI operation through TanStack Vue Query. */
-export function useHealthz<TData = Awaited<ReturnType<typeof healthz>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthz>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** useDownloadSignedContent executes its OpenAPI operation through TanStack Vue Query. */
+export function useDownloadSignedContent<TData = Awaited<ReturnType<typeof downloadSignedContent>>, TError = ErrorResponse>(
+ token: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSignedContent>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getHealthzQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** readyzResponse200 represents a declared HTTP response from the readyz response200 operation. */
-export type readyzResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: HealthResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** readyzResponse503 represents a declared HTTP response from the readyz response503 operation. */
-export type readyzResponse503 = {
-  /** Data contains the decoded response payload. */
-  data: InternalErrorResponse
-  /** Status is the HTTP response status code. */
-  status: 503
-}
-
-/** readyzResponseSuccess represents a declared HTTP response from the readyz response success operation. */
-export type readyzResponseSuccess = (readyzResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** readyzResponseError represents a declared HTTP response from the readyz response error operation. */
-export type readyzResponseError = (readyzResponse503) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** readyzResponse represents a declared HTTP response from the readyz response operation. */
-export type readyzResponse = (readyzResponseSuccess | readyzResponseError)
-
-/** getReadyzUrl builds the relative URL for its OpenAPI operation. */
-export const getReadyzUrl = () => {
-
-
-  return `/readyz`
-}
-
-/**
- * Reports whether Meridian dependencies are ready to serve traffic.
- */
-export const readyz = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<readyzResponse> => {
-
-  return meridianFetch<readyzResponse>(getReadyzUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getReadyzQueryKey is generated from the Meridian OpenAPI contract for get readyz query key. */
-export const getReadyzQueryKey = () => {
-    return [
-    'readyz'
-    ] as const;
-    }
-
-
-/** getReadyzQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getReadyzQueryOptions = <TData = Awaited<ReturnType<typeof readyz>>, TError = InternalErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readyz>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getReadyzQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readyz>>> = ({ signal }) => readyz({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readyz>>, TError, TData>
-}
-
-/** ReadyzQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ReadyzQueryResult = NonNullable<Awaited<ReturnType<typeof readyz>>>
-/** ReadyzQueryError is the error type returned by its generated Vue Query hook. */
-export type ReadyzQueryError = InternalErrorResponse
-
-
-
-/** useReadyz executes its OpenAPI operation through TanStack Vue Query. */
-export function useReadyz<TData = Awaited<ReturnType<typeof readyz>>, TError = InternalErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readyz>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getReadyzQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** metricsResponse200 represents a declared HTTP response from the metrics response200 operation. */
-export type metricsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: string
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** metricsResponseSuccess represents a declared HTTP response from the metrics response success operation. */
-export type metricsResponseSuccess = (metricsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-;
-
-/** metricsResponse represents a declared HTTP response from the metrics response operation. */
-export type metricsResponse = (metricsResponseSuccess)
-
-/** getMetricsUrl builds the relative URL for its OpenAPI operation. */
-export const getMetricsUrl = () => {
-
-
-  return `/metrics`
-}
-
-/**
- * Returns deployment metrics in Prometheus text exposition format.
- */
-export const metrics = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<metricsResponse> => {
-
-  return meridianFetch<metricsResponse>(getMetricsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getMetricsQueryKey is generated from the Meridian OpenAPI contract for get metrics query key. */
-export const getMetricsQueryKey = () => {
-    return [
-    'metrics'
-    ] as const;
-    }
-
-
-/** getMetricsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getMetricsQueryOptions = <TData = Awaited<ReturnType<typeof metrics>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metrics>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getMetricsQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof metrics>>> = ({ signal }) => metrics({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metrics>>, TError, TData>
-}
-
-/** MetricsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type MetricsQueryResult = NonNullable<Awaited<ReturnType<typeof metrics>>>
-/** MetricsQueryError is the error type returned by its generated Vue Query hook. */
-export type MetricsQueryError = unknown
-
-
-
-/** useMetrics executes its OpenAPI operation through TanStack Vue Query. */
-export function useMetrics<TData = Awaited<ReturnType<typeof metrics>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metrics>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getMetricsQueryOptions(options)
+  const queryOptions = getDownloadSignedContentQueryOptions(token,options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -538,49 +343,37 @@ export function useGetVersion<TData = Awaited<ReturnType<typeof getVersion>>, TE
 
 
 
-/** downloadSignedContentResponse200 represents a declared HTTP response from the download signed content response200 operation. */
-export type downloadSignedContentResponse200 = {
+/** healthzResponse200 represents a declared HTTP response from the healthz response200 operation. */
+export type healthzResponse200 = {
   /** Data contains the decoded response payload. */
-  data: Blob
+  data: Health
   /** Status is the HTTP response status code. */
   status: 200
 }
 
-/** downloadSignedContentResponse404 represents a declared HTTP response from the download signed content response404 operation. */
-export type downloadSignedContentResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** downloadSignedContentResponseSuccess represents a declared HTTP response from the download signed content response success operation. */
-export type downloadSignedContentResponseSuccess = (downloadSignedContentResponse200) & {
+/** healthzResponseSuccess represents a declared HTTP response from the healthz response success operation. */
+export type healthzResponseSuccess = (healthzResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** downloadSignedContentResponseError represents a declared HTTP response from the download signed content response error operation. */
-export type downloadSignedContentResponseError = (downloadSignedContentResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
+;
 
-/** downloadSignedContentResponse represents a declared HTTP response from the download signed content response operation. */
-export type downloadSignedContentResponse = (downloadSignedContentResponseSuccess | downloadSignedContentResponseError)
+/** healthzResponse represents a declared HTTP response from the healthz response operation. */
+export type healthzResponse = (healthzResponseSuccess)
 
-/** getDownloadSignedContentUrl builds the relative URL for its OpenAPI operation. */
-export const getDownloadSignedContentUrl = (token: string,) => {
+/** getHealthzUrl builds the relative URL for its OpenAPI operation. */
+export const getHealthzUrl = () => {
 
 
-  return `/api/v1/content/${token}`
+  return `/healthz`
 }
 
 /**
- * Downloads signed content within the authorized request scope.
+ * Reports whether the Meridian process is alive.
  */
-export const downloadSignedContent = async (token: string, options?: Parameters<typeof meridianFetch>[1]): Promise<downloadSignedContentResponse> => {
+export const healthz = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<healthzResponse> => {
 
-  return meridianFetch<downloadSignedContentResponse>(getDownloadSignedContentUrl(token),
+  return meridianFetch<healthzResponse>(getHealthzUrl(),
   {
     ...options,
     method: 'GET'
@@ -593,47 +386,253 @@ export const downloadSignedContent = async (token: string, options?: Parameters<
 
 
 
-/** getDownloadSignedContentQueryKey is generated from the Meridian OpenAPI contract for get download signed content query key. */
-export const getDownloadSignedContentQueryKey = (token: MaybeRefOrGetter<string>,) => {
+/** getHealthzQueryKey is generated from the Meridian OpenAPI contract for get healthz query key. */
+export const getHealthzQueryKey = () => {
     return [
-    'api','v1','content',token
+    'healthz'
     ] as const;
     }
 
 
-/** getDownloadSignedContentQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getDownloadSignedContentQueryOptions = <TData = Awaited<ReturnType<typeof downloadSignedContent>>, TError = NotFoundResponse>(token: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSignedContent>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** getHealthzQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getHealthzQueryOptions = <TData = Awaited<ReturnType<typeof healthz>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthz>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getDownloadSignedContentQueryKey(token);
+  const queryKey =  getHealthzQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadSignedContent>>> = ({ signal }) => downloadSignedContent(toValue(token), { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof healthz>>> = ({ signal }) => healthz({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: computed(() => toValue(token) !== null && toValue(token) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadSignedContent>>, TError, TData>
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof healthz>>, TError, TData>
 }
 
-/** DownloadSignedContentQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type DownloadSignedContentQueryResult = NonNullable<Awaited<ReturnType<typeof downloadSignedContent>>>
-/** DownloadSignedContentQueryError is the error type returned by its generated Vue Query hook. */
-export type DownloadSignedContentQueryError = NotFoundResponse
+/** HealthzQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type HealthzQueryResult = NonNullable<Awaited<ReturnType<typeof healthz>>>
+/** HealthzQueryError is the error type returned by its generated Vue Query hook. */
+export type HealthzQueryError = unknown
 
 
 
-/** useDownloadSignedContent executes its OpenAPI operation through TanStack Vue Query. */
-export function useDownloadSignedContent<TData = Awaited<ReturnType<typeof downloadSignedContent>>, TError = NotFoundResponse>(
- token: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSignedContent>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** useHealthz executes its OpenAPI operation through TanStack Vue Query. */
+export function useHealthz<TData = Awaited<ReturnType<typeof healthz>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthz>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getDownloadSignedContentQueryOptions(token,options)
+  const queryOptions = getHealthzQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** metricsResponse200 represents a declared HTTP response from the metrics response200 operation. */
+export type metricsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: string
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** metricsResponseSuccess represents a declared HTTP response from the metrics response success operation. */
+export type metricsResponseSuccess = (metricsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+;
+
+/** metricsResponse represents a declared HTTP response from the metrics response operation. */
+export type metricsResponse = (metricsResponseSuccess)
+
+/** getMetricsUrl builds the relative URL for its OpenAPI operation. */
+export const getMetricsUrl = () => {
+
+
+  return `/metrics`
+}
+
+/**
+ * Returns deployment metrics in Prometheus text exposition format.
+ */
+export const metrics = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<metricsResponse> => {
+
+  return meridianFetch<metricsResponse>(getMetricsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getMetricsQueryKey is generated from the Meridian OpenAPI contract for get metrics query key. */
+export const getMetricsQueryKey = () => {
+    return [
+    'metrics'
+    ] as const;
+    }
+
+
+/** getMetricsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getMetricsQueryOptions = <TData = Awaited<ReturnType<typeof metrics>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metrics>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getMetricsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metrics>>> = ({ signal }) => metrics({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metrics>>, TError, TData>
+}
+
+/** MetricsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type MetricsQueryResult = NonNullable<Awaited<ReturnType<typeof metrics>>>
+/** MetricsQueryError is the error type returned by its generated Vue Query hook. */
+export type MetricsQueryError = unknown
+
+
+
+/** useMetrics executes its OpenAPI operation through TanStack Vue Query. */
+export function useMetrics<TData = Awaited<ReturnType<typeof metrics>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metrics>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** readyzResponse200 represents a declared HTTP response from the readyz response200 operation. */
+export type readyzResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: Health
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** readyzResponse503 represents a declared HTTP response from the readyz response503 operation. */
+export type readyzResponse503 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 503
+}
+
+/** readyzResponseSuccess represents a declared HTTP response from the readyz response success operation. */
+export type readyzResponseSuccess = (readyzResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** readyzResponseError represents a declared HTTP response from the readyz response error operation. */
+export type readyzResponseError = (readyzResponse503) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** readyzResponse represents a declared HTTP response from the readyz response operation. */
+export type readyzResponse = (readyzResponseSuccess | readyzResponseError)
+
+/** getReadyzUrl builds the relative URL for its OpenAPI operation. */
+export const getReadyzUrl = () => {
+
+
+  return `/readyz`
+}
+
+/**
+ * Reports whether Meridian dependencies are ready to serve traffic.
+ */
+export const readyz = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<readyzResponse> => {
+
+  return meridianFetch<readyzResponse>(getReadyzUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getReadyzQueryKey is generated from the Meridian OpenAPI contract for get readyz query key. */
+export const getReadyzQueryKey = () => {
+    return [
+    'readyz'
+    ] as const;
+    }
+
+
+/** getReadyzQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getReadyzQueryOptions = <TData = Awaited<ReturnType<typeof readyz>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readyz>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getReadyzQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readyz>>> = ({ signal }) => readyz({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readyz>>, TError, TData>
+}
+
+/** ReadyzQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ReadyzQueryResult = NonNullable<Awaited<ReturnType<typeof readyz>>>
+/** ReadyzQueryError is the error type returned by its generated Vue Query hook. */
+export type ReadyzQueryError = ErrorResponse
+
+
+
+/** useReadyz executes its OpenAPI operation through TanStack Vue Query. */
+export function useReadyz<TData = Awaited<ReturnType<typeof readyz>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readyz>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadyzQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

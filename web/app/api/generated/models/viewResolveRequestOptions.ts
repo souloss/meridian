@@ -9,4 +9,4 @@
 /**
  * specifies the options associated with this view resolve request.
  */
-export type ViewResolveRequestOptions = { [key: string]: unknown };
+export type ViewResolveRequestOptions = {[key: string]: unknown};

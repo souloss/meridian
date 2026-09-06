@@ -8,7 +8,7 @@
 
 ## 1. 契约与范围
 
-前端构建首先从 `contracts/openapi.yaml` 生成 TypeScript client 和 schema types；视图定义来自 `contracts/views.yaml`；角色和状态来自 `contracts/domain.yaml`；验收状态由 `contracts/acceptance.yaml` 决定。手写类型只能用于纯 UI 状态。
+前端构建首先从 `contracts/openapi.yaml`（由 `contracts/api/` 下的 TypeSpec 唯一源编译生成）生成 TypeScript client 和 schema types；视图定义来自 `contracts/views.yaml`；角色和状态来自 `contracts/domain.yaml`；验收状态由 `contracts/acceptance.yaml` 决定。手写类型只能用于纯 UI 状态。
 
 若设计稿文案与生成类型不一致，以契约为准并阻断 CI。禁止用 `as unknown as`、本地枚举或前端计算的 publish/approve 谓词掩盖契约漂移。
 

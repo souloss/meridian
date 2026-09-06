@@ -10,7 +10,7 @@ import type { NotificationChannelKind } from './notificationChannelKind.ts';
 /**
  * defines validated input for the corresponding Meridian API operation.
  */
-export type NotificationChannelCreateRequest = unknown & unknown & unknown & ({
+export interface NotificationChannelCreateRequest {
   /**
      * specifies the name associated with this notification channel create request.
      * @minLength 1
@@ -24,14 +24,12 @@ export type NotificationChannelCreateRequest = unknown & unknown & unknown & ({
   /**
      * specifies the endpoint associated with this notification channel create request.
      * @maxLength 2048
-     * @nullable
      */
   endpoint?: string | null;
   /**
      * is write-only secret material and must never be returned by the API.
      * @minLength 32
      * @maxLength 4096
-     * @nullable
      */
   secret?: string | null;
-});
+}

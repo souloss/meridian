@@ -8,13 +8,14 @@
 import type { DocumentSelector } from './documentSelector.ts';
 import type { ScopeSelector } from './scopeSelector.ts';
 import type { ShareLinkCreateRequestOptions } from './shareLinkCreateRequestOptions.ts';
+import type { ShareLinkCreateRequestResourceType } from './shareLinkCreateRequestResourceType.ts';
 
 /**
  * Creates a view share. The server resolves all ref selectors to immutable version IDs, freezes scope membership and options, and allowlists only the resulting artifacts. Diff snapshots use the dedicated diff-snapshot share operation.
  */
 export interface ShareLinkCreateRequest {
   /** specifies the resource type associated with this share link create request. */
-  resourceType: 'view';
+  resourceType: ShareLinkCreateRequestResourceType;
   /**
      * specifies the view id associated with this share link create request.
      * @minLength 1

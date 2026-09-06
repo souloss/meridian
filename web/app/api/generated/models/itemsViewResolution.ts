@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { AssetItem } from './assetItem.ts';
+import type { ItemsViewResolutionKind } from './itemsViewResolutionKind.ts';
 import type { ViewDefinition } from './viewDefinition.ts';
 
 /**
@@ -13,7 +14,7 @@ import type { ViewDefinition } from './viewDefinition.ts';
  */
 export interface ItemsViewResolution {
   /** specifies the kind associated with this items view resolution. */
-  kind: 'items';
+  kind: ItemsViewResolutionKind;
   /** contains the view definition associated with this items view resolution. */
   view: ViewDefinition;
   /** contains the ordered items associated with this items view resolution. */

@@ -5,6 +5,7 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
+import type { JobLogEventEvent } from './jobLogEventEvent.ts';
 import type { PipelineStage } from './pipelineStage.ts';
 import type { Timestamp } from './timestamp.ts';
 
@@ -13,7 +14,7 @@ import type { Timestamp } from './timestamp.ts';
  */
 export interface JobLogEvent {
   /** specifies the event associated with this job log event. */
-  event: 'log';
+  event: JobLogEventEvent;
   /** uniquely identifies this resource. */
   id: string;
   /** contains the timestamp associated with this job log event. */

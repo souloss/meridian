@@ -6,12 +6,27 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { BreakingTodo } from './breakingTodo.ts';
-import type { PageInfo } from './pageInfo.ts';
 
 /**
  * contains one paginated page of breaking todo records.
  */
-export type BreakingTodoPage = PageInfo & {
+export interface BreakingTodoPage {
+  /**
+     * is the number of matching records across all pages.
+     * @minimum 0
+     */
+  total: number;
+  /**
+     * is the one-based page number.
+     * @minimum 1
+     */
+  page: number;
+  /**
+     * is the maximum number of records returned on one page.
+     * @minimum 1
+     * @maximum 100
+     */
+  pageSize: number;
   /** contains the ordered items associated with this breaking todo page. */
   items: BreakingTodo[];
-};
+}

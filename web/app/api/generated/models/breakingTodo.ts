@@ -24,10 +24,7 @@ export interface BreakingTodo {
   status: TodoStatus;
   /** contains the diff counts associated with this breaking todo. */
   summary: DiffCounts;
-  /**
-     * specifies the comment associated with this breaking todo.
-     * @nullable
-     */
+  /** specifies the comment associated with this breaking todo. */
   comment: string | null;
   /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;

@@ -9,4 +9,4 @@
 /**
  * specifies the query associated with this view definition.
  */
-export type ViewDefinitionQuery = { [key: string]: unknown };
+export type ViewDefinitionQuery = {[key: string]: unknown};

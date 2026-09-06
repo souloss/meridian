@@ -16,9 +16,6 @@ export interface RepositoryDiscoverRequest {
   refType?: RefType;
   /** contains the ref name associated with this repository discover request. */
   ref?: RefName;
-  /**
-     * contains the ordered path prefixes associated with this repository discover request.
-     * @items.maxLength 512
-     */
+  /** contains the ordered path prefixes associated with this repository discover request. */
   pathPrefixes?: string[];
 }

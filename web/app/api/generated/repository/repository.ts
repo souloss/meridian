@@ -31,31 +31,27 @@ import type {
 } from 'vue';
 
 import type {
-  CandidatePageResponse,
-  CandidateResponse,
-  CandidatesAcceptBody,
-  ConfigImportApplyBody,
-  ConfigImportPreviewBody,
-  ConfigImportPreviewResponse,
-  ConfigImportResultResponse,
-  ConflictResponse,
-  ConnectionTestResponse,
+  CandidatePage,
+  CandidatesAcceptRequest,
+  ConfigImportApplyRequest,
+  ConfigImportPreview,
+  ConfigImportPreviewRequest,
+  ConfigImportResult,
+  ConnectionTest,
+  DiscoveryCandidate,
+  ErrorResponse,
   GitPushWebhook,
-  JobAcceptedResponse,
+  JobAccepted,
   ListDiscoveryCandidatesParams,
   ListRepositoriesParams,
-  NotFoundResponse,
-  PreconditionFailedResponse,
-  QuotaExceededResponse,
-  RepositoryConnectionCheckBody,
-  RepositoryCreateBody,
-  RepositoryDiscoverBody,
-  RepositoryPageResponse,
-  RepositoryPatchBody,
-  RepositoryResponse,
-  RepositorySyncBody,
-  ServiceListResponse,
-  UnauthenticatedResponse
+  Repository,
+  RepositoryConnectionCheckRequest,
+  RepositoryCreateRequest,
+  RepositoryDiscoverRequest,
+  RepositoryPage,
+  RepositoryPatchRequest,
+  RepositorySyncRequest,
+  ServiceList
 } from '../models';
 
 import { meridianFetch } from '../../fetcher.ts';
@@ -66,123 +62,10 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-/** checkRepositoryConnectionResponse200 represents a declared HTTP response from the check repository connection response200 operation. */
-export type checkRepositoryConnectionResponse200 = {
+/** listRepositoriesResponse200 represents a declared HTTP response from the list repositories response200 operation. */
+export type listRepositoriesResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ConnectionTestResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** checkRepositoryConnectionResponse404 represents a declared HTTP response from the check repository connection response404 operation. */
-export type checkRepositoryConnectionResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** checkRepositoryConnectionResponseSuccess represents a declared HTTP response from the check repository connection response success operation. */
-export type checkRepositoryConnectionResponseSuccess = (checkRepositoryConnectionResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** checkRepositoryConnectionResponseError represents a declared HTTP response from the check repository connection response error operation. */
-export type checkRepositoryConnectionResponseError = (checkRepositoryConnectionResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** checkRepositoryConnectionResponse represents a declared HTTP response from the check repository connection response operation. */
-export type checkRepositoryConnectionResponse = (checkRepositoryConnectionResponseSuccess | checkRepositoryConnectionResponseError)
-
-/** getCheckRepositoryConnectionUrl builds the relative URL for its OpenAPI operation. */
-export const getCheckRepositoryConnectionUrl = (tenantSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/repositories:check-connection`
-}
-
-/**
- * Checks repository connection within the authorized request scope.
- */
-export const checkRepositoryConnection = async (tenantSlug: string,
-    repositoryConnectionCheckBody: RepositoryConnectionCheckBody, options?: Parameters<typeof meridianFetch>[1]): Promise<checkRepositoryConnectionResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<checkRepositoryConnectionResponse>(getCheckRepositoryConnectionUrl(tenantSlug),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(repositoryConnectionCheckBody)
-  }
-);}
-
-
-
-
-
-/** getCheckRepositoryConnectionMutationKey is generated from the Meridian OpenAPI contract for get check repository connection mutation key. */
-export const getCheckRepositoryConnectionMutationKey = () => ['checkRepositoryConnection'] as const;
-
-/** getCheckRepositoryConnectionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCheckRepositoryConnectionMutationOptions = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkRepositoryConnection>>, TError,CheckRepositoryConnectionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof checkRepositoryConnection>>, TError,CheckRepositoryConnectionMutationVariables, TContext> => {
-
-const mutationKey = getCheckRepositoryConnectionMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkRepositoryConnection>>, CheckRepositoryConnectionMutationVariables> = (props) => {
-          const {tenantSlug,data} = props ?? {};
-
-          return  checkRepositoryConnection(tenantSlug,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** CheckRepositoryConnectionMutationResult is generated from the Meridian OpenAPI contract for check repository connection mutation result. */
-    export type CheckRepositoryConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof checkRepositoryConnection>>>
-    /** CheckRepositoryConnectionMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CheckRepositoryConnectionMutationBody = RepositoryConnectionCheckBody
-    /** CheckRepositoryConnectionMutationError is generated from the Meridian OpenAPI contract for check repository connection mutation error. */
-    export type CheckRepositoryConnectionMutationError = NotFoundResponse
-    /** CheckRepositoryConnectionMutationVariables is generated from the Meridian OpenAPI contract for check repository connection mutation variables. */
-    export type CheckRepositoryConnectionMutationVariables = {/** TenantSlug carries the tenant slug value for CheckRepositoryConnectionMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: RepositoryConnectionCheckBody}
-
-    /** useCheckRepositoryConnection executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCheckRepositoryConnection = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkRepositoryConnection>>, TError,CheckRepositoryConnectionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof checkRepositoryConnection>>,
-        TError,
-        CheckRepositoryConnectionMutationVariables,
-        TContext
-      > => {
-      return useMutation(getCheckRepositoryConnectionMutationOptions(options), queryClient);
-    }
-    /** listRepositoriesResponse200 represents a declared HTTP response from the list repositories response200 operation. */
-    export type listRepositoriesResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: RepositoryPageResponse
+  data: RepositoryPage
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -190,7 +73,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** listRepositoriesResponse404 represents a declared HTTP response from the list repositories response404 operation. */
 export type listRepositoriesResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -246,7 +129,7 @@ export const getListRepositoriesQueryKey = (tenantSlug: MaybeRefOrGetter<string>
 
 
 /** getListRepositoriesQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListRepositoriesQueryOptions = <TData = Awaited<ReturnType<typeof listRepositories>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
+export const getListRepositoriesQueryOptions = <TData = Awaited<ReturnType<typeof listRepositories>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListRepositoriesParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRepositories>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
@@ -268,12 +151,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** ListRepositoriesQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListRepositoriesQueryResult = NonNullable<Awaited<ReturnType<typeof listRepositories>>>
 /** ListRepositoriesQueryError is the error type returned by its generated Vue Query hook. */
-export type ListRepositoriesQueryError = NotFoundResponse
+export type ListRepositoriesQueryError = ErrorResponse
 
 
 
 /** useListRepositories executes its OpenAPI operation through TanStack Vue Query. */
-export function useListRepositories<TData = Awaited<ReturnType<typeof listRepositories>>, TError = NotFoundResponse>(
+export function useListRepositories<TData = Awaited<ReturnType<typeof listRepositories>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListRepositoriesParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRepositories>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
@@ -296,7 +179,7 @@ export function useListRepositories<TData = Awaited<ReturnType<typeof listReposi
 /** createRepositoryResponse201 represents a declared HTTP response from the create repository response201 operation. */
 export type createRepositoryResponse201 = {
   /** Data contains the decoded response payload. */
-  data: RepositoryResponse
+  data: Repository
   /** Status is the HTTP response status code. */
   status: 201
 }
@@ -304,7 +187,7 @@ export type createRepositoryResponse201 = {
 /** createRepositoryResponse404 represents a declared HTTP response from the create repository response404 operation. */
 export type createRepositoryResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -312,7 +195,7 @@ export type createRepositoryResponse404 = {
 /** createRepositoryResponse409 represents a declared HTTP response from the create repository response409 operation. */
 export type createRepositoryResponse409 = {
   /** Data contains the decoded response payload. */
-  data: QuotaExceededResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 409
 }
@@ -342,7 +225,7 @@ export const getCreateRepositoryUrl = (tenantSlug: string,) => {
  * Creates repository within the authorized request scope.
  */
 export const createRepository = async (tenantSlug: string,
-    repositoryCreateBody: RepositoryCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createRepositoryResponse> => {
+    repositoryCreateRequest: RepositoryCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createRepositoryResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -355,7 +238,7 @@ return meridianFetch<createRepositoryResponse>(getCreateRepositoryUrl(tenantSlug
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(repositoryCreateBody)
+    body: JSON.stringify(repositoryCreateRequest)
   }
 );}
 
@@ -367,7 +250,7 @@ return meridianFetch<createRepositoryResponse>(getCreateRepositoryUrl(tenantSlug
 export const getCreateRepositoryMutationKey = () => ['createRepository'] as const;
 
 /** getCreateRepositoryMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateRepositoryMutationOptions = <TError = NotFoundResponse | QuotaExceededResponse,
+export const getCreateRepositoryMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRepository>>, TError,CreateRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createRepository>>, TError,CreateRepositoryMutationVariables, TContext> => {
 
@@ -397,14 +280,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateRepositoryMutationResult is generated from the Meridian OpenAPI contract for create repository mutation result. */
     export type CreateRepositoryMutationResult = NonNullable<Awaited<ReturnType<typeof createRepository>>>
     /** CreateRepositoryMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateRepositoryMutationBody = RepositoryCreateBody
+    export type CreateRepositoryMutationBody = RepositoryCreateRequest
     /** CreateRepositoryMutationError is generated from the Meridian OpenAPI contract for create repository mutation error. */
-    export type CreateRepositoryMutationError = NotFoundResponse | QuotaExceededResponse
+    export type CreateRepositoryMutationError = ErrorResponse
     /** CreateRepositoryMutationVariables is generated from the Meridian OpenAPI contract for create repository mutation variables. */
-    export type CreateRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for CreateRepositoryMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: RepositoryCreateBody}
+    export type CreateRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for CreateRepositoryMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: RepositoryCreateRequest}
 
     /** useCreateRepository executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateRepository = <TError = NotFoundResponse | QuotaExceededResponse,
+    export const useCreateRepository = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRepository>>, TError,CreateRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createRepository>>,
@@ -414,10 +297,125 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateRepositoryMutationOptions(options), queryClient);
     }
+    /** deleteRepositoryResponse204 represents a declared HTTP response from the delete repository response204 operation. */
+    export type deleteRepositoryResponse204 = {
+  /** Data contains the decoded response payload. */
+  data: void
+  /** Status is the HTTP response status code. */
+  status: 204
+}
+
+/** deleteRepositoryResponse404 represents a declared HTTP response from the delete repository response404 operation. */
+export type deleteRepositoryResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** deleteRepositoryResponse412 represents a declared HTTP response from the delete repository response412 operation. */
+export type deleteRepositoryResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** deleteRepositoryResponseSuccess represents a declared HTTP response from the delete repository response success operation. */
+export type deleteRepositoryResponseSuccess = (deleteRepositoryResponse204) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** deleteRepositoryResponseError represents a declared HTTP response from the delete repository response error operation. */
+export type deleteRepositoryResponseError = (deleteRepositoryResponse404 | deleteRepositoryResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** deleteRepositoryResponse represents a declared HTTP response from the delete repository response operation. */
+export type deleteRepositoryResponse = (deleteRepositoryResponseSuccess | deleteRepositoryResponseError)
+
+/** getDeleteRepositoryUrl builds the relative URL for its OpenAPI operation. */
+export const getDeleteRepositoryUrl = (tenantSlug: string,
+    repositoryId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/repositories/${repositoryId}`
+}
+
+/**
+ * Deletes the selected repository within the authorized request scope.
+ */
+export const deleteRepository = async (tenantSlug: string,
+    repositoryId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteRepositoryResponse> => {
+
+  return meridianFetch<deleteRepositoryResponse>(getDeleteRepositoryUrl(tenantSlug,repositoryId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+/** getDeleteRepositoryMutationKey is generated from the Meridian OpenAPI contract for get delete repository mutation key. */
+export const getDeleteRepositoryMutationKey = () => ['deleteRepository'] as const;
+
+/** getDeleteRepositoryMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getDeleteRepositoryMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRepository>>, TError,DeleteRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteRepository>>, TError,DeleteRepositoryMutationVariables, TContext> => {
+
+const mutationKey = getDeleteRepositoryMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteRepository>>, DeleteRepositoryMutationVariables> = (props) => {
+          const {tenantSlug,repositoryId} = props ?? {};
+
+          return  deleteRepository(tenantSlug,repositoryId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** DeleteRepositoryMutationResult is generated from the Meridian OpenAPI contract for delete repository mutation result. */
+    export type DeleteRepositoryMutationResult = NonNullable<Awaited<ReturnType<typeof deleteRepository>>>
+
+    /** DeleteRepositoryMutationError is generated from the Meridian OpenAPI contract for delete repository mutation error. */
+    export type DeleteRepositoryMutationError = ErrorResponse
+    /** DeleteRepositoryMutationVariables is generated from the Meridian OpenAPI contract for delete repository mutation variables. */
+    export type DeleteRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteRepositoryMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for DeleteRepositoryMutationVariables. */ repositoryId: string}
+
+    /** useDeleteRepository executes its OpenAPI operation through TanStack Vue Query. */
+    export const useDeleteRepository = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRepository>>, TError,DeleteRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof deleteRepository>>,
+        TError,
+        DeleteRepositoryMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteRepositoryMutationOptions(options), queryClient);
+    }
     /** getRepositoryResponse200 represents a declared HTTP response from the get repository response200 operation. */
     export type getRepositoryResponse200 = {
   /** Data contains the decoded response payload. */
-  data: RepositoryResponse
+  data: Repository
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -425,7 +423,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** getRepositoryResponse404 represents a declared HTTP response from the get repository response404 operation. */
 export type getRepositoryResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -481,7 +479,7 @@ export const getGetRepositoryQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
 
 
 /** getGetRepositoryQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetRepositoryQueryOptions = <TData = Awaited<ReturnType<typeof getRepository>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
+export const getGetRepositoryQueryOptions = <TData = Awaited<ReturnType<typeof getRepository>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
     repositoryId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRepository>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
@@ -503,12 +501,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** GetRepositoryQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetRepositoryQueryResult = NonNullable<Awaited<ReturnType<typeof getRepository>>>
 /** GetRepositoryQueryError is the error type returned by its generated Vue Query hook. */
-export type GetRepositoryQueryError = NotFoundResponse
+export type GetRepositoryQueryError = ErrorResponse
 
 
 
 /** useGetRepository executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetRepository<TData = Awaited<ReturnType<typeof getRepository>>, TError = NotFoundResponse>(
+export function useGetRepository<TData = Awaited<ReturnType<typeof getRepository>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     repositoryId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRepository>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
@@ -531,7 +529,7 @@ export function useGetRepository<TData = Awaited<ReturnType<typeof getRepository
 /** updateRepositoryResponse200 represents a declared HTTP response from the update repository response200 operation. */
 export type updateRepositoryResponse200 = {
   /** Data contains the decoded response payload. */
-  data: RepositoryResponse
+  data: Repository
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -539,7 +537,7 @@ export type updateRepositoryResponse200 = {
 /** updateRepositoryResponse404 represents a declared HTTP response from the update repository response404 operation. */
 export type updateRepositoryResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -547,7 +545,7 @@ export type updateRepositoryResponse404 = {
 /** updateRepositoryResponse412 represents a declared HTTP response from the update repository response412 operation. */
 export type updateRepositoryResponse412 = {
   /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 412
 }
@@ -579,7 +577,7 @@ export const getUpdateRepositoryUrl = (tenantSlug: string,
  */
 export const updateRepository = async (tenantSlug: string,
     repositoryId: string,
-    repositoryPatchBody: RepositoryPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateRepositoryResponse> => {
+    repositoryPatchRequest: RepositoryPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateRepositoryResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -592,7 +590,7 @@ return meridianFetch<updateRepositoryResponse>(getUpdateRepositoryUrl(tenantSlug
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(repositoryPatchBody)
+    body: JSON.stringify(repositoryPatchRequest)
   }
 );}
 
@@ -604,7 +602,7 @@ return meridianFetch<updateRepositoryResponse>(getUpdateRepositoryUrl(tenantSlug
 export const getUpdateRepositoryMutationKey = () => ['updateRepository'] as const;
 
 /** getUpdateRepositoryMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateRepositoryMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
+export const getUpdateRepositoryMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRepository>>, TError,UpdateRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateRepository>>, TError,UpdateRepositoryMutationVariables, TContext> => {
 
@@ -634,14 +632,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** UpdateRepositoryMutationResult is generated from the Meridian OpenAPI contract for update repository mutation result. */
     export type UpdateRepositoryMutationResult = NonNullable<Awaited<ReturnType<typeof updateRepository>>>
     /** UpdateRepositoryMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateRepositoryMutationBody = RepositoryPatchBody
+    export type UpdateRepositoryMutationBody = RepositoryPatchRequest
     /** UpdateRepositoryMutationError is generated from the Meridian OpenAPI contract for update repository mutation error. */
-    export type UpdateRepositoryMutationError = NotFoundResponse | PreconditionFailedResponse
+    export type UpdateRepositoryMutationError = ErrorResponse
     /** UpdateRepositoryMutationVariables is generated from the Meridian OpenAPI contract for update repository mutation variables. */
-    export type UpdateRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateRepositoryMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for UpdateRepositoryMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: RepositoryPatchBody}
+    export type UpdateRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateRepositoryMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for UpdateRepositoryMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: RepositoryPatchRequest}
 
     /** useUpdateRepository executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateRepository = <TError = NotFoundResponse | PreconditionFailedResponse,
+    export const useUpdateRepository = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRepository>>, TError,UpdateRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof updateRepository>>,
@@ -651,371 +649,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdateRepositoryMutationOptions(options), queryClient);
     }
-    /** deleteRepositoryResponse204 represents a declared HTTP response from the delete repository response204 operation. */
-    export type deleteRepositoryResponse204 = {
-  /** Data contains the decoded response payload. */
-  data: void
-  /** Status is the HTTP response status code. */
-  status: 204
-}
-
-/** deleteRepositoryResponse404 represents a declared HTTP response from the delete repository response404 operation. */
-export type deleteRepositoryResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** deleteRepositoryResponse412 represents a declared HTTP response from the delete repository response412 operation. */
-export type deleteRepositoryResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** deleteRepositoryResponseSuccess represents a declared HTTP response from the delete repository response success operation. */
-export type deleteRepositoryResponseSuccess = (deleteRepositoryResponse204) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** deleteRepositoryResponseError represents a declared HTTP response from the delete repository response error operation. */
-export type deleteRepositoryResponseError = (deleteRepositoryResponse404 | deleteRepositoryResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** deleteRepositoryResponse represents a declared HTTP response from the delete repository response operation. */
-export type deleteRepositoryResponse = (deleteRepositoryResponseSuccess | deleteRepositoryResponseError)
-
-/** getDeleteRepositoryUrl builds the relative URL for its OpenAPI operation. */
-export const getDeleteRepositoryUrl = (tenantSlug: string,
-    repositoryId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/repositories/${repositoryId}`
-}
-
-/**
- * Deletes the selected repository within the authorized request scope.
- */
-export const deleteRepository = async (tenantSlug: string,
-    repositoryId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteRepositoryResponse> => {
-
-  return meridianFetch<deleteRepositoryResponse>(getDeleteRepositoryUrl(tenantSlug,repositoryId),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
-
-
-
-
-/** getDeleteRepositoryMutationKey is generated from the Meridian OpenAPI contract for get delete repository mutation key. */
-export const getDeleteRepositoryMutationKey = () => ['deleteRepository'] as const;
-
-/** getDeleteRepositoryMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeleteRepositoryMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRepository>>, TError,DeleteRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteRepository>>, TError,DeleteRepositoryMutationVariables, TContext> => {
-
-const mutationKey = getDeleteRepositoryMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteRepository>>, DeleteRepositoryMutationVariables> = (props) => {
-          const {tenantSlug,repositoryId} = props ?? {};
-
-          return  deleteRepository(tenantSlug,repositoryId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** DeleteRepositoryMutationResult is generated from the Meridian OpenAPI contract for delete repository mutation result. */
-    export type DeleteRepositoryMutationResult = NonNullable<Awaited<ReturnType<typeof deleteRepository>>>
-
-    /** DeleteRepositoryMutationError is generated from the Meridian OpenAPI contract for delete repository mutation error. */
-    export type DeleteRepositoryMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** DeleteRepositoryMutationVariables is generated from the Meridian OpenAPI contract for delete repository mutation variables. */
-    export type DeleteRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteRepositoryMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for DeleteRepositoryMutationVariables. */ repositoryId: string}
-
-    /** useDeleteRepository executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeleteRepository = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRepository>>, TError,DeleteRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof deleteRepository>>,
-        TError,
-        DeleteRepositoryMutationVariables,
-        TContext
-      > => {
-      return useMutation(getDeleteRepositoryMutationOptions(options), queryClient);
-    }
-    /** syncRepositoryResponse202 represents a declared HTTP response from the sync repository response202 operation. */
-    export type syncRepositoryResponse202 = {
-  /** Data contains the decoded response payload. */
-  data: JobAcceptedResponse
-  /** Status is the HTTP response status code. */
-  status: 202
-}
-
-/** syncRepositoryResponse404 represents a declared HTTP response from the sync repository response404 operation. */
-export type syncRepositoryResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** syncRepositoryResponse409 represents a declared HTTP response from the sync repository response409 operation. */
-export type syncRepositoryResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** syncRepositoryResponseSuccess represents a declared HTTP response from the sync repository response success operation. */
-export type syncRepositoryResponseSuccess = (syncRepositoryResponse202) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** syncRepositoryResponseError represents a declared HTTP response from the sync repository response error operation. */
-export type syncRepositoryResponseError = (syncRepositoryResponse404 | syncRepositoryResponse409) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** syncRepositoryResponse represents a declared HTTP response from the sync repository response operation. */
-export type syncRepositoryResponse = (syncRepositoryResponseSuccess | syncRepositoryResponseError)
-
-/** getSyncRepositoryUrl builds the relative URL for its OpenAPI operation. */
-export const getSyncRepositoryUrl = (tenantSlug: string,
-    repositoryId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/repositories/${repositoryId}:sync`
-}
-
-/**
- * Performs the sync repository workflow within the authorized request scope.
- */
-export const syncRepository = async (tenantSlug: string,
-    repositoryId: string,
-    repositorySyncBody: RepositorySyncBody, options?: Parameters<typeof meridianFetch>[1]): Promise<syncRepositoryResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<syncRepositoryResponse>(getSyncRepositoryUrl(tenantSlug,repositoryId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(repositorySyncBody)
-  }
-);}
-
-
-
-
-
-/** getSyncRepositoryMutationKey is generated from the Meridian OpenAPI contract for get sync repository mutation key. */
-export const getSyncRepositoryMutationKey = () => ['syncRepository'] as const;
-
-/** getSyncRepositoryMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getSyncRepositoryMutationOptions = <TError = NotFoundResponse | ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncRepository>>, TError,SyncRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof syncRepository>>, TError,SyncRepositoryMutationVariables, TContext> => {
-
-const mutationKey = getSyncRepositoryMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof syncRepository>>, SyncRepositoryMutationVariables> = (props) => {
-          const {tenantSlug,repositoryId,data} = props ?? {};
-
-          return  syncRepository(tenantSlug,repositoryId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** SyncRepositoryMutationResult is generated from the Meridian OpenAPI contract for sync repository mutation result. */
-    export type SyncRepositoryMutationResult = NonNullable<Awaited<ReturnType<typeof syncRepository>>>
-    /** SyncRepositoryMutationBody is the request body type for its generated OpenAPI operation. */
-    export type SyncRepositoryMutationBody = RepositorySyncBody
-    /** SyncRepositoryMutationError is generated from the Meridian OpenAPI contract for sync repository mutation error. */
-    export type SyncRepositoryMutationError = NotFoundResponse | ConflictResponse
-    /** SyncRepositoryMutationVariables is generated from the Meridian OpenAPI contract for sync repository mutation variables. */
-    export type SyncRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for SyncRepositoryMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for SyncRepositoryMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: RepositorySyncBody}
-
-    /** useSyncRepository executes its OpenAPI operation through TanStack Vue Query. */
-    export const useSyncRepository = <TError = NotFoundResponse | ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncRepository>>, TError,SyncRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof syncRepository>>,
-        TError,
-        SyncRepositoryMutationVariables,
-        TContext
-      > => {
-      return useMutation(getSyncRepositoryMutationOptions(options), queryClient);
-    }
-    /** discoverRepositoryResponse202 represents a declared HTTP response from the discover repository response202 operation. */
-    export type discoverRepositoryResponse202 = {
-  /** Data contains the decoded response payload. */
-  data: JobAcceptedResponse
-  /** Status is the HTTP response status code. */
-  status: 202
-}
-
-/** discoverRepositoryResponse404 represents a declared HTTP response from the discover repository response404 operation. */
-export type discoverRepositoryResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** discoverRepositoryResponse409 represents a declared HTTP response from the discover repository response409 operation. */
-export type discoverRepositoryResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** discoverRepositoryResponseSuccess represents a declared HTTP response from the discover repository response success operation. */
-export type discoverRepositoryResponseSuccess = (discoverRepositoryResponse202) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** discoverRepositoryResponseError represents a declared HTTP response from the discover repository response error operation. */
-export type discoverRepositoryResponseError = (discoverRepositoryResponse404 | discoverRepositoryResponse409) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** discoverRepositoryResponse represents a declared HTTP response from the discover repository response operation. */
-export type discoverRepositoryResponse = (discoverRepositoryResponseSuccess | discoverRepositoryResponseError)
-
-/** getDiscoverRepositoryUrl builds the relative URL for its OpenAPI operation. */
-export const getDiscoverRepositoryUrl = (tenantSlug: string,
-    repositoryId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/repositories/${repositoryId}:discover`
-}
-
-/**
- * Performs the discover repository workflow within the authorized request scope.
- */
-export const discoverRepository = async (tenantSlug: string,
-    repositoryId: string,
-    repositoryDiscoverBody: RepositoryDiscoverBody, options?: Parameters<typeof meridianFetch>[1]): Promise<discoverRepositoryResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<discoverRepositoryResponse>(getDiscoverRepositoryUrl(tenantSlug,repositoryId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(repositoryDiscoverBody)
-  }
-);}
-
-
-
-
-
-/** getDiscoverRepositoryMutationKey is generated from the Meridian OpenAPI contract for get discover repository mutation key. */
-export const getDiscoverRepositoryMutationKey = () => ['discoverRepository'] as const;
-
-/** getDiscoverRepositoryMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDiscoverRepositoryMutationOptions = <TError = NotFoundResponse | ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof discoverRepository>>, TError,DiscoverRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof discoverRepository>>, TError,DiscoverRepositoryMutationVariables, TContext> => {
-
-const mutationKey = getDiscoverRepositoryMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof discoverRepository>>, DiscoverRepositoryMutationVariables> = (props) => {
-          const {tenantSlug,repositoryId,data} = props ?? {};
-
-          return  discoverRepository(tenantSlug,repositoryId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** DiscoverRepositoryMutationResult is generated from the Meridian OpenAPI contract for discover repository mutation result. */
-    export type DiscoverRepositoryMutationResult = NonNullable<Awaited<ReturnType<typeof discoverRepository>>>
-    /** DiscoverRepositoryMutationBody is the request body type for its generated OpenAPI operation. */
-    export type DiscoverRepositoryMutationBody = RepositoryDiscoverBody
-    /** DiscoverRepositoryMutationError is generated from the Meridian OpenAPI contract for discover repository mutation error. */
-    export type DiscoverRepositoryMutationError = NotFoundResponse | ConflictResponse
-    /** DiscoverRepositoryMutationVariables is generated from the Meridian OpenAPI contract for discover repository mutation variables. */
-    export type DiscoverRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for DiscoverRepositoryMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for DiscoverRepositoryMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: RepositoryDiscoverBody}
-
-    /** useDiscoverRepository executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDiscoverRepository = <TError = NotFoundResponse | ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof discoverRepository>>, TError,DiscoverRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof discoverRepository>>,
-        TError,
-        DiscoverRepositoryMutationVariables,
-        TContext
-      > => {
-      return useMutation(getDiscoverRepositoryMutationOptions(options), queryClient);
-    }
     /** listDiscoveryCandidatesResponse200 represents a declared HTTP response from the list discovery candidates response200 operation. */
     export type listDiscoveryCandidatesResponse200 = {
   /** Data contains the decoded response payload. */
-  data: CandidatePageResponse
+  data: CandidatePage
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1023,7 +660,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** listDiscoveryCandidatesResponse404 represents a declared HTTP response from the list discovery candidates response404 operation. */
 export type listDiscoveryCandidatesResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1082,7 +719,7 @@ export const getListDiscoveryCandidatesQueryKey = (tenantSlug: MaybeRefOrGetter<
 
 
 /** getListDiscoveryCandidatesQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListDiscoveryCandidatesQueryOptions = <TData = Awaited<ReturnType<typeof listDiscoveryCandidates>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
+export const getListDiscoveryCandidatesQueryOptions = <TData = Awaited<ReturnType<typeof listDiscoveryCandidates>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
     repositoryId: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListDiscoveryCandidatesParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDiscoveryCandidates>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
@@ -1105,12 +742,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** ListDiscoveryCandidatesQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListDiscoveryCandidatesQueryResult = NonNullable<Awaited<ReturnType<typeof listDiscoveryCandidates>>>
 /** ListDiscoveryCandidatesQueryError is the error type returned by its generated Vue Query hook. */
-export type ListDiscoveryCandidatesQueryError = NotFoundResponse
+export type ListDiscoveryCandidatesQueryError = ErrorResponse
 
 
 
 /** useListDiscoveryCandidates executes its OpenAPI operation through TanStack Vue Query. */
-export function useListDiscoveryCandidates<TData = Awaited<ReturnType<typeof listDiscoveryCandidates>>, TError = NotFoundResponse>(
+export function useListDiscoveryCandidates<TData = Awaited<ReturnType<typeof listDiscoveryCandidates>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     repositoryId: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListDiscoveryCandidatesParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDiscoveryCandidates>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -1131,133 +768,10 @@ export function useListDiscoveryCandidates<TData = Awaited<ReturnType<typeof lis
 
 
 
-/** acceptDiscoveryCandidatesResponse200 represents a declared HTTP response from the accept discovery candidates response200 operation. */
-export type acceptDiscoveryCandidatesResponse200 = {
+/** dismissDiscoveryCandidateResponse200 represents a declared HTTP response from the dismiss discovery candidate response200 operation. */
+export type dismissDiscoveryCandidateResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ServiceListResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** acceptDiscoveryCandidatesResponse404 represents a declared HTTP response from the accept discovery candidates response404 operation. */
-export type acceptDiscoveryCandidatesResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** acceptDiscoveryCandidatesResponse409 represents a declared HTTP response from the accept discovery candidates response409 operation. */
-export type acceptDiscoveryCandidatesResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** acceptDiscoveryCandidatesResponseSuccess represents a declared HTTP response from the accept discovery candidates response success operation. */
-export type acceptDiscoveryCandidatesResponseSuccess = (acceptDiscoveryCandidatesResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** acceptDiscoveryCandidatesResponseError represents a declared HTTP response from the accept discovery candidates response error operation. */
-export type acceptDiscoveryCandidatesResponseError = (acceptDiscoveryCandidatesResponse404 | acceptDiscoveryCandidatesResponse409) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** acceptDiscoveryCandidatesResponse represents a declared HTTP response from the accept discovery candidates response operation. */
-export type acceptDiscoveryCandidatesResponse = (acceptDiscoveryCandidatesResponseSuccess | acceptDiscoveryCandidatesResponseError)
-
-/** getAcceptDiscoveryCandidatesUrl builds the relative URL for its OpenAPI operation. */
-export const getAcceptDiscoveryCandidatesUrl = (tenantSlug: string,
-    repositoryId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/repositories/${repositoryId}/candidates:accept`
-}
-
-/**
- * Performs the accept discovery candidates workflow within the authorized request scope.
- */
-export const acceptDiscoveryCandidates = async (tenantSlug: string,
-    repositoryId: string,
-    candidatesAcceptBody: CandidatesAcceptBody, options?: Parameters<typeof meridianFetch>[1]): Promise<acceptDiscoveryCandidatesResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<acceptDiscoveryCandidatesResponse>(getAcceptDiscoveryCandidatesUrl(tenantSlug,repositoryId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(candidatesAcceptBody)
-  }
-);}
-
-
-
-
-
-/** getAcceptDiscoveryCandidatesMutationKey is generated from the Meridian OpenAPI contract for get accept discovery candidates mutation key. */
-export const getAcceptDiscoveryCandidatesMutationKey = () => ['acceptDiscoveryCandidates'] as const;
-
-/** getAcceptDiscoveryCandidatesMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getAcceptDiscoveryCandidatesMutationOptions = <TError = NotFoundResponse | ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>, TError,AcceptDiscoveryCandidatesMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>, TError,AcceptDiscoveryCandidatesMutationVariables, TContext> => {
-
-const mutationKey = getAcceptDiscoveryCandidatesMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>, AcceptDiscoveryCandidatesMutationVariables> = (props) => {
-          const {tenantSlug,repositoryId,data} = props ?? {};
-
-          return  acceptDiscoveryCandidates(tenantSlug,repositoryId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** AcceptDiscoveryCandidatesMutationResult is generated from the Meridian OpenAPI contract for accept discovery candidates mutation result. */
-    export type AcceptDiscoveryCandidatesMutationResult = NonNullable<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>>
-    /** AcceptDiscoveryCandidatesMutationBody is the request body type for its generated OpenAPI operation. */
-    export type AcceptDiscoveryCandidatesMutationBody = CandidatesAcceptBody
-    /** AcceptDiscoveryCandidatesMutationError is generated from the Meridian OpenAPI contract for accept discovery candidates mutation error. */
-    export type AcceptDiscoveryCandidatesMutationError = NotFoundResponse | ConflictResponse
-    /** AcceptDiscoveryCandidatesMutationVariables is generated from the Meridian OpenAPI contract for accept discovery candidates mutation variables. */
-    export type AcceptDiscoveryCandidatesMutationVariables = {/** TenantSlug carries the tenant slug value for AcceptDiscoveryCandidatesMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for AcceptDiscoveryCandidatesMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: CandidatesAcceptBody}
-
-    /** useAcceptDiscoveryCandidates executes its OpenAPI operation through TanStack Vue Query. */
-    export const useAcceptDiscoveryCandidates = <TError = NotFoundResponse | ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>, TError,AcceptDiscoveryCandidatesMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof acceptDiscoveryCandidates>>,
-        TError,
-        AcceptDiscoveryCandidatesMutationVariables,
-        TContext
-      > => {
-      return useMutation(getAcceptDiscoveryCandidatesMutationOptions(options), queryClient);
-    }
-    /** dismissDiscoveryCandidateResponse200 represents a declared HTTP response from the dismiss discovery candidate response200 operation. */
-    export type dismissDiscoveryCandidateResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: CandidateResponse
+  data: DiscoveryCandidate
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1265,7 +779,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** dismissDiscoveryCandidateResponse404 represents a declared HTTP response from the dismiss discovery candidate response404 operation. */
 export type dismissDiscoveryCandidateResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1317,7 +831,7 @@ export const dismissDiscoveryCandidate = async (tenantSlug: string,
 export const getDismissDiscoveryCandidateMutationKey = () => ['dismissDiscoveryCandidate'] as const;
 
 /** getDismissDiscoveryCandidateMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDismissDiscoveryCandidateMutationOptions = <TError = NotFoundResponse,
+export const getDismissDiscoveryCandidateMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissDiscoveryCandidate>>, TError,DismissDiscoveryCandidateMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof dismissDiscoveryCandidate>>, TError,DismissDiscoveryCandidateMutationVariables, TContext> => {
 
@@ -1348,12 +862,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DismissDiscoveryCandidateMutationResult = NonNullable<Awaited<ReturnType<typeof dismissDiscoveryCandidate>>>
 
     /** DismissDiscoveryCandidateMutationError is generated from the Meridian OpenAPI contract for dismiss discovery candidate mutation error. */
-    export type DismissDiscoveryCandidateMutationError = NotFoundResponse
+    export type DismissDiscoveryCandidateMutationError = ErrorResponse
     /** DismissDiscoveryCandidateMutationVariables is generated from the Meridian OpenAPI contract for dismiss discovery candidate mutation variables. */
     export type DismissDiscoveryCandidateMutationVariables = {/** TenantSlug carries the tenant slug value for DismissDiscoveryCandidateMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for DismissDiscoveryCandidateMutationVariables. */ repositoryId: string;/** CandidateId carries the candidate id value for DismissDiscoveryCandidateMutationVariables. */ candidateId: string}
 
     /** useDismissDiscoveryCandidate executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDismissDiscoveryCandidate = <TError = NotFoundResponse,
+    export const useDismissDiscoveryCandidate = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissDiscoveryCandidate>>, TError,DismissDiscoveryCandidateMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof dismissDiscoveryCandidate>>,
@@ -1363,10 +877,133 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDismissDiscoveryCandidateMutationOptions(options), queryClient);
     }
+    /** acceptDiscoveryCandidatesResponse200 represents a declared HTTP response from the accept discovery candidates response200 operation. */
+    export type acceptDiscoveryCandidatesResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ServiceList
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** acceptDiscoveryCandidatesResponse404 represents a declared HTTP response from the accept discovery candidates response404 operation. */
+export type acceptDiscoveryCandidatesResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** acceptDiscoveryCandidatesResponse409 represents a declared HTTP response from the accept discovery candidates response409 operation. */
+export type acceptDiscoveryCandidatesResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** acceptDiscoveryCandidatesResponseSuccess represents a declared HTTP response from the accept discovery candidates response success operation. */
+export type acceptDiscoveryCandidatesResponseSuccess = (acceptDiscoveryCandidatesResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** acceptDiscoveryCandidatesResponseError represents a declared HTTP response from the accept discovery candidates response error operation. */
+export type acceptDiscoveryCandidatesResponseError = (acceptDiscoveryCandidatesResponse404 | acceptDiscoveryCandidatesResponse409) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** acceptDiscoveryCandidatesResponse represents a declared HTTP response from the accept discovery candidates response operation. */
+export type acceptDiscoveryCandidatesResponse = (acceptDiscoveryCandidatesResponseSuccess | acceptDiscoveryCandidatesResponseError)
+
+/** getAcceptDiscoveryCandidatesUrl builds the relative URL for its OpenAPI operation. */
+export const getAcceptDiscoveryCandidatesUrl = (tenantSlug: string,
+    repositoryId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/repositories/${repositoryId}/candidates:accept`
+}
+
+/**
+ * Performs the accept discovery candidates workflow within the authorized request scope.
+ */
+export const acceptDiscoveryCandidates = async (tenantSlug: string,
+    repositoryId: string,
+    candidatesAcceptRequest: CandidatesAcceptRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<acceptDiscoveryCandidatesResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<acceptDiscoveryCandidatesResponse>(getAcceptDiscoveryCandidatesUrl(tenantSlug,repositoryId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(candidatesAcceptRequest)
+  }
+);}
+
+
+
+
+
+/** getAcceptDiscoveryCandidatesMutationKey is generated from the Meridian OpenAPI contract for get accept discovery candidates mutation key. */
+export const getAcceptDiscoveryCandidatesMutationKey = () => ['acceptDiscoveryCandidates'] as const;
+
+/** getAcceptDiscoveryCandidatesMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getAcceptDiscoveryCandidatesMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>, TError,AcceptDiscoveryCandidatesMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>, TError,AcceptDiscoveryCandidatesMutationVariables, TContext> => {
+
+const mutationKey = getAcceptDiscoveryCandidatesMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>, AcceptDiscoveryCandidatesMutationVariables> = (props) => {
+          const {tenantSlug,repositoryId,data} = props ?? {};
+
+          return  acceptDiscoveryCandidates(tenantSlug,repositoryId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** AcceptDiscoveryCandidatesMutationResult is generated from the Meridian OpenAPI contract for accept discovery candidates mutation result. */
+    export type AcceptDiscoveryCandidatesMutationResult = NonNullable<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>>
+    /** AcceptDiscoveryCandidatesMutationBody is the request body type for its generated OpenAPI operation. */
+    export type AcceptDiscoveryCandidatesMutationBody = CandidatesAcceptRequest
+    /** AcceptDiscoveryCandidatesMutationError is generated from the Meridian OpenAPI contract for accept discovery candidates mutation error. */
+    export type AcceptDiscoveryCandidatesMutationError = ErrorResponse
+    /** AcceptDiscoveryCandidatesMutationVariables is generated from the Meridian OpenAPI contract for accept discovery candidates mutation variables. */
+    export type AcceptDiscoveryCandidatesMutationVariables = {/** TenantSlug carries the tenant slug value for AcceptDiscoveryCandidatesMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for AcceptDiscoveryCandidatesMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: CandidatesAcceptRequest}
+
+    /** useAcceptDiscoveryCandidates executes its OpenAPI operation through TanStack Vue Query. */
+    export const useAcceptDiscoveryCandidates = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptDiscoveryCandidates>>, TError,AcceptDiscoveryCandidatesMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof acceptDiscoveryCandidates>>,
+        TError,
+        AcceptDiscoveryCandidatesMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAcceptDiscoveryCandidatesMutationOptions(options), queryClient);
+    }
     /** previewRepositoryConfigImportResponse201 represents a declared HTTP response from the preview repository config import response201 operation. */
     export type previewRepositoryConfigImportResponse201 = {
   /** Data contains the decoded response payload. */
-  data: ConfigImportPreviewResponse
+  data: ConfigImportPreview
   /** Status is the HTTP response status code. */
   status: 201
 }
@@ -1374,7 +1011,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** previewRepositoryConfigImportResponse404 represents a declared HTTP response from the preview repository config import response404 operation. */
 export type previewRepositoryConfigImportResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1382,7 +1019,7 @@ export type previewRepositoryConfigImportResponse404 = {
 /** previewRepositoryConfigImportResponse409 represents a declared HTTP response from the preview repository config import response409 operation. */
 export type previewRepositoryConfigImportResponse409 = {
   /** Data contains the decoded response payload. */
-  data: ConflictResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 409
 }
@@ -1414,7 +1051,7 @@ export const getPreviewRepositoryConfigImportUrl = (tenantSlug: string,
  */
 export const previewRepositoryConfigImport = async (tenantSlug: string,
     repositoryId: string,
-    configImportPreviewBody: ConfigImportPreviewBody, options?: Parameters<typeof meridianFetch>[1]): Promise<previewRepositoryConfigImportResponse> => {
+    configImportPreviewRequest: ConfigImportPreviewRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<previewRepositoryConfigImportResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1427,7 +1064,7 @@ return meridianFetch<previewRepositoryConfigImportResponse>(getPreviewRepository
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(configImportPreviewBody)
+    body: JSON.stringify(configImportPreviewRequest)
   }
 );}
 
@@ -1439,7 +1076,7 @@ return meridianFetch<previewRepositoryConfigImportResponse>(getPreviewRepository
 export const getPreviewRepositoryConfigImportMutationKey = () => ['previewRepositoryConfigImport'] as const;
 
 /** getPreviewRepositoryConfigImportMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPreviewRepositoryConfigImportMutationOptions = <TError = NotFoundResponse | ConflictResponse,
+export const getPreviewRepositoryConfigImportMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewRepositoryConfigImport>>, TError,PreviewRepositoryConfigImportMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof previewRepositoryConfigImport>>, TError,PreviewRepositoryConfigImportMutationVariables, TContext> => {
 
@@ -1469,14 +1106,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** PreviewRepositoryConfigImportMutationResult is generated from the Meridian OpenAPI contract for preview repository config import mutation result. */
     export type PreviewRepositoryConfigImportMutationResult = NonNullable<Awaited<ReturnType<typeof previewRepositoryConfigImport>>>
     /** PreviewRepositoryConfigImportMutationBody is the request body type for its generated OpenAPI operation. */
-    export type PreviewRepositoryConfigImportMutationBody = ConfigImportPreviewBody
+    export type PreviewRepositoryConfigImportMutationBody = ConfigImportPreviewRequest
     /** PreviewRepositoryConfigImportMutationError is generated from the Meridian OpenAPI contract for preview repository config import mutation error. */
-    export type PreviewRepositoryConfigImportMutationError = NotFoundResponse | ConflictResponse
+    export type PreviewRepositoryConfigImportMutationError = ErrorResponse
     /** PreviewRepositoryConfigImportMutationVariables is generated from the Meridian OpenAPI contract for preview repository config import mutation variables. */
-    export type PreviewRepositoryConfigImportMutationVariables = {/** TenantSlug carries the tenant slug value for PreviewRepositoryConfigImportMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for PreviewRepositoryConfigImportMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: ConfigImportPreviewBody}
+    export type PreviewRepositoryConfigImportMutationVariables = {/** TenantSlug carries the tenant slug value for PreviewRepositoryConfigImportMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for PreviewRepositoryConfigImportMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: ConfigImportPreviewRequest}
 
     /** usePreviewRepositoryConfigImport executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePreviewRepositoryConfigImport = <TError = NotFoundResponse | ConflictResponse,
+    export const usePreviewRepositoryConfigImport = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewRepositoryConfigImport>>, TError,PreviewRepositoryConfigImportMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof previewRepositoryConfigImport>>,
@@ -1489,7 +1126,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** applyRepositoryConfigImportResponse200 represents a declared HTTP response from the apply repository config import response200 operation. */
     export type applyRepositoryConfigImportResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ConfigImportResultResponse
+  data: ConfigImportResult
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1497,7 +1134,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** applyRepositoryConfigImportResponse404 represents a declared HTTP response from the apply repository config import response404 operation. */
 export type applyRepositoryConfigImportResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1505,7 +1142,7 @@ export type applyRepositoryConfigImportResponse404 = {
 /** applyRepositoryConfigImportResponse409 represents a declared HTTP response from the apply repository config import response409 operation. */
 export type applyRepositoryConfigImportResponse409 = {
   /** Data contains the decoded response payload. */
-  data: ConflictResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 409
 }
@@ -1539,7 +1176,7 @@ export const getApplyRepositoryConfigImportUrl = (tenantSlug: string,
 export const applyRepositoryConfigImport = async (tenantSlug: string,
     repositoryId: string,
     previewId: string,
-    configImportApplyBody: ConfigImportApplyBody, options?: Parameters<typeof meridianFetch>[1]): Promise<applyRepositoryConfigImportResponse> => {
+    configImportApplyRequest: ConfigImportApplyRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<applyRepositoryConfigImportResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1552,7 +1189,7 @@ return meridianFetch<applyRepositoryConfigImportResponse>(getApplyRepositoryConf
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(configImportApplyBody)
+    body: JSON.stringify(configImportApplyRequest)
   }
 );}
 
@@ -1564,7 +1201,7 @@ return meridianFetch<applyRepositoryConfigImportResponse>(getApplyRepositoryConf
 export const getApplyRepositoryConfigImportMutationKey = () => ['applyRepositoryConfigImport'] as const;
 
 /** getApplyRepositoryConfigImportMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getApplyRepositoryConfigImportMutationOptions = <TError = NotFoundResponse | ConflictResponse,
+export const getApplyRepositoryConfigImportMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof applyRepositoryConfigImport>>, TError,ApplyRepositoryConfigImportMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof applyRepositoryConfigImport>>, TError,ApplyRepositoryConfigImportMutationVariables, TContext> => {
 
@@ -1594,14 +1231,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** ApplyRepositoryConfigImportMutationResult is generated from the Meridian OpenAPI contract for apply repository config import mutation result. */
     export type ApplyRepositoryConfigImportMutationResult = NonNullable<Awaited<ReturnType<typeof applyRepositoryConfigImport>>>
     /** ApplyRepositoryConfigImportMutationBody is the request body type for its generated OpenAPI operation. */
-    export type ApplyRepositoryConfigImportMutationBody = ConfigImportApplyBody
+    export type ApplyRepositoryConfigImportMutationBody = ConfigImportApplyRequest
     /** ApplyRepositoryConfigImportMutationError is generated from the Meridian OpenAPI contract for apply repository config import mutation error. */
-    export type ApplyRepositoryConfigImportMutationError = NotFoundResponse | ConflictResponse
+    export type ApplyRepositoryConfigImportMutationError = ErrorResponse
     /** ApplyRepositoryConfigImportMutationVariables is generated from the Meridian OpenAPI contract for apply repository config import mutation variables. */
-    export type ApplyRepositoryConfigImportMutationVariables = {/** TenantSlug carries the tenant slug value for ApplyRepositoryConfigImportMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for ApplyRepositoryConfigImportMutationVariables. */ repositoryId: string;/** PreviewId carries the preview id value for ApplyRepositoryConfigImportMutationVariables. */ previewId: string;/** Data contains the decoded response payload. */ data: ConfigImportApplyBody}
+    export type ApplyRepositoryConfigImportMutationVariables = {/** TenantSlug carries the tenant slug value for ApplyRepositoryConfigImportMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for ApplyRepositoryConfigImportMutationVariables. */ repositoryId: string;/** PreviewId carries the preview id value for ApplyRepositoryConfigImportMutationVariables. */ previewId: string;/** Data contains the decoded response payload. */ data: ConfigImportApplyRequest}
 
     /** useApplyRepositoryConfigImport executes its OpenAPI operation through TanStack Vue Query. */
-    export const useApplyRepositoryConfigImport = <TError = NotFoundResponse | ConflictResponse,
+    export const useApplyRepositoryConfigImport = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof applyRepositoryConfigImport>>, TError,ApplyRepositoryConfigImportMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof applyRepositoryConfigImport>>,
@@ -1611,10 +1248,369 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getApplyRepositoryConfigImportMutationOptions(options), queryClient);
     }
+    /** discoverRepositoryResponse202 represents a declared HTTP response from the discover repository response202 operation. */
+    export type discoverRepositoryResponse202 = {
+  /** Data contains the decoded response payload. */
+  data: JobAccepted
+  /** Status is the HTTP response status code. */
+  status: 202
+}
+
+/** discoverRepositoryResponse404 represents a declared HTTP response from the discover repository response404 operation. */
+export type discoverRepositoryResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** discoverRepositoryResponse409 represents a declared HTTP response from the discover repository response409 operation. */
+export type discoverRepositoryResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** discoverRepositoryResponseSuccess represents a declared HTTP response from the discover repository response success operation. */
+export type discoverRepositoryResponseSuccess = (discoverRepositoryResponse202) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** discoverRepositoryResponseError represents a declared HTTP response from the discover repository response error operation. */
+export type discoverRepositoryResponseError = (discoverRepositoryResponse404 | discoverRepositoryResponse409) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** discoverRepositoryResponse represents a declared HTTP response from the discover repository response operation. */
+export type discoverRepositoryResponse = (discoverRepositoryResponseSuccess | discoverRepositoryResponseError)
+
+/** getDiscoverRepositoryUrl builds the relative URL for its OpenAPI operation. */
+export const getDiscoverRepositoryUrl = (tenantSlug: string,
+    repositoryId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/repositories/${repositoryId}:discover`
+}
+
+/**
+ * Performs the discover repository workflow within the authorized request scope.
+ */
+export const discoverRepository = async (tenantSlug: string,
+    repositoryId: string,
+    repositoryDiscoverRequest: RepositoryDiscoverRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<discoverRepositoryResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<discoverRepositoryResponse>(getDiscoverRepositoryUrl(tenantSlug,repositoryId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(repositoryDiscoverRequest)
+  }
+);}
+
+
+
+
+
+/** getDiscoverRepositoryMutationKey is generated from the Meridian OpenAPI contract for get discover repository mutation key. */
+export const getDiscoverRepositoryMutationKey = () => ['discoverRepository'] as const;
+
+/** getDiscoverRepositoryMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getDiscoverRepositoryMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof discoverRepository>>, TError,DiscoverRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof discoverRepository>>, TError,DiscoverRepositoryMutationVariables, TContext> => {
+
+const mutationKey = getDiscoverRepositoryMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof discoverRepository>>, DiscoverRepositoryMutationVariables> = (props) => {
+          const {tenantSlug,repositoryId,data} = props ?? {};
+
+          return  discoverRepository(tenantSlug,repositoryId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** DiscoverRepositoryMutationResult is generated from the Meridian OpenAPI contract for discover repository mutation result. */
+    export type DiscoverRepositoryMutationResult = NonNullable<Awaited<ReturnType<typeof discoverRepository>>>
+    /** DiscoverRepositoryMutationBody is the request body type for its generated OpenAPI operation. */
+    export type DiscoverRepositoryMutationBody = RepositoryDiscoverRequest
+    /** DiscoverRepositoryMutationError is generated from the Meridian OpenAPI contract for discover repository mutation error. */
+    export type DiscoverRepositoryMutationError = ErrorResponse
+    /** DiscoverRepositoryMutationVariables is generated from the Meridian OpenAPI contract for discover repository mutation variables. */
+    export type DiscoverRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for DiscoverRepositoryMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for DiscoverRepositoryMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: RepositoryDiscoverRequest}
+
+    /** useDiscoverRepository executes its OpenAPI operation through TanStack Vue Query. */
+    export const useDiscoverRepository = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof discoverRepository>>, TError,DiscoverRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof discoverRepository>>,
+        TError,
+        DiscoverRepositoryMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDiscoverRepositoryMutationOptions(options), queryClient);
+    }
+    /** syncRepositoryResponse202 represents a declared HTTP response from the sync repository response202 operation. */
+    export type syncRepositoryResponse202 = {
+  /** Data contains the decoded response payload. */
+  data: JobAccepted
+  /** Status is the HTTP response status code. */
+  status: 202
+}
+
+/** syncRepositoryResponse404 represents a declared HTTP response from the sync repository response404 operation. */
+export type syncRepositoryResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** syncRepositoryResponse409 represents a declared HTTP response from the sync repository response409 operation. */
+export type syncRepositoryResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** syncRepositoryResponseSuccess represents a declared HTTP response from the sync repository response success operation. */
+export type syncRepositoryResponseSuccess = (syncRepositoryResponse202) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** syncRepositoryResponseError represents a declared HTTP response from the sync repository response error operation. */
+export type syncRepositoryResponseError = (syncRepositoryResponse404 | syncRepositoryResponse409) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** syncRepositoryResponse represents a declared HTTP response from the sync repository response operation. */
+export type syncRepositoryResponse = (syncRepositoryResponseSuccess | syncRepositoryResponseError)
+
+/** getSyncRepositoryUrl builds the relative URL for its OpenAPI operation. */
+export const getSyncRepositoryUrl = (tenantSlug: string,
+    repositoryId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/repositories/${repositoryId}:sync`
+}
+
+/**
+ * Performs the sync repository workflow within the authorized request scope.
+ */
+export const syncRepository = async (tenantSlug: string,
+    repositoryId: string,
+    repositorySyncRequest: RepositorySyncRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<syncRepositoryResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<syncRepositoryResponse>(getSyncRepositoryUrl(tenantSlug,repositoryId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(repositorySyncRequest)
+  }
+);}
+
+
+
+
+
+/** getSyncRepositoryMutationKey is generated from the Meridian OpenAPI contract for get sync repository mutation key. */
+export const getSyncRepositoryMutationKey = () => ['syncRepository'] as const;
+
+/** getSyncRepositoryMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getSyncRepositoryMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncRepository>>, TError,SyncRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof syncRepository>>, TError,SyncRepositoryMutationVariables, TContext> => {
+
+const mutationKey = getSyncRepositoryMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof syncRepository>>, SyncRepositoryMutationVariables> = (props) => {
+          const {tenantSlug,repositoryId,data} = props ?? {};
+
+          return  syncRepository(tenantSlug,repositoryId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** SyncRepositoryMutationResult is generated from the Meridian OpenAPI contract for sync repository mutation result. */
+    export type SyncRepositoryMutationResult = NonNullable<Awaited<ReturnType<typeof syncRepository>>>
+    /** SyncRepositoryMutationBody is the request body type for its generated OpenAPI operation. */
+    export type SyncRepositoryMutationBody = RepositorySyncRequest
+    /** SyncRepositoryMutationError is generated from the Meridian OpenAPI contract for sync repository mutation error. */
+    export type SyncRepositoryMutationError = ErrorResponse
+    /** SyncRepositoryMutationVariables is generated from the Meridian OpenAPI contract for sync repository mutation variables. */
+    export type SyncRepositoryMutationVariables = {/** TenantSlug carries the tenant slug value for SyncRepositoryMutationVariables. */ tenantSlug: string;/** RepositoryId carries the repository id value for SyncRepositoryMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: RepositorySyncRequest}
+
+    /** useSyncRepository executes its OpenAPI operation through TanStack Vue Query. */
+    export const useSyncRepository = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncRepository>>, TError,SyncRepositoryMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof syncRepository>>,
+        TError,
+        SyncRepositoryMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSyncRepositoryMutationOptions(options), queryClient);
+    }
+    /** checkRepositoryConnectionResponse200 represents a declared HTTP response from the check repository connection response200 operation. */
+    export type checkRepositoryConnectionResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ConnectionTest
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** checkRepositoryConnectionResponse404 represents a declared HTTP response from the check repository connection response404 operation. */
+export type checkRepositoryConnectionResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** checkRepositoryConnectionResponseSuccess represents a declared HTTP response from the check repository connection response success operation. */
+export type checkRepositoryConnectionResponseSuccess = (checkRepositoryConnectionResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** checkRepositoryConnectionResponseError represents a declared HTTP response from the check repository connection response error operation. */
+export type checkRepositoryConnectionResponseError = (checkRepositoryConnectionResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** checkRepositoryConnectionResponse represents a declared HTTP response from the check repository connection response operation. */
+export type checkRepositoryConnectionResponse = (checkRepositoryConnectionResponseSuccess | checkRepositoryConnectionResponseError)
+
+/** getCheckRepositoryConnectionUrl builds the relative URL for its OpenAPI operation. */
+export const getCheckRepositoryConnectionUrl = (tenantSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/repositories:check-connection`
+}
+
+/**
+ * Checks repository connection within the authorized request scope.
+ */
+export const checkRepositoryConnection = async (tenantSlug: string,
+    repositoryConnectionCheckRequest: RepositoryConnectionCheckRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<checkRepositoryConnectionResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<checkRepositoryConnectionResponse>(getCheckRepositoryConnectionUrl(tenantSlug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(repositoryConnectionCheckRequest)
+  }
+);}
+
+
+
+
+
+/** getCheckRepositoryConnectionMutationKey is generated from the Meridian OpenAPI contract for get check repository connection mutation key. */
+export const getCheckRepositoryConnectionMutationKey = () => ['checkRepositoryConnection'] as const;
+
+/** getCheckRepositoryConnectionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getCheckRepositoryConnectionMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkRepositoryConnection>>, TError,CheckRepositoryConnectionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkRepositoryConnection>>, TError,CheckRepositoryConnectionMutationVariables, TContext> => {
+
+const mutationKey = getCheckRepositoryConnectionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkRepositoryConnection>>, CheckRepositoryConnectionMutationVariables> = (props) => {
+          const {tenantSlug,data} = props ?? {};
+
+          return  checkRepositoryConnection(tenantSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** CheckRepositoryConnectionMutationResult is generated from the Meridian OpenAPI contract for check repository connection mutation result. */
+    export type CheckRepositoryConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof checkRepositoryConnection>>>
+    /** CheckRepositoryConnectionMutationBody is the request body type for its generated OpenAPI operation. */
+    export type CheckRepositoryConnectionMutationBody = RepositoryConnectionCheckRequest
+    /** CheckRepositoryConnectionMutationError is generated from the Meridian OpenAPI contract for check repository connection mutation error. */
+    export type CheckRepositoryConnectionMutationError = ErrorResponse
+    /** CheckRepositoryConnectionMutationVariables is generated from the Meridian OpenAPI contract for check repository connection mutation variables. */
+    export type CheckRepositoryConnectionMutationVariables = {/** TenantSlug carries the tenant slug value for CheckRepositoryConnectionMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: RepositoryConnectionCheckRequest}
+
+    /** useCheckRepositoryConnection executes its OpenAPI operation through TanStack Vue Query. */
+    export const useCheckRepositoryConnection = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkRepositoryConnection>>, TError,CheckRepositoryConnectionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof checkRepositoryConnection>>,
+        TError,
+        CheckRepositoryConnectionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCheckRepositoryConnectionMutationOptions(options), queryClient);
+    }
     /** receiveGitWebhookResponse202 represents a declared HTTP response from the receive git webhook response202 operation. */
     export type receiveGitWebhookResponse202 = {
   /** Data contains the decoded response payload. */
-  data: JobAcceptedResponse
+  data: JobAccepted
   /** Status is the HTTP response status code. */
   status: 202
 }
@@ -1622,7 +1618,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** receiveGitWebhookResponse401 represents a declared HTTP response from the receive git webhook response401 operation. */
 export type receiveGitWebhookResponse401 = {
   /** Data contains the decoded response payload. */
-  data: UnauthenticatedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 401
 }
@@ -1630,7 +1626,7 @@ export type receiveGitWebhookResponse401 = {
 /** receiveGitWebhookResponse404 represents a declared HTTP response from the receive git webhook response404 operation. */
 export type receiveGitWebhookResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1685,7 +1681,7 @@ return meridianFetch<receiveGitWebhookResponse>(getReceiveGitWebhookUrl(reposito
 export const getReceiveGitWebhookMutationKey = () => ['receiveGitWebhook'] as const;
 
 /** getReceiveGitWebhookMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getReceiveGitWebhookMutationOptions = <TError = UnauthenticatedResponse | NotFoundResponse,
+export const getReceiveGitWebhookMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveGitWebhook>>, TError,ReceiveGitWebhookMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof receiveGitWebhook>>, TError,ReceiveGitWebhookMutationVariables, TContext> => {
 
@@ -1717,12 +1713,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** ReceiveGitWebhookMutationBody is the request body type for its generated OpenAPI operation. */
     export type ReceiveGitWebhookMutationBody = GitPushWebhook
     /** ReceiveGitWebhookMutationError is generated from the Meridian OpenAPI contract for receive git webhook mutation error. */
-    export type ReceiveGitWebhookMutationError = UnauthenticatedResponse | NotFoundResponse
+    export type ReceiveGitWebhookMutationError = ErrorResponse
     /** ReceiveGitWebhookMutationVariables is generated from the Meridian OpenAPI contract for receive git webhook mutation variables. */
     export type ReceiveGitWebhookMutationVariables = {/** RepositoryId carries the repository id value for ReceiveGitWebhookMutationVariables. */ repositoryId: string;/** Data contains the decoded response payload. */ data: GitPushWebhook}
 
     /** useReceiveGitWebhook executes its OpenAPI operation through TanStack Vue Query. */
-    export const useReceiveGitWebhook = <TError = UnauthenticatedResponse | NotFoundResponse,
+    export const useReceiveGitWebhook = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveGitWebhook>>, TError,ReceiveGitWebhookMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof receiveGitWebhook>>,

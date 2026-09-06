@@ -5,13 +5,28 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
-import type { PageInfo } from './pageInfo.ts';
 import type { PlatformJob } from './platformJob.ts';
 
 /**
  * contains one paginated page of platform job records.
  */
-export type PlatformJobPage = PageInfo & {
+export interface PlatformJobPage {
+  /**
+     * is the number of matching records across all pages.
+     * @minimum 0
+     */
+  total: number;
+  /**
+     * is the one-based page number.
+     * @minimum 1
+     */
+  page: number;
+  /**
+     * is the maximum number of records returned on one page.
+     * @minimum 1
+     * @maximum 100
+     */
+  pageSize: number;
   /** contains the ordered items associated with this platform job page. */
   items: PlatformJob[];
-};
+}

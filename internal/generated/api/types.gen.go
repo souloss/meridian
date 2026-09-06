@@ -91,24 +91,6 @@ func (e ConfigImportApplyRequestDefaultResolution) Valid() bool {
 	}
 }
 
-// Defines values for ConfigImportApplyRequestFieldResolutions.
-const (
-	ConfigImportApplyRequestFieldResolutionsKeepDb   ConfigImportApplyRequestFieldResolutions = "keep_db"
-	ConfigImportApplyRequestFieldResolutionsTakeFile ConfigImportApplyRequestFieldResolutions = "take_file"
-)
-
-// Valid indicates whether the value is a known member of the ConfigImportApplyRequestFieldResolutions enum.
-func (e ConfigImportApplyRequestFieldResolutions) Valid() bool {
-	switch e {
-	case ConfigImportApplyRequestFieldResolutionsKeepDb:
-		return true
-	case ConfigImportApplyRequestFieldResolutionsTakeFile:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for ConfigSource.
 const (
 	DbManual      ConfigSource = "db_manual"
@@ -132,12 +114,11 @@ func (e ConfigSource) Valid() bool {
 
 // Defines values for ConnectionTestErrorClass.
 const (
-	ConnectionTestErrorClassAuth        ConnectionTestErrorClass = "auth"
-	ConnectionTestErrorClassDns         ConnectionTestErrorClass = "dns"
-	ConnectionTestErrorClassHostKey     ConnectionTestErrorClass = "host_key"
-	ConnectionTestErrorClassLessThannil ConnectionTestErrorClass = "<nil>"
-	ConnectionTestErrorClassOther       ConnectionTestErrorClass = "other"
-	ConnectionTestErrorClassTimeout     ConnectionTestErrorClass = "timeout"
+	ConnectionTestErrorClassAuth    ConnectionTestErrorClass = "auth"
+	ConnectionTestErrorClassDns     ConnectionTestErrorClass = "dns"
+	ConnectionTestErrorClassHostKey ConnectionTestErrorClass = "host_key"
+	ConnectionTestErrorClassOther   ConnectionTestErrorClass = "other"
+	ConnectionTestErrorClassTimeout ConnectionTestErrorClass = "timeout"
 )
 
 // Valid indicates whether the value is a known member of the ConnectionTestErrorClass enum.
@@ -148,8 +129,6 @@ func (e ConnectionTestErrorClass) Valid() bool {
 	case ConnectionTestErrorClassDns:
 		return true
 	case ConnectionTestErrorClassHostKey:
-		return true
-	case ConnectionTestErrorClassLessThannil:
 		return true
 	case ConnectionTestErrorClassOther:
 		return true
@@ -433,27 +412,6 @@ func (e DomainEventType) Valid() bool {
 	}
 }
 
-// Defines values for DriftResolutionRequestFields.
-const (
-	DriftResolutionRequestFieldsIgnore   DriftResolutionRequestFields = "ignore"
-	DriftResolutionRequestFieldsKeepDb   DriftResolutionRequestFields = "keep_db"
-	DriftResolutionRequestFieldsTakeFile DriftResolutionRequestFields = "take_file"
-)
-
-// Valid indicates whether the value is a known member of the DriftResolutionRequestFields enum.
-func (e DriftResolutionRequestFields) Valid() bool {
-	switch e {
-	case DriftResolutionRequestFieldsIgnore:
-		return true
-	case DriftResolutionRequestFieldsKeepDb:
-		return true
-	case DriftResolutionRequestFieldsTakeFile:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for DriftResolutionRequestResolution.
 const (
 	DriftResolutionRequestResolutionIgnore   DriftResolutionRequestResolution = "ignore"
@@ -477,94 +435,112 @@ func (e DriftResolutionRequestResolution) Valid() bool {
 
 // Defines values for ErrorCode.
 const (
-	ErrorCodeAiDisabled                 ErrorCode = "ai_disabled"
-	ErrorCodeAssetPathNotFound          ErrorCode = "asset_path_not_found"
-	ErrorCodeBaseLayerExists            ErrorCode = "base_layer_exists"
-	ErrorCodeBranchNotIndexed           ErrorCode = "branch_not_indexed"
-	ErrorCodeConfigImportConflict       ErrorCode = "config_import_conflict"
-	ErrorCodeContentTooLarge            ErrorCode = "content_too_large"
-	ErrorCodeCredentialInUse            ErrorCode = "credential_in_use"
-	ErrorCodeCsrfInvalid                ErrorCode = "csrf_invalid"
-	ErrorCodeDuplicate                  ErrorCode = "duplicate"
-	ErrorCodeIdempotencyConflict        ErrorCode = "idempotency_conflict"
-	ErrorCodeInputSpecMismatch          ErrorCode = "input_spec_mismatch"
-	ErrorCodeInternalError              ErrorCode = "internal_error"
-	ErrorCodeInvalidState               ErrorCode = "invalid_state"
-	ErrorCodeJobNotCancellable          ErrorCode = "job_not_cancellable"
-	ErrorCodeKindDisabled               ErrorCode = "kind_disabled"
-	ErrorCodeLastAdmin                  ErrorCode = "last_admin"
-	ErrorCodeNestingTooDeep             ErrorCode = "nesting_too_deep"
-	ErrorCodeNotFound                   ErrorCode = "not_found"
-	ErrorCodeOverlayInvalid             ErrorCode = "overlay_invalid"
-	ErrorCodePreconditionFailed         ErrorCode = "precondition_failed"
-	ErrorCodeProducerProfileUnavailable ErrorCode = "producer_profile_unavailable"
-	ErrorCodeQuotaExceeded              ErrorCode = "quota_exceeded"
-	ErrorCodeRateLimited                ErrorCode = "rate_limited"
-	ErrorCodeUnauthenticated            ErrorCode = "unauthenticated"
-	ErrorCodeUnsupportedKind            ErrorCode = "unsupported_kind"
-	ErrorCodeUploadExpired              ErrorCode = "upload_expired"
-	ErrorCodeValidationError            ErrorCode = "validation_error"
-	ErrorCodeVersionNotPublishable      ErrorCode = "version_not_publishable"
+	AiDisabled                 ErrorCode = "ai_disabled"
+	AssetPathNotFound          ErrorCode = "asset_path_not_found"
+	BaseLayerExists            ErrorCode = "base_layer_exists"
+	BranchNotIndexed           ErrorCode = "branch_not_indexed"
+	ConfigImportConflict       ErrorCode = "config_import_conflict"
+	ContentTooLarge            ErrorCode = "content_too_large"
+	CredentialInUse            ErrorCode = "credential_in_use"
+	CsrfInvalid                ErrorCode = "csrf_invalid"
+	Duplicate                  ErrorCode = "duplicate"
+	IdempotencyConflict        ErrorCode = "idempotency_conflict"
+	InputSpecMismatch          ErrorCode = "input_spec_mismatch"
+	InternalError              ErrorCode = "internal_error"
+	InvalidState               ErrorCode = "invalid_state"
+	JobNotCancellable          ErrorCode = "job_not_cancellable"
+	KindDisabled               ErrorCode = "kind_disabled"
+	LastAdmin                  ErrorCode = "last_admin"
+	NestingTooDeep             ErrorCode = "nesting_too_deep"
+	NotFound                   ErrorCode = "not_found"
+	OverlayInvalid             ErrorCode = "overlay_invalid"
+	PreconditionFailed         ErrorCode = "precondition_failed"
+	ProducerProfileUnavailable ErrorCode = "producer_profile_unavailable"
+	QuotaExceeded              ErrorCode = "quota_exceeded"
+	RateLimited                ErrorCode = "rate_limited"
+	Unauthenticated            ErrorCode = "unauthenticated"
+	UnsupportedKind            ErrorCode = "unsupported_kind"
+	UploadExpired              ErrorCode = "upload_expired"
+	ValidationError            ErrorCode = "validation_error"
+	VersionNotPublishable      ErrorCode = "version_not_publishable"
 )
 
 // Valid indicates whether the value is a known member of the ErrorCode enum.
 func (e ErrorCode) Valid() bool {
 	switch e {
-	case ErrorCodeAiDisabled:
+	case AiDisabled:
 		return true
-	case ErrorCodeAssetPathNotFound:
+	case AssetPathNotFound:
 		return true
-	case ErrorCodeBaseLayerExists:
+	case BaseLayerExists:
 		return true
-	case ErrorCodeBranchNotIndexed:
+	case BranchNotIndexed:
 		return true
-	case ErrorCodeConfigImportConflict:
+	case ConfigImportConflict:
 		return true
-	case ErrorCodeContentTooLarge:
+	case ContentTooLarge:
 		return true
-	case ErrorCodeCredentialInUse:
+	case CredentialInUse:
 		return true
-	case ErrorCodeCsrfInvalid:
+	case CsrfInvalid:
 		return true
-	case ErrorCodeDuplicate:
+	case Duplicate:
 		return true
-	case ErrorCodeIdempotencyConflict:
+	case IdempotencyConflict:
 		return true
-	case ErrorCodeInputSpecMismatch:
+	case InputSpecMismatch:
 		return true
-	case ErrorCodeInternalError:
+	case InternalError:
 		return true
-	case ErrorCodeInvalidState:
+	case InvalidState:
 		return true
-	case ErrorCodeJobNotCancellable:
+	case JobNotCancellable:
 		return true
-	case ErrorCodeKindDisabled:
+	case KindDisabled:
 		return true
-	case ErrorCodeLastAdmin:
+	case LastAdmin:
 		return true
-	case ErrorCodeNestingTooDeep:
+	case NestingTooDeep:
 		return true
-	case ErrorCodeNotFound:
+	case NotFound:
 		return true
-	case ErrorCodeOverlayInvalid:
+	case OverlayInvalid:
 		return true
-	case ErrorCodePreconditionFailed:
+	case PreconditionFailed:
 		return true
-	case ErrorCodeProducerProfileUnavailable:
+	case ProducerProfileUnavailable:
 		return true
-	case ErrorCodeQuotaExceeded:
+	case QuotaExceeded:
 		return true
-	case ErrorCodeRateLimited:
+	case RateLimited:
 		return true
-	case ErrorCodeUnauthenticated:
+	case Unauthenticated:
 		return true
-	case ErrorCodeUnsupportedKind:
+	case UnsupportedKind:
 		return true
-	case ErrorCodeUploadExpired:
+	case UploadExpired:
 		return true
-	case ErrorCodeValidationError:
+	case ValidationError:
 		return true
-	case ErrorCodeVersionNotPublishable:
+	case VersionNotPublishable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ExportFormat.
+const (
+	ExportFormatJson     ExportFormat = "json"
+	ExportFormatMarkdown ExportFormat = "markdown"
+)
+
+// Valid indicates whether the value is a known member of the ExportFormat enum.
+func (e ExportFormat) Valid() bool {
+	switch e {
+	case ExportFormatJson:
+		return true
+	case ExportFormatMarkdown:
 		return true
 	default:
 		return false
@@ -825,49 +801,49 @@ func (e JobTrigger) Valid() bool {
 
 // Defines values for JobType.
 const (
-	JobTypeAssetAiGenerate  JobType = "asset.ai_generate"
-	JobTypeAssetIndex       JobType = "asset.index"
-	JobTypeAssetMerge       JobType = "asset.merge"
-	JobTypeAssetProduce     JobType = "asset.produce"
-	JobTypeAssetReindex     JobType = "asset.reindex"
-	JobTypeBlobGc           JobType = "blob.gc"
-	JobTypeDiffRun          JobType = "diff.run"
-	JobTypeOutboxDispatch   JobType = "outbox.dispatch"
-	JobTypeRepoDiscover     JobType = "repo.discover"
-	JobTypeRepoSync         JobType = "repo.sync"
-	JobTypeRetentionCleanup JobType = "retention.cleanup"
-	JobTypeTenantDelete     JobType = "tenant.delete"
-	JobTypeWorkspaceGc      JobType = "workspace.gc"
+	AssetAiGenerate  JobType = "asset.ai_generate"
+	AssetIndex       JobType = "asset.index"
+	AssetMerge       JobType = "asset.merge"
+	AssetProduce     JobType = "asset.produce"
+	AssetReindex     JobType = "asset.reindex"
+	BlobGc           JobType = "blob.gc"
+	DiffRun          JobType = "diff.run"
+	OutboxDispatch   JobType = "outbox.dispatch"
+	RepoDiscover     JobType = "repo.discover"
+	RepoSync         JobType = "repo.sync"
+	RetentionCleanup JobType = "retention.cleanup"
+	TenantDelete     JobType = "tenant.delete"
+	WorkspaceGc      JobType = "workspace.gc"
 )
 
 // Valid indicates whether the value is a known member of the JobType enum.
 func (e JobType) Valid() bool {
 	switch e {
-	case JobTypeAssetAiGenerate:
+	case AssetAiGenerate:
 		return true
-	case JobTypeAssetIndex:
+	case AssetIndex:
 		return true
-	case JobTypeAssetMerge:
+	case AssetMerge:
 		return true
-	case JobTypeAssetProduce:
+	case AssetProduce:
 		return true
-	case JobTypeAssetReindex:
+	case AssetReindex:
 		return true
-	case JobTypeBlobGc:
+	case BlobGc:
 		return true
-	case JobTypeDiffRun:
+	case DiffRun:
 		return true
-	case JobTypeOutboxDispatch:
+	case OutboxDispatch:
 		return true
-	case JobTypeRepoDiscover:
+	case RepoDiscover:
 		return true
-	case JobTypeRepoSync:
+	case RepoSync:
 		return true
-	case JobTypeRetentionCleanup:
+	case RetentionCleanup:
 		return true
-	case JobTypeTenantDelete:
+	case TenantDelete:
 		return true
-	case JobTypeWorkspaceGc:
+	case WorkspaceGc:
 		return true
 	default:
 		return false
@@ -1105,27 +1081,6 @@ func (e NotificationChannelKind) Valid() bool {
 	}
 }
 
-// Defines values for OverlayDialect.
-const (
-	OverlayDialectNone         OverlayDialect = "none"
-	OverlayDialectOasOverlay10 OverlayDialect = "oas-overlay-1.0"
-	OverlayDialectPlatformV1   OverlayDialect = "platform-v1"
-)
-
-// Valid indicates whether the value is a known member of the OverlayDialect enum.
-func (e OverlayDialect) Valid() bool {
-	switch e {
-	case OverlayDialectNone:
-		return true
-	case OverlayDialectOasOverlay10:
-		return true
-	case OverlayDialectPlatformV1:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for PipelineStage.
 const (
 	Discover  PipelineStage = "discover"
@@ -1176,16 +1131,16 @@ func (e ProducerDependencyStatus) Valid() bool {
 
 // Defines values for ProducerNetworkMode.
 const (
-	ProducerNetworkModeInherit ProducerNetworkMode = "inherit"
-	ProducerNetworkModeNone    ProducerNetworkMode = "none"
+	Inherit ProducerNetworkMode = "inherit"
+	None    ProducerNetworkMode = "none"
 )
 
 // Valid indicates whether the value is a known member of the ProducerNetworkMode enum.
 func (e ProducerNetworkMode) Valid() bool {
 	switch e {
-	case ProducerNetworkModeInherit:
+	case Inherit:
 		return true
-	case ProducerNetworkModeNone:
+	case None:
 		return true
 	default:
 		return false
@@ -1740,19 +1695,19 @@ func (e TodoStatus) Valid() bool {
 
 // Defines values for TokenScope.
 const (
-	TokenScopeAssetPush TokenScope = "asset:push"
-	TokenScopeAssetRead TokenScope = "asset:read"
-	TokenScopeJobRun    TokenScope = "job:run"
+	AssetPush TokenScope = "asset:push"
+	AssetRead TokenScope = "asset:read"
+	JobRun    TokenScope = "job:run"
 )
 
 // Valid indicates whether the value is a known member of the TokenScope enum.
 func (e TokenScope) Valid() bool {
 	switch e {
-	case TokenScopeAssetPush:
+	case AssetPush:
 		return true
-	case TokenScopeAssetRead:
+	case AssetRead:
 		return true
-	case TokenScopeJobRun:
+	case JobRun:
 		return true
 	default:
 		return false
@@ -2035,42 +1990,6 @@ func (e ViewInputSpecScopes) Valid() bool {
 	}
 }
 
-// Defines values for ExportFormat.
-const (
-	ExportFormatJson     ExportFormat = "json"
-	ExportFormatMarkdown ExportFormat = "markdown"
-)
-
-// Valid indicates whether the value is a known member of the ExportFormat enum.
-func (e ExportFormat) Valid() bool {
-	switch e {
-	case ExportFormatJson:
-		return true
-	case ExportFormatMarkdown:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for Order.
-const (
-	Asc  Order = "asc"
-	Desc Order = "desc"
-)
-
-// Valid indicates whether the value is a known member of the Order enum.
-func (e Order) Valid() bool {
-	switch e {
-	case Asc:
-		return true
-	case Desc:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for WebhookEvent.
 const (
 	WebhookEventPush WebhookEvent = "push"
@@ -2080,39 +1999,6 @@ const (
 func (e WebhookEvent) Valid() bool {
 	switch e {
 	case WebhookEventPush:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for ExportDiffSnapshotParamsFormat.
-const (
-	ExportDiffSnapshotParamsFormatJson     ExportDiffSnapshotParamsFormat = "json"
-	ExportDiffSnapshotParamsFormatMarkdown ExportDiffSnapshotParamsFormat = "markdown"
-)
-
-// Valid indicates whether the value is a known member of the ExportDiffSnapshotParamsFormat enum.
-func (e ExportDiffSnapshotParamsFormat) Valid() bool {
-	switch e {
-	case ExportDiffSnapshotParamsFormatJson:
-		return true
-	case ExportDiffSnapshotParamsFormatMarkdown:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for ReceiveGitWebhookParamsXMeridianEvent.
-const (
-	ReceiveGitWebhookParamsXMeridianEventPush ReceiveGitWebhookParamsXMeridianEvent = "push"
-)
-
-// Valid indicates whether the value is a known member of the ReceiveGitWebhookParamsXMeridianEvent enum.
-func (e ReceiveGitWebhookParamsXMeridianEvent) Valid() bool {
-	switch e {
-	case ReceiveGitWebhookParamsXMeridianEventPush:
 		return true
 	default:
 		return false
@@ -2238,6 +2124,9 @@ type AssetAiGenerateRequest struct {
 	// SourceId identifies the source associated with this resource.
 	SourceId nullable.Nullable[Uuid] `json:"sourceId,omitempty"`
 }
+
+// AssetId UUID v7
+type AssetId = Uuid
 
 // AssetItem represents asset item data exchanged through the Meridian API.
 type AssetItem struct {
@@ -2422,7 +2311,7 @@ type AssetVersion struct {
 	DiffSummary nullable.Nullable[DiffCounts] `json:"diffSummary"`
 
 	// Downloads specifies the downloads associated with this asset version.
-	Downloads map[string]string `json:"downloads"`
+	Downloads map[string]any `json:"downloads"`
 
 	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
@@ -2440,7 +2329,7 @@ type AssetVersion struct {
 	KindPluginVersion string `json:"kindPluginVersion"`
 
 	// Labels specifies the labels associated with this asset version.
-	Labels map[string]string `json:"labels"`
+	Labels map[string]any `json:"labels"`
 
 	// LayerManifest contains the ordered layer manifest associated with this asset version.
 	LayerManifest []LayerManifestEntry `json:"layerManifest"`
@@ -2551,6 +2440,9 @@ type AuditFilter struct {
 	To *Timestamp `json:"to,omitempty"`
 }
 
+// AuditFilters defines supported filters for selecting audit records.
+type AuditFilters = AuditFilter
+
 // AuditLogPage contains one paginated page of audit log records.
 type AuditLogPage struct {
 	// Items contains the ordered items associated with this audit log page.
@@ -2623,6 +2515,9 @@ type BreakingTodoPage struct {
 	Total int `json:"total"`
 }
 
+// CandidateId UUID v7
+type CandidateId = Uuid
+
 // CandidateOverride represents candidate override data exchanged through the Meridian API.
 type CandidateOverride struct {
 	// CandidateId contains the uuid associated with this candidate override.
@@ -2664,6 +2559,12 @@ type CandidatesAcceptRequest struct {
 
 // CapabilityList contains an ordered collection of capability values.
 type CapabilityList = []string
+
+// CapabilityListItem contains an ordered collection of capability values.
+type CapabilityListItem = []string
+
+// ChannelId UUID v7
+type ChannelId = Uuid
 
 // Comment represents comment data exchanged through the Meridian API.
 type Comment struct {
@@ -2731,7 +2632,7 @@ type ConfigImportApplyRequest struct {
 	DefaultResolution ConfigImportApplyRequestDefaultResolution `json:"defaultResolution"`
 
 	// FieldResolutions specifies the field resolutions associated with this config import apply request.
-	FieldResolutions *map[string]ConfigImportApplyRequestFieldResolutions `json:"fieldResolutions,omitempty"`
+	FieldResolutions *map[string]any `json:"fieldResolutions,omitempty"`
 
 	// ReplaceAiBases Explicitly applies the domain baseReplacement transaction for matching repository bases.
 	ReplaceAiBases *bool `json:"replaceAiBases,omitempty"`
@@ -2739,9 +2640,6 @@ type ConfigImportApplyRequest struct {
 
 // ConfigImportApplyRequestDefaultResolution specifies the default resolution associated with this config import apply request.
 type ConfigImportApplyRequestDefaultResolution string
-
-// ConfigImportApplyRequestFieldResolutions defines model for ConfigImportApplyRequest.FieldResolutions.
-type ConfigImportApplyRequestFieldResolutions string
 
 // ConfigImportPreview represents config import preview data exchanged through the Meridian API.
 type ConfigImportPreview struct {
@@ -2818,7 +2716,7 @@ type ConnectionTest struct {
 	Ok bool `json:"ok"`
 }
 
-// ConnectionTestErrorClass specifies the error class associated with this connection test.
+// ConnectionTestErrorClass defines model for ConnectionTest.ErrorClass.
 type ConnectionTestErrorClass string
 
 // ConnectionTestRequest defines validated input for the corresponding Meridian API operation.
@@ -2826,6 +2724,9 @@ type ConnectionTestRequest struct {
 	// RepositoryUrl contains the git remote url associated with this connection test request.
 	RepositoryUrl GitRemoteUrl `json:"repositoryUrl"`
 }
+
+// ContentToken defines model for ContentToken.
+type ContentToken = string
 
 // ContentType identifies one supported content type value.
 type ContentType string
@@ -2879,54 +2780,57 @@ type CredentialCreateRequest struct {
 
 // CredentialCreateRequest0 defines model for CredentialCreateRequest.0.
 type CredentialCreateRequest0 struct {
-	// Kind specifies the kind associated with this credential create request.
+	// Kind specifies the kind value.
 	Kind CredentialCreateRequest0Kind `json:"kind"`
 
-	// Name specifies the name associated with this credential create request.
+	// Name specifies the name value.
 	Name string `json:"name"`
 
-	// SharedScope specifies the shared scope associated with this credential create request.
+	// SharedScope specifies the sharedScope value.
 	SharedScope *CredentialCreateRequest0SharedScope `json:"sharedScope,omitempty"`
 
-	// SshKey contains the ssh secret input associated with this credential create request.
+	// SshKey specifies the sshKey value.
 	SshKey SshSecretInput `json:"sshKey"`
 
-	// TeamIds contains the ordered team ids associated with this credential create request.
+	// TeamIds specifies the teamIds value.
 	TeamIds *[]Uuid `json:"teamIds,omitempty"`
 }
 
-// CredentialCreateRequest0Kind specifies the kind associated with this credential create request.
+// CredentialCreateRequest0Kind specifies the kind value.
 type CredentialCreateRequest0Kind string
 
-// CredentialCreateRequest0SharedScope specifies the shared scope associated with this credential create request.
+// CredentialCreateRequest0SharedScope specifies the sharedScope value.
 type CredentialCreateRequest0SharedScope string
 
 // CredentialCreateRequest1 defines model for CredentialCreateRequest.1.
 type CredentialCreateRequest1 struct {
-	// HttpToken contains the http secret input associated with this credential create request.
+	// HttpToken specifies the httpToken value.
 	HttpToken HttpSecretInput `json:"httpToken"`
 
-	// Kind specifies the kind associated with this credential create request.
+	// Kind specifies the kind value.
 	Kind CredentialCreateRequest1Kind `json:"kind"`
 
-	// Name specifies the name associated with this credential create request.
+	// Name specifies the name value.
 	Name string `json:"name"`
 
-	// SharedScope specifies the shared scope associated with this credential create request.
+	// SharedScope specifies the sharedScope value.
 	SharedScope *CredentialCreateRequest1SharedScope `json:"sharedScope,omitempty"`
 
-	// TeamIds contains the ordered team ids associated with this credential create request.
+	// TeamIds specifies the teamIds value.
 	TeamIds *[]Uuid `json:"teamIds,omitempty"`
 }
 
-// CredentialCreateRequest1Kind specifies the kind associated with this credential create request.
+// CredentialCreateRequest1Kind specifies the kind value.
 type CredentialCreateRequest1Kind string
 
-// CredentialCreateRequest1SharedScope specifies the shared scope associated with this credential create request.
+// CredentialCreateRequest1SharedScope specifies the sharedScope value.
 type CredentialCreateRequest1SharedScope string
 
 // CredentialFingerprint SSH uses the OpenSSH SHA256 public-key fingerprint; HTTP tokens use the keyed fingerprint defined in domain.yaml; both encode 32 digest bytes without padding.
 type CredentialFingerprint = string
+
+// CredentialId UUID v7
+type CredentialId = Uuid
 
 // CredentialKind identifies one supported credential kind value.
 type CredentialKind string
@@ -3304,14 +3208,11 @@ type DriftResolutionRequest struct {
 	ConfigDigest string `json:"configDigest"`
 
 	// Fields specifies the fields associated with this drift resolution request.
-	Fields *map[string]DriftResolutionRequestFields `json:"fields,omitempty"`
+	Fields *map[string]any `json:"fields,omitempty"`
 
 	// Resolution specifies the resolution associated with this drift resolution request.
 	Resolution DriftResolutionRequestResolution `json:"resolution"`
 }
-
-// DriftResolutionRequestFields defines model for DriftResolutionRequest.Fields.
-type DriftResolutionRequestFields string
 
 // DriftResolutionRequestResolution specifies the resolution associated with this drift resolution request.
 type DriftResolutionRequestResolution string
@@ -3336,6 +3237,9 @@ type ErrorResponse struct {
 	// RequestId correlates this result with server logs and audit records.
 	RequestId string `json:"requestId"`
 }
+
+// ExportFormat defines model for ExportFormat.
+type ExportFormat string
 
 // ExternalRevisionTrustMode identifies one supported external revision trust mode value.
 type ExternalRevisionTrustMode string
@@ -3367,18 +3271,6 @@ type FetchConfig struct {
 // FetchConfigKnownHostPolicy specifies the known host policy associated with this fetch config.
 type FetchConfigKnownHostPolicy string
 
-// FieldError represents field error data exchanged through the Meridian API.
-type FieldError struct {
-	// Message specifies the message associated with this field error.
-	Message string `json:"message"`
-
-	// Path specifies the path associated with this field error.
-	Path string `json:"path"`
-
-	// Rule specifies the rule associated with this field error.
-	Rule nullable.Nullable[string] `json:"rule,omitempty"`
-}
-
 // FieldSource represents field source data exchanged through the Meridian API.
 type FieldSource struct {
 	// Pointer specifies the pointer associated with this field source.
@@ -3387,6 +3279,9 @@ type FieldSource struct {
 	// Source contains the config source associated with this field source.
 	Source ConfigSource `json:"source"`
 }
+
+// Force defines model for Force.
+type Force = bool
 
 // GitPushWebhook afterCommit is null exactly when deleted is true; beforeCommit may be null for a new ref.
 type GitPushWebhook struct {
@@ -3449,32 +3344,32 @@ type GlobalCredentialCreateRequest struct {
 
 // GlobalCredentialCreateRequest0 defines model for GlobalCredentialCreateRequest.0.
 type GlobalCredentialCreateRequest0 struct {
-	// Kind specifies the kind associated with this global credential create request.
+	// Kind specifies the kind value.
 	Kind GlobalCredentialCreateRequest0Kind `json:"kind"`
 
-	// Name specifies the name associated with this global credential create request.
+	// Name specifies the name value.
 	Name string `json:"name"`
 
-	// SshKey contains the ssh secret input associated with this global credential create request.
+	// SshKey specifies the sshKey value.
 	SshKey SshSecretInput `json:"sshKey"`
 }
 
-// GlobalCredentialCreateRequest0Kind specifies the kind associated with this global credential create request.
+// GlobalCredentialCreateRequest0Kind specifies the kind value.
 type GlobalCredentialCreateRequest0Kind string
 
 // GlobalCredentialCreateRequest1 defines model for GlobalCredentialCreateRequest.1.
 type GlobalCredentialCreateRequest1 struct {
-	// HttpToken contains the http secret input associated with this global credential create request.
+	// HttpToken specifies the httpToken value.
 	HttpToken HttpSecretInput `json:"httpToken"`
 
-	// Kind specifies the kind associated with this global credential create request.
+	// Kind specifies the kind value.
 	Kind GlobalCredentialCreateRequest1Kind `json:"kind"`
 
-	// Name specifies the name associated with this global credential create request.
+	// Name specifies the name value.
 	Name string `json:"name"`
 }
 
-// GlobalCredentialCreateRequest1Kind specifies the kind associated with this global credential create request.
+// GlobalCredentialCreateRequest1Kind specifies the kind value.
 type GlobalCredentialCreateRequest1Kind string
 
 // GlobalCredentialPage contains one paginated page of global credential records.
@@ -3558,6 +3453,9 @@ type GraphViewResolution struct {
 // GraphViewResolutionKind specifies the kind associated with this graph view resolution.
 type GraphViewResolutionKind string
 
+// GroupId UUID v7
+type GroupId = Uuid
+
 // Health reports successful liveness or readiness evaluation.
 type Health struct {
 	// Status is ok when the requested health check succeeds.
@@ -3570,11 +3468,17 @@ type HealthStatus string
 // HttpSecretInput carries write-only HTTP basic or token credentials for encryption at rest.
 type HttpSecretInput struct {
 	// Token is secret bearer material and must never be logged or persisted as plaintext.
-	Token *string `json:"token,omitempty"`
+	Token string `json:"token"`
 
 	// Username specifies the username associated with this http secret input.
 	Username string `json:"username"`
 }
+
+// IdempotencyKey defines model for IdempotencyKey.
+type IdempotencyKey = openapi_types.UUID
+
+// IfMatch Opaque HTTP entity tag including quotes
+type IfMatch = ETag
 
 // ItemsViewResolution represents items view resolution data exchanged through the Meridian API.
 type ItemsViewResolution struct {
@@ -3687,6 +3591,12 @@ type JobFilter struct {
 	Types *[]JobType `json:"types,omitempty"`
 }
 
+// JobFilters defines supported filters for selecting job records.
+type JobFilters = JobFilter
+
+// JobId UUID v7
+type JobId = Uuid
+
 // JobLogEvent represents a job log event emitted by Meridian.
 type JobLogEvent struct {
 	// At contains the timestamp associated with this job log event.
@@ -3782,6 +3692,9 @@ type JobTrigger string
 // JobType identifies one supported job type value.
 type JobType string
 
+// KindFilter identifies an asset kind registered in contracts/kinds.yaml.
+type KindFilter = KindId
+
 // KindId identifies an asset kind registered in contracts/kinds.yaml.
 type KindId = string
 
@@ -3863,6 +3776,9 @@ type KnownHostPage struct {
 	Total int `json:"total"`
 }
 
+// LastEventId defines model for LastEventId.
+type LastEventId = string
+
 // Layer represents layer data exchanged through the Meridian API.
 type Layer struct {
 	// AssetId identifies the asset associated with this resource.
@@ -3928,6 +3844,9 @@ type LayerHead struct {
 
 // LayerHeadScopeType specifies the scope type associated with this layer head.
 type LayerHeadScopeType string
+
+// LayerId UUID v7
+type LayerId = Uuid
 
 // LayerList contains an ordered collection of layer values.
 type LayerList struct {
@@ -4142,7 +4061,7 @@ type Lifecycle string
 // LoginRequest contains local credentials used to create a browser session.
 type LoginRequest struct {
 	// Password is the write-only plaintext password supplied for authentication.
-	Password *string `json:"password,omitempty"`
+	Password string `json:"password"`
 
 	// Username specifies the username associated with this login request.
 	Username string `json:"username"`
@@ -4355,8 +4274,11 @@ type NotificationChannelPatchRequest struct {
 // NotificationChannelRotateRequest defines validated input for the corresponding Meridian API operation.
 type NotificationChannelRotateRequest struct {
 	// Secret is write-only secret material and must never be returned by the API.
-	Secret *string `json:"secret,omitempty"`
+	Secret string `json:"secret"`
 }
+
+// NotificationId UUID v7
+type NotificationId = Uuid
 
 // NotificationPage contains one paginated page of notification records.
 type NotificationPage struct {
@@ -4376,9 +4298,6 @@ type NotificationPage struct {
 	UnreadCount int `json:"unreadCount"`
 }
 
-// OverlayDialect identifies one supported overlay dialect value.
-type OverlayDialect string
-
 // OwnerRefs represents owner refs data exchanged through the Meridian API.
 type OwnerRefs struct {
 	// TeamIds contains the ordered team ids associated with this owner refs.
@@ -4387,6 +4306,9 @@ type OwnerRefs struct {
 	// UserIds contains the ordered user ids associated with this owner refs.
 	UserIds []Uuid `json:"userIds"`
 }
+
+// Page defines model for Page.
+type Page = int
 
 // PageInfo represents page info data exchanged through the Meridian API.
 type PageInfo struct {
@@ -4399,6 +4321,9 @@ type PageInfo struct {
 	// Total is the number of matching records across all pages.
 	Total int `json:"total"`
 }
+
+// PageSize defines model for PageSize.
+type PageSize = int
 
 // PipelineStage identifies one supported pipeline stage value.
 type PipelineStage string
@@ -4426,6 +4351,9 @@ type PlatformAuditFilter struct {
 	// To contains the timestamp associated with this platform audit filter.
 	To *Timestamp `json:"to,omitempty"`
 }
+
+// PlatformAuditFilters defines supported filters for selecting platform audit records.
+type PlatformAuditFilters = PlatformAuditFilter
 
 // PlatformJob represents platform job data exchanged through the Meridian API.
 type PlatformJob struct {
@@ -4481,6 +4409,9 @@ type PlatformJobFilter struct {
 	Types *[]JobType `json:"types,omitempty"`
 }
 
+// PlatformJobFilters defines supported filters for selecting platform job records.
+type PlatformJobFilters = PlatformJobFilter
+
 // PlatformJobPage contains one paginated page of platform job records.
 type PlatformJobPage struct {
 	// Items contains the ordered items associated with this platform job page.
@@ -4508,7 +4439,7 @@ type PlatformSettings struct {
 	DefaultTenantSettings TenantSettingsTemplate `json:"defaultTenantSettings"`
 
 	// DefaultViewOverrides specifies the default view overrides associated with this platform settings.
-	DefaultViewOverrides map[string]ViewOverrideValue `json:"defaultViewOverrides"`
+	DefaultViewOverrides map[string]any `json:"defaultViewOverrides"`
 
 	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
@@ -4526,8 +4457,11 @@ type PlatformSettingsPatchRequest struct {
 	DefaultTenantSettings *TenantSettingsTemplate `json:"defaultTenantSettings,omitempty"`
 
 	// DefaultViewOverrides specifies the default view overrides associated with this platform settings patch request.
-	DefaultViewOverrides *map[string]ViewOverrideValue `json:"defaultViewOverrides,omitempty"`
+	DefaultViewOverrides *map[string]any `json:"defaultViewOverrides,omitempty"`
 }
+
+// PreviewId UUID v7
+type PreviewId = Uuid
 
 // ProduceSourceRequest defines validated input for the corresponding Meridian API operation.
 type ProduceSourceRequest struct {
@@ -4651,6 +4585,9 @@ type ProducerProfileCreateRequest struct {
 	// TimeoutSec Omitted values default to 300 seconds for command profiles and 600 seconds for ai profiles, as defined in domain.yaml.
 	TimeoutSec *int `json:"timeoutSec,omitempty"`
 }
+
+// ProducerProfileId UUID v7
+type ProducerProfileId = Uuid
 
 // ProducerProfileKind identifies one supported producer profile kind value.
 type ProducerProfileKind string
@@ -4820,6 +4757,9 @@ type PublicViewResolveRequest struct {
 // PublicViewResolveRequestViewId specifies the view id associated with this public view resolve request.
 type PublicViewResolveRequestViewId string
 
+// Query defines model for Query.
+type Query = string
+
 // Quota represents quota data exchanged through the Meridian API.
 type Quota struct {
 	// MaxCollectConcurrency specifies the max collect concurrency associated with this quota.
@@ -4979,6 +4919,9 @@ type RepositoryHealth struct {
 	LastSyncAt nullable.Nullable[Timestamp] `json:"lastSyncAt"`
 }
 
+// RepositoryId UUID v7
+type RepositoryId = Uuid
+
 // RepositoryPage contains one paginated page of repository records.
 type RepositoryPage struct {
 	// Items contains the ordered items associated with this repository page.
@@ -5035,6 +4978,9 @@ type RepositorySyncRequest struct {
 	// RefType contains the ref type associated with this repository sync request.
 	RefType *RefType `json:"refType,omitempty"`
 }
+
+// RequiredQuery defines model for RequiredQuery.
+type RequiredQuery = string
 
 // ResolvedDocumentRef Immutable resolution. version requires assetId/versionId and upload requires uploadId; requestedRef fields are informational and never re-resolved.
 type ResolvedDocumentRef struct {
@@ -5108,6 +5054,9 @@ type ReviewFilter struct {
 	Status *[]RevisionStatus `json:"status,omitempty"`
 }
 
+// ReviewFilters defines supported filters for selecting review records.
+type ReviewFilters = ReviewFilter
+
 // ReviewPage contains one paginated page of review records.
 type ReviewPage struct {
 	// Items contains the ordered items associated with this review page.
@@ -5128,6 +5077,9 @@ type RevisionApproveRequest struct {
 	// Comment specifies the comment associated with this revision approve request.
 	Comment nullable.Nullable[string] `json:"comment,omitempty"`
 }
+
+// RevisionId UUID v7
+type RevisionId = Uuid
 
 // RevisionRejectRequest defines validated input for the corresponding Meridian API operation.
 type RevisionRejectRequest struct {
@@ -5155,6 +5107,9 @@ type RevisionReviewResult struct {
 
 // RevisionStatus identifies one supported revision status value.
 type RevisionStatus string
+
+// RuleSetId UUID v7
+type RuleSetId = Uuid
 
 // ScopeSelector identifies the scope selected by a request.
 type ScopeSelector struct {
@@ -5222,6 +5177,9 @@ type SearchFacetSet struct {
 	Teams []SearchFacetBucket `json:"teams"`
 }
 
+// SearchFacets defines supported filters for selecting search records.
+type SearchFacets = SearchFilter
+
 // SearchFilter defines supported filters for selecting search records.
 type SearchFilter struct {
 	// GroupIds contains the ordered group ids associated with this search filter.
@@ -5264,7 +5222,7 @@ type SearchHit struct {
 	DeepLink nullable.Nullable[SearchDeepLink] `json:"deepLink"`
 
 	// Highlights specifies the highlights associated with this search hit.
-	Highlights map[string][]string `json:"highlights"`
+	Highlights map[string]any `json:"highlights"`
 
 	// Id uniquely identifies this resource.
 	Id string `json:"id"`
@@ -5456,12 +5414,6 @@ type ServiceGrantPermissions string
 // ServiceGrantPrincipalType specifies the principal type associated with this service grant.
 type ServiceGrantPrincipalType string
 
-// ServiceGrantList contains an ordered collection of service grant values.
-type ServiceGrantList struct {
-	// Items contains the ordered items associated with this service grant list.
-	Items []ServiceGrant `json:"items"`
-}
-
 // ServiceList contains an ordered collection of service values.
 type ServiceList struct {
 	// Items contains the ordered items associated with this service list.
@@ -5518,6 +5470,9 @@ type ServiceRef struct {
 
 // ServiceRole identifies one supported service role value.
 type ServiceRole string
+
+// ServiceSlug is a stable lowercase URL identifier containing letters, digits, and hyphens.
+type ServiceSlug = Slug
 
 // ServiceVisibility identifies one supported service visibility value.
 type ServiceVisibility string
@@ -5600,7 +5555,7 @@ type ShareLinkCreated struct {
 	RevokedAt nullable.Nullable[Timestamp] `json:"revokedAt"`
 
 	// Token is secret bearer material and must never be logged or persisted as plaintext.
-	Token *string `json:"token,omitempty"`
+	Token string `json:"token"`
 
 	// Url specifies the url associated with this share link created.
 	Url string `json:"url"`
@@ -5608,6 +5563,9 @@ type ShareLinkCreated struct {
 
 // ShareLinkCreatedResourceType specifies the resource type associated with this share link created.
 type ShareLinkCreatedResourceType string
+
+// ShareLinkId UUID v7
+type ShareLinkId = Uuid
 
 // ShareLinkPage contains one paginated page of share link records.
 type ShareLinkPage struct {
@@ -5623,6 +5581,9 @@ type ShareLinkPage struct {
 	// Total is the number of matching records across all pages.
 	Total int `json:"total"`
 }
+
+// ShareToken defines model for ShareToken.
+type ShareToken = string
 
 // SharedView represents shared view data exchanged through the Meridian API.
 type SharedView struct {
@@ -5646,6 +5607,12 @@ type SharedViewResourceType string
 
 // Slug is a stable lowercase URL identifier containing letters, digits, and hyphens.
 type Slug = string
+
+// SnapshotId UUID v7
+type SnapshotId = Uuid
+
+// Sort defines model for Sort.
+type Sort = string
 
 // SourceBinding represents source binding data exchanged through the Meridian API.
 type SourceBinding struct {
@@ -5691,6 +5658,9 @@ type SourceBindingList struct {
 	// Items contains the ordered items associated with this source binding list.
 	Items []SourceBinding `json:"items"`
 }
+
+// SourceId UUID v7
+type SourceId = Uuid
 
 // SourceMode identifies one supported source mode value.
 type SourceMode string
@@ -5786,7 +5756,46 @@ type SourceSpec struct {
 }
 
 // SourceSpecCreateRequest defines validated input for the corresponding Meridian API operation.
-type SourceSpecCreateRequest = SourceSpecInput
+type SourceSpecCreateRequest struct {
+	// AssetNameTemplate specifies the asset name template associated with this source spec input.
+	AssetNameTemplate *AssetNameTemplate `json:"assetNameTemplate,omitempty"`
+
+	// BranchPatterns contains the ordered branch patterns associated with this source spec input.
+	BranchPatterns *[]RefGlob `json:"branchPatterns,omitempty"`
+
+	// Enabled indicates whether enabled applies to this source spec input.
+	Enabled *bool `json:"enabled,omitempty"`
+
+	// Kind contains the kind id associated with this source spec input.
+	Kind KindId `json:"kind"`
+
+	// Mode contains the source mode associated with this source spec input.
+	Mode SourceMode `json:"mode"`
+
+	// Ord specifies the ord associated with this source spec input.
+	Ord *int `json:"ord,omitempty"`
+
+	// Origin contains the layer origin associated with this source spec input.
+	Origin LayerOrigin `json:"origin"`
+
+	// Path specifies the path associated with this source spec input.
+	Path nullable.Nullable[string] `json:"path,omitempty"`
+
+	// ProducerProfileId specifies the producer profile id associated with this source spec input.
+	ProducerProfileId nullable.Nullable[Uuid] `json:"producerProfileId,omitempty"`
+
+	// ReplaceAiBase On create only, explicitly archives an existing AI-generated base and its source in the same transaction before creating this repository base. Invalid for other replacements.
+	ReplaceAiBase *bool `json:"replaceAiBase,omitempty"`
+
+	// Role contains the layer role associated with this source spec input.
+	Role LayerRole `json:"role"`
+
+	// TargetAssetId Required only for manual mode; the asset must belong to the path service and match kind.
+	TargetAssetId nullable.Nullable[Uuid] `json:"targetAssetId,omitempty"`
+
+	// TimeoutSec Omitted values use the mode default in domain.yaml.
+	TimeoutSec *int `json:"timeoutSec,omitempty"`
+}
 
 // SourceSpecInput represents source spec input data exchanged through the Meridian API.
 type SourceSpecInput struct {
@@ -5875,7 +5884,7 @@ type SshSecretInput struct {
 	Passphrase nullable.Nullable[string] `json:"passphrase,omitempty"`
 
 	// PrivateKeyPem is the write-only PEM-encoded SSH private key and must never be logged.
-	PrivateKeyPem *string `json:"privateKeyPem,omitempty"`
+	PrivateKeyPem string `json:"privateKeyPem"`
 }
 
 // StarState represents star state data exchanged through the Meridian API.
@@ -5946,7 +5955,7 @@ type SubscriptionPutRequest_ScopeId struct {
 }
 
 // SubscriptionScopeConstraints represents subscription scope constraints data exchanged through the Meridian API.
-type SubscriptionScopeConstraints = any
+type SubscriptionScopeConstraints = map[string]any
 
 // SubscriptionScopeType identifies one supported subscription scope type value.
 type SubscriptionScopeType string
@@ -6056,6 +6065,9 @@ type TagCreateRequest struct {
 	Name string `json:"name"`
 }
 
+// TagId UUID v7
+type TagId = Uuid
+
 // TagList contains an ordered collection of tag values.
 type TagList = []Tag
 
@@ -6100,6 +6112,9 @@ type TeamCreateRequest struct {
 	// Slug contains the slug associated with this team create request.
 	Slug Slug `json:"slug"`
 }
+
+// TeamId UUID v7
+type TeamId = Uuid
 
 // TeamMembersReplaceRequest defines validated input for the corresponding Meridian API operation.
 type TeamMembersReplaceRequest struct {
@@ -6173,7 +6188,7 @@ type TenantDeleteRequest struct {
 	ConfirmationSlug Slug `json:"confirmationSlug"`
 
 	// CurrentPassword specifies the current password associated with this tenant delete request.
-	CurrentPassword *string `json:"currentPassword,omitempty"`
+	CurrentPassword string `json:"currentPassword"`
 }
 
 // TenantDeletionAccepted represents tenant deletion accepted data exchanged through the Meridian API.
@@ -6239,7 +6254,7 @@ type TenantSettings struct {
 	AutoPublish bool `json:"autoPublish"`
 
 	// DefaultAiProducerProfileId specifies the default ai producer profile id associated with this tenant settings.
-	DefaultAiProducerProfileId nullable.Nullable[openapi_types.UUID] `json:"defaultAiProducerProfileId"`
+	DefaultAiProducerProfileId nullable.Nullable[string] `json:"defaultAiProducerProfileId"`
 
 	// DefaultLocale specifies the default locale associated with this tenant settings.
 	DefaultLocale TenantSettingsDefaultLocale `json:"defaultLocale"`
@@ -6263,7 +6278,7 @@ type TenantSettingsPatchRequest struct {
 	AutoPublish *bool `json:"autoPublish,omitempty"`
 
 	// DefaultAiProducerProfileId specifies the default ai producer profile id associated with this tenant settings patch request.
-	DefaultAiProducerProfileId nullable.Nullable[openapi_types.UUID] `json:"defaultAiProducerProfileId,omitempty"`
+	DefaultAiProducerProfileId nullable.Nullable[string] `json:"defaultAiProducerProfileId,omitempty"`
 
 	// DefaultLocale specifies the default locale associated with this tenant settings patch request.
 	DefaultLocale *TenantSettingsPatchRequestDefaultLocale `json:"defaultLocale,omitempty"`
@@ -6284,7 +6299,7 @@ type TenantSettingsTemplate struct {
 	AutoPublish bool `json:"autoPublish"`
 
 	// DefaultAiProducerProfileId specifies the default ai producer profile id associated with this tenant settings template.
-	DefaultAiProducerProfileId nullable.Nullable[openapi_types.UUID] `json:"defaultAiProducerProfileId"`
+	DefaultAiProducerProfileId nullable.Nullable[string] `json:"defaultAiProducerProfileId"`
 
 	// DefaultLocale specifies the default locale associated with this tenant settings template.
 	DefaultLocale TenantSettingsTemplateDefaultLocale `json:"defaultLocale"`
@@ -6299,14 +6314,23 @@ type TenantSettingsTemplate struct {
 // TenantSettingsTemplateDefaultLocale specifies the default locale associated with this tenant settings template.
 type TenantSettingsTemplateDefaultLocale string
 
+// TenantSlug is a stable lowercase URL identifier containing letters, digits, and hyphens.
+type TenantSlug = Slug
+
 // TenantStatus identifies one supported tenant status value.
 type TenantStatus string
 
 // Timestamp RFC 3339 UTC
 type Timestamp = time.Time
 
+// TodoId UUID v7
+type TodoId = Uuid
+
 // TodoStatus identifies one supported todo status value.
 type TodoStatus string
+
+// TodoStatusFilter identifies one supported todo status value.
+type TodoStatusFilter = TodoStatus
 
 // TokenCreateRequest defines the name, least-privilege scopes, and optional expiry of a new PAT.
 type TokenCreateRequest struct {
@@ -6344,8 +6368,11 @@ type TokenCreated struct {
 	Scopes []TokenScope `json:"scopes"`
 
 	// Token is secret bearer material and must never be logged or persisted as plaintext.
-	Token *string `json:"token,omitempty"`
+	Token string `json:"token"`
 }
+
+// TokenId UUID v7
+type TokenId = Uuid
 
 // TokenPage contains one paginated page of token records.
 type TokenPage struct {
@@ -6364,6 +6391,9 @@ type TokenPage struct {
 
 // TokenScope identifies one supported token scope value.
 type TokenScope string
+
+// UnreadFilter defines model for UnreadFilter.
+type UnreadFilter = bool
 
 // Upload represents upload data exchanged through the Meridian API.
 type Upload struct {
@@ -6389,13 +6419,13 @@ type Upload struct {
 // UploadRequest defines validated input for the corresponding Meridian API operation.
 type UploadRequest struct {
 	// ContentType contains the content type associated with this upload request.
-	ContentType ContentType `json:"contentType"`
+	ContentType map[string]any `json:"contentType"`
 
 	// File specifies the file associated with this upload request.
 	File openapi_types.File `json:"file"`
 
 	// Kind contains the kind id associated with this upload request.
-	Kind KindId `json:"kind"`
+	Kind map[string]any `json:"kind"`
 }
 
 // UploadSelector identifies the upload selected by a request.
@@ -6419,7 +6449,7 @@ type User struct {
 	DisplayName string `json:"displayName"`
 
 	// Email specifies the email associated with this user.
-	Email nullable.Nullable[openapi_types.Email] `json:"email"`
+	Email nullable.Nullable[string] `json:"email"`
 
 	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
@@ -6446,14 +6476,17 @@ type UserCreateRequest struct {
 	DisplayName string `json:"displayName"`
 
 	// Email specifies the email associated with this user create request.
-	Email nullable.Nullable[openapi_types.Email] `json:"email,omitempty"`
+	Email nullable.Nullable[string] `json:"email,omitempty"`
 
 	// Password is the write-only plaintext password supplied for authentication.
-	Password *string `json:"password,omitempty"`
+	Password string `json:"password"`
 
 	// Username specifies the username associated with this user create request.
 	Username string `json:"username"`
 }
+
+// UserId UUID v7
+type UserId = Uuid
 
 // UserPage contains one paginated page of user records.
 type UserPage struct {
@@ -6476,7 +6509,7 @@ type UserPatchRequest struct {
 	DisplayName *string `json:"displayName,omitempty"`
 
 	// Email specifies the email associated with this user patch request.
-	Email nullable.Nullable[openapi_types.Email] `json:"email,omitempty"`
+	Email nullable.Nullable[string] `json:"email,omitempty"`
 
 	// Password is the write-only plaintext password supplied for authentication.
 	Password *string `json:"password,omitempty"`
@@ -6491,7 +6524,7 @@ type UserPatchRequestStatus string
 // UserPreferences represents user preferences data exchanged through the Meridian API.
 type UserPreferences struct {
 	// DefaultViews specifies the default views associated with this user preferences.
-	DefaultViews map[string]string `json:"defaultViews"`
+	DefaultViews map[string]any `json:"defaultViews"`
 
 	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
@@ -6512,7 +6545,7 @@ type UserPreferencesTheme string
 // UserPreferencesPatchRequest defines validated input for the corresponding Meridian API operation.
 type UserPreferencesPatchRequest struct {
 	// DefaultViews specifies the default views associated with this user preferences patch request.
-	DefaultViews *map[string]string `json:"defaultViews,omitempty"`
+	DefaultViews *map[string]any `json:"defaultViews,omitempty"`
 
 	// Locale specifies the locale associated with this user preferences patch request.
 	Locale *UserPreferencesPatchRequestLocale `json:"locale,omitempty"`
@@ -6548,6 +6581,9 @@ type ValidationIssue struct {
 // ValidationIssueSeverity specifies the severity associated with this validation issue.
 type ValidationIssueSeverity string
 
+// VersionId UUID v7
+type VersionId = Uuid
+
 // VersionInfo identifies the running server build and its public API contract.
 type VersionInfo struct {
 	// ApiVersion is the HTTP route major implemented by this server.
@@ -6572,7 +6608,7 @@ type VersionInfoContractVersion string
 // VersionPublishRequest defines validated input for the corresponding Meridian API operation.
 type VersionPublishRequest struct {
 	// Labels specifies the labels associated with this version publish request.
-	Labels *map[string]string `json:"labels,omitempty"`
+	Labels *map[string]any `json:"labels,omitempty"`
 
 	// Version specifies the version associated with this version publish request.
 	Version nullable.Nullable[string] `json:"version,omitempty"`
@@ -6653,6 +6689,9 @@ type ViewDefinition struct {
 // ViewDefinitionMount specifies the mount associated with this view definition.
 type ViewDefinitionMount string
 
+// ViewId defines model for ViewId.
+type ViewId = string
+
 // ViewInputSpec represents view input spec data exchanged through the Meridian API.
 type ViewInputSpec struct {
 	// Kinds specifies the kinds associated with this view input spec.
@@ -6722,7 +6761,13 @@ type ViewOverrideList struct {
 }
 
 // ViewOverridePutRequest defines validated input for the corresponding Meridian API operation.
-type ViewOverridePutRequest = ViewOverrideValue
+type ViewOverridePutRequest struct {
+	// DefaultOptions specifies the default options associated with this view override value.
+	DefaultOptions *map[string]any `json:"defaultOptions,omitempty"`
+
+	// Enabled indicates whether enabled applies to this view override value.
+	Enabled *bool `json:"enabled,omitempty"`
+}
 
 // ViewOverrideValue represents view override value data exchanged through the Meridian API.
 type ViewOverrideValue struct {
@@ -6753,150 +6798,6 @@ type ViewResolveRequest struct {
 	ViewId string `json:"viewId"`
 }
 
-// AssetId UUID v7
-type AssetId = Uuid
-
-// AuditFilters defines supported filters for selecting audit records.
-type AuditFilters = AuditFilter
-
-// CandidateId UUID v7
-type CandidateId = Uuid
-
-// ChannelId UUID v7
-type ChannelId = Uuid
-
-// ContentToken defines model for ContentToken.
-type ContentToken = string
-
-// CredentialId UUID v7
-type CredentialId = Uuid
-
-// ExportFormat defines model for ExportFormat.
-type ExportFormat string
-
-// Force defines model for Force.
-type Force = bool
-
-// GroupId UUID v7
-type GroupId = Uuid
-
-// IdempotencyKey defines model for IdempotencyKey.
-type IdempotencyKey = openapi_types.UUID
-
-// IfMatch Opaque HTTP entity tag including quotes
-type IfMatch = ETag
-
-// JobFilters defines supported filters for selecting job records.
-type JobFilters = JobFilter
-
-// JobId UUID v7
-type JobId = Uuid
-
-// KindFilter identifies an asset kind registered in contracts/kinds.yaml.
-type KindFilter = KindId
-
-// LastEventId defines model for LastEventId.
-type LastEventId = string
-
-// LayerId UUID v7
-type LayerId = Uuid
-
-// NoteId UUID v7
-type NoteId = Uuid
-
-// NotificationId UUID v7
-type NotificationId = Uuid
-
-// Order defines model for Order.
-type Order string
-
-// Page defines model for Page.
-type Page = int
-
-// PageSize defines model for PageSize.
-type PageSize = int
-
-// PlatformAuditFilters defines supported filters for selecting platform audit records.
-type PlatformAuditFilters = PlatformAuditFilter
-
-// PlatformJobFilters defines supported filters for selecting platform job records.
-type PlatformJobFilters = PlatformJobFilter
-
-// PreviewId UUID v7
-type PreviewId = Uuid
-
-// ProducerProfileId UUID v7
-type ProducerProfileId = Uuid
-
-// Query defines model for Query.
-type Query = string
-
-// RepositoryId UUID v7
-type RepositoryId = Uuid
-
-// RequiredQuery defines model for RequiredQuery.
-type RequiredQuery = string
-
-// ReviewFilters defines supported filters for selecting review records.
-type ReviewFilters = ReviewFilter
-
-// RevisionId UUID v7
-type RevisionId = Uuid
-
-// RuleSetId UUID v7
-type RuleSetId = Uuid
-
-// SearchFacets defines supported filters for selecting search records.
-type SearchFacets = SearchFilter
-
-// ServiceSlug is a stable lowercase URL identifier containing letters, digits, and hyphens.
-type ServiceSlug = Slug
-
-// ShareLinkId UUID v7
-type ShareLinkId = Uuid
-
-// ShareToken defines model for ShareToken.
-type ShareToken = string
-
-// SnapshotId UUID v7
-type SnapshotId = Uuid
-
-// Sort defines model for Sort.
-type Sort = string
-
-// SourceId UUID v7
-type SourceId = Uuid
-
-// TagId UUID v7
-type TagId = Uuid
-
-// TeamId UUID v7
-type TeamId = Uuid
-
-// TenantSlug is a stable lowercase URL identifier containing letters, digits, and hyphens.
-type TenantSlug = Slug
-
-// TodoId UUID v7
-type TodoId = Uuid
-
-// TodoStatusFilter identifies one supported todo status value.
-type TodoStatusFilter = TodoStatus
-
-// TokenId UUID v7
-type TokenId = Uuid
-
-// UnreadFilter defines model for UnreadFilter.
-type UnreadFilter = bool
-
-// UserId UUID v7
-type UserId = Uuid
-
-// VersionId UUID v7
-type VersionId = Uuid
-
-// ViewId defines model for ViewId.
-type ViewId = string
-
 // WebhookDelivery defines model for WebhookDelivery.
 type WebhookDelivery = string
 
@@ -6905,1263 +6806,6 @@ type WebhookEvent string
 
 // WebhookSignature defines model for WebhookSignature.
 type WebhookSignature = string
-
-// BaseLayerExists is the stable machine-readable failure envelope returned by every JSON API error.
-type BaseLayerExists = ErrorResponse
-
-// Candidate represents discovery candidate data exchanged through the Meridian API.
-type Candidate = DiscoveryCandidate
-
-// ConfigImportConflict is the stable machine-readable failure envelope returned by every JSON API error.
-type ConfigImportConflict = ErrorResponse
-
-// Conflict is the stable machine-readable failure envelope returned by every JSON API error.
-type Conflict = ErrorResponse
-
-// ContentTooLarge is the stable machine-readable failure envelope returned by every JSON API error.
-type ContentTooLarge = ErrorResponse
-
-// CredentialInUse is the stable machine-readable failure envelope returned by every JSON API error.
-type CredentialInUse = ErrorResponse
-
-// CredentialRotation reports the result of the corresponding Meridian operation.
-type CredentialRotation = CredentialRotationResult
-
-// CsrfInvalid is the stable machine-readable failure envelope returned by every JSON API error.
-type CsrfInvalid = ErrorResponse
-
-// Duplicate is the stable machine-readable failure envelope returned by every JSON API error.
-type Duplicate = ErrorResponse
-
-// GlobalCredentialRotation reports the result of the corresponding Meridian operation.
-type GlobalCredentialRotation = GlobalCredentialRotationResult
-
-// InputSpecMismatch is the stable machine-readable failure envelope returned by every JSON API error.
-type InputSpecMismatch = ErrorResponse
-
-// InternalError is the stable machine-readable failure envelope returned by every JSON API error.
-type InternalError = ErrorResponse
-
-// InvalidState is the stable machine-readable failure envelope returned by every JSON API error.
-type InvalidState = ErrorResponse
-
-// JobNotCancellable is the stable machine-readable failure envelope returned by every JSON API error.
-type JobNotCancellable = ErrorResponse
-
-// LastAdmin is the stable machine-readable failure envelope returned by every JSON API error.
-type LastAdmin = ErrorResponse
-
-// NestingTooDeep is the stable machine-readable failure envelope returned by every JSON API error.
-type NestingTooDeep = ErrorResponse
-
-// NotFound is the stable machine-readable failure envelope returned by every JSON API error.
-type NotFound = ErrorResponse
-
-// OverlayInvalid is the stable machine-readable failure envelope returned by every JSON API error.
-type OverlayInvalid = ErrorResponse
-
-// PreconditionFailed is the stable machine-readable failure envelope returned by every JSON API error.
-type PreconditionFailed = ErrorResponse
-
-// ProducerProfileUnavailable is the stable machine-readable failure envelope returned by every JSON API error.
-type ProducerProfileUnavailable = ErrorResponse
-
-// QuotaExceeded is the stable machine-readable failure envelope returned by every JSON API error.
-type QuotaExceeded = ErrorResponse
-
-// RateLimited is the stable machine-readable failure envelope returned by every JSON API error.
-type RateLimited = ErrorResponse
-
-// Unauthenticated is the stable machine-readable failure envelope returned by every JSON API error.
-type Unauthenticated = ErrorResponse
-
-// ValidationError is the stable machine-readable failure envelope returned by every JSON API error.
-type ValidationError = ErrorResponse
-
-// VersionNotPublishable is the stable machine-readable failure envelope returned by every JSON API error.
-type VersionNotPublishable = ErrorResponse
-
-// AssetAiGenerate defines validated input for the corresponding Meridian API operation.
-type AssetAiGenerate = AssetAiGenerateRequest
-
-// AssetKindPatch defines validated input for the corresponding Meridian API operation.
-type AssetKindPatch = AssetKindPatchRequest
-
-// AssetPush defines validated input for the corresponding Meridian API operation.
-type AssetPush = AssetPushRequest
-
-// BreakingTodoAcknowledge defines validated input for the corresponding Meridian API operation.
-type BreakingTodoAcknowledge = BreakingTodoAcknowledgeRequest
-
-// CandidatesAccept defines validated input for the corresponding Meridian API operation.
-type CandidatesAccept = CandidatesAcceptRequest
-
-// CommentCreate defines validated input for the corresponding Meridian API operation.
-type CommentCreate = CommentCreateRequest
-
-// ConfigImportApply defines validated input for the corresponding Meridian API operation.
-type ConfigImportApply = ConfigImportApplyRequest
-
-// ConfigImportPreviewRequestBody defines validated input for the corresponding Meridian API operation.
-type ConfigImportPreviewRequestBody = ConfigImportPreviewRequest
-
-// ConnectionTestRequestBody defines validated input for the corresponding Meridian API operation.
-type ConnectionTestRequestBody = ConnectionTestRequest
-
-// CredentialCreate supplies exactly one SSH or HTTP secret and its authorized sharing scope.
-type CredentialCreate = CredentialCreateRequest
-
-// CredentialPatch defines validated input for the corresponding Meridian API operation.
-type CredentialPatch = CredentialPatchRequest
-
-// CredentialRotate defines validated input for the corresponding Meridian API operation.
-type CredentialRotate = CredentialRotateRequest
-
-// DiffCreate defines validated input for the corresponding Meridian API operation.
-type DiffCreate = DiffCreateRequest
-
-// DiffRuleSetCreate defines validated input for the corresponding Meridian API operation.
-type DiffRuleSetCreate = DiffRuleSetCreateRequest
-
-// DiffRuleSetPatch defines validated input for the corresponding Meridian API operation.
-type DiffRuleSetPatch = DiffRuleSetPatchRequest
-
-// DiffSnapshotShare defines validated input for the corresponding Meridian API operation.
-type DiffSnapshotShare = DiffSnapshotShareRequest
-
-// DriftResolution defines validated input for the corresponding Meridian API operation.
-type DriftResolution = DriftResolutionRequest
-
-// GlobalCredentialCreate defines validated input for the corresponding Meridian API operation.
-type GlobalCredentialCreate = GlobalCredentialCreateRequest
-
-// GlobalCredentialPatch defines validated input for the corresponding Meridian API operation.
-type GlobalCredentialPatch = GlobalCredentialPatchRequest
-
-// KnownHostCreate defines validated input for the corresponding Meridian API operation.
-type KnownHostCreate = KnownHostCreateRequest
-
-// LayerOrderReplace defines validated input for the corresponding Meridian API operation.
-type LayerOrderReplace = LayerOrderReplaceRequest
-
-// LayerPatch defines validated input for the corresponding Meridian API operation.
-type LayerPatch = LayerPatchRequest
-
-// LayerRevisionCreate defines validated input for the corresponding Meridian API operation.
-type LayerRevisionCreate = LayerRevisionCreateRequest
-
-// LayerRollback defines validated input for the corresponding Meridian API operation.
-type LayerRollback = LayerRollbackRequest
-
-// MemberPut defines validated input for the corresponding Meridian API operation.
-type MemberPut = MemberPutRequest
-
-// MergePreviewRequestBody defines validated input for the corresponding Meridian API operation.
-type MergePreviewRequestBody = MergePreviewRequest
-
-// NotificationChannelCreate defines validated input for the corresponding Meridian API operation.
-type NotificationChannelCreate = NotificationChannelCreateRequest
-
-// NotificationChannelPatch defines validated input for the corresponding Meridian API operation.
-type NotificationChannelPatch = NotificationChannelPatchRequest
-
-// NotificationChannelRotate defines validated input for the corresponding Meridian API operation.
-type NotificationChannelRotate = NotificationChannelRotateRequest
-
-// PlatformSettingsPatch defines validated input for the corresponding Meridian API operation.
-type PlatformSettingsPatch = PlatformSettingsPatchRequest
-
-// ProduceSource defines validated input for the corresponding Meridian API operation.
-type ProduceSource = ProduceSourceRequest
-
-// ProducerProfileCreate defines validated input for the corresponding Meridian API operation.
-type ProducerProfileCreate = ProducerProfileCreateRequest
-
-// ProducerProfilePatch defines validated input for the corresponding Meridian API operation.
-type ProducerProfilePatch = ProducerProfilePatchRequest
-
-// PublicViewResolve defines validated input for the corresponding Meridian API operation.
-type PublicViewResolve = PublicViewResolveRequest
-
-// RepositoryConnectionCheck defines validated input for the corresponding Meridian API operation.
-type RepositoryConnectionCheck = RepositoryConnectionCheckRequest
-
-// RepositoryCreate defines validated input for the corresponding Meridian API operation.
-type RepositoryCreate = RepositoryCreateRequest
-
-// RepositoryDiscover defines validated input for the corresponding Meridian API operation.
-type RepositoryDiscover = RepositoryDiscoverRequest
-
-// RepositoryPatch defines validated input for the corresponding Meridian API operation.
-type RepositoryPatch = RepositoryPatchRequest
-
-// RepositorySync defines validated input for the corresponding Meridian API operation.
-type RepositorySync = RepositorySyncRequest
-
-// RevisionApprove defines validated input for the corresponding Meridian API operation.
-type RevisionApprove = RevisionApproveRequest
-
-// RevisionReject defines validated input for the corresponding Meridian API operation.
-type RevisionReject = RevisionRejectRequest
-
-// ServiceAccessPut defines validated input for the corresponding Meridian API operation.
-type ServiceAccessPut = ServiceAccessPutRequest
-
-// ServiceAiGenerate defines validated input for the corresponding Meridian API operation.
-type ServiceAiGenerate = ServiceAiGenerateRequest
-
-// ServiceCreate defines validated input for the corresponding Meridian API operation.
-type ServiceCreate = ServiceCreateRequest
-
-// ServicePatch defines validated input for the corresponding Meridian API operation.
-type ServicePatch = ServicePatchRequest
-
-// ShareLinkCreate Creates a view share. The server resolves all ref selectors to immutable version IDs, freezes scope membership and options, and allowlists only the resulting artifacts. Diff snapshots use the dedicated diff-snapshot share operation.
-type ShareLinkCreate = ShareLinkCreateRequest
-
-// SourceSpecCreate defines validated input for the corresponding Meridian API operation.
-type SourceSpecCreate = SourceSpecCreateRequest
-
-// SourceSpecPatch The server merges this partial document with the stored SourceSpec and validates the complete resulting aggregate against sourceCompatibility.
-type SourceSpecPatch = SourceSpecPatchRequest
-
-// SubscriptionPut defines validated input for the corresponding Meridian API operation.
-type SubscriptionPut = SubscriptionPutRequest
-
-// SystemGroupCreate defines validated input for the corresponding Meridian API operation.
-type SystemGroupCreate = SystemGroupCreateRequest
-
-// SystemGroupMembersReplace defines validated input for the corresponding Meridian API operation.
-type SystemGroupMembersReplace = SystemGroupMembersReplaceRequest
-
-// SystemGroupPatch defines validated input for the corresponding Meridian API operation.
-type SystemGroupPatch = SystemGroupPatchRequest
-
-// TagCreate defines validated input for the corresponding Meridian API operation.
-type TagCreate = TagCreateRequest
-
-// TagPatch defines validated input for the corresponding Meridian API operation.
-type TagPatch = TagPatchRequest
-
-// TeamCreate defines validated input for the corresponding Meridian API operation.
-type TeamCreate = TeamCreateRequest
-
-// TeamMembersReplace defines validated input for the corresponding Meridian API operation.
-type TeamMembersReplace = TeamMembersReplaceRequest
-
-// TeamPatch defines validated input for the corresponding Meridian API operation.
-type TeamPatch = TeamPatchRequest
-
-// TenantCreate defines validated input for the corresponding Meridian API operation.
-type TenantCreate = TenantCreateRequest
-
-// TenantDelete defines validated input for the corresponding Meridian API operation.
-type TenantDelete = TenantDeleteRequest
-
-// TenantPatch defines validated input for the corresponding Meridian API operation.
-type TenantPatch = TenantPatchRequest
-
-// TenantSettingsPatch defines validated input for the corresponding Meridian API operation.
-type TenantSettingsPatch = TenantSettingsPatchRequest
-
-// TokenCreate defines the name, least-privilege scopes, and optional expiry of a new PAT.
-type TokenCreate = TokenCreateRequest
-
-// UserCreateBody defines validated input for the corresponding Meridian API operation.
-type UserCreateBody = UserCreateRequest
-
-// UserPatch defines validated input for the corresponding Meridian API operation.
-type UserPatch = UserPatchRequest
-
-// UserPreferencesPatch defines validated input for the corresponding Meridian API operation.
-type UserPreferencesPatch = UserPreferencesPatchRequest
-
-// VersionPublish defines validated input for the corresponding Meridian API operation.
-type VersionPublish = VersionPublishRequest
-
-// ViewOverridePut defines validated input for the corresponding Meridian API operation.
-type ViewOverridePut = ViewOverridePutRequest
-
-// ViewResolve Input arity and kind constraints are validated from the selected entry in views.yaml.
-type ViewResolve = ViewResolveRequest
-
-// ListPlatformAuditLogsParams defines parameters for ListPlatformAuditLogs.
-type ListPlatformAuditLogsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Filter identifies or filters the filter value in the query.
-	Filter *PlatformAuditFilters `json:"filter,omitempty"`
-}
-
-// ListGlobalCredentialsParams defines parameters for ListGlobalCredentials.
-type ListGlobalCredentialsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// DeleteGlobalCredentialParams defines parameters for DeleteGlobalCredential.
-type DeleteGlobalCredentialParams struct {
-	// Force identifies or filters the force value in the query.
-	Force *Force `form:"force,omitempty" json:"force,omitempty"`
-
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateGlobalCredentialParams defines parameters for UpdateGlobalCredential.
-type UpdateGlobalCredentialParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// RotateGlobalCredentialParams defines parameters for RotateGlobalCredential.
-type RotateGlobalCredentialParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListPlatformJobsParams defines parameters for ListPlatformJobs.
-type ListPlatformJobsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Filter identifies or filters the filter value in the query.
-	Filter *PlatformJobFilters `json:"filter,omitempty"`
-}
-
-// ListProducerProfilesParams defines parameters for ListProducerProfiles.
-type ListProducerProfilesParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// DeleteProducerProfileParams defines parameters for DeleteProducerProfile.
-type DeleteProducerProfileParams struct {
-	// Force identifies or filters the force value in the query.
-	Force *Force `form:"force,omitempty" json:"force,omitempty"`
-
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateProducerProfileParams defines parameters for UpdateProducerProfile.
-type UpdateProducerProfileParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdatePlatformSettingsParams defines parameters for UpdatePlatformSettings.
-type UpdatePlatformSettingsParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListTenantsParams defines parameters for ListTenants.
-type ListTenantsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// DeleteTenantParams defines parameters for DeleteTenant.
-type DeleteTenantParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateTenantParams defines parameters for UpdateTenant.
-type UpdateTenantParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListUsersParams defines parameters for ListUsers.
-type ListUsersParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Q identifies or filters the q value in the query.
-	Q *Query `form:"q,omitempty" json:"q,omitempty"`
-}
-
-// UpdateUserParams defines parameters for UpdateUser.
-type UpdateUserParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateMyPreferencesParams defines parameters for UpdateMyPreferences.
-type UpdateMyPreferencesParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateAssetKindStateParams defines parameters for UpdateAssetKindState.
-type UpdateAssetKindStateParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListAssetVersionItemsParams defines parameters for ListAssetVersionItems.
-type ListAssetVersionItemsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Q identifies or filters the q value in the query.
-	Q *Query `form:"q,omitempty" json:"q,omitempty"`
-}
-
-// DeprecateAssetVersionParams defines parameters for DeprecateAssetVersion.
-type DeprecateAssetVersionParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// PublishAssetVersionParams defines parameters for PublishAssetVersion.
-type PublishAssetVersionParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// RetireAssetVersionParams defines parameters for RetireAssetVersion.
-type RetireAssetVersionParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// GetAssetParams defines parameters for GetAsset.
-type GetAssetParams struct {
-	// RefType identifies or filters the ref type value in the query.
-	RefType *RefType `form:"refType,omitempty" json:"refType,omitempty"`
-
-	// Ref identifies or filters the ref value in the query.
-	Ref *RefName `form:"ref,omitempty" json:"ref,omitempty"`
-}
-
-// ReorderAssetLayersParams defines parameters for ReorderAssetLayers.
-type ReorderAssetLayersParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListAssetVersionsParams defines parameters for ListAssetVersions.
-type ListAssetVersionsParams struct {
-	// RefType identifies or filters the ref type value in the query.
-	RefType *RefType `form:"refType,omitempty" json:"refType,omitempty"`
-
-	// Ref identifies or filters the ref value in the query.
-	Ref *RefName `form:"ref,omitempty" json:"ref,omitempty"`
-
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// GenerateAssetWithAiParams defines parameters for GenerateAssetWithAi.
-type GenerateAssetWithAiParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// PushAssetRevisionParams defines parameters for PushAssetRevision.
-type PushAssetRevisionParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListAuditLogsParams defines parameters for ListAuditLogs.
-type ListAuditLogsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Filter identifies or filters the filter value in the query.
-	Filter *AuditFilters `json:"filter,omitempty"`
-}
-
-// ListBreakingTodosParams defines parameters for ListBreakingTodos.
-type ListBreakingTodosParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Status identifies or filters the status value in the query.
-	Status *TodoStatusFilter `form:"status,omitempty" json:"status,omitempty"`
-}
-
-// ListCredentialsParams defines parameters for ListCredentials.
-type ListCredentialsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// DeleteCredentialParams defines parameters for DeleteCredential.
-type DeleteCredentialParams struct {
-	// Force identifies or filters the force value in the query.
-	Force *Force `form:"force,omitempty" json:"force,omitempty"`
-
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateCredentialParams defines parameters for UpdateCredential.
-type UpdateCredentialParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// RotateCredentialParams defines parameters for RotateCredential.
-type RotateCredentialParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// DeleteDiffRuleSetParams defines parameters for DeleteDiffRuleSet.
-type DeleteDiffRuleSetParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateDiffRuleSetParams defines parameters for UpdateDiffRuleSet.
-type UpdateDiffRuleSetParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListDiffSnapshotsParams defines parameters for ListDiffSnapshots.
-type ListDiffSnapshotsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// ExportDiffSnapshotParams defines parameters for ExportDiffSnapshot.
-type ExportDiffSnapshotParams struct {
-	// Format identifies or filters the format value in the query.
-	Format ExportDiffSnapshotParamsFormat `form:"format" json:"format"`
-}
-
-// ExportDiffSnapshotParamsFormat defines parameters for ExportDiffSnapshot.
-type ExportDiffSnapshotParamsFormat string
-
-// SearchTenantUsersParams defines parameters for SearchTenantUsers.
-type SearchTenantUsersParams struct {
-	// Q identifies or filters the q value in the query.
-	Q *Query `form:"q,omitempty" json:"q,omitempty"`
-
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// CreateTenantExportParams defines parameters for CreateTenantExport.
-type CreateTenantExportParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListJobsParams defines parameters for ListJobs.
-type ListJobsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Filter identifies or filters the filter value in the query.
-	Filter *JobFilters `json:"filter,omitempty"`
-}
-
-// StreamJobLogsParams defines parameters for StreamJobLogs.
-type StreamJobLogsParams struct {
-	// LastEventID resumes an event stream strictly after this non-negative persisted log sequence.
-	LastEventID *LastEventId `json:"Last-Event-ID,omitempty"`
-}
-
-// RetryJobParams defines parameters for RetryJob.
-type RetryJobParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListKnownHostsParams defines parameters for ListKnownHosts.
-type ListKnownHostsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// ApproveLayerRevisionParams defines parameters for ApproveLayerRevision.
-type ApproveLayerRevisionParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// RejectLayerRevisionParams defines parameters for RejectLayerRevision.
-type RejectLayerRevisionParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// GetLayerParams defines parameters for GetLayer.
-type GetLayerParams struct {
-	// RefType identifies or filters the ref type value in the query.
-	RefType *RefType `form:"refType,omitempty" json:"refType,omitempty"`
-
-	// Ref identifies or filters the ref value in the query.
-	Ref *RefName `form:"ref,omitempty" json:"ref,omitempty"`
-}
-
-// UpdateLayerParams defines parameters for UpdateLayer.
-type UpdateLayerParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListLayerRevisionsParams defines parameters for ListLayerRevisions.
-type ListLayerRevisionsParams struct {
-	// RefType identifies or filters the ref type value in the query.
-	RefType *RefType `form:"refType,omitempty" json:"refType,omitempty"`
-
-	// Ref identifies or filters the ref value in the query.
-	Ref *RefName `form:"ref,omitempty" json:"ref,omitempty"`
-
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// CreateLayerRevisionParams defines parameters for CreateLayerRevision.
-type CreateLayerRevisionParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// RollbackLayerParams defines parameters for RollbackLayer.
-type RollbackLayerParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListTenantMembersParams defines parameters for ListTenantMembers.
-type ListTenantMembersParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// DeleteNotificationChannelParams defines parameters for DeleteNotificationChannel.
-type DeleteNotificationChannelParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateNotificationChannelParams defines parameters for UpdateNotificationChannel.
-type UpdateNotificationChannelParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// RotateNotificationChannelSecretParams defines parameters for RotateNotificationChannelSecret.
-type RotateNotificationChannelSecretParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListNotificationsParams defines parameters for ListNotifications.
-type ListNotificationsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Unread identifies or filters the unread value in the query.
-	Unread *UnreadFilter `form:"unread,omitempty" json:"unread,omitempty"`
-}
-
-// ListRepositoriesParams defines parameters for ListRepositories.
-type ListRepositoriesParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Q identifies or filters the q value in the query.
-	Q *Query `form:"q,omitempty" json:"q,omitempty"`
-}
-
-// DeleteRepositoryParams defines parameters for DeleteRepository.
-type DeleteRepositoryParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateRepositoryParams defines parameters for UpdateRepository.
-type UpdateRepositoryParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListDiscoveryCandidatesParams defines parameters for ListDiscoveryCandidates.
-type ListDiscoveryCandidatesParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// AcceptDiscoveryCandidatesParams defines parameters for AcceptDiscoveryCandidates.
-type AcceptDiscoveryCandidatesParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// PreviewRepositoryConfigImportParams defines parameters for PreviewRepositoryConfigImport.
-type PreviewRepositoryConfigImportParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ApplyRepositoryConfigImportParams defines parameters for ApplyRepositoryConfigImport.
-type ApplyRepositoryConfigImportParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// DiscoverRepositoryParams defines parameters for DiscoverRepository.
-type DiscoverRepositoryParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// SyncRepositoryParams defines parameters for SyncRepository.
-type SyncRepositoryParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListReviewsParams defines parameters for ListReviews.
-type ListReviewsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Filter identifies or filters the filter value in the query.
-	Filter *ReviewFilters `json:"filter,omitempty"`
-}
-
-// SearchParams defines parameters for Search.
-type SearchParams struct {
-	// Q identifies or filters the q value in the query.
-	Q RequiredQuery `form:"q" json:"q"`
-
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Filter identifies or filters the filter value in the query.
-	Filter *SearchFacets `json:"filter,omitempty"`
-}
-
-// ListServicesParams defines parameters for ListServices.
-type ListServicesParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-
-	// Q identifies or filters the q value in the query.
-	Q *Query `form:"q,omitempty" json:"q,omitempty"`
-
-	// Sort identifies or filters the sort value in the query.
-	Sort *Sort `form:"sort,omitempty" json:"sort,omitempty"`
-
-	// GroupId identifies or filters the group id value in the query.
-	GroupId *openapi_types.UUID `form:"groupId,omitempty" json:"groupId,omitempty"`
-
-	// Tag identifies or filters the tag value in the query.
-	Tag *string `form:"tag,omitempty" json:"tag,omitempty"`
-
-	// Team identifies or filters the team value in the query.
-	Team *string `form:"team,omitempty" json:"team,omitempty"`
-
-	// Lifecycle identifies or filters the lifecycle value in the query.
-	Lifecycle *Lifecycle `form:"lifecycle,omitempty" json:"lifecycle,omitempty"`
-
-	// Language identifies or filters the language value in the query.
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Kind identifies or filters the kind value in the query.
-	Kind *string `form:"kind,omitempty" json:"kind,omitempty"`
-
-	// Starred identifies or filters the starred value in the query.
-	Starred *bool `form:"starred,omitempty" json:"starred,omitempty"`
-
-	// Mine identifies or filters the mine value in the query.
-	Mine *bool `form:"mine,omitempty" json:"mine,omitempty"`
-}
-
-// DeleteServiceParams defines parameters for DeleteService.
-type DeleteServiceParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateServiceParams defines parameters for UpdateService.
-type UpdateServiceParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// GenerateMissingAssetWithAiParams defines parameters for GenerateMissingAssetWithAi.
-type GenerateMissingAssetWithAiParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListServiceCommentsParams defines parameters for ListServiceComments.
-type ListServiceCommentsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// ResolveServiceDriftParams defines parameters for ResolveServiceDrift.
-type ResolveServiceDriftParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// ListRecentServicesParams defines parameters for ListRecentServices.
-type ListRecentServicesParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// UpdateTenantSettingsParams defines parameters for UpdateTenantSettings.
-type UpdateTenantSettingsParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListShareLinksParams defines parameters for ListShareLinks.
-type ListShareLinksParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// DeleteSourceSpecParams defines parameters for DeleteSourceSpec.
-type DeleteSourceSpecParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateSourceSpecParams defines parameters for UpdateSourceSpec.
-type UpdateSourceSpecParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ProduceSourceParams defines parameters for ProduceSource.
-type ProduceSourceParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
-}
-
-// DeleteSystemGroupParams defines parameters for DeleteSystemGroup.
-type DeleteSystemGroupParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateSystemGroupParams defines parameters for UpdateSystemGroup.
-type UpdateSystemGroupParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// PutSystemGroupMembersParams defines parameters for PutSystemGroupMembers.
-type PutSystemGroupMembersParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// DeleteTagParams defines parameters for DeleteTag.
-type DeleteTagParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateTagParams defines parameters for UpdateTag.
-type UpdateTagParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListTeamsParams defines parameters for ListTeams.
-type ListTeamsParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// DeleteTeamParams defines parameters for DeleteTeam.
-type DeleteTeamParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// UpdateTeamParams defines parameters for UpdateTeam.
-type UpdateTeamParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ReplaceTeamMembersParams defines parameters for ReplaceTeamMembers.
-type ReplaceTeamMembersParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListTokensParams defines parameters for ListTokens.
-type ListTokensParams struct {
-	// Page selects a one-based result page.
-	Page *Page `form:"page,omitempty" json:"page,omitempty"`
-
-	// PageSize limits the number of records returned on one page.
-	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
-}
-
-// DeleteViewOverrideParams defines parameters for DeleteViewOverride.
-type DeleteViewOverrideParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// PutViewOverrideParams defines parameters for PutViewOverride.
-type PutViewOverrideParams struct {
-	// IfMatch carries the current ETag required for a conditional mutation.
-	IfMatch IfMatch `json:"If-Match"`
-}
-
-// ListViewsParams defines parameters for ListViews.
-type ListViewsParams struct {
-	// Kind identifies or filters the kind value in the query.
-	Kind *KindFilter `form:"kind,omitempty" json:"kind,omitempty"`
-}
-
-// ReceiveGitWebhookParams defines parameters for ReceiveGitWebhook.
-type ReceiveGitWebhookParams struct {
-	// XMeridianDelivery identifies or filters the x meridian delivery value in the header.
-	XMeridianDelivery WebhookDelivery `json:"X-Meridian-Delivery"`
-
-	// XMeridianEvent identifies or filters the x meridian event value in the header.
-	XMeridianEvent ReceiveGitWebhookParamsXMeridianEvent `json:"X-Meridian-Event"`
-
-	// XMeridianSignature256 identifies or filters the x meridian signature 256 value in the header.
-	XMeridianSignature256 WebhookSignature `json:"X-Meridian-Signature-256"`
-}
-
-// ReceiveGitWebhookParamsXMeridianEvent defines parameters for ReceiveGitWebhook.
-type ReceiveGitWebhookParamsXMeridianEvent string
-
-// CreateGlobalCredentialJSONRequestBody defines body for CreateGlobalCredential for application/json ContentType.
-type CreateGlobalCredentialJSONRequestBody = GlobalCredentialCreateRequest
-
-// UpdateGlobalCredentialJSONRequestBody defines body for UpdateGlobalCredential for application/json ContentType.
-type UpdateGlobalCredentialJSONRequestBody = GlobalCredentialPatchRequest
-
-// RotateGlobalCredentialJSONRequestBody defines body for RotateGlobalCredential for application/json ContentType.
-type RotateGlobalCredentialJSONRequestBody = CredentialRotateRequest
-
-// TestGlobalCredentialJSONRequestBody defines body for TestGlobalCredential for application/json ContentType.
-type TestGlobalCredentialJSONRequestBody = ConnectionTestRequest
-
-// CreateProducerProfileJSONRequestBody defines body for CreateProducerProfile for application/json ContentType.
-type CreateProducerProfileJSONRequestBody = ProducerProfileCreateRequest
-
-// UpdateProducerProfileJSONRequestBody defines body for UpdateProducerProfile for application/json ContentType.
-type UpdateProducerProfileJSONRequestBody = ProducerProfilePatchRequest
-
-// UpdatePlatformSettingsJSONRequestBody defines body for UpdatePlatformSettings for application/json ContentType.
-type UpdatePlatformSettingsJSONRequestBody = PlatformSettingsPatchRequest
-
-// CreateTenantJSONRequestBody defines body for CreateTenant for application/json ContentType.
-type CreateTenantJSONRequestBody = TenantCreateRequest
-
-// DeleteTenantJSONRequestBody defines body for DeleteTenant for application/json ContentType.
-type DeleteTenantJSONRequestBody = TenantDeleteRequest
-
-// UpdateTenantJSONRequestBody defines body for UpdateTenant for application/json ContentType.
-type UpdateTenantJSONRequestBody = TenantPatchRequest
-
-// PutTenantMemberAsPlatformAdminJSONRequestBody defines body for PutTenantMemberAsPlatformAdmin for application/json ContentType.
-type PutTenantMemberAsPlatformAdminJSONRequestBody = MemberPutRequest
-
-// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
-type CreateUserJSONRequestBody = UserCreateRequest
-
-// UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
-type UpdateUserJSONRequestBody = UserPatchRequest
-
-// LoginJSONRequestBody defines body for Login for application/json ContentType.
-type LoginJSONRequestBody = LoginRequest
-
-// UpdateMyPreferencesJSONRequestBody defines body for UpdateMyPreferences for application/json ContentType.
-type UpdateMyPreferencesJSONRequestBody = UserPreferencesPatchRequest
-
-// ResolvePublicViewJSONRequestBody defines body for ResolvePublicView for application/json ContentType.
-type ResolvePublicViewJSONRequestBody = PublicViewResolveRequest
-
-// UpdateAssetKindStateJSONRequestBody defines body for UpdateAssetKindState for application/json ContentType.
-type UpdateAssetKindStateJSONRequestBody = AssetKindPatchRequest
-
-// PublishAssetVersionJSONRequestBody defines body for PublishAssetVersion for application/json ContentType.
-type PublishAssetVersionJSONRequestBody = VersionPublishRequest
-
-// ReorderAssetLayersJSONRequestBody defines body for ReorderAssetLayers for application/json ContentType.
-type ReorderAssetLayersJSONRequestBody = LayerOrderReplaceRequest
-
-// GenerateAssetWithAiJSONRequestBody defines body for GenerateAssetWithAi for application/json ContentType.
-type GenerateAssetWithAiJSONRequestBody = AssetAiGenerateRequest
-
-// PreviewMergeJSONRequestBody defines body for PreviewMerge for application/json ContentType.
-type PreviewMergeJSONRequestBody = MergePreviewRequest
-
-// PushAssetRevisionJSONRequestBody defines body for PushAssetRevision for application/json ContentType.
-type PushAssetRevisionJSONRequestBody = AssetPushRequest
-
-// AcknowledgeBreakingTodoJSONRequestBody defines body for AcknowledgeBreakingTodo for application/json ContentType.
-type AcknowledgeBreakingTodoJSONRequestBody = BreakingTodoAcknowledgeRequest
-
-// CreateCredentialJSONRequestBody defines body for CreateCredential for application/json ContentType.
-type CreateCredentialJSONRequestBody = CredentialCreateRequest
-
-// UpdateCredentialJSONRequestBody defines body for UpdateCredential for application/json ContentType.
-type UpdateCredentialJSONRequestBody = CredentialPatchRequest
-
-// RotateCredentialJSONRequestBody defines body for RotateCredential for application/json ContentType.
-type RotateCredentialJSONRequestBody = CredentialRotateRequest
-
-// TestCredentialJSONRequestBody defines body for TestCredential for application/json ContentType.
-type TestCredentialJSONRequestBody = ConnectionTestRequest
-
-// RunDiffJSONRequestBody defines body for RunDiff for application/json ContentType.
-type RunDiffJSONRequestBody = DiffCreateRequest
-
-// CreateDiffRuleSetJSONRequestBody defines body for CreateDiffRuleSet for application/json ContentType.
-type CreateDiffRuleSetJSONRequestBody = DiffRuleSetCreateRequest
-
-// UpdateDiffRuleSetJSONRequestBody defines body for UpdateDiffRuleSet for application/json ContentType.
-type UpdateDiffRuleSetJSONRequestBody = DiffRuleSetPatchRequest
-
-// CreateDiffSnapshotShareLinkJSONRequestBody defines body for CreateDiffSnapshotShareLink for application/json ContentType.
-type CreateDiffSnapshotShareLinkJSONRequestBody = DiffSnapshotShareRequest
-
-// CreateKnownHostJSONRequestBody defines body for CreateKnownHost for application/json ContentType.
-type CreateKnownHostJSONRequestBody = KnownHostCreateRequest
-
-// ApproveLayerRevisionJSONRequestBody defines body for ApproveLayerRevision for application/json ContentType.
-type ApproveLayerRevisionJSONRequestBody = RevisionApproveRequest
-
-// RejectLayerRevisionJSONRequestBody defines body for RejectLayerRevision for application/json ContentType.
-type RejectLayerRevisionJSONRequestBody = RevisionRejectRequest
-
-// UpdateLayerJSONRequestBody defines body for UpdateLayer for application/json ContentType.
-type UpdateLayerJSONRequestBody = LayerPatchRequest
-
-// CreateLayerRevisionJSONRequestBody defines body for CreateLayerRevision for application/json ContentType.
-type CreateLayerRevisionJSONRequestBody = LayerRevisionCreateRequest
-
-// RollbackLayerJSONRequestBody defines body for RollbackLayer for application/json ContentType.
-type RollbackLayerJSONRequestBody = LayerRollbackRequest
-
-// PutTenantMemberJSONRequestBody defines body for PutTenantMember for application/json ContentType.
-type PutTenantMemberJSONRequestBody = MemberPutRequest
-
-// CreateNotificationChannelJSONRequestBody defines body for CreateNotificationChannel for application/json ContentType.
-type CreateNotificationChannelJSONRequestBody = NotificationChannelCreateRequest
-
-// UpdateNotificationChannelJSONRequestBody defines body for UpdateNotificationChannel for application/json ContentType.
-type UpdateNotificationChannelJSONRequestBody = NotificationChannelPatchRequest
-
-// RotateNotificationChannelSecretJSONRequestBody defines body for RotateNotificationChannelSecret for application/json ContentType.
-type RotateNotificationChannelSecretJSONRequestBody = NotificationChannelRotateRequest
-
-// CreateRepositoryJSONRequestBody defines body for CreateRepository for application/json ContentType.
-type CreateRepositoryJSONRequestBody = RepositoryCreateRequest
-
-// UpdateRepositoryJSONRequestBody defines body for UpdateRepository for application/json ContentType.
-type UpdateRepositoryJSONRequestBody = RepositoryPatchRequest
-
-// AcceptDiscoveryCandidatesJSONRequestBody defines body for AcceptDiscoveryCandidates for application/json ContentType.
-type AcceptDiscoveryCandidatesJSONRequestBody = CandidatesAcceptRequest
-
-// PreviewRepositoryConfigImportJSONRequestBody defines body for PreviewRepositoryConfigImport for application/json ContentType.
-type PreviewRepositoryConfigImportJSONRequestBody = ConfigImportPreviewRequest
-
-// ApplyRepositoryConfigImportJSONRequestBody defines body for ApplyRepositoryConfigImport for application/json ContentType.
-type ApplyRepositoryConfigImportJSONRequestBody = ConfigImportApplyRequest
-
-// CreateServiceInRepositoryJSONRequestBody defines body for CreateServiceInRepository for application/json ContentType.
-type CreateServiceInRepositoryJSONRequestBody = ServiceCreateRequest
-
-// DiscoverRepositoryJSONRequestBody defines body for DiscoverRepository for application/json ContentType.
-type DiscoverRepositoryJSONRequestBody = RepositoryDiscoverRequest
-
-// SyncRepositoryJSONRequestBody defines body for SyncRepository for application/json ContentType.
-type SyncRepositoryJSONRequestBody = RepositorySyncRequest
-
-// CheckRepositoryConnectionJSONRequestBody defines body for CheckRepositoryConnection for application/json ContentType.
-type CheckRepositoryConnectionJSONRequestBody = RepositoryConnectionCheckRequest
-
-// UpdateServiceJSONRequestBody defines body for UpdateService for application/json ContentType.
-type UpdateServiceJSONRequestBody = ServicePatchRequest
-
-// PutServiceAccessJSONRequestBody defines body for PutServiceAccess for application/json ContentType.
-type PutServiceAccessJSONRequestBody = ServiceAccessPutRequest
-
-// GenerateMissingAssetWithAiJSONRequestBody defines body for GenerateMissingAssetWithAi for application/json ContentType.
-type GenerateMissingAssetWithAiJSONRequestBody = ServiceAiGenerateRequest
-
-// CreateServiceCommentJSONRequestBody defines body for CreateServiceComment for application/json ContentType.
-type CreateServiceCommentJSONRequestBody = CommentCreateRequest
-
-// CreateSourceSpecJSONRequestBody defines body for CreateSourceSpec for application/json ContentType.
-type CreateSourceSpecJSONRequestBody = SourceSpecCreateRequest
-
-// ResolveServiceDriftJSONRequestBody defines body for ResolveServiceDrift for application/json ContentType.
-type ResolveServiceDriftJSONRequestBody = DriftResolutionRequest
-
-// UpdateTenantSettingsJSONRequestBody defines body for UpdateTenantSettings for application/json ContentType.
-type UpdateTenantSettingsJSONRequestBody = TenantSettingsPatchRequest
-
-// CreateShareLinkJSONRequestBody defines body for CreateShareLink for application/json ContentType.
-type CreateShareLinkJSONRequestBody = ShareLinkCreateRequest
-
-// UpdateSourceSpecJSONRequestBody defines body for UpdateSourceSpec for application/json ContentType.
-type UpdateSourceSpecJSONRequestBody = SourceSpecPatchRequest
-
-// ProduceSourceJSONRequestBody defines body for ProduceSource for application/json ContentType.
-type ProduceSourceJSONRequestBody = ProduceSourceRequest
-
-// PutSubscriptionJSONRequestBody defines body for PutSubscription for application/json ContentType.
-type PutSubscriptionJSONRequestBody = SubscriptionPutRequest
-
-// CreateSystemGroupJSONRequestBody defines body for CreateSystemGroup for application/json ContentType.
-type CreateSystemGroupJSONRequestBody = SystemGroupCreateRequest
-
-// UpdateSystemGroupJSONRequestBody defines body for UpdateSystemGroup for application/json ContentType.
-type UpdateSystemGroupJSONRequestBody = SystemGroupPatchRequest
-
-// PutSystemGroupMembersJSONRequestBody defines body for PutSystemGroupMembers for application/json ContentType.
-type PutSystemGroupMembersJSONRequestBody = SystemGroupMembersReplaceRequest
-
-// CreateTagJSONRequestBody defines body for CreateTag for application/json ContentType.
-type CreateTagJSONRequestBody = TagCreateRequest
-
-// UpdateTagJSONRequestBody defines body for UpdateTag for application/json ContentType.
-type UpdateTagJSONRequestBody = TagPatchRequest
-
-// CreateTeamJSONRequestBody defines body for CreateTeam for application/json ContentType.
-type CreateTeamJSONRequestBody = TeamCreateRequest
-
-// UpdateTeamJSONRequestBody defines body for UpdateTeam for application/json ContentType.
-type UpdateTeamJSONRequestBody = TeamPatchRequest
-
-// ReplaceTeamMembersJSONRequestBody defines body for ReplaceTeamMembers for application/json ContentType.
-type ReplaceTeamMembersJSONRequestBody = TeamMembersReplaceRequest
-
-// CreateTokenJSONRequestBody defines body for CreateToken for application/json ContentType.
-type CreateTokenJSONRequestBody = TokenCreateRequest
-
-// CreateDiffUploadMultipartRequestBody defines body for CreateDiffUpload for multipart/form-data ContentType.
-type CreateDiffUploadMultipartRequestBody = UploadRequest
-
-// PutViewOverrideJSONRequestBody defines body for PutViewOverride for application/json ContentType.
-type PutViewOverrideJSONRequestBody = ViewOverridePutRequest
-
-// ResolveViewJSONRequestBody defines body for ResolveView for application/json ContentType.
-type ResolveViewJSONRequestBody = ViewResolveRequest
-
-// ReceiveGitWebhookJSONRequestBody defines body for ReceiveGitWebhook for application/json ContentType.
-type ReceiveGitWebhookJSONRequestBody = GitPushWebhook
 
 // AsCredentialCreateRequest0 returns the union data inside the CredentialCreateRequest as a CredentialCreateRequest0
 func (t CredentialCreateRequest) AsCredentialCreateRequest0() (CredentialCreateRequest0, error) {
@@ -8304,7 +6948,7 @@ func (t *DocumentSelector) FromVersionSelector(v VersionSelector) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"type":"VersionSelector"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"type":"version"}`))
 	t.union = b
 	return err
 }
@@ -8315,7 +6959,7 @@ func (t *DocumentSelector) MergeVersionSelector(v VersionSelector) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"type":"VersionSelector"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"type":"version"}`))
 	if err != nil {
 		return err
 	}
@@ -8338,7 +6982,7 @@ func (t *DocumentSelector) FromRefSelector(v RefSelector) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"type":"RefSelector"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"type":"ref"}`))
 	t.union = b
 	return err
 }
@@ -8349,7 +6993,7 @@ func (t *DocumentSelector) MergeRefSelector(v RefSelector) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"type":"RefSelector"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"type":"ref"}`))
 	if err != nil {
 		return err
 	}
@@ -8372,7 +7016,7 @@ func (t *DocumentSelector) FromUploadSelector(v UploadSelector) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"type":"UploadSelector"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"type":"upload"}`))
 	t.union = b
 	return err
 }
@@ -8383,7 +7027,7 @@ func (t *DocumentSelector) MergeUploadSelector(v UploadSelector) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"type":"UploadSelector"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"type":"upload"}`))
 	if err != nil {
 		return err
 	}
@@ -8409,11 +7053,11 @@ func (t DocumentSelector) ValueByDiscriminator() (any, error) {
 		return nil, err
 	}
 	switch discriminator {
-	case "RefSelector":
+	case "ref":
 		return t.AsRefSelector()
-	case "UploadSelector":
+	case "upload":
 		return t.AsUploadSelector()
-	case "VersionSelector":
+	case "version":
 		return t.AsVersionSelector()
 	default:
 		return nil, errors.New("unknown discriminator value: " + discriminator)
@@ -8509,7 +7153,7 @@ func (t *JobSseEvent) FromJobLogEvent(v JobLogEvent) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"event":"JobLogEvent"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"event":"log"}`))
 	t.union = b
 	return err
 }
@@ -8520,7 +7164,7 @@ func (t *JobSseEvent) MergeJobLogEvent(v JobLogEvent) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"event":"JobLogEvent"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"event":"log"}`))
 	if err != nil {
 		return err
 	}
@@ -8543,7 +7187,7 @@ func (t *JobSseEvent) FromJobStateEvent(v JobStateEvent) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"event":"JobStateEvent"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"event":"state"}`))
 	t.union = b
 	return err
 }
@@ -8554,7 +7198,7 @@ func (t *JobSseEvent) MergeJobStateEvent(v JobStateEvent) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"event":"JobStateEvent"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"event":"state"}`))
 	if err != nil {
 		return err
 	}
@@ -8580,9 +7224,9 @@ func (t JobSseEvent) ValueByDiscriminator() (any, error) {
 		return nil, err
 	}
 	switch discriminator {
-	case "JobLogEvent":
+	case "log":
 		return t.AsJobLogEvent()
-	case "JobStateEvent":
+	case "state":
 		return t.AsJobStateEvent()
 	default:
 		return nil, errors.New("unknown discriminator value: " + discriminator)
@@ -8870,7 +7514,7 @@ func (t *ViewResolution) FromDocumentViewResolution(v DocumentViewResolution) er
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"kind":"DocumentViewResolution"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"kind":"document"}`))
 	t.union = b
 	return err
 }
@@ -8881,7 +7525,7 @@ func (t *ViewResolution) MergeDocumentViewResolution(v DocumentViewResolution) e
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"kind":"DocumentViewResolution"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"kind":"document"}`))
 	if err != nil {
 		return err
 	}
@@ -8904,7 +7548,7 @@ func (t *ViewResolution) FromItemsViewResolution(v ItemsViewResolution) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"kind":"ItemsViewResolution"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"kind":"items"}`))
 	t.union = b
 	return err
 }
@@ -8915,7 +7559,7 @@ func (t *ViewResolution) MergeItemsViewResolution(v ItemsViewResolution) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"kind":"ItemsViewResolution"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"kind":"items"}`))
 	if err != nil {
 		return err
 	}
@@ -8938,7 +7582,7 @@ func (t *ViewResolution) FromGraphViewResolution(v GraphViewResolution) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"kind":"GraphViewResolution"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"kind":"dep_graph"}`))
 	t.union = b
 	return err
 }
@@ -8949,7 +7593,7 @@ func (t *ViewResolution) MergeGraphViewResolution(v GraphViewResolution) error {
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"kind":"GraphViewResolution"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"kind":"dep_graph"}`))
 	if err != nil {
 		return err
 	}
@@ -8972,7 +7616,7 @@ func (t *ViewResolution) FromDashboardViewResolution(v DashboardViewResolution) 
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"kind":"DashboardViewResolution"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"kind":"catalog_dashboard"}`))
 	t.union = b
 	return err
 }
@@ -8983,7 +7627,7 @@ func (t *ViewResolution) MergeDashboardViewResolution(v DashboardViewResolution)
 	if err != nil {
 		return err
 	}
-	b, err = runtime.JSONMerge(b, []byte(`{"kind":"DashboardViewResolution"}`))
+	b, err = runtime.JSONMerge(b, []byte(`{"kind":"catalog_dashboard"}`))
 	if err != nil {
 		return err
 	}
@@ -9009,13 +7653,13 @@ func (t ViewResolution) ValueByDiscriminator() (any, error) {
 		return nil, err
 	}
 	switch discriminator {
-	case "DashboardViewResolution":
+	case "catalog_dashboard":
 		return t.AsDashboardViewResolution()
-	case "DocumentViewResolution":
-		return t.AsDocumentViewResolution()
-	case "GraphViewResolution":
+	case "dep_graph":
 		return t.AsGraphViewResolution()
-	case "ItemsViewResolution":
+	case "document":
+		return t.AsDocumentViewResolution()
+	case "items":
 		return t.AsItemsViewResolution()
 	default:
 		return nil, errors.New("unknown discriminator value: " + discriminator)

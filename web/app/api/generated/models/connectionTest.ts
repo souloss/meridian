@@ -14,10 +14,7 @@ import type { KnownHostCandidate } from './knownHostCandidate.ts';
 export interface ConnectionTest {
   /** indicates whether ok applies to this connection test. */
   ok: boolean;
-  /**
-     * specifies the error class associated with this connection test.
-     * @nullable
-     */
+  /** specifies the error class associated with this connection test. */
   errorClass: ConnectionTestErrorClass;
   /** specifies the message associated with this connection test. */
   message: string;

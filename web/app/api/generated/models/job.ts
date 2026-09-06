@@ -5,7 +5,7 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
-import type { CapabilityList } from './capabilityList.ts';
+import type { CapabilityListItem } from './capabilityListItem.ts';
 import type { ErrorResponse } from './errorResponse.ts';
 import type { JobResult } from './jobResult.ts';
 import type { JobScopeType } from './jobScopeType.ts';
@@ -40,19 +40,13 @@ export interface Job {
   stage: PipelineStage | null;
   /** contains the job scope type associated with this job. */
   scopeType: JobScopeType;
-  /**
-     * specifies the scope id associated with this job.
-     * @nullable
-     */
+  /** specifies the scope id associated with this job. */
   scopeId: string | null;
   /** specifies the ref type associated with this job. */
   refType: RefType | null;
   /** specifies the ref associated with this job. */
   ref: RefName | null;
-  /**
-     * Operation-specific non-secret result identifiers and counters.
-     * @nullable
-     */
+  /** Operation-specific non-secret result identifiers and counters. */
   result: JobResult;
   /**
      * specifies the progress associated with this job.
@@ -85,5 +79,5 @@ export interface Job {
   /** is the RFC 3339 UTC instant when processing reached a terminal state. */
   finishedAt: Timestamp | null;
   /** lists actions the authenticated principal may perform on this resource. */
-  capabilities: CapabilityList;
+  capabilities: CapabilityListItem;
 }

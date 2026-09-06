@@ -5,12 +5,16 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
+	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
+
+	// TestCredential decrypts one tenant-visible credential only for a bounded connection probe.
+	repository "github.com/meridian-labs/meridian/internal/generated/api/repository"
+	tenant "github.com/meridian-labs/meridian/internal/generated/api/tenant"
 )
 
-// TestCredential decrypts one tenant-visible credential only for a bounded connection probe.
-func (s *Server) TestCredential(ctx context.Context, request api.TestCredentialRequestObject) (api.TestCredentialResponseObject, error) {
+func (s *Server) TestCredential(ctx context.Context, request tenant.TestCredentialRequestObject) (tenant.TestCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -22,11 +26,11 @@ func (s *Server) TestCredential(ctx context.Context, request api.TestCredentialR
 	if err != nil {
 		return nil, err
 	}
-	return api.TestCredential200JSONResponse{ConnectionTestJSONResponse: api.ConnectionTestJSONResponse(connectionTestResponse(result))}, nil
+	return tenant.TestCredential200JSONResponse(connectionTestResponse(result)), nil
 }
 
 // TestGlobalCredential decrypts one platform credential only for a bounded connection probe.
-func (s *Server) TestGlobalCredential(ctx context.Context, request api.TestGlobalCredentialRequestObject) (api.TestGlobalCredentialResponseObject, error) {
+func (s *Server) TestGlobalCredential(ctx context.Context, request platform.TestGlobalCredentialRequestObject) (platform.TestGlobalCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -38,11 +42,11 @@ func (s *Server) TestGlobalCredential(ctx context.Context, request api.TestGloba
 	if err != nil {
 		return nil, err
 	}
-	return api.TestGlobalCredential200JSONResponse{ConnectionTestJSONResponse: api.ConnectionTestJSONResponse(connectionTestResponse(result))}, nil
+	return platform.TestGlobalCredential200JSONResponse(connectionTestResponse(result)), nil
 }
 
 // CheckRepositoryConnection probes a remote before a repository is persisted.
-func (s *Server) CheckRepositoryConnection(ctx context.Context, request api.CheckRepositoryConnectionRequestObject) (api.CheckRepositoryConnectionResponseObject, error) {
+func (s *Server) CheckRepositoryConnection(ctx context.Context, request repository.CheckRepositoryConnectionRequestObject) (repository.CheckRepositoryConnectionResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -59,7 +63,7 @@ func (s *Server) CheckRepositoryConnection(ctx context.Context, request api.Chec
 	if err != nil {
 		return nil, err
 	}
-	return api.CheckRepositoryConnection200JSONResponse{ConnectionTestJSONResponse: api.ConnectionTestJSONResponse(connectionTestResponse(result))}, nil
+	return repository.CheckRepositoryConnection200JSONResponse(connectionTestResponse(result)), nil
 }
 
 func connectionTestResponse(result service.ConnectionTestResult) api.ConnectionTest {

@@ -9,4 +9,4 @@
 /**
  * specifies the metrics associated with this dashboard view resolution.
  */
-export type DashboardViewResolutionMetrics = { [key: string]: unknown };
+export type DashboardViewResolutionMetrics = {[key: string]: unknown};

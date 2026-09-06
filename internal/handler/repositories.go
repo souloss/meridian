@@ -5,12 +5,13 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
+	repository "github.com/meridian-labs/meridian/internal/generated/api/repository"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
 )
 
 // ListRepositories returns the tenant-scoped repository page and per-item capabilities.
-func (s *Server) ListRepositories(ctx context.Context, request api.ListRepositoriesRequestObject) (api.ListRepositoriesResponseObject, error) {
+func (s *Server) ListRepositories(ctx context.Context, request repository.ListRepositoriesRequestObject) (repository.ListRepositoriesResponseObject, error) {
 	if s.repositories == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -31,13 +32,13 @@ func (s *Server) ListRepositories(ctx context.Context, request api.ListRepositor
 	for _, item := range items {
 		responses = append(responses, repositoryResponse(item))
 	}
-	return api.ListRepositories200JSONResponse{RepositoryPageJSONResponse: api.RepositoryPageJSONResponse(api.RepositoryPage{
+	return repository.ListRepositories200JSONResponse(api.RepositoryPage{
 		Items: responses, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // CreateRepository validates, authorizes, and persists one tenant repository.
-func (s *Server) CreateRepository(ctx context.Context, request api.CreateRepositoryRequestObject) (api.CreateRepositoryResponseObject, error) {
+func (s *Server) CreateRepository(ctx context.Context, request repository.CreateRepositoryRequestObject) (repository.CreateRepositoryResponseObject, error) {
 	if s.repositories == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -50,13 +51,11 @@ func (s *Server) CreateRepository(ctx context.Context, request api.CreateReposit
 		return nil, err
 	}
 	body := repositoryResponse(created)
-	return api.CreateRepository201JSONResponse{RepositoryJSONResponse: api.RepositoryJSONResponse{
-		Body: body, Headers: api.RepositoryResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return repository.CreateRepository201JSONResponse{Body: body, Headers: repository.CreateRepository201ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // GetRepository returns one tenant repository without exposing credential material.
-func (s *Server) GetRepository(ctx context.Context, request api.GetRepositoryRequestObject) (api.GetRepositoryResponseObject, error) {
+func (s *Server) GetRepository(ctx context.Context, request repository.GetRepositoryRequestObject) (repository.GetRepositoryResponseObject, error) {
 	if s.repositories == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -69,13 +68,11 @@ func (s *Server) GetRepository(ctx context.Context, request api.GetRepositoryReq
 		return nil, err
 	}
 	body := repositoryResponse(record)
-	return api.GetRepository200JSONResponse{RepositoryJSONResponse: api.RepositoryJSONResponse{
-		Body: body, Headers: api.RepositoryResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return repository.GetRepository200JSONResponse{Body: body, Headers: repository.GetRepository200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // UpdateRepository applies a three-state patch under the caller's If-Match ETag.
-func (s *Server) UpdateRepository(ctx context.Context, request api.UpdateRepositoryRequestObject) (api.UpdateRepositoryResponseObject, error) {
+func (s *Server) UpdateRepository(ctx context.Context, request repository.UpdateRepositoryRequestObject) (repository.UpdateRepositoryResponseObject, error) {
 	if s.repositories == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -88,13 +85,11 @@ func (s *Server) UpdateRepository(ctx context.Context, request api.UpdateReposit
 		return nil, err
 	}
 	body := repositoryResponse(updated)
-	return api.UpdateRepository200JSONResponse{RepositoryJSONResponse: api.RepositoryJSONResponse{
-		Body: body, Headers: api.RepositoryResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return repository.UpdateRepository200JSONResponse{Body: body, Headers: repository.UpdateRepository200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // DeleteRepository soft-deletes one repository under its current ETag.
-func (s *Server) DeleteRepository(ctx context.Context, request api.DeleteRepositoryRequestObject) (api.DeleteRepositoryResponseObject, error) {
+func (s *Server) DeleteRepository(ctx context.Context, request repository.DeleteRepositoryRequestObject) (repository.DeleteRepositoryResponseObject, error) {
 	if s.repositories == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -105,7 +100,7 @@ func (s *Server) DeleteRepository(ctx context.Context, request api.DeleteReposit
 	if err := s.repositories.Delete(ctx, principal, request.TenantSlug, serviceUUID(request.RepositoryId), request.Params.IfMatch); err != nil {
 		return nil, err
 	}
-	return api.DeleteRepository204Response{}, nil
+	return repository.DeleteRepository204Response{}, nil
 }
 
 func newRepositoryInput(body api.RepositoryCreateRequest) service.NewRepositoryInput {

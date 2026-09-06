@@ -41,7 +41,6 @@ export interface SourceSpec {
   /**
      * specifies the path associated with this source spec.
      * @maxLength 512
-     * @nullable
      */
   path: string | null;
   /** specifies the producer profile id associated with this source spec. */
@@ -68,10 +67,7 @@ export interface SourceSpec {
   configOrigin: ConfigSource;
   /** contains the ordered config field sources associated with this source spec. */
   configFieldSources: FieldSource[];
-  /**
-     * specifies the last error associated with this source spec.
-     * @nullable
-     */
+  /** specifies the last error associated with this source spec. */
   lastError: string | null;
   /** specifies the last run associated with this source spec. */
   lastRun: SourceRunSummary | null;

@@ -26,7 +26,6 @@ export interface ServiceAiGenerateRequest {
   /**
      * specifies the hint associated with this service ai generate request.
      * @maxLength 500
-     * @nullable
      */
   hint?: string | null;
   /** contains the uuid associated with this service ai generate request. */

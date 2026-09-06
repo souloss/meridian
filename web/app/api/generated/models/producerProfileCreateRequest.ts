@@ -30,13 +30,9 @@ export interface ProducerProfileCreateRequest {
   /**
      * contains the ordered args associated with this producer profile create request.
      * @maxItems 64
-     * @items.maxLength 512
      */
   args: string[];
-  /**
-     * Names only; must be a subset of the deployment producer environment allowlist.
-     * @items.pattern ^[A-Z][A-Z0-9_]*$
-     */
+  /** Names only; must be a subset of the deployment producer environment allowlist. */
   envAllowlist: string[];
   /**
      * contains the ordered supported kinds associated with this producer profile create request.

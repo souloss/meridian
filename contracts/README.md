@@ -6,7 +6,8 @@
 
 | 文件 | 唯一负责内容 |
 | --- | --- |
-| [openapi.yaml](./openapi.yaml) | HTTP operation、鉴权、请求响应、错误 |
+| [openapi.yaml](./openapi.yaml) | `contracts/api/` 生成的完整 HTTP canonical bundle，不直接编辑 |
+| [api/](./api/) | TypeSpec 唯一真实源：`main.tsp`、`common/models.tsp` 与 `domains/*.tsp`；构建时生成 build 投影和 canonical `openapi.yaml` |
 | [domain.yaml](./domain.yaml) | 领域枚举、权限、状态机、限制、默认值、并发与恢复语义 |
 | [storage.yaml](./storage.yaml) | PostgreSQL 表、键、索引、外键策略、事务边界 |
 | [kinds.yaml](./kinds.yaml) | AssetKind 插件接口、内建 kind、内容 schema、breaking 规则 |
@@ -20,7 +21,7 @@
 ## 使用规则
 
 1. 先改拥有该语义的 YAML，再更新其它投影；
-2. OpenAPI 生成 Go server/client 与 TypeScript client，生成目录见 manifest；
+2. API 只维护 `api/*.tsp`；`make contracts-sync` 自动编译 TypeSpec，生成 `build/contracts/api` 与 canonical `openapi.yaml`，再从共享模型和领域投影生成 Go server；TypeScript client 继续从 canonical contract 生成；生成目录见 manifest；
 3. 所有 operation、schema、字段和参数必须在 OpenAPI 写清 `description`；Go/TypeScript 生成器会传播这些语义，并为纯传输胶水补充稳定的 GoDoc/JSDoc，禁止手改生成文件；
 4. OpenAPI 结构校验使用同目录 `.redocly.yaml`，摘要和标签文案是编辑元数据，不能替代 operationId、schema、鉴权和响应校验；
 5. 领域枚举在 OpenAPI、数据库和测试中的投影必须与 `domain.yaml` 一致；
@@ -28,5 +29,6 @@
 7. 冲突是构建错误，不通过覆盖顺序解决；
 8. Markdown 只解释业务和实现，不成为第二份契约。
 9. `work-items.yaml` 只引用其它契约的 operation/story/assertion，不复制其语义；工作项状态和证据必须与 git 提交绑定。
+10. 修改 OpenAPI 时只编辑 `api/` 下的真实源（不得新增路径副本或投影文件）；运行 `make contracts-sync` 生成聚合文件与 canonical bundle，运行 `make contracts-check` 检查 CI 中是否存在漂移。
 
 `status: frozen` 表示已允许编码，不表示永不变更。破坏性变更按 manifest 的兼容策略升级版本并保留旧 API 一个发布周期。

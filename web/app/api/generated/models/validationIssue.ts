@@ -17,9 +17,6 @@ export interface ValidationIssue {
   code: string;
   /** specifies the message associated with this validation issue. */
   message: string;
-  /**
-     * specifies the pointer associated with this validation issue.
-     * @nullable
-     */
+  /** specifies the pointer associated with this validation issue. */
   pointer: string | null;
 }

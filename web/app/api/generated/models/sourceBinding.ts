@@ -27,10 +27,7 @@ export interface SourceBinding {
   scopeKey: string;
   /** specifies the expansion key associated with this source binding. */
   expansionKey: string;
-  /**
-     * Null only for push/manual sources with no repository file. A previously resolved repository path is retained when a file disappears and the binding becomes stale.
-     * @nullable
-     */
+  /** Null only for push/manual sources with no repository file. A previously resolved repository path is retained when a file disappears and the binding becomes stale. */
   resolvedPath: string | null;
   /** identifies the asset associated with this resource. */
   assetId: Uuid;
@@ -40,7 +37,6 @@ export interface SourceBinding {
   state: SourceBindingState;
   /**
      * Null for global non-Git materializations.
-     * @nullable
      * @pattern ^[0-9a-f]{40,64}$
      */
   lastSeenCommit: string | null;

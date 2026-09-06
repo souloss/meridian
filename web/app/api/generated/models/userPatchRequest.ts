@@ -17,10 +17,7 @@ export interface UserPatchRequest {
      * @maxLength 128
      */
   displayName?: string;
-  /**
-     * specifies the email associated with this user patch request.
-     * @nullable
-     */
+  /** specifies the email associated with this user patch request. */
   email?: string | null;
   /** is the current lifecycle or processing state. */
   status?: UserPatchRequestStatus;

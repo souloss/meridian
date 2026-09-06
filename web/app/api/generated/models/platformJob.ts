@@ -32,10 +32,7 @@ export interface PlatformJob {
   stage: PipelineStage | null;
   /** contains the job scope type associated with this platform job. */
   scopeType: JobScopeType;
-  /**
-     * Exposed only for tenant or repository scope; null for service, asset, version, layer, and other business scopes.
-     * @nullable
-     */
+  /** Exposed only for tenant or repository scope; null for service, asset, version, layer, and other business scopes. */
   scopeId: string | null;
   /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;

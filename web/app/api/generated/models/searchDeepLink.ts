@@ -15,9 +15,6 @@ export interface SearchDeepLink {
   assetId: Uuid;
   /** identifies the asset version associated with this resource. */
   versionId: Uuid;
-  /**
-     * specifies the item key associated with this search deep link.
-     * @nullable
-     */
+  /** specifies the item key associated with this search deep link. */
   itemKey: string | null;
 }

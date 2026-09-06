@@ -7,14 +7,13 @@
  */
 import type { DomainEventType } from './domainEventType.ts';
 import type { KindId } from './kindId.ts';
-import type { SubscriptionScopeConstraints } from './subscriptionScopeConstraints.ts';
 import type { SubscriptionScopeType } from './subscriptionScopeType.ts';
 import type { Uuid } from './uuid.ts';
 
 /**
  * defines validated input for the corresponding Meridian API operation.
  */
-export type SubscriptionPutRequest = SubscriptionScopeConstraints & ({
+export interface SubscriptionPutRequest {
   /**
      * contains the ordered event types associated with this subscription put request.
      * @minItems 1
@@ -31,4 +30,4 @@ export type SubscriptionPutRequest = SubscriptionScopeConstraints & ({
   channelIds: Uuid[];
   /** indicates whether enabled applies to this subscription put request. */
   enabled: boolean;
-});
+}

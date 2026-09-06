@@ -6,3 +6,8 @@ web/dist/
 bin/
 *.log
 artifacts/smoke/
+
+node_modules
+build/contracts/api/
+contracts/api/tsp-output/
+__pycache__/

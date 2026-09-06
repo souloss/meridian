@@ -11,23 +11,21 @@ import type { RefType } from './refType.ts';
 /**
  * afterCommit is null exactly when deleted is true; beforeCommit may be null for a new ref.
  */
-export type GitPushWebhook = unknown & ({
+export interface GitPushWebhook {
   /** contains the ref type associated with this git push webhook. */
   refType: RefType;
   /** contains the ref name associated with this git push webhook. */
   ref: RefName;
   /**
      * specifies the before commit associated with this git push webhook.
-     * @nullable
      * @pattern ^[0-9a-f]{40,64}$
      */
   beforeCommit: string | null;
   /**
      * specifies the after commit associated with this git push webhook.
-     * @nullable
      * @pattern ^[0-9a-f]{40,64}$
      */
   afterCommit: string | null;
   /** indicates whether deleted applies to this git push webhook. */
   deleted: boolean;
-});
+}

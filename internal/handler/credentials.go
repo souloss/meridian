@@ -7,12 +7,15 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
+	tenant "github.com/meridian-labs/meridian/internal/generated/api/tenant"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
+
+	// ListCredentials returns tenant-visible credential metadata without secret material.
+	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
 )
 
-// ListCredentials returns tenant-visible credential metadata without secret material.
-func (s *Server) ListCredentials(ctx context.Context, request api.ListCredentialsRequestObject) (api.ListCredentialsResponseObject, error) {
+func (s *Server) ListCredentials(ctx context.Context, request tenant.ListCredentialsRequestObject) (tenant.ListCredentialsResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -29,13 +32,13 @@ func (s *Server) ListCredentials(ctx context.Context, request api.ListCredential
 	for _, item := range items {
 		responses = append(responses, credentialResponse(item))
 	}
-	return api.ListCredentials200JSONResponse{CredentialPageJSONResponse: api.CredentialPageJSONResponse(api.CredentialPage{
+	return tenant.ListCredentials200JSONResponse(api.CredentialPage{
 		Items: responses, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // CreateCredential encrypts and persists one tenant-owned credential.
-func (s *Server) CreateCredential(ctx context.Context, request api.CreateCredentialRequestObject) (api.CreateCredentialResponseObject, error) {
+func (s *Server) CreateCredential(ctx context.Context, request tenant.CreateCredentialRequestObject) (tenant.CreateCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -52,13 +55,11 @@ func (s *Server) CreateCredential(ctx context.Context, request api.CreateCredent
 		return nil, err
 	}
 	body := credentialResponse(created)
-	return api.CreateCredential201JSONResponse{CredentialJSONResponse: api.CredentialJSONResponse{
-		Body: body, Headers: api.CredentialResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return tenant.CreateCredential201JSONResponse{Body: body, Headers: tenant.CreateCredential201ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // UpdateCredential conditionally changes tenant credential metadata and sharing.
-func (s *Server) UpdateCredential(ctx context.Context, request api.UpdateCredentialRequestObject) (api.UpdateCredentialResponseObject, error) {
+func (s *Server) UpdateCredential(ctx context.Context, request tenant.UpdateCredentialRequestObject) (tenant.UpdateCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -83,13 +84,11 @@ func (s *Server) UpdateCredential(ctx context.Context, request api.UpdateCredent
 		return nil, err
 	}
 	body := credentialResponse(updated)
-	return api.UpdateCredential200JSONResponse{CredentialJSONResponse: api.CredentialJSONResponse{
-		Body: body, Headers: api.CredentialResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return tenant.UpdateCredential200JSONResponse{Body: body, Headers: tenant.UpdateCredential200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // DeleteCredential conditionally removes a tenant credential and supports forced unbinding.
-func (s *Server) DeleteCredential(ctx context.Context, request api.DeleteCredentialRequestObject) (api.DeleteCredentialResponseObject, error) {
+func (s *Server) DeleteCredential(ctx context.Context, request tenant.DeleteCredentialRequestObject) (tenant.DeleteCredentialResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -101,11 +100,11 @@ func (s *Server) DeleteCredential(ctx context.Context, request api.DeleteCredent
 	if err := s.credentials.DeleteTenant(ctx, principal, request.TenantSlug, serviceUUID(request.CredentialId), request.Params.IfMatch, force); err != nil {
 		return nil, err
 	}
-	return api.DeleteCredential204Response{}, nil
+	return tenant.DeleteCredential204Response{}, nil
 }
 
 // RotateCredential replaces a tenant secret under the supplied ETag.
-func (s *Server) RotateCredential(ctx context.Context, request api.RotateCredentialRequestObject) (api.RotateCredentialResponseObject, error) {
+func (s *Server) RotateCredential(ctx context.Context, request tenant.RotateCredentialRequestObject) (tenant.RotateCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -133,13 +132,11 @@ func (s *Server) RotateCredential(ctx context.Context, request api.RotateCredent
 		Etag:       credentialResponse(rotated).Etag,
 		SyncJobs:   syncJobResponses(jobs),
 	}
-	return api.RotateCredential200JSONResponse{CredentialRotationJSONResponse: api.CredentialRotationJSONResponse{
-		Body: body, Headers: api.CredentialRotationResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return tenant.RotateCredential200JSONResponse{Body: body, Headers: tenant.RotateCredential200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // ListGlobalCredentials returns platform credential metadata for a platform administrator.
-func (s *Server) ListGlobalCredentials(ctx context.Context, request api.ListGlobalCredentialsRequestObject) (api.ListGlobalCredentialsResponseObject, error) {
+func (s *Server) ListGlobalCredentials(ctx context.Context, request platform.ListGlobalCredentialsRequestObject) (platform.ListGlobalCredentialsResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -156,13 +153,13 @@ func (s *Server) ListGlobalCredentials(ctx context.Context, request api.ListGlob
 	for _, item := range items {
 		responses = append(responses, globalCredentialResponse(item))
 	}
-	return api.ListGlobalCredentials200JSONResponse{GlobalCredentialPageJSONResponse: api.GlobalCredentialPageJSONResponse(api.GlobalCredentialPage{
+	return platform.ListGlobalCredentials200JSONResponse(api.GlobalCredentialPage{
 		Items: responses, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // CreateGlobalCredential encrypts and persists one platform-owned credential.
-func (s *Server) CreateGlobalCredential(ctx context.Context, request api.CreateGlobalCredentialRequestObject) (api.CreateGlobalCredentialResponseObject, error) {
+func (s *Server) CreateGlobalCredential(ctx context.Context, request platform.CreateGlobalCredentialRequestObject) (platform.CreateGlobalCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -179,13 +176,11 @@ func (s *Server) CreateGlobalCredential(ctx context.Context, request api.CreateG
 		return nil, err
 	}
 	body := globalCredentialResponse(created)
-	return api.CreateGlobalCredential201JSONResponse{GlobalCredentialJSONResponse: api.GlobalCredentialJSONResponse{
-		Body: body, Headers: api.GlobalCredentialResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return platform.CreateGlobalCredential201JSONResponse{Body: body, Headers: platform.CreateGlobalCredential201ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // UpdateGlobalCredential conditionally changes a platform credential name.
-func (s *Server) UpdateGlobalCredential(ctx context.Context, request api.UpdateGlobalCredentialRequestObject) (api.UpdateGlobalCredentialResponseObject, error) {
+func (s *Server) UpdateGlobalCredential(ctx context.Context, request platform.UpdateGlobalCredentialRequestObject) (platform.UpdateGlobalCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -198,13 +193,11 @@ func (s *Server) UpdateGlobalCredential(ctx context.Context, request api.UpdateG
 		return nil, err
 	}
 	body := globalCredentialResponse(updated)
-	return api.UpdateGlobalCredential200JSONResponse{GlobalCredentialJSONResponse: api.GlobalCredentialJSONResponse{
-		Body: body, Headers: api.GlobalCredentialResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return platform.UpdateGlobalCredential200JSONResponse{Body: body, Headers: platform.UpdateGlobalCredential200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // DeleteGlobalCredential conditionally removes a platform credential and supports forced unbinding.
-func (s *Server) DeleteGlobalCredential(ctx context.Context, request api.DeleteGlobalCredentialRequestObject) (api.DeleteGlobalCredentialResponseObject, error) {
+func (s *Server) DeleteGlobalCredential(ctx context.Context, request platform.DeleteGlobalCredentialRequestObject) (platform.DeleteGlobalCredentialResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -216,11 +209,11 @@ func (s *Server) DeleteGlobalCredential(ctx context.Context, request api.DeleteG
 	if err := s.credentials.DeleteGlobal(ctx, principal, serviceUUID(request.CredentialId), request.Params.IfMatch, force); err != nil {
 		return nil, err
 	}
-	return api.DeleteGlobalCredential204Response{}, nil
+	return platform.DeleteGlobalCredential204Response{}, nil
 }
 
 // RotateGlobalCredential replaces a platform secret under the supplied ETag.
-func (s *Server) RotateGlobalCredential(ctx context.Context, request api.RotateGlobalCredentialRequestObject) (api.RotateGlobalCredentialResponseObject, error) {
+func (s *Server) RotateGlobalCredential(ctx context.Context, request platform.RotateGlobalCredentialRequestObject) (platform.RotateGlobalCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -245,13 +238,11 @@ func (s *Server) RotateGlobalCredential(ctx context.Context, request api.RotateG
 	}
 	bodyCredential := globalCredentialResponse(rotated)
 	body := api.GlobalCredentialRotationResult{Credential: bodyCredential, Etag: bodyCredential.Etag, SyncJobs: syncJobResponses(jobs)}
-	return api.RotateGlobalCredential200JSONResponse{GlobalCredentialRotationJSONResponse: api.GlobalCredentialRotationJSONResponse{
-		Body: body, Headers: api.GlobalCredentialRotationResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return platform.RotateGlobalCredential200JSONResponse{Body: body, Headers: platform.RotateGlobalCredential200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // ListKnownHosts returns tenant-approved SSH host identities without stored public-key material.
-func (s *Server) ListKnownHosts(ctx context.Context, request api.ListKnownHostsRequestObject) (api.ListKnownHostsResponseObject, error) {
+func (s *Server) ListKnownHosts(ctx context.Context, request tenant.ListKnownHostsRequestObject) (tenant.ListKnownHostsResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -268,13 +259,13 @@ func (s *Server) ListKnownHosts(ctx context.Context, request api.ListKnownHostsR
 	for _, item := range items {
 		responses = append(responses, knownHostResponse(item))
 	}
-	return api.ListKnownHosts200JSONResponse{KnownHostPageJSONResponse: api.KnownHostPageJSONResponse(api.KnownHostPage{
+	return tenant.ListKnownHosts200JSONResponse(api.KnownHostPage{
 		Items: responses, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // CreateKnownHost validates and stores one manually approved SSH host key.
-func (s *Server) CreateKnownHost(ctx context.Context, request api.CreateKnownHostRequestObject) (api.CreateKnownHostResponseObject, error) {
+func (s *Server) CreateKnownHost(ctx context.Context, request tenant.CreateKnownHostRequestObject) (tenant.CreateKnownHostResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -286,25 +277,25 @@ func (s *Server) CreateKnownHost(ctx context.Context, request api.CreateKnownHos
 	if err != nil {
 		return nil, err
 	}
-	return api.CreateKnownHost201JSONResponse{KnownHostJSONResponse: api.KnownHostJSONResponse(knownHostResponse(created))}, nil
+	return tenant.CreateKnownHost201JSONResponse(knownHostResponse(created)), nil
 }
 
 func tenantCredentialInput(body api.CredentialCreateRequest) (service.CredentialInput, error) {
 	if sshInput, err := body.AsCredentialCreateRequest0(); err == nil && string(sshInput.Kind) == "ssh_key" {
-		if sshInput.SshKey.PrivateKeyPem == nil {
+		if sshInput.SshKey.PrivateKeyPem == "" {
 			return service.CredentialInput{}, service.ErrValidation
 		}
 		return service.CredentialInput{
-			Name: sshInput.Name, Secret: service.CredentialSecret{Kind: "ssh_key", PrivateKey: *sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase)},
+			Name: sshInput.Name, Secret: service.CredentialSecret{Kind: "ssh_key", PrivateKey: sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase)},
 			SharedScope: optionalSharedScope0(sshInput.SharedScope), TeamIDs: apiUUIDs(sshInput.TeamIds),
 		}, nil
 	}
 	if httpInput, err := body.AsCredentialCreateRequest1(); err == nil && string(httpInput.Kind) == "http_token" {
-		if httpInput.HttpToken.Token == nil {
+		if httpInput.HttpToken.Token == "" {
 			return service.CredentialInput{}, service.ErrValidation
 		}
 		return service.CredentialInput{
-			Name: httpInput.Name, Secret: service.CredentialSecret{Kind: "http_token", HTTPUsername: httpInput.HttpToken.Username, HTTPToken: *httpInput.HttpToken.Token},
+			Name: httpInput.Name, Secret: service.CredentialSecret{Kind: "http_token", HTTPUsername: httpInput.HttpToken.Username, HTTPToken: httpInput.HttpToken.Token},
 			SharedScope: optionalSharedScope1(httpInput.SharedScope), TeamIDs: apiUUIDs(httpInput.TeamIds),
 		}, nil
 	}
@@ -313,30 +304,30 @@ func tenantCredentialInput(body api.CredentialCreateRequest) (service.Credential
 
 func globalCredentialInput(body api.GlobalCredentialCreateRequest) (service.CredentialInput, error) {
 	if sshInput, err := body.AsGlobalCredentialCreateRequest0(); err == nil && string(sshInput.Kind) == "ssh_key" {
-		if sshInput.SshKey.PrivateKeyPem == nil {
+		if sshInput.SshKey.PrivateKeyPem == "" {
 			return service.CredentialInput{}, service.ErrValidation
 		}
 		return service.CredentialInput{Name: sshInput.Name, SharedScope: "private", Secret: service.CredentialSecret{
-			Kind: "ssh_key", PrivateKey: *sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase),
+			Kind: "ssh_key", PrivateKey: sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase),
 		}}, nil
 	}
 	if httpInput, err := body.AsGlobalCredentialCreateRequest1(); err == nil && string(httpInput.Kind) == "http_token" {
-		if httpInput.HttpToken.Token == nil {
+		if httpInput.HttpToken.Token == "" {
 			return service.CredentialInput{}, service.ErrValidation
 		}
 		return service.CredentialInput{Name: httpInput.Name, SharedScope: "private", Secret: service.CredentialSecret{
-			Kind: "http_token", HTTPUsername: httpInput.HttpToken.Username, HTTPToken: *httpInput.HttpToken.Token,
+			Kind: "http_token", HTTPUsername: httpInput.HttpToken.Username, HTTPToken: httpInput.HttpToken.Token,
 		}}, nil
 	}
 	return service.CredentialInput{}, service.ErrValidation
 }
 
 func rotateSecret(value api.CredentialRotateRequest_Secret) (service.CredentialSecret, error) {
-	if sshInput, err := value.AsSshSecretInput(); err == nil && sshInput.PrivateKeyPem != nil {
-		return service.CredentialSecret{Kind: "ssh_key", PrivateKey: *sshInput.PrivateKeyPem, Passphrase: optionalString(sshInput.Passphrase)}, nil
+	if sshInput, err := value.AsSshSecretInput(); err == nil && sshInput.PrivateKeyPem != "" {
+		return service.CredentialSecret{Kind: "ssh_key", PrivateKey: sshInput.PrivateKeyPem, Passphrase: optionalString(sshInput.Passphrase)}, nil
 	}
-	if httpInput, err := value.AsHttpSecretInput(); err == nil && httpInput.Token != nil {
-		return service.CredentialSecret{Kind: "http_token", HTTPUsername: httpInput.Username, HTTPToken: *httpInput.Token}, nil
+	if httpInput, err := value.AsHttpSecretInput(); err == nil && httpInput.Token != "" {
+		return service.CredentialSecret{Kind: "http_token", HTTPUsername: httpInput.Username, HTTPToken: httpInput.Token}, nil
 	}
 	return service.CredentialSecret{}, service.ErrValidation
 }

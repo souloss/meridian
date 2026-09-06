@@ -9,4 +9,4 @@
 /**
  * specifies the details associated with this graph edge.
  */
-export type GraphEdgeDetails = { [key: string]: unknown };
+export type GraphEdgeDetails = {[key: string]: unknown};

@@ -5,7 +5,7 @@ MERIDIAN_DEV_MASTER_KEY_VERSION ?= 1
 MERIDIAN_DEV_CREDENTIAL_FINGERPRINT_KEY ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 MILESTONE ?= $(if $(ITEM),$(firstword $(subst -, ,$(ITEM))),M5)
 
-.PHONY: all build generate backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint smoke smoke-all smoke-m0-credentials smoke-runner-test agent-protocol-test agent-preflight quality-gate
+.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint smoke smoke-all smoke-m0-credentials smoke-runner-test agent-protocol-test agent-preflight quality-gate
 
 all: build
 
@@ -15,7 +15,15 @@ build: frontend-generate
 
 generate: backend-generate frontend-generate
 
-backend-generate:
+contracts-sync:
+	sh ./scripts/bundle-openapi.sh
+
+contracts-bundle: contracts-sync
+
+contracts-check:
+	sh ./scripts/bundle-openapi.sh --check
+
+backend-generate: contracts-sync
 	vfox exec golang@1.27.1 -- go generate ./...
 
 backend-test:
@@ -42,7 +50,7 @@ migrate-status: database-up
 frontend-install:
 	vfox exec nodejs@24.20.0 -- pnpm --dir web install --frozen-lockfile
 
-frontend-api: frontend-install
+frontend-api: contracts-sync frontend-install
 	vfox exec nodejs@24.20.0 -- pnpm --dir web generate:api
 
 frontend-generate: frontend-api
@@ -59,6 +67,7 @@ contracts-generate-then-git-diff-exit-code: contracts-generate
 contracts-validate:
 	$(MAKE) agent-protocol-test smoke-runner-test
 	vfox exec golang@1.27.1 -- go tool sqlc vet
+	$(MAKE) contracts-check
 	vfox exec nodejs@24.20.0 -- pnpm --dir web exec redocly lint --config ../contracts/.redocly.yaml ../contracts/openapi.yaml
 	vfox exec nodejs@24.20.0 -- pnpm --dir web check:generated-docs
 

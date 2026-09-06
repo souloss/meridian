@@ -31,52 +31,44 @@ import type {
 } from 'vue';
 
 import type {
-  AuditLogPageResponse,
-  ConflictResponse,
-  ConnectionTestBody,
-  ConnectionTestResponse,
-  CredentialInUseResponse,
-  CredentialRotateBody,
-  CsrfInvalidResponse,
+  AuditLogPage,
+  ConnectionTest,
+  ConnectionTestRequest,
+  CredentialRotateRequest,
   DeleteGlobalCredentialParams,
   DeleteProducerProfileParams,
-  DuplicateResponse,
-  GlobalCredentialCreateBody,
-  GlobalCredentialPageResponse,
-  GlobalCredentialPatchBody,
-  GlobalCredentialResponse,
-  GlobalCredentialRotationResponse,
-  InvalidStateResponse,
+  ErrorResponse,
+  GlobalCredential,
+  GlobalCredentialCreateRequest,
+  GlobalCredentialPage,
+  GlobalCredentialPatchRequest,
+  GlobalCredentialRotationResult,
   ListGlobalCredentialsParams,
   ListPlatformAuditLogsParams,
   ListPlatformJobsParams,
   ListProducerProfilesParams,
   ListTenantsParams,
   ListUsersParams,
-  MemberPutBody,
-  MemberResponse,
-  NotFoundResponse,
-  PlatformJobPageResponse,
-  PlatformJobResponse,
-  PlatformSettingsPatchBody,
-  PlatformSettingsResponse,
-  PreconditionFailedResponse,
-  ProducerProfileCreateBody,
-  ProducerProfilePageResponse,
-  ProducerProfilePatchBody,
-  ProducerProfileResponse,
-  TenantCreateBody,
-  TenantDeleteBody,
-  TenantDeletionAcceptedResponse,
-  TenantPageResponse,
-  TenantPatchBody,
-  TenantResponse,
-  UnauthenticatedResponse,
-  UserCreateBodyBody,
-  UserPageResponse,
-  UserPatchBody,
-  UserResponse,
-  ValidationErrorResponse
+  Member,
+  MemberPutRequest,
+  PlatformJob,
+  PlatformJobPage,
+  PlatformSettings,
+  PlatformSettingsPatchRequest,
+  ProducerProfile,
+  ProducerProfileCreateRequest,
+  ProducerProfilePage,
+  ProducerProfilePatchRequest,
+  Tenant,
+  TenantCreateRequest,
+  TenantDeleteRequest,
+  TenantDeletionAccepted,
+  TenantPage,
+  TenantPatchRequest,
+  User,
+  UserCreateRequest,
+  UserPage,
+  UserPatchRequest
 } from '../models';
 
 import { meridianFetch } from '../../fetcher.ts';
@@ -87,49 +79,49 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-/** listUsersResponse200 represents a declared HTTP response from the list users response200 operation. */
-export type listUsersResponse200 = {
+/** listPlatformAuditLogsResponse200 represents a declared HTTP response from the list platform audit logs response200 operation. */
+export type listPlatformAuditLogsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: UserPageResponse
+  data: AuditLogPage
   /** Status is the HTTP response status code. */
   status: 200
 }
 
-/** listUsersResponse404 represents a declared HTTP response from the list users response404 operation. */
-export type listUsersResponse404 = {
+/** listPlatformAuditLogsResponse404 represents a declared HTTP response from the list platform audit logs response404 operation. */
+export type listPlatformAuditLogsResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
 
-/** listUsersResponseSuccess represents a declared HTTP response from the list users response success operation. */
-export type listUsersResponseSuccess = (listUsersResponse200) & {
+/** listPlatformAuditLogsResponseSuccess represents a declared HTTP response from the list platform audit logs response success operation. */
+export type listPlatformAuditLogsResponseSuccess = (listPlatformAuditLogsResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** listUsersResponseError represents a declared HTTP response from the list users response error operation. */
-export type listUsersResponseError = (listUsersResponse404) & {
+/** listPlatformAuditLogsResponseError represents a declared HTTP response from the list platform audit logs response error operation. */
+export type listPlatformAuditLogsResponseError = (listPlatformAuditLogsResponse404) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
-/** listUsersResponse represents a declared HTTP response from the list users response operation. */
-export type listUsersResponse = (listUsersResponseSuccess | listUsersResponseError)
+/** listPlatformAuditLogsResponse represents a declared HTTP response from the list platform audit logs response operation. */
+export type listPlatformAuditLogsResponse = (listPlatformAuditLogsResponseSuccess | listPlatformAuditLogsResponseError)
 
-/** getListUsersUrl builds the relative URL for its OpenAPI operation. */
-export const getListUsersUrl = (params?: ListUsersParams,) => {
+/** getListPlatformAuditLogsUrl builds the relative URL for its OpenAPI operation. */
+export const getListPlatformAuditLogsUrl = (params?: ListPlatformAuditLogsParams,) => {
   const stringifiedParams = serializeQueryParams(params);
 
-  return stringifiedParams.length > 0 ? `/api/v1/admin/users?${stringifiedParams}` : `/api/v1/admin/users`
+  return stringifiedParams.length > 0 ? `/api/v1/admin/audit-logs?${stringifiedParams}` : `/api/v1/admin/audit-logs`
 }
 
 /**
- * Returns the requested page of users within the authorized request scope.
+ * Returns the requested page of platform audit logs within the authorized request scope.
  */
-export const listUsers = async (params?: ListUsersParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listUsersResponse> => {
+export const listPlatformAuditLogs = async (params?: ListPlatformAuditLogsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listPlatformAuditLogsResponse> => {
 
-  return meridianFetch<listUsersResponse>(getListUsersUrl(params),
+  return meridianFetch<listPlatformAuditLogsResponse>(getListPlatformAuditLogsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -142,47 +134,47 @@ export const listUsers = async (params?: ListUsersParams, options?: Parameters<t
 
 
 
-/** getListUsersQueryKey is generated from the Meridian OpenAPI contract for get list users query key. */
-export const getListUsersQueryKey = (params?: MaybeRefOrGetter<ListUsersParams>,) => {
+/** getListPlatformAuditLogsQueryKey is generated from the Meridian OpenAPI contract for get list platform audit logs query key. */
+export const getListPlatformAuditLogsQueryKey = (params?: MaybeRefOrGetter<ListPlatformAuditLogsParams>,) => {
     return [
-    'api','v1','admin','users', ...(params ? [params] : [])
+    'api','v1','admin','audit-logs', ...(params ? [params] : [])
     ] as const;
     }
 
 
-/** getListUsersQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListUsersQueryOptions = <TData = Awaited<ReturnType<typeof listUsers>>, TError = NotFoundResponse>(params?: MaybeRefOrGetter<ListUsersParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** getListPlatformAuditLogsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListPlatformAuditLogsQueryOptions = <TData = Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError = ErrorResponse>(params?: MaybeRefOrGetter<ListPlatformAuditLogsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getListUsersQueryKey(params);
+  const queryKey =  getListPlatformAuditLogsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listUsers>>> = ({ signal }) => listUsers(toValue(params), { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlatformAuditLogs>>> = ({ signal }) => listPlatformAuditLogs(toValue(params), { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError, TData>
 }
 
-/** ListUsersQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListUsersQueryResult = NonNullable<Awaited<ReturnType<typeof listUsers>>>
-/** ListUsersQueryError is the error type returned by its generated Vue Query hook. */
-export type ListUsersQueryError = NotFoundResponse
+/** ListPlatformAuditLogsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListPlatformAuditLogsQueryResult = NonNullable<Awaited<ReturnType<typeof listPlatformAuditLogs>>>
+/** ListPlatformAuditLogsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListPlatformAuditLogsQueryError = ErrorResponse
 
 
 
-/** useListUsers executes its OpenAPI operation through TanStack Vue Query. */
-export function useListUsers<TData = Awaited<ReturnType<typeof listUsers>>, TError = NotFoundResponse>(
- params?: MaybeRefOrGetter<ListUsersParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** useListPlatformAuditLogs executes its OpenAPI operation through TanStack Vue Query. */
+export function useListPlatformAuditLogs<TData = Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError = ErrorResponse>(
+ params?: MaybeRefOrGetter<ListPlatformAuditLogsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListUsersQueryOptions(params,options)
+  const queryOptions = getListPlatformAuditLogsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -196,1090 +188,10 @@ export function useListUsers<TData = Awaited<ReturnType<typeof listUsers>>, TErr
 
 
 
-/** createUserResponse201 represents a declared HTTP response from the create user response201 operation. */
-export type createUserResponse201 = {
+/** listGlobalCredentialsResponse200 represents a declared HTTP response from the list global credentials response200 operation. */
+export type listGlobalCredentialsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: UserResponse
-  /** Status is the HTTP response status code. */
-  status: 201
-}
-
-/** createUserResponse401 represents a declared HTTP response from the create user response401 operation. */
-export type createUserResponse401 = {
-  /** Data contains the decoded response payload. */
-  data: UnauthenticatedResponse
-  /** Status is the HTTP response status code. */
-  status: 401
-}
-
-/** createUserResponse403 represents a declared HTTP response from the create user response403 operation. */
-export type createUserResponse403 = {
-  /** Data contains the decoded response payload. */
-  data: CsrfInvalidResponse
-  /** Status is the HTTP response status code. */
-  status: 403
-}
-
-/** createUserResponse404 represents a declared HTTP response from the create user response404 operation. */
-export type createUserResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** createUserResponse409 represents a declared HTTP response from the create user response409 operation. */
-export type createUserResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: DuplicateResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** createUserResponse422 represents a declared HTTP response from the create user response422 operation. */
-export type createUserResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** createUserResponseSuccess represents a declared HTTP response from the create user response success operation. */
-export type createUserResponseSuccess = (createUserResponse201) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** createUserResponseError represents a declared HTTP response from the create user response error operation. */
-export type createUserResponseError = (createUserResponse401 | createUserResponse403 | createUserResponse404 | createUserResponse409 | createUserResponse422) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** createUserResponse represents a declared HTTP response from the create user response operation. */
-export type createUserResponse = (createUserResponseSuccess | createUserResponseError)
-
-/** getCreateUserUrl builds the relative URL for its OpenAPI operation. */
-export const getCreateUserUrl = () => {
-
-
-  return `/api/v1/admin/users`
-}
-
-/**
- * Creates user within the authorized request scope.
- */
-export const createUser = async (userCreateBodyBody: UserCreateBodyBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createUserResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<createUserResponse>(getCreateUserUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(userCreateBodyBody)
-  }
-);}
-
-
-
-
-
-/** getCreateUserMutationKey is generated from the Meridian OpenAPI contract for get create user mutation key. */
-export const getCreateUserMutationKey = () => ['createUser'] as const;
-
-/** getCreateUserMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateUserMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext> => {
-
-const mutationKey = getCreateUserMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, CreateUserMutationVariables> = (props) => {
-          const {data} = props ?? {};
-
-          return  createUser(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** CreateUserMutationResult is generated from the Meridian OpenAPI contract for create user mutation result. */
-    export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
-    /** CreateUserMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateUserMutationBody = UserCreateBodyBody
-    /** CreateUserMutationError is generated from the Meridian OpenAPI contract for create user mutation error. */
-    export type CreateUserMutationError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse | ValidationErrorResponse
-    /** CreateUserMutationVariables is generated from the Meridian OpenAPI contract for create user mutation variables. */
-    export type CreateUserMutationVariables = {/** Data contains the decoded response payload. */ data: UserCreateBodyBody}
-
-    /** useCreateUser executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateUser = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof createUser>>,
-        TError,
-        CreateUserMutationVariables,
-        TContext
-      > => {
-      return useMutation(getCreateUserMutationOptions(options), queryClient);
-    }
-    /** updateUserResponse200 represents a declared HTTP response from the update user response200 operation. */
-    export type updateUserResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: UserResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** updateUserResponse404 represents a declared HTTP response from the update user response404 operation. */
-export type updateUserResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** updateUserResponse412 represents a declared HTTP response from the update user response412 operation. */
-export type updateUserResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** updateUserResponseSuccess represents a declared HTTP response from the update user response success operation. */
-export type updateUserResponseSuccess = (updateUserResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** updateUserResponseError represents a declared HTTP response from the update user response error operation. */
-export type updateUserResponseError = (updateUserResponse404 | updateUserResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** updateUserResponse represents a declared HTTP response from the update user response operation. */
-export type updateUserResponse = (updateUserResponseSuccess | updateUserResponseError)
-
-/** getUpdateUserUrl builds the relative URL for its OpenAPI operation. */
-export const getUpdateUserUrl = (userId: string,) => {
-
-
-  return `/api/v1/admin/users/${userId}`
-}
-
-/**
- * Updates the selected user within the authorized request scope.
- */
-export const updateUser = async (userId: string,
-    userPatchBody: UserPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateUserResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<updateUserResponse>(getUpdateUserUrl(userId),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(userPatchBody)
-  }
-);}
-
-
-
-
-
-/** getUpdateUserMutationKey is generated from the Meridian OpenAPI contract for get update user mutation key. */
-export const getUpdateUserMutationKey = () => ['updateUser'] as const;
-
-/** getUpdateUserMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateUserMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,UpdateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,UpdateUserMutationVariables, TContext> => {
-
-const mutationKey = getUpdateUserMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUser>>, UpdateUserMutationVariables> = (props) => {
-          const {userId,data} = props ?? {};
-
-          return  updateUser(userId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** UpdateUserMutationResult is generated from the Meridian OpenAPI contract for update user mutation result. */
-    export type UpdateUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateUser>>>
-    /** UpdateUserMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateUserMutationBody = UserPatchBody
-    /** UpdateUserMutationError is generated from the Meridian OpenAPI contract for update user mutation error. */
-    export type UpdateUserMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** UpdateUserMutationVariables is generated from the Meridian OpenAPI contract for update user mutation variables. */
-    export type UpdateUserMutationVariables = {/** UserId carries the user id value for UpdateUserMutationVariables. */ userId: string;/** Data contains the decoded response payload. */ data: UserPatchBody}
-
-    /** useUpdateUser executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateUser = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,UpdateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof updateUser>>,
-        TError,
-        UpdateUserMutationVariables,
-        TContext
-      > => {
-      return useMutation(getUpdateUserMutationOptions(options), queryClient);
-    }
-    /** listTenantsResponse200 represents a declared HTTP response from the list tenants response200 operation. */
-    export type listTenantsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: TenantPageResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listTenantsResponseSuccess represents a declared HTTP response from the list tenants response success operation. */
-export type listTenantsResponseSuccess = (listTenantsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-;
-
-/** listTenantsResponse represents a declared HTTP response from the list tenants response operation. */
-export type listTenantsResponse = (listTenantsResponseSuccess)
-
-/** getListTenantsUrl builds the relative URL for its OpenAPI operation. */
-export const getListTenantsUrl = (params?: ListTenantsParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
-
-  return stringifiedParams.length > 0 ? `/api/v1/admin/tenants?${stringifiedParams}` : `/api/v1/admin/tenants`
-}
-
-/**
- * Returns the requested page of tenants within the authorized request scope.
- */
-export const listTenants = async (params?: ListTenantsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listTenantsResponse> => {
-
-  return meridianFetch<listTenantsResponse>(getListTenantsUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListTenantsQueryKey is generated from the Meridian OpenAPI contract for get list tenants query key. */
-export const getListTenantsQueryKey = (params?: MaybeRefOrGetter<ListTenantsParams>,) => {
-    return [
-    'api','v1','admin','tenants', ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-/** getListTenantsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListTenantsQueryOptions = <TData = Awaited<ReturnType<typeof listTenants>>, TError = unknown>(params?: MaybeRefOrGetter<ListTenantsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTenants>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListTenantsQueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTenants>>> = ({ signal }) => listTenants(toValue(params), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTenants>>, TError, TData>
-}
-
-/** ListTenantsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListTenantsQueryResult = NonNullable<Awaited<ReturnType<typeof listTenants>>>
-/** ListTenantsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListTenantsQueryError = unknown
-
-
-
-/** useListTenants executes its OpenAPI operation through TanStack Vue Query. */
-export function useListTenants<TData = Awaited<ReturnType<typeof listTenants>>, TError = unknown>(
- params?: MaybeRefOrGetter<ListTenantsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTenants>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListTenantsQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** createTenantResponse201 represents a declared HTTP response from the create tenant response201 operation. */
-export type createTenantResponse201 = {
-  /** Data contains the decoded response payload. */
-  data: TenantResponse
-  /** Status is the HTTP response status code. */
-  status: 201
-}
-
-/** createTenantResponse401 represents a declared HTTP response from the create tenant response401 operation. */
-export type createTenantResponse401 = {
-  /** Data contains the decoded response payload. */
-  data: UnauthenticatedResponse
-  /** Status is the HTTP response status code. */
-  status: 401
-}
-
-/** createTenantResponse403 represents a declared HTTP response from the create tenant response403 operation. */
-export type createTenantResponse403 = {
-  /** Data contains the decoded response payload. */
-  data: CsrfInvalidResponse
-  /** Status is the HTTP response status code. */
-  status: 403
-}
-
-/** createTenantResponse404 represents a declared HTTP response from the create tenant response404 operation. */
-export type createTenantResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** createTenantResponse409 represents a declared HTTP response from the create tenant response409 operation. */
-export type createTenantResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: DuplicateResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** createTenantResponseSuccess represents a declared HTTP response from the create tenant response success operation. */
-export type createTenantResponseSuccess = (createTenantResponse201) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** createTenantResponseError represents a declared HTTP response from the create tenant response error operation. */
-export type createTenantResponseError = (createTenantResponse401 | createTenantResponse403 | createTenantResponse404 | createTenantResponse409) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** createTenantResponse represents a declared HTTP response from the create tenant response operation. */
-export type createTenantResponse = (createTenantResponseSuccess | createTenantResponseError)
-
-/** getCreateTenantUrl builds the relative URL for its OpenAPI operation. */
-export const getCreateTenantUrl = () => {
-
-
-  return `/api/v1/admin/tenants`
-}
-
-/**
- * Creates tenant within the authorized request scope.
- */
-export const createTenant = async (tenantCreateBody: TenantCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createTenantResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<createTenantResponse>(getCreateTenantUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(tenantCreateBody)
-  }
-);}
-
-
-
-
-
-/** getCreateTenantMutationKey is generated from the Meridian OpenAPI contract for get create tenant mutation key. */
-export const getCreateTenantMutationKey = () => ['createTenant'] as const;
-
-/** getCreateTenantMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateTenantMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext> => {
-
-const mutationKey = getCreateTenantMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTenant>>, CreateTenantMutationVariables> = (props) => {
-          const {data} = props ?? {};
-
-          return  createTenant(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** CreateTenantMutationResult is generated from the Meridian OpenAPI contract for create tenant mutation result. */
-    export type CreateTenantMutationResult = NonNullable<Awaited<ReturnType<typeof createTenant>>>
-    /** CreateTenantMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateTenantMutationBody = TenantCreateBody
-    /** CreateTenantMutationError is generated from the Meridian OpenAPI contract for create tenant mutation error. */
-    export type CreateTenantMutationError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse
-    /** CreateTenantMutationVariables is generated from the Meridian OpenAPI contract for create tenant mutation variables. */
-    export type CreateTenantMutationVariables = {/** Data contains the decoded response payload. */ data: TenantCreateBody}
-
-    /** useCreateTenant executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateTenant = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse | DuplicateResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof createTenant>>,
-        TError,
-        CreateTenantMutationVariables,
-        TContext
-      > => {
-      return useMutation(getCreateTenantMutationOptions(options), queryClient);
-    }
-    /** updateTenantResponse200 represents a declared HTTP response from the update tenant response200 operation. */
-    export type updateTenantResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: TenantResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** updateTenantResponse404 represents a declared HTTP response from the update tenant response404 operation. */
-export type updateTenantResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** updateTenantResponse412 represents a declared HTTP response from the update tenant response412 operation. */
-export type updateTenantResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** updateTenantResponseSuccess represents a declared HTTP response from the update tenant response success operation. */
-export type updateTenantResponseSuccess = (updateTenantResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** updateTenantResponseError represents a declared HTTP response from the update tenant response error operation. */
-export type updateTenantResponseError = (updateTenantResponse404 | updateTenantResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** updateTenantResponse represents a declared HTTP response from the update tenant response operation. */
-export type updateTenantResponse = (updateTenantResponseSuccess | updateTenantResponseError)
-
-/** getUpdateTenantUrl builds the relative URL for its OpenAPI operation. */
-export const getUpdateTenantUrl = (tenantSlug: string,) => {
-
-
-  return `/api/v1/admin/tenants/${tenantSlug}`
-}
-
-/**
- * Updates the selected tenant within the authorized request scope.
- */
-export const updateTenant = async (tenantSlug: string,
-    tenantPatchBody: TenantPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateTenantResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<updateTenantResponse>(getUpdateTenantUrl(tenantSlug),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(tenantPatchBody)
-  }
-);}
-
-
-
-
-
-/** getUpdateTenantMutationKey is generated from the Meridian OpenAPI contract for get update tenant mutation key. */
-export const getUpdateTenantMutationKey = () => ['updateTenant'] as const;
-
-/** getUpdateTenantMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateTenantMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTenant>>, TError,UpdateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateTenant>>, TError,UpdateTenantMutationVariables, TContext> => {
-
-const mutationKey = getUpdateTenantMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTenant>>, UpdateTenantMutationVariables> = (props) => {
-          const {tenantSlug,data} = props ?? {};
-
-          return  updateTenant(tenantSlug,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** UpdateTenantMutationResult is generated from the Meridian OpenAPI contract for update tenant mutation result. */
-    export type UpdateTenantMutationResult = NonNullable<Awaited<ReturnType<typeof updateTenant>>>
-    /** UpdateTenantMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateTenantMutationBody = TenantPatchBody
-    /** UpdateTenantMutationError is generated from the Meridian OpenAPI contract for update tenant mutation error. */
-    export type UpdateTenantMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** UpdateTenantMutationVariables is generated from the Meridian OpenAPI contract for update tenant mutation variables. */
-    export type UpdateTenantMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateTenantMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: TenantPatchBody}
-
-    /** useUpdateTenant executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateTenant = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTenant>>, TError,UpdateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof updateTenant>>,
-        TError,
-        UpdateTenantMutationVariables,
-        TContext
-      > => {
-      return useMutation(getUpdateTenantMutationOptions(options), queryClient);
-    }
-    /** deleteTenantResponse202 represents a declared HTTP response from the delete tenant response202 operation. */
-    export type deleteTenantResponse202 = {
-  /** Data contains the decoded response payload. */
-  data: TenantDeletionAcceptedResponse
-  /** Status is the HTTP response status code. */
-  status: 202
-}
-
-/** deleteTenantResponse404 represents a declared HTTP response from the delete tenant response404 operation. */
-export type deleteTenantResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** deleteTenantResponse412 represents a declared HTTP response from the delete tenant response412 operation. */
-export type deleteTenantResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** deleteTenantResponseSuccess represents a declared HTTP response from the delete tenant response success operation. */
-export type deleteTenantResponseSuccess = (deleteTenantResponse202) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** deleteTenantResponseError represents a declared HTTP response from the delete tenant response error operation. */
-export type deleteTenantResponseError = (deleteTenantResponse404 | deleteTenantResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** deleteTenantResponse represents a declared HTTP response from the delete tenant response operation. */
-export type deleteTenantResponse = (deleteTenantResponseSuccess | deleteTenantResponseError)
-
-/** getDeleteTenantUrl builds the relative URL for its OpenAPI operation. */
-export const getDeleteTenantUrl = (tenantSlug: string,) => {
-
-
-  return `/api/v1/admin/tenants/${tenantSlug}`
-}
-
-/**
- * Deletes the selected tenant within the authorized request scope.
- */
-export const deleteTenant = async (tenantSlug: string,
-    tenantDeleteBody: TenantDeleteBody, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteTenantResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<deleteTenantResponse>(getDeleteTenantUrl(tenantSlug),
-  {
-    ...options,
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(tenantDeleteBody)
-  }
-);}
-
-
-
-
-
-/** getDeleteTenantMutationKey is generated from the Meridian OpenAPI contract for get delete tenant mutation key. */
-export const getDeleteTenantMutationKey = () => ['deleteTenant'] as const;
-
-/** getDeleteTenantMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeleteTenantMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTenant>>, TError,DeleteTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteTenant>>, TError,DeleteTenantMutationVariables, TContext> => {
-
-const mutationKey = getDeleteTenantMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTenant>>, DeleteTenantMutationVariables> = (props) => {
-          const {tenantSlug,data} = props ?? {};
-
-          return  deleteTenant(tenantSlug,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** DeleteTenantMutationResult is generated from the Meridian OpenAPI contract for delete tenant mutation result. */
-    export type DeleteTenantMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTenant>>>
-    /** DeleteTenantMutationBody is the request body type for its generated OpenAPI operation. */
-    export type DeleteTenantMutationBody = TenantDeleteBody
-    /** DeleteTenantMutationError is generated from the Meridian OpenAPI contract for delete tenant mutation error. */
-    export type DeleteTenantMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** DeleteTenantMutationVariables is generated from the Meridian OpenAPI contract for delete tenant mutation variables. */
-    export type DeleteTenantMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteTenantMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: TenantDeleteBody}
-
-    /** useDeleteTenant executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeleteTenant = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTenant>>, TError,DeleteTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof deleteTenant>>,
-        TError,
-        DeleteTenantMutationVariables,
-        TContext
-      > => {
-      return useMutation(getDeleteTenantMutationOptions(options), queryClient);
-    }
-    /** putTenantMemberAsPlatformAdminResponse200 represents a declared HTTP response from the put tenant member as platform admin response200 operation. */
-    export type putTenantMemberAsPlatformAdminResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: MemberResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** putTenantMemberAsPlatformAdminResponse401 represents a declared HTTP response from the put tenant member as platform admin response401 operation. */
-export type putTenantMemberAsPlatformAdminResponse401 = {
-  /** Data contains the decoded response payload. */
-  data: UnauthenticatedResponse
-  /** Status is the HTTP response status code. */
-  status: 401
-}
-
-/** putTenantMemberAsPlatformAdminResponse403 represents a declared HTTP response from the put tenant member as platform admin response403 operation. */
-export type putTenantMemberAsPlatformAdminResponse403 = {
-  /** Data contains the decoded response payload. */
-  data: CsrfInvalidResponse
-  /** Status is the HTTP response status code. */
-  status: 403
-}
-
-/** putTenantMemberAsPlatformAdminResponse404 represents a declared HTTP response from the put tenant member as platform admin response404 operation. */
-export type putTenantMemberAsPlatformAdminResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** putTenantMemberAsPlatformAdminResponseSuccess represents a declared HTTP response from the put tenant member as platform admin response success operation. */
-export type putTenantMemberAsPlatformAdminResponseSuccess = (putTenantMemberAsPlatformAdminResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** putTenantMemberAsPlatformAdminResponseError represents a declared HTTP response from the put tenant member as platform admin response error operation. */
-export type putTenantMemberAsPlatformAdminResponseError = (putTenantMemberAsPlatformAdminResponse401 | putTenantMemberAsPlatformAdminResponse403 | putTenantMemberAsPlatformAdminResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** putTenantMemberAsPlatformAdminResponse represents a declared HTTP response from the put tenant member as platform admin response operation. */
-export type putTenantMemberAsPlatformAdminResponse = (putTenantMemberAsPlatformAdminResponseSuccess | putTenantMemberAsPlatformAdminResponseError)
-
-/** getPutTenantMemberAsPlatformAdminUrl builds the relative URL for its OpenAPI operation. */
-export const getPutTenantMemberAsPlatformAdminUrl = (tenantSlug: string,
-    userId: string,) => {
-
-
-  return `/api/v1/admin/tenants/${tenantSlug}/members/${userId}`
-}
-
-/**
- * Creates or replaces the selected tenant member as platform admin within the authorized request scope.
- */
-export const putTenantMemberAsPlatformAdmin = async (tenantSlug: string,
-    userId: string,
-    memberPutBody: MemberPutBody, options?: Parameters<typeof meridianFetch>[1]): Promise<putTenantMemberAsPlatformAdminResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<putTenantMemberAsPlatformAdminResponse>(getPutTenantMemberAsPlatformAdminUrl(tenantSlug,userId),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(memberPutBody)
-  }
-);}
-
-
-
-
-
-/** getPutTenantMemberAsPlatformAdminMutationKey is generated from the Meridian OpenAPI contract for get put tenant member as platform admin mutation key. */
-export const getPutTenantMemberAsPlatformAdminMutationKey = () => ['putTenantMemberAsPlatformAdmin'] as const;
-
-/** getPutTenantMemberAsPlatformAdminMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPutTenantMemberAsPlatformAdminMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext> => {
-
-const mutationKey = getPutTenantMemberAsPlatformAdminMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, PutTenantMemberAsPlatformAdminMutationVariables> = (props) => {
-          const {tenantSlug,userId,data} = props ?? {};
-
-          return  putTenantMemberAsPlatformAdmin(tenantSlug,userId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** PutTenantMemberAsPlatformAdminMutationResult is generated from the Meridian OpenAPI contract for put tenant member as platform admin mutation result. */
-    export type PutTenantMemberAsPlatformAdminMutationResult = NonNullable<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>>
-    /** PutTenantMemberAsPlatformAdminMutationBody is the request body type for its generated OpenAPI operation. */
-    export type PutTenantMemberAsPlatformAdminMutationBody = MemberPutBody
-    /** PutTenantMemberAsPlatformAdminMutationError is generated from the Meridian OpenAPI contract for put tenant member as platform admin mutation error. */
-    export type PutTenantMemberAsPlatformAdminMutationError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse
-    /** PutTenantMemberAsPlatformAdminMutationVariables is generated from the Meridian OpenAPI contract for put tenant member as platform admin mutation variables. */
-    export type PutTenantMemberAsPlatformAdminMutationVariables = {/** TenantSlug carries the tenant slug value for PutTenantMemberAsPlatformAdminMutationVariables. */ tenantSlug: string;/** UserId carries the user id value for PutTenantMemberAsPlatformAdminMutationVariables. */ userId: string;/** Data contains the decoded response payload. */ data: MemberPutBody}
-
-    /** usePutTenantMemberAsPlatformAdmin executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePutTenantMemberAsPlatformAdmin = <TError = UnauthenticatedResponse | CsrfInvalidResponse | NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>,
-        TError,
-        PutTenantMemberAsPlatformAdminMutationVariables,
-        TContext
-      > => {
-      return useMutation(getPutTenantMemberAsPlatformAdminMutationOptions(options), queryClient);
-    }
-    /** getPlatformSettingsResponse200 represents a declared HTTP response from the get platform settings response200 operation. */
-    export type getPlatformSettingsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: PlatformSettingsResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** getPlatformSettingsResponseSuccess represents a declared HTTP response from the get platform settings response success operation. */
-export type getPlatformSettingsResponseSuccess = (getPlatformSettingsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-;
-
-/** getPlatformSettingsResponse represents a declared HTTP response from the get platform settings response operation. */
-export type getPlatformSettingsResponse = (getPlatformSettingsResponseSuccess)
-
-/** getGetPlatformSettingsUrl builds the relative URL for its OpenAPI operation. */
-export const getGetPlatformSettingsUrl = () => {
-
-
-  return `/api/v1/admin/settings`
-}
-
-/**
- * Returns the selected platform settings within the authorized request scope.
- */
-export const getPlatformSettings = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<getPlatformSettingsResponse> => {
-
-  return meridianFetch<getPlatformSettingsResponse>(getGetPlatformSettingsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getGetPlatformSettingsQueryKey is generated from the Meridian OpenAPI contract for get get platform settings query key. */
-export const getGetPlatformSettingsQueryKey = () => {
-    return [
-    'api','v1','admin','settings'
-    ] as const;
-    }
-
-
-/** getGetPlatformSettingsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetPlatformSettingsQueryOptions = <TData = Awaited<ReturnType<typeof getPlatformSettings>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlatformSettings>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getGetPlatformSettingsQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlatformSettings>>> = ({ signal }) => getPlatformSettings({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlatformSettings>>, TError, TData>
-}
-
-/** GetPlatformSettingsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type GetPlatformSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getPlatformSettings>>>
-/** GetPlatformSettingsQueryError is the error type returned by its generated Vue Query hook. */
-export type GetPlatformSettingsQueryError = unknown
-
-
-
-/** useGetPlatformSettings executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetPlatformSettings<TData = Awaited<ReturnType<typeof getPlatformSettings>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlatformSettings>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetPlatformSettingsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** updatePlatformSettingsResponse200 represents a declared HTTP response from the update platform settings response200 operation. */
-export type updatePlatformSettingsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: PlatformSettingsResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** updatePlatformSettingsResponse412 represents a declared HTTP response from the update platform settings response412 operation. */
-export type updatePlatformSettingsResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** updatePlatformSettingsResponseSuccess represents a declared HTTP response from the update platform settings response success operation. */
-export type updatePlatformSettingsResponseSuccess = (updatePlatformSettingsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** updatePlatformSettingsResponseError represents a declared HTTP response from the update platform settings response error operation. */
-export type updatePlatformSettingsResponseError = (updatePlatformSettingsResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** updatePlatformSettingsResponse represents a declared HTTP response from the update platform settings response operation. */
-export type updatePlatformSettingsResponse = (updatePlatformSettingsResponseSuccess | updatePlatformSettingsResponseError)
-
-/** getUpdatePlatformSettingsUrl builds the relative URL for its OpenAPI operation. */
-export const getUpdatePlatformSettingsUrl = () => {
-
-
-  return `/api/v1/admin/settings`
-}
-
-/**
- * Updates the selected platform settings within the authorized request scope.
- */
-export const updatePlatformSettings = async (platformSettingsPatchBody: PlatformSettingsPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updatePlatformSettingsResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<updatePlatformSettingsResponse>(getUpdatePlatformSettingsUrl(),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(platformSettingsPatchBody)
-  }
-);}
-
-
-
-
-
-/** getUpdatePlatformSettingsMutationKey is generated from the Meridian OpenAPI contract for get update platform settings mutation key. */
-export const getUpdatePlatformSettingsMutationKey = () => ['updatePlatformSettings'] as const;
-
-/** getUpdatePlatformSettingsMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdatePlatformSettingsMutationOptions = <TError = PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlatformSettings>>, TError,UpdatePlatformSettingsMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updatePlatformSettings>>, TError,UpdatePlatformSettingsMutationVariables, TContext> => {
-
-const mutationKey = getUpdatePlatformSettingsMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlatformSettings>>, UpdatePlatformSettingsMutationVariables> = (props) => {
-          const {data} = props ?? {};
-
-          return  updatePlatformSettings(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** UpdatePlatformSettingsMutationResult is generated from the Meridian OpenAPI contract for update platform settings mutation result. */
-    export type UpdatePlatformSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlatformSettings>>>
-    /** UpdatePlatformSettingsMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdatePlatformSettingsMutationBody = PlatformSettingsPatchBody
-    /** UpdatePlatformSettingsMutationError is generated from the Meridian OpenAPI contract for update platform settings mutation error. */
-    export type UpdatePlatformSettingsMutationError = PreconditionFailedResponse
-    /** UpdatePlatformSettingsMutationVariables is generated from the Meridian OpenAPI contract for update platform settings mutation variables. */
-    export type UpdatePlatformSettingsMutationVariables = {/** Data contains the decoded response payload. */ data: PlatformSettingsPatchBody}
-
-    /** useUpdatePlatformSettings executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdatePlatformSettings = <TError = PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlatformSettings>>, TError,UpdatePlatformSettingsMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof updatePlatformSettings>>,
-        TError,
-        UpdatePlatformSettingsMutationVariables,
-        TContext
-      > => {
-      return useMutation(getUpdatePlatformSettingsMutationOptions(options), queryClient);
-    }
-    /** listGlobalCredentialsResponse200 represents a declared HTTP response from the list global credentials response200 operation. */
-    export type listGlobalCredentialsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: GlobalCredentialPageResponse
+  data: GlobalCredentialPage
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1376,7 +288,7 @@ export function useListGlobalCredentials<TData = Awaited<ReturnType<typeof listG
 /** createGlobalCredentialResponse201 represents a declared HTTP response from the create global credential response201 operation. */
 export type createGlobalCredentialResponse201 = {
   /** Data contains the decoded response payload. */
-  data: GlobalCredentialResponse
+  data: GlobalCredential
   /** Status is the HTTP response status code. */
   status: 201
 }
@@ -1384,7 +296,7 @@ export type createGlobalCredentialResponse201 = {
 /** createGlobalCredentialResponse409 represents a declared HTTP response from the create global credential response409 operation. */
 export type createGlobalCredentialResponse409 = {
   /** Data contains the decoded response payload. */
-  data: DuplicateResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 409
 }
@@ -1392,7 +304,7 @@ export type createGlobalCredentialResponse409 = {
 /** createGlobalCredentialResponse422 represents a declared HTTP response from the create global credential response422 operation. */
 export type createGlobalCredentialResponse422 = {
   /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
@@ -1421,7 +333,7 @@ export const getCreateGlobalCredentialUrl = () => {
 /**
  * Creates global credential within the authorized request scope.
  */
-export const createGlobalCredential = async (globalCredentialCreateBody: GlobalCredentialCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createGlobalCredentialResponse> => {
+export const createGlobalCredential = async (globalCredentialCreateRequest: GlobalCredentialCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createGlobalCredentialResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1434,7 +346,7 @@ return meridianFetch<createGlobalCredentialResponse>(getCreateGlobalCredentialUr
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(globalCredentialCreateBody)
+    body: JSON.stringify(globalCredentialCreateRequest)
   }
 );}
 
@@ -1446,7 +358,7 @@ return meridianFetch<createGlobalCredentialResponse>(getCreateGlobalCredentialUr
 export const getCreateGlobalCredentialMutationKey = () => ['createGlobalCredential'] as const;
 
 /** getCreateGlobalCredentialMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateGlobalCredentialMutationOptions = <TError = DuplicateResponse | ValidationErrorResponse,
+export const getCreateGlobalCredentialMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGlobalCredential>>, TError,CreateGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createGlobalCredential>>, TError,CreateGlobalCredentialMutationVariables, TContext> => {
 
@@ -1476,14 +388,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateGlobalCredentialMutationResult is generated from the Meridian OpenAPI contract for create global credential mutation result. */
     export type CreateGlobalCredentialMutationResult = NonNullable<Awaited<ReturnType<typeof createGlobalCredential>>>
     /** CreateGlobalCredentialMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateGlobalCredentialMutationBody = GlobalCredentialCreateBody
+    export type CreateGlobalCredentialMutationBody = GlobalCredentialCreateRequest
     /** CreateGlobalCredentialMutationError is generated from the Meridian OpenAPI contract for create global credential mutation error. */
-    export type CreateGlobalCredentialMutationError = DuplicateResponse | ValidationErrorResponse
+    export type CreateGlobalCredentialMutationError = ErrorResponse
     /** CreateGlobalCredentialMutationVariables is generated from the Meridian OpenAPI contract for create global credential mutation variables. */
-    export type CreateGlobalCredentialMutationVariables = {/** Data contains the decoded response payload. */ data: GlobalCredentialCreateBody}
+    export type CreateGlobalCredentialMutationVariables = {/** Data contains the decoded response payload. */ data: GlobalCredentialCreateRequest}
 
     /** useCreateGlobalCredential executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateGlobalCredential = <TError = DuplicateResponse | ValidationErrorResponse,
+    export const useCreateGlobalCredential = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGlobalCredential>>, TError,CreateGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createGlobalCredential>>,
@@ -1492,127 +404,6 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getCreateGlobalCredentialMutationOptions(options), queryClient);
-    }
-    /** updateGlobalCredentialResponse200 represents a declared HTTP response from the update global credential response200 operation. */
-    export type updateGlobalCredentialResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: GlobalCredentialResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** updateGlobalCredentialResponse404 represents a declared HTTP response from the update global credential response404 operation. */
-export type updateGlobalCredentialResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** updateGlobalCredentialResponse412 represents a declared HTTP response from the update global credential response412 operation. */
-export type updateGlobalCredentialResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** updateGlobalCredentialResponseSuccess represents a declared HTTP response from the update global credential response success operation. */
-export type updateGlobalCredentialResponseSuccess = (updateGlobalCredentialResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** updateGlobalCredentialResponseError represents a declared HTTP response from the update global credential response error operation. */
-export type updateGlobalCredentialResponseError = (updateGlobalCredentialResponse404 | updateGlobalCredentialResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** updateGlobalCredentialResponse represents a declared HTTP response from the update global credential response operation. */
-export type updateGlobalCredentialResponse = (updateGlobalCredentialResponseSuccess | updateGlobalCredentialResponseError)
-
-/** getUpdateGlobalCredentialUrl builds the relative URL for its OpenAPI operation. */
-export const getUpdateGlobalCredentialUrl = (credentialId: string,) => {
-
-
-  return `/api/v1/admin/global-credentials/${credentialId}`
-}
-
-/**
- * Updates the selected global credential within the authorized request scope.
- */
-export const updateGlobalCredential = async (credentialId: string,
-    globalCredentialPatchBody: GlobalCredentialPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateGlobalCredentialResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<updateGlobalCredentialResponse>(getUpdateGlobalCredentialUrl(credentialId),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(globalCredentialPatchBody)
-  }
-);}
-
-
-
-
-
-/** getUpdateGlobalCredentialMutationKey is generated from the Meridian OpenAPI contract for get update global credential mutation key. */
-export const getUpdateGlobalCredentialMutationKey = () => ['updateGlobalCredential'] as const;
-
-/** getUpdateGlobalCredentialMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateGlobalCredentialMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateGlobalCredential>>, TError,UpdateGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateGlobalCredential>>, TError,UpdateGlobalCredentialMutationVariables, TContext> => {
-
-const mutationKey = getUpdateGlobalCredentialMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateGlobalCredential>>, UpdateGlobalCredentialMutationVariables> = (props) => {
-          const {credentialId,data} = props ?? {};
-
-          return  updateGlobalCredential(credentialId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** UpdateGlobalCredentialMutationResult is generated from the Meridian OpenAPI contract for update global credential mutation result. */
-    export type UpdateGlobalCredentialMutationResult = NonNullable<Awaited<ReturnType<typeof updateGlobalCredential>>>
-    /** UpdateGlobalCredentialMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateGlobalCredentialMutationBody = GlobalCredentialPatchBody
-    /** UpdateGlobalCredentialMutationError is generated from the Meridian OpenAPI contract for update global credential mutation error. */
-    export type UpdateGlobalCredentialMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** UpdateGlobalCredentialMutationVariables is generated from the Meridian OpenAPI contract for update global credential mutation variables. */
-    export type UpdateGlobalCredentialMutationVariables = {/** CredentialId carries the credential id value for UpdateGlobalCredentialMutationVariables. */ credentialId: string;/** Data contains the decoded response payload. */ data: GlobalCredentialPatchBody}
-
-    /** useUpdateGlobalCredential executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateGlobalCredential = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateGlobalCredential>>, TError,UpdateGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof updateGlobalCredential>>,
-        TError,
-        UpdateGlobalCredentialMutationVariables,
-        TContext
-      > => {
-      return useMutation(getUpdateGlobalCredentialMutationOptions(options), queryClient);
     }
     /** deleteGlobalCredentialResponse204 represents a declared HTTP response from the delete global credential response204 operation. */
     export type deleteGlobalCredentialResponse204 = {
@@ -1625,7 +416,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** deleteGlobalCredentialResponse404 represents a declared HTTP response from the delete global credential response404 operation. */
 export type deleteGlobalCredentialResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1633,7 +424,7 @@ export type deleteGlobalCredentialResponse404 = {
 /** deleteGlobalCredentialResponse409 represents a declared HTTP response from the delete global credential response409 operation. */
 export type deleteGlobalCredentialResponse409 = {
   /** Data contains the decoded response payload. */
-  data: CredentialInUseResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 409
 }
@@ -1641,7 +432,7 @@ export type deleteGlobalCredentialResponse409 = {
 /** deleteGlobalCredentialResponse412 represents a declared HTTP response from the delete global credential response412 operation. */
 export type deleteGlobalCredentialResponse412 = {
   /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 412
 }
@@ -1691,7 +482,7 @@ export const deleteGlobalCredential = async (credentialId: string,
 export const getDeleteGlobalCredentialMutationKey = () => ['deleteGlobalCredential'] as const;
 
 /** getDeleteGlobalCredentialMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeleteGlobalCredentialMutationOptions = <TError = NotFoundResponse | CredentialInUseResponse | PreconditionFailedResponse,
+export const getDeleteGlobalCredentialMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteGlobalCredential>>, TError,DeleteGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteGlobalCredential>>, TError,DeleteGlobalCredentialMutationVariables, TContext> => {
 
@@ -1722,12 +513,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DeleteGlobalCredentialMutationResult = NonNullable<Awaited<ReturnType<typeof deleteGlobalCredential>>>
 
     /** DeleteGlobalCredentialMutationError is generated from the Meridian OpenAPI contract for delete global credential mutation error. */
-    export type DeleteGlobalCredentialMutationError = NotFoundResponse | CredentialInUseResponse | PreconditionFailedResponse
+    export type DeleteGlobalCredentialMutationError = ErrorResponse
     /** DeleteGlobalCredentialMutationVariables is generated from the Meridian OpenAPI contract for delete global credential mutation variables. */
     export type DeleteGlobalCredentialMutationVariables = {/** CredentialId carries the credential id value for DeleteGlobalCredentialMutationVariables. */ credentialId: string;/** Params carries the params value for DeleteGlobalCredentialMutationVariables. */ params?: DeleteGlobalCredentialParams}
 
     /** useDeleteGlobalCredential executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeleteGlobalCredential = <TError = NotFoundResponse | CredentialInUseResponse | PreconditionFailedResponse,
+    export const useDeleteGlobalCredential = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteGlobalCredential>>, TError,DeleteGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof deleteGlobalCredential>>,
@@ -1737,48 +528,56 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDeleteGlobalCredentialMutationOptions(options), queryClient);
     }
-    /** testGlobalCredentialResponse200 represents a declared HTTP response from the test global credential response200 operation. */
-    export type testGlobalCredentialResponse200 = {
+    /** updateGlobalCredentialResponse200 represents a declared HTTP response from the update global credential response200 operation. */
+    export type updateGlobalCredentialResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ConnectionTestResponse
+  data: GlobalCredential
   /** Status is the HTTP response status code. */
   status: 200
 }
 
-/** testGlobalCredentialResponse404 represents a declared HTTP response from the test global credential response404 operation. */
-export type testGlobalCredentialResponse404 = {
+/** updateGlobalCredentialResponse404 represents a declared HTTP response from the update global credential response404 operation. */
+export type updateGlobalCredentialResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
 
-/** testGlobalCredentialResponseSuccess represents a declared HTTP response from the test global credential response success operation. */
-export type testGlobalCredentialResponseSuccess = (testGlobalCredentialResponse200) & {
+/** updateGlobalCredentialResponse412 represents a declared HTTP response from the update global credential response412 operation. */
+export type updateGlobalCredentialResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** updateGlobalCredentialResponseSuccess represents a declared HTTP response from the update global credential response success operation. */
+export type updateGlobalCredentialResponseSuccess = (updateGlobalCredentialResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** testGlobalCredentialResponseError represents a declared HTTP response from the test global credential response error operation. */
-export type testGlobalCredentialResponseError = (testGlobalCredentialResponse404) & {
+/** updateGlobalCredentialResponseError represents a declared HTTP response from the update global credential response error operation. */
+export type updateGlobalCredentialResponseError = (updateGlobalCredentialResponse404 | updateGlobalCredentialResponse412) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
-/** testGlobalCredentialResponse represents a declared HTTP response from the test global credential response operation. */
-export type testGlobalCredentialResponse = (testGlobalCredentialResponseSuccess | testGlobalCredentialResponseError)
+/** updateGlobalCredentialResponse represents a declared HTTP response from the update global credential response operation. */
+export type updateGlobalCredentialResponse = (updateGlobalCredentialResponseSuccess | updateGlobalCredentialResponseError)
 
-/** getTestGlobalCredentialUrl builds the relative URL for its OpenAPI operation. */
-export const getTestGlobalCredentialUrl = (credentialId: string,) => {
+/** getUpdateGlobalCredentialUrl builds the relative URL for its OpenAPI operation. */
+export const getUpdateGlobalCredentialUrl = (credentialId: string,) => {
 
 
-  return `/api/v1/admin/global-credentials/${credentialId}:test`
+  return `/api/v1/admin/global-credentials/${credentialId}`
 }
 
 /**
- * Tests global credential within the authorized request scope.
+ * Updates the selected global credential within the authorized request scope.
  */
-export const testGlobalCredential = async (credentialId: string,
-    connectionTestBody: ConnectionTestBody, options?: Parameters<typeof meridianFetch>[1]): Promise<testGlobalCredentialResponse> => {
+export const updateGlobalCredential = async (credentialId: string,
+    globalCredentialPatchRequest: GlobalCredentialPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateGlobalCredentialResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1786,12 +585,12 @@ export const testGlobalCredential = async (credentialId: string,
     if (Array.isArray(h)) return Object.fromEntries(h);
     return h;
   };
-return meridianFetch<testGlobalCredentialResponse>(getTestGlobalCredentialUrl(credentialId),
+return meridianFetch<updateGlobalCredentialResponse>(getUpdateGlobalCredentialUrl(credentialId),
   {
     ...options,
-    method: 'POST',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(connectionTestBody)
+    body: JSON.stringify(globalCredentialPatchRequest)
   }
 );}
 
@@ -1799,15 +598,15 @@ return meridianFetch<testGlobalCredentialResponse>(getTestGlobalCredentialUrl(cr
 
 
 
-/** getTestGlobalCredentialMutationKey is generated from the Meridian OpenAPI contract for get test global credential mutation key. */
-export const getTestGlobalCredentialMutationKey = () => ['testGlobalCredential'] as const;
+/** getUpdateGlobalCredentialMutationKey is generated from the Meridian OpenAPI contract for get update global credential mutation key. */
+export const getUpdateGlobalCredentialMutationKey = () => ['updateGlobalCredential'] as const;
 
-/** getTestGlobalCredentialMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getTestGlobalCredentialMutationOptions = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testGlobalCredential>>, TError,TestGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof testGlobalCredential>>, TError,TestGlobalCredentialMutationVariables, TContext> => {
+/** getUpdateGlobalCredentialMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getUpdateGlobalCredentialMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateGlobalCredential>>, TError,UpdateGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateGlobalCredential>>, TError,UpdateGlobalCredentialMutationVariables, TContext> => {
 
-const mutationKey = getTestGlobalCredentialMutationKey();
+const mutationKey = getUpdateGlobalCredentialMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -1817,10 +616,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof testGlobalCredential>>, TestGlobalCredentialMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateGlobalCredential>>, UpdateGlobalCredentialMutationVariables> = (props) => {
           const {credentialId,data} = props ?? {};
 
-          return  testGlobalCredential(credentialId,data,requestOptions)
+          return  updateGlobalCredential(credentialId,data,requestOptions)
         }
 
 
@@ -1830,30 +629,30 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    /** TestGlobalCredentialMutationResult is generated from the Meridian OpenAPI contract for test global credential mutation result. */
-    export type TestGlobalCredentialMutationResult = NonNullable<Awaited<ReturnType<typeof testGlobalCredential>>>
-    /** TestGlobalCredentialMutationBody is the request body type for its generated OpenAPI operation. */
-    export type TestGlobalCredentialMutationBody = ConnectionTestBody
-    /** TestGlobalCredentialMutationError is generated from the Meridian OpenAPI contract for test global credential mutation error. */
-    export type TestGlobalCredentialMutationError = NotFoundResponse
-    /** TestGlobalCredentialMutationVariables is generated from the Meridian OpenAPI contract for test global credential mutation variables. */
-    export type TestGlobalCredentialMutationVariables = {/** CredentialId carries the credential id value for TestGlobalCredentialMutationVariables. */ credentialId: string;/** Data contains the decoded response payload. */ data: ConnectionTestBody}
+    /** UpdateGlobalCredentialMutationResult is generated from the Meridian OpenAPI contract for update global credential mutation result. */
+    export type UpdateGlobalCredentialMutationResult = NonNullable<Awaited<ReturnType<typeof updateGlobalCredential>>>
+    /** UpdateGlobalCredentialMutationBody is the request body type for its generated OpenAPI operation. */
+    export type UpdateGlobalCredentialMutationBody = GlobalCredentialPatchRequest
+    /** UpdateGlobalCredentialMutationError is generated from the Meridian OpenAPI contract for update global credential mutation error. */
+    export type UpdateGlobalCredentialMutationError = ErrorResponse
+    /** UpdateGlobalCredentialMutationVariables is generated from the Meridian OpenAPI contract for update global credential mutation variables. */
+    export type UpdateGlobalCredentialMutationVariables = {/** CredentialId carries the credential id value for UpdateGlobalCredentialMutationVariables. */ credentialId: string;/** Data contains the decoded response payload. */ data: GlobalCredentialPatchRequest}
 
-    /** useTestGlobalCredential executes its OpenAPI operation through TanStack Vue Query. */
-    export const useTestGlobalCredential = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testGlobalCredential>>, TError,TestGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+    /** useUpdateGlobalCredential executes its OpenAPI operation through TanStack Vue Query. */
+    export const useUpdateGlobalCredential = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateGlobalCredential>>, TError,UpdateGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof testGlobalCredential>>,
+        Awaited<ReturnType<typeof updateGlobalCredential>>,
         TError,
-        TestGlobalCredentialMutationVariables,
+        UpdateGlobalCredentialMutationVariables,
         TContext
       > => {
-      return useMutation(getTestGlobalCredentialMutationOptions(options), queryClient);
+      return useMutation(getUpdateGlobalCredentialMutationOptions(options), queryClient);
     }
     /** rotateGlobalCredentialResponse200 represents a declared HTTP response from the rotate global credential response200 operation. */
     export type rotateGlobalCredentialResponse200 = {
   /** Data contains the decoded response payload. */
-  data: GlobalCredentialRotationResponse
+  data: GlobalCredentialRotationResult
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1861,7 +660,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** rotateGlobalCredentialResponse404 represents a declared HTTP response from the rotate global credential response404 operation. */
 export type rotateGlobalCredentialResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1869,7 +668,7 @@ export type rotateGlobalCredentialResponse404 = {
 /** rotateGlobalCredentialResponse409 represents a declared HTTP response from the rotate global credential response409 operation. */
 export type rotateGlobalCredentialResponse409 = {
   /** Data contains the decoded response payload. */
-  data: ConflictResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 409
 }
@@ -1877,7 +676,7 @@ export type rotateGlobalCredentialResponse409 = {
 /** rotateGlobalCredentialResponse412 represents a declared HTTP response from the rotate global credential response412 operation. */
 export type rotateGlobalCredentialResponse412 = {
   /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 412
 }
@@ -1885,7 +684,7 @@ export type rotateGlobalCredentialResponse412 = {
 /** rotateGlobalCredentialResponse422 represents a declared HTTP response from the rotate global credential response422 operation. */
 export type rotateGlobalCredentialResponse422 = {
   /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
@@ -1915,7 +714,7 @@ export const getRotateGlobalCredentialUrl = (credentialId: string,) => {
  * Performs the rotate global credential workflow within the authorized request scope.
  */
 export const rotateGlobalCredential = async (credentialId: string,
-    credentialRotateBody: CredentialRotateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<rotateGlobalCredentialResponse> => {
+    credentialRotateRequest: CredentialRotateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<rotateGlobalCredentialResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1928,7 +727,7 @@ return meridianFetch<rotateGlobalCredentialResponse>(getRotateGlobalCredentialUr
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(credentialRotateBody)
+    body: JSON.stringify(credentialRotateRequest)
   }
 );}
 
@@ -1940,7 +739,7 @@ return meridianFetch<rotateGlobalCredentialResponse>(getRotateGlobalCredentialUr
 export const getRotateGlobalCredentialMutationKey = () => ['rotateGlobalCredential'] as const;
 
 /** getRotateGlobalCredentialMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getRotateGlobalCredentialMutationOptions = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse | ValidationErrorResponse,
+export const getRotateGlobalCredentialMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rotateGlobalCredential>>, TError,RotateGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof rotateGlobalCredential>>, TError,RotateGlobalCredentialMutationVariables, TContext> => {
 
@@ -1970,14 +769,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** RotateGlobalCredentialMutationResult is generated from the Meridian OpenAPI contract for rotate global credential mutation result. */
     export type RotateGlobalCredentialMutationResult = NonNullable<Awaited<ReturnType<typeof rotateGlobalCredential>>>
     /** RotateGlobalCredentialMutationBody is the request body type for its generated OpenAPI operation. */
-    export type RotateGlobalCredentialMutationBody = CredentialRotateBody
+    export type RotateGlobalCredentialMutationBody = CredentialRotateRequest
     /** RotateGlobalCredentialMutationError is generated from the Meridian OpenAPI contract for rotate global credential mutation error. */
-    export type RotateGlobalCredentialMutationError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse | ValidationErrorResponse
+    export type RotateGlobalCredentialMutationError = ErrorResponse
     /** RotateGlobalCredentialMutationVariables is generated from the Meridian OpenAPI contract for rotate global credential mutation variables. */
-    export type RotateGlobalCredentialMutationVariables = {/** CredentialId carries the credential id value for RotateGlobalCredentialMutationVariables. */ credentialId: string;/** Data contains the decoded response payload. */ data: CredentialRotateBody}
+    export type RotateGlobalCredentialMutationVariables = {/** CredentialId carries the credential id value for RotateGlobalCredentialMutationVariables. */ credentialId: string;/** Data contains the decoded response payload. */ data: CredentialRotateRequest}
 
     /** useRotateGlobalCredential executes its OpenAPI operation through TanStack Vue Query. */
-    export const useRotateGlobalCredential = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse | ValidationErrorResponse,
+    export const useRotateGlobalCredential = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rotateGlobalCredential>>, TError,RotateGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof rotateGlobalCredential>>,
@@ -1987,10 +786,341 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRotateGlobalCredentialMutationOptions(options), queryClient);
     }
-    /** listProducerProfilesResponse200 represents a declared HTTP response from the list producer profiles response200 operation. */
-    export type listProducerProfilesResponse200 = {
+    /** testGlobalCredentialResponse200 represents a declared HTTP response from the test global credential response200 operation. */
+    export type testGlobalCredentialResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ProducerProfilePageResponse
+  data: ConnectionTest
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** testGlobalCredentialResponse404 represents a declared HTTP response from the test global credential response404 operation. */
+export type testGlobalCredentialResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** testGlobalCredentialResponseSuccess represents a declared HTTP response from the test global credential response success operation. */
+export type testGlobalCredentialResponseSuccess = (testGlobalCredentialResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** testGlobalCredentialResponseError represents a declared HTTP response from the test global credential response error operation. */
+export type testGlobalCredentialResponseError = (testGlobalCredentialResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** testGlobalCredentialResponse represents a declared HTTP response from the test global credential response operation. */
+export type testGlobalCredentialResponse = (testGlobalCredentialResponseSuccess | testGlobalCredentialResponseError)
+
+/** getTestGlobalCredentialUrl builds the relative URL for its OpenAPI operation. */
+export const getTestGlobalCredentialUrl = (credentialId: string,) => {
+
+
+  return `/api/v1/admin/global-credentials/${credentialId}:test`
+}
+
+/**
+ * Tests global credential within the authorized request scope.
+ */
+export const testGlobalCredential = async (credentialId: string,
+    connectionTestRequest: ConnectionTestRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<testGlobalCredentialResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<testGlobalCredentialResponse>(getTestGlobalCredentialUrl(credentialId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(connectionTestRequest)
+  }
+);}
+
+
+
+
+
+/** getTestGlobalCredentialMutationKey is generated from the Meridian OpenAPI contract for get test global credential mutation key. */
+export const getTestGlobalCredentialMutationKey = () => ['testGlobalCredential'] as const;
+
+/** getTestGlobalCredentialMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getTestGlobalCredentialMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testGlobalCredential>>, TError,TestGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof testGlobalCredential>>, TError,TestGlobalCredentialMutationVariables, TContext> => {
+
+const mutationKey = getTestGlobalCredentialMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof testGlobalCredential>>, TestGlobalCredentialMutationVariables> = (props) => {
+          const {credentialId,data} = props ?? {};
+
+          return  testGlobalCredential(credentialId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** TestGlobalCredentialMutationResult is generated from the Meridian OpenAPI contract for test global credential mutation result. */
+    export type TestGlobalCredentialMutationResult = NonNullable<Awaited<ReturnType<typeof testGlobalCredential>>>
+    /** TestGlobalCredentialMutationBody is the request body type for its generated OpenAPI operation. */
+    export type TestGlobalCredentialMutationBody = ConnectionTestRequest
+    /** TestGlobalCredentialMutationError is generated from the Meridian OpenAPI contract for test global credential mutation error. */
+    export type TestGlobalCredentialMutationError = ErrorResponse
+    /** TestGlobalCredentialMutationVariables is generated from the Meridian OpenAPI contract for test global credential mutation variables. */
+    export type TestGlobalCredentialMutationVariables = {/** CredentialId carries the credential id value for TestGlobalCredentialMutationVariables. */ credentialId: string;/** Data contains the decoded response payload. */ data: ConnectionTestRequest}
+
+    /** useTestGlobalCredential executes its OpenAPI operation through TanStack Vue Query. */
+    export const useTestGlobalCredential = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testGlobalCredential>>, TError,TestGlobalCredentialMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof testGlobalCredential>>,
+        TError,
+        TestGlobalCredentialMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTestGlobalCredentialMutationOptions(options), queryClient);
+    }
+    /** listPlatformJobsResponse200 represents a declared HTTP response from the list platform jobs response200 operation. */
+    export type listPlatformJobsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: PlatformJobPage
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listPlatformJobsResponse404 represents a declared HTTP response from the list platform jobs response404 operation. */
+export type listPlatformJobsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listPlatformJobsResponseSuccess represents a declared HTTP response from the list platform jobs response success operation. */
+export type listPlatformJobsResponseSuccess = (listPlatformJobsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listPlatformJobsResponseError represents a declared HTTP response from the list platform jobs response error operation. */
+export type listPlatformJobsResponseError = (listPlatformJobsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listPlatformJobsResponse represents a declared HTTP response from the list platform jobs response operation. */
+export type listPlatformJobsResponse = (listPlatformJobsResponseSuccess | listPlatformJobsResponseError)
+
+/** getListPlatformJobsUrl builds the relative URL for its OpenAPI operation. */
+export const getListPlatformJobsUrl = (params?: ListPlatformJobsParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
+
+  return stringifiedParams.length > 0 ? `/api/v1/admin/jobs?${stringifiedParams}` : `/api/v1/admin/jobs`
+}
+
+/**
+ * Returns the requested page of platform jobs within the authorized request scope.
+ */
+export const listPlatformJobs = async (params?: ListPlatformJobsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listPlatformJobsResponse> => {
+
+  return meridianFetch<listPlatformJobsResponse>(getListPlatformJobsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListPlatformJobsQueryKey is generated from the Meridian OpenAPI contract for get list platform jobs query key. */
+export const getListPlatformJobsQueryKey = (params?: MaybeRefOrGetter<ListPlatformJobsParams>,) => {
+    return [
+    'api','v1','admin','jobs', ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+/** getListPlatformJobsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListPlatformJobsQueryOptions = <TData = Awaited<ReturnType<typeof listPlatformJobs>>, TError = ErrorResponse>(params?: MaybeRefOrGetter<ListPlatformJobsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlatformJobs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListPlatformJobsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlatformJobs>>> = ({ signal }) => listPlatformJobs(toValue(params), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPlatformJobs>>, TError, TData>
+}
+
+/** ListPlatformJobsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListPlatformJobsQueryResult = NonNullable<Awaited<ReturnType<typeof listPlatformJobs>>>
+/** ListPlatformJobsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListPlatformJobsQueryError = ErrorResponse
+
+
+
+/** useListPlatformJobs executes its OpenAPI operation through TanStack Vue Query. */
+export function useListPlatformJobs<TData = Awaited<ReturnType<typeof listPlatformJobs>>, TError = ErrorResponse>(
+ params?: MaybeRefOrGetter<ListPlatformJobsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlatformJobs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListPlatformJobsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** getPlatformJobResponse200 represents a declared HTTP response from the get platform job response200 operation. */
+export type getPlatformJobResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: PlatformJob
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** getPlatformJobResponse404 represents a declared HTTP response from the get platform job response404 operation. */
+export type getPlatformJobResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** getPlatformJobResponseSuccess represents a declared HTTP response from the get platform job response success operation. */
+export type getPlatformJobResponseSuccess = (getPlatformJobResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** getPlatformJobResponseError represents a declared HTTP response from the get platform job response error operation. */
+export type getPlatformJobResponseError = (getPlatformJobResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** getPlatformJobResponse represents a declared HTTP response from the get platform job response operation. */
+export type getPlatformJobResponse = (getPlatformJobResponseSuccess | getPlatformJobResponseError)
+
+/** getGetPlatformJobUrl builds the relative URL for its OpenAPI operation. */
+export const getGetPlatformJobUrl = (jobId: string,) => {
+
+
+  return `/api/v1/admin/jobs/${jobId}`
+}
+
+/**
+ * Returns the selected platform job within the authorized request scope.
+ */
+export const getPlatformJob = async (jobId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getPlatformJobResponse> => {
+
+  return meridianFetch<getPlatformJobResponse>(getGetPlatformJobUrl(jobId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getGetPlatformJobQueryKey is generated from the Meridian OpenAPI contract for get get platform job query key. */
+export const getGetPlatformJobQueryKey = (jobId: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','admin','jobs',jobId
+    ] as const;
+    }
+
+
+/** getGetPlatformJobQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getGetPlatformJobQueryOptions = <TData = Awaited<ReturnType<typeof getPlatformJob>>, TError = ErrorResponse>(jobId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlatformJob>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getGetPlatformJobQueryKey(jobId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlatformJob>>> = ({ signal }) => getPlatformJob(toValue(jobId), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(jobId) !== null && toValue(jobId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlatformJob>>, TError, TData>
+}
+
+/** GetPlatformJobQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type GetPlatformJobQueryResult = NonNullable<Awaited<ReturnType<typeof getPlatformJob>>>
+/** GetPlatformJobQueryError is the error type returned by its generated Vue Query hook. */
+export type GetPlatformJobQueryError = ErrorResponse
+
+
+
+/** useGetPlatformJob executes its OpenAPI operation through TanStack Vue Query. */
+export function useGetPlatformJob<TData = Awaited<ReturnType<typeof getPlatformJob>>, TError = ErrorResponse>(
+ jobId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlatformJob>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPlatformJobQueryOptions(jobId,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** listProducerProfilesResponse200 represents a declared HTTP response from the list producer profiles response200 operation. */
+export type listProducerProfilesResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ProducerProfilePage
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -2087,7 +1217,7 @@ export function useListProducerProfiles<TData = Awaited<ReturnType<typeof listPr
 /** createProducerProfileResponse201 represents a declared HTTP response from the create producer profile response201 operation. */
 export type createProducerProfileResponse201 = {
   /** Data contains the decoded response payload. */
-  data: ProducerProfileResponse
+  data: ProducerProfile
   /** Status is the HTTP response status code. */
   status: 201
 }
@@ -2095,7 +1225,7 @@ export type createProducerProfileResponse201 = {
 /** createProducerProfileResponse409 represents a declared HTTP response from the create producer profile response409 operation. */
 export type createProducerProfileResponse409 = {
   /** Data contains the decoded response payload. */
-  data: DuplicateResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 409
 }
@@ -2103,7 +1233,7 @@ export type createProducerProfileResponse409 = {
 /** createProducerProfileResponse422 represents a declared HTTP response from the create producer profile response422 operation. */
 export type createProducerProfileResponse422 = {
   /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
@@ -2132,7 +1262,7 @@ export const getCreateProducerProfileUrl = () => {
 /**
  * Creates producer profile within the authorized request scope.
  */
-export const createProducerProfile = async (producerProfileCreateBody: ProducerProfileCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createProducerProfileResponse> => {
+export const createProducerProfile = async (producerProfileCreateRequest: ProducerProfileCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createProducerProfileResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -2145,7 +1275,7 @@ return meridianFetch<createProducerProfileResponse>(getCreateProducerProfileUrl(
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(producerProfileCreateBody)
+    body: JSON.stringify(producerProfileCreateRequest)
   }
 );}
 
@@ -2157,7 +1287,7 @@ return meridianFetch<createProducerProfileResponse>(getCreateProducerProfileUrl(
 export const getCreateProducerProfileMutationKey = () => ['createProducerProfile'] as const;
 
 /** getCreateProducerProfileMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateProducerProfileMutationOptions = <TError = DuplicateResponse | ValidationErrorResponse,
+export const getCreateProducerProfileMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProducerProfile>>, TError,CreateProducerProfileMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createProducerProfile>>, TError,CreateProducerProfileMutationVariables, TContext> => {
 
@@ -2187,14 +1317,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateProducerProfileMutationResult is generated from the Meridian OpenAPI contract for create producer profile mutation result. */
     export type CreateProducerProfileMutationResult = NonNullable<Awaited<ReturnType<typeof createProducerProfile>>>
     /** CreateProducerProfileMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateProducerProfileMutationBody = ProducerProfileCreateBody
+    export type CreateProducerProfileMutationBody = ProducerProfileCreateRequest
     /** CreateProducerProfileMutationError is generated from the Meridian OpenAPI contract for create producer profile mutation error. */
-    export type CreateProducerProfileMutationError = DuplicateResponse | ValidationErrorResponse
+    export type CreateProducerProfileMutationError = ErrorResponse
     /** CreateProducerProfileMutationVariables is generated from the Meridian OpenAPI contract for create producer profile mutation variables. */
-    export type CreateProducerProfileMutationVariables = {/** Data contains the decoded response payload. */ data: ProducerProfileCreateBody}
+    export type CreateProducerProfileMutationVariables = {/** Data contains the decoded response payload. */ data: ProducerProfileCreateRequest}
 
     /** useCreateProducerProfile executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateProducerProfile = <TError = DuplicateResponse | ValidationErrorResponse,
+    export const useCreateProducerProfile = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProducerProfile>>, TError,CreateProducerProfileMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createProducerProfile>>,
@@ -2204,10 +1334,133 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateProducerProfileMutationOptions(options), queryClient);
     }
+    /** deleteProducerProfileResponse204 represents a declared HTTP response from the delete producer profile response204 operation. */
+    export type deleteProducerProfileResponse204 = {
+  /** Data contains the decoded response payload. */
+  data: void
+  /** Status is the HTTP response status code. */
+  status: 204
+}
+
+/** deleteProducerProfileResponse404 represents a declared HTTP response from the delete producer profile response404 operation. */
+export type deleteProducerProfileResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** deleteProducerProfileResponse409 represents a declared HTTP response from the delete producer profile response409 operation. */
+export type deleteProducerProfileResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** deleteProducerProfileResponse412 represents a declared HTTP response from the delete producer profile response412 operation. */
+export type deleteProducerProfileResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** deleteProducerProfileResponseSuccess represents a declared HTTP response from the delete producer profile response success operation. */
+export type deleteProducerProfileResponseSuccess = (deleteProducerProfileResponse204) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** deleteProducerProfileResponseError represents a declared HTTP response from the delete producer profile response error operation. */
+export type deleteProducerProfileResponseError = (deleteProducerProfileResponse404 | deleteProducerProfileResponse409 | deleteProducerProfileResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** deleteProducerProfileResponse represents a declared HTTP response from the delete producer profile response operation. */
+export type deleteProducerProfileResponse = (deleteProducerProfileResponseSuccess | deleteProducerProfileResponseError)
+
+/** getDeleteProducerProfileUrl builds the relative URL for its OpenAPI operation. */
+export const getDeleteProducerProfileUrl = (producerProfileId: string,
+    params?: DeleteProducerProfileParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
+
+  return stringifiedParams.length > 0 ? `/api/v1/admin/producer-profiles/${producerProfileId}?${stringifiedParams}` : `/api/v1/admin/producer-profiles/${producerProfileId}`
+}
+
+/**
+ * Deletes the selected producer profile within the authorized request scope.
+ */
+export const deleteProducerProfile = async (producerProfileId: string,
+    params?: DeleteProducerProfileParams, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteProducerProfileResponse> => {
+
+  return meridianFetch<deleteProducerProfileResponse>(getDeleteProducerProfileUrl(producerProfileId,params),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+/** getDeleteProducerProfileMutationKey is generated from the Meridian OpenAPI contract for get delete producer profile mutation key. */
+export const getDeleteProducerProfileMutationKey = () => ['deleteProducerProfile'] as const;
+
+/** getDeleteProducerProfileMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getDeleteProducerProfileMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProducerProfile>>, TError,DeleteProducerProfileMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteProducerProfile>>, TError,DeleteProducerProfileMutationVariables, TContext> => {
+
+const mutationKey = getDeleteProducerProfileMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteProducerProfile>>, DeleteProducerProfileMutationVariables> = (props) => {
+          const {producerProfileId,params} = props ?? {};
+
+          return  deleteProducerProfile(producerProfileId,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** DeleteProducerProfileMutationResult is generated from the Meridian OpenAPI contract for delete producer profile mutation result. */
+    export type DeleteProducerProfileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteProducerProfile>>>
+
+    /** DeleteProducerProfileMutationError is generated from the Meridian OpenAPI contract for delete producer profile mutation error. */
+    export type DeleteProducerProfileMutationError = ErrorResponse
+    /** DeleteProducerProfileMutationVariables is generated from the Meridian OpenAPI contract for delete producer profile mutation variables. */
+    export type DeleteProducerProfileMutationVariables = {/** ProducerProfileId carries the producer profile id value for DeleteProducerProfileMutationVariables. */ producerProfileId: string;/** Params carries the params value for DeleteProducerProfileMutationVariables. */ params?: DeleteProducerProfileParams}
+
+    /** useDeleteProducerProfile executes its OpenAPI operation through TanStack Vue Query. */
+    export const useDeleteProducerProfile = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProducerProfile>>, TError,DeleteProducerProfileMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof deleteProducerProfile>>,
+        TError,
+        DeleteProducerProfileMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteProducerProfileMutationOptions(options), queryClient);
+    }
     /** getProducerProfileResponse200 represents a declared HTTP response from the get producer profile response200 operation. */
     export type getProducerProfileResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ProducerProfileResponse
+  data: ProducerProfile
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -2215,7 +1468,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** getProducerProfileResponse404 represents a declared HTTP response from the get producer profile response404 operation. */
 export type getProducerProfileResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -2268,7 +1521,7 @@ export const getGetProducerProfileQueryKey = (producerProfileId: MaybeRefOrGette
 
 
 /** getGetProducerProfileQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetProducerProfileQueryOptions = <TData = Awaited<ReturnType<typeof getProducerProfile>>, TError = NotFoundResponse>(producerProfileId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProducerProfile>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+export const getGetProducerProfileQueryOptions = <TData = Awaited<ReturnType<typeof getProducerProfile>>, TError = ErrorResponse>(producerProfileId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProducerProfile>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -2289,12 +1542,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** GetProducerProfileQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetProducerProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getProducerProfile>>>
 /** GetProducerProfileQueryError is the error type returned by its generated Vue Query hook. */
-export type GetProducerProfileQueryError = NotFoundResponse
+export type GetProducerProfileQueryError = ErrorResponse
 
 
 
 /** useGetProducerProfile executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetProducerProfile<TData = Awaited<ReturnType<typeof getProducerProfile>>, TError = NotFoundResponse>(
+export function useGetProducerProfile<TData = Awaited<ReturnType<typeof getProducerProfile>>, TError = ErrorResponse>(
  producerProfileId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProducerProfile>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -2316,7 +1569,7 @@ export function useGetProducerProfile<TData = Awaited<ReturnType<typeof getProdu
 /** updateProducerProfileResponse200 represents a declared HTTP response from the update producer profile response200 operation. */
 export type updateProducerProfileResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ProducerProfileResponse
+  data: ProducerProfile
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -2324,7 +1577,7 @@ export type updateProducerProfileResponse200 = {
 /** updateProducerProfileResponse404 represents a declared HTTP response from the update producer profile response404 operation. */
 export type updateProducerProfileResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -2332,7 +1585,7 @@ export type updateProducerProfileResponse404 = {
 /** updateProducerProfileResponse412 represents a declared HTTP response from the update producer profile response412 operation. */
 export type updateProducerProfileResponse412 = {
   /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 412
 }
@@ -2362,7 +1615,7 @@ export const getUpdateProducerProfileUrl = (producerProfileId: string,) => {
  * Updates the selected producer profile within the authorized request scope.
  */
 export const updateProducerProfile = async (producerProfileId: string,
-    producerProfilePatchBody: ProducerProfilePatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateProducerProfileResponse> => {
+    producerProfilePatchRequest: ProducerProfilePatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateProducerProfileResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -2375,7 +1628,7 @@ return meridianFetch<updateProducerProfileResponse>(getUpdateProducerProfileUrl(
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(producerProfilePatchBody)
+    body: JSON.stringify(producerProfilePatchRequest)
   }
 );}
 
@@ -2387,7 +1640,7 @@ return meridianFetch<updateProducerProfileResponse>(getUpdateProducerProfileUrl(
 export const getUpdateProducerProfileMutationKey = () => ['updateProducerProfile'] as const;
 
 /** getUpdateProducerProfileMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateProducerProfileMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
+export const getUpdateProducerProfileMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProducerProfile>>, TError,UpdateProducerProfileMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateProducerProfile>>, TError,UpdateProducerProfileMutationVariables, TContext> => {
 
@@ -2417,14 +1670,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** UpdateProducerProfileMutationResult is generated from the Meridian OpenAPI contract for update producer profile mutation result. */
     export type UpdateProducerProfileMutationResult = NonNullable<Awaited<ReturnType<typeof updateProducerProfile>>>
     /** UpdateProducerProfileMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateProducerProfileMutationBody = ProducerProfilePatchBody
+    export type UpdateProducerProfileMutationBody = ProducerProfilePatchRequest
     /** UpdateProducerProfileMutationError is generated from the Meridian OpenAPI contract for update producer profile mutation error. */
-    export type UpdateProducerProfileMutationError = NotFoundResponse | PreconditionFailedResponse
+    export type UpdateProducerProfileMutationError = ErrorResponse
     /** UpdateProducerProfileMutationVariables is generated from the Meridian OpenAPI contract for update producer profile mutation variables. */
-    export type UpdateProducerProfileMutationVariables = {/** ProducerProfileId carries the producer profile id value for UpdateProducerProfileMutationVariables. */ producerProfileId: string;/** Data contains the decoded response payload. */ data: ProducerProfilePatchBody}
+    export type UpdateProducerProfileMutationVariables = {/** ProducerProfileId carries the producer profile id value for UpdateProducerProfileMutationVariables. */ producerProfileId: string;/** Data contains the decoded response payload. */ data: ProducerProfilePatchRequest}
 
     /** useUpdateProducerProfile executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateProducerProfile = <TError = NotFoundResponse | PreconditionFailedResponse,
+    export const useUpdateProducerProfile = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProducerProfile>>, TError,UpdateProducerProfileMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof updateProducerProfile>>,
@@ -2434,70 +1687,40 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdateProducerProfileMutationOptions(options), queryClient);
     }
-    /** deleteProducerProfileResponse204 represents a declared HTTP response from the delete producer profile response204 operation. */
-    export type deleteProducerProfileResponse204 = {
+    /** getPlatformSettingsResponse200 represents a declared HTTP response from the get platform settings response200 operation. */
+    export type getPlatformSettingsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: void
+  data: PlatformSettings
   /** Status is the HTTP response status code. */
-  status: 204
+  status: 200
 }
 
-/** deleteProducerProfileResponse404 represents a declared HTTP response from the delete producer profile response404 operation. */
-export type deleteProducerProfileResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** deleteProducerProfileResponse409 represents a declared HTTP response from the delete producer profile response409 operation. */
-export type deleteProducerProfileResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: InvalidStateResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** deleteProducerProfileResponse412 represents a declared HTTP response from the delete producer profile response412 operation. */
-export type deleteProducerProfileResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** deleteProducerProfileResponseSuccess represents a declared HTTP response from the delete producer profile response success operation. */
-export type deleteProducerProfileResponseSuccess = (deleteProducerProfileResponse204) & {
+/** getPlatformSettingsResponseSuccess represents a declared HTTP response from the get platform settings response success operation. */
+export type getPlatformSettingsResponseSuccess = (getPlatformSettingsResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** deleteProducerProfileResponseError represents a declared HTTP response from the delete producer profile response error operation. */
-export type deleteProducerProfileResponseError = (deleteProducerProfileResponse404 | deleteProducerProfileResponse409 | deleteProducerProfileResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
+;
 
-/** deleteProducerProfileResponse represents a declared HTTP response from the delete producer profile response operation. */
-export type deleteProducerProfileResponse = (deleteProducerProfileResponseSuccess | deleteProducerProfileResponseError)
+/** getPlatformSettingsResponse represents a declared HTTP response from the get platform settings response operation. */
+export type getPlatformSettingsResponse = (getPlatformSettingsResponseSuccess)
 
-/** getDeleteProducerProfileUrl builds the relative URL for its OpenAPI operation. */
-export const getDeleteProducerProfileUrl = (producerProfileId: string,
-    params?: DeleteProducerProfileParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
+/** getGetPlatformSettingsUrl builds the relative URL for its OpenAPI operation. */
+export const getGetPlatformSettingsUrl = () => {
 
-  return stringifiedParams.length > 0 ? `/api/v1/admin/producer-profiles/${producerProfileId}?${stringifiedParams}` : `/api/v1/admin/producer-profiles/${producerProfileId}`
+
+  return `/api/v1/admin/settings`
 }
 
 /**
- * Deletes the selected producer profile within the authorized request scope.
+ * Returns the selected platform settings within the authorized request scope.
  */
-export const deleteProducerProfile = async (producerProfileId: string,
-    params?: DeleteProducerProfileParams, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteProducerProfileResponse> => {
+export const getPlatformSettings = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<getPlatformSettingsResponse> => {
 
-  return meridianFetch<deleteProducerProfileResponse>(getDeleteProducerProfileUrl(producerProfileId,params),
+  return meridianFetch<getPlatformSettingsResponse>(getGetPlatformSettingsUrl(),
   {
     ...options,
-    method: 'DELETE'
+    method: 'GET'
 
 
   }
@@ -2507,15 +1730,130 @@ export const deleteProducerProfile = async (producerProfileId: string,
 
 
 
-/** getDeleteProducerProfileMutationKey is generated from the Meridian OpenAPI contract for get delete producer profile mutation key. */
-export const getDeleteProducerProfileMutationKey = () => ['deleteProducerProfile'] as const;
+/** getGetPlatformSettingsQueryKey is generated from the Meridian OpenAPI contract for get get platform settings query key. */
+export const getGetPlatformSettingsQueryKey = () => {
+    return [
+    'api','v1','admin','settings'
+    ] as const;
+    }
 
-/** getDeleteProducerProfileMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeleteProducerProfileMutationOptions = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProducerProfile>>, TError,DeleteProducerProfileMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteProducerProfile>>, TError,DeleteProducerProfileMutationVariables, TContext> => {
 
-const mutationKey = getDeleteProducerProfileMutationKey();
+/** getGetPlatformSettingsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getGetPlatformSettingsQueryOptions = <TData = Awaited<ReturnType<typeof getPlatformSettings>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlatformSettings>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getGetPlatformSettingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlatformSettings>>> = ({ signal }) => getPlatformSettings({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlatformSettings>>, TError, TData>
+}
+
+/** GetPlatformSettingsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type GetPlatformSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getPlatformSettings>>>
+/** GetPlatformSettingsQueryError is the error type returned by its generated Vue Query hook. */
+export type GetPlatformSettingsQueryError = unknown
+
+
+
+/** useGetPlatformSettings executes its OpenAPI operation through TanStack Vue Query. */
+export function useGetPlatformSettings<TData = Awaited<ReturnType<typeof getPlatformSettings>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlatformSettings>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPlatformSettingsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** updatePlatformSettingsResponse200 represents a declared HTTP response from the update platform settings response200 operation. */
+export type updatePlatformSettingsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: PlatformSettings
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** updatePlatformSettingsResponse412 represents a declared HTTP response from the update platform settings response412 operation. */
+export type updatePlatformSettingsResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** updatePlatformSettingsResponseSuccess represents a declared HTTP response from the update platform settings response success operation. */
+export type updatePlatformSettingsResponseSuccess = (updatePlatformSettingsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** updatePlatformSettingsResponseError represents a declared HTTP response from the update platform settings response error operation. */
+export type updatePlatformSettingsResponseError = (updatePlatformSettingsResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** updatePlatformSettingsResponse represents a declared HTTP response from the update platform settings response operation. */
+export type updatePlatformSettingsResponse = (updatePlatformSettingsResponseSuccess | updatePlatformSettingsResponseError)
+
+/** getUpdatePlatformSettingsUrl builds the relative URL for its OpenAPI operation. */
+export const getUpdatePlatformSettingsUrl = () => {
+
+
+  return `/api/v1/admin/settings`
+}
+
+/**
+ * Updates the selected platform settings within the authorized request scope.
+ */
+export const updatePlatformSettings = async (platformSettingsPatchRequest: PlatformSettingsPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updatePlatformSettingsResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<updatePlatformSettingsResponse>(getUpdatePlatformSettingsUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformSettingsPatchRequest)
+  }
+);}
+
+
+
+
+
+/** getUpdatePlatformSettingsMutationKey is generated from the Meridian OpenAPI contract for get update platform settings mutation key. */
+export const getUpdatePlatformSettingsMutationKey = () => ['updatePlatformSettings'] as const;
+
+/** getUpdatePlatformSettingsMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getUpdatePlatformSettingsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlatformSettings>>, TError,UpdatePlatformSettingsMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlatformSettings>>, TError,UpdatePlatformSettingsMutationVariables, TContext> => {
+
+const mutationKey = getUpdatePlatformSettingsMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -2525,10 +1863,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteProducerProfile>>, DeleteProducerProfileMutationVariables> = (props) => {
-          const {producerProfileId,params} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlatformSettings>>, UpdatePlatformSettingsMutationVariables> = (props) => {
+          const {data} = props ?? {};
 
-          return  deleteProducerProfile(producerProfileId,params,requestOptions)
+          return  updatePlatformSettings(data,requestOptions)
         }
 
 
@@ -2538,68 +1876,57 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    /** DeleteProducerProfileMutationResult is generated from the Meridian OpenAPI contract for delete producer profile mutation result. */
-    export type DeleteProducerProfileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteProducerProfile>>>
+    /** UpdatePlatformSettingsMutationResult is generated from the Meridian OpenAPI contract for update platform settings mutation result. */
+    export type UpdatePlatformSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlatformSettings>>>
+    /** UpdatePlatformSettingsMutationBody is the request body type for its generated OpenAPI operation. */
+    export type UpdatePlatformSettingsMutationBody = PlatformSettingsPatchRequest
+    /** UpdatePlatformSettingsMutationError is generated from the Meridian OpenAPI contract for update platform settings mutation error. */
+    export type UpdatePlatformSettingsMutationError = ErrorResponse
+    /** UpdatePlatformSettingsMutationVariables is generated from the Meridian OpenAPI contract for update platform settings mutation variables. */
+    export type UpdatePlatformSettingsMutationVariables = {/** Data contains the decoded response payload. */ data: PlatformSettingsPatchRequest}
 
-    /** DeleteProducerProfileMutationError is generated from the Meridian OpenAPI contract for delete producer profile mutation error. */
-    export type DeleteProducerProfileMutationError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse
-    /** DeleteProducerProfileMutationVariables is generated from the Meridian OpenAPI contract for delete producer profile mutation variables. */
-    export type DeleteProducerProfileMutationVariables = {/** ProducerProfileId carries the producer profile id value for DeleteProducerProfileMutationVariables. */ producerProfileId: string;/** Params carries the params value for DeleteProducerProfileMutationVariables. */ params?: DeleteProducerProfileParams}
-
-    /** useDeleteProducerProfile executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeleteProducerProfile = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProducerProfile>>, TError,DeleteProducerProfileMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+    /** useUpdatePlatformSettings executes its OpenAPI operation through TanStack Vue Query. */
+    export const useUpdatePlatformSettings = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlatformSettings>>, TError,UpdatePlatformSettingsMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof deleteProducerProfile>>,
+        Awaited<ReturnType<typeof updatePlatformSettings>>,
         TError,
-        DeleteProducerProfileMutationVariables,
+        UpdatePlatformSettingsMutationVariables,
         TContext
       > => {
-      return useMutation(getDeleteProducerProfileMutationOptions(options), queryClient);
+      return useMutation(getUpdatePlatformSettingsMutationOptions(options), queryClient);
     }
-    /** listPlatformJobsResponse200 represents a declared HTTP response from the list platform jobs response200 operation. */
-    export type listPlatformJobsResponse200 = {
+    /** listTenantsResponse200 represents a declared HTTP response from the list tenants response200 operation. */
+    export type listTenantsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: PlatformJobPageResponse
+  data: TenantPage
   /** Status is the HTTP response status code. */
   status: 200
 }
 
-/** listPlatformJobsResponse404 represents a declared HTTP response from the list platform jobs response404 operation. */
-export type listPlatformJobsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listPlatformJobsResponseSuccess represents a declared HTTP response from the list platform jobs response success operation. */
-export type listPlatformJobsResponseSuccess = (listPlatformJobsResponse200) & {
+/** listTenantsResponseSuccess represents a declared HTTP response from the list tenants response success operation. */
+export type listTenantsResponseSuccess = (listTenantsResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** listPlatformJobsResponseError represents a declared HTTP response from the list platform jobs response error operation. */
-export type listPlatformJobsResponseError = (listPlatformJobsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
+;
 
-/** listPlatformJobsResponse represents a declared HTTP response from the list platform jobs response operation. */
-export type listPlatformJobsResponse = (listPlatformJobsResponseSuccess | listPlatformJobsResponseError)
+/** listTenantsResponse represents a declared HTTP response from the list tenants response operation. */
+export type listTenantsResponse = (listTenantsResponseSuccess)
 
-/** getListPlatformJobsUrl builds the relative URL for its OpenAPI operation. */
-export const getListPlatformJobsUrl = (params?: ListPlatformJobsParams,) => {
+/** getListTenantsUrl builds the relative URL for its OpenAPI operation. */
+export const getListTenantsUrl = (params?: ListTenantsParams,) => {
   const stringifiedParams = serializeQueryParams(params);
 
-  return stringifiedParams.length > 0 ? `/api/v1/admin/jobs?${stringifiedParams}` : `/api/v1/admin/jobs`
+  return stringifiedParams.length > 0 ? `/api/v1/admin/tenants?${stringifiedParams}` : `/api/v1/admin/tenants`
 }
 
 /**
- * Returns the requested page of platform jobs within the authorized request scope.
+ * Returns the requested page of tenants within the authorized request scope.
  */
-export const listPlatformJobs = async (params?: ListPlatformJobsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listPlatformJobsResponse> => {
+export const listTenants = async (params?: ListTenantsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listTenantsResponse> => {
 
-  return meridianFetch<listPlatformJobsResponse>(getListPlatformJobsUrl(params),
+  return meridianFetch<listTenantsResponse>(getListTenantsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -2612,47 +1939,47 @@ export const listPlatformJobs = async (params?: ListPlatformJobsParams, options?
 
 
 
-/** getListPlatformJobsQueryKey is generated from the Meridian OpenAPI contract for get list platform jobs query key. */
-export const getListPlatformJobsQueryKey = (params?: MaybeRefOrGetter<ListPlatformJobsParams>,) => {
+/** getListTenantsQueryKey is generated from the Meridian OpenAPI contract for get list tenants query key. */
+export const getListTenantsQueryKey = (params?: MaybeRefOrGetter<ListTenantsParams>,) => {
     return [
-    'api','v1','admin','jobs', ...(params ? [params] : [])
+    'api','v1','admin','tenants', ...(params ? [params] : [])
     ] as const;
     }
 
 
-/** getListPlatformJobsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListPlatformJobsQueryOptions = <TData = Awaited<ReturnType<typeof listPlatformJobs>>, TError = NotFoundResponse>(params?: MaybeRefOrGetter<ListPlatformJobsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlatformJobs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** getListTenantsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListTenantsQueryOptions = <TData = Awaited<ReturnType<typeof listTenants>>, TError = unknown>(params?: MaybeRefOrGetter<ListTenantsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTenants>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getListPlatformJobsQueryKey(params);
+  const queryKey =  getListTenantsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlatformJobs>>> = ({ signal }) => listPlatformJobs(toValue(params), { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTenants>>> = ({ signal }) => listTenants(toValue(params), { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPlatformJobs>>, TError, TData>
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTenants>>, TError, TData>
 }
 
-/** ListPlatformJobsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListPlatformJobsQueryResult = NonNullable<Awaited<ReturnType<typeof listPlatformJobs>>>
-/** ListPlatformJobsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListPlatformJobsQueryError = NotFoundResponse
+/** ListTenantsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListTenantsQueryResult = NonNullable<Awaited<ReturnType<typeof listTenants>>>
+/** ListTenantsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListTenantsQueryError = unknown
 
 
 
-/** useListPlatformJobs executes its OpenAPI operation through TanStack Vue Query. */
-export function useListPlatformJobs<TData = Awaited<ReturnType<typeof listPlatformJobs>>, TError = NotFoundResponse>(
- params?: MaybeRefOrGetter<ListPlatformJobsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlatformJobs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** useListTenants executes its OpenAPI operation through TanStack Vue Query. */
+export function useListTenants<TData = Awaited<ReturnType<typeof listTenants>>, TError = unknown>(
+ params?: MaybeRefOrGetter<ListTenantsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTenants>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListPlatformJobsQueryOptions(params,options)
+  const queryOptions = getListTenantsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -2666,54 +1993,84 @@ export function useListPlatformJobs<TData = Awaited<ReturnType<typeof listPlatfo
 
 
 
-/** getPlatformJobResponse200 represents a declared HTTP response from the get platform job response200 operation. */
-export type getPlatformJobResponse200 = {
+/** createTenantResponse201 represents a declared HTTP response from the create tenant response201 operation. */
+export type createTenantResponse201 = {
   /** Data contains the decoded response payload. */
-  data: PlatformJobResponse
+  data: Tenant
   /** Status is the HTTP response status code. */
-  status: 200
+  status: 201
 }
 
-/** getPlatformJobResponse404 represents a declared HTTP response from the get platform job response404 operation. */
-export type getPlatformJobResponse404 = {
+/** createTenantResponse401 represents a declared HTTP response from the create tenant response401 operation. */
+export type createTenantResponse401 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** createTenantResponse403 represents a declared HTTP response from the create tenant response403 operation. */
+export type createTenantResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
+/** createTenantResponse404 represents a declared HTTP response from the create tenant response404 operation. */
+export type createTenantResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
 
-/** getPlatformJobResponseSuccess represents a declared HTTP response from the get platform job response success operation. */
-export type getPlatformJobResponseSuccess = (getPlatformJobResponse200) & {
+/** createTenantResponse409 represents a declared HTTP response from the create tenant response409 operation. */
+export type createTenantResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** createTenantResponseSuccess represents a declared HTTP response from the create tenant response success operation. */
+export type createTenantResponseSuccess = (createTenantResponse201) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** getPlatformJobResponseError represents a declared HTTP response from the get platform job response error operation. */
-export type getPlatformJobResponseError = (getPlatformJobResponse404) & {
+/** createTenantResponseError represents a declared HTTP response from the create tenant response error operation. */
+export type createTenantResponseError = (createTenantResponse401 | createTenantResponse403 | createTenantResponse404 | createTenantResponse409) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
-/** getPlatformJobResponse represents a declared HTTP response from the get platform job response operation. */
-export type getPlatformJobResponse = (getPlatformJobResponseSuccess | getPlatformJobResponseError)
+/** createTenantResponse represents a declared HTTP response from the create tenant response operation. */
+export type createTenantResponse = (createTenantResponseSuccess | createTenantResponseError)
 
-/** getGetPlatformJobUrl builds the relative URL for its OpenAPI operation. */
-export const getGetPlatformJobUrl = (jobId: string,) => {
+/** getCreateTenantUrl builds the relative URL for its OpenAPI operation. */
+export const getCreateTenantUrl = () => {
 
 
-  return `/api/v1/admin/jobs/${jobId}`
+  return `/api/v1/admin/tenants`
 }
 
 /**
- * Returns the selected platform job within the authorized request scope.
+ * Creates tenant within the authorized request scope.
  */
-export const getPlatformJob = async (jobId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getPlatformJobResponse> => {
+export const createTenant = async (tenantCreateRequest: TenantCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createTenantResponse> => {
 
-  return meridianFetch<getPlatformJobResponse>(getGetPlatformJobUrl(jobId),
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<createTenantResponse>(getCreateTenantUrl(),
   {
     ...options,
-    method: 'GET'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(tenantCreateRequest)
   }
 );}
 
@@ -2721,103 +2078,473 @@ export const getPlatformJob = async (jobId: string, options?: Parameters<typeof 
 
 
 
-/** getGetPlatformJobQueryKey is generated from the Meridian OpenAPI contract for get get platform job query key. */
-export const getGetPlatformJobQueryKey = (jobId: MaybeRefOrGetter<string>,) => {
-    return [
-    'api','v1','admin','jobs',jobId
-    ] as const;
+/** getCreateTenantMutationKey is generated from the Meridian OpenAPI contract for get create tenant mutation key. */
+export const getCreateTenantMutationKey = () => ['createTenant'] as const;
+
+/** getCreateTenantMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getCreateTenantMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext> => {
+
+const mutationKey = getCreateTenantMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTenant>>, CreateTenantMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTenant(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** CreateTenantMutationResult is generated from the Meridian OpenAPI contract for create tenant mutation result. */
+    export type CreateTenantMutationResult = NonNullable<Awaited<ReturnType<typeof createTenant>>>
+    /** CreateTenantMutationBody is the request body type for its generated OpenAPI operation. */
+    export type CreateTenantMutationBody = TenantCreateRequest
+    /** CreateTenantMutationError is generated from the Meridian OpenAPI contract for create tenant mutation error. */
+    export type CreateTenantMutationError = ErrorResponse
+    /** CreateTenantMutationVariables is generated from the Meridian OpenAPI contract for create tenant mutation variables. */
+    export type CreateTenantMutationVariables = {/** Data contains the decoded response payload. */ data: TenantCreateRequest}
+
+    /** useCreateTenant executes its OpenAPI operation through TanStack Vue Query. */
+    export const useCreateTenant = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTenant>>, TError,CreateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof createTenant>>,
+        TError,
+        CreateTenantMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateTenantMutationOptions(options), queryClient);
     }
-
-
-/** getGetPlatformJobQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetPlatformJobQueryOptions = <TData = Awaited<ReturnType<typeof getPlatformJob>>, TError = NotFoundResponse>(jobId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlatformJob>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getGetPlatformJobQueryKey(jobId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlatformJob>>> = ({ signal }) => getPlatformJob(toValue(jobId), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(jobId) !== null && toValue(jobId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlatformJob>>, TError, TData>
-}
-
-/** GetPlatformJobQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type GetPlatformJobQueryResult = NonNullable<Awaited<ReturnType<typeof getPlatformJob>>>
-/** GetPlatformJobQueryError is the error type returned by its generated Vue Query hook. */
-export type GetPlatformJobQueryError = NotFoundResponse
-
-
-
-/** useGetPlatformJob executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetPlatformJob<TData = Awaited<ReturnType<typeof getPlatformJob>>, TError = NotFoundResponse>(
- jobId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlatformJob>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetPlatformJobQueryOptions(jobId,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** listPlatformAuditLogsResponse200 represents a declared HTTP response from the list platform audit logs response200 operation. */
-export type listPlatformAuditLogsResponse200 = {
+    /** deleteTenantResponse202 represents a declared HTTP response from the delete tenant response202 operation. */
+    export type deleteTenantResponse202 = {
   /** Data contains the decoded response payload. */
-  data: AuditLogPageResponse
+  data: TenantDeletionAccepted
   /** Status is the HTTP response status code. */
-  status: 200
+  status: 202
 }
 
-/** listPlatformAuditLogsResponse404 represents a declared HTTP response from the list platform audit logs response404 operation. */
-export type listPlatformAuditLogsResponse404 = {
+/** deleteTenantResponse404 represents a declared HTTP response from the delete tenant response404 operation. */
+export type deleteTenantResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
 
-/** listPlatformAuditLogsResponseSuccess represents a declared HTTP response from the list platform audit logs response success operation. */
-export type listPlatformAuditLogsResponseSuccess = (listPlatformAuditLogsResponse200) & {
+/** deleteTenantResponse412 represents a declared HTTP response from the delete tenant response412 operation. */
+export type deleteTenantResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** deleteTenantResponseSuccess represents a declared HTTP response from the delete tenant response success operation. */
+export type deleteTenantResponseSuccess = (deleteTenantResponse202) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** listPlatformAuditLogsResponseError represents a declared HTTP response from the list platform audit logs response error operation. */
-export type listPlatformAuditLogsResponseError = (listPlatformAuditLogsResponse404) & {
+/** deleteTenantResponseError represents a declared HTTP response from the delete tenant response error operation. */
+export type deleteTenantResponseError = (deleteTenantResponse404 | deleteTenantResponse412) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
-/** listPlatformAuditLogsResponse represents a declared HTTP response from the list platform audit logs response operation. */
-export type listPlatformAuditLogsResponse = (listPlatformAuditLogsResponseSuccess | listPlatformAuditLogsResponseError)
+/** deleteTenantResponse represents a declared HTTP response from the delete tenant response operation. */
+export type deleteTenantResponse = (deleteTenantResponseSuccess | deleteTenantResponseError)
 
-/** getListPlatformAuditLogsUrl builds the relative URL for its OpenAPI operation. */
-export const getListPlatformAuditLogsUrl = (params?: ListPlatformAuditLogsParams,) => {
+/** getDeleteTenantUrl builds the relative URL for its OpenAPI operation. */
+export const getDeleteTenantUrl = (tenantSlug: string,) => {
+
+
+  return `/api/v1/admin/tenants/${tenantSlug}`
+}
+
+/**
+ * Deletes the selected tenant within the authorized request scope.
+ */
+export const deleteTenant = async (tenantSlug: string,
+    tenantDeleteRequest: TenantDeleteRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteTenantResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<deleteTenantResponse>(getDeleteTenantUrl(tenantSlug),
+  {
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(tenantDeleteRequest)
+  }
+);}
+
+
+
+
+
+/** getDeleteTenantMutationKey is generated from the Meridian OpenAPI contract for get delete tenant mutation key. */
+export const getDeleteTenantMutationKey = () => ['deleteTenant'] as const;
+
+/** getDeleteTenantMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getDeleteTenantMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTenant>>, TError,DeleteTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTenant>>, TError,DeleteTenantMutationVariables, TContext> => {
+
+const mutationKey = getDeleteTenantMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTenant>>, DeleteTenantMutationVariables> = (props) => {
+          const {tenantSlug,data} = props ?? {};
+
+          return  deleteTenant(tenantSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** DeleteTenantMutationResult is generated from the Meridian OpenAPI contract for delete tenant mutation result. */
+    export type DeleteTenantMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTenant>>>
+    /** DeleteTenantMutationBody is the request body type for its generated OpenAPI operation. */
+    export type DeleteTenantMutationBody = TenantDeleteRequest
+    /** DeleteTenantMutationError is generated from the Meridian OpenAPI contract for delete tenant mutation error. */
+    export type DeleteTenantMutationError = ErrorResponse
+    /** DeleteTenantMutationVariables is generated from the Meridian OpenAPI contract for delete tenant mutation variables. */
+    export type DeleteTenantMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteTenantMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: TenantDeleteRequest}
+
+    /** useDeleteTenant executes its OpenAPI operation through TanStack Vue Query. */
+    export const useDeleteTenant = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTenant>>, TError,DeleteTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof deleteTenant>>,
+        TError,
+        DeleteTenantMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteTenantMutationOptions(options), queryClient);
+    }
+    /** updateTenantResponse200 represents a declared HTTP response from the update tenant response200 operation. */
+    export type updateTenantResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: Tenant
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** updateTenantResponse404 represents a declared HTTP response from the update tenant response404 operation. */
+export type updateTenantResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** updateTenantResponse412 represents a declared HTTP response from the update tenant response412 operation. */
+export type updateTenantResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** updateTenantResponseSuccess represents a declared HTTP response from the update tenant response success operation. */
+export type updateTenantResponseSuccess = (updateTenantResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** updateTenantResponseError represents a declared HTTP response from the update tenant response error operation. */
+export type updateTenantResponseError = (updateTenantResponse404 | updateTenantResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** updateTenantResponse represents a declared HTTP response from the update tenant response operation. */
+export type updateTenantResponse = (updateTenantResponseSuccess | updateTenantResponseError)
+
+/** getUpdateTenantUrl builds the relative URL for its OpenAPI operation. */
+export const getUpdateTenantUrl = (tenantSlug: string,) => {
+
+
+  return `/api/v1/admin/tenants/${tenantSlug}`
+}
+
+/**
+ * Updates the selected tenant within the authorized request scope.
+ */
+export const updateTenant = async (tenantSlug: string,
+    tenantPatchRequest: TenantPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateTenantResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<updateTenantResponse>(getUpdateTenantUrl(tenantSlug),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(tenantPatchRequest)
+  }
+);}
+
+
+
+
+
+/** getUpdateTenantMutationKey is generated from the Meridian OpenAPI contract for get update tenant mutation key. */
+export const getUpdateTenantMutationKey = () => ['updateTenant'] as const;
+
+/** getUpdateTenantMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getUpdateTenantMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTenant>>, TError,UpdateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTenant>>, TError,UpdateTenantMutationVariables, TContext> => {
+
+const mutationKey = getUpdateTenantMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTenant>>, UpdateTenantMutationVariables> = (props) => {
+          const {tenantSlug,data} = props ?? {};
+
+          return  updateTenant(tenantSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** UpdateTenantMutationResult is generated from the Meridian OpenAPI contract for update tenant mutation result. */
+    export type UpdateTenantMutationResult = NonNullable<Awaited<ReturnType<typeof updateTenant>>>
+    /** UpdateTenantMutationBody is the request body type for its generated OpenAPI operation. */
+    export type UpdateTenantMutationBody = TenantPatchRequest
+    /** UpdateTenantMutationError is generated from the Meridian OpenAPI contract for update tenant mutation error. */
+    export type UpdateTenantMutationError = ErrorResponse
+    /** UpdateTenantMutationVariables is generated from the Meridian OpenAPI contract for update tenant mutation variables. */
+    export type UpdateTenantMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateTenantMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: TenantPatchRequest}
+
+    /** useUpdateTenant executes its OpenAPI operation through TanStack Vue Query. */
+    export const useUpdateTenant = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTenant>>, TError,UpdateTenantMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof updateTenant>>,
+        TError,
+        UpdateTenantMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateTenantMutationOptions(options), queryClient);
+    }
+    /** putTenantMemberAsPlatformAdminResponse200 represents a declared HTTP response from the put tenant member as platform admin response200 operation. */
+    export type putTenantMemberAsPlatformAdminResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: Member
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** putTenantMemberAsPlatformAdminResponse401 represents a declared HTTP response from the put tenant member as platform admin response401 operation. */
+export type putTenantMemberAsPlatformAdminResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** putTenantMemberAsPlatformAdminResponse403 represents a declared HTTP response from the put tenant member as platform admin response403 operation. */
+export type putTenantMemberAsPlatformAdminResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
+/** putTenantMemberAsPlatformAdminResponse404 represents a declared HTTP response from the put tenant member as platform admin response404 operation. */
+export type putTenantMemberAsPlatformAdminResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** putTenantMemberAsPlatformAdminResponseSuccess represents a declared HTTP response from the put tenant member as platform admin response success operation. */
+export type putTenantMemberAsPlatformAdminResponseSuccess = (putTenantMemberAsPlatformAdminResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** putTenantMemberAsPlatformAdminResponseError represents a declared HTTP response from the put tenant member as platform admin response error operation. */
+export type putTenantMemberAsPlatformAdminResponseError = (putTenantMemberAsPlatformAdminResponse401 | putTenantMemberAsPlatformAdminResponse403 | putTenantMemberAsPlatformAdminResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** putTenantMemberAsPlatformAdminResponse represents a declared HTTP response from the put tenant member as platform admin response operation. */
+export type putTenantMemberAsPlatformAdminResponse = (putTenantMemberAsPlatformAdminResponseSuccess | putTenantMemberAsPlatformAdminResponseError)
+
+/** getPutTenantMemberAsPlatformAdminUrl builds the relative URL for its OpenAPI operation. */
+export const getPutTenantMemberAsPlatformAdminUrl = (tenantSlug: string,
+    userId: string,) => {
+
+
+  return `/api/v1/admin/tenants/${tenantSlug}/members/${userId}`
+}
+
+/**
+ * Creates or replaces the selected tenant member as platform admin within the authorized request scope.
+ */
+export const putTenantMemberAsPlatformAdmin = async (tenantSlug: string,
+    userId: string,
+    memberPutRequest: MemberPutRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<putTenantMemberAsPlatformAdminResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<putTenantMemberAsPlatformAdminResponse>(getPutTenantMemberAsPlatformAdminUrl(tenantSlug,userId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(memberPutRequest)
+  }
+);}
+
+
+
+
+
+/** getPutTenantMemberAsPlatformAdminMutationKey is generated from the Meridian OpenAPI contract for get put tenant member as platform admin mutation key. */
+export const getPutTenantMemberAsPlatformAdminMutationKey = () => ['putTenantMemberAsPlatformAdmin'] as const;
+
+/** getPutTenantMemberAsPlatformAdminMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getPutTenantMemberAsPlatformAdminMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext> => {
+
+const mutationKey = getPutTenantMemberAsPlatformAdminMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, PutTenantMemberAsPlatformAdminMutationVariables> = (props) => {
+          const {tenantSlug,userId,data} = props ?? {};
+
+          return  putTenantMemberAsPlatformAdmin(tenantSlug,userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** PutTenantMemberAsPlatformAdminMutationResult is generated from the Meridian OpenAPI contract for put tenant member as platform admin mutation result. */
+    export type PutTenantMemberAsPlatformAdminMutationResult = NonNullable<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>>
+    /** PutTenantMemberAsPlatformAdminMutationBody is the request body type for its generated OpenAPI operation. */
+    export type PutTenantMemberAsPlatformAdminMutationBody = MemberPutRequest
+    /** PutTenantMemberAsPlatformAdminMutationError is generated from the Meridian OpenAPI contract for put tenant member as platform admin mutation error. */
+    export type PutTenantMemberAsPlatformAdminMutationError = ErrorResponse
+    /** PutTenantMemberAsPlatformAdminMutationVariables is generated from the Meridian OpenAPI contract for put tenant member as platform admin mutation variables. */
+    export type PutTenantMemberAsPlatformAdminMutationVariables = {/** TenantSlug carries the tenant slug value for PutTenantMemberAsPlatformAdminMutationVariables. */ tenantSlug: string;/** UserId carries the user id value for PutTenantMemberAsPlatformAdminMutationVariables. */ userId: string;/** Data contains the decoded response payload. */ data: MemberPutRequest}
+
+    /** usePutTenantMemberAsPlatformAdmin executes its OpenAPI operation through TanStack Vue Query. */
+    export const usePutTenantMemberAsPlatformAdmin = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>, TError,PutTenantMemberAsPlatformAdminMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof putTenantMemberAsPlatformAdmin>>,
+        TError,
+        PutTenantMemberAsPlatformAdminMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutTenantMemberAsPlatformAdminMutationOptions(options), queryClient);
+    }
+    /** listUsersResponse200 represents a declared HTTP response from the list users response200 operation. */
+    export type listUsersResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: UserPage
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listUsersResponse404 represents a declared HTTP response from the list users response404 operation. */
+export type listUsersResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listUsersResponseSuccess represents a declared HTTP response from the list users response success operation. */
+export type listUsersResponseSuccess = (listUsersResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listUsersResponseError represents a declared HTTP response from the list users response error operation. */
+export type listUsersResponseError = (listUsersResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listUsersResponse represents a declared HTTP response from the list users response operation. */
+export type listUsersResponse = (listUsersResponseSuccess | listUsersResponseError)
+
+/** getListUsersUrl builds the relative URL for its OpenAPI operation. */
+export const getListUsersUrl = (params?: ListUsersParams,) => {
   const stringifiedParams = serializeQueryParams(params);
 
-  return stringifiedParams.length > 0 ? `/api/v1/admin/audit-logs?${stringifiedParams}` : `/api/v1/admin/audit-logs`
+  return stringifiedParams.length > 0 ? `/api/v1/admin/users?${stringifiedParams}` : `/api/v1/admin/users`
 }
 
 /**
- * Returns the requested page of platform audit logs within the authorized request scope.
+ * Returns the requested page of users within the authorized request scope.
  */
-export const listPlatformAuditLogs = async (params?: ListPlatformAuditLogsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listPlatformAuditLogsResponse> => {
+export const listUsers = async (params?: ListUsersParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listUsersResponse> => {
 
-  return meridianFetch<listPlatformAuditLogsResponse>(getListPlatformAuditLogsUrl(params),
+  return meridianFetch<listUsersResponse>(getListUsersUrl(params),
   {
     ...options,
     method: 'GET'
@@ -2830,47 +2557,47 @@ export const listPlatformAuditLogs = async (params?: ListPlatformAuditLogsParams
 
 
 
-/** getListPlatformAuditLogsQueryKey is generated from the Meridian OpenAPI contract for get list platform audit logs query key. */
-export const getListPlatformAuditLogsQueryKey = (params?: MaybeRefOrGetter<ListPlatformAuditLogsParams>,) => {
+/** getListUsersQueryKey is generated from the Meridian OpenAPI contract for get list users query key. */
+export const getListUsersQueryKey = (params?: MaybeRefOrGetter<ListUsersParams>,) => {
     return [
-    'api','v1','admin','audit-logs', ...(params ? [params] : [])
+    'api','v1','admin','users', ...(params ? [params] : [])
     ] as const;
     }
 
 
-/** getListPlatformAuditLogsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListPlatformAuditLogsQueryOptions = <TData = Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError = NotFoundResponse>(params?: MaybeRefOrGetter<ListPlatformAuditLogsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** getListUsersQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListUsersQueryOptions = <TData = Awaited<ReturnType<typeof listUsers>>, TError = ErrorResponse>(params?: MaybeRefOrGetter<ListUsersParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getListPlatformAuditLogsQueryKey(params);
+  const queryKey =  getListUsersQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlatformAuditLogs>>> = ({ signal }) => listPlatformAuditLogs(toValue(params), { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listUsers>>> = ({ signal }) => listUsers(toValue(params), { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError, TData>
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>
 }
 
-/** ListPlatformAuditLogsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListPlatformAuditLogsQueryResult = NonNullable<Awaited<ReturnType<typeof listPlatformAuditLogs>>>
-/** ListPlatformAuditLogsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListPlatformAuditLogsQueryError = NotFoundResponse
+/** ListUsersQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListUsersQueryResult = NonNullable<Awaited<ReturnType<typeof listUsers>>>
+/** ListUsersQueryError is the error type returned by its generated Vue Query hook. */
+export type ListUsersQueryError = ErrorResponse
 
 
 
-/** useListPlatformAuditLogs executes its OpenAPI operation through TanStack Vue Query. */
-export function useListPlatformAuditLogs<TData = Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError = NotFoundResponse>(
- params?: MaybeRefOrGetter<ListPlatformAuditLogsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlatformAuditLogs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+/** useListUsers executes its OpenAPI operation through TanStack Vue Query. */
+export function useListUsers<TData = Awaited<ReturnType<typeof listUsers>>, TError = ErrorResponse>(
+ params?: MaybeRefOrGetter<ListUsersParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListPlatformAuditLogsQueryOptions(params,options)
+  const queryOptions = getListUsersQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -2884,3 +2611,268 @@ export function useListPlatformAuditLogs<TData = Awaited<ReturnType<typeof listP
 
 
 
+/** createUserResponse201 represents a declared HTTP response from the create user response201 operation. */
+export type createUserResponse201 = {
+  /** Data contains the decoded response payload. */
+  data: User
+  /** Status is the HTTP response status code. */
+  status: 201
+}
+
+/** createUserResponse401 represents a declared HTTP response from the create user response401 operation. */
+export type createUserResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** createUserResponse403 represents a declared HTTP response from the create user response403 operation. */
+export type createUserResponse403 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 403
+}
+
+/** createUserResponse404 represents a declared HTTP response from the create user response404 operation. */
+export type createUserResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** createUserResponse409 represents a declared HTTP response from the create user response409 operation. */
+export type createUserResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** createUserResponse422 represents a declared HTTP response from the create user response422 operation. */
+export type createUserResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** createUserResponseSuccess represents a declared HTTP response from the create user response success operation. */
+export type createUserResponseSuccess = (createUserResponse201) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** createUserResponseError represents a declared HTTP response from the create user response error operation. */
+export type createUserResponseError = (createUserResponse401 | createUserResponse403 | createUserResponse404 | createUserResponse409 | createUserResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** createUserResponse represents a declared HTTP response from the create user response operation. */
+export type createUserResponse = (createUserResponseSuccess | createUserResponseError)
+
+/** getCreateUserUrl builds the relative URL for its OpenAPI operation. */
+export const getCreateUserUrl = () => {
+
+
+  return `/api/v1/admin/users`
+}
+
+/**
+ * Creates user within the authorized request scope.
+ */
+export const createUser = async (userCreateRequest: UserCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createUserResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<createUserResponse>(getCreateUserUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(userCreateRequest)
+  }
+);}
+
+
+
+
+
+/** getCreateUserMutationKey is generated from the Meridian OpenAPI contract for get create user mutation key. */
+export const getCreateUserMutationKey = () => ['createUser'] as const;
+
+/** getCreateUserMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getCreateUserMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext> => {
+
+const mutationKey = getCreateUserMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, CreateUserMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createUser(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** CreateUserMutationResult is generated from the Meridian OpenAPI contract for create user mutation result. */
+    export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
+    /** CreateUserMutationBody is the request body type for its generated OpenAPI operation. */
+    export type CreateUserMutationBody = UserCreateRequest
+    /** CreateUserMutationError is generated from the Meridian OpenAPI contract for create user mutation error. */
+    export type CreateUserMutationError = ErrorResponse
+    /** CreateUserMutationVariables is generated from the Meridian OpenAPI contract for create user mutation variables. */
+    export type CreateUserMutationVariables = {/** Data contains the decoded response payload. */ data: UserCreateRequest}
+
+    /** useCreateUser executes its OpenAPI operation through TanStack Vue Query. */
+    export const useCreateUser = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,CreateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof createUser>>,
+        TError,
+        CreateUserMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateUserMutationOptions(options), queryClient);
+    }
+    /** updateUserResponse200 represents a declared HTTP response from the update user response200 operation. */
+    export type updateUserResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: User
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** updateUserResponse404 represents a declared HTTP response from the update user response404 operation. */
+export type updateUserResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** updateUserResponse412 represents a declared HTTP response from the update user response412 operation. */
+export type updateUserResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** updateUserResponseSuccess represents a declared HTTP response from the update user response success operation. */
+export type updateUserResponseSuccess = (updateUserResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** updateUserResponseError represents a declared HTTP response from the update user response error operation. */
+export type updateUserResponseError = (updateUserResponse404 | updateUserResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** updateUserResponse represents a declared HTTP response from the update user response operation. */
+export type updateUserResponse = (updateUserResponseSuccess | updateUserResponseError)
+
+/** getUpdateUserUrl builds the relative URL for its OpenAPI operation. */
+export const getUpdateUserUrl = (userId: string,) => {
+
+
+  return `/api/v1/admin/users/${userId}`
+}
+
+/**
+ * Updates the selected user within the authorized request scope.
+ */
+export const updateUser = async (userId: string,
+    userPatchRequest: UserPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateUserResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<updateUserResponse>(getUpdateUserUrl(userId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(userPatchRequest)
+  }
+);}
+
+
+
+
+
+/** getUpdateUserMutationKey is generated from the Meridian OpenAPI contract for get update user mutation key. */
+export const getUpdateUserMutationKey = () => ['updateUser'] as const;
+
+/** getUpdateUserMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getUpdateUserMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,UpdateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,UpdateUserMutationVariables, TContext> => {
+
+const mutationKey = getUpdateUserMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUser>>, UpdateUserMutationVariables> = (props) => {
+          const {userId,data} = props ?? {};
+
+          return  updateUser(userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** UpdateUserMutationResult is generated from the Meridian OpenAPI contract for update user mutation result. */
+    export type UpdateUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateUser>>>
+    /** UpdateUserMutationBody is the request body type for its generated OpenAPI operation. */
+    export type UpdateUserMutationBody = UserPatchRequest
+    /** UpdateUserMutationError is generated from the Meridian OpenAPI contract for update user mutation error. */
+    export type UpdateUserMutationError = ErrorResponse
+    /** UpdateUserMutationVariables is generated from the Meridian OpenAPI contract for update user mutation variables. */
+    export type UpdateUserMutationVariables = {/** UserId carries the user id value for UpdateUserMutationVariables. */ userId: string;/** Data contains the decoded response payload. */ data: UserPatchRequest}
+
+    /** useUpdateUser executes its OpenAPI operation through TanStack Vue Query. */
+    export const useUpdateUser = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,UpdateUserMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof updateUser>>,
+        TError,
+        UpdateUserMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateUserMutationOptions(options), queryClient);
+    }

@@ -15,9 +15,6 @@ export interface SshSecretInput {
      * @minLength 32
      */
   privateKeyPem: string;
-  /**
-     * unlocks the private key when encrypted and must never be logged.
-     * @nullable
-     */
+  /** unlocks the private key when encrypted and must never be logged. */
   passphrase?: string | null;
 }

@@ -19,10 +19,7 @@ export interface TenantSettingsPatchRequest {
   autoPublish?: boolean;
   /** specifies the default locale associated with this tenant settings patch request. */
   defaultLocale?: TenantSettingsPatchRequestDefaultLocale;
-  /**
-     * specifies the default ai producer profile id associated with this tenant settings patch request.
-     * @nullable
-     */
+  /** specifies the default ai producer profile id associated with this tenant settings patch request. */
   defaultAiProducerProfileId?: string | null;
   /** contains the retention settings associated with this tenant settings patch request. */
   retention?: RetentionSettings;

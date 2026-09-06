@@ -27,9 +27,6 @@ export interface ProducerProfileOption {
   network: ProducerNetworkMode;
   /** contains the producer dependency status associated with this producer profile option. */
   dependencyStatus: ProducerDependencyStatus;
-  /**
-     * specifies the unavailable reason associated with this producer profile option.
-     * @nullable
-     */
+  /** specifies the unavailable reason associated with this producer profile option. */
   unavailableReason: string | null;
 }

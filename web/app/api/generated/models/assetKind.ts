@@ -5,7 +5,7 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
-import type { CapabilityList } from './capabilityList.ts';
+import type { CapabilityListItem } from './capabilityListItem.ts';
 import type { ETag } from './eTag.ts';
 import type { KindId } from './kindId.ts';
 
@@ -27,7 +27,7 @@ export interface AssetKind {
   /** contains the ordered accepted media types associated with this asset kind. */
   acceptedMediaTypes: string[];
   /** lists actions the authenticated principal may perform on this resource. */
-  capabilities: CapabilityList;
+  capabilities: CapabilityListItem;
   /** contains the ordered default views associated with this asset kind. */
   defaultViews: string[];
   /**

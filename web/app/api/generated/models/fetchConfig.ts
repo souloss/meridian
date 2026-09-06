@@ -17,7 +17,6 @@ export interface FetchConfig {
      * specifies the depth associated with this fetch config.
      * @minimum 1
      * @maximum 10000
-     * @nullable
      */
   depth?: number | null;
   /** indicates whether submodules applies to this fetch config. */
@@ -25,18 +24,11 @@ export interface FetchConfig {
   /**
      * specifies the proxy associated with this fetch config.
      * @maxLength 2048
-     * @nullable
      */
   proxy?: string | null;
-  /**
-     * contains the ordered path allow associated with this fetch config.
-     * @items.maxLength 512
-     */
+  /** contains the ordered path allow associated with this fetch config. */
   pathAllow: string[];
-  /**
-     * contains the ordered path ignore associated with this fetch config.
-     * @items.maxLength 512
-     */
+  /** contains the ordered path ignore associated with this fetch config. */
   pathIgnore: string[];
   /** specifies the known host policy associated with this fetch config. */
   knownHostPolicy: FetchConfigKnownHostPolicy;

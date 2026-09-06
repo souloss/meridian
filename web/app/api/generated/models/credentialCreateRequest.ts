@@ -14,32 +14,32 @@ import type { Uuid } from './uuid.ts';
  */
 export type CredentialCreateRequest = {
   /**
-     * specifies the name associated with this credential create request.
+     * specifies the name value.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
-  /** specifies the kind associated with this credential create request. */
+  /** specifies the kind value. */
   kind: 'ssh_key';
-  /** contains the ssh secret input associated with this credential create request. */
+  /** specifies the sshKey value. */
   sshKey: SshSecretInput;
-  /** specifies the shared scope associated with this credential create request. */
+  /** specifies the sharedScope value. */
   sharedScope?: 'private' | 'team' | 'tenant';
-  /** contains the ordered team ids associated with this credential create request. */
+  /** specifies the teamIds value. */
   teamIds?: Uuid[];
 } | {
   /**
-     * specifies the name associated with this credential create request.
+     * specifies the name value.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
-  /** specifies the kind associated with this credential create request. */
+  /** specifies the kind value. */
   kind: 'http_token';
-  /** contains the http secret input associated with this credential create request. */
+  /** specifies the httpToken value. */
   httpToken: HttpSecretInput;
-  /** specifies the shared scope associated with this credential create request. */
+  /** specifies the sharedScope value. */
   sharedScope?: 'private' | 'team' | 'tenant';
-  /** contains the ordered team ids associated with this credential create request. */
+  /** specifies the teamIds value. */
   teamIds?: Uuid[];
 };

@@ -23,7 +23,6 @@ export interface ServicePatchRequest {
   /**
      * specifies the description associated with this service patch request.
      * @maxLength 2000
-     * @nullable
      */
   description?: string | null;
   /** contains the service visibility associated with this service patch request. */

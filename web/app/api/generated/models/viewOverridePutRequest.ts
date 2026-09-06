@@ -5,9 +5,14 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
-import type { ViewOverrideValue } from './viewOverrideValue.ts';
+import type { ViewOverridePutRequestDefaultOptions } from './viewOverridePutRequestDefaultOptions.ts';
 
 /**
  * defines validated input for the corresponding Meridian API operation.
  */
-export type ViewOverridePutRequest = ViewOverrideValue;
+export interface ViewOverridePutRequest {
+  /** indicates whether enabled applies to this view override value. */
+  enabled?: boolean;
+  /** specifies the default options associated with this view override value. */
+  defaultOptions?: ViewOverridePutRequestDefaultOptions;
+}

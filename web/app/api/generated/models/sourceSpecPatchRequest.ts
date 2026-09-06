@@ -27,7 +27,6 @@ export interface SourceSpecPatchRequest {
   /**
      * specifies the path associated with this source spec patch request.
      * @maxLength 512
-     * @nullable
      */
   path?: string | null;
   /** specifies the producer profile id associated with this source spec patch request. */

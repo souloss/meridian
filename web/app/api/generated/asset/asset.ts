@@ -31,41 +31,34 @@ import type {
 } from 'vue';
 
 import type {
-  AiGenerationAcceptedResponse,
-  AssetAiGenerateBody,
-  AssetItemPageResponse,
-  AssetKindListResponse,
-  AssetKindPatchBody,
-  AssetKindResponse,
-  AssetPushBody,
-  AssetPushResultResponse,
-  AssetResponse,
-  AssetVersionPageResponse,
-  AssetVersionResponse,
-  ConflictResponse,
-  ContentTooLargeResponse,
+  AiGenerationAccepted,
+  Asset,
+  AssetAiGenerateRequest,
+  AssetItemPage,
+  AssetKind,
+  AssetKindList,
+  AssetKindPatchRequest,
+  AssetPushRequest,
+  AssetPushResult,
+  AssetVersion,
+  AssetVersionPage,
+  ErrorResponse,
   GetAssetParams,
-  InvalidStateResponse,
-  JobAcceptedResponse,
+  JobAccepted,
   ListAssetVersionItemsParams,
   ListAssetVersionsParams,
-  MergePreviewBody,
-  MergePreviewResponse,
-  NotFoundResponse,
-  OverlayInvalidResponse,
-  PreconditionFailedResponse,
-  ProduceSourceBody,
-  ProducerProfileUnavailableResponse,
-  ProvenanceListResponse,
-  PublicAssetResponse,
-  ServiceAiGenerateBody,
-  SourceBindingListResponse,
-  SourceSpecCreateBody,
-  SourceSpecListResponse,
-  SourceSpecPatchBody,
-  SourceSpecResponse,
-  ValidationErrorResponse,
-  VersionPublishBody
+  MergePreview,
+  MergePreviewRequest,
+  ProduceSourceRequest,
+  ProvenanceList,
+  PublicAsset,
+  ServiceAiGenerateRequest,
+  SourceBindingList,
+  SourceSpec,
+  SourceSpecCreateRequest,
+  SourceSpecList,
+  SourceSpecPatchRequest,
+  VersionPublishRequest
 } from '../models';
 
 import { meridianFetch } from '../../fetcher.ts';
@@ -76,2492 +69,10 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-/** listAssetKindsResponse200 represents a declared HTTP response from the list asset kinds response200 operation. */
-export type listAssetKindsResponse200 = {
+/** getPublicAssetResponse200 represents a declared HTTP response from the get public asset response200 operation. */
+export type getPublicAssetResponse200 = {
   /** Data contains the decoded response payload. */
-  data: AssetKindListResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listAssetKindsResponse404 represents a declared HTTP response from the list asset kinds response404 operation. */
-export type listAssetKindsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listAssetKindsResponseSuccess represents a declared HTTP response from the list asset kinds response success operation. */
-export type listAssetKindsResponseSuccess = (listAssetKindsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listAssetKindsResponseError represents a declared HTTP response from the list asset kinds response error operation. */
-export type listAssetKindsResponseError = (listAssetKindsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listAssetKindsResponse represents a declared HTTP response from the list asset kinds response operation. */
-export type listAssetKindsResponse = (listAssetKindsResponseSuccess | listAssetKindsResponseError)
-
-/** getListAssetKindsUrl builds the relative URL for its OpenAPI operation. */
-export const getListAssetKindsUrl = (tenantSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/asset-kinds`
-}
-
-/**
- * Returns the requested page of asset kinds within the authorized request scope.
- */
-export const listAssetKinds = async (tenantSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listAssetKindsResponse> => {
-
-  return meridianFetch<listAssetKindsResponse>(getListAssetKindsUrl(tenantSlug),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListAssetKindsQueryKey is generated from the Meridian OpenAPI contract for get list asset kinds query key. */
-export const getListAssetKindsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,) => {
-    return [
-    'api','v1','t',tenantSlug,'asset-kinds'
-    ] as const;
-    }
-
-
-/** getListAssetKindsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListAssetKindsQueryOptions = <TData = Awaited<ReturnType<typeof listAssetKinds>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetKinds>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListAssetKindsQueryKey(tenantSlug);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssetKinds>>> = ({ signal }) => listAssetKinds(toValue(tenantSlug), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssetKinds>>, TError, TData>
-}
-
-/** ListAssetKindsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListAssetKindsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssetKinds>>>
-/** ListAssetKindsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListAssetKindsQueryError = NotFoundResponse
-
-
-
-/** useListAssetKinds executes its OpenAPI operation through TanStack Vue Query. */
-export function useListAssetKinds<TData = Awaited<ReturnType<typeof listAssetKinds>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetKinds>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListAssetKindsQueryOptions(tenantSlug,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** updateAssetKindStateResponse200 represents a declared HTTP response from the update asset kind state response200 operation. */
-export type updateAssetKindStateResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetKindResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** updateAssetKindStateResponse404 represents a declared HTTP response from the update asset kind state response404 operation. */
-export type updateAssetKindStateResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** updateAssetKindStateResponse412 represents a declared HTTP response from the update asset kind state response412 operation. */
-export type updateAssetKindStateResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** updateAssetKindStateResponseSuccess represents a declared HTTP response from the update asset kind state response success operation. */
-export type updateAssetKindStateResponseSuccess = (updateAssetKindStateResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** updateAssetKindStateResponseError represents a declared HTTP response from the update asset kind state response error operation. */
-export type updateAssetKindStateResponseError = (updateAssetKindStateResponse404 | updateAssetKindStateResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** updateAssetKindStateResponse represents a declared HTTP response from the update asset kind state response operation. */
-export type updateAssetKindStateResponse = (updateAssetKindStateResponseSuccess | updateAssetKindStateResponseError)
-
-/** getUpdateAssetKindStateUrl builds the relative URL for its OpenAPI operation. */
-export const getUpdateAssetKindStateUrl = (tenantSlug: string,
-    kindId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/asset-kinds/${kindId}`
-}
-
-/**
- * Updates the selected asset kind state within the authorized request scope.
- */
-export const updateAssetKindState = async (tenantSlug: string,
-    kindId: string,
-    assetKindPatchBody: AssetKindPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateAssetKindStateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<updateAssetKindStateResponse>(getUpdateAssetKindStateUrl(tenantSlug,kindId),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(assetKindPatchBody)
-  }
-);}
-
-
-
-
-
-/** getUpdateAssetKindStateMutationKey is generated from the Meridian OpenAPI contract for get update asset kind state mutation key. */
-export const getUpdateAssetKindStateMutationKey = () => ['updateAssetKindState'] as const;
-
-/** getUpdateAssetKindStateMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateAssetKindStateMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAssetKindState>>, TError,UpdateAssetKindStateMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateAssetKindState>>, TError,UpdateAssetKindStateMutationVariables, TContext> => {
-
-const mutationKey = getUpdateAssetKindStateMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAssetKindState>>, UpdateAssetKindStateMutationVariables> = (props) => {
-          const {tenantSlug,kindId,data} = props ?? {};
-
-          return  updateAssetKindState(tenantSlug,kindId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** UpdateAssetKindStateMutationResult is generated from the Meridian OpenAPI contract for update asset kind state mutation result. */
-    export type UpdateAssetKindStateMutationResult = NonNullable<Awaited<ReturnType<typeof updateAssetKindState>>>
-    /** UpdateAssetKindStateMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateAssetKindStateMutationBody = AssetKindPatchBody
-    /** UpdateAssetKindStateMutationError is generated from the Meridian OpenAPI contract for update asset kind state mutation error. */
-    export type UpdateAssetKindStateMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** UpdateAssetKindStateMutationVariables is generated from the Meridian OpenAPI contract for update asset kind state mutation variables. */
-    export type UpdateAssetKindStateMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateAssetKindStateMutationVariables. */ tenantSlug: string;/** KindId carries the kind id value for UpdateAssetKindStateMutationVariables. */ kindId: string;/** Data contains the decoded response payload. */ data: AssetKindPatchBody}
-
-    /** useUpdateAssetKindState executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateAssetKindState = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAssetKindState>>, TError,UpdateAssetKindStateMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof updateAssetKindState>>,
-        TError,
-        UpdateAssetKindStateMutationVariables,
-        TContext
-      > => {
-      return useMutation(getUpdateAssetKindStateMutationOptions(options), queryClient);
-    }
-    /** listSourceSpecsResponse200 represents a declared HTTP response from the list source specs response200 operation. */
-    export type listSourceSpecsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: SourceSpecListResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listSourceSpecsResponse404 represents a declared HTTP response from the list source specs response404 operation. */
-export type listSourceSpecsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listSourceSpecsResponseSuccess represents a declared HTTP response from the list source specs response success operation. */
-export type listSourceSpecsResponseSuccess = (listSourceSpecsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listSourceSpecsResponseError represents a declared HTTP response from the list source specs response error operation. */
-export type listSourceSpecsResponseError = (listSourceSpecsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listSourceSpecsResponse represents a declared HTTP response from the list source specs response operation. */
-export type listSourceSpecsResponse = (listSourceSpecsResponseSuccess | listSourceSpecsResponseError)
-
-/** getListSourceSpecsUrl builds the relative URL for its OpenAPI operation. */
-export const getListSourceSpecsUrl = (tenantSlug: string,
-    serviceSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/services/${serviceSlug}/sources`
-}
-
-/**
- * Returns the requested page of source specs within the authorized request scope.
- */
-export const listSourceSpecs = async (tenantSlug: string,
-    serviceSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listSourceSpecsResponse> => {
-
-  return meridianFetch<listSourceSpecsResponse>(getListSourceSpecsUrl(tenantSlug,serviceSlug),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListSourceSpecsQueryKey is generated from the Meridian OpenAPI contract for get list source specs query key. */
-export const getListSourceSpecsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    serviceSlug: MaybeRefOrGetter<string>,) => {
-    return [
-    'api','v1','t',tenantSlug,'services',serviceSlug,'sources'
-    ] as const;
-    }
-
-
-/** getListSourceSpecsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListSourceSpecsQueryOptions = <TData = Awaited<ReturnType<typeof listSourceSpecs>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    serviceSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSourceSpecs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListSourceSpecsQueryKey(tenantSlug,serviceSlug);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSourceSpecs>>> = ({ signal }) => listSourceSpecs(toValue(tenantSlug),toValue(serviceSlug), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(serviceSlug) !== null && toValue(serviceSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSourceSpecs>>, TError, TData>
-}
-
-/** ListSourceSpecsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListSourceSpecsQueryResult = NonNullable<Awaited<ReturnType<typeof listSourceSpecs>>>
-/** ListSourceSpecsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListSourceSpecsQueryError = NotFoundResponse
-
-
-
-/** useListSourceSpecs executes its OpenAPI operation through TanStack Vue Query. */
-export function useListSourceSpecs<TData = Awaited<ReturnType<typeof listSourceSpecs>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    serviceSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSourceSpecs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListSourceSpecsQueryOptions(tenantSlug,serviceSlug,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** createSourceSpecResponse201 represents a declared HTTP response from the create source spec response201 operation. */
-export type createSourceSpecResponse201 = {
-  /** Data contains the decoded response payload. */
-  data: SourceSpecResponse
-  /** Status is the HTTP response status code. */
-  status: 201
-}
-
-/** createSourceSpecResponse404 represents a declared HTTP response from the create source spec response404 operation. */
-export type createSourceSpecResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** createSourceSpecResponse409 represents a declared HTTP response from the create source spec response409 operation. */
-export type createSourceSpecResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** createSourceSpecResponse422 represents a declared HTTP response from the create source spec response422 operation. */
-export type createSourceSpecResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** createSourceSpecResponseSuccess represents a declared HTTP response from the create source spec response success operation. */
-export type createSourceSpecResponseSuccess = (createSourceSpecResponse201) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** createSourceSpecResponseError represents a declared HTTP response from the create source spec response error operation. */
-export type createSourceSpecResponseError = (createSourceSpecResponse404 | createSourceSpecResponse409 | createSourceSpecResponse422) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** createSourceSpecResponse represents a declared HTTP response from the create source spec response operation. */
-export type createSourceSpecResponse = (createSourceSpecResponseSuccess | createSourceSpecResponseError)
-
-/** getCreateSourceSpecUrl builds the relative URL for its OpenAPI operation. */
-export const getCreateSourceSpecUrl = (tenantSlug: string,
-    serviceSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/services/${serviceSlug}/sources`
-}
-
-/**
- * Creates source spec within the authorized request scope.
- */
-export const createSourceSpec = async (tenantSlug: string,
-    serviceSlug: string,
-    sourceSpecCreateBody: SourceSpecCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createSourceSpecResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<createSourceSpecResponse>(getCreateSourceSpecUrl(tenantSlug,serviceSlug),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(sourceSpecCreateBody)
-  }
-);}
-
-
-
-
-
-/** getCreateSourceSpecMutationKey is generated from the Meridian OpenAPI contract for get create source spec mutation key. */
-export const getCreateSourceSpecMutationKey = () => ['createSourceSpec'] as const;
-
-/** getCreateSourceSpecMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateSourceSpecMutationOptions = <TError = NotFoundResponse | ConflictResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSourceSpec>>, TError,CreateSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createSourceSpec>>, TError,CreateSourceSpecMutationVariables, TContext> => {
-
-const mutationKey = getCreateSourceSpecMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSourceSpec>>, CreateSourceSpecMutationVariables> = (props) => {
-          const {tenantSlug,serviceSlug,data} = props ?? {};
-
-          return  createSourceSpec(tenantSlug,serviceSlug,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** CreateSourceSpecMutationResult is generated from the Meridian OpenAPI contract for create source spec mutation result. */
-    export type CreateSourceSpecMutationResult = NonNullable<Awaited<ReturnType<typeof createSourceSpec>>>
-    /** CreateSourceSpecMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateSourceSpecMutationBody = SourceSpecCreateBody
-    /** CreateSourceSpecMutationError is generated from the Meridian OpenAPI contract for create source spec mutation error. */
-    export type CreateSourceSpecMutationError = NotFoundResponse | ConflictResponse | ValidationErrorResponse
-    /** CreateSourceSpecMutationVariables is generated from the Meridian OpenAPI contract for create source spec mutation variables. */
-    export type CreateSourceSpecMutationVariables = {/** TenantSlug carries the tenant slug value for CreateSourceSpecMutationVariables. */ tenantSlug: string;/** ServiceSlug carries the service slug value for CreateSourceSpecMutationVariables. */ serviceSlug: string;/** Data contains the decoded response payload. */ data: SourceSpecCreateBody}
-
-    /** useCreateSourceSpec executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateSourceSpec = <TError = NotFoundResponse | ConflictResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSourceSpec>>, TError,CreateSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof createSourceSpec>>,
-        TError,
-        CreateSourceSpecMutationVariables,
-        TContext
-      > => {
-      return useMutation(getCreateSourceSpecMutationOptions(options), queryClient);
-    }
-    /** updateSourceSpecResponse200 represents a declared HTTP response from the update source spec response200 operation. */
-    export type updateSourceSpecResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: SourceSpecResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** updateSourceSpecResponse404 represents a declared HTTP response from the update source spec response404 operation. */
-export type updateSourceSpecResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** updateSourceSpecResponse409 represents a declared HTTP response from the update source spec response409 operation. */
-export type updateSourceSpecResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: InvalidStateResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** updateSourceSpecResponse412 represents a declared HTTP response from the update source spec response412 operation. */
-export type updateSourceSpecResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** updateSourceSpecResponse422 represents a declared HTTP response from the update source spec response422 operation. */
-export type updateSourceSpecResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** updateSourceSpecResponseSuccess represents a declared HTTP response from the update source spec response success operation. */
-export type updateSourceSpecResponseSuccess = (updateSourceSpecResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** updateSourceSpecResponseError represents a declared HTTP response from the update source spec response error operation. */
-export type updateSourceSpecResponseError = (updateSourceSpecResponse404 | updateSourceSpecResponse409 | updateSourceSpecResponse412 | updateSourceSpecResponse422) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** updateSourceSpecResponse represents a declared HTTP response from the update source spec response operation. */
-export type updateSourceSpecResponse = (updateSourceSpecResponseSuccess | updateSourceSpecResponseError)
-
-/** getUpdateSourceSpecUrl builds the relative URL for its OpenAPI operation. */
-export const getUpdateSourceSpecUrl = (tenantSlug: string,
-    sourceId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/sources/${sourceId}`
-}
-
-/**
- * Updates the selected source spec within the authorized request scope.
- */
-export const updateSourceSpec = async (tenantSlug: string,
-    sourceId: string,
-    sourceSpecPatchBody: SourceSpecPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateSourceSpecResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<updateSourceSpecResponse>(getUpdateSourceSpecUrl(tenantSlug,sourceId),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(sourceSpecPatchBody)
-  }
-);}
-
-
-
-
-
-/** getUpdateSourceSpecMutationKey is generated from the Meridian OpenAPI contract for get update source spec mutation key. */
-export const getUpdateSourceSpecMutationKey = () => ['updateSourceSpec'] as const;
-
-/** getUpdateSourceSpecMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateSourceSpecMutationOptions = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSourceSpec>>, TError,UpdateSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateSourceSpec>>, TError,UpdateSourceSpecMutationVariables, TContext> => {
-
-const mutationKey = getUpdateSourceSpecMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSourceSpec>>, UpdateSourceSpecMutationVariables> = (props) => {
-          const {tenantSlug,sourceId,data} = props ?? {};
-
-          return  updateSourceSpec(tenantSlug,sourceId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** UpdateSourceSpecMutationResult is generated from the Meridian OpenAPI contract for update source spec mutation result. */
-    export type UpdateSourceSpecMutationResult = NonNullable<Awaited<ReturnType<typeof updateSourceSpec>>>
-    /** UpdateSourceSpecMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateSourceSpecMutationBody = SourceSpecPatchBody
-    /** UpdateSourceSpecMutationError is generated from the Meridian OpenAPI contract for update source spec mutation error. */
-    export type UpdateSourceSpecMutationError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse
-    /** UpdateSourceSpecMutationVariables is generated from the Meridian OpenAPI contract for update source spec mutation variables. */
-    export type UpdateSourceSpecMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateSourceSpecMutationVariables. */ tenantSlug: string;/** SourceId carries the source id value for UpdateSourceSpecMutationVariables. */ sourceId: string;/** Data contains the decoded response payload. */ data: SourceSpecPatchBody}
-
-    /** useUpdateSourceSpec executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateSourceSpec = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSourceSpec>>, TError,UpdateSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof updateSourceSpec>>,
-        TError,
-        UpdateSourceSpecMutationVariables,
-        TContext
-      > => {
-      return useMutation(getUpdateSourceSpecMutationOptions(options), queryClient);
-    }
-    /** deleteSourceSpecResponse204 represents a declared HTTP response from the delete source spec response204 operation. */
-    export type deleteSourceSpecResponse204 = {
-  /** Data contains the decoded response payload. */
-  data: void
-  /** Status is the HTTP response status code. */
-  status: 204
-}
-
-/** deleteSourceSpecResponse404 represents a declared HTTP response from the delete source spec response404 operation. */
-export type deleteSourceSpecResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** deleteSourceSpecResponse409 represents a declared HTTP response from the delete source spec response409 operation. */
-export type deleteSourceSpecResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: InvalidStateResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** deleteSourceSpecResponse412 represents a declared HTTP response from the delete source spec response412 operation. */
-export type deleteSourceSpecResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** deleteSourceSpecResponseSuccess represents a declared HTTP response from the delete source spec response success operation. */
-export type deleteSourceSpecResponseSuccess = (deleteSourceSpecResponse204) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** deleteSourceSpecResponseError represents a declared HTTP response from the delete source spec response error operation. */
-export type deleteSourceSpecResponseError = (deleteSourceSpecResponse404 | deleteSourceSpecResponse409 | deleteSourceSpecResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** deleteSourceSpecResponse represents a declared HTTP response from the delete source spec response operation. */
-export type deleteSourceSpecResponse = (deleteSourceSpecResponseSuccess | deleteSourceSpecResponseError)
-
-/** getDeleteSourceSpecUrl builds the relative URL for its OpenAPI operation. */
-export const getDeleteSourceSpecUrl = (tenantSlug: string,
-    sourceId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/sources/${sourceId}`
-}
-
-/**
- * Deletes the selected source spec within the authorized request scope.
- */
-export const deleteSourceSpec = async (tenantSlug: string,
-    sourceId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteSourceSpecResponse> => {
-
-  return meridianFetch<deleteSourceSpecResponse>(getDeleteSourceSpecUrl(tenantSlug,sourceId),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
-
-
-
-
-/** getDeleteSourceSpecMutationKey is generated from the Meridian OpenAPI contract for get delete source spec mutation key. */
-export const getDeleteSourceSpecMutationKey = () => ['deleteSourceSpec'] as const;
-
-/** getDeleteSourceSpecMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeleteSourceSpecMutationOptions = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSourceSpec>>, TError,DeleteSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteSourceSpec>>, TError,DeleteSourceSpecMutationVariables, TContext> => {
-
-const mutationKey = getDeleteSourceSpecMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSourceSpec>>, DeleteSourceSpecMutationVariables> = (props) => {
-          const {tenantSlug,sourceId} = props ?? {};
-
-          return  deleteSourceSpec(tenantSlug,sourceId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** DeleteSourceSpecMutationResult is generated from the Meridian OpenAPI contract for delete source spec mutation result. */
-    export type DeleteSourceSpecMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSourceSpec>>>
-
-    /** DeleteSourceSpecMutationError is generated from the Meridian OpenAPI contract for delete source spec mutation error. */
-    export type DeleteSourceSpecMutationError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse
-    /** DeleteSourceSpecMutationVariables is generated from the Meridian OpenAPI contract for delete source spec mutation variables. */
-    export type DeleteSourceSpecMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteSourceSpecMutationVariables. */ tenantSlug: string;/** SourceId carries the source id value for DeleteSourceSpecMutationVariables. */ sourceId: string}
-
-    /** useDeleteSourceSpec executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeleteSourceSpec = <TError = NotFoundResponse | InvalidStateResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSourceSpec>>, TError,DeleteSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof deleteSourceSpec>>,
-        TError,
-        DeleteSourceSpecMutationVariables,
-        TContext
-      > => {
-      return useMutation(getDeleteSourceSpecMutationOptions(options), queryClient);
-    }
-    /** listSourceBindingsResponse200 represents a declared HTTP response from the list source bindings response200 operation. */
-    export type listSourceBindingsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: SourceBindingListResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listSourceBindingsResponse404 represents a declared HTTP response from the list source bindings response404 operation. */
-export type listSourceBindingsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listSourceBindingsResponseSuccess represents a declared HTTP response from the list source bindings response success operation. */
-export type listSourceBindingsResponseSuccess = (listSourceBindingsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listSourceBindingsResponseError represents a declared HTTP response from the list source bindings response error operation. */
-export type listSourceBindingsResponseError = (listSourceBindingsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listSourceBindingsResponse represents a declared HTTP response from the list source bindings response operation. */
-export type listSourceBindingsResponse = (listSourceBindingsResponseSuccess | listSourceBindingsResponseError)
-
-/** getListSourceBindingsUrl builds the relative URL for its OpenAPI operation. */
-export const getListSourceBindingsUrl = (tenantSlug: string,
-    sourceId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/sources/${sourceId}/bindings`
-}
-
-/**
- * Returns the requested page of source bindings within the authorized request scope.
- */
-export const listSourceBindings = async (tenantSlug: string,
-    sourceId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listSourceBindingsResponse> => {
-
-  return meridianFetch<listSourceBindingsResponse>(getListSourceBindingsUrl(tenantSlug,sourceId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListSourceBindingsQueryKey is generated from the Meridian OpenAPI contract for get list source bindings query key. */
-export const getListSourceBindingsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    sourceId: MaybeRefOrGetter<string>,) => {
-    return [
-    'api','v1','t',tenantSlug,'sources',sourceId,'bindings'
-    ] as const;
-    }
-
-
-/** getListSourceBindingsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListSourceBindingsQueryOptions = <TData = Awaited<ReturnType<typeof listSourceBindings>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    sourceId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSourceBindings>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListSourceBindingsQueryKey(tenantSlug,sourceId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSourceBindings>>> = ({ signal }) => listSourceBindings(toValue(tenantSlug),toValue(sourceId), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(sourceId) !== null && toValue(sourceId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSourceBindings>>, TError, TData>
-}
-
-/** ListSourceBindingsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListSourceBindingsQueryResult = NonNullable<Awaited<ReturnType<typeof listSourceBindings>>>
-/** ListSourceBindingsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListSourceBindingsQueryError = NotFoundResponse
-
-
-
-/** useListSourceBindings executes its OpenAPI operation through TanStack Vue Query. */
-export function useListSourceBindings<TData = Awaited<ReturnType<typeof listSourceBindings>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    sourceId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSourceBindings>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListSourceBindingsQueryOptions(tenantSlug,sourceId,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** produceSourceResponse202 represents a declared HTTP response from the produce source response202 operation. */
-export type produceSourceResponse202 = {
-  /** Data contains the decoded response payload. */
-  data: JobAcceptedResponse
-  /** Status is the HTTP response status code. */
-  status: 202
-}
-
-/** produceSourceResponse404 represents a declared HTTP response from the produce source response404 operation. */
-export type produceSourceResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** produceSourceResponse409 represents a declared HTTP response from the produce source response409 operation. */
-export type produceSourceResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** produceSourceResponseSuccess represents a declared HTTP response from the produce source response success operation. */
-export type produceSourceResponseSuccess = (produceSourceResponse202) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** produceSourceResponseError represents a declared HTTP response from the produce source response error operation. */
-export type produceSourceResponseError = (produceSourceResponse404 | produceSourceResponse409) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** produceSourceResponse represents a declared HTTP response from the produce source response operation. */
-export type produceSourceResponse = (produceSourceResponseSuccess | produceSourceResponseError)
-
-/** getProduceSourceUrl builds the relative URL for its OpenAPI operation. */
-export const getProduceSourceUrl = (tenantSlug: string,
-    sourceId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/sources/${sourceId}:produce`
-}
-
-/**
- * Performs the produce source workflow within the authorized request scope.
- */
-export const produceSource = async (tenantSlug: string,
-    sourceId: string,
-    produceSourceBody: ProduceSourceBody, options?: Parameters<typeof meridianFetch>[1]): Promise<produceSourceResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<produceSourceResponse>(getProduceSourceUrl(tenantSlug,sourceId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(produceSourceBody)
-  }
-);}
-
-
-
-
-
-/** getProduceSourceMutationKey is generated from the Meridian OpenAPI contract for get produce source mutation key. */
-export const getProduceSourceMutationKey = () => ['produceSource'] as const;
-
-/** getProduceSourceMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getProduceSourceMutationOptions = <TError = NotFoundResponse | ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof produceSource>>, TError,ProduceSourceMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof produceSource>>, TError,ProduceSourceMutationVariables, TContext> => {
-
-const mutationKey = getProduceSourceMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof produceSource>>, ProduceSourceMutationVariables> = (props) => {
-          const {tenantSlug,sourceId,data} = props ?? {};
-
-          return  produceSource(tenantSlug,sourceId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** ProduceSourceMutationResult is generated from the Meridian OpenAPI contract for produce source mutation result. */
-    export type ProduceSourceMutationResult = NonNullable<Awaited<ReturnType<typeof produceSource>>>
-    /** ProduceSourceMutationBody is the request body type for its generated OpenAPI operation. */
-    export type ProduceSourceMutationBody = ProduceSourceBody
-    /** ProduceSourceMutationError is generated from the Meridian OpenAPI contract for produce source mutation error. */
-    export type ProduceSourceMutationError = NotFoundResponse | ConflictResponse
-    /** ProduceSourceMutationVariables is generated from the Meridian OpenAPI contract for produce source mutation variables. */
-    export type ProduceSourceMutationVariables = {/** TenantSlug carries the tenant slug value for ProduceSourceMutationVariables. */ tenantSlug: string;/** SourceId carries the source id value for ProduceSourceMutationVariables. */ sourceId: string;/** Data contains the decoded response payload. */ data: ProduceSourceBody}
-
-    /** useProduceSource executes its OpenAPI operation through TanStack Vue Query. */
-    export const useProduceSource = <TError = NotFoundResponse | ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof produceSource>>, TError,ProduceSourceMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof produceSource>>,
-        TError,
-        ProduceSourceMutationVariables,
-        TContext
-      > => {
-      return useMutation(getProduceSourceMutationOptions(options), queryClient);
-    }
-    /** generateMissingAssetWithAiResponse202 represents a declared HTTP response from the generate missing asset with ai response202 operation. */
-    export type generateMissingAssetWithAiResponse202 = {
-  /** Data contains the decoded response payload. */
-  data: AiGenerationAcceptedResponse
-  /** Status is the HTTP response status code. */
-  status: 202
-}
-
-/** generateMissingAssetWithAiResponse404 represents a declared HTTP response from the generate missing asset with ai response404 operation. */
-export type generateMissingAssetWithAiResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** generateMissingAssetWithAiResponse409 represents a declared HTTP response from the generate missing asset with ai response409 operation. */
-export type generateMissingAssetWithAiResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** generateMissingAssetWithAiResponse422 represents a declared HTTP response from the generate missing asset with ai response422 operation. */
-export type generateMissingAssetWithAiResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: ProducerProfileUnavailableResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** generateMissingAssetWithAiResponseSuccess represents a declared HTTP response from the generate missing asset with ai response success operation. */
-export type generateMissingAssetWithAiResponseSuccess = (generateMissingAssetWithAiResponse202) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** generateMissingAssetWithAiResponseError represents a declared HTTP response from the generate missing asset with ai response error operation. */
-export type generateMissingAssetWithAiResponseError = (generateMissingAssetWithAiResponse404 | generateMissingAssetWithAiResponse409 | generateMissingAssetWithAiResponse422) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** generateMissingAssetWithAiResponse represents a declared HTTP response from the generate missing asset with ai response operation. */
-export type generateMissingAssetWithAiResponse = (generateMissingAssetWithAiResponseSuccess | generateMissingAssetWithAiResponseError)
-
-/** getGenerateMissingAssetWithAiUrl builds the relative URL for its OpenAPI operation. */
-export const getGenerateMissingAssetWithAiUrl = (tenantSlug: string,
-    serviceSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/services/${serviceSlug}/assets:ai-generate`
-}
-
-/**
- * Performs the generate missing asset with ai workflow within the authorized request scope.
- */
-export const generateMissingAssetWithAi = async (tenantSlug: string,
-    serviceSlug: string,
-    serviceAiGenerateBody: ServiceAiGenerateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<generateMissingAssetWithAiResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<generateMissingAssetWithAiResponse>(getGenerateMissingAssetWithAiUrl(tenantSlug,serviceSlug),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(serviceAiGenerateBody)
-  }
-);}
-
-
-
-
-
-/** getGenerateMissingAssetWithAiMutationKey is generated from the Meridian OpenAPI contract for get generate missing asset with ai mutation key. */
-export const getGenerateMissingAssetWithAiMutationKey = () => ['generateMissingAssetWithAi'] as const;
-
-/** getGenerateMissingAssetWithAiMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getGenerateMissingAssetWithAiMutationOptions = <TError = NotFoundResponse | ConflictResponse | ProducerProfileUnavailableResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateMissingAssetWithAi>>, TError,GenerateMissingAssetWithAiMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof generateMissingAssetWithAi>>, TError,GenerateMissingAssetWithAiMutationVariables, TContext> => {
-
-const mutationKey = getGenerateMissingAssetWithAiMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateMissingAssetWithAi>>, GenerateMissingAssetWithAiMutationVariables> = (props) => {
-          const {tenantSlug,serviceSlug,data} = props ?? {};
-
-          return  generateMissingAssetWithAi(tenantSlug,serviceSlug,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** GenerateMissingAssetWithAiMutationResult is generated from the Meridian OpenAPI contract for generate missing asset with ai mutation result. */
-    export type GenerateMissingAssetWithAiMutationResult = NonNullable<Awaited<ReturnType<typeof generateMissingAssetWithAi>>>
-    /** GenerateMissingAssetWithAiMutationBody is the request body type for its generated OpenAPI operation. */
-    export type GenerateMissingAssetWithAiMutationBody = ServiceAiGenerateBody
-    /** GenerateMissingAssetWithAiMutationError is generated from the Meridian OpenAPI contract for generate missing asset with ai mutation error. */
-    export type GenerateMissingAssetWithAiMutationError = NotFoundResponse | ConflictResponse | ProducerProfileUnavailableResponse
-    /** GenerateMissingAssetWithAiMutationVariables is generated from the Meridian OpenAPI contract for generate missing asset with ai mutation variables. */
-    export type GenerateMissingAssetWithAiMutationVariables = {/** TenantSlug carries the tenant slug value for GenerateMissingAssetWithAiMutationVariables. */ tenantSlug: string;/** ServiceSlug carries the service slug value for GenerateMissingAssetWithAiMutationVariables. */ serviceSlug: string;/** Data contains the decoded response payload. */ data: ServiceAiGenerateBody}
-
-    /** useGenerateMissingAssetWithAi executes its OpenAPI operation through TanStack Vue Query. */
-    export const useGenerateMissingAssetWithAi = <TError = NotFoundResponse | ConflictResponse | ProducerProfileUnavailableResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateMissingAssetWithAi>>, TError,GenerateMissingAssetWithAiMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof generateMissingAssetWithAi>>,
-        TError,
-        GenerateMissingAssetWithAiMutationVariables,
-        TContext
-      > => {
-      return useMutation(getGenerateMissingAssetWithAiMutationOptions(options), queryClient);
-    }
-    /** getAssetResponse200 represents a declared HTTP response from the get asset response200 operation. */
-    export type getAssetResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** getAssetResponse404 represents a declared HTTP response from the get asset response404 operation. */
-export type getAssetResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** getAssetResponseSuccess represents a declared HTTP response from the get asset response success operation. */
-export type getAssetResponseSuccess = (getAssetResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** getAssetResponseError represents a declared HTTP response from the get asset response error operation. */
-export type getAssetResponseError = (getAssetResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** getAssetResponse represents a declared HTTP response from the get asset response operation. */
-export type getAssetResponse = (getAssetResponseSuccess | getAssetResponseError)
-
-/** getGetAssetUrl builds the relative URL for its OpenAPI operation. */
-export const getGetAssetUrl = (tenantSlug: string,
-    assetId: string,
-    params?: GetAssetParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
-
-  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/assets/${assetId}?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/assets/${assetId}`
-}
-
-/**
- * Returns the selected asset within the authorized request scope.
- */
-export const getAsset = async (tenantSlug: string,
-    assetId: string,
-    params?: GetAssetParams, options?: Parameters<typeof meridianFetch>[1]): Promise<getAssetResponse> => {
-
-  return meridianFetch<getAssetResponse>(getGetAssetUrl(tenantSlug,assetId,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getGetAssetQueryKey is generated from the Meridian OpenAPI contract for get get asset query key. */
-export const getGetAssetQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    assetId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<GetAssetParams>,) => {
-    return [
-    'api','v1','t',tenantSlug,'assets',assetId, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-/** getGetAssetQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetAssetQueryOptions = <TData = Awaited<ReturnType<typeof getAsset>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    assetId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<GetAssetParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAsset>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getGetAssetQueryKey(tenantSlug,assetId,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAsset>>> = ({ signal }) => getAsset(toValue(tenantSlug),toValue(assetId),toValue(params), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(assetId) !== null && toValue(assetId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAsset>>, TError, TData>
-}
-
-/** GetAssetQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type GetAssetQueryResult = NonNullable<Awaited<ReturnType<typeof getAsset>>>
-/** GetAssetQueryError is the error type returned by its generated Vue Query hook. */
-export type GetAssetQueryError = NotFoundResponse
-
-
-
-/** useGetAsset executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetAsset<TData = Awaited<ReturnType<typeof getAsset>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    assetId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<GetAssetParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAsset>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetAssetQueryOptions(tenantSlug,assetId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** listAssetVersionsResponse200 represents a declared HTTP response from the list asset versions response200 operation. */
-export type listAssetVersionsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetVersionPageResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listAssetVersionsResponse404 represents a declared HTTP response from the list asset versions response404 operation. */
-export type listAssetVersionsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listAssetVersionsResponseSuccess represents a declared HTTP response from the list asset versions response success operation. */
-export type listAssetVersionsResponseSuccess = (listAssetVersionsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listAssetVersionsResponseError represents a declared HTTP response from the list asset versions response error operation. */
-export type listAssetVersionsResponseError = (listAssetVersionsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listAssetVersionsResponse represents a declared HTTP response from the list asset versions response operation. */
-export type listAssetVersionsResponse = (listAssetVersionsResponseSuccess | listAssetVersionsResponseError)
-
-/** getListAssetVersionsUrl builds the relative URL for its OpenAPI operation. */
-export const getListAssetVersionsUrl = (tenantSlug: string,
-    assetId: string,
-    params?: ListAssetVersionsParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
-
-  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/assets/${assetId}/versions?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/assets/${assetId}/versions`
-}
-
-/**
- * Returns the requested page of asset versions within the authorized request scope.
- */
-export const listAssetVersions = async (tenantSlug: string,
-    assetId: string,
-    params?: ListAssetVersionsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listAssetVersionsResponse> => {
-
-  return meridianFetch<listAssetVersionsResponse>(getListAssetVersionsUrl(tenantSlug,assetId,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListAssetVersionsQueryKey is generated from the Meridian OpenAPI contract for get list asset versions query key. */
-export const getListAssetVersionsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    assetId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAssetVersionsParams>,) => {
-    return [
-    'api','v1','t',tenantSlug,'assets',assetId,'versions', ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-/** getListAssetVersionsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListAssetVersionsQueryOptions = <TData = Awaited<ReturnType<typeof listAssetVersions>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    assetId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAssetVersionsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetVersions>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListAssetVersionsQueryKey(tenantSlug,assetId,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssetVersions>>> = ({ signal }) => listAssetVersions(toValue(tenantSlug),toValue(assetId),toValue(params), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(assetId) !== null && toValue(assetId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssetVersions>>, TError, TData>
-}
-
-/** ListAssetVersionsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListAssetVersionsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssetVersions>>>
-/** ListAssetVersionsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListAssetVersionsQueryError = NotFoundResponse
-
-
-
-/** useListAssetVersions executes its OpenAPI operation through TanStack Vue Query. */
-export function useListAssetVersions<TData = Awaited<ReturnType<typeof listAssetVersions>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    assetId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAssetVersionsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetVersions>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListAssetVersionsQueryOptions(tenantSlug,assetId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** getAssetVersionResponse200 represents a declared HTTP response from the get asset version response200 operation. */
-export type getAssetVersionResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetVersionResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** getAssetVersionResponse404 represents a declared HTTP response from the get asset version response404 operation. */
-export type getAssetVersionResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** getAssetVersionResponseSuccess represents a declared HTTP response from the get asset version response success operation. */
-export type getAssetVersionResponseSuccess = (getAssetVersionResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** getAssetVersionResponseError represents a declared HTTP response from the get asset version response error operation. */
-export type getAssetVersionResponseError = (getAssetVersionResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** getAssetVersionResponse represents a declared HTTP response from the get asset version response operation. */
-export type getAssetVersionResponse = (getAssetVersionResponseSuccess | getAssetVersionResponseError)
-
-/** getGetAssetVersionUrl builds the relative URL for its OpenAPI operation. */
-export const getGetAssetVersionUrl = (tenantSlug: string,
-    versionId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}`
-}
-
-/**
- * Returns the selected asset version within the authorized request scope.
- */
-export const getAssetVersion = async (tenantSlug: string,
-    versionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getAssetVersionResponse> => {
-
-  return meridianFetch<getAssetVersionResponse>(getGetAssetVersionUrl(tenantSlug,versionId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getGetAssetVersionQueryKey is generated from the Meridian OpenAPI contract for get get asset version query key. */
-export const getGetAssetVersionQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>,) => {
-    return [
-    'api','v1','t',tenantSlug,'asset-versions',versionId
-    ] as const;
-    }
-
-
-/** getGetAssetVersionQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetAssetVersionQueryOptions = <TData = Awaited<ReturnType<typeof getAssetVersion>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssetVersion>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getGetAssetVersionQueryKey(tenantSlug,versionId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAssetVersion>>> = ({ signal }) => getAssetVersion(toValue(tenantSlug),toValue(versionId), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(versionId) !== null && toValue(versionId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAssetVersion>>, TError, TData>
-}
-
-/** GetAssetVersionQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type GetAssetVersionQueryResult = NonNullable<Awaited<ReturnType<typeof getAssetVersion>>>
-/** GetAssetVersionQueryError is the error type returned by its generated Vue Query hook. */
-export type GetAssetVersionQueryError = NotFoundResponse
-
-
-
-/** useGetAssetVersion executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetAssetVersion<TData = Awaited<ReturnType<typeof getAssetVersion>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssetVersion>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetAssetVersionQueryOptions(tenantSlug,versionId,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** listAssetVersionItemsResponse200 represents a declared HTTP response from the list asset version items response200 operation. */
-export type listAssetVersionItemsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetItemPageResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listAssetVersionItemsResponse404 represents a declared HTTP response from the list asset version items response404 operation. */
-export type listAssetVersionItemsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listAssetVersionItemsResponseSuccess represents a declared HTTP response from the list asset version items response success operation. */
-export type listAssetVersionItemsResponseSuccess = (listAssetVersionItemsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listAssetVersionItemsResponseError represents a declared HTTP response from the list asset version items response error operation. */
-export type listAssetVersionItemsResponseError = (listAssetVersionItemsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listAssetVersionItemsResponse represents a declared HTTP response from the list asset version items response operation. */
-export type listAssetVersionItemsResponse = (listAssetVersionItemsResponseSuccess | listAssetVersionItemsResponseError)
-
-/** getListAssetVersionItemsUrl builds the relative URL for its OpenAPI operation. */
-export const getListAssetVersionItemsUrl = (tenantSlug: string,
-    versionId: string,
-    params?: ListAssetVersionItemsParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
-
-  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/asset-versions/${versionId}/items?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/asset-versions/${versionId}/items`
-}
-
-/**
- * Returns the requested page of asset version items within the authorized request scope.
- */
-export const listAssetVersionItems = async (tenantSlug: string,
-    versionId: string,
-    params?: ListAssetVersionItemsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listAssetVersionItemsResponse> => {
-
-  return meridianFetch<listAssetVersionItemsResponse>(getListAssetVersionItemsUrl(tenantSlug,versionId,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListAssetVersionItemsQueryKey is generated from the Meridian OpenAPI contract for get list asset version items query key. */
-export const getListAssetVersionItemsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAssetVersionItemsParams>,) => {
-    return [
-    'api','v1','t',tenantSlug,'asset-versions',versionId,'items', ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-/** getListAssetVersionItemsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListAssetVersionItemsQueryOptions = <TData = Awaited<ReturnType<typeof listAssetVersionItems>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAssetVersionItemsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetVersionItems>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListAssetVersionItemsQueryKey(tenantSlug,versionId,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssetVersionItems>>> = ({ signal }) => listAssetVersionItems(toValue(tenantSlug),toValue(versionId),toValue(params), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(versionId) !== null && toValue(versionId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssetVersionItems>>, TError, TData>
-}
-
-/** ListAssetVersionItemsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListAssetVersionItemsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssetVersionItems>>>
-/** ListAssetVersionItemsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListAssetVersionItemsQueryError = NotFoundResponse
-
-
-
-/** useListAssetVersionItems executes its OpenAPI operation through TanStack Vue Query. */
-export function useListAssetVersionItems<TData = Awaited<ReturnType<typeof listAssetVersionItems>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListAssetVersionItemsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetVersionItems>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListAssetVersionItemsQueryOptions(tenantSlug,versionId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** getAssetVersionProvenanceResponse200 represents a declared HTTP response from the get asset version provenance response200 operation. */
-export type getAssetVersionProvenanceResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: ProvenanceListResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** getAssetVersionProvenanceResponse404 represents a declared HTTP response from the get asset version provenance response404 operation. */
-export type getAssetVersionProvenanceResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** getAssetVersionProvenanceResponseSuccess represents a declared HTTP response from the get asset version provenance response success operation. */
-export type getAssetVersionProvenanceResponseSuccess = (getAssetVersionProvenanceResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** getAssetVersionProvenanceResponseError represents a declared HTTP response from the get asset version provenance response error operation. */
-export type getAssetVersionProvenanceResponseError = (getAssetVersionProvenanceResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** getAssetVersionProvenanceResponse represents a declared HTTP response from the get asset version provenance response operation. */
-export type getAssetVersionProvenanceResponse = (getAssetVersionProvenanceResponseSuccess | getAssetVersionProvenanceResponseError)
-
-/** getGetAssetVersionProvenanceUrl builds the relative URL for its OpenAPI operation. */
-export const getGetAssetVersionProvenanceUrl = (tenantSlug: string,
-    versionId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}/provenance`
-}
-
-/**
- * Returns the selected asset version provenance within the authorized request scope.
- */
-export const getAssetVersionProvenance = async (tenantSlug: string,
-    versionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getAssetVersionProvenanceResponse> => {
-
-  return meridianFetch<getAssetVersionProvenanceResponse>(getGetAssetVersionProvenanceUrl(tenantSlug,versionId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getGetAssetVersionProvenanceQueryKey is generated from the Meridian OpenAPI contract for get get asset version provenance query key. */
-export const getGetAssetVersionProvenanceQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>,) => {
-    return [
-    'api','v1','t',tenantSlug,'asset-versions',versionId,'provenance'
-    ] as const;
-    }
-
-
-/** getGetAssetVersionProvenanceQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetAssetVersionProvenanceQueryOptions = <TData = Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getGetAssetVersionProvenanceQueryKey(tenantSlug,versionId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAssetVersionProvenance>>> = ({ signal }) => getAssetVersionProvenance(toValue(tenantSlug),toValue(versionId), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(versionId) !== null && toValue(versionId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError, TData>
-}
-
-/** GetAssetVersionProvenanceQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type GetAssetVersionProvenanceQueryResult = NonNullable<Awaited<ReturnType<typeof getAssetVersionProvenance>>>
-/** GetAssetVersionProvenanceQueryError is the error type returned by its generated Vue Query hook. */
-export type GetAssetVersionProvenanceQueryError = NotFoundResponse
-
-
-
-/** useGetAssetVersionProvenance executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetAssetVersionProvenance<TData = Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    versionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetAssetVersionProvenanceQueryOptions(tenantSlug,versionId,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** publishAssetVersionResponse200 represents a declared HTTP response from the publish asset version response200 operation. */
-export type publishAssetVersionResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetVersionResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** publishAssetVersionResponse404 represents a declared HTTP response from the publish asset version response404 operation. */
-export type publishAssetVersionResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** publishAssetVersionResponse409 represents a declared HTTP response from the publish asset version response409 operation. */
-export type publishAssetVersionResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** publishAssetVersionResponse412 represents a declared HTTP response from the publish asset version response412 operation. */
-export type publishAssetVersionResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** publishAssetVersionResponseSuccess represents a declared HTTP response from the publish asset version response success operation. */
-export type publishAssetVersionResponseSuccess = (publishAssetVersionResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** publishAssetVersionResponseError represents a declared HTTP response from the publish asset version response error operation. */
-export type publishAssetVersionResponseError = (publishAssetVersionResponse404 | publishAssetVersionResponse409 | publishAssetVersionResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** publishAssetVersionResponse represents a declared HTTP response from the publish asset version response operation. */
-export type publishAssetVersionResponse = (publishAssetVersionResponseSuccess | publishAssetVersionResponseError)
-
-/** getPublishAssetVersionUrl builds the relative URL for its OpenAPI operation. */
-export const getPublishAssetVersionUrl = (tenantSlug: string,
-    versionId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}:publish`
-}
-
-/**
- * Performs the publish asset version workflow within the authorized request scope.
- */
-export const publishAssetVersion = async (tenantSlug: string,
-    versionId: string,
-    versionPublishBody: VersionPublishBody, options?: Parameters<typeof meridianFetch>[1]): Promise<publishAssetVersionResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<publishAssetVersionResponse>(getPublishAssetVersionUrl(tenantSlug,versionId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(versionPublishBody)
-  }
-);}
-
-
-
-
-
-/** getPublishAssetVersionMutationKey is generated from the Meridian OpenAPI contract for get publish asset version mutation key. */
-export const getPublishAssetVersionMutationKey = () => ['publishAssetVersion'] as const;
-
-/** getPublishAssetVersionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPublishAssetVersionMutationOptions = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAssetVersion>>, TError,PublishAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof publishAssetVersion>>, TError,PublishAssetVersionMutationVariables, TContext> => {
-
-const mutationKey = getPublishAssetVersionMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishAssetVersion>>, PublishAssetVersionMutationVariables> = (props) => {
-          const {tenantSlug,versionId,data} = props ?? {};
-
-          return  publishAssetVersion(tenantSlug,versionId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** PublishAssetVersionMutationResult is generated from the Meridian OpenAPI contract for publish asset version mutation result. */
-    export type PublishAssetVersionMutationResult = NonNullable<Awaited<ReturnType<typeof publishAssetVersion>>>
-    /** PublishAssetVersionMutationBody is the request body type for its generated OpenAPI operation. */
-    export type PublishAssetVersionMutationBody = VersionPublishBody
-    /** PublishAssetVersionMutationError is generated from the Meridian OpenAPI contract for publish asset version mutation error. */
-    export type PublishAssetVersionMutationError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse
-    /** PublishAssetVersionMutationVariables is generated from the Meridian OpenAPI contract for publish asset version mutation variables. */
-    export type PublishAssetVersionMutationVariables = {/** TenantSlug carries the tenant slug value for PublishAssetVersionMutationVariables. */ tenantSlug: string;/** VersionId carries the version id value for PublishAssetVersionMutationVariables. */ versionId: string;/** Data contains the decoded response payload. */ data: VersionPublishBody}
-
-    /** usePublishAssetVersion executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePublishAssetVersion = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAssetVersion>>, TError,PublishAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof publishAssetVersion>>,
-        TError,
-        PublishAssetVersionMutationVariables,
-        TContext
-      > => {
-      return useMutation(getPublishAssetVersionMutationOptions(options), queryClient);
-    }
-    /** deprecateAssetVersionResponse200 represents a declared HTTP response from the deprecate asset version response200 operation. */
-    export type deprecateAssetVersionResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetVersionResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** deprecateAssetVersionResponse404 represents a declared HTTP response from the deprecate asset version response404 operation. */
-export type deprecateAssetVersionResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** deprecateAssetVersionResponse409 represents a declared HTTP response from the deprecate asset version response409 operation. */
-export type deprecateAssetVersionResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** deprecateAssetVersionResponse412 represents a declared HTTP response from the deprecate asset version response412 operation. */
-export type deprecateAssetVersionResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** deprecateAssetVersionResponseSuccess represents a declared HTTP response from the deprecate asset version response success operation. */
-export type deprecateAssetVersionResponseSuccess = (deprecateAssetVersionResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** deprecateAssetVersionResponseError represents a declared HTTP response from the deprecate asset version response error operation. */
-export type deprecateAssetVersionResponseError = (deprecateAssetVersionResponse404 | deprecateAssetVersionResponse409 | deprecateAssetVersionResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** deprecateAssetVersionResponse represents a declared HTTP response from the deprecate asset version response operation. */
-export type deprecateAssetVersionResponse = (deprecateAssetVersionResponseSuccess | deprecateAssetVersionResponseError)
-
-/** getDeprecateAssetVersionUrl builds the relative URL for its OpenAPI operation. */
-export const getDeprecateAssetVersionUrl = (tenantSlug: string,
-    versionId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}:deprecate`
-}
-
-/**
- * Performs the deprecate asset version workflow within the authorized request scope.
- */
-export const deprecateAssetVersion = async (tenantSlug: string,
-    versionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deprecateAssetVersionResponse> => {
-
-  return meridianFetch<deprecateAssetVersionResponse>(getDeprecateAssetVersionUrl(tenantSlug,versionId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-
-
-
-/** getDeprecateAssetVersionMutationKey is generated from the Meridian OpenAPI contract for get deprecate asset version mutation key. */
-export const getDeprecateAssetVersionMutationKey = () => ['deprecateAssetVersion'] as const;
-
-/** getDeprecateAssetVersionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeprecateAssetVersionMutationOptions = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deprecateAssetVersion>>, TError,DeprecateAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deprecateAssetVersion>>, TError,DeprecateAssetVersionMutationVariables, TContext> => {
-
-const mutationKey = getDeprecateAssetVersionMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deprecateAssetVersion>>, DeprecateAssetVersionMutationVariables> = (props) => {
-          const {tenantSlug,versionId} = props ?? {};
-
-          return  deprecateAssetVersion(tenantSlug,versionId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** DeprecateAssetVersionMutationResult is generated from the Meridian OpenAPI contract for deprecate asset version mutation result. */
-    export type DeprecateAssetVersionMutationResult = NonNullable<Awaited<ReturnType<typeof deprecateAssetVersion>>>
-
-    /** DeprecateAssetVersionMutationError is generated from the Meridian OpenAPI contract for deprecate asset version mutation error. */
-    export type DeprecateAssetVersionMutationError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse
-    /** DeprecateAssetVersionMutationVariables is generated from the Meridian OpenAPI contract for deprecate asset version mutation variables. */
-    export type DeprecateAssetVersionMutationVariables = {/** TenantSlug carries the tenant slug value for DeprecateAssetVersionMutationVariables. */ tenantSlug: string;/** VersionId carries the version id value for DeprecateAssetVersionMutationVariables. */ versionId: string}
-
-    /** useDeprecateAssetVersion executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeprecateAssetVersion = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deprecateAssetVersion>>, TError,DeprecateAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof deprecateAssetVersion>>,
-        TError,
-        DeprecateAssetVersionMutationVariables,
-        TContext
-      > => {
-      return useMutation(getDeprecateAssetVersionMutationOptions(options), queryClient);
-    }
-    /** retireAssetVersionResponse200 represents a declared HTTP response from the retire asset version response200 operation. */
-    export type retireAssetVersionResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetVersionResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** retireAssetVersionResponse404 represents a declared HTTP response from the retire asset version response404 operation. */
-export type retireAssetVersionResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** retireAssetVersionResponse409 represents a declared HTTP response from the retire asset version response409 operation. */
-export type retireAssetVersionResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** retireAssetVersionResponse412 represents a declared HTTP response from the retire asset version response412 operation. */
-export type retireAssetVersionResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** retireAssetVersionResponseSuccess represents a declared HTTP response from the retire asset version response success operation. */
-export type retireAssetVersionResponseSuccess = (retireAssetVersionResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** retireAssetVersionResponseError represents a declared HTTP response from the retire asset version response error operation. */
-export type retireAssetVersionResponseError = (retireAssetVersionResponse404 | retireAssetVersionResponse409 | retireAssetVersionResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** retireAssetVersionResponse represents a declared HTTP response from the retire asset version response operation. */
-export type retireAssetVersionResponse = (retireAssetVersionResponseSuccess | retireAssetVersionResponseError)
-
-/** getRetireAssetVersionUrl builds the relative URL for its OpenAPI operation. */
-export const getRetireAssetVersionUrl = (tenantSlug: string,
-    versionId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}:retire`
-}
-
-/**
- * Performs the retire asset version workflow within the authorized request scope.
- */
-export const retireAssetVersion = async (tenantSlug: string,
-    versionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<retireAssetVersionResponse> => {
-
-  return meridianFetch<retireAssetVersionResponse>(getRetireAssetVersionUrl(tenantSlug,versionId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-
-
-
-/** getRetireAssetVersionMutationKey is generated from the Meridian OpenAPI contract for get retire asset version mutation key. */
-export const getRetireAssetVersionMutationKey = () => ['retireAssetVersion'] as const;
-
-/** getRetireAssetVersionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getRetireAssetVersionMutationOptions = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retireAssetVersion>>, TError,RetireAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof retireAssetVersion>>, TError,RetireAssetVersionMutationVariables, TContext> => {
-
-const mutationKey = getRetireAssetVersionMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retireAssetVersion>>, RetireAssetVersionMutationVariables> = (props) => {
-          const {tenantSlug,versionId} = props ?? {};
-
-          return  retireAssetVersion(tenantSlug,versionId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** RetireAssetVersionMutationResult is generated from the Meridian OpenAPI contract for retire asset version mutation result. */
-    export type RetireAssetVersionMutationResult = NonNullable<Awaited<ReturnType<typeof retireAssetVersion>>>
-
-    /** RetireAssetVersionMutationError is generated from the Meridian OpenAPI contract for retire asset version mutation error. */
-    export type RetireAssetVersionMutationError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse
-    /** RetireAssetVersionMutationVariables is generated from the Meridian OpenAPI contract for retire asset version mutation variables. */
-    export type RetireAssetVersionMutationVariables = {/** TenantSlug carries the tenant slug value for RetireAssetVersionMutationVariables. */ tenantSlug: string;/** VersionId carries the version id value for RetireAssetVersionMutationVariables. */ versionId: string}
-
-    /** useRetireAssetVersion executes its OpenAPI operation through TanStack Vue Query. */
-    export const useRetireAssetVersion = <TError = NotFoundResponse | ConflictResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retireAssetVersion>>, TError,RetireAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof retireAssetVersion>>,
-        TError,
-        RetireAssetVersionMutationVariables,
-        TContext
-      > => {
-      return useMutation(getRetireAssetVersionMutationOptions(options), queryClient);
-    }
-    /** generateAssetWithAiResponse202 represents a declared HTTP response from the generate asset with ai response202 operation. */
-    export type generateAssetWithAiResponse202 = {
-  /** Data contains the decoded response payload. */
-  data: AiGenerationAcceptedResponse
-  /** Status is the HTTP response status code. */
-  status: 202
-}
-
-/** generateAssetWithAiResponse404 represents a declared HTTP response from the generate asset with ai response404 operation. */
-export type generateAssetWithAiResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** generateAssetWithAiResponse409 represents a declared HTTP response from the generate asset with ai response409 operation. */
-export type generateAssetWithAiResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** generateAssetWithAiResponse422 represents a declared HTTP response from the generate asset with ai response422 operation. */
-export type generateAssetWithAiResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: ProducerProfileUnavailableResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** generateAssetWithAiResponseSuccess represents a declared HTTP response from the generate asset with ai response success operation. */
-export type generateAssetWithAiResponseSuccess = (generateAssetWithAiResponse202) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** generateAssetWithAiResponseError represents a declared HTTP response from the generate asset with ai response error operation. */
-export type generateAssetWithAiResponseError = (generateAssetWithAiResponse404 | generateAssetWithAiResponse409 | generateAssetWithAiResponse422) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** generateAssetWithAiResponse represents a declared HTTP response from the generate asset with ai response operation. */
-export type generateAssetWithAiResponse = (generateAssetWithAiResponseSuccess | generateAssetWithAiResponseError)
-
-/** getGenerateAssetWithAiUrl builds the relative URL for its OpenAPI operation. */
-export const getGenerateAssetWithAiUrl = (tenantSlug: string,
-    assetId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/assets/${assetId}:ai-generate`
-}
-
-/**
- * Performs the generate asset with ai workflow within the authorized request scope.
- */
-export const generateAssetWithAi = async (tenantSlug: string,
-    assetId: string,
-    assetAiGenerateBody: AssetAiGenerateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<generateAssetWithAiResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<generateAssetWithAiResponse>(getGenerateAssetWithAiUrl(tenantSlug,assetId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(assetAiGenerateBody)
-  }
-);}
-
-
-
-
-
-/** getGenerateAssetWithAiMutationKey is generated from the Meridian OpenAPI contract for get generate asset with ai mutation key. */
-export const getGenerateAssetWithAiMutationKey = () => ['generateAssetWithAi'] as const;
-
-/** getGenerateAssetWithAiMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getGenerateAssetWithAiMutationOptions = <TError = NotFoundResponse | ConflictResponse | ProducerProfileUnavailableResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAssetWithAi>>, TError,GenerateAssetWithAiMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof generateAssetWithAi>>, TError,GenerateAssetWithAiMutationVariables, TContext> => {
-
-const mutationKey = getGenerateAssetWithAiMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateAssetWithAi>>, GenerateAssetWithAiMutationVariables> = (props) => {
-          const {tenantSlug,assetId,data} = props ?? {};
-
-          return  generateAssetWithAi(tenantSlug,assetId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** GenerateAssetWithAiMutationResult is generated from the Meridian OpenAPI contract for generate asset with ai mutation result. */
-    export type GenerateAssetWithAiMutationResult = NonNullable<Awaited<ReturnType<typeof generateAssetWithAi>>>
-    /** GenerateAssetWithAiMutationBody is the request body type for its generated OpenAPI operation. */
-    export type GenerateAssetWithAiMutationBody = AssetAiGenerateBody
-    /** GenerateAssetWithAiMutationError is generated from the Meridian OpenAPI contract for generate asset with ai mutation error. */
-    export type GenerateAssetWithAiMutationError = NotFoundResponse | ConflictResponse | ProducerProfileUnavailableResponse
-    /** GenerateAssetWithAiMutationVariables is generated from the Meridian OpenAPI contract for generate asset with ai mutation variables. */
-    export type GenerateAssetWithAiMutationVariables = {/** TenantSlug carries the tenant slug value for GenerateAssetWithAiMutationVariables. */ tenantSlug: string;/** AssetId carries the asset id value for GenerateAssetWithAiMutationVariables. */ assetId: string;/** Data contains the decoded response payload. */ data: AssetAiGenerateBody}
-
-    /** useGenerateAssetWithAi executes its OpenAPI operation through TanStack Vue Query. */
-    export const useGenerateAssetWithAi = <TError = NotFoundResponse | ConflictResponse | ProducerProfileUnavailableResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAssetWithAi>>, TError,GenerateAssetWithAiMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof generateAssetWithAi>>,
-        TError,
-        GenerateAssetWithAiMutationVariables,
-        TContext
-      > => {
-      return useMutation(getGenerateAssetWithAiMutationOptions(options), queryClient);
-    }
-    /** previewMergeResponse200 represents a declared HTTP response from the preview merge response200 operation. */
-    export type previewMergeResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: MergePreviewResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** previewMergeResponse404 represents a declared HTTP response from the preview merge response404 operation. */
-export type previewMergeResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** previewMergeResponse409 represents a declared HTTP response from the preview merge response409 operation. */
-export type previewMergeResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: InvalidStateResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** previewMergeResponse413 represents a declared HTTP response from the preview merge response413 operation. */
-export type previewMergeResponse413 = {
-  /** Data contains the decoded response payload. */
-  data: ContentTooLargeResponse
-  /** Status is the HTTP response status code. */
-  status: 413
-}
-
-/** previewMergeResponse422 represents a declared HTTP response from the preview merge response422 operation. */
-export type previewMergeResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: OverlayInvalidResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** previewMergeResponseSuccess represents a declared HTTP response from the preview merge response success operation. */
-export type previewMergeResponseSuccess = (previewMergeResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** previewMergeResponseError represents a declared HTTP response from the preview merge response error operation. */
-export type previewMergeResponseError = (previewMergeResponse404 | previewMergeResponse409 | previewMergeResponse413 | previewMergeResponse422) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** previewMergeResponse represents a declared HTTP response from the preview merge response operation. */
-export type previewMergeResponse = (previewMergeResponseSuccess | previewMergeResponseError)
-
-/** getPreviewMergeUrl builds the relative URL for its OpenAPI operation. */
-export const getPreviewMergeUrl = (tenantSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/assets:preview-merge`
-}
-
-/**
- * Performs the preview merge workflow within the authorized request scope.
- */
-export const previewMerge = async (tenantSlug: string,
-    mergePreviewBody: MergePreviewBody, options?: Parameters<typeof meridianFetch>[1]): Promise<previewMergeResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<previewMergeResponse>(getPreviewMergeUrl(tenantSlug),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(mergePreviewBody)
-  }
-);}
-
-
-
-
-
-/** getPreviewMergeMutationKey is generated from the Meridian OpenAPI contract for get preview merge mutation key. */
-export const getPreviewMergeMutationKey = () => ['previewMerge'] as const;
-
-/** getPreviewMergeMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPreviewMergeMutationOptions = <TError = NotFoundResponse | InvalidStateResponse | ContentTooLargeResponse | OverlayInvalidResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewMerge>>, TError,PreviewMergeMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof previewMerge>>, TError,PreviewMergeMutationVariables, TContext> => {
-
-const mutationKey = getPreviewMergeMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof previewMerge>>, PreviewMergeMutationVariables> = (props) => {
-          const {tenantSlug,data} = props ?? {};
-
-          return  previewMerge(tenantSlug,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** PreviewMergeMutationResult is generated from the Meridian OpenAPI contract for preview merge mutation result. */
-    export type PreviewMergeMutationResult = NonNullable<Awaited<ReturnType<typeof previewMerge>>>
-    /** PreviewMergeMutationBody is the request body type for its generated OpenAPI operation. */
-    export type PreviewMergeMutationBody = MergePreviewBody
-    /** PreviewMergeMutationError is generated from the Meridian OpenAPI contract for preview merge mutation error. */
-    export type PreviewMergeMutationError = NotFoundResponse | InvalidStateResponse | ContentTooLargeResponse | OverlayInvalidResponse
-    /** PreviewMergeMutationVariables is generated from the Meridian OpenAPI contract for preview merge mutation variables. */
-    export type PreviewMergeMutationVariables = {/** TenantSlug carries the tenant slug value for PreviewMergeMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: MergePreviewBody}
-
-    /** usePreviewMerge executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePreviewMerge = <TError = NotFoundResponse | InvalidStateResponse | ContentTooLargeResponse | OverlayInvalidResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewMerge>>, TError,PreviewMergeMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof previewMerge>>,
-        TError,
-        PreviewMergeMutationVariables,
-        TContext
-      > => {
-      return useMutation(getPreviewMergeMutationOptions(options), queryClient);
-    }
-    /** pushAssetRevisionResponse200 represents a declared HTTP response from the push asset revision response200 operation. */
-    export type pushAssetRevisionResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: AssetPushResultResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** pushAssetRevisionResponse201 represents a declared HTTP response from the push asset revision response201 operation. */
-export type pushAssetRevisionResponse201 = {
-  /** Data contains the decoded response payload. */
-  data: AssetPushResultResponse
-  /** Status is the HTTP response status code. */
-  status: 201
-}
-
-/** pushAssetRevisionResponse404 represents a declared HTTP response from the push asset revision response404 operation. */
-export type pushAssetRevisionResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** pushAssetRevisionResponse409 represents a declared HTTP response from the push asset revision response409 operation. */
-export type pushAssetRevisionResponse409 = {
-  /** Data contains the decoded response payload. */
-  data: ConflictResponse
-  /** Status is the HTTP response status code. */
-  status: 409
-}
-
-/** pushAssetRevisionResponse413 represents a declared HTTP response from the push asset revision response413 operation. */
-export type pushAssetRevisionResponse413 = {
-  /** Data contains the decoded response payload. */
-  data: ContentTooLargeResponse
-  /** Status is the HTTP response status code. */
-  status: 413
-}
-
-/** pushAssetRevisionResponse422 represents a declared HTTP response from the push asset revision response422 operation. */
-export type pushAssetRevisionResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** pushAssetRevisionResponseSuccess represents a declared HTTP response from the push asset revision response success operation. */
-export type pushAssetRevisionResponseSuccess = (pushAssetRevisionResponse200 | pushAssetRevisionResponse201) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** pushAssetRevisionResponseError represents a declared HTTP response from the push asset revision response error operation. */
-export type pushAssetRevisionResponseError = (pushAssetRevisionResponse404 | pushAssetRevisionResponse409 | pushAssetRevisionResponse413 | pushAssetRevisionResponse422) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** pushAssetRevisionResponse represents a declared HTTP response from the push asset revision response operation. */
-export type pushAssetRevisionResponse = (pushAssetRevisionResponseSuccess | pushAssetRevisionResponseError)
-
-/** getPushAssetRevisionUrl builds the relative URL for its OpenAPI operation. */
-export const getPushAssetRevisionUrl = (tenantSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/assets:push`
-}
-
-/**
- * Performs the push asset revision workflow within the authorized request scope.
- */
-export const pushAssetRevision = async (tenantSlug: string,
-    assetPushBody: AssetPushBody, options?: Parameters<typeof meridianFetch>[1]): Promise<pushAssetRevisionResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<pushAssetRevisionResponse>(getPushAssetRevisionUrl(tenantSlug),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(assetPushBody)
-  }
-);}
-
-
-
-
-
-/** getPushAssetRevisionMutationKey is generated from the Meridian OpenAPI contract for get push asset revision mutation key. */
-export const getPushAssetRevisionMutationKey = () => ['pushAssetRevision'] as const;
-
-/** getPushAssetRevisionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPushAssetRevisionMutationOptions = <TError = NotFoundResponse | ConflictResponse | ContentTooLargeResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pushAssetRevision>>, TError,PushAssetRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof pushAssetRevision>>, TError,PushAssetRevisionMutationVariables, TContext> => {
-
-const mutationKey = getPushAssetRevisionMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pushAssetRevision>>, PushAssetRevisionMutationVariables> = (props) => {
-          const {tenantSlug,data} = props ?? {};
-
-          return  pushAssetRevision(tenantSlug,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** PushAssetRevisionMutationResult is generated from the Meridian OpenAPI contract for push asset revision mutation result. */
-    export type PushAssetRevisionMutationResult = NonNullable<Awaited<ReturnType<typeof pushAssetRevision>>>
-    /** PushAssetRevisionMutationBody is the request body type for its generated OpenAPI operation. */
-    export type PushAssetRevisionMutationBody = AssetPushBody
-    /** PushAssetRevisionMutationError is generated from the Meridian OpenAPI contract for push asset revision mutation error. */
-    export type PushAssetRevisionMutationError = NotFoundResponse | ConflictResponse | ContentTooLargeResponse | ValidationErrorResponse
-    /** PushAssetRevisionMutationVariables is generated from the Meridian OpenAPI contract for push asset revision mutation variables. */
-    export type PushAssetRevisionMutationVariables = {/** TenantSlug carries the tenant slug value for PushAssetRevisionMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: AssetPushBody}
-
-    /** usePushAssetRevision executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePushAssetRevision = <TError = NotFoundResponse | ConflictResponse | ContentTooLargeResponse | ValidationErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pushAssetRevision>>, TError,PushAssetRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof pushAssetRevision>>,
-        TError,
-        PushAssetRevisionMutationVariables,
-        TContext
-      > => {
-      return useMutation(getPushAssetRevisionMutationOptions(options), queryClient);
-    }
-    /** getPublicAssetResponse200 represents a declared HTTP response from the get public asset response200 operation. */
-    export type getPublicAssetResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: PublicAssetResponse
+  data: PublicAsset
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -2569,7 +80,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** getPublicAssetResponse404 represents a declared HTTP response from the get public asset response404 operation. */
 export type getPublicAssetResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -2631,7 +142,7 @@ export const getGetPublicAssetQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
 
 
 /** getGetPublicAssetQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetPublicAssetQueryOptions = <TData = Awaited<ReturnType<typeof getPublicAsset>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
+export const getGetPublicAssetQueryOptions = <TData = Awaited<ReturnType<typeof getPublicAsset>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
     serviceSlug: MaybeRefOrGetter<string>,
     kindId: MaybeRefOrGetter<string>,
     assetName: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPublicAsset>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
@@ -2655,12 +166,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** GetPublicAssetQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetPublicAssetQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicAsset>>>
 /** GetPublicAssetQueryError is the error type returned by its generated Vue Query hook. */
-export type GetPublicAssetQueryError = NotFoundResponse
+export type GetPublicAssetQueryError = ErrorResponse
 
 
 
 /** useGetPublicAsset executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetPublicAsset<TData = Awaited<ReturnType<typeof getPublicAsset>>, TError = NotFoundResponse>(
+export function useGetPublicAsset<TData = Awaited<ReturnType<typeof getPublicAsset>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     serviceSlug: MaybeRefOrGetter<string>,
     kindId: MaybeRefOrGetter<string>,
@@ -2682,3 +193,2485 @@ export function useGetPublicAsset<TData = Awaited<ReturnType<typeof getPublicAss
 
 
 
+/** listAssetKindsResponse200 represents a declared HTTP response from the list asset kinds response200 operation. */
+export type listAssetKindsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetKindList
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listAssetKindsResponse404 represents a declared HTTP response from the list asset kinds response404 operation. */
+export type listAssetKindsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listAssetKindsResponseSuccess represents a declared HTTP response from the list asset kinds response success operation. */
+export type listAssetKindsResponseSuccess = (listAssetKindsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listAssetKindsResponseError represents a declared HTTP response from the list asset kinds response error operation. */
+export type listAssetKindsResponseError = (listAssetKindsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listAssetKindsResponse represents a declared HTTP response from the list asset kinds response operation. */
+export type listAssetKindsResponse = (listAssetKindsResponseSuccess | listAssetKindsResponseError)
+
+/** getListAssetKindsUrl builds the relative URL for its OpenAPI operation. */
+export const getListAssetKindsUrl = (tenantSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/asset-kinds`
+}
+
+/**
+ * Returns the requested page of asset kinds within the authorized request scope.
+ */
+export const listAssetKinds = async (tenantSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listAssetKindsResponse> => {
+
+  return meridianFetch<listAssetKindsResponse>(getListAssetKindsUrl(tenantSlug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListAssetKindsQueryKey is generated from the Meridian OpenAPI contract for get list asset kinds query key. */
+export const getListAssetKindsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','t',tenantSlug,'asset-kinds'
+    ] as const;
+    }
+
+
+/** getListAssetKindsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListAssetKindsQueryOptions = <TData = Awaited<ReturnType<typeof listAssetKinds>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetKinds>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListAssetKindsQueryKey(tenantSlug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssetKinds>>> = ({ signal }) => listAssetKinds(toValue(tenantSlug), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssetKinds>>, TError, TData>
+}
+
+/** ListAssetKindsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListAssetKindsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssetKinds>>>
+/** ListAssetKindsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListAssetKindsQueryError = ErrorResponse
+
+
+
+/** useListAssetKinds executes its OpenAPI operation through TanStack Vue Query. */
+export function useListAssetKinds<TData = Awaited<ReturnType<typeof listAssetKinds>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetKinds>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssetKindsQueryOptions(tenantSlug,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** updateAssetKindStateResponse200 represents a declared HTTP response from the update asset kind state response200 operation. */
+export type updateAssetKindStateResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetKind
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** updateAssetKindStateResponse404 represents a declared HTTP response from the update asset kind state response404 operation. */
+export type updateAssetKindStateResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** updateAssetKindStateResponse412 represents a declared HTTP response from the update asset kind state response412 operation. */
+export type updateAssetKindStateResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** updateAssetKindStateResponseSuccess represents a declared HTTP response from the update asset kind state response success operation. */
+export type updateAssetKindStateResponseSuccess = (updateAssetKindStateResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** updateAssetKindStateResponseError represents a declared HTTP response from the update asset kind state response error operation. */
+export type updateAssetKindStateResponseError = (updateAssetKindStateResponse404 | updateAssetKindStateResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** updateAssetKindStateResponse represents a declared HTTP response from the update asset kind state response operation. */
+export type updateAssetKindStateResponse = (updateAssetKindStateResponseSuccess | updateAssetKindStateResponseError)
+
+/** getUpdateAssetKindStateUrl builds the relative URL for its OpenAPI operation. */
+export const getUpdateAssetKindStateUrl = (tenantSlug: string,
+    kindId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/asset-kinds/${kindId}`
+}
+
+/**
+ * Updates the selected asset kind state within the authorized request scope.
+ */
+export const updateAssetKindState = async (tenantSlug: string,
+    kindId: string,
+    assetKindPatchRequest: AssetKindPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateAssetKindStateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<updateAssetKindStateResponse>(getUpdateAssetKindStateUrl(tenantSlug,kindId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assetKindPatchRequest)
+  }
+);}
+
+
+
+
+
+/** getUpdateAssetKindStateMutationKey is generated from the Meridian OpenAPI contract for get update asset kind state mutation key. */
+export const getUpdateAssetKindStateMutationKey = () => ['updateAssetKindState'] as const;
+
+/** getUpdateAssetKindStateMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getUpdateAssetKindStateMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAssetKindState>>, TError,UpdateAssetKindStateMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAssetKindState>>, TError,UpdateAssetKindStateMutationVariables, TContext> => {
+
+const mutationKey = getUpdateAssetKindStateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAssetKindState>>, UpdateAssetKindStateMutationVariables> = (props) => {
+          const {tenantSlug,kindId,data} = props ?? {};
+
+          return  updateAssetKindState(tenantSlug,kindId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** UpdateAssetKindStateMutationResult is generated from the Meridian OpenAPI contract for update asset kind state mutation result. */
+    export type UpdateAssetKindStateMutationResult = NonNullable<Awaited<ReturnType<typeof updateAssetKindState>>>
+    /** UpdateAssetKindStateMutationBody is the request body type for its generated OpenAPI operation. */
+    export type UpdateAssetKindStateMutationBody = AssetKindPatchRequest
+    /** UpdateAssetKindStateMutationError is generated from the Meridian OpenAPI contract for update asset kind state mutation error. */
+    export type UpdateAssetKindStateMutationError = ErrorResponse
+    /** UpdateAssetKindStateMutationVariables is generated from the Meridian OpenAPI contract for update asset kind state mutation variables. */
+    export type UpdateAssetKindStateMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateAssetKindStateMutationVariables. */ tenantSlug: string;/** KindId carries the kind id value for UpdateAssetKindStateMutationVariables. */ kindId: string;/** Data contains the decoded response payload. */ data: AssetKindPatchRequest}
+
+    /** useUpdateAssetKindState executes its OpenAPI operation through TanStack Vue Query. */
+    export const useUpdateAssetKindState = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAssetKindState>>, TError,UpdateAssetKindStateMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof updateAssetKindState>>,
+        TError,
+        UpdateAssetKindStateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateAssetKindStateMutationOptions(options), queryClient);
+    }
+    /** getAssetVersionResponse200 represents a declared HTTP response from the get asset version response200 operation. */
+    export type getAssetVersionResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetVersion
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** getAssetVersionResponse404 represents a declared HTTP response from the get asset version response404 operation. */
+export type getAssetVersionResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** getAssetVersionResponseSuccess represents a declared HTTP response from the get asset version response success operation. */
+export type getAssetVersionResponseSuccess = (getAssetVersionResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** getAssetVersionResponseError represents a declared HTTP response from the get asset version response error operation. */
+export type getAssetVersionResponseError = (getAssetVersionResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** getAssetVersionResponse represents a declared HTTP response from the get asset version response operation. */
+export type getAssetVersionResponse = (getAssetVersionResponseSuccess | getAssetVersionResponseError)
+
+/** getGetAssetVersionUrl builds the relative URL for its OpenAPI operation. */
+export const getGetAssetVersionUrl = (tenantSlug: string,
+    versionId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}`
+}
+
+/**
+ * Returns the selected asset version within the authorized request scope.
+ */
+export const getAssetVersion = async (tenantSlug: string,
+    versionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getAssetVersionResponse> => {
+
+  return meridianFetch<getAssetVersionResponse>(getGetAssetVersionUrl(tenantSlug,versionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getGetAssetVersionQueryKey is generated from the Meridian OpenAPI contract for get get asset version query key. */
+export const getGetAssetVersionQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','t',tenantSlug,'asset-versions',versionId
+    ] as const;
+    }
+
+
+/** getGetAssetVersionQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getGetAssetVersionQueryOptions = <TData = Awaited<ReturnType<typeof getAssetVersion>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssetVersion>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getGetAssetVersionQueryKey(tenantSlug,versionId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAssetVersion>>> = ({ signal }) => getAssetVersion(toValue(tenantSlug),toValue(versionId), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(versionId) !== null && toValue(versionId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAssetVersion>>, TError, TData>
+}
+
+/** GetAssetVersionQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type GetAssetVersionQueryResult = NonNullable<Awaited<ReturnType<typeof getAssetVersion>>>
+/** GetAssetVersionQueryError is the error type returned by its generated Vue Query hook. */
+export type GetAssetVersionQueryError = ErrorResponse
+
+
+
+/** useGetAssetVersion executes its OpenAPI operation through TanStack Vue Query. */
+export function useGetAssetVersion<TData = Awaited<ReturnType<typeof getAssetVersion>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssetVersion>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAssetVersionQueryOptions(tenantSlug,versionId,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** listAssetVersionItemsResponse200 represents a declared HTTP response from the list asset version items response200 operation. */
+export type listAssetVersionItemsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetItemPage
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listAssetVersionItemsResponse404 represents a declared HTTP response from the list asset version items response404 operation. */
+export type listAssetVersionItemsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listAssetVersionItemsResponseSuccess represents a declared HTTP response from the list asset version items response success operation. */
+export type listAssetVersionItemsResponseSuccess = (listAssetVersionItemsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listAssetVersionItemsResponseError represents a declared HTTP response from the list asset version items response error operation. */
+export type listAssetVersionItemsResponseError = (listAssetVersionItemsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listAssetVersionItemsResponse represents a declared HTTP response from the list asset version items response operation. */
+export type listAssetVersionItemsResponse = (listAssetVersionItemsResponseSuccess | listAssetVersionItemsResponseError)
+
+/** getListAssetVersionItemsUrl builds the relative URL for its OpenAPI operation. */
+export const getListAssetVersionItemsUrl = (tenantSlug: string,
+    versionId: string,
+    params?: ListAssetVersionItemsParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
+
+  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/asset-versions/${versionId}/items?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/asset-versions/${versionId}/items`
+}
+
+/**
+ * Returns the requested page of asset version items within the authorized request scope.
+ */
+export const listAssetVersionItems = async (tenantSlug: string,
+    versionId: string,
+    params?: ListAssetVersionItemsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listAssetVersionItemsResponse> => {
+
+  return meridianFetch<listAssetVersionItemsResponse>(getListAssetVersionItemsUrl(tenantSlug,versionId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListAssetVersionItemsQueryKey is generated from the Meridian OpenAPI contract for get list asset version items query key. */
+export const getListAssetVersionItemsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAssetVersionItemsParams>,) => {
+    return [
+    'api','v1','t',tenantSlug,'asset-versions',versionId,'items', ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+/** getListAssetVersionItemsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListAssetVersionItemsQueryOptions = <TData = Awaited<ReturnType<typeof listAssetVersionItems>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAssetVersionItemsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetVersionItems>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListAssetVersionItemsQueryKey(tenantSlug,versionId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssetVersionItems>>> = ({ signal }) => listAssetVersionItems(toValue(tenantSlug),toValue(versionId),toValue(params), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(versionId) !== null && toValue(versionId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssetVersionItems>>, TError, TData>
+}
+
+/** ListAssetVersionItemsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListAssetVersionItemsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssetVersionItems>>>
+/** ListAssetVersionItemsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListAssetVersionItemsQueryError = ErrorResponse
+
+
+
+/** useListAssetVersionItems executes its OpenAPI operation through TanStack Vue Query. */
+export function useListAssetVersionItems<TData = Awaited<ReturnType<typeof listAssetVersionItems>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAssetVersionItemsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetVersionItems>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssetVersionItemsQueryOptions(tenantSlug,versionId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** getAssetVersionProvenanceResponse200 represents a declared HTTP response from the get asset version provenance response200 operation. */
+export type getAssetVersionProvenanceResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ProvenanceList
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** getAssetVersionProvenanceResponse404 represents a declared HTTP response from the get asset version provenance response404 operation. */
+export type getAssetVersionProvenanceResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** getAssetVersionProvenanceResponseSuccess represents a declared HTTP response from the get asset version provenance response success operation. */
+export type getAssetVersionProvenanceResponseSuccess = (getAssetVersionProvenanceResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** getAssetVersionProvenanceResponseError represents a declared HTTP response from the get asset version provenance response error operation. */
+export type getAssetVersionProvenanceResponseError = (getAssetVersionProvenanceResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** getAssetVersionProvenanceResponse represents a declared HTTP response from the get asset version provenance response operation. */
+export type getAssetVersionProvenanceResponse = (getAssetVersionProvenanceResponseSuccess | getAssetVersionProvenanceResponseError)
+
+/** getGetAssetVersionProvenanceUrl builds the relative URL for its OpenAPI operation. */
+export const getGetAssetVersionProvenanceUrl = (tenantSlug: string,
+    versionId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}/provenance`
+}
+
+/**
+ * Returns the selected asset version provenance within the authorized request scope.
+ */
+export const getAssetVersionProvenance = async (tenantSlug: string,
+    versionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getAssetVersionProvenanceResponse> => {
+
+  return meridianFetch<getAssetVersionProvenanceResponse>(getGetAssetVersionProvenanceUrl(tenantSlug,versionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getGetAssetVersionProvenanceQueryKey is generated from the Meridian OpenAPI contract for get get asset version provenance query key. */
+export const getGetAssetVersionProvenanceQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','t',tenantSlug,'asset-versions',versionId,'provenance'
+    ] as const;
+    }
+
+
+/** getGetAssetVersionProvenanceQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getGetAssetVersionProvenanceQueryOptions = <TData = Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getGetAssetVersionProvenanceQueryKey(tenantSlug,versionId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAssetVersionProvenance>>> = ({ signal }) => getAssetVersionProvenance(toValue(tenantSlug),toValue(versionId), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(versionId) !== null && toValue(versionId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError, TData>
+}
+
+/** GetAssetVersionProvenanceQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type GetAssetVersionProvenanceQueryResult = NonNullable<Awaited<ReturnType<typeof getAssetVersionProvenance>>>
+/** GetAssetVersionProvenanceQueryError is the error type returned by its generated Vue Query hook. */
+export type GetAssetVersionProvenanceQueryError = ErrorResponse
+
+
+
+/** useGetAssetVersionProvenance executes its OpenAPI operation through TanStack Vue Query. */
+export function useGetAssetVersionProvenance<TData = Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    versionId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAssetVersionProvenance>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAssetVersionProvenanceQueryOptions(tenantSlug,versionId,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** deprecateAssetVersionResponse200 represents a declared HTTP response from the deprecate asset version response200 operation. */
+export type deprecateAssetVersionResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetVersion
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** deprecateAssetVersionResponse404 represents a declared HTTP response from the deprecate asset version response404 operation. */
+export type deprecateAssetVersionResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** deprecateAssetVersionResponse409 represents a declared HTTP response from the deprecate asset version response409 operation. */
+export type deprecateAssetVersionResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** deprecateAssetVersionResponse412 represents a declared HTTP response from the deprecate asset version response412 operation. */
+export type deprecateAssetVersionResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** deprecateAssetVersionResponseSuccess represents a declared HTTP response from the deprecate asset version response success operation. */
+export type deprecateAssetVersionResponseSuccess = (deprecateAssetVersionResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** deprecateAssetVersionResponseError represents a declared HTTP response from the deprecate asset version response error operation. */
+export type deprecateAssetVersionResponseError = (deprecateAssetVersionResponse404 | deprecateAssetVersionResponse409 | deprecateAssetVersionResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** deprecateAssetVersionResponse represents a declared HTTP response from the deprecate asset version response operation. */
+export type deprecateAssetVersionResponse = (deprecateAssetVersionResponseSuccess | deprecateAssetVersionResponseError)
+
+/** getDeprecateAssetVersionUrl builds the relative URL for its OpenAPI operation. */
+export const getDeprecateAssetVersionUrl = (tenantSlug: string,
+    versionId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}:deprecate`
+}
+
+/**
+ * Performs the deprecate asset version workflow within the authorized request scope.
+ */
+export const deprecateAssetVersion = async (tenantSlug: string,
+    versionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deprecateAssetVersionResponse> => {
+
+  return meridianFetch<deprecateAssetVersionResponse>(getDeprecateAssetVersionUrl(tenantSlug,versionId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+/** getDeprecateAssetVersionMutationKey is generated from the Meridian OpenAPI contract for get deprecate asset version mutation key. */
+export const getDeprecateAssetVersionMutationKey = () => ['deprecateAssetVersion'] as const;
+
+/** getDeprecateAssetVersionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getDeprecateAssetVersionMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deprecateAssetVersion>>, TError,DeprecateAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deprecateAssetVersion>>, TError,DeprecateAssetVersionMutationVariables, TContext> => {
+
+const mutationKey = getDeprecateAssetVersionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deprecateAssetVersion>>, DeprecateAssetVersionMutationVariables> = (props) => {
+          const {tenantSlug,versionId} = props ?? {};
+
+          return  deprecateAssetVersion(tenantSlug,versionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** DeprecateAssetVersionMutationResult is generated from the Meridian OpenAPI contract for deprecate asset version mutation result. */
+    export type DeprecateAssetVersionMutationResult = NonNullable<Awaited<ReturnType<typeof deprecateAssetVersion>>>
+
+    /** DeprecateAssetVersionMutationError is generated from the Meridian OpenAPI contract for deprecate asset version mutation error. */
+    export type DeprecateAssetVersionMutationError = ErrorResponse
+    /** DeprecateAssetVersionMutationVariables is generated from the Meridian OpenAPI contract for deprecate asset version mutation variables. */
+    export type DeprecateAssetVersionMutationVariables = {/** TenantSlug carries the tenant slug value for DeprecateAssetVersionMutationVariables. */ tenantSlug: string;/** VersionId carries the version id value for DeprecateAssetVersionMutationVariables. */ versionId: string}
+
+    /** useDeprecateAssetVersion executes its OpenAPI operation through TanStack Vue Query. */
+    export const useDeprecateAssetVersion = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deprecateAssetVersion>>, TError,DeprecateAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof deprecateAssetVersion>>,
+        TError,
+        DeprecateAssetVersionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeprecateAssetVersionMutationOptions(options), queryClient);
+    }
+    /** publishAssetVersionResponse200 represents a declared HTTP response from the publish asset version response200 operation. */
+    export type publishAssetVersionResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetVersion
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** publishAssetVersionResponse404 represents a declared HTTP response from the publish asset version response404 operation. */
+export type publishAssetVersionResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** publishAssetVersionResponse409 represents a declared HTTP response from the publish asset version response409 operation. */
+export type publishAssetVersionResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** publishAssetVersionResponse412 represents a declared HTTP response from the publish asset version response412 operation. */
+export type publishAssetVersionResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** publishAssetVersionResponseSuccess represents a declared HTTP response from the publish asset version response success operation. */
+export type publishAssetVersionResponseSuccess = (publishAssetVersionResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** publishAssetVersionResponseError represents a declared HTTP response from the publish asset version response error operation. */
+export type publishAssetVersionResponseError = (publishAssetVersionResponse404 | publishAssetVersionResponse409 | publishAssetVersionResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** publishAssetVersionResponse represents a declared HTTP response from the publish asset version response operation. */
+export type publishAssetVersionResponse = (publishAssetVersionResponseSuccess | publishAssetVersionResponseError)
+
+/** getPublishAssetVersionUrl builds the relative URL for its OpenAPI operation. */
+export const getPublishAssetVersionUrl = (tenantSlug: string,
+    versionId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}:publish`
+}
+
+/**
+ * Performs the publish asset version workflow within the authorized request scope.
+ */
+export const publishAssetVersion = async (tenantSlug: string,
+    versionId: string,
+    versionPublishRequest: VersionPublishRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<publishAssetVersionResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<publishAssetVersionResponse>(getPublishAssetVersionUrl(tenantSlug,versionId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(versionPublishRequest)
+  }
+);}
+
+
+
+
+
+/** getPublishAssetVersionMutationKey is generated from the Meridian OpenAPI contract for get publish asset version mutation key. */
+export const getPublishAssetVersionMutationKey = () => ['publishAssetVersion'] as const;
+
+/** getPublishAssetVersionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getPublishAssetVersionMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAssetVersion>>, TError,PublishAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishAssetVersion>>, TError,PublishAssetVersionMutationVariables, TContext> => {
+
+const mutationKey = getPublishAssetVersionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishAssetVersion>>, PublishAssetVersionMutationVariables> = (props) => {
+          const {tenantSlug,versionId,data} = props ?? {};
+
+          return  publishAssetVersion(tenantSlug,versionId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** PublishAssetVersionMutationResult is generated from the Meridian OpenAPI contract for publish asset version mutation result. */
+    export type PublishAssetVersionMutationResult = NonNullable<Awaited<ReturnType<typeof publishAssetVersion>>>
+    /** PublishAssetVersionMutationBody is the request body type for its generated OpenAPI operation. */
+    export type PublishAssetVersionMutationBody = VersionPublishRequest
+    /** PublishAssetVersionMutationError is generated from the Meridian OpenAPI contract for publish asset version mutation error. */
+    export type PublishAssetVersionMutationError = ErrorResponse
+    /** PublishAssetVersionMutationVariables is generated from the Meridian OpenAPI contract for publish asset version mutation variables. */
+    export type PublishAssetVersionMutationVariables = {/** TenantSlug carries the tenant slug value for PublishAssetVersionMutationVariables. */ tenantSlug: string;/** VersionId carries the version id value for PublishAssetVersionMutationVariables. */ versionId: string;/** Data contains the decoded response payload. */ data: VersionPublishRequest}
+
+    /** usePublishAssetVersion executes its OpenAPI operation through TanStack Vue Query. */
+    export const usePublishAssetVersion = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAssetVersion>>, TError,PublishAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof publishAssetVersion>>,
+        TError,
+        PublishAssetVersionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPublishAssetVersionMutationOptions(options), queryClient);
+    }
+    /** retireAssetVersionResponse200 represents a declared HTTP response from the retire asset version response200 operation. */
+    export type retireAssetVersionResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetVersion
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** retireAssetVersionResponse404 represents a declared HTTP response from the retire asset version response404 operation. */
+export type retireAssetVersionResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** retireAssetVersionResponse409 represents a declared HTTP response from the retire asset version response409 operation. */
+export type retireAssetVersionResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** retireAssetVersionResponse412 represents a declared HTTP response from the retire asset version response412 operation. */
+export type retireAssetVersionResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** retireAssetVersionResponseSuccess represents a declared HTTP response from the retire asset version response success operation. */
+export type retireAssetVersionResponseSuccess = (retireAssetVersionResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** retireAssetVersionResponseError represents a declared HTTP response from the retire asset version response error operation. */
+export type retireAssetVersionResponseError = (retireAssetVersionResponse404 | retireAssetVersionResponse409 | retireAssetVersionResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** retireAssetVersionResponse represents a declared HTTP response from the retire asset version response operation. */
+export type retireAssetVersionResponse = (retireAssetVersionResponseSuccess | retireAssetVersionResponseError)
+
+/** getRetireAssetVersionUrl builds the relative URL for its OpenAPI operation. */
+export const getRetireAssetVersionUrl = (tenantSlug: string,
+    versionId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/asset-versions/${versionId}:retire`
+}
+
+/**
+ * Performs the retire asset version workflow within the authorized request scope.
+ */
+export const retireAssetVersion = async (tenantSlug: string,
+    versionId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<retireAssetVersionResponse> => {
+
+  return meridianFetch<retireAssetVersionResponse>(getRetireAssetVersionUrl(tenantSlug,versionId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+/** getRetireAssetVersionMutationKey is generated from the Meridian OpenAPI contract for get retire asset version mutation key. */
+export const getRetireAssetVersionMutationKey = () => ['retireAssetVersion'] as const;
+
+/** getRetireAssetVersionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getRetireAssetVersionMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retireAssetVersion>>, TError,RetireAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retireAssetVersion>>, TError,RetireAssetVersionMutationVariables, TContext> => {
+
+const mutationKey = getRetireAssetVersionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retireAssetVersion>>, RetireAssetVersionMutationVariables> = (props) => {
+          const {tenantSlug,versionId} = props ?? {};
+
+          return  retireAssetVersion(tenantSlug,versionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** RetireAssetVersionMutationResult is generated from the Meridian OpenAPI contract for retire asset version mutation result. */
+    export type RetireAssetVersionMutationResult = NonNullable<Awaited<ReturnType<typeof retireAssetVersion>>>
+
+    /** RetireAssetVersionMutationError is generated from the Meridian OpenAPI contract for retire asset version mutation error. */
+    export type RetireAssetVersionMutationError = ErrorResponse
+    /** RetireAssetVersionMutationVariables is generated from the Meridian OpenAPI contract for retire asset version mutation variables. */
+    export type RetireAssetVersionMutationVariables = {/** TenantSlug carries the tenant slug value for RetireAssetVersionMutationVariables. */ tenantSlug: string;/** VersionId carries the version id value for RetireAssetVersionMutationVariables. */ versionId: string}
+
+    /** useRetireAssetVersion executes its OpenAPI operation through TanStack Vue Query. */
+    export const useRetireAssetVersion = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retireAssetVersion>>, TError,RetireAssetVersionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof retireAssetVersion>>,
+        TError,
+        RetireAssetVersionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRetireAssetVersionMutationOptions(options), queryClient);
+    }
+    /** getAssetResponse200 represents a declared HTTP response from the get asset response200 operation. */
+    export type getAssetResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: Asset
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** getAssetResponse404 represents a declared HTTP response from the get asset response404 operation. */
+export type getAssetResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** getAssetResponseSuccess represents a declared HTTP response from the get asset response success operation. */
+export type getAssetResponseSuccess = (getAssetResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** getAssetResponseError represents a declared HTTP response from the get asset response error operation. */
+export type getAssetResponseError = (getAssetResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** getAssetResponse represents a declared HTTP response from the get asset response operation. */
+export type getAssetResponse = (getAssetResponseSuccess | getAssetResponseError)
+
+/** getGetAssetUrl builds the relative URL for its OpenAPI operation. */
+export const getGetAssetUrl = (tenantSlug: string,
+    assetId: string,
+    params?: GetAssetParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
+
+  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/assets/${assetId}?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/assets/${assetId}`
+}
+
+/**
+ * Returns the selected asset within the authorized request scope.
+ */
+export const getAsset = async (tenantSlug: string,
+    assetId: string,
+    params?: GetAssetParams, options?: Parameters<typeof meridianFetch>[1]): Promise<getAssetResponse> => {
+
+  return meridianFetch<getAssetResponse>(getGetAssetUrl(tenantSlug,assetId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getGetAssetQueryKey is generated from the Meridian OpenAPI contract for get get asset query key. */
+export const getGetAssetQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<GetAssetParams>,) => {
+    return [
+    'api','v1','t',tenantSlug,'assets',assetId, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+/** getGetAssetQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getGetAssetQueryOptions = <TData = Awaited<ReturnType<typeof getAsset>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<GetAssetParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAsset>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getGetAssetQueryKey(tenantSlug,assetId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAsset>>> = ({ signal }) => getAsset(toValue(tenantSlug),toValue(assetId),toValue(params), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(assetId) !== null && toValue(assetId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAsset>>, TError, TData>
+}
+
+/** GetAssetQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type GetAssetQueryResult = NonNullable<Awaited<ReturnType<typeof getAsset>>>
+/** GetAssetQueryError is the error type returned by its generated Vue Query hook. */
+export type GetAssetQueryError = ErrorResponse
+
+
+
+/** useGetAsset executes its OpenAPI operation through TanStack Vue Query. */
+export function useGetAsset<TData = Awaited<ReturnType<typeof getAsset>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<GetAssetParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAsset>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAssetQueryOptions(tenantSlug,assetId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** listAssetVersionsResponse200 represents a declared HTTP response from the list asset versions response200 operation. */
+export type listAssetVersionsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetVersionPage
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listAssetVersionsResponse404 represents a declared HTTP response from the list asset versions response404 operation. */
+export type listAssetVersionsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listAssetVersionsResponseSuccess represents a declared HTTP response from the list asset versions response success operation. */
+export type listAssetVersionsResponseSuccess = (listAssetVersionsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listAssetVersionsResponseError represents a declared HTTP response from the list asset versions response error operation. */
+export type listAssetVersionsResponseError = (listAssetVersionsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listAssetVersionsResponse represents a declared HTTP response from the list asset versions response operation. */
+export type listAssetVersionsResponse = (listAssetVersionsResponseSuccess | listAssetVersionsResponseError)
+
+/** getListAssetVersionsUrl builds the relative URL for its OpenAPI operation. */
+export const getListAssetVersionsUrl = (tenantSlug: string,
+    assetId: string,
+    params?: ListAssetVersionsParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
+
+  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/assets/${assetId}/versions?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/assets/${assetId}/versions`
+}
+
+/**
+ * Returns the requested page of asset versions within the authorized request scope.
+ */
+export const listAssetVersions = async (tenantSlug: string,
+    assetId: string,
+    params?: ListAssetVersionsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listAssetVersionsResponse> => {
+
+  return meridianFetch<listAssetVersionsResponse>(getListAssetVersionsUrl(tenantSlug,assetId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListAssetVersionsQueryKey is generated from the Meridian OpenAPI contract for get list asset versions query key. */
+export const getListAssetVersionsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAssetVersionsParams>,) => {
+    return [
+    'api','v1','t',tenantSlug,'assets',assetId,'versions', ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+/** getListAssetVersionsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListAssetVersionsQueryOptions = <TData = Awaited<ReturnType<typeof listAssetVersions>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAssetVersionsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetVersions>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListAssetVersionsQueryKey(tenantSlug,assetId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssetVersions>>> = ({ signal }) => listAssetVersions(toValue(tenantSlug),toValue(assetId),toValue(params), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(assetId) !== null && toValue(assetId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssetVersions>>, TError, TData>
+}
+
+/** ListAssetVersionsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListAssetVersionsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssetVersions>>>
+/** ListAssetVersionsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListAssetVersionsQueryError = ErrorResponse
+
+
+
+/** useListAssetVersions executes its OpenAPI operation through TanStack Vue Query. */
+export function useListAssetVersions<TData = Awaited<ReturnType<typeof listAssetVersions>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAssetVersionsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetVersions>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssetVersionsQueryOptions(tenantSlug,assetId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** generateAssetWithAiResponse202 represents a declared HTTP response from the generate asset with ai response202 operation. */
+export type generateAssetWithAiResponse202 = {
+  /** Data contains the decoded response payload. */
+  data: AiGenerationAccepted
+  /** Status is the HTTP response status code. */
+  status: 202
+}
+
+/** generateAssetWithAiResponse404 represents a declared HTTP response from the generate asset with ai response404 operation. */
+export type generateAssetWithAiResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** generateAssetWithAiResponse409 represents a declared HTTP response from the generate asset with ai response409 operation. */
+export type generateAssetWithAiResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** generateAssetWithAiResponse422 represents a declared HTTP response from the generate asset with ai response422 operation. */
+export type generateAssetWithAiResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** generateAssetWithAiResponseSuccess represents a declared HTTP response from the generate asset with ai response success operation. */
+export type generateAssetWithAiResponseSuccess = (generateAssetWithAiResponse202) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** generateAssetWithAiResponseError represents a declared HTTP response from the generate asset with ai response error operation. */
+export type generateAssetWithAiResponseError = (generateAssetWithAiResponse404 | generateAssetWithAiResponse409 | generateAssetWithAiResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** generateAssetWithAiResponse represents a declared HTTP response from the generate asset with ai response operation. */
+export type generateAssetWithAiResponse = (generateAssetWithAiResponseSuccess | generateAssetWithAiResponseError)
+
+/** getGenerateAssetWithAiUrl builds the relative URL for its OpenAPI operation. */
+export const getGenerateAssetWithAiUrl = (tenantSlug: string,
+    assetId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/assets/${assetId}:ai-generate`
+}
+
+/**
+ * Performs the generate asset with ai workflow within the authorized request scope.
+ */
+export const generateAssetWithAi = async (tenantSlug: string,
+    assetId: string,
+    assetAiGenerateRequest: AssetAiGenerateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<generateAssetWithAiResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<generateAssetWithAiResponse>(getGenerateAssetWithAiUrl(tenantSlug,assetId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assetAiGenerateRequest)
+  }
+);}
+
+
+
+
+
+/** getGenerateAssetWithAiMutationKey is generated from the Meridian OpenAPI contract for get generate asset with ai mutation key. */
+export const getGenerateAssetWithAiMutationKey = () => ['generateAssetWithAi'] as const;
+
+/** getGenerateAssetWithAiMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getGenerateAssetWithAiMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAssetWithAi>>, TError,GenerateAssetWithAiMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateAssetWithAi>>, TError,GenerateAssetWithAiMutationVariables, TContext> => {
+
+const mutationKey = getGenerateAssetWithAiMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateAssetWithAi>>, GenerateAssetWithAiMutationVariables> = (props) => {
+          const {tenantSlug,assetId,data} = props ?? {};
+
+          return  generateAssetWithAi(tenantSlug,assetId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** GenerateAssetWithAiMutationResult is generated from the Meridian OpenAPI contract for generate asset with ai mutation result. */
+    export type GenerateAssetWithAiMutationResult = NonNullable<Awaited<ReturnType<typeof generateAssetWithAi>>>
+    /** GenerateAssetWithAiMutationBody is the request body type for its generated OpenAPI operation. */
+    export type GenerateAssetWithAiMutationBody = AssetAiGenerateRequest
+    /** GenerateAssetWithAiMutationError is generated from the Meridian OpenAPI contract for generate asset with ai mutation error. */
+    export type GenerateAssetWithAiMutationError = ErrorResponse
+    /** GenerateAssetWithAiMutationVariables is generated from the Meridian OpenAPI contract for generate asset with ai mutation variables. */
+    export type GenerateAssetWithAiMutationVariables = {/** TenantSlug carries the tenant slug value for GenerateAssetWithAiMutationVariables. */ tenantSlug: string;/** AssetId carries the asset id value for GenerateAssetWithAiMutationVariables. */ assetId: string;/** Data contains the decoded response payload. */ data: AssetAiGenerateRequest}
+
+    /** useGenerateAssetWithAi executes its OpenAPI operation through TanStack Vue Query. */
+    export const useGenerateAssetWithAi = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAssetWithAi>>, TError,GenerateAssetWithAiMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof generateAssetWithAi>>,
+        TError,
+        GenerateAssetWithAiMutationVariables,
+        TContext
+      > => {
+      return useMutation(getGenerateAssetWithAiMutationOptions(options), queryClient);
+    }
+    /** previewMergeResponse200 represents a declared HTTP response from the preview merge response200 operation. */
+    export type previewMergeResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: MergePreview
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** previewMergeResponse404 represents a declared HTTP response from the preview merge response404 operation. */
+export type previewMergeResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** previewMergeResponse409 represents a declared HTTP response from the preview merge response409 operation. */
+export type previewMergeResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** previewMergeResponse413 represents a declared HTTP response from the preview merge response413 operation. */
+export type previewMergeResponse413 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 413
+}
+
+/** previewMergeResponse422 represents a declared HTTP response from the preview merge response422 operation. */
+export type previewMergeResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** previewMergeResponseSuccess represents a declared HTTP response from the preview merge response success operation. */
+export type previewMergeResponseSuccess = (previewMergeResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** previewMergeResponseError represents a declared HTTP response from the preview merge response error operation. */
+export type previewMergeResponseError = (previewMergeResponse404 | previewMergeResponse409 | previewMergeResponse413 | previewMergeResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** previewMergeResponse represents a declared HTTP response from the preview merge response operation. */
+export type previewMergeResponse = (previewMergeResponseSuccess | previewMergeResponseError)
+
+/** getPreviewMergeUrl builds the relative URL for its OpenAPI operation. */
+export const getPreviewMergeUrl = (tenantSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/assets:preview-merge`
+}
+
+/**
+ * Performs the preview merge workflow within the authorized request scope.
+ */
+export const previewMerge = async (tenantSlug: string,
+    mergePreviewRequest: MergePreviewRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<previewMergeResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<previewMergeResponse>(getPreviewMergeUrl(tenantSlug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(mergePreviewRequest)
+  }
+);}
+
+
+
+
+
+/** getPreviewMergeMutationKey is generated from the Meridian OpenAPI contract for get preview merge mutation key. */
+export const getPreviewMergeMutationKey = () => ['previewMerge'] as const;
+
+/** getPreviewMergeMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getPreviewMergeMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewMerge>>, TError,PreviewMergeMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof previewMerge>>, TError,PreviewMergeMutationVariables, TContext> => {
+
+const mutationKey = getPreviewMergeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof previewMerge>>, PreviewMergeMutationVariables> = (props) => {
+          const {tenantSlug,data} = props ?? {};
+
+          return  previewMerge(tenantSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** PreviewMergeMutationResult is generated from the Meridian OpenAPI contract for preview merge mutation result. */
+    export type PreviewMergeMutationResult = NonNullable<Awaited<ReturnType<typeof previewMerge>>>
+    /** PreviewMergeMutationBody is the request body type for its generated OpenAPI operation. */
+    export type PreviewMergeMutationBody = MergePreviewRequest
+    /** PreviewMergeMutationError is generated from the Meridian OpenAPI contract for preview merge mutation error. */
+    export type PreviewMergeMutationError = ErrorResponse
+    /** PreviewMergeMutationVariables is generated from the Meridian OpenAPI contract for preview merge mutation variables. */
+    export type PreviewMergeMutationVariables = {/** TenantSlug carries the tenant slug value for PreviewMergeMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: MergePreviewRequest}
+
+    /** usePreviewMerge executes its OpenAPI operation through TanStack Vue Query. */
+    export const usePreviewMerge = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewMerge>>, TError,PreviewMergeMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof previewMerge>>,
+        TError,
+        PreviewMergeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPreviewMergeMutationOptions(options), queryClient);
+    }
+    /** pushAssetRevisionResponse200 represents a declared HTTP response from the push asset revision response200 operation. */
+    export type pushAssetRevisionResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetPushResult
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** pushAssetRevisionResponse201 represents a declared HTTP response from the push asset revision response201 operation. */
+export type pushAssetRevisionResponse201 = {
+  /** Data contains the decoded response payload. */
+  data: AssetPushResult
+  /** Status is the HTTP response status code. */
+  status: 201
+}
+
+/** pushAssetRevisionResponse404 represents a declared HTTP response from the push asset revision response404 operation. */
+export type pushAssetRevisionResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** pushAssetRevisionResponse409 represents a declared HTTP response from the push asset revision response409 operation. */
+export type pushAssetRevisionResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** pushAssetRevisionResponse413 represents a declared HTTP response from the push asset revision response413 operation. */
+export type pushAssetRevisionResponse413 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 413
+}
+
+/** pushAssetRevisionResponse422 represents a declared HTTP response from the push asset revision response422 operation. */
+export type pushAssetRevisionResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** pushAssetRevisionResponseSuccess represents a declared HTTP response from the push asset revision response success operation. */
+export type pushAssetRevisionResponseSuccess = (pushAssetRevisionResponse200 | pushAssetRevisionResponse201) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** pushAssetRevisionResponseError represents a declared HTTP response from the push asset revision response error operation. */
+export type pushAssetRevisionResponseError = (pushAssetRevisionResponse404 | pushAssetRevisionResponse409 | pushAssetRevisionResponse413 | pushAssetRevisionResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** pushAssetRevisionResponse represents a declared HTTP response from the push asset revision response operation. */
+export type pushAssetRevisionResponse = (pushAssetRevisionResponseSuccess | pushAssetRevisionResponseError)
+
+/** getPushAssetRevisionUrl builds the relative URL for its OpenAPI operation. */
+export const getPushAssetRevisionUrl = (tenantSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/assets:push`
+}
+
+/**
+ * Performs the push asset revision workflow within the authorized request scope.
+ */
+export const pushAssetRevision = async (tenantSlug: string,
+    assetPushRequest: AssetPushRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<pushAssetRevisionResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<pushAssetRevisionResponse>(getPushAssetRevisionUrl(tenantSlug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assetPushRequest)
+  }
+);}
+
+
+
+
+
+/** getPushAssetRevisionMutationKey is generated from the Meridian OpenAPI contract for get push asset revision mutation key. */
+export const getPushAssetRevisionMutationKey = () => ['pushAssetRevision'] as const;
+
+/** getPushAssetRevisionMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getPushAssetRevisionMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pushAssetRevision>>, TError,PushAssetRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof pushAssetRevision>>, TError,PushAssetRevisionMutationVariables, TContext> => {
+
+const mutationKey = getPushAssetRevisionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pushAssetRevision>>, PushAssetRevisionMutationVariables> = (props) => {
+          const {tenantSlug,data} = props ?? {};
+
+          return  pushAssetRevision(tenantSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** PushAssetRevisionMutationResult is generated from the Meridian OpenAPI contract for push asset revision mutation result. */
+    export type PushAssetRevisionMutationResult = NonNullable<Awaited<ReturnType<typeof pushAssetRevision>>>
+    /** PushAssetRevisionMutationBody is the request body type for its generated OpenAPI operation. */
+    export type PushAssetRevisionMutationBody = AssetPushRequest
+    /** PushAssetRevisionMutationError is generated from the Meridian OpenAPI contract for push asset revision mutation error. */
+    export type PushAssetRevisionMutationError = ErrorResponse
+    /** PushAssetRevisionMutationVariables is generated from the Meridian OpenAPI contract for push asset revision mutation variables. */
+    export type PushAssetRevisionMutationVariables = {/** TenantSlug carries the tenant slug value for PushAssetRevisionMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: AssetPushRequest}
+
+    /** usePushAssetRevision executes its OpenAPI operation through TanStack Vue Query. */
+    export const usePushAssetRevision = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pushAssetRevision>>, TError,PushAssetRevisionMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof pushAssetRevision>>,
+        TError,
+        PushAssetRevisionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPushAssetRevisionMutationOptions(options), queryClient);
+    }
+    /** generateMissingAssetWithAiResponse202 represents a declared HTTP response from the generate missing asset with ai response202 operation. */
+    export type generateMissingAssetWithAiResponse202 = {
+  /** Data contains the decoded response payload. */
+  data: AiGenerationAccepted
+  /** Status is the HTTP response status code. */
+  status: 202
+}
+
+/** generateMissingAssetWithAiResponse404 represents a declared HTTP response from the generate missing asset with ai response404 operation. */
+export type generateMissingAssetWithAiResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** generateMissingAssetWithAiResponse409 represents a declared HTTP response from the generate missing asset with ai response409 operation. */
+export type generateMissingAssetWithAiResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** generateMissingAssetWithAiResponse422 represents a declared HTTP response from the generate missing asset with ai response422 operation. */
+export type generateMissingAssetWithAiResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** generateMissingAssetWithAiResponseSuccess represents a declared HTTP response from the generate missing asset with ai response success operation. */
+export type generateMissingAssetWithAiResponseSuccess = (generateMissingAssetWithAiResponse202) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** generateMissingAssetWithAiResponseError represents a declared HTTP response from the generate missing asset with ai response error operation. */
+export type generateMissingAssetWithAiResponseError = (generateMissingAssetWithAiResponse404 | generateMissingAssetWithAiResponse409 | generateMissingAssetWithAiResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** generateMissingAssetWithAiResponse represents a declared HTTP response from the generate missing asset with ai response operation. */
+export type generateMissingAssetWithAiResponse = (generateMissingAssetWithAiResponseSuccess | generateMissingAssetWithAiResponseError)
+
+/** getGenerateMissingAssetWithAiUrl builds the relative URL for its OpenAPI operation. */
+export const getGenerateMissingAssetWithAiUrl = (tenantSlug: string,
+    serviceSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/services/${serviceSlug}/assets:ai-generate`
+}
+
+/**
+ * Performs the generate missing asset with ai workflow within the authorized request scope.
+ */
+export const generateMissingAssetWithAi = async (tenantSlug: string,
+    serviceSlug: string,
+    serviceAiGenerateRequest: ServiceAiGenerateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<generateMissingAssetWithAiResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<generateMissingAssetWithAiResponse>(getGenerateMissingAssetWithAiUrl(tenantSlug,serviceSlug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(serviceAiGenerateRequest)
+  }
+);}
+
+
+
+
+
+/** getGenerateMissingAssetWithAiMutationKey is generated from the Meridian OpenAPI contract for get generate missing asset with ai mutation key. */
+export const getGenerateMissingAssetWithAiMutationKey = () => ['generateMissingAssetWithAi'] as const;
+
+/** getGenerateMissingAssetWithAiMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getGenerateMissingAssetWithAiMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateMissingAssetWithAi>>, TError,GenerateMissingAssetWithAiMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateMissingAssetWithAi>>, TError,GenerateMissingAssetWithAiMutationVariables, TContext> => {
+
+const mutationKey = getGenerateMissingAssetWithAiMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateMissingAssetWithAi>>, GenerateMissingAssetWithAiMutationVariables> = (props) => {
+          const {tenantSlug,serviceSlug,data} = props ?? {};
+
+          return  generateMissingAssetWithAi(tenantSlug,serviceSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** GenerateMissingAssetWithAiMutationResult is generated from the Meridian OpenAPI contract for generate missing asset with ai mutation result. */
+    export type GenerateMissingAssetWithAiMutationResult = NonNullable<Awaited<ReturnType<typeof generateMissingAssetWithAi>>>
+    /** GenerateMissingAssetWithAiMutationBody is the request body type for its generated OpenAPI operation. */
+    export type GenerateMissingAssetWithAiMutationBody = ServiceAiGenerateRequest
+    /** GenerateMissingAssetWithAiMutationError is generated from the Meridian OpenAPI contract for generate missing asset with ai mutation error. */
+    export type GenerateMissingAssetWithAiMutationError = ErrorResponse
+    /** GenerateMissingAssetWithAiMutationVariables is generated from the Meridian OpenAPI contract for generate missing asset with ai mutation variables. */
+    export type GenerateMissingAssetWithAiMutationVariables = {/** TenantSlug carries the tenant slug value for GenerateMissingAssetWithAiMutationVariables. */ tenantSlug: string;/** ServiceSlug carries the service slug value for GenerateMissingAssetWithAiMutationVariables. */ serviceSlug: string;/** Data contains the decoded response payload. */ data: ServiceAiGenerateRequest}
+
+    /** useGenerateMissingAssetWithAi executes its OpenAPI operation through TanStack Vue Query. */
+    export const useGenerateMissingAssetWithAi = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateMissingAssetWithAi>>, TError,GenerateMissingAssetWithAiMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof generateMissingAssetWithAi>>,
+        TError,
+        GenerateMissingAssetWithAiMutationVariables,
+        TContext
+      > => {
+      return useMutation(getGenerateMissingAssetWithAiMutationOptions(options), queryClient);
+    }
+    /** listSourceSpecsResponse200 represents a declared HTTP response from the list source specs response200 operation. */
+    export type listSourceSpecsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: SourceSpecList
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listSourceSpecsResponse404 represents a declared HTTP response from the list source specs response404 operation. */
+export type listSourceSpecsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listSourceSpecsResponseSuccess represents a declared HTTP response from the list source specs response success operation. */
+export type listSourceSpecsResponseSuccess = (listSourceSpecsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listSourceSpecsResponseError represents a declared HTTP response from the list source specs response error operation. */
+export type listSourceSpecsResponseError = (listSourceSpecsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listSourceSpecsResponse represents a declared HTTP response from the list source specs response operation. */
+export type listSourceSpecsResponse = (listSourceSpecsResponseSuccess | listSourceSpecsResponseError)
+
+/** getListSourceSpecsUrl builds the relative URL for its OpenAPI operation. */
+export const getListSourceSpecsUrl = (tenantSlug: string,
+    serviceSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/services/${serviceSlug}/sources`
+}
+
+/**
+ * Returns the requested page of source specs within the authorized request scope.
+ */
+export const listSourceSpecs = async (tenantSlug: string,
+    serviceSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listSourceSpecsResponse> => {
+
+  return meridianFetch<listSourceSpecsResponse>(getListSourceSpecsUrl(tenantSlug,serviceSlug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListSourceSpecsQueryKey is generated from the Meridian OpenAPI contract for get list source specs query key. */
+export const getListSourceSpecsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    serviceSlug: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','t',tenantSlug,'services',serviceSlug,'sources'
+    ] as const;
+    }
+
+
+/** getListSourceSpecsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListSourceSpecsQueryOptions = <TData = Awaited<ReturnType<typeof listSourceSpecs>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    serviceSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSourceSpecs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListSourceSpecsQueryKey(tenantSlug,serviceSlug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSourceSpecs>>> = ({ signal }) => listSourceSpecs(toValue(tenantSlug),toValue(serviceSlug), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(serviceSlug) !== null && toValue(serviceSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSourceSpecs>>, TError, TData>
+}
+
+/** ListSourceSpecsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListSourceSpecsQueryResult = NonNullable<Awaited<ReturnType<typeof listSourceSpecs>>>
+/** ListSourceSpecsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListSourceSpecsQueryError = ErrorResponse
+
+
+
+/** useListSourceSpecs executes its OpenAPI operation through TanStack Vue Query. */
+export function useListSourceSpecs<TData = Awaited<ReturnType<typeof listSourceSpecs>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    serviceSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSourceSpecs>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListSourceSpecsQueryOptions(tenantSlug,serviceSlug,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** createSourceSpecResponse201 represents a declared HTTP response from the create source spec response201 operation. */
+export type createSourceSpecResponse201 = {
+  /** Data contains the decoded response payload. */
+  data: SourceSpec
+  /** Status is the HTTP response status code. */
+  status: 201
+}
+
+/** createSourceSpecResponse404 represents a declared HTTP response from the create source spec response404 operation. */
+export type createSourceSpecResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** createSourceSpecResponse409 represents a declared HTTP response from the create source spec response409 operation. */
+export type createSourceSpecResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** createSourceSpecResponse422 represents a declared HTTP response from the create source spec response422 operation. */
+export type createSourceSpecResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** createSourceSpecResponseSuccess represents a declared HTTP response from the create source spec response success operation. */
+export type createSourceSpecResponseSuccess = (createSourceSpecResponse201) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** createSourceSpecResponseError represents a declared HTTP response from the create source spec response error operation. */
+export type createSourceSpecResponseError = (createSourceSpecResponse404 | createSourceSpecResponse409 | createSourceSpecResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** createSourceSpecResponse represents a declared HTTP response from the create source spec response operation. */
+export type createSourceSpecResponse = (createSourceSpecResponseSuccess | createSourceSpecResponseError)
+
+/** getCreateSourceSpecUrl builds the relative URL for its OpenAPI operation. */
+export const getCreateSourceSpecUrl = (tenantSlug: string,
+    serviceSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/services/${serviceSlug}/sources`
+}
+
+/**
+ * Creates source spec within the authorized request scope.
+ */
+export const createSourceSpec = async (tenantSlug: string,
+    serviceSlug: string,
+    sourceSpecCreateRequest: SourceSpecCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createSourceSpecResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<createSourceSpecResponse>(getCreateSourceSpecUrl(tenantSlug,serviceSlug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(sourceSpecCreateRequest)
+  }
+);}
+
+
+
+
+
+/** getCreateSourceSpecMutationKey is generated from the Meridian OpenAPI contract for get create source spec mutation key. */
+export const getCreateSourceSpecMutationKey = () => ['createSourceSpec'] as const;
+
+/** getCreateSourceSpecMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getCreateSourceSpecMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSourceSpec>>, TError,CreateSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSourceSpec>>, TError,CreateSourceSpecMutationVariables, TContext> => {
+
+const mutationKey = getCreateSourceSpecMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSourceSpec>>, CreateSourceSpecMutationVariables> = (props) => {
+          const {tenantSlug,serviceSlug,data} = props ?? {};
+
+          return  createSourceSpec(tenantSlug,serviceSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** CreateSourceSpecMutationResult is generated from the Meridian OpenAPI contract for create source spec mutation result. */
+    export type CreateSourceSpecMutationResult = NonNullable<Awaited<ReturnType<typeof createSourceSpec>>>
+    /** CreateSourceSpecMutationBody is the request body type for its generated OpenAPI operation. */
+    export type CreateSourceSpecMutationBody = SourceSpecCreateRequest
+    /** CreateSourceSpecMutationError is generated from the Meridian OpenAPI contract for create source spec mutation error. */
+    export type CreateSourceSpecMutationError = ErrorResponse
+    /** CreateSourceSpecMutationVariables is generated from the Meridian OpenAPI contract for create source spec mutation variables. */
+    export type CreateSourceSpecMutationVariables = {/** TenantSlug carries the tenant slug value for CreateSourceSpecMutationVariables. */ tenantSlug: string;/** ServiceSlug carries the service slug value for CreateSourceSpecMutationVariables. */ serviceSlug: string;/** Data contains the decoded response payload. */ data: SourceSpecCreateRequest}
+
+    /** useCreateSourceSpec executes its OpenAPI operation through TanStack Vue Query. */
+    export const useCreateSourceSpec = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSourceSpec>>, TError,CreateSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof createSourceSpec>>,
+        TError,
+        CreateSourceSpecMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateSourceSpecMutationOptions(options), queryClient);
+    }
+    /** deleteSourceSpecResponse204 represents a declared HTTP response from the delete source spec response204 operation. */
+    export type deleteSourceSpecResponse204 = {
+  /** Data contains the decoded response payload. */
+  data: void
+  /** Status is the HTTP response status code. */
+  status: 204
+}
+
+/** deleteSourceSpecResponse404 represents a declared HTTP response from the delete source spec response404 operation. */
+export type deleteSourceSpecResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** deleteSourceSpecResponse409 represents a declared HTTP response from the delete source spec response409 operation. */
+export type deleteSourceSpecResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** deleteSourceSpecResponse412 represents a declared HTTP response from the delete source spec response412 operation. */
+export type deleteSourceSpecResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** deleteSourceSpecResponseSuccess represents a declared HTTP response from the delete source spec response success operation. */
+export type deleteSourceSpecResponseSuccess = (deleteSourceSpecResponse204) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** deleteSourceSpecResponseError represents a declared HTTP response from the delete source spec response error operation. */
+export type deleteSourceSpecResponseError = (deleteSourceSpecResponse404 | deleteSourceSpecResponse409 | deleteSourceSpecResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** deleteSourceSpecResponse represents a declared HTTP response from the delete source spec response operation. */
+export type deleteSourceSpecResponse = (deleteSourceSpecResponseSuccess | deleteSourceSpecResponseError)
+
+/** getDeleteSourceSpecUrl builds the relative URL for its OpenAPI operation. */
+export const getDeleteSourceSpecUrl = (tenantSlug: string,
+    sourceId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/sources/${sourceId}`
+}
+
+/**
+ * Deletes the selected source spec within the authorized request scope.
+ */
+export const deleteSourceSpec = async (tenantSlug: string,
+    sourceId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteSourceSpecResponse> => {
+
+  return meridianFetch<deleteSourceSpecResponse>(getDeleteSourceSpecUrl(tenantSlug,sourceId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+/** getDeleteSourceSpecMutationKey is generated from the Meridian OpenAPI contract for get delete source spec mutation key. */
+export const getDeleteSourceSpecMutationKey = () => ['deleteSourceSpec'] as const;
+
+/** getDeleteSourceSpecMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getDeleteSourceSpecMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSourceSpec>>, TError,DeleteSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSourceSpec>>, TError,DeleteSourceSpecMutationVariables, TContext> => {
+
+const mutationKey = getDeleteSourceSpecMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSourceSpec>>, DeleteSourceSpecMutationVariables> = (props) => {
+          const {tenantSlug,sourceId} = props ?? {};
+
+          return  deleteSourceSpec(tenantSlug,sourceId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** DeleteSourceSpecMutationResult is generated from the Meridian OpenAPI contract for delete source spec mutation result. */
+    export type DeleteSourceSpecMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSourceSpec>>>
+
+    /** DeleteSourceSpecMutationError is generated from the Meridian OpenAPI contract for delete source spec mutation error. */
+    export type DeleteSourceSpecMutationError = ErrorResponse
+    /** DeleteSourceSpecMutationVariables is generated from the Meridian OpenAPI contract for delete source spec mutation variables. */
+    export type DeleteSourceSpecMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteSourceSpecMutationVariables. */ tenantSlug: string;/** SourceId carries the source id value for DeleteSourceSpecMutationVariables. */ sourceId: string}
+
+    /** useDeleteSourceSpec executes its OpenAPI operation through TanStack Vue Query. */
+    export const useDeleteSourceSpec = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSourceSpec>>, TError,DeleteSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof deleteSourceSpec>>,
+        TError,
+        DeleteSourceSpecMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteSourceSpecMutationOptions(options), queryClient);
+    }
+    /** updateSourceSpecResponse200 represents a declared HTTP response from the update source spec response200 operation. */
+    export type updateSourceSpecResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: SourceSpec
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** updateSourceSpecResponse404 represents a declared HTTP response from the update source spec response404 operation. */
+export type updateSourceSpecResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** updateSourceSpecResponse409 represents a declared HTTP response from the update source spec response409 operation. */
+export type updateSourceSpecResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** updateSourceSpecResponse412 represents a declared HTTP response from the update source spec response412 operation. */
+export type updateSourceSpecResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** updateSourceSpecResponse422 represents a declared HTTP response from the update source spec response422 operation. */
+export type updateSourceSpecResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** updateSourceSpecResponseSuccess represents a declared HTTP response from the update source spec response success operation. */
+export type updateSourceSpecResponseSuccess = (updateSourceSpecResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** updateSourceSpecResponseError represents a declared HTTP response from the update source spec response error operation. */
+export type updateSourceSpecResponseError = (updateSourceSpecResponse404 | updateSourceSpecResponse409 | updateSourceSpecResponse412 | updateSourceSpecResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** updateSourceSpecResponse represents a declared HTTP response from the update source spec response operation. */
+export type updateSourceSpecResponse = (updateSourceSpecResponseSuccess | updateSourceSpecResponseError)
+
+/** getUpdateSourceSpecUrl builds the relative URL for its OpenAPI operation. */
+export const getUpdateSourceSpecUrl = (tenantSlug: string,
+    sourceId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/sources/${sourceId}`
+}
+
+/**
+ * Updates the selected source spec within the authorized request scope.
+ */
+export const updateSourceSpec = async (tenantSlug: string,
+    sourceId: string,
+    sourceSpecPatchRequest: SourceSpecPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateSourceSpecResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<updateSourceSpecResponse>(getUpdateSourceSpecUrl(tenantSlug,sourceId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(sourceSpecPatchRequest)
+  }
+);}
+
+
+
+
+
+/** getUpdateSourceSpecMutationKey is generated from the Meridian OpenAPI contract for get update source spec mutation key. */
+export const getUpdateSourceSpecMutationKey = () => ['updateSourceSpec'] as const;
+
+/** getUpdateSourceSpecMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getUpdateSourceSpecMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSourceSpec>>, TError,UpdateSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSourceSpec>>, TError,UpdateSourceSpecMutationVariables, TContext> => {
+
+const mutationKey = getUpdateSourceSpecMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSourceSpec>>, UpdateSourceSpecMutationVariables> = (props) => {
+          const {tenantSlug,sourceId,data} = props ?? {};
+
+          return  updateSourceSpec(tenantSlug,sourceId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** UpdateSourceSpecMutationResult is generated from the Meridian OpenAPI contract for update source spec mutation result. */
+    export type UpdateSourceSpecMutationResult = NonNullable<Awaited<ReturnType<typeof updateSourceSpec>>>
+    /** UpdateSourceSpecMutationBody is the request body type for its generated OpenAPI operation. */
+    export type UpdateSourceSpecMutationBody = SourceSpecPatchRequest
+    /** UpdateSourceSpecMutationError is generated from the Meridian OpenAPI contract for update source spec mutation error. */
+    export type UpdateSourceSpecMutationError = ErrorResponse
+    /** UpdateSourceSpecMutationVariables is generated from the Meridian OpenAPI contract for update source spec mutation variables. */
+    export type UpdateSourceSpecMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateSourceSpecMutationVariables. */ tenantSlug: string;/** SourceId carries the source id value for UpdateSourceSpecMutationVariables. */ sourceId: string;/** Data contains the decoded response payload. */ data: SourceSpecPatchRequest}
+
+    /** useUpdateSourceSpec executes its OpenAPI operation through TanStack Vue Query. */
+    export const useUpdateSourceSpec = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSourceSpec>>, TError,UpdateSourceSpecMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof updateSourceSpec>>,
+        TError,
+        UpdateSourceSpecMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateSourceSpecMutationOptions(options), queryClient);
+    }
+    /** listSourceBindingsResponse200 represents a declared HTTP response from the list source bindings response200 operation. */
+    export type listSourceBindingsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: SourceBindingList
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listSourceBindingsResponse404 represents a declared HTTP response from the list source bindings response404 operation. */
+export type listSourceBindingsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listSourceBindingsResponseSuccess represents a declared HTTP response from the list source bindings response success operation. */
+export type listSourceBindingsResponseSuccess = (listSourceBindingsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listSourceBindingsResponseError represents a declared HTTP response from the list source bindings response error operation. */
+export type listSourceBindingsResponseError = (listSourceBindingsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listSourceBindingsResponse represents a declared HTTP response from the list source bindings response operation. */
+export type listSourceBindingsResponse = (listSourceBindingsResponseSuccess | listSourceBindingsResponseError)
+
+/** getListSourceBindingsUrl builds the relative URL for its OpenAPI operation. */
+export const getListSourceBindingsUrl = (tenantSlug: string,
+    sourceId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/sources/${sourceId}/bindings`
+}
+
+/**
+ * Returns the requested page of source bindings within the authorized request scope.
+ */
+export const listSourceBindings = async (tenantSlug: string,
+    sourceId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listSourceBindingsResponse> => {
+
+  return meridianFetch<listSourceBindingsResponse>(getListSourceBindingsUrl(tenantSlug,sourceId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListSourceBindingsQueryKey is generated from the Meridian OpenAPI contract for get list source bindings query key. */
+export const getListSourceBindingsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    sourceId: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','t',tenantSlug,'sources',sourceId,'bindings'
+    ] as const;
+    }
+
+
+/** getListSourceBindingsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListSourceBindingsQueryOptions = <TData = Awaited<ReturnType<typeof listSourceBindings>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    sourceId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSourceBindings>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListSourceBindingsQueryKey(tenantSlug,sourceId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSourceBindings>>> = ({ signal }) => listSourceBindings(toValue(tenantSlug),toValue(sourceId), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(sourceId) !== null && toValue(sourceId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSourceBindings>>, TError, TData>
+}
+
+/** ListSourceBindingsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListSourceBindingsQueryResult = NonNullable<Awaited<ReturnType<typeof listSourceBindings>>>
+/** ListSourceBindingsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListSourceBindingsQueryError = ErrorResponse
+
+
+
+/** useListSourceBindings executes its OpenAPI operation through TanStack Vue Query. */
+export function useListSourceBindings<TData = Awaited<ReturnType<typeof listSourceBindings>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    sourceId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSourceBindings>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListSourceBindingsQueryOptions(tenantSlug,sourceId,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** produceSourceResponse202 represents a declared HTTP response from the produce source response202 operation. */
+export type produceSourceResponse202 = {
+  /** Data contains the decoded response payload. */
+  data: JobAccepted
+  /** Status is the HTTP response status code. */
+  status: 202
+}
+
+/** produceSourceResponse404 represents a declared HTTP response from the produce source response404 operation. */
+export type produceSourceResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** produceSourceResponse409 represents a declared HTTP response from the produce source response409 operation. */
+export type produceSourceResponse409 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 409
+}
+
+/** produceSourceResponseSuccess represents a declared HTTP response from the produce source response success operation. */
+export type produceSourceResponseSuccess = (produceSourceResponse202) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** produceSourceResponseError represents a declared HTTP response from the produce source response error operation. */
+export type produceSourceResponseError = (produceSourceResponse404 | produceSourceResponse409) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** produceSourceResponse represents a declared HTTP response from the produce source response operation. */
+export type produceSourceResponse = (produceSourceResponseSuccess | produceSourceResponseError)
+
+/** getProduceSourceUrl builds the relative URL for its OpenAPI operation. */
+export const getProduceSourceUrl = (tenantSlug: string,
+    sourceId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/sources/${sourceId}:produce`
+}
+
+/**
+ * Performs the produce source workflow within the authorized request scope.
+ */
+export const produceSource = async (tenantSlug: string,
+    sourceId: string,
+    produceSourceRequest: ProduceSourceRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<produceSourceResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<produceSourceResponse>(getProduceSourceUrl(tenantSlug,sourceId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(produceSourceRequest)
+  }
+);}
+
+
+
+
+
+/** getProduceSourceMutationKey is generated from the Meridian OpenAPI contract for get produce source mutation key. */
+export const getProduceSourceMutationKey = () => ['produceSource'] as const;
+
+/** getProduceSourceMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getProduceSourceMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof produceSource>>, TError,ProduceSourceMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof produceSource>>, TError,ProduceSourceMutationVariables, TContext> => {
+
+const mutationKey = getProduceSourceMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof produceSource>>, ProduceSourceMutationVariables> = (props) => {
+          const {tenantSlug,sourceId,data} = props ?? {};
+
+          return  produceSource(tenantSlug,sourceId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** ProduceSourceMutationResult is generated from the Meridian OpenAPI contract for produce source mutation result. */
+    export type ProduceSourceMutationResult = NonNullable<Awaited<ReturnType<typeof produceSource>>>
+    /** ProduceSourceMutationBody is the request body type for its generated OpenAPI operation. */
+    export type ProduceSourceMutationBody = ProduceSourceRequest
+    /** ProduceSourceMutationError is generated from the Meridian OpenAPI contract for produce source mutation error. */
+    export type ProduceSourceMutationError = ErrorResponse
+    /** ProduceSourceMutationVariables is generated from the Meridian OpenAPI contract for produce source mutation variables. */
+    export type ProduceSourceMutationVariables = {/** TenantSlug carries the tenant slug value for ProduceSourceMutationVariables. */ tenantSlug: string;/** SourceId carries the source id value for ProduceSourceMutationVariables. */ sourceId: string;/** Data contains the decoded response payload. */ data: ProduceSourceRequest}
+
+    /** useProduceSource executes its OpenAPI operation through TanStack Vue Query. */
+    export const useProduceSource = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof produceSource>>, TError,ProduceSourceMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof produceSource>>,
+        TError,
+        ProduceSourceMutationVariables,
+        TContext
+      > => {
+      return useMutation(getProduceSourceMutationOptions(options), queryClient);
+    }

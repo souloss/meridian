@@ -24,15 +24,9 @@ export interface AuditEntry {
   action: string;
   /** specifies the resource type associated with this audit entry. */
   resourceType: string;
-  /**
-     * specifies the resource id associated with this audit entry.
-     * @nullable
-     */
+  /** specifies the resource id associated with this audit entry. */
   resourceId: string | null;
-  /**
-     * correlates this result with server logs and audit records.
-     * @nullable
-     */
+  /** correlates this result with server logs and audit records. */
   requestId: string | null;
   /** specifies the metadata associated with this audit entry. */
   metadata: AuditEntryMetadata;

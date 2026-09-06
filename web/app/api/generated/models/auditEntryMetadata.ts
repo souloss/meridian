@@ -9,4 +9,4 @@
 /**
  * specifies the metadata associated with this audit entry.
  */
-export type AuditEntryMetadata = { [key: string]: unknown };
+export type AuditEntryMetadata = {[key: string]: unknown};

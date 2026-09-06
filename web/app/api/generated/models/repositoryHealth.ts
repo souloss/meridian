@@ -14,10 +14,7 @@ import type { Timestamp } from './timestamp.ts';
 export interface RepositoryHealth {
   /** specifies the last sync at associated with this repository health. */
   lastSyncAt: Timestamp | null;
-  /**
-     * specifies the last commit associated with this repository health.
-     * @nullable
-     */
+  /** specifies the last commit associated with this repository health. */
   lastCommit: string | null;
   /** specifies the last error associated with this repository health. */
   lastError: RepositoryError | null;
@@ -29,7 +26,6 @@ export interface RepositoryHealth {
   /**
      * specifies the duration ms associated with this repository health.
      * @minimum 0
-     * @nullable
      */
   durationMs: number | null;
 }

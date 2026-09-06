@@ -8,7 +8,7 @@
 import type { AssetVersionDownloads } from './assetVersionDownloads.ts';
 import type { AssetVersionLabels } from './assetVersionLabels.ts';
 import type { AssetVersionOverlayMode } from './assetVersionOverlayMode.ts';
-import type { CapabilityList } from './capabilityList.ts';
+import type { CapabilityListItem } from './capabilityListItem.ts';
 import type { DiffCounts } from './diffCounts.ts';
 import type { ETag } from './eTag.ts';
 import type { LayerManifestEntry } from './layerManifestEntry.ts';
@@ -63,10 +63,7 @@ export interface AssetVersion {
   mergedHash: string;
   /** contains the ordered layer manifest associated with this asset version. */
   layerManifest: LayerManifestEntry[];
-  /**
-     * specifies the source commit associated with this asset version.
-     * @nullable
-     */
+  /** specifies the source commit associated with this asset version. */
   sourceCommit: string | null;
   /** specifies the baseline version id associated with this asset version. */
   baselineVersionId: Uuid | null;
@@ -81,5 +78,5 @@ export interface AssetVersion {
   /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
   /** lists actions the authenticated principal may perform on this resource. */
-  capabilities: CapabilityList;
+  capabilities: CapabilityListItem;
 }

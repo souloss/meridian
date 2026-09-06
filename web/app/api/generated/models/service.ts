@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { AssetSummary } from './assetSummary.ts';
-import type { CapabilityList } from './capabilityList.ts';
+import type { CapabilityListItem } from './capabilityListItem.ts';
 import type { DriftInfo } from './driftInfo.ts';
 import type { ETag } from './eTag.ts';
 import type { Lifecycle } from './lifecycle.ts';
@@ -31,10 +31,7 @@ export interface Service {
   slug: Slug;
   /** specifies the display name associated with this service. */
   displayName: string;
-  /**
-     * specifies the description associated with this service.
-     * @nullable
-     */
+  /** specifies the description associated with this service. */
   description: string | null;
   /**
      * Empty string means repository root.
@@ -44,13 +41,11 @@ export interface Service {
   /**
      * specifies the language associated with this service.
      * @maxLength 64
-     * @nullable
      */
   language: string | null;
   /**
      * specifies the framework associated with this service.
      * @maxLength 64
-     * @nullable
      */
   framework: string | null;
   /** contains the service visibility associated with this service. */
@@ -70,7 +65,7 @@ export interface Service {
   /** contains the drift info associated with this service. */
   drift: DriftInfo;
   /** lists actions the authenticated principal may perform on this resource. */
-  capabilities: CapabilityList;
+  capabilities: CapabilityListItem;
   /** indicates whether starred applies to this service. */
   starred: boolean;
   /** is the RFC 3339 UTC instant when this resource was created. */

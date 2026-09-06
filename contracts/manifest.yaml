@@ -6,8 +6,8 @@ authority:
   conflictBehavior: fail-validation-no-implicit-precedence
   ownership:
     manifest.yaml: development-toolchain-version-ranges-code-generation-and-build-gates
-    openapi.yaml: http-transport-security-operation-and-wire-schema
-    domain.yaml: domain-enum-state-permission-default-limit-and-behavior
+    openapi.yaml: generated-http-transport-security-operation-and-wire-schema
+    api/*.tsp: http-transport-security-operation-and-wire-schema-source
     storage.yaml: relational-schema-key-index-and-transaction-boundary
     kinds.yaml: asset-kind-plugin-and-content-schema
     views.yaml: built-in-view-registry-and-input-contract
@@ -21,6 +21,7 @@ authority:
     openapiViewSchemas: must-accept-every-built-in-view-from-views.yaml
     storageDomainStates: must-exactly-match-domain.yaml
   roots:
+    apiSource: ./api/main.tsp
     api: ./openapi.yaml
     domain: ./domain.yaml
     views: ./views.yaml
@@ -42,6 +43,8 @@ compatibility:
     optionalFieldAddition: compatible
 generatedArtifacts:
   goAPI: internal/generated/api
+  goAPILayout: common-and-domain-subpackages
+  apiBuild: build/contracts/api
   goRepository: internal/generated/repository
   typescriptClient: web/app/api/generated
   typescriptMocks: web/app/api/generated/mocks
@@ -91,10 +94,14 @@ toolchain:
     localization: {package: '@nuxtjs/i18n', version: '>=10.6.0,<11.0.0'}
     icons: {packages: ['@nuxt/icon', '@iconify-json/lucide'], runtimeNetwork: forbidden}
   openapiGeneration:
+    source: typespec
+    typespec:
+      compiler: '@typespec/compiler'
+      version: '1.15.0'
     go:
       generator: github.com/oapi-codegen/oapi-codegen/v2
       version: '>=2.8.0,<3.0.0'
-      targets: [models, chi-server, strict-server, client, embedded-spec]
+      targets: [models, chi-server, strict-server, embedded-spec]
       requestValidation: github.com/oapi-codegen/nethttp-middleware
     typescript:
       generator: orval

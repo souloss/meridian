@@ -40,7 +40,6 @@ export interface Asset {
      * specifies the quality score associated with this asset.
      * @minimum 0
      * @maximum 100
-     * @nullable
      */
   qualityScore: number | null;
   /** specifies the current version associated with this asset. */

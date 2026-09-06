@@ -8,6 +8,5 @@
 
 /**
  * specifies the ai meta associated with this layer revision.
- * @nullable
  */
-export type LayerRevisionAiMeta = { [key: string]: unknown } | null;
+export type LayerRevisionAiMeta = {[key: string]: unknown} | null;

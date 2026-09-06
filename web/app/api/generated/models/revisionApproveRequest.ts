@@ -13,7 +13,6 @@ export interface RevisionApproveRequest {
   /**
      * specifies the comment associated with this revision approve request.
      * @maxLength 2000
-     * @nullable
      */
   comment?: string | null;
 }

@@ -8,32 +8,35 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
+	auth "github.com/meridian-labs/meridian/internal/generated/api/auth"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
-	openapi_types "github.com/oapi-codegen/runtime/types"
+
+	// Login creates a browser session after verifying local credentials.
+	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
+	tenant "github.com/meridian-labs/meridian/internal/generated/api/tenant"
 )
 
-// Login creates a browser session after verifying local credentials.
-func (s *Server) Login(ctx context.Context, request api.LoginRequestObject) (api.LoginResponseObject, error) {
-	if s.identity == nil || request.Body == nil || request.Body.Password == nil {
+func (s *Server) Login(ctx context.Context, request auth.LoginRequestObject) (auth.LoginResponseObject, error) {
+	if s.identity == nil || request.Body == nil || request.Body.Password == "" {
 		return nil, service.ErrUnauthenticated
 	}
-	result, err := s.identity.Login(ctx, request.Body.Username, *request.Body.Password)
+	result, err := s.identity.Login(ctx, request.Body.Username, request.Body.Password)
 	if err != nil {
 		return nil, err
 	}
 	cookie := sessionCookie(result.SessionToken, result.ExpiresAt, s.secureCookies)
-	return api.Login200JSONResponse{
+	return auth.Login200JSONResponse{
 		Body: api.LoginResult{
 			CsrfToken: result.CSRFToken,
 			Me:        meResponse(result.Principal.User, result.Memberships),
 		},
-		Headers: api.Login200ResponseHeaders{SetCookie: new(cookie.String())},
+		Headers: auth.Login200ResponseHeaders{SetCookie: new(cookie.String())},
 	}, nil
 }
 
 // Logout revokes and clears the current browser session.
-func (s *Server) Logout(ctx context.Context, _ api.LogoutRequestObject) (api.LogoutResponseObject, error) {
+func (s *Server) Logout(ctx context.Context, _ auth.LogoutRequestObject) (auth.LogoutResponseObject, error) {
 	if s.identity == nil {
 		return nil, service.ErrUnauthenticated
 	}
@@ -45,11 +48,11 @@ func (s *Server) Logout(ctx context.Context, _ api.LogoutRequestObject) (api.Log
 		return nil, err
 	}
 	cookie := expiredSessionCookie(s.secureCookies)
-	return api.Logout204Response{Headers: api.Logout204ResponseHeaders{SetCookie: new(cookie.String())}}, nil
+	return auth.Logout204Response{Headers: auth.Logout204ResponseHeaders{SetCookie: new(cookie.String())}}, nil
 }
 
 // GetMe returns the current browser identity and active tenant memberships.
-func (s *Server) GetMe(ctx context.Context, _ api.GetMeRequestObject) (api.GetMeResponseObject, error) {
+func (s *Server) GetMe(ctx context.Context, _ auth.GetMeRequestObject) (auth.GetMeResponseObject, error) {
 	if s.identity == nil {
 		return nil, service.ErrUnauthenticated
 	}
@@ -61,11 +64,11 @@ func (s *Server) GetMe(ctx context.Context, _ api.GetMeRequestObject) (api.GetMe
 	if err != nil {
 		return nil, err
 	}
-	return api.GetMe200JSONResponse(meResponse(user, memberships)), nil
+	return auth.GetMe200JSONResponse(meResponse(user, memberships)), nil
 }
 
 // GetCsrfToken rotates and returns the anti-forgery token for a browser session.
-func (s *Server) GetCsrfToken(ctx context.Context, _ api.GetCsrfTokenRequestObject) (api.GetCsrfTokenResponseObject, error) {
+func (s *Server) GetCsrfToken(ctx context.Context, _ auth.GetCsrfTokenRequestObject) (auth.GetCsrfTokenResponseObject, error) {
 	if s.identity == nil {
 		return nil, service.ErrUnauthenticated
 	}
@@ -77,12 +80,12 @@ func (s *Server) GetCsrfToken(ctx context.Context, _ api.GetCsrfTokenRequestObje
 	if err != nil {
 		return nil, err
 	}
-	return api.GetCsrfToken200JSONResponse{CsrfToken: token}, nil
+	return auth.GetCsrfToken200JSONResponse{CsrfToken: token}, nil
 }
 
 // CreateUser creates a local identity through the platform administration boundary.
-func (s *Server) CreateUser(ctx context.Context, request api.CreateUserRequestObject) (api.CreateUserResponseObject, error) {
-	if s.identity == nil || request.Body == nil || request.Body.Password == nil {
+func (s *Server) CreateUser(ctx context.Context, request platform.CreateUserRequestObject) (platform.CreateUserResponseObject, error) {
+	if s.identity == nil || request.Body == nil || request.Body.Password == "" {
 		return nil, service.ErrValidation
 	}
 	principal, err := principalFromContext(ctx)
@@ -91,7 +94,7 @@ func (s *Server) CreateUser(ctx context.Context, request api.CreateUserRequestOb
 	}
 	user, err := s.identity.CreateUser(ctx, principal, service.CreateUserInput{
 		Username:    request.Body.Username,
-		Password:    *request.Body.Password,
+		Password:    request.Body.Password,
 		DisplayName: request.Body.DisplayName,
 		Email:       optionalEmail(request.Body.Email),
 	})
@@ -99,14 +102,11 @@ func (s *Server) CreateUser(ctx context.Context, request api.CreateUserRequestOb
 		return nil, err
 	}
 	body := userResponse(user)
-	return api.CreateUser201JSONResponse{UserJSONResponse: api.UserJSONResponse{
-		Body:    body,
-		Headers: api.UserResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return platform.CreateUser201JSONResponse{Body: body, Headers: platform.CreateUser201ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // ListUsers returns a paginated platform identity directory without secret fields.
-func (s *Server) ListUsers(ctx context.Context, request api.ListUsersRequestObject) (api.ListUsersResponseObject, error) {
+func (s *Server) ListUsers(ctx context.Context, request platform.ListUsersRequestObject) (platform.ListUsersResponseObject, error) {
 	if s.identity == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -127,13 +127,13 @@ func (s *Server) ListUsers(ctx context.Context, request api.ListUsersRequestObje
 	for _, item := range items {
 		users = append(users, userResponse(item))
 	}
-	return api.ListUsers200JSONResponse{UserPageJSONResponse: api.UserPageJSONResponse(api.UserPage{
+	return platform.ListUsers200JSONResponse(api.UserPage{
 		Items: users, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // CreateTenant creates a tenant with an atomic snapshot of platform defaults.
-func (s *Server) CreateTenant(ctx context.Context, request api.CreateTenantRequestObject) (api.CreateTenantResponseObject, error) {
+func (s *Server) CreateTenant(ctx context.Context, request platform.CreateTenantRequestObject) (platform.CreateTenantResponseObject, error) {
 	if s.identity == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -150,14 +150,11 @@ func (s *Server) CreateTenant(ctx context.Context, request api.CreateTenantReque
 		return nil, err
 	}
 	body := tenantResponse(tenant)
-	return api.CreateTenant201JSONResponse{TenantJSONResponse: api.TenantJSONResponse{
-		Body:    body,
-		Headers: api.TenantResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return platform.CreateTenant201JSONResponse{Body: body, Headers: platform.CreateTenant201ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // ListTenants returns a paginated platform tenant directory across lifecycle states.
-func (s *Server) ListTenants(ctx context.Context, request api.ListTenantsRequestObject) (api.ListTenantsResponseObject, error) {
+func (s *Server) ListTenants(ctx context.Context, request platform.ListTenantsRequestObject) (platform.ListTenantsResponseObject, error) {
 	if s.identity == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
@@ -174,13 +171,13 @@ func (s *Server) ListTenants(ctx context.Context, request api.ListTenantsRequest
 	for _, item := range items {
 		tenants = append(tenants, tenantResponse(item))
 	}
-	return api.ListTenants200JSONResponse{TenantPageJSONResponse: api.TenantPageJSONResponse(api.TenantPage{
+	return platform.ListTenants200JSONResponse(api.TenantPage{
 		Items: tenants, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // UpdateTenant applies a platform tenant patch under the caller's ETag.
-func (s *Server) UpdateTenant(ctx context.Context, request api.UpdateTenantRequestObject) (api.UpdateTenantResponseObject, error) {
+func (s *Server) UpdateTenant(ctx context.Context, request platform.UpdateTenantRequestObject) (platform.UpdateTenantResponseObject, error) {
 	if s.identity == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -201,13 +198,11 @@ func (s *Server) UpdateTenant(ctx context.Context, request api.UpdateTenantReque
 		return nil, err
 	}
 	body := tenantResponse(tenant)
-	return api.UpdateTenant200JSONResponse{TenantJSONResponse: api.TenantJSONResponse{
-		Body: body, Headers: api.TenantResponseHeaders{ETag: new(body.Etag)},
-	}}, nil
+	return platform.UpdateTenant200JSONResponse{Body: body, Headers: platform.UpdateTenant200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
 // PutTenantMemberAsPlatformAdmin creates or replaces one tenant role assignment.
-func (s *Server) PutTenantMemberAsPlatformAdmin(ctx context.Context, request api.PutTenantMemberAsPlatformAdminRequestObject) (api.PutTenantMemberAsPlatformAdminResponseObject, error) {
+func (s *Server) PutTenantMemberAsPlatformAdmin(ctx context.Context, request platform.PutTenantMemberAsPlatformAdminRequestObject) (platform.PutTenantMemberAsPlatformAdminResponseObject, error) {
 	if s.identity == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -219,11 +214,11 @@ func (s *Server) PutTenantMemberAsPlatformAdmin(ctx context.Context, request api
 	if err != nil {
 		return nil, err
 	}
-	return api.PutTenantMemberAsPlatformAdmin200JSONResponse{MemberJSONResponse: api.MemberJSONResponse(memberResponse(user, membership))}, nil
+	return platform.PutTenantMemberAsPlatformAdmin200JSONResponse(memberResponse(user, membership)), nil
 }
 
 // ListTokens returns one page of PAT metadata without bearer values.
-func (s *Server) ListTokens(ctx context.Context, request api.ListTokensRequestObject) (api.ListTokensResponseObject, error) {
+func (s *Server) ListTokens(ctx context.Context, request tenant.ListTokensRequestObject) (tenant.ListTokensResponseObject, error) {
 	if s.identity == nil {
 		return nil, service.ErrUnauthenticated
 	}
@@ -240,13 +235,13 @@ func (s *Server) ListTokens(ctx context.Context, request api.ListTokensRequestOb
 	for _, token := range tokens {
 		items = append(items, tokenResponse(token))
 	}
-	return api.ListTokens200JSONResponse{TokenPageJSONResponse: api.TokenPageJSONResponse(api.TokenPage{
+	return tenant.ListTokens200JSONResponse(api.TokenPage{
 		Items: items, Page: page, PageSize: pageSize, Total: int(total),
-	})}, nil
+	}), nil
 }
 
 // CreateToken creates a PAT and returns its bearer value exactly once.
-func (s *Server) CreateToken(ctx context.Context, request api.CreateTokenRequestObject) (api.CreateTokenResponseObject, error) {
+func (s *Server) CreateToken(ctx context.Context, request tenant.CreateTokenRequestObject) (tenant.CreateTokenResponseObject, error) {
 	if s.identity == nil || request.Body == nil {
 		return nil, service.ErrValidation
 	}
@@ -267,15 +262,15 @@ func (s *Server) CreateToken(ctx context.Context, request api.CreateTokenRequest
 		return nil, err
 	}
 	metadata := tokenResponse(created.Token)
-	return api.CreateToken201JSONResponse{TokenCreatedJSONResponse: api.TokenCreatedJSONResponse(api.TokenCreated{
+	return tenant.CreateToken201JSONResponse(api.TokenCreated{
 		Id: metadata.Id, Name: metadata.Name, Scopes: metadata.Scopes, ExpiresAt: metadata.ExpiresAt,
 		LastUsedAt: metadata.LastUsedAt, RevokedAt: metadata.RevokedAt, CreatedAt: metadata.CreatedAt,
-		Token: new(created.Plaintext),
-	})}, nil
+		Token: created.Plaintext,
+	}), nil
 }
 
 // RevokeToken idempotently revokes a PAT owned by the current browser user.
-func (s *Server) RevokeToken(ctx context.Context, request api.RevokeTokenRequestObject) (api.RevokeTokenResponseObject, error) {
+func (s *Server) RevokeToken(ctx context.Context, request tenant.RevokeTokenRequestObject) (tenant.RevokeTokenResponseObject, error) {
 	if s.identity == nil {
 		return nil, service.ErrUnauthenticated
 	}
@@ -286,7 +281,7 @@ func (s *Server) RevokeToken(ctx context.Context, request api.RevokeTokenRequest
 	if err := s.identity.RevokeToken(ctx, principal, request.TenantSlug, serviceUUID(request.TokenId)); err != nil {
 		return nil, err
 	}
-	return api.RevokeToken204Response{}, nil
+	return tenant.RevokeToken204Response{}, nil
 }
 
 func sessionCookie(token string, expiresAt time.Time, secure bool) http.Cookie {
@@ -315,9 +310,9 @@ func meResponse(user service.User, memberships []service.Membership) api.Me {
 }
 
 func userResponse(user service.User) api.User {
-	email := nullable.NewNullNullable[openapi_types.Email]()
+	email := nullable.NewNullNullable[string]()
 	if user.Email != nil {
-		email = nullable.NewNullableWithValue(openapi_types.Email(*user.Email))
+		email = nullable.NewNullableWithValue(*user.Email)
 	}
 	return api.User{
 		Id: api.Uuid(user.ID), Username: user.Username, DisplayName: user.DisplayName, Email: email,
@@ -352,7 +347,7 @@ func tokenResponse(token service.Token) api.ApiToken {
 	}
 }
 
-func optionalEmail(value nullable.Nullable[openapi_types.Email]) *string {
+func optionalEmail(value nullable.Nullable[string]) *string {
 	if !value.IsSpecified() || value.IsNull() {
 		return nil
 	}

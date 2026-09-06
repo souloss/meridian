@@ -5,6 +5,7 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
+import type { UploadSelectorType } from './uploadSelectorType.ts';
 import type { Uuid } from './uuid.ts';
 
 /**
@@ -12,7 +13,7 @@ import type { Uuid } from './uuid.ts';
  */
 export interface UploadSelector {
   /** specifies the type associated with this upload selector. */
-  type: 'upload';
+  type: UploadSelectorType;
   /** contains the uuid associated with this upload selector. */
   uploadId: Uuid;
 }

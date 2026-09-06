@@ -9,4 +9,4 @@
 /**
  * specifies the display associated with this asset item.
  */
-export type AssetItemDisplay = { [key: string]: unknown };
+export type AssetItemDisplay = {[key: string]: unknown};

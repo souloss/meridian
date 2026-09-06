@@ -27,145 +27,182 @@ import {
   TokenScope
 } from '../../models';
 import type {
-  ConnectionTestResponse,
-  CredentialPageResponse,
-  CredentialResponse,
-  CredentialRotationResponse,
-  JobAcceptedResponse,
+  ConnectionTest,
+  Credential,
+  CredentialPage,
+  CredentialRotationResult,
+  JobAccepted,
+  KnownHost,
   KnownHostCandidate,
-  KnownHostPageResponse,
-  KnownHostResponse,
-  MemberPageResponse,
-  MemberResponse,
-  ProducerProfileOptionListResponse,
-  TagListResponse,
-  TagResponse,
-  TeamPageResponse,
-  TeamResponse,
-  TenantSettingsResponse,
-  TokenCreatedResponse,
-  TokenPageResponse,
-  UserPageResponse
+  KnownHostPage,
+  Member,
+  MemberPage,
+  ProducerProfileOptionList,
+  Tag,
+  TagList,
+  Team,
+  TeamPage,
+  TenantSettings,
+  TokenCreated,
+  TokenPage,
+  UserPage
 } from '../../models';
 
 
-/** getGetTenantSettingsResponseMock provides generated MSW behavior for contract tests. */
-export const getGetTenantSettingsResponseMock = (overrideResponse: Partial<Extract<TenantSettingsResponse, object>> = {}): TenantSettingsResponse => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), externalRevisionTrustMode: faker.helpers.arrayElement(Object.values(ExternalRevisionTrustMode)), autoPublish: faker.datatype.boolean(), defaultLocale: faker.helpers.arrayElement(['zh-CN','en'] as const), defaultAiProducerProfileId: faker.helpers.arrayElement([faker.string.uuid(), null]), retention: {jobLogsDays: faker.number.int({min: 1, max: 3650}), archivedRevisionsDays: faker.number.int({min: 1, max: 3650})}, ...overrideResponse})
-
-/** getUpdateTenantSettingsResponseMock provides generated MSW behavior for contract tests. */
-export const getUpdateTenantSettingsResponseMock = (overrideResponse: Partial<Extract<TenantSettingsResponse, object>> = {}): TenantSettingsResponse => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), externalRevisionTrustMode: faker.helpers.arrayElement(Object.values(ExternalRevisionTrustMode)), autoPublish: faker.datatype.boolean(), defaultLocale: faker.helpers.arrayElement(['zh-CN','en'] as const), defaultAiProducerProfileId: faker.helpers.arrayElement([faker.string.uuid(), null]), retention: {jobLogsDays: faker.number.int({min: 1, max: 3650}), archivedRevisionsDays: faker.number.int({min: 1, max: 3650})}, ...overrideResponse})
-
-/** getListAvailableProducerProfilesResponseMock provides generated MSW behavior for contract tests. */
-export const getListAvailableProducerProfilesResponseMock = (overrideResponse: Partial<Extract<ProducerProfileOptionListResponse, object>> = {}): ProducerProfileOptionListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(ProducerProfileKind)), supportedKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"))), network: faker.helpers.arrayElement(Object.values(ProducerNetworkMode)), dependencyStatus: faker.helpers.arrayElement(Object.values(ProducerDependencyStatus)), unavailableReason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])})), ...overrideResponse})
-
-/** getSearchTenantUsersResponseMock provides generated MSW behavior for contract tests. */
-export const getSearchTenantUsersResponseMock = (): UserPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
-
-/** getListTenantMembersResponseMock provides generated MSW behavior for contract tests. */
-export const getListTenantMembersResponseMock = (): MemberPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({user: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, role: faker.helpers.arrayElement(Object.values(TenantRole)), joinedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
-
-/** getPutTenantMemberResponseMock provides generated MSW behavior for contract tests. */
-export const getPutTenantMemberResponseMock = (overrideResponse: Partial<Extract<MemberResponse, object>> = {}): MemberResponse => ({user: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, role: faker.helpers.arrayElement(Object.values(TenantRole)), joinedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getListTokensResponseMock provides generated MSW behavior for contract tests. */
-export const getListTokensResponseMock = (): TokenPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 1, max: 64}}), scopes: faker.helpers.arrayElements(Object.values(TokenScope)), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), revokedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
-
-/** getCreateTokenResponseMock provides generated MSW behavior for contract tests. */
-export const getCreateTokenResponseMock = (overrideResponse: Partial<Extract<TokenCreatedResponse, object>> = {}): TokenCreatedResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 1, max: 64}}), scopes: faker.helpers.arrayElements(Object.values(TokenScope)), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), revokedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', token: faker.helpers.fromRegExp("^pat_"), ...overrideResponse})
-
 /** getListCredentialsResponseMock provides generated MSW behavior for contract tests. */
-export const getListCredentialsResponseMock = (): CredentialPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), sharedScope: faker.helpers.arrayElement(['private','team','tenant'] as const), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), isGlobal: faker.datatype.boolean(), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
+export const getListCredentialsResponseMock = (overrideResponse: Partial<Extract<CredentialPage, object>> = {}): CredentialPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), sharedScope: faker.helpers.arrayElement(['private','team','tenant'] as const), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), isGlobal: faker.datatype.boolean(), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
 /** getCreateCredentialResponseMock provides generated MSW behavior for contract tests. */
-export const getCreateCredentialResponseMock = (overrideResponse: Partial<Extract<CredentialResponse, object>> = {}): CredentialResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), sharedScope: faker.helpers.arrayElement(['private','team','tenant'] as const), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), isGlobal: faker.datatype.boolean(), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+export const getCreateCredentialResponseMock = (overrideResponse: Partial<Extract<Credential, object>> = {}): Credential => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), sharedScope: faker.helpers.arrayElement(['private','team','tenant'] as const), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), isGlobal: faker.datatype.boolean(), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 /** getUpdateCredentialResponseMock provides generated MSW behavior for contract tests. */
-export const getUpdateCredentialResponseMock = (overrideResponse: Partial<Extract<CredentialResponse, object>> = {}): CredentialResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), sharedScope: faker.helpers.arrayElement(['private','team','tenant'] as const), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), isGlobal: faker.datatype.boolean(), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+export const getUpdateCredentialResponseMock = (overrideResponse: Partial<Extract<Credential, object>> = {}): Credential => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), sharedScope: faker.helpers.arrayElement(['private','team','tenant'] as const), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), isGlobal: faker.datatype.boolean(), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getRotateCredentialResponseMock provides generated MSW behavior for contract tests. */
+export const getRotateCredentialResponseMock = (overrideResponse: Partial<Extract<CredentialRotationResult, object>> = {}): CredentialRotationResult => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), credential: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), sharedScope: faker.helpers.arrayElement(['private','team','tenant'] as const), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), isGlobal: faker.datatype.boolean(), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, syncJobs: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({tenantSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), repositoryId: faker.string.uuid(), jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean()})), ...overrideResponse})
 
 /** getTestCredentialResponseKnownHostCandidateMock provides generated MSW behavior for contract tests. */
 export const getTestCredentialResponseKnownHostCandidateMock = (overrideResponse: Partial<KnownHostCandidate> = {}): KnownHostCandidate => ({...{host: faker.string.alpha({length: {min: 1, max: 255}}), port: faker.number.int({min: 1, max: 65535}), keyType: faker.helpers.arrayElement(['ssh-ed25519','ssh-rsa'] as const), publicKey: faker.helpers.fromRegExp("^[A-Za-z0-9+/]+={0,2}$"), fingerprint: faker.helpers.fromRegExp("^SHA256:[A-Za-z0-9+/]{43}$")}, ...overrideResponse});
 
 /** getTestCredentialResponseMock provides generated MSW behavior for contract tests. */
-export const getTestCredentialResponseMock = (overrideResponse: Partial<Extract<ConnectionTestResponse, object>> = {}): ConnectionTestResponse => ({ok: faker.datatype.boolean(), errorClass: faker.helpers.arrayElement([faker.helpers.arrayElement(['dns','auth','host_key','timeout','other'] as const), null]), message: faker.string.alpha({length: {min: 10, max: 20}}), hostKeyCandidate: faker.helpers.arrayElement([{...getTestCredentialResponseKnownHostCandidateMock()},null,]), ...overrideResponse})
+export const getTestCredentialResponseMock = (overrideResponse: Partial<Extract<ConnectionTest, object>> = {}): ConnectionTest => ({ok: faker.datatype.boolean(), errorClass: faker.helpers.arrayElement([faker.helpers.arrayElement(['dns','auth','host_key','timeout','other'] as const),null,null,]), message: faker.string.alpha({length: {min: 10, max: 20}}), hostKeyCandidate: faker.helpers.arrayElement([{...getTestCredentialResponseKnownHostCandidateMock()},null,]), ...overrideResponse})
 
-/** getRotateCredentialResponseMock provides generated MSW behavior for contract tests. */
-export const getRotateCredentialResponseMock = (overrideResponse: Partial<Extract<CredentialRotationResponse, object>> = {}): CredentialRotationResponse => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), credential: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), kind: faker.helpers.arrayElement(Object.values(CredentialKind)), fingerprint: faker.helpers.fromRegExp("^(?:SHA256:[A-Za-z0-9+/]{43}|HMAC-SHA256:[A-Za-z0-9_-]{43})$"), sharedScope: faker.helpers.arrayElement(['private','team','tenant'] as const), teamIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), isGlobal: faker.datatype.boolean(), createdBy: faker.string.uuid(), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, syncJobs: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({tenantSlug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), repositoryId: faker.string.uuid(), jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean()})), ...overrideResponse})
-
-/** getListKnownHostsResponseMock provides generated MSW behavior for contract tests. */
-export const getListKnownHostsResponseMock = (): KnownHostPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), host: faker.string.alpha({length: {min: 1, max: 255}}), port: faker.number.int({min: 1, max: 65535}), keyType: faker.helpers.arrayElement(['ssh-ed25519','ssh-rsa'] as const), fingerprint: faker.helpers.fromRegExp("^SHA256:[A-Za-z0-9+/]{43}$"), source: faker.helpers.arrayElement(['manual','accept_new'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
-
-/** getCreateKnownHostResponseMock provides generated MSW behavior for contract tests. */
-export const getCreateKnownHostResponseMock = (overrideResponse: Partial<Extract<KnownHostResponse, object>> = {}): KnownHostResponse => ({id: faker.string.uuid(), host: faker.string.alpha({length: {min: 1, max: 255}}), port: faker.number.int({min: 1, max: 65535}), keyType: faker.helpers.arrayElement(['ssh-ed25519','ssh-rsa'] as const), fingerprint: faker.helpers.fromRegExp("^SHA256:[A-Za-z0-9+/]{43}$"), source: faker.helpers.arrayElement(['manual','accept_new'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getListTeamsResponseMock provides generated MSW behavior for contract tests. */
-export const getListTeamsResponseMock = (): TeamPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
-
-/** getCreateTeamResponseMock provides generated MSW behavior for contract tests. */
-export const getCreateTeamResponseMock = (overrideResponse: Partial<Extract<TeamResponse, object>> = {}): TeamResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getGetTeamResponseMock provides generated MSW behavior for contract tests. */
-export const getGetTeamResponseMock = (overrideResponse: Partial<Extract<TeamResponse, object>> = {}): TeamResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getUpdateTeamResponseMock provides generated MSW behavior for contract tests. */
-export const getUpdateTeamResponseMock = (overrideResponse: Partial<Extract<TeamResponse, object>> = {}): TeamResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getReplaceTeamMembersResponseMock provides generated MSW behavior for contract tests. */
-export const getReplaceTeamMembersResponseMock = (overrideResponse: Partial<Extract<TeamResponse, object>> = {}): TeamResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getListTagsResponseMock provides generated MSW behavior for contract tests. */
-export const getListTagsResponseMock = (): TagListResponse => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), color: faker.helpers.arrayElement([faker.helpers.fromRegExp("^#[0-9A-Fa-f]{6}$"), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
-
-/** getCreateTagResponseMock provides generated MSW behavior for contract tests. */
-export const getCreateTagResponseMock = (overrideResponse: Partial<Extract<TagResponse, object>> = {}): TagResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), color: faker.helpers.arrayElement([faker.helpers.fromRegExp("^#[0-9A-Fa-f]{6}$"), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getUpdateTagResponseMock provides generated MSW behavior for contract tests. */
-export const getUpdateTagResponseMock = (overrideResponse: Partial<Extract<TagResponse, object>> = {}): TagResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), color: faker.helpers.arrayElement([faker.helpers.fromRegExp("^#[0-9A-Fa-f]{6}$"), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+/** getSearchTenantUsersResponseMock provides generated MSW behavior for contract tests. */
+export const getSearchTenantUsersResponseMock = (overrideResponse: Partial<Extract<UserPage, object>> = {}): UserPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.internet.email(), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
 /** getCreateTenantExportResponseMock provides generated MSW behavior for contract tests. */
-export const getCreateTenantExportResponseMock = (overrideResponse: Partial<Extract<JobAcceptedResponse, object>> = {}): JobAcceptedResponse => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
+export const getCreateTenantExportResponseMock = (overrideResponse: Partial<Extract<JobAccepted, object>> = {}): JobAccepted => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
+
+/** getListKnownHostsResponseMock provides generated MSW behavior for contract tests. */
+export const getListKnownHostsResponseMock = (overrideResponse: Partial<Extract<KnownHostPage, object>> = {}): KnownHostPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), host: faker.string.alpha({length: {min: 1, max: 255}}), port: faker.number.int({min: 1, max: 65535}), keyType: faker.helpers.arrayElement(['ssh-ed25519','ssh-rsa'] as const), fingerprint: faker.helpers.fromRegExp("^SHA256:[A-Za-z0-9+/]{43}$"), source: faker.helpers.arrayElement(['manual','accept_new'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
+
+/** getCreateKnownHostResponseMock provides generated MSW behavior for contract tests. */
+export const getCreateKnownHostResponseMock = (overrideResponse: Partial<Extract<KnownHost, object>> = {}): KnownHost => ({id: faker.string.uuid(), host: faker.string.alpha({length: {min: 1, max: 255}}), port: faker.number.int({min: 1, max: 65535}), keyType: faker.helpers.arrayElement(['ssh-ed25519','ssh-rsa'] as const), fingerprint: faker.helpers.fromRegExp("^SHA256:[A-Za-z0-9+/]{43}$"), source: faker.helpers.arrayElement(['manual','accept_new'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getListTenantMembersResponseMock provides generated MSW behavior for contract tests. */
+export const getListTenantMembersResponseMock = (overrideResponse: Partial<Extract<MemberPage, object>> = {}): MemberPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({user: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.internet.email(), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, role: faker.helpers.arrayElement(Object.values(TenantRole)), joinedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
+
+/** getPutTenantMemberResponseMock provides generated MSW behavior for contract tests. */
+export const getPutTenantMemberResponseMock = (overrideResponse: Partial<Extract<Member, object>> = {}): Member => ({user: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.internet.email(), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, role: faker.helpers.arrayElement(Object.values(TenantRole)), joinedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getListAvailableProducerProfilesResponseMock provides generated MSW behavior for contract tests. */
+export const getListAvailableProducerProfilesResponseMock = (overrideResponse: Partial<Extract<ProducerProfileOptionList, object>> = {}): ProducerProfileOptionList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(ProducerProfileKind)), supportedKinds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"))), network: faker.helpers.arrayElement(Object.values(ProducerNetworkMode)), dependencyStatus: faker.helpers.arrayElement(Object.values(ProducerDependencyStatus)), unavailableReason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,])})), ...overrideResponse})
+
+/** getGetTenantSettingsResponseMock provides generated MSW behavior for contract tests. */
+export const getGetTenantSettingsResponseMock = (overrideResponse: Partial<Extract<TenantSettings, object>> = {}): TenantSettings => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), externalRevisionTrustMode: faker.helpers.arrayElement(Object.values(ExternalRevisionTrustMode)), autoPublish: faker.datatype.boolean(), defaultLocale: faker.helpers.arrayElement(['zh-CN','en'] as const), defaultAiProducerProfileId: faker.string.uuid(), retention: {jobLogsDays: faker.number.int({min: 1, max: 3650}), archivedRevisionsDays: faker.number.int({min: 1, max: 3650})}, ...overrideResponse})
+
+/** getUpdateTenantSettingsResponseMock provides generated MSW behavior for contract tests. */
+export const getUpdateTenantSettingsResponseMock = (overrideResponse: Partial<Extract<TenantSettings, object>> = {}): TenantSettings => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), externalRevisionTrustMode: faker.helpers.arrayElement(Object.values(ExternalRevisionTrustMode)), autoPublish: faker.datatype.boolean(), defaultLocale: faker.helpers.arrayElement(['zh-CN','en'] as const), defaultAiProducerProfileId: faker.string.uuid(), retention: {jobLogsDays: faker.number.int({min: 1, max: 3650}), archivedRevisionsDays: faker.number.int({min: 1, max: 3650})}, ...overrideResponse})
+
+/** getListTagsResponseMock provides generated MSW behavior for contract tests. */
+export const getListTagsResponseMock = (): TagList => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), color: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
+
+/** getCreateTagResponseMock provides generated MSW behavior for contract tests. */
+export const getCreateTagResponseMock = (overrideResponse: Partial<Extract<Tag, object>> = {}): Tag => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), color: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getUpdateTagResponseMock provides generated MSW behavior for contract tests. */
+export const getUpdateTagResponseMock = (overrideResponse: Partial<Extract<Tag, object>> = {}): Tag => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 1, max: 64}}), color: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getListTeamsResponseMock provides generated MSW behavior for contract tests. */
+export const getListTeamsResponseMock = (overrideResponse: Partial<Extract<TeamPage, object>> = {}): TeamPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
+
+/** getCreateTeamResponseMock provides generated MSW behavior for contract tests. */
+export const getCreateTeamResponseMock = (overrideResponse: Partial<Extract<Team, object>> = {}): Team => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getGetTeamResponseMock provides generated MSW behavior for contract tests. */
+export const getGetTeamResponseMock = (overrideResponse: Partial<Extract<Team, object>> = {}): Team => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getUpdateTeamResponseMock provides generated MSW behavior for contract tests. */
+export const getUpdateTeamResponseMock = (overrideResponse: Partial<Extract<Team, object>> = {}): Team => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getReplaceTeamMembersResponseMock provides generated MSW behavior for contract tests. */
+export const getReplaceTeamMembersResponseMock = (overrideResponse: Partial<Extract<Team, object>> = {}): Team => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 1, max: 128}}), memberIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getListTokensResponseMock provides generated MSW behavior for contract tests. */
+export const getListTokensResponseMock = (overrideResponse: Partial<Extract<TokenPage, object>> = {}): TokenPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 1, max: 64}}), scopes: faker.helpers.arrayElements(Object.values(TokenScope)), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), revokedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
+
+/** getCreateTokenResponseMock provides generated MSW behavior for contract tests. */
+export const getCreateTokenResponseMock = (overrideResponse: Partial<Extract<TokenCreated, object>> = {}): TokenCreated => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 1, max: 64}}), scopes: faker.helpers.arrayElements(Object.values(TokenScope)), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), lastUsedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), revokedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', token: faker.helpers.fromRegExp("^pat_"), ...overrideResponse})
 
 
-/** getGetTenantSettingsMockHandler provides generated MSW behavior for contract tests. */
-export const getGetTenantSettingsMockHandler = (overrideResponse?: TenantSettingsResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TenantSettingsResponse> | TenantSettingsResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/settings', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+/** getListCredentialsMockHandler provides generated MSW behavior for contract tests. */
+export const getListCredentialsMockHandler = (overrideResponse?: CredentialPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CredentialPage> | CredentialPage), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/credentials', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetTenantSettingsResponseMock(),
+    : getListCredentialsResponseMock(),
       { status: 200
       })
   }, options)
 }
 
-/** getUpdateTenantSettingsMockHandler provides generated MSW behavior for contract tests. */
-export const getUpdateTenantSettingsMockHandler = (overrideResponse?: TenantSettingsResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<TenantSettingsResponse> | TenantSettingsResponse), options?: RequestHandlerOptions) => {
-  return http.patch('*/api/v1/t/:tenantSlug/settings', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+/** getCreateCredentialMockHandler provides generated MSW behavior for contract tests. */
+export const getCreateCredentialMockHandler = (overrideResponse?: Credential | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Credential> | Credential), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/credentials', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getUpdateTenantSettingsResponseMock(),
+    : getCreateCredentialResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+/** getDeleteCredentialMockHandler provides generated MSW behavior for contract tests. */
+export const getDeleteCredentialMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete('*/api/v1/t/:tenantSlug/credentials/:credentialId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+/** getUpdateCredentialMockHandler provides generated MSW behavior for contract tests. */
+export const getUpdateCredentialMockHandler = (overrideResponse?: Credential | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<Credential> | Credential), options?: RequestHandlerOptions) => {
+  return http.patch('*/api/v1/t/:tenantSlug/credentials/:credentialId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUpdateCredentialResponseMock(),
       { status: 200
       })
   }, options)
 }
 
-/** getListAvailableProducerProfilesMockHandler provides generated MSW behavior for contract tests. */
-export const getListAvailableProducerProfilesMockHandler = (overrideResponse?: ProducerProfileOptionListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProducerProfileOptionListResponse> | ProducerProfileOptionListResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/producer-profiles', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+/** getRotateCredentialMockHandler provides generated MSW behavior for contract tests. */
+export const getRotateCredentialMockHandler = (overrideResponse?: CredentialRotationResult | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CredentialRotationResult> | CredentialRotationResult), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/credentials/:credentialId\\:rotate', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListAvailableProducerProfilesResponseMock(),
+    : getRotateCredentialResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getTestCredentialMockHandler provides generated MSW behavior for contract tests. */
+export const getTestCredentialMockHandler = (overrideResponse?: ConnectionTest | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ConnectionTest> | ConnectionTest), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/credentials/:credentialId\\:test', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTestCredentialResponseMock(),
       { status: 200
       })
   }, options)
 }
 
 /** getSearchTenantUsersMockHandler provides generated MSW behavior for contract tests. */
-export const getSearchTenantUsersMockHandler = (overrideResponse?: UserPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserPageResponse> | UserPageResponse), options?: RequestHandlerOptions) => {
+export const getSearchTenantUsersMockHandler = (overrideResponse?: UserPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserPage> | UserPage), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/directory/users', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
@@ -177,27 +214,53 @@ export const getSearchTenantUsersMockHandler = (overrideResponse?: UserPageRespo
   }, options)
 }
 
+/** getCreateTenantExportMockHandler provides generated MSW behavior for contract tests. */
+export const getCreateTenantExportMockHandler = (overrideResponse?: JobAccepted | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAccepted> | JobAccepted), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/exports', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCreateTenantExportResponseMock(),
+      { status: 202
+      })
+  }, options)
+}
+
+/** getListKnownHostsMockHandler provides generated MSW behavior for contract tests. */
+export const getListKnownHostsMockHandler = (overrideResponse?: KnownHostPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<KnownHostPage> | KnownHostPage), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/known-hosts', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListKnownHostsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getCreateKnownHostMockHandler provides generated MSW behavior for contract tests. */
+export const getCreateKnownHostMockHandler = (overrideResponse?: KnownHost | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<KnownHost> | KnownHost), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/known-hosts', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCreateKnownHostResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
 /** getListTenantMembersMockHandler provides generated MSW behavior for contract tests. */
-export const getListTenantMembersMockHandler = (overrideResponse?: MemberPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MemberPageResponse> | MemberPageResponse), options?: RequestHandlerOptions) => {
+export const getListTenantMembersMockHandler = (overrideResponse?: MemberPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MemberPage> | MemberPage), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/members', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getListTenantMembersResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getPutTenantMemberMockHandler provides generated MSW behavior for contract tests. */
-export const getPutTenantMemberMockHandler = (overrideResponse?: MemberResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<MemberResponse> | MemberResponse), options?: RequestHandlerOptions) => {
-  return http.put('*/api/v1/t/:tenantSlug/members/:userId', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getPutTenantMemberResponseMock(),
       { status: 200
       })
   }, options)
@@ -214,8 +277,186 @@ export const getDeleteTenantMemberMockHandler = (overrideResponse?: void | ((inf
   }, options)
 }
 
+/** getPutTenantMemberMockHandler provides generated MSW behavior for contract tests. */
+export const getPutTenantMemberMockHandler = (overrideResponse?: Member | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Member> | Member), options?: RequestHandlerOptions) => {
+  return http.put('*/api/v1/t/:tenantSlug/members/:userId', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPutTenantMemberResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getListAvailableProducerProfilesMockHandler provides generated MSW behavior for contract tests. */
+export const getListAvailableProducerProfilesMockHandler = (overrideResponse?: ProducerProfileOptionList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProducerProfileOptionList> | ProducerProfileOptionList), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/producer-profiles', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListAvailableProducerProfilesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getGetTenantSettingsMockHandler provides generated MSW behavior for contract tests. */
+export const getGetTenantSettingsMockHandler = (overrideResponse?: TenantSettings | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TenantSettings> | TenantSettings), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/settings', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetTenantSettingsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getUpdateTenantSettingsMockHandler provides generated MSW behavior for contract tests. */
+export const getUpdateTenantSettingsMockHandler = (overrideResponse?: TenantSettings | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<TenantSettings> | TenantSettings), options?: RequestHandlerOptions) => {
+  return http.patch('*/api/v1/t/:tenantSlug/settings', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUpdateTenantSettingsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getListTagsMockHandler provides generated MSW behavior for contract tests. */
+export const getListTagsMockHandler = (overrideResponse?: TagList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TagList> | TagList), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/tags', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListTagsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getCreateTagMockHandler provides generated MSW behavior for contract tests. */
+export const getCreateTagMockHandler = (overrideResponse?: Tag | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Tag> | Tag), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/tags', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCreateTagResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+/** getDeleteTagMockHandler provides generated MSW behavior for contract tests. */
+export const getDeleteTagMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete('*/api/v1/t/:tenantSlug/tags/:tagId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+/** getUpdateTagMockHandler provides generated MSW behavior for contract tests. */
+export const getUpdateTagMockHandler = (overrideResponse?: Tag | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<Tag> | Tag), options?: RequestHandlerOptions) => {
+  return http.patch('*/api/v1/t/:tenantSlug/tags/:tagId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUpdateTagResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getListTeamsMockHandler provides generated MSW behavior for contract tests. */
+export const getListTeamsMockHandler = (overrideResponse?: TeamPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TeamPage> | TeamPage), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/teams', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListTeamsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getCreateTeamMockHandler provides generated MSW behavior for contract tests. */
+export const getCreateTeamMockHandler = (overrideResponse?: Team | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Team> | Team), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/teams', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCreateTeamResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+/** getDeleteTeamMockHandler provides generated MSW behavior for contract tests. */
+export const getDeleteTeamMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete('*/api/v1/t/:tenantSlug/teams/:teamId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+/** getGetTeamMockHandler provides generated MSW behavior for contract tests. */
+export const getGetTeamMockHandler = (overrideResponse?: Team | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Team> | Team), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/teams/:teamId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetTeamResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getUpdateTeamMockHandler provides generated MSW behavior for contract tests. */
+export const getUpdateTeamMockHandler = (overrideResponse?: Team | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<Team> | Team), options?: RequestHandlerOptions) => {
+  return http.patch('*/api/v1/t/:tenantSlug/teams/:teamId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUpdateTeamResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getReplaceTeamMembersMockHandler provides generated MSW behavior for contract tests. */
+export const getReplaceTeamMembersMockHandler = (overrideResponse?: Team | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Team> | Team), options?: RequestHandlerOptions) => {
+  return http.put('*/api/v1/t/:tenantSlug/teams/:teamId/members', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getReplaceTeamMembersResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 /** getListTokensMockHandler provides generated MSW behavior for contract tests. */
-export const getListTokensMockHandler = (overrideResponse?: TokenPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TokenPageResponse> | TokenPageResponse), options?: RequestHandlerOptions) => {
+export const getListTokensMockHandler = (overrideResponse?: TokenPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TokenPage> | TokenPage), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/tokens', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
@@ -228,7 +469,7 @@ export const getListTokensMockHandler = (overrideResponse?: TokenPageResponse | 
 }
 
 /** getCreateTokenMockHandler provides generated MSW behavior for contract tests. */
-export const getCreateTokenMockHandler = (overrideResponse?: TokenCreatedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<TokenCreatedResponse> | TokenCreatedResponse), options?: RequestHandlerOptions) => {
+export const getCreateTokenMockHandler = (overrideResponse?: TokenCreated | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<TokenCreated> | TokenCreated), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/tokens', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
 
@@ -250,276 +491,35 @@ export const getRevokeTokenMockHandler = (overrideResponse?: void | ((info: Para
       })
   }, options)
 }
-
-/** getListCredentialsMockHandler provides generated MSW behavior for contract tests. */
-export const getListCredentialsMockHandler = (overrideResponse?: CredentialPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CredentialPageResponse> | CredentialPageResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/credentials', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListCredentialsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getCreateCredentialMockHandler provides generated MSW behavior for contract tests. */
-export const getCreateCredentialMockHandler = (overrideResponse?: CredentialResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CredentialResponse> | CredentialResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/credentials', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getCreateCredentialResponseMock(),
-      { status: 201
-      })
-  }, options)
-}
-
-/** getUpdateCredentialMockHandler provides generated MSW behavior for contract tests. */
-export const getUpdateCredentialMockHandler = (overrideResponse?: CredentialResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<CredentialResponse> | CredentialResponse), options?: RequestHandlerOptions) => {
-  return http.patch('*/api/v1/t/:tenantSlug/credentials/:credentialId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getUpdateCredentialResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getDeleteCredentialMockHandler provides generated MSW behavior for contract tests. */
-export const getDeleteCredentialMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.delete('*/api/v1/t/:tenantSlug/credentials/:credentialId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-
-    return new HttpResponse(null,
-      { status: 204
-      })
-  }, options)
-}
-
-/** getTestCredentialMockHandler provides generated MSW behavior for contract tests. */
-export const getTestCredentialMockHandler = (overrideResponse?: ConnectionTestResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ConnectionTestResponse> | ConnectionTestResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/credentials/:credentialId\\:test', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getTestCredentialResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getRotateCredentialMockHandler provides generated MSW behavior for contract tests. */
-export const getRotateCredentialMockHandler = (overrideResponse?: CredentialRotationResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CredentialRotationResponse> | CredentialRotationResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/credentials/:credentialId\\:rotate', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getRotateCredentialResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getListKnownHostsMockHandler provides generated MSW behavior for contract tests. */
-export const getListKnownHostsMockHandler = (overrideResponse?: KnownHostPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<KnownHostPageResponse> | KnownHostPageResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/known-hosts', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListKnownHostsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getCreateKnownHostMockHandler provides generated MSW behavior for contract tests. */
-export const getCreateKnownHostMockHandler = (overrideResponse?: KnownHostResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<KnownHostResponse> | KnownHostResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/known-hosts', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getCreateKnownHostResponseMock(),
-      { status: 201
-      })
-  }, options)
-}
-
-/** getListTeamsMockHandler provides generated MSW behavior for contract tests. */
-export const getListTeamsMockHandler = (overrideResponse?: TeamPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TeamPageResponse> | TeamPageResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/teams', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListTeamsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getCreateTeamMockHandler provides generated MSW behavior for contract tests. */
-export const getCreateTeamMockHandler = (overrideResponse?: TeamResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<TeamResponse> | TeamResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/teams', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getCreateTeamResponseMock(),
-      { status: 201
-      })
-  }, options)
-}
-
-/** getGetTeamMockHandler provides generated MSW behavior for contract tests. */
-export const getGetTeamMockHandler = (overrideResponse?: TeamResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TeamResponse> | TeamResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/teams/:teamId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetTeamResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getUpdateTeamMockHandler provides generated MSW behavior for contract tests. */
-export const getUpdateTeamMockHandler = (overrideResponse?: TeamResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<TeamResponse> | TeamResponse), options?: RequestHandlerOptions) => {
-  return http.patch('*/api/v1/t/:tenantSlug/teams/:teamId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getUpdateTeamResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getDeleteTeamMockHandler provides generated MSW behavior for contract tests. */
-export const getDeleteTeamMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.delete('*/api/v1/t/:tenantSlug/teams/:teamId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-
-    return new HttpResponse(null,
-      { status: 204
-      })
-  }, options)
-}
-
-/** getReplaceTeamMembersMockHandler provides generated MSW behavior for contract tests. */
-export const getReplaceTeamMembersMockHandler = (overrideResponse?: TeamResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<TeamResponse> | TeamResponse), options?: RequestHandlerOptions) => {
-  return http.put('*/api/v1/t/:tenantSlug/teams/:teamId/members', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getReplaceTeamMembersResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getListTagsMockHandler provides generated MSW behavior for contract tests. */
-export const getListTagsMockHandler = (overrideResponse?: TagListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TagListResponse> | TagListResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/tags', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListTagsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getCreateTagMockHandler provides generated MSW behavior for contract tests. */
-export const getCreateTagMockHandler = (overrideResponse?: TagResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<TagResponse> | TagResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/tags', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getCreateTagResponseMock(),
-      { status: 201
-      })
-  }, options)
-}
-
-/** getUpdateTagMockHandler provides generated MSW behavior for contract tests. */
-export const getUpdateTagMockHandler = (overrideResponse?: TagResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<TagResponse> | TagResponse), options?: RequestHandlerOptions) => {
-  return http.patch('*/api/v1/t/:tenantSlug/tags/:tagId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getUpdateTagResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getDeleteTagMockHandler provides generated MSW behavior for contract tests. */
-export const getDeleteTagMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.delete('*/api/v1/t/:tenantSlug/tags/:tagId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-
-    return new HttpResponse(null,
-      { status: 204
-      })
-  }, options)
-}
-
-/** getCreateTenantExportMockHandler provides generated MSW behavior for contract tests. */
-export const getCreateTenantExportMockHandler = (overrideResponse?: JobAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAcceptedResponse> | JobAcceptedResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/exports', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getCreateTenantExportResponseMock(),
-      { status: 202
-      })
-  }, options)
-}
 /** getTenantMock provides generated MSW behavior for contract tests. */
 export const getTenantMock = () => [
-  getGetTenantSettingsMockHandler(),
-  getUpdateTenantSettingsMockHandler(),
-  getListAvailableProducerProfilesMockHandler(),
-  getSearchTenantUsersMockHandler(),
-  getListTenantMembersMockHandler(),
-  getPutTenantMemberMockHandler(),
-  getDeleteTenantMemberMockHandler(),
-  getListTokensMockHandler(),
-  getCreateTokenMockHandler(),
-  getRevokeTokenMockHandler(),
   getListCredentialsMockHandler(),
   getCreateCredentialMockHandler(),
-  getUpdateCredentialMockHandler(),
   getDeleteCredentialMockHandler(),
-  getTestCredentialMockHandler(),
+  getUpdateCredentialMockHandler(),
   getRotateCredentialMockHandler(),
+  getTestCredentialMockHandler(),
+  getSearchTenantUsersMockHandler(),
+  getCreateTenantExportMockHandler(),
   getListKnownHostsMockHandler(),
   getCreateKnownHostMockHandler(),
-  getListTeamsMockHandler(),
-  getCreateTeamMockHandler(),
-  getGetTeamMockHandler(),
-  getUpdateTeamMockHandler(),
-  getDeleteTeamMockHandler(),
-  getReplaceTeamMembersMockHandler(),
+  getListTenantMembersMockHandler(),
+  getDeleteTenantMemberMockHandler(),
+  getPutTenantMemberMockHandler(),
+  getListAvailableProducerProfilesMockHandler(),
+  getGetTenantSettingsMockHandler(),
+  getUpdateTenantSettingsMockHandler(),
   getListTagsMockHandler(),
   getCreateTagMockHandler(),
-  getUpdateTagMockHandler(),
   getDeleteTagMockHandler(),
-  getCreateTenantExportMockHandler()
+  getUpdateTagMockHandler(),
+  getListTeamsMockHandler(),
+  getCreateTeamMockHandler(),
+  getDeleteTeamMockHandler(),
+  getGetTeamMockHandler(),
+  getUpdateTeamMockHandler(),
+  getReplaceTeamMembersMockHandler(),
+  getListTokensMockHandler(),
+  getCreateTokenMockHandler(),
+  getRevokeTokenMockHandler()
 ]

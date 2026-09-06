@@ -18,10 +18,7 @@ export interface PublicService {
   slug: Slug;
   /** specifies the display name associated with this public service. */
   displayName: string;
-  /**
-     * specifies the description associated with this public service.
-     * @nullable
-     */
+  /** specifies the description associated with this public service. */
   description: string | null;
   /** contains the lifecycle associated with this public service. */
   lifecycle: Lifecycle;

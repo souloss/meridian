@@ -48,7 +48,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 | --- | --- | --- | --- |
 | Go 1.27.1、Node 24 LTS、pnpm 11 与 vfox 工具链 | 已完成 | 切片门禁已通过 | `b29514f`，`.vfox.toml`、Makefile |
 | `cmd/meridian` 单入口、Nuxt 静态产物嵌入、健康检查和 API/static 404 边界 | 已完成 | 后端自动化覆盖存在；M0 全量前端 Spike 尚未放行 | `b29514f`，`internal/handler/server_test.go` |
-| OpenAPI 驱动的 oapi-codegen/Orval 生成和无漂移检查 | 已完成 | 生成门禁已建立 | `b29514f`、`5e3a45a`、`ddeae8d` |
+| OpenAPI canonical bundle、oapi-codegen/Orval 生成和无漂移检查 | 已完成 | 拆分源与 canonical 语义等价；12 个领域 server 包、统一路由装配、公共 models/spec 与前端生成门禁均已接入 | `scripts/bundle-openapi.sh`、`generate.go`、`internal/handler/domain_adapters.gen.go` |
 | 生成 API 导出声明/字段注释与应用 DDL 每列注释 | 已完成 | OpenAPI/生成 Go 导出注释和实际迁移列注释均由契约测试强制 | `5e3a45a`，`internal/contracttest/openapi_documentation_test.go`，`internal/contracttest/storage_documentation_test.go` |
 | Goose 应用迁移、River 迁移及 up/down/up 生命周期 | 已完成 | SMK-001 的数据库主路径已有集成覆盖，里程碑 Smoke 尚未统一放行 | `ab1635f`、`7ef39f8`，`internal/database/database_integration_test.go` |
 | sqlc + pgx 强类型持久化基础 | 已完成 | 切片门禁已通过 | `ddeae8d` |

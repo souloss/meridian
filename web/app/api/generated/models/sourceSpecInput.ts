@@ -16,7 +16,7 @@ import type { Uuid } from './uuid.ts';
 /**
  * represents source spec input data exchanged through the Meridian API.
  */
-export type SourceSpecInput = unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown & ({
+export interface SourceSpecInput {
   /** contains the kind id associated with this source spec input. */
   kind: KindId;
   /** specifies the asset name template associated with this source spec input. */
@@ -30,7 +30,6 @@ export type SourceSpecInput = unknown & unknown & unknown & unknown & unknown & 
   /**
      * specifies the path associated with this source spec input.
      * @maxLength 512
-     * @nullable
      */
   path?: string | null;
   /** specifies the producer profile id associated with this source spec input. */
@@ -57,4 +56,4 @@ export type SourceSpecInput = unknown & unknown & unknown & unknown & unknown & 
   replaceAiBase?: boolean;
   /** Required only for manual mode; the asset must belong to the path service and match kind. */
   targetAssetId?: Uuid | null;
-});
+}

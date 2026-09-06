@@ -9,4 +9,4 @@
 /**
  * specifies the default options associated with this view definition.
  */
-export type ViewDefinitionDefaultOptions = { [key: string]: unknown };
+export type ViewDefinitionDefaultOptions = {[key: string]: unknown};

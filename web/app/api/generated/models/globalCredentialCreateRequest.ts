@@ -13,24 +13,24 @@ import type { SshSecretInput } from './sshSecretInput.ts';
  */
 export type GlobalCredentialCreateRequest = {
   /**
-     * specifies the name associated with this global credential create request.
+     * specifies the name value.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
-  /** specifies the kind associated with this global credential create request. */
+  /** specifies the kind value. */
   kind: 'ssh_key';
-  /** contains the ssh secret input associated with this global credential create request. */
+  /** specifies the sshKey value. */
   sshKey: SshSecretInput;
 } | {
   /**
-     * specifies the name associated with this global credential create request.
+     * specifies the name value.
      * @minLength 1
      * @maxLength 64
      */
   name: string;
-  /** specifies the kind associated with this global credential create request. */
+  /** specifies the kind value. */
   kind: 'http_token';
-  /** contains the http secret input associated with this global credential create request. */
+  /** specifies the httpToken value. */
   httpToken: HttpSecretInput;
 };

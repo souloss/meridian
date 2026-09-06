@@ -9,4 +9,4 @@
 /**
  * represents subscription scope constraints data exchanged through the Meridian API.
  */
-export type SubscriptionScopeConstraints = unknown & unknown & unknown;
+export interface SubscriptionScopeConstraints { [key: string]: unknown }

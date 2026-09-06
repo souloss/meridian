@@ -13,10 +13,7 @@ import type { LayerRole } from './layerRole.ts';
 export interface LayerPatchRequest {
   /** contains the layer role associated with this layer patch request. */
   role?: LayerRole;
-  /**
-     * specifies the dialect associated with this layer patch request.
-     * @nullable
-     */
+  /** specifies the dialect associated with this layer patch request. */
   dialect?: string | null;
   /** indicates whether enabled applies to this layer patch request. */
   enabled?: boolean;

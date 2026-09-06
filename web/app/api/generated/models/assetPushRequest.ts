@@ -45,14 +45,8 @@ export interface AssetPushRequest {
   contentType: ContentType;
   /** specifies the role associated with this asset push request. */
   role?: LayerRole;
-  /**
-     * specifies the dialect associated with this asset push request.
-     * @nullable
-     */
+  /** specifies the dialect associated with this asset push request. */
   dialect?: string | null;
-  /**
-     * specifies the source commit associated with this asset push request.
-     * @nullable
-     */
+  /** specifies the source commit associated with this asset push request. */
   sourceCommit?: string | null;
 }

@@ -24,62 +24,101 @@ import {
   TodoStatus
 } from '../../models';
 import type {
-  AuditLogPageResponse,
-  BreakingTodoPageResponse,
-  BreakingTodoResponse,
-  CommentPageResponse,
-  CommentResponse,
-  JobAcceptedResponse,
-  NotificationChannelListResponse,
-  NotificationChannelResponse,
-  NotificationPageResponse,
-  SubscriptionListResponse,
-  SubscriptionResponse
+  AuditLogPage,
+  BreakingTodo,
+  BreakingTodoPage,
+  Comment,
+  CommentPage,
+  JobAccepted,
+  NotificationChannel,
+  NotificationChannelList,
+  NotificationPage,
+  Subscription,
+  SubscriptionList
 } from '../../models';
 
 
-/** getListNotificationChannelsResponseMock provides generated MSW behavior for contract tests. */
-export const getListNotificationChannelsResponseMock = (overrideResponse: Partial<Extract<NotificationChannelListResponse, object>> = {}): NotificationChannelListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(NotificationChannelKind)), enabled: faker.datatype.boolean(), endpoint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), secretConfigured: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
-
-/** getCreateNotificationChannelResponseMock provides generated MSW behavior for contract tests. */
-export const getCreateNotificationChannelResponseMock = (overrideResponse: Partial<Extract<NotificationChannelResponse, object>> = {}): NotificationChannelResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(NotificationChannelKind)), enabled: faker.datatype.boolean(), endpoint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), secretConfigured: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getUpdateNotificationChannelResponseMock provides generated MSW behavior for contract tests. */
-export const getUpdateNotificationChannelResponseMock = (overrideResponse: Partial<Extract<NotificationChannelResponse, object>> = {}): NotificationChannelResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(NotificationChannelKind)), enabled: faker.datatype.boolean(), endpoint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), secretConfigured: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getTestNotificationChannelResponseMock provides generated MSW behavior for contract tests. */
-export const getTestNotificationChannelResponseMock = (overrideResponse: Partial<Extract<JobAcceptedResponse, object>> = {}): JobAcceptedResponse => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
-
-/** getRotateNotificationChannelSecretResponseMock provides generated MSW behavior for contract tests. */
-export const getRotateNotificationChannelSecretResponseMock = (overrideResponse: Partial<Extract<NotificationChannelResponse, object>> = {}): NotificationChannelResponse => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(NotificationChannelKind)), enabled: faker.datatype.boolean(), endpoint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), secretConfigured: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getListServiceCommentsResponseMock provides generated MSW behavior for contract tests. */
-export const getListServiceCommentsResponseMock = (): CommentPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), serviceId: faker.string.uuid(), author: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, body: faker.string.alpha({length: {min: 10, max: 20}}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
-
-/** getCreateServiceCommentResponseMock provides generated MSW behavior for contract tests. */
-export const getCreateServiceCommentResponseMock = (overrideResponse: Partial<Extract<CommentResponse, object>> = {}): CommentResponse => ({id: faker.string.uuid(), serviceId: faker.string.uuid(), author: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.helpers.arrayElement([faker.internet.email(), null]), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, body: faker.string.alpha({length: {min: 10, max: 20}}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-
-/** getListSubscriptionsResponseMock provides generated MSW behavior for contract tests. */
-export const getListSubscriptionsResponseMock = (overrideResponse: Partial<Extract<SubscriptionListResponse, object>> = {}): SubscriptionListResponse => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({...{}, id: faker.string.uuid(), eventTypes: faker.helpers.arrayElements(Object.values(DomainEventType)), scopeType: faker.helpers.arrayElement(Object.values(SubscriptionScopeType)), scopeId: faker.helpers.arrayElement([faker.string.uuid(),faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"),null,]), channelIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), enabled: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
-
-/** getPutSubscriptionResponseMock provides generated MSW behavior for contract tests. */
-export const getPutSubscriptionResponseMock = (): SubscriptionResponse => ({...{}, id: faker.string.uuid(), eventTypes: faker.helpers.arrayElements(Object.values(DomainEventType)), scopeType: faker.helpers.arrayElement(Object.values(SubscriptionScopeType)), scopeId: faker.helpers.arrayElement([faker.string.uuid(),faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"),null,]), channelIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), enabled: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})
-
-/** getListNotificationsResponseMock provides generated MSW behavior for contract tests. */
-export const getListNotificationsResponseMock = (): NotificationPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), eventType: faker.helpers.arrayElement(Object.values(DomainEventType)), title: faker.string.alpha({length: {min: 10, max: 20}}), body: faker.string.alpha({length: {min: 10, max: 20}}), resourceUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), readAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), unreadCount: faker.number.int({min: 0})},})
+/** getListAuditLogsResponseMock provides generated MSW behavior for contract tests. */
+export const getListAuditLogsResponseMock = (overrideResponse: Partial<Extract<AuditLogPage, object>> = {}): AuditLogPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), tenantSlug: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"),null,]), actorId: faker.helpers.arrayElement([faker.string.uuid(),null,]), action: faker.string.alpha({length: {min: 10, max: 20}}), resourceType: faker.string.alpha({length: {min: 10, max: 20}}), resourceId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), requestId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), metadata: {}, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
 /** getListBreakingTodosResponseMock provides generated MSW behavior for contract tests. */
-export const getListBreakingTodosResponseMock = (): BreakingTodoPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), assetVersionId: faker.string.uuid(), assigneeId: faker.string.uuid(), status: faker.helpers.arrayElement(Object.values(TodoStatus)), summary: {added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, comment: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acknowledgedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])}))},})
+export const getListBreakingTodosResponseMock = (overrideResponse: Partial<Extract<BreakingTodoPage, object>> = {}): BreakingTodoPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), assetVersionId: faker.string.uuid(), assigneeId: faker.string.uuid(), status: faker.helpers.arrayElement(Object.values(TodoStatus)), summary: {added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, comment: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acknowledgedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), ...overrideResponse})
 
 /** getAcknowledgeBreakingTodoResponseMock provides generated MSW behavior for contract tests. */
-export const getAcknowledgeBreakingTodoResponseMock = (overrideResponse: Partial<Extract<BreakingTodoResponse, object>> = {}): BreakingTodoResponse => ({id: faker.string.uuid(), assetVersionId: faker.string.uuid(), assigneeId: faker.string.uuid(), status: faker.helpers.arrayElement(Object.values(TodoStatus)), summary: {added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, comment: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acknowledgedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), ...overrideResponse})
+export const getAcknowledgeBreakingTodoResponseMock = (overrideResponse: Partial<Extract<BreakingTodo, object>> = {}): BreakingTodo => ({id: faker.string.uuid(), assetVersionId: faker.string.uuid(), assigneeId: faker.string.uuid(), status: faker.helpers.arrayElement(Object.values(TodoStatus)), summary: {added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, comment: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acknowledgedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), ...overrideResponse})
 
-/** getListAuditLogsResponseMock provides generated MSW behavior for contract tests. */
-export const getListAuditLogsResponseMock = (): AuditLogPageResponse => ({...{total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100})},...{items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), tenantSlug: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"),null,]), actorId: faker.helpers.arrayElement([faker.string.uuid(),null,]), action: faker.string.alpha({length: {min: 10, max: 20}}), resourceType: faker.string.alpha({length: {min: 10, max: 20}}), resourceId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), requestId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), metadata: {}, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}))},})
+/** getListNotificationChannelsResponseMock provides generated MSW behavior for contract tests. */
+export const getListNotificationChannelsResponseMock = (overrideResponse: Partial<Extract<NotificationChannelList, object>> = {}): NotificationChannelList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(NotificationChannelKind)), enabled: faker.datatype.boolean(), endpoint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), secretConfigured: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
+/** getCreateNotificationChannelResponseMock provides generated MSW behavior for contract tests. */
+export const getCreateNotificationChannelResponseMock = (overrideResponse: Partial<Extract<NotificationChannel, object>> = {}): NotificationChannel => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(NotificationChannelKind)), enabled: faker.datatype.boolean(), endpoint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), secretConfigured: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getUpdateNotificationChannelResponseMock provides generated MSW behavior for contract tests. */
+export const getUpdateNotificationChannelResponseMock = (overrideResponse: Partial<Extract<NotificationChannel, object>> = {}): NotificationChannel => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(NotificationChannelKind)), enabled: faker.datatype.boolean(), endpoint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), secretConfigured: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getRotateNotificationChannelSecretResponseMock provides generated MSW behavior for contract tests. */
+export const getRotateNotificationChannelSecretResponseMock = (overrideResponse: Partial<Extract<NotificationChannel, object>> = {}): NotificationChannel => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), name: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.helpers.arrayElement(Object.values(NotificationChannelKind)), enabled: faker.datatype.boolean(), endpoint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), secretConfigured: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getTestNotificationChannelResponseMock provides generated MSW behavior for contract tests. */
+export const getTestNotificationChannelResponseMock = (overrideResponse: Partial<Extract<JobAccepted, object>> = {}): JobAccepted => ({jobId: faker.string.uuid(), deduplicated: faker.datatype.boolean(), ...overrideResponse})
+
+/** getListNotificationsResponseMock provides generated MSW behavior for contract tests. */
+export const getListNotificationsResponseMock = (overrideResponse: Partial<Extract<NotificationPage, object>> = {}): NotificationPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), eventType: faker.helpers.arrayElement(Object.values(DomainEventType)), title: faker.string.alpha({length: {min: 10, max: 20}}), body: faker.string.alpha({length: {min: 10, max: 20}}), resourceUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), readAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), unreadCount: faker.number.int({min: 0}), ...overrideResponse})
+
+/** getListServiceCommentsResponseMock provides generated MSW behavior for contract tests. */
+export const getListServiceCommentsResponseMock = (overrideResponse: Partial<Extract<CommentPage, object>> = {}): CommentPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), serviceId: faker.string.uuid(), author: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.internet.email(), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, body: faker.string.alpha({length: {min: 10, max: 20}}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
+
+/** getCreateServiceCommentResponseMock provides generated MSW behavior for contract tests. */
+export const getCreateServiceCommentResponseMock = (overrideResponse: Partial<Extract<Comment, object>> = {}): Comment => ({id: faker.string.uuid(), serviceId: faker.string.uuid(), author: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.internet.email(), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, body: faker.string.alpha({length: {min: 10, max: 20}}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+/** getListSubscriptionsResponseMock provides generated MSW behavior for contract tests. */
+export const getListSubscriptionsResponseMock = (overrideResponse: Partial<Extract<SubscriptionList, object>> = {}): SubscriptionList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), eventTypes: faker.helpers.arrayElements(Object.values(DomainEventType)), scopeType: faker.helpers.arrayElement(Object.values(SubscriptionScopeType)), scopeId: faker.helpers.arrayElement([faker.string.uuid(),faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"),null,]), channelIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), enabled: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
+
+/** getPutSubscriptionResponseMock provides generated MSW behavior for contract tests. */
+export const getPutSubscriptionResponseMock = (overrideResponse: Partial<Extract<Subscription, object>> = {}): Subscription => ({id: faker.string.uuid(), eventTypes: faker.helpers.arrayElements(Object.values(DomainEventType)), scopeType: faker.helpers.arrayElement(Object.values(SubscriptionScopeType)), scopeId: faker.helpers.arrayElement([faker.string.uuid(),faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"),null,]), channelIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), enabled: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+
+/** getListAuditLogsMockHandler provides generated MSW behavior for contract tests. */
+export const getListAuditLogsMockHandler = (overrideResponse?: AuditLogPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AuditLogPage> | AuditLogPage), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/audit-logs', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListAuditLogsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getListBreakingTodosMockHandler provides generated MSW behavior for contract tests. */
+export const getListBreakingTodosMockHandler = (overrideResponse?: BreakingTodoPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<BreakingTodoPage> | BreakingTodoPage), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/breaking-todos', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListBreakingTodosResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+/** getAcknowledgeBreakingTodoMockHandler provides generated MSW behavior for contract tests. */
+export const getAcknowledgeBreakingTodoMockHandler = (overrideResponse?: BreakingTodo | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<BreakingTodo> | BreakingTodo), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/breaking-todos/:todoId\\:ack', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAcknowledgeBreakingTodoResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 
 /** getListNotificationChannelsMockHandler provides generated MSW behavior for contract tests. */
-export const getListNotificationChannelsMockHandler = (overrideResponse?: NotificationChannelListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<NotificationChannelListResponse> | NotificationChannelListResponse), options?: RequestHandlerOptions) => {
+export const getListNotificationChannelsMockHandler = (overrideResponse?: NotificationChannelList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<NotificationChannelList> | NotificationChannelList), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/notification-channels', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
@@ -92,7 +131,7 @@ export const getListNotificationChannelsMockHandler = (overrideResponse?: Notifi
 }
 
 /** getCreateNotificationChannelMockHandler provides generated MSW behavior for contract tests. */
-export const getCreateNotificationChannelMockHandler = (overrideResponse?: NotificationChannelResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<NotificationChannelResponse> | NotificationChannelResponse), options?: RequestHandlerOptions) => {
+export const getCreateNotificationChannelMockHandler = (overrideResponse?: NotificationChannel | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<NotificationChannel> | NotificationChannel), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/notification-channels', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
 
@@ -100,19 +139,6 @@ export const getCreateNotificationChannelMockHandler = (overrideResponse?: Notif
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getCreateNotificationChannelResponseMock(),
       { status: 201
-      })
-  }, options)
-}
-
-/** getUpdateNotificationChannelMockHandler provides generated MSW behavior for contract tests. */
-export const getUpdateNotificationChannelMockHandler = (overrideResponse?: NotificationChannelResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<NotificationChannelResponse> | NotificationChannelResponse), options?: RequestHandlerOptions) => {
-  return http.patch('*/api/v1/t/:tenantSlug/notification-channels/:channelId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getUpdateNotificationChannelResponseMock(),
-      { status: 200
       })
   }, options)
 }
@@ -128,21 +154,21 @@ export const getDeleteNotificationChannelMockHandler = (overrideResponse?: void 
   }, options)
 }
 
-/** getTestNotificationChannelMockHandler provides generated MSW behavior for contract tests. */
-export const getTestNotificationChannelMockHandler = (overrideResponse?: JobAcceptedResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAcceptedResponse> | JobAcceptedResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/notification-channels/:channelId\\:test', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+/** getUpdateNotificationChannelMockHandler provides generated MSW behavior for contract tests. */
+export const getUpdateNotificationChannelMockHandler = (overrideResponse?: NotificationChannel | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<NotificationChannel> | NotificationChannel), options?: RequestHandlerOptions) => {
+  return http.patch('*/api/v1/t/:tenantSlug/notification-channels/:channelId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getTestNotificationChannelResponseMock(),
-      { status: 202
+    : getUpdateNotificationChannelResponseMock(),
+      { status: 200
       })
   }, options)
 }
 
 /** getRotateNotificationChannelSecretMockHandler provides generated MSW behavior for contract tests. */
-export const getRotateNotificationChannelSecretMockHandler = (overrideResponse?: NotificationChannelResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<NotificationChannelResponse> | NotificationChannelResponse), options?: RequestHandlerOptions) => {
+export const getRotateNotificationChannelSecretMockHandler = (overrideResponse?: NotificationChannel | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<NotificationChannel> | NotificationChannel), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/t/:tenantSlug/notification-channels/:channelId\\:rotate', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
 
@@ -154,60 +180,21 @@ export const getRotateNotificationChannelSecretMockHandler = (overrideResponse?:
   }, options)
 }
 
-/** getListServiceCommentsMockHandler provides generated MSW behavior for contract tests. */
-export const getListServiceCommentsMockHandler = (overrideResponse?: CommentPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CommentPageResponse> | CommentPageResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/services/:serviceSlug/comments', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+/** getTestNotificationChannelMockHandler provides generated MSW behavior for contract tests. */
+export const getTestNotificationChannelMockHandler = (overrideResponse?: JobAccepted | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<JobAccepted> | JobAccepted), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/notification-channels/:channelId\\:test', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListServiceCommentsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getCreateServiceCommentMockHandler provides generated MSW behavior for contract tests. */
-export const getCreateServiceCommentMockHandler = (overrideResponse?: CommentResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CommentResponse> | CommentResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/services/:serviceSlug/comments', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getCreateServiceCommentResponseMock(),
-      { status: 201
-      })
-  }, options)
-}
-
-/** getListSubscriptionsMockHandler provides generated MSW behavior for contract tests. */
-export const getListSubscriptionsMockHandler = (overrideResponse?: SubscriptionListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<SubscriptionListResponse> | SubscriptionListResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/subscriptions', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListSubscriptionsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-/** getPutSubscriptionMockHandler provides generated MSW behavior for contract tests. */
-export const getPutSubscriptionMockHandler = (overrideResponse?: SubscriptionResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<SubscriptionResponse> | SubscriptionResponse), options?: RequestHandlerOptions) => {
-  return http.put('*/api/v1/t/:tenantSlug/subscriptions', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getPutSubscriptionResponseMock(),
-      { status: 200
+    : getTestNotificationChannelResponseMock(),
+      { status: 202
       })
   }, options)
 }
 
 /** getListNotificationsMockHandler provides generated MSW behavior for contract tests. */
-export const getListNotificationsMockHandler = (overrideResponse?: NotificationPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<NotificationPageResponse> | NotificationPageResponse), options?: RequestHandlerOptions) => {
+export const getListNotificationsMockHandler = (overrideResponse?: NotificationPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<NotificationPage> | NotificationPage), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/t/:tenantSlug/notifications', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
@@ -241,60 +228,73 @@ export const getMarkAllNotificationsReadMockHandler = (overrideResponse?: void |
   }, options)
 }
 
-/** getListBreakingTodosMockHandler provides generated MSW behavior for contract tests. */
-export const getListBreakingTodosMockHandler = (overrideResponse?: BreakingTodoPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<BreakingTodoPageResponse> | BreakingTodoPageResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/breaking-todos', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+/** getListServiceCommentsMockHandler provides generated MSW behavior for contract tests. */
+export const getListServiceCommentsMockHandler = (overrideResponse?: CommentPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CommentPage> | CommentPage), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/services/:serviceSlug/comments', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListBreakingTodosResponseMock(),
+    : getListServiceCommentsResponseMock(),
       { status: 200
       })
   }, options)
 }
 
-/** getAcknowledgeBreakingTodoMockHandler provides generated MSW behavior for contract tests. */
-export const getAcknowledgeBreakingTodoMockHandler = (overrideResponse?: BreakingTodoResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<BreakingTodoResponse> | BreakingTodoResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/t/:tenantSlug/breaking-todos/:todoId\\:ack', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+/** getCreateServiceCommentMockHandler provides generated MSW behavior for contract tests. */
+export const getCreateServiceCommentMockHandler = (overrideResponse?: Comment | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Comment> | Comment), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/t/:tenantSlug/services/:serviceSlug/comments', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getAcknowledgeBreakingTodoResponseMock(),
+    : getCreateServiceCommentResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+/** getListSubscriptionsMockHandler provides generated MSW behavior for contract tests. */
+export const getListSubscriptionsMockHandler = (overrideResponse?: SubscriptionList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<SubscriptionList> | SubscriptionList), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/subscriptions', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListSubscriptionsResponseMock(),
       { status: 200
       })
   }, options)
 }
 
-/** getListAuditLogsMockHandler provides generated MSW behavior for contract tests. */
-export const getListAuditLogsMockHandler = (overrideResponse?: AuditLogPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AuditLogPageResponse> | AuditLogPageResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/t/:tenantSlug/audit-logs', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+/** getPutSubscriptionMockHandler provides generated MSW behavior for contract tests. */
+export const getPutSubscriptionMockHandler = (overrideResponse?: Subscription | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Subscription> | Subscription), options?: RequestHandlerOptions) => {
+  return http.put('*/api/v1/t/:tenantSlug/subscriptions', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListAuditLogsResponseMock(),
+    : getPutSubscriptionResponseMock(),
       { status: 200
       })
   }, options)
 }
 /** getCollaborationMock provides generated MSW behavior for contract tests. */
 export const getCollaborationMock = () => [
+  getListAuditLogsMockHandler(),
+  getListBreakingTodosMockHandler(),
+  getAcknowledgeBreakingTodoMockHandler(),
   getListNotificationChannelsMockHandler(),
   getCreateNotificationChannelMockHandler(),
-  getUpdateNotificationChannelMockHandler(),
   getDeleteNotificationChannelMockHandler(),
-  getTestNotificationChannelMockHandler(),
+  getUpdateNotificationChannelMockHandler(),
   getRotateNotificationChannelSecretMockHandler(),
-  getListServiceCommentsMockHandler(),
-  getCreateServiceCommentMockHandler(),
-  getListSubscriptionsMockHandler(),
-  getPutSubscriptionMockHandler(),
+  getTestNotificationChannelMockHandler(),
   getListNotificationsMockHandler(),
   getMarkNotificationReadMockHandler(),
   getMarkAllNotificationsReadMockHandler(),
-  getListBreakingTodosMockHandler(),
-  getAcknowledgeBreakingTodoMockHandler(),
-  getListAuditLogsMockHandler()
+  getListServiceCommentsMockHandler(),
+  getCreateServiceCommentMockHandler(),
+  getListSubscriptionsMockHandler(),
+  getPutSubscriptionMockHandler()
 ]

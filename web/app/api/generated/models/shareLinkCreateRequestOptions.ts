@@ -9,4 +9,4 @@
 /**
  * specifies the options associated with this share link create request.
  */
-export type ShareLinkCreateRequestOptions = { [key: string]: unknown };
+export type ShareLinkCreateRequestOptions = {[key: string]: unknown};

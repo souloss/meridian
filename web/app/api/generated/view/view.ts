@@ -31,28 +31,25 @@ import type {
 } from 'vue';
 
 import type {
-  InputSpecMismatchResponse,
+  ErrorResponse,
   ListShareLinksParams,
   ListViewsParams,
-  NestingTooDeepResponse,
-  NotFoundResponse,
-  PreconditionFailedResponse,
-  PublicViewResolveBody,
-  ShareLinkCreateBody,
-  ShareLinkCreatedResponse,
-  ShareLinkPageResponse,
-  SharedViewResponse,
-  SystemGroupCreateBody,
-  SystemGroupListResponse,
-  SystemGroupMembersReplaceBody,
-  SystemGroupPatchBody,
-  SystemGroupResponse,
-  ViewListResponse,
-  ViewOverrideListResponse,
-  ViewOverridePutBody,
-  ViewOverrideResponse,
-  ViewResolutionResponse,
-  ViewResolveBody
+  PublicViewResolveRequest,
+  ShareLinkCreateRequest,
+  ShareLinkCreated,
+  ShareLinkPage,
+  SharedView,
+  SystemGroup,
+  SystemGroupCreateRequest,
+  SystemGroupList,
+  SystemGroupMembersReplaceRequest,
+  SystemGroupPatchRequest,
+  ViewList,
+  ViewOverride,
+  ViewOverrideList,
+  ViewOverridePutRequest,
+  ViewResolution,
+  ViewResolveRequest
 } from '../models';
 
 import { meridianFetch } from '../../fetcher.ts';
@@ -63,517 +60,56 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-/** listViewOverridesResponse200 represents a declared HTTP response from the list view overrides response200 operation. */
-export type listViewOverridesResponse200 = {
+/** resolvePublicViewResponse200 represents a declared HTTP response from the resolve public view response200 operation. */
+export type resolvePublicViewResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ViewOverrideListResponse
+  data: ViewResolution
   /** Status is the HTTP response status code. */
   status: 200
 }
 
-/** listViewOverridesResponse404 represents a declared HTTP response from the list view overrides response404 operation. */
-export type listViewOverridesResponse404 = {
+/** resolvePublicViewResponse404 represents a declared HTTP response from the resolve public view response404 operation. */
+export type resolvePublicViewResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
 
-/** listViewOverridesResponseSuccess represents a declared HTTP response from the list view overrides response success operation. */
-export type listViewOverridesResponseSuccess = (listViewOverridesResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listViewOverridesResponseError represents a declared HTTP response from the list view overrides response error operation. */
-export type listViewOverridesResponseError = (listViewOverridesResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listViewOverridesResponse represents a declared HTTP response from the list view overrides response operation. */
-export type listViewOverridesResponse = (listViewOverridesResponseSuccess | listViewOverridesResponseError)
-
-/** getListViewOverridesUrl builds the relative URL for its OpenAPI operation. */
-export const getListViewOverridesUrl = (tenantSlug: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/view-overrides`
-}
-
-/**
- * Returns the requested page of view overrides within the authorized request scope.
- */
-export const listViewOverrides = async (tenantSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listViewOverridesResponse> => {
-
-  return meridianFetch<listViewOverridesResponse>(getListViewOverridesUrl(tenantSlug),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListViewOverridesQueryKey is generated from the Meridian OpenAPI contract for get list view overrides query key. */
-export const getListViewOverridesQueryKey = (tenantSlug: MaybeRefOrGetter<string>,) => {
-    return [
-    'api','v1','t',tenantSlug,'view-overrides'
-    ] as const;
-    }
-
-
-/** getListViewOverridesQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListViewOverridesQueryOptions = <TData = Awaited<ReturnType<typeof listViewOverrides>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listViewOverrides>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListViewOverridesQueryKey(tenantSlug);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listViewOverrides>>> = ({ signal }) => listViewOverrides(toValue(tenantSlug), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listViewOverrides>>, TError, TData>
-}
-
-/** ListViewOverridesQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListViewOverridesQueryResult = NonNullable<Awaited<ReturnType<typeof listViewOverrides>>>
-/** ListViewOverridesQueryError is the error type returned by its generated Vue Query hook. */
-export type ListViewOverridesQueryError = NotFoundResponse
-
-
-
-/** useListViewOverrides executes its OpenAPI operation through TanStack Vue Query. */
-export function useListViewOverrides<TData = Awaited<ReturnType<typeof listViewOverrides>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listViewOverrides>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListViewOverridesQueryOptions(tenantSlug,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** putViewOverrideResponse200 represents a declared HTTP response from the put view override response200 operation. */
-export type putViewOverrideResponse200 = {
+/** resolvePublicViewResponse422 represents a declared HTTP response from the resolve public view response422 operation. */
+export type resolvePublicViewResponse422 = {
   /** Data contains the decoded response payload. */
-  data: ViewOverrideResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** putViewOverrideResponse404 represents a declared HTTP response from the put view override response404 operation. */
-export type putViewOverrideResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** putViewOverrideResponse412 represents a declared HTTP response from the put view override response412 operation. */
-export type putViewOverrideResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** putViewOverrideResponseSuccess represents a declared HTTP response from the put view override response success operation. */
-export type putViewOverrideResponseSuccess = (putViewOverrideResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** putViewOverrideResponseError represents a declared HTTP response from the put view override response error operation. */
-export type putViewOverrideResponseError = (putViewOverrideResponse404 | putViewOverrideResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** putViewOverrideResponse represents a declared HTTP response from the put view override response operation. */
-export type putViewOverrideResponse = (putViewOverrideResponseSuccess | putViewOverrideResponseError)
-
-/** getPutViewOverrideUrl builds the relative URL for its OpenAPI operation. */
-export const getPutViewOverrideUrl = (tenantSlug: string,
-    viewId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/view-overrides/${viewId}`
-}
-
-/**
- * Creates or replaces the selected view override within the authorized request scope.
- */
-export const putViewOverride = async (tenantSlug: string,
-    viewId: string,
-    viewOverridePutBody: ViewOverridePutBody, options?: Parameters<typeof meridianFetch>[1]): Promise<putViewOverrideResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<putViewOverrideResponse>(getPutViewOverrideUrl(tenantSlug,viewId),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(viewOverridePutBody)
-  }
-);}
-
-
-
-
-
-/** getPutViewOverrideMutationKey is generated from the Meridian OpenAPI contract for get put view override mutation key. */
-export const getPutViewOverrideMutationKey = () => ['putViewOverride'] as const;
-
-/** getPutViewOverrideMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPutViewOverrideMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putViewOverride>>, TError,PutViewOverrideMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof putViewOverride>>, TError,PutViewOverrideMutationVariables, TContext> => {
-
-const mutationKey = getPutViewOverrideMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putViewOverride>>, PutViewOverrideMutationVariables> = (props) => {
-          const {tenantSlug,viewId,data} = props ?? {};
-
-          return  putViewOverride(tenantSlug,viewId,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** PutViewOverrideMutationResult is generated from the Meridian OpenAPI contract for put view override mutation result. */
-    export type PutViewOverrideMutationResult = NonNullable<Awaited<ReturnType<typeof putViewOverride>>>
-    /** PutViewOverrideMutationBody is the request body type for its generated OpenAPI operation. */
-    export type PutViewOverrideMutationBody = ViewOverridePutBody
-    /** PutViewOverrideMutationError is generated from the Meridian OpenAPI contract for put view override mutation error. */
-    export type PutViewOverrideMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** PutViewOverrideMutationVariables is generated from the Meridian OpenAPI contract for put view override mutation variables. */
-    export type PutViewOverrideMutationVariables = {/** TenantSlug carries the tenant slug value for PutViewOverrideMutationVariables. */ tenantSlug: string;/** ViewId carries the view id value for PutViewOverrideMutationVariables. */ viewId: string;/** Data contains the decoded response payload. */ data: ViewOverridePutBody}
-
-    /** usePutViewOverride executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePutViewOverride = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putViewOverride>>, TError,PutViewOverrideMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof putViewOverride>>,
-        TError,
-        PutViewOverrideMutationVariables,
-        TContext
-      > => {
-      return useMutation(getPutViewOverrideMutationOptions(options), queryClient);
-    }
-    /** deleteViewOverrideResponse204 represents a declared HTTP response from the delete view override response204 operation. */
-    export type deleteViewOverrideResponse204 = {
-  /** Data contains the decoded response payload. */
-  data: void
-  /** Status is the HTTP response status code. */
-  status: 204
-}
-
-/** deleteViewOverrideResponse404 represents a declared HTTP response from the delete view override response404 operation. */
-export type deleteViewOverrideResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** deleteViewOverrideResponse412 represents a declared HTTP response from the delete view override response412 operation. */
-export type deleteViewOverrideResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** deleteViewOverrideResponseSuccess represents a declared HTTP response from the delete view override response success operation. */
-export type deleteViewOverrideResponseSuccess = (deleteViewOverrideResponse204) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** deleteViewOverrideResponseError represents a declared HTTP response from the delete view override response error operation. */
-export type deleteViewOverrideResponseError = (deleteViewOverrideResponse404 | deleteViewOverrideResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** deleteViewOverrideResponse represents a declared HTTP response from the delete view override response operation. */
-export type deleteViewOverrideResponse = (deleteViewOverrideResponseSuccess | deleteViewOverrideResponseError)
-
-/** getDeleteViewOverrideUrl builds the relative URL for its OpenAPI operation. */
-export const getDeleteViewOverrideUrl = (tenantSlug: string,
-    viewId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/view-overrides/${viewId}`
-}
-
-/**
- * Deletes the selected view override within the authorized request scope.
- */
-export const deleteViewOverride = async (tenantSlug: string,
-    viewId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteViewOverrideResponse> => {
-
-  return meridianFetch<deleteViewOverrideResponse>(getDeleteViewOverrideUrl(tenantSlug,viewId),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
-
-
-
-
-/** getDeleteViewOverrideMutationKey is generated from the Meridian OpenAPI contract for get delete view override mutation key. */
-export const getDeleteViewOverrideMutationKey = () => ['deleteViewOverride'] as const;
-
-/** getDeleteViewOverrideMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeleteViewOverrideMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteViewOverride>>, TError,DeleteViewOverrideMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteViewOverride>>, TError,DeleteViewOverrideMutationVariables, TContext> => {
-
-const mutationKey = getDeleteViewOverrideMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteViewOverride>>, DeleteViewOverrideMutationVariables> = (props) => {
-          const {tenantSlug,viewId} = props ?? {};
-
-          return  deleteViewOverride(tenantSlug,viewId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** DeleteViewOverrideMutationResult is generated from the Meridian OpenAPI contract for delete view override mutation result. */
-    export type DeleteViewOverrideMutationResult = NonNullable<Awaited<ReturnType<typeof deleteViewOverride>>>
-
-    /** DeleteViewOverrideMutationError is generated from the Meridian OpenAPI contract for delete view override mutation error. */
-    export type DeleteViewOverrideMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** DeleteViewOverrideMutationVariables is generated from the Meridian OpenAPI contract for delete view override mutation variables. */
-    export type DeleteViewOverrideMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteViewOverrideMutationVariables. */ tenantSlug: string;/** ViewId carries the view id value for DeleteViewOverrideMutationVariables. */ viewId: string}
-
-    /** useDeleteViewOverride executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeleteViewOverride = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteViewOverride>>, TError,DeleteViewOverrideMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof deleteViewOverride>>,
-        TError,
-        DeleteViewOverrideMutationVariables,
-        TContext
-      > => {
-      return useMutation(getDeleteViewOverrideMutationOptions(options), queryClient);
-    }
-    /** listViewsResponse200 represents a declared HTTP response from the list views response200 operation. */
-    export type listViewsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: ViewListResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** listViewsResponse404 represents a declared HTTP response from the list views response404 operation. */
-export type listViewsResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** listViewsResponseSuccess represents a declared HTTP response from the list views response success operation. */
-export type listViewsResponseSuccess = (listViewsResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** listViewsResponseError represents a declared HTTP response from the list views response error operation. */
-export type listViewsResponseError = (listViewsResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** listViewsResponse represents a declared HTTP response from the list views response operation. */
-export type listViewsResponse = (listViewsResponseSuccess | listViewsResponseError)
-
-/** getListViewsUrl builds the relative URL for its OpenAPI operation. */
-export const getListViewsUrl = (tenantSlug: string,
-    params?: ListViewsParams,) => {
-  const stringifiedParams = serializeQueryParams(params);
-
-  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/views?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/views`
-}
-
-/**
- * Returns the requested page of views within the authorized request scope.
- */
-export const listViews = async (tenantSlug: string,
-    params?: ListViewsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listViewsResponse> => {
-
-  return meridianFetch<listViewsResponse>(getListViewsUrl(tenantSlug,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getListViewsQueryKey is generated from the Meridian OpenAPI contract for get list views query key. */
-export const getListViewsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListViewsParams>,) => {
-    return [
-    'api','v1','t',tenantSlug,'views', ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-/** getListViewsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListViewsQueryOptions = <TData = Awaited<ReturnType<typeof listViews>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListViewsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listViews>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getListViewsQueryKey(tenantSlug,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listViews>>> = ({ signal }) => listViews(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listViews>>, TError, TData>
-}
-
-/** ListViewsQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type ListViewsQueryResult = NonNullable<Awaited<ReturnType<typeof listViews>>>
-/** ListViewsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListViewsQueryError = NotFoundResponse
-
-
-
-/** useListViews executes its OpenAPI operation through TanStack Vue Query. */
-export function useListViews<TData = Awaited<ReturnType<typeof listViews>>, TError = NotFoundResponse>(
- tenantSlug: MaybeRefOrGetter<string>,
-    params?: MaybeRefOrGetter<ListViewsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listViews>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListViewsQueryOptions(tenantSlug,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** resolveViewResponse200 represents a declared HTTP response from the resolve view response200 operation. */
-export type resolveViewResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: ViewResolutionResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** resolveViewResponse404 represents a declared HTTP response from the resolve view response404 operation. */
-export type resolveViewResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** resolveViewResponse422 represents a declared HTTP response from the resolve view response422 operation. */
-export type resolveViewResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: InputSpecMismatchResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
 
-/** resolveViewResponseSuccess represents a declared HTTP response from the resolve view response success operation. */
-export type resolveViewResponseSuccess = (resolveViewResponse200) & {
+/** resolvePublicViewResponseSuccess represents a declared HTTP response from the resolve public view response success operation. */
+export type resolvePublicViewResponseSuccess = (resolvePublicViewResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** resolveViewResponseError represents a declared HTTP response from the resolve view response error operation. */
-export type resolveViewResponseError = (resolveViewResponse404 | resolveViewResponse422) & {
+/** resolvePublicViewResponseError represents a declared HTTP response from the resolve public view response error operation. */
+export type resolvePublicViewResponseError = (resolvePublicViewResponse404 | resolvePublicViewResponse422) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
-/** resolveViewResponse represents a declared HTTP response from the resolve view response operation. */
-export type resolveViewResponse = (resolveViewResponseSuccess | resolveViewResponseError)
+/** resolvePublicViewResponse represents a declared HTTP response from the resolve public view response operation. */
+export type resolvePublicViewResponse = (resolvePublicViewResponseSuccess | resolvePublicViewResponseError)
 
-/** getResolveViewUrl builds the relative URL for its OpenAPI operation. */
-export const getResolveViewUrl = (tenantSlug: string,) => {
+/** getResolvePublicViewUrl builds the relative URL for its OpenAPI operation. */
+export const getResolvePublicViewUrl = (tenantSlug: string,) => {
 
 
-  return `/api/v1/t/${tenantSlug}/views:resolve`
+  return `/api/v1/public/t/${tenantSlug}/views:resolve`
 }
 
 /**
- * Resolves view within the authorized request scope.
+ * Resolves public view within the authorized request scope.
  */
-export const resolveView = async (tenantSlug: string,
-    viewResolveBody: ViewResolveBody, options?: Parameters<typeof meridianFetch>[1]): Promise<resolveViewResponse> => {
+export const resolvePublicView = async (tenantSlug: string,
+    publicViewResolveRequest: PublicViewResolveRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<resolvePublicViewResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -581,12 +117,12 @@ export const resolveView = async (tenantSlug: string,
     if (Array.isArray(h)) return Object.fromEntries(h);
     return h;
   };
-return meridianFetch<resolveViewResponse>(getResolveViewUrl(tenantSlug),
+return meridianFetch<resolvePublicViewResponse>(getResolvePublicViewUrl(tenantSlug),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(viewResolveBody)
+    body: JSON.stringify(publicViewResolveRequest)
   }
 );}
 
@@ -594,15 +130,15 @@ return meridianFetch<resolveViewResponse>(getResolveViewUrl(tenantSlug),
 
 
 
-/** getResolveViewMutationKey is generated from the Meridian OpenAPI contract for get resolve view mutation key. */
-export const getResolveViewMutationKey = () => ['resolveView'] as const;
+/** getResolvePublicViewMutationKey is generated from the Meridian OpenAPI contract for get resolve public view mutation key. */
+export const getResolvePublicViewMutationKey = () => ['resolvePublicView'] as const;
 
-/** getResolveViewMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getResolveViewMutationOptions = <TError = NotFoundResponse | InputSpecMismatchResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveView>>, TError,ResolveViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof resolveView>>, TError,ResolveViewMutationVariables, TContext> => {
+/** getResolvePublicViewMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getResolvePublicViewMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolvePublicView>>, TError,ResolvePublicViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolvePublicView>>, TError,ResolvePublicViewMutationVariables, TContext> => {
 
-const mutationKey = getResolveViewMutationKey();
+const mutationKey = getResolvePublicViewMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -612,10 +148,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveView>>, ResolveViewMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolvePublicView>>, ResolvePublicViewMutationVariables> = (props) => {
           const {tenantSlug,data} = props ?? {};
 
-          return  resolveView(tenantSlug,data,requestOptions)
+          return  resolvePublicView(tenantSlug,data,requestOptions)
         }
 
 
@@ -625,30 +161,139 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    /** ResolveViewMutationResult is generated from the Meridian OpenAPI contract for resolve view mutation result. */
-    export type ResolveViewMutationResult = NonNullable<Awaited<ReturnType<typeof resolveView>>>
-    /** ResolveViewMutationBody is the request body type for its generated OpenAPI operation. */
-    export type ResolveViewMutationBody = ViewResolveBody
-    /** ResolveViewMutationError is generated from the Meridian OpenAPI contract for resolve view mutation error. */
-    export type ResolveViewMutationError = NotFoundResponse | InputSpecMismatchResponse
-    /** ResolveViewMutationVariables is generated from the Meridian OpenAPI contract for resolve view mutation variables. */
-    export type ResolveViewMutationVariables = {/** TenantSlug carries the tenant slug value for ResolveViewMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: ViewResolveBody}
+    /** ResolvePublicViewMutationResult is generated from the Meridian OpenAPI contract for resolve public view mutation result. */
+    export type ResolvePublicViewMutationResult = NonNullable<Awaited<ReturnType<typeof resolvePublicView>>>
+    /** ResolvePublicViewMutationBody is the request body type for its generated OpenAPI operation. */
+    export type ResolvePublicViewMutationBody = PublicViewResolveRequest
+    /** ResolvePublicViewMutationError is generated from the Meridian OpenAPI contract for resolve public view mutation error. */
+    export type ResolvePublicViewMutationError = ErrorResponse
+    /** ResolvePublicViewMutationVariables is generated from the Meridian OpenAPI contract for resolve public view mutation variables. */
+    export type ResolvePublicViewMutationVariables = {/** TenantSlug carries the tenant slug value for ResolvePublicViewMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: PublicViewResolveRequest}
 
-    /** useResolveView executes its OpenAPI operation through TanStack Vue Query. */
-    export const useResolveView = <TError = NotFoundResponse | InputSpecMismatchResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveView>>, TError,ResolveViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+    /** useResolvePublicView executes its OpenAPI operation through TanStack Vue Query. */
+    export const useResolvePublicView = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolvePublicView>>, TError,ResolvePublicViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof resolveView>>,
+        Awaited<ReturnType<typeof resolvePublicView>>,
         TError,
-        ResolveViewMutationVariables,
+        ResolvePublicViewMutationVariables,
         TContext
       > => {
-      return useMutation(getResolveViewMutationOptions(options), queryClient);
+      return useMutation(getResolvePublicViewMutationOptions(options), queryClient);
     }
-    /** listShareLinksResponse200 represents a declared HTTP response from the list share links response200 operation. */
-    export type listShareLinksResponse200 = {
+    /** getSharedViewResponse200 represents a declared HTTP response from the get shared view response200 operation. */
+    export type getSharedViewResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ShareLinkPageResponse
+  data: SharedView
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** getSharedViewResponse404 represents a declared HTTP response from the get shared view response404 operation. */
+export type getSharedViewResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** getSharedViewResponseSuccess represents a declared HTTP response from the get shared view response success operation. */
+export type getSharedViewResponseSuccess = (getSharedViewResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** getSharedViewResponseError represents a declared HTTP response from the get shared view response error operation. */
+export type getSharedViewResponseError = (getSharedViewResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** getSharedViewResponse represents a declared HTTP response from the get shared view response operation. */
+export type getSharedViewResponse = (getSharedViewResponseSuccess | getSharedViewResponseError)
+
+/** getGetSharedViewUrl builds the relative URL for its OpenAPI operation. */
+export const getGetSharedViewUrl = (shareToken: string,) => {
+
+
+  return `/api/v1/shared/${shareToken}`
+}
+
+/**
+ * Returns the selected shared view within the authorized request scope.
+ */
+export const getSharedView = async (shareToken: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getSharedViewResponse> => {
+
+  return meridianFetch<getSharedViewResponse>(getGetSharedViewUrl(shareToken),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getGetSharedViewQueryKey is generated from the Meridian OpenAPI contract for get get shared view query key. */
+export const getGetSharedViewQueryKey = (shareToken: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','shared',shareToken
+    ] as const;
+    }
+
+
+/** getGetSharedViewQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getGetSharedViewQueryOptions = <TData = Awaited<ReturnType<typeof getSharedView>>, TError = ErrorResponse>(shareToken: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSharedView>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getGetSharedViewQueryKey(shareToken);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSharedView>>> = ({ signal }) => getSharedView(toValue(shareToken), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(shareToken) !== null && toValue(shareToken) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSharedView>>, TError, TData>
+}
+
+/** GetSharedViewQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type GetSharedViewQueryResult = NonNullable<Awaited<ReturnType<typeof getSharedView>>>
+/** GetSharedViewQueryError is the error type returned by its generated Vue Query hook. */
+export type GetSharedViewQueryError = ErrorResponse
+
+
+
+/** useGetSharedView executes its OpenAPI operation through TanStack Vue Query. */
+export function useGetSharedView<TData = Awaited<ReturnType<typeof getSharedView>>, TError = ErrorResponse>(
+ shareToken: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSharedView>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSharedViewQueryOptions(shareToken,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** listShareLinksResponse200 represents a declared HTTP response from the list share links response200 operation. */
+export type listShareLinksResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ShareLinkPage
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -656,7 +301,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** listShareLinksResponse404 represents a declared HTTP response from the list share links response404 operation. */
 export type listShareLinksResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -712,7 +357,7 @@ export const getListShareLinksQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
 
 
 /** getListShareLinksQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListShareLinksQueryOptions = <TData = Awaited<ReturnType<typeof listShareLinks>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
+export const getListShareLinksQueryOptions = <TData = Awaited<ReturnType<typeof listShareLinks>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListShareLinksParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShareLinks>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
@@ -734,12 +379,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** ListShareLinksQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListShareLinksQueryResult = NonNullable<Awaited<ReturnType<typeof listShareLinks>>>
 /** ListShareLinksQueryError is the error type returned by its generated Vue Query hook. */
-export type ListShareLinksQueryError = NotFoundResponse
+export type ListShareLinksQueryError = ErrorResponse
 
 
 
 /** useListShareLinks executes its OpenAPI operation through TanStack Vue Query. */
-export function useListShareLinks<TData = Awaited<ReturnType<typeof listShareLinks>>, TError = NotFoundResponse>(
+export function useListShareLinks<TData = Awaited<ReturnType<typeof listShareLinks>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     params?: MaybeRefOrGetter<ListShareLinksParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShareLinks>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
@@ -762,7 +407,7 @@ export function useListShareLinks<TData = Awaited<ReturnType<typeof listShareLin
 /** createShareLinkResponse201 represents a declared HTTP response from the create share link response201 operation. */
 export type createShareLinkResponse201 = {
   /** Data contains the decoded response payload. */
-  data: ShareLinkCreatedResponse
+  data: ShareLinkCreated
   /** Status is the HTTP response status code. */
   status: 201
 }
@@ -770,7 +415,7 @@ export type createShareLinkResponse201 = {
 /** createShareLinkResponse404 represents a declared HTTP response from the create share link response404 operation. */
 export type createShareLinkResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -778,7 +423,7 @@ export type createShareLinkResponse404 = {
 /** createShareLinkResponse422 represents a declared HTTP response from the create share link response422 operation. */
 export type createShareLinkResponse422 = {
   /** Data contains the decoded response payload. */
-  data: InputSpecMismatchResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
@@ -808,7 +453,7 @@ export const getCreateShareLinkUrl = (tenantSlug: string,) => {
  * Creates share link within the authorized request scope.
  */
 export const createShareLink = async (tenantSlug: string,
-    shareLinkCreateBody: ShareLinkCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createShareLinkResponse> => {
+    shareLinkCreateRequest: ShareLinkCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createShareLinkResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -821,7 +466,7 @@ return meridianFetch<createShareLinkResponse>(getCreateShareLinkUrl(tenantSlug),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(shareLinkCreateBody)
+    body: JSON.stringify(shareLinkCreateRequest)
   }
 );}
 
@@ -833,7 +478,7 @@ return meridianFetch<createShareLinkResponse>(getCreateShareLinkUrl(tenantSlug),
 export const getCreateShareLinkMutationKey = () => ['createShareLink'] as const;
 
 /** getCreateShareLinkMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateShareLinkMutationOptions = <TError = NotFoundResponse | InputSpecMismatchResponse,
+export const getCreateShareLinkMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createShareLink>>, TError,CreateShareLinkMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createShareLink>>, TError,CreateShareLinkMutationVariables, TContext> => {
 
@@ -863,14 +508,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateShareLinkMutationResult is generated from the Meridian OpenAPI contract for create share link mutation result. */
     export type CreateShareLinkMutationResult = NonNullable<Awaited<ReturnType<typeof createShareLink>>>
     /** CreateShareLinkMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateShareLinkMutationBody = ShareLinkCreateBody
+    export type CreateShareLinkMutationBody = ShareLinkCreateRequest
     /** CreateShareLinkMutationError is generated from the Meridian OpenAPI contract for create share link mutation error. */
-    export type CreateShareLinkMutationError = NotFoundResponse | InputSpecMismatchResponse
+    export type CreateShareLinkMutationError = ErrorResponse
     /** CreateShareLinkMutationVariables is generated from the Meridian OpenAPI contract for create share link mutation variables. */
-    export type CreateShareLinkMutationVariables = {/** TenantSlug carries the tenant slug value for CreateShareLinkMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: ShareLinkCreateBody}
+    export type CreateShareLinkMutationVariables = {/** TenantSlug carries the tenant slug value for CreateShareLinkMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: ShareLinkCreateRequest}
 
     /** useCreateShareLink executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateShareLink = <TError = NotFoundResponse | InputSpecMismatchResponse,
+    export const useCreateShareLink = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createShareLink>>, TError,CreateShareLinkMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createShareLink>>,
@@ -891,7 +536,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** revokeShareLinkResponse404 represents a declared HTTP response from the revoke share link response404 operation. */
 export type revokeShareLinkResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -941,7 +586,7 @@ export const revokeShareLink = async (tenantSlug: string,
 export const getRevokeShareLinkMutationKey = () => ['revokeShareLink'] as const;
 
 /** getRevokeShareLinkMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getRevokeShareLinkMutationOptions = <TError = NotFoundResponse,
+export const getRevokeShareLinkMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeShareLink>>, TError,RevokeShareLinkMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof revokeShareLink>>, TError,RevokeShareLinkMutationVariables, TContext> => {
 
@@ -972,12 +617,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RevokeShareLinkMutationResult = NonNullable<Awaited<ReturnType<typeof revokeShareLink>>>
 
     /** RevokeShareLinkMutationError is generated from the Meridian OpenAPI contract for revoke share link mutation error. */
-    export type RevokeShareLinkMutationError = NotFoundResponse
+    export type RevokeShareLinkMutationError = ErrorResponse
     /** RevokeShareLinkMutationVariables is generated from the Meridian OpenAPI contract for revoke share link mutation variables. */
     export type RevokeShareLinkMutationVariables = {/** TenantSlug carries the tenant slug value for RevokeShareLinkMutationVariables. */ tenantSlug: string;/** ShareLinkId carries the share link id value for RevokeShareLinkMutationVariables. */ shareLinkId: string}
 
     /** useRevokeShareLink executes its OpenAPI operation through TanStack Vue Query. */
-    export const useRevokeShareLink = <TError = NotFoundResponse,
+    export const useRevokeShareLink = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeShareLink>>, TError,RevokeShareLinkMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof revokeShareLink>>,
@@ -987,119 +632,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRevokeShareLinkMutationOptions(options), queryClient);
     }
-    /** getSharedViewResponse200 represents a declared HTTP response from the get shared view response200 operation. */
-    export type getSharedViewResponse200 = {
+    /** listSystemGroupsResponse200 represents a declared HTTP response from the list system groups response200 operation. */
+    export type listSystemGroupsResponse200 = {
   /** Data contains the decoded response payload. */
-  data: SharedViewResponse
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** getSharedViewResponse404 represents a declared HTTP response from the get shared view response404 operation. */
-export type getSharedViewResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** getSharedViewResponseSuccess represents a declared HTTP response from the get shared view response success operation. */
-export type getSharedViewResponseSuccess = (getSharedViewResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** getSharedViewResponseError represents a declared HTTP response from the get shared view response error operation. */
-export type getSharedViewResponseError = (getSharedViewResponse404) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** getSharedViewResponse represents a declared HTTP response from the get shared view response operation. */
-export type getSharedViewResponse = (getSharedViewResponseSuccess | getSharedViewResponseError)
-
-/** getGetSharedViewUrl builds the relative URL for its OpenAPI operation. */
-export const getGetSharedViewUrl = (shareToken: string,) => {
-
-
-  return `/api/v1/shared/${shareToken}`
-}
-
-/**
- * Returns the selected shared view within the authorized request scope.
- */
-export const getSharedView = async (shareToken: string, options?: Parameters<typeof meridianFetch>[1]): Promise<getSharedViewResponse> => {
-
-  return meridianFetch<getSharedViewResponse>(getGetSharedViewUrl(shareToken),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getGetSharedViewQueryKey is generated from the Meridian OpenAPI contract for get get shared view query key. */
-export const getGetSharedViewQueryKey = (shareToken: MaybeRefOrGetter<string>,) => {
-    return [
-    'api','v1','shared',shareToken
-    ] as const;
-    }
-
-
-/** getGetSharedViewQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetSharedViewQueryOptions = <TData = Awaited<ReturnType<typeof getSharedView>>, TError = NotFoundResponse>(shareToken: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSharedView>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getGetSharedViewQueryKey(shareToken);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSharedView>>> = ({ signal }) => getSharedView(toValue(shareToken), { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: computed(() => toValue(shareToken) !== null && toValue(shareToken) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSharedView>>, TError, TData>
-}
-
-/** GetSharedViewQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type GetSharedViewQueryResult = NonNullable<Awaited<ReturnType<typeof getSharedView>>>
-/** GetSharedViewQueryError is the error type returned by its generated Vue Query hook. */
-export type GetSharedViewQueryError = NotFoundResponse
-
-
-
-/** useGetSharedView executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetSharedView<TData = Awaited<ReturnType<typeof getSharedView>>, TError = NotFoundResponse>(
- shareToken: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSharedView>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetSharedViewQueryOptions(shareToken,options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
-
-
-
-/** listSystemGroupsResponse200 represents a declared HTTP response from the list system groups response200 operation. */
-export type listSystemGroupsResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: SystemGroupListResponse
+  data: SystemGroupList
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1107,7 +643,7 @@ export type listSystemGroupsResponse200 = {
 /** listSystemGroupsResponse404 represents a declared HTTP response from the list system groups response404 operation. */
 export type listSystemGroupsResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1160,7 +696,7 @@ export const getListSystemGroupsQueryKey = (tenantSlug: MaybeRefOrGetter<string>
 
 
 /** getListSystemGroupsQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListSystemGroupsQueryOptions = <TData = Awaited<ReturnType<typeof listSystemGroups>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSystemGroups>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+export const getListSystemGroupsQueryOptions = <TData = Awaited<ReturnType<typeof listSystemGroups>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSystemGroups>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1181,12 +717,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** ListSystemGroupsQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type ListSystemGroupsQueryResult = NonNullable<Awaited<ReturnType<typeof listSystemGroups>>>
 /** ListSystemGroupsQueryError is the error type returned by its generated Vue Query hook. */
-export type ListSystemGroupsQueryError = NotFoundResponse
+export type ListSystemGroupsQueryError = ErrorResponse
 
 
 
 /** useListSystemGroups executes its OpenAPI operation through TanStack Vue Query. */
-export function useListSystemGroups<TData = Awaited<ReturnType<typeof listSystemGroups>>, TError = NotFoundResponse>(
+export function useListSystemGroups<TData = Awaited<ReturnType<typeof listSystemGroups>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSystemGroups>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -1208,7 +744,7 @@ export function useListSystemGroups<TData = Awaited<ReturnType<typeof listSystem
 /** createSystemGroupResponse201 represents a declared HTTP response from the create system group response201 operation. */
 export type createSystemGroupResponse201 = {
   /** Data contains the decoded response payload. */
-  data: SystemGroupResponse
+  data: SystemGroup
   /** Status is the HTTP response status code. */
   status: 201
 }
@@ -1216,7 +752,7 @@ export type createSystemGroupResponse201 = {
 /** createSystemGroupResponse404 represents a declared HTTP response from the create system group response404 operation. */
 export type createSystemGroupResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1224,7 +760,7 @@ export type createSystemGroupResponse404 = {
 /** createSystemGroupResponse422 represents a declared HTTP response from the create system group response422 operation. */
 export type createSystemGroupResponse422 = {
   /** Data contains the decoded response payload. */
-  data: NestingTooDeepResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
@@ -1254,7 +790,7 @@ export const getCreateSystemGroupUrl = (tenantSlug: string,) => {
  * Creates system group within the authorized request scope.
  */
 export const createSystemGroup = async (tenantSlug: string,
-    systemGroupCreateBody: SystemGroupCreateBody, options?: Parameters<typeof meridianFetch>[1]): Promise<createSystemGroupResponse> => {
+    systemGroupCreateRequest: SystemGroupCreateRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<createSystemGroupResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1267,7 +803,7 @@ return meridianFetch<createSystemGroupResponse>(getCreateSystemGroupUrl(tenantSl
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(systemGroupCreateBody)
+    body: JSON.stringify(systemGroupCreateRequest)
   }
 );}
 
@@ -1279,7 +815,7 @@ return meridianFetch<createSystemGroupResponse>(getCreateSystemGroupUrl(tenantSl
 export const getCreateSystemGroupMutationKey = () => ['createSystemGroup'] as const;
 
 /** getCreateSystemGroupMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getCreateSystemGroupMutationOptions = <TError = NotFoundResponse | NestingTooDeepResponse,
+export const getCreateSystemGroupMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSystemGroup>>, TError,CreateSystemGroupMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createSystemGroup>>, TError,CreateSystemGroupMutationVariables, TContext> => {
 
@@ -1309,14 +845,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** CreateSystemGroupMutationResult is generated from the Meridian OpenAPI contract for create system group mutation result. */
     export type CreateSystemGroupMutationResult = NonNullable<Awaited<ReturnType<typeof createSystemGroup>>>
     /** CreateSystemGroupMutationBody is the request body type for its generated OpenAPI operation. */
-    export type CreateSystemGroupMutationBody = SystemGroupCreateBody
+    export type CreateSystemGroupMutationBody = SystemGroupCreateRequest
     /** CreateSystemGroupMutationError is generated from the Meridian OpenAPI contract for create system group mutation error. */
-    export type CreateSystemGroupMutationError = NotFoundResponse | NestingTooDeepResponse
+    export type CreateSystemGroupMutationError = ErrorResponse
     /** CreateSystemGroupMutationVariables is generated from the Meridian OpenAPI contract for create system group mutation variables. */
-    export type CreateSystemGroupMutationVariables = {/** TenantSlug carries the tenant slug value for CreateSystemGroupMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: SystemGroupCreateBody}
+    export type CreateSystemGroupMutationVariables = {/** TenantSlug carries the tenant slug value for CreateSystemGroupMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: SystemGroupCreateRequest}
 
     /** useCreateSystemGroup executes its OpenAPI operation through TanStack Vue Query. */
-    export const useCreateSystemGroup = <TError = NotFoundResponse | NestingTooDeepResponse,
+    export const useCreateSystemGroup = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSystemGroup>>, TError,CreateSystemGroupMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createSystemGroup>>,
@@ -1326,10 +862,125 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateSystemGroupMutationOptions(options), queryClient);
     }
+    /** deleteSystemGroupResponse204 represents a declared HTTP response from the delete system group response204 operation. */
+    export type deleteSystemGroupResponse204 = {
+  /** Data contains the decoded response payload. */
+  data: void
+  /** Status is the HTTP response status code. */
+  status: 204
+}
+
+/** deleteSystemGroupResponse404 represents a declared HTTP response from the delete system group response404 operation. */
+export type deleteSystemGroupResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** deleteSystemGroupResponse412 represents a declared HTTP response from the delete system group response412 operation. */
+export type deleteSystemGroupResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** deleteSystemGroupResponseSuccess represents a declared HTTP response from the delete system group response success operation. */
+export type deleteSystemGroupResponseSuccess = (deleteSystemGroupResponse204) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** deleteSystemGroupResponseError represents a declared HTTP response from the delete system group response error operation. */
+export type deleteSystemGroupResponseError = (deleteSystemGroupResponse404 | deleteSystemGroupResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** deleteSystemGroupResponse represents a declared HTTP response from the delete system group response operation. */
+export type deleteSystemGroupResponse = (deleteSystemGroupResponseSuccess | deleteSystemGroupResponseError)
+
+/** getDeleteSystemGroupUrl builds the relative URL for its OpenAPI operation. */
+export const getDeleteSystemGroupUrl = (tenantSlug: string,
+    groupId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/system-groups/${groupId}`
+}
+
+/**
+ * Deletes the selected system group within the authorized request scope.
+ */
+export const deleteSystemGroup = async (tenantSlug: string,
+    groupId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteSystemGroupResponse> => {
+
+  return meridianFetch<deleteSystemGroupResponse>(getDeleteSystemGroupUrl(tenantSlug,groupId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+/** getDeleteSystemGroupMutationKey is generated from the Meridian OpenAPI contract for get delete system group mutation key. */
+export const getDeleteSystemGroupMutationKey = () => ['deleteSystemGroup'] as const;
+
+/** getDeleteSystemGroupMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getDeleteSystemGroupMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSystemGroup>>, TError,DeleteSystemGroupMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSystemGroup>>, TError,DeleteSystemGroupMutationVariables, TContext> => {
+
+const mutationKey = getDeleteSystemGroupMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSystemGroup>>, DeleteSystemGroupMutationVariables> = (props) => {
+          const {tenantSlug,groupId} = props ?? {};
+
+          return  deleteSystemGroup(tenantSlug,groupId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** DeleteSystemGroupMutationResult is generated from the Meridian OpenAPI contract for delete system group mutation result. */
+    export type DeleteSystemGroupMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSystemGroup>>>
+
+    /** DeleteSystemGroupMutationError is generated from the Meridian OpenAPI contract for delete system group mutation error. */
+    export type DeleteSystemGroupMutationError = ErrorResponse
+    /** DeleteSystemGroupMutationVariables is generated from the Meridian OpenAPI contract for delete system group mutation variables. */
+    export type DeleteSystemGroupMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteSystemGroupMutationVariables. */ tenantSlug: string;/** GroupId carries the group id value for DeleteSystemGroupMutationVariables. */ groupId: string}
+
+    /** useDeleteSystemGroup executes its OpenAPI operation through TanStack Vue Query. */
+    export const useDeleteSystemGroup = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSystemGroup>>, TError,DeleteSystemGroupMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof deleteSystemGroup>>,
+        TError,
+        DeleteSystemGroupMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteSystemGroupMutationOptions(options), queryClient);
+    }
     /** getSystemGroupResponse200 represents a declared HTTP response from the get system group response200 operation. */
     export type getSystemGroupResponse200 = {
   /** Data contains the decoded response payload. */
-  data: SystemGroupResponse
+  data: SystemGroup
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1337,7 +988,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** getSystemGroupResponse404 represents a declared HTTP response from the get system group response404 operation. */
 export type getSystemGroupResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1393,7 +1044,7 @@ export const getGetSystemGroupQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
 
 
 /** getGetSystemGroupQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetSystemGroupQueryOptions = <TData = Awaited<ReturnType<typeof getSystemGroup>>, TError = NotFoundResponse>(tenantSlug: MaybeRefOrGetter<string>,
+export const getGetSystemGroupQueryOptions = <TData = Awaited<ReturnType<typeof getSystemGroup>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
     groupId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSystemGroup>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
@@ -1415,12 +1066,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** GetSystemGroupQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetSystemGroupQueryResult = NonNullable<Awaited<ReturnType<typeof getSystemGroup>>>
 /** GetSystemGroupQueryError is the error type returned by its generated Vue Query hook. */
-export type GetSystemGroupQueryError = NotFoundResponse
+export type GetSystemGroupQueryError = ErrorResponse
 
 
 
 /** useGetSystemGroup executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetSystemGroup<TData = Awaited<ReturnType<typeof getSystemGroup>>, TError = NotFoundResponse>(
+export function useGetSystemGroup<TData = Awaited<ReturnType<typeof getSystemGroup>>, TError = ErrorResponse>(
  tenantSlug: MaybeRefOrGetter<string>,
     groupId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSystemGroup>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
@@ -1443,7 +1094,7 @@ export function useGetSystemGroup<TData = Awaited<ReturnType<typeof getSystemGro
 /** updateSystemGroupResponse200 represents a declared HTTP response from the update system group response200 operation. */
 export type updateSystemGroupResponse200 = {
   /** Data contains the decoded response payload. */
-  data: SystemGroupResponse
+  data: SystemGroup
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1451,7 +1102,7 @@ export type updateSystemGroupResponse200 = {
 /** updateSystemGroupResponse404 represents a declared HTTP response from the update system group response404 operation. */
 export type updateSystemGroupResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1459,7 +1110,7 @@ export type updateSystemGroupResponse404 = {
 /** updateSystemGroupResponse412 represents a declared HTTP response from the update system group response412 operation. */
 export type updateSystemGroupResponse412 = {
   /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 412
 }
@@ -1467,7 +1118,7 @@ export type updateSystemGroupResponse412 = {
 /** updateSystemGroupResponse422 represents a declared HTTP response from the update system group response422 operation. */
 export type updateSystemGroupResponse422 = {
   /** Data contains the decoded response payload. */
-  data: NestingTooDeepResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
@@ -1499,7 +1150,7 @@ export const getUpdateSystemGroupUrl = (tenantSlug: string,
  */
 export const updateSystemGroup = async (tenantSlug: string,
     groupId: string,
-    systemGroupPatchBody: SystemGroupPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateSystemGroupResponse> => {
+    systemGroupPatchRequest: SystemGroupPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateSystemGroupResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1512,7 +1163,7 @@ return meridianFetch<updateSystemGroupResponse>(getUpdateSystemGroupUrl(tenantSl
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(systemGroupPatchBody)
+    body: JSON.stringify(systemGroupPatchRequest)
   }
 );}
 
@@ -1524,7 +1175,7 @@ return meridianFetch<updateSystemGroupResponse>(getUpdateSystemGroupUrl(tenantSl
 export const getUpdateSystemGroupMutationKey = () => ['updateSystemGroup'] as const;
 
 /** getUpdateSystemGroupMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateSystemGroupMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse | NestingTooDeepResponse,
+export const getUpdateSystemGroupMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSystemGroup>>, TError,UpdateSystemGroupMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateSystemGroup>>, TError,UpdateSystemGroupMutationVariables, TContext> => {
 
@@ -1554,14 +1205,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** UpdateSystemGroupMutationResult is generated from the Meridian OpenAPI contract for update system group mutation result. */
     export type UpdateSystemGroupMutationResult = NonNullable<Awaited<ReturnType<typeof updateSystemGroup>>>
     /** UpdateSystemGroupMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateSystemGroupMutationBody = SystemGroupPatchBody
+    export type UpdateSystemGroupMutationBody = SystemGroupPatchRequest
     /** UpdateSystemGroupMutationError is generated from the Meridian OpenAPI contract for update system group mutation error. */
-    export type UpdateSystemGroupMutationError = NotFoundResponse | PreconditionFailedResponse | NestingTooDeepResponse
+    export type UpdateSystemGroupMutationError = ErrorResponse
     /** UpdateSystemGroupMutationVariables is generated from the Meridian OpenAPI contract for update system group mutation variables. */
-    export type UpdateSystemGroupMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateSystemGroupMutationVariables. */ tenantSlug: string;/** GroupId carries the group id value for UpdateSystemGroupMutationVariables. */ groupId: string;/** Data contains the decoded response payload. */ data: SystemGroupPatchBody}
+    export type UpdateSystemGroupMutationVariables = {/** TenantSlug carries the tenant slug value for UpdateSystemGroupMutationVariables. */ tenantSlug: string;/** GroupId carries the group id value for UpdateSystemGroupMutationVariables. */ groupId: string;/** Data contains the decoded response payload. */ data: SystemGroupPatchRequest}
 
     /** useUpdateSystemGroup executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateSystemGroup = <TError = NotFoundResponse | PreconditionFailedResponse | NestingTooDeepResponse,
+    export const useUpdateSystemGroup = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSystemGroup>>, TError,UpdateSystemGroupMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof updateSystemGroup>>,
@@ -1571,125 +1222,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdateSystemGroupMutationOptions(options), queryClient);
     }
-    /** deleteSystemGroupResponse204 represents a declared HTTP response from the delete system group response204 operation. */
-    export type deleteSystemGroupResponse204 = {
-  /** Data contains the decoded response payload. */
-  data: void
-  /** Status is the HTTP response status code. */
-  status: 204
-}
-
-/** deleteSystemGroupResponse404 represents a declared HTTP response from the delete system group response404 operation. */
-export type deleteSystemGroupResponse404 = {
-  /** Data contains the decoded response payload. */
-  data: NotFoundResponse
-  /** Status is the HTTP response status code. */
-  status: 404
-}
-
-/** deleteSystemGroupResponse412 represents a declared HTTP response from the delete system group response412 operation. */
-export type deleteSystemGroupResponse412 = {
-  /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
-  /** Status is the HTTP response status code. */
-  status: 412
-}
-
-/** deleteSystemGroupResponseSuccess represents a declared HTTP response from the delete system group response success operation. */
-export type deleteSystemGroupResponseSuccess = (deleteSystemGroupResponse204) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** deleteSystemGroupResponseError represents a declared HTTP response from the delete system group response error operation. */
-export type deleteSystemGroupResponseError = (deleteSystemGroupResponse404 | deleteSystemGroupResponse412) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** deleteSystemGroupResponse represents a declared HTTP response from the delete system group response operation. */
-export type deleteSystemGroupResponse = (deleteSystemGroupResponseSuccess | deleteSystemGroupResponseError)
-
-/** getDeleteSystemGroupUrl builds the relative URL for its OpenAPI operation. */
-export const getDeleteSystemGroupUrl = (tenantSlug: string,
-    groupId: string,) => {
-
-
-  return `/api/v1/t/${tenantSlug}/system-groups/${groupId}`
-}
-
-/**
- * Deletes the selected system group within the authorized request scope.
- */
-export const deleteSystemGroup = async (tenantSlug: string,
-    groupId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteSystemGroupResponse> => {
-
-  return meridianFetch<deleteSystemGroupResponse>(getDeleteSystemGroupUrl(tenantSlug,groupId),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
-
-
-
-
-/** getDeleteSystemGroupMutationKey is generated from the Meridian OpenAPI contract for get delete system group mutation key. */
-export const getDeleteSystemGroupMutationKey = () => ['deleteSystemGroup'] as const;
-
-/** getDeleteSystemGroupMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getDeleteSystemGroupMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSystemGroup>>, TError,DeleteSystemGroupMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteSystemGroup>>, TError,DeleteSystemGroupMutationVariables, TContext> => {
-
-const mutationKey = getDeleteSystemGroupMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSystemGroup>>, DeleteSystemGroupMutationVariables> = (props) => {
-          const {tenantSlug,groupId} = props ?? {};
-
-          return  deleteSystemGroup(tenantSlug,groupId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    /** DeleteSystemGroupMutationResult is generated from the Meridian OpenAPI contract for delete system group mutation result. */
-    export type DeleteSystemGroupMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSystemGroup>>>
-
-    /** DeleteSystemGroupMutationError is generated from the Meridian OpenAPI contract for delete system group mutation error. */
-    export type DeleteSystemGroupMutationError = NotFoundResponse | PreconditionFailedResponse
-    /** DeleteSystemGroupMutationVariables is generated from the Meridian OpenAPI contract for delete system group mutation variables. */
-    export type DeleteSystemGroupMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteSystemGroupMutationVariables. */ tenantSlug: string;/** GroupId carries the group id value for DeleteSystemGroupMutationVariables. */ groupId: string}
-
-    /** useDeleteSystemGroup executes its OpenAPI operation through TanStack Vue Query. */
-    export const useDeleteSystemGroup = <TError = NotFoundResponse | PreconditionFailedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSystemGroup>>, TError,DeleteSystemGroupMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof deleteSystemGroup>>,
-        TError,
-        DeleteSystemGroupMutationVariables,
-        TContext
-      > => {
-      return useMutation(getDeleteSystemGroupMutationOptions(options), queryClient);
-    }
     /** putSystemGroupMembersResponse200 represents a declared HTTP response from the put system group members response200 operation. */
     export type putSystemGroupMembersResponse200 = {
   /** Data contains the decoded response payload. */
-  data: SystemGroupResponse
+  data: SystemGroup
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -1697,7 +1233,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** putSystemGroupMembersResponse404 represents a declared HTTP response from the put system group members response404 operation. */
 export type putSystemGroupMembersResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
@@ -1705,7 +1241,7 @@ export type putSystemGroupMembersResponse404 = {
 /** putSystemGroupMembersResponse412 represents a declared HTTP response from the put system group members response412 operation. */
 export type putSystemGroupMembersResponse412 = {
   /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 412
 }
@@ -1737,7 +1273,7 @@ export const getPutSystemGroupMembersUrl = (tenantSlug: string,
  */
 export const putSystemGroupMembers = async (tenantSlug: string,
     groupId: string,
-    systemGroupMembersReplaceBody: SystemGroupMembersReplaceBody, options?: Parameters<typeof meridianFetch>[1]): Promise<putSystemGroupMembersResponse> => {
+    systemGroupMembersReplaceRequest: SystemGroupMembersReplaceRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<putSystemGroupMembersResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1750,7 +1286,7 @@ return meridianFetch<putSystemGroupMembersResponse>(getPutSystemGroupMembersUrl(
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(systemGroupMembersReplaceBody)
+    body: JSON.stringify(systemGroupMembersReplaceRequest)
   }
 );}
 
@@ -1762,7 +1298,7 @@ return meridianFetch<putSystemGroupMembersResponse>(getPutSystemGroupMembersUrl(
 export const getPutSystemGroupMembersMutationKey = () => ['putSystemGroupMembers'] as const;
 
 /** getPutSystemGroupMembersMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getPutSystemGroupMembersMutationOptions = <TError = NotFoundResponse | PreconditionFailedResponse,
+export const getPutSystemGroupMembersMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putSystemGroupMembers>>, TError,PutSystemGroupMembersMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof putSystemGroupMembers>>, TError,PutSystemGroupMembersMutationVariables, TContext> => {
 
@@ -1792,14 +1328,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** PutSystemGroupMembersMutationResult is generated from the Meridian OpenAPI contract for put system group members mutation result. */
     export type PutSystemGroupMembersMutationResult = NonNullable<Awaited<ReturnType<typeof putSystemGroupMembers>>>
     /** PutSystemGroupMembersMutationBody is the request body type for its generated OpenAPI operation. */
-    export type PutSystemGroupMembersMutationBody = SystemGroupMembersReplaceBody
+    export type PutSystemGroupMembersMutationBody = SystemGroupMembersReplaceRequest
     /** PutSystemGroupMembersMutationError is generated from the Meridian OpenAPI contract for put system group members mutation error. */
-    export type PutSystemGroupMembersMutationError = NotFoundResponse | PreconditionFailedResponse
+    export type PutSystemGroupMembersMutationError = ErrorResponse
     /** PutSystemGroupMembersMutationVariables is generated from the Meridian OpenAPI contract for put system group members mutation variables. */
-    export type PutSystemGroupMembersMutationVariables = {/** TenantSlug carries the tenant slug value for PutSystemGroupMembersMutationVariables. */ tenantSlug: string;/** GroupId carries the group id value for PutSystemGroupMembersMutationVariables. */ groupId: string;/** Data contains the decoded response payload. */ data: SystemGroupMembersReplaceBody}
+    export type PutSystemGroupMembersMutationVariables = {/** TenantSlug carries the tenant slug value for PutSystemGroupMembersMutationVariables. */ tenantSlug: string;/** GroupId carries the group id value for PutSystemGroupMembersMutationVariables. */ groupId: string;/** Data contains the decoded response payload. */ data: SystemGroupMembersReplaceRequest}
 
     /** usePutSystemGroupMembers executes its OpenAPI operation through TanStack Vue Query. */
-    export const usePutSystemGroupMembers = <TError = NotFoundResponse | PreconditionFailedResponse,
+    export const usePutSystemGroupMembers = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putSystemGroupMembers>>, TError,PutSystemGroupMembersMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof putSystemGroupMembers>>,
@@ -1809,69 +1345,54 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getPutSystemGroupMembersMutationOptions(options), queryClient);
     }
-    /** resolvePublicViewResponse200 represents a declared HTTP response from the resolve public view response200 operation. */
-    export type resolvePublicViewResponse200 = {
+    /** listViewOverridesResponse200 represents a declared HTTP response from the list view overrides response200 operation. */
+    export type listViewOverridesResponse200 = {
   /** Data contains the decoded response payload. */
-  data: ViewResolutionResponse
+  data: ViewOverrideList
   /** Status is the HTTP response status code. */
   status: 200
 }
 
-/** resolvePublicViewResponse404 represents a declared HTTP response from the resolve public view response404 operation. */
-export type resolvePublicViewResponse404 = {
+/** listViewOverridesResponse404 represents a declared HTTP response from the list view overrides response404 operation. */
+export type listViewOverridesResponse404 = {
   /** Data contains the decoded response payload. */
-  data: NotFoundResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 404
 }
 
-/** resolvePublicViewResponse422 represents a declared HTTP response from the resolve public view response422 operation. */
-export type resolvePublicViewResponse422 = {
-  /** Data contains the decoded response payload. */
-  data: InputSpecMismatchResponse
-  /** Status is the HTTP response status code. */
-  status: 422
-}
-
-/** resolvePublicViewResponseSuccess represents a declared HTTP response from the resolve public view response success operation. */
-export type resolvePublicViewResponseSuccess = (resolvePublicViewResponse200) & {
+/** listViewOverridesResponseSuccess represents a declared HTTP response from the list view overrides response success operation. */
+export type listViewOverridesResponseSuccess = (listViewOverridesResponse200) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
-/** resolvePublicViewResponseError represents a declared HTTP response from the resolve public view response error operation. */
-export type resolvePublicViewResponseError = (resolvePublicViewResponse404 | resolvePublicViewResponse422) & {
+/** listViewOverridesResponseError represents a declared HTTP response from the list view overrides response error operation. */
+export type listViewOverridesResponseError = (listViewOverridesResponse404) & {
   /** Headers contains the HTTP response headers. */
   headers: Headers;
 };
 
-/** resolvePublicViewResponse represents a declared HTTP response from the resolve public view response operation. */
-export type resolvePublicViewResponse = (resolvePublicViewResponseSuccess | resolvePublicViewResponseError)
+/** listViewOverridesResponse represents a declared HTTP response from the list view overrides response operation. */
+export type listViewOverridesResponse = (listViewOverridesResponseSuccess | listViewOverridesResponseError)
 
-/** getResolvePublicViewUrl builds the relative URL for its OpenAPI operation. */
-export const getResolvePublicViewUrl = (tenantSlug: string,) => {
+/** getListViewOverridesUrl builds the relative URL for its OpenAPI operation. */
+export const getListViewOverridesUrl = (tenantSlug: string,) => {
 
 
-  return `/api/v1/public/t/${tenantSlug}/views:resolve`
+  return `/api/v1/t/${tenantSlug}/view-overrides`
 }
 
 /**
- * Resolves public view within the authorized request scope.
+ * Returns the requested page of view overrides within the authorized request scope.
  */
-export const resolvePublicView = async (tenantSlug: string,
-    publicViewResolveBody: PublicViewResolveBody, options?: Parameters<typeof meridianFetch>[1]): Promise<resolvePublicViewResponse> => {
+export const listViewOverrides = async (tenantSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listViewOverridesResponse> => {
 
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return meridianFetch<resolvePublicViewResponse>(getResolvePublicViewUrl(tenantSlug),
+  return meridianFetch<listViewOverridesResponse>(getListViewOverridesUrl(tenantSlug),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(publicViewResolveBody)
+    method: 'GET'
+
+
   }
 );}
 
@@ -1879,15 +1400,134 @@ return meridianFetch<resolvePublicViewResponse>(getResolvePublicViewUrl(tenantSl
 
 
 
-/** getResolvePublicViewMutationKey is generated from the Meridian OpenAPI contract for get resolve public view mutation key. */
-export const getResolvePublicViewMutationKey = () => ['resolvePublicView'] as const;
+/** getListViewOverridesQueryKey is generated from the Meridian OpenAPI contract for get list view overrides query key. */
+export const getListViewOverridesQueryKey = (tenantSlug: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','t',tenantSlug,'view-overrides'
+    ] as const;
+    }
 
-/** getResolvePublicViewMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getResolvePublicViewMutationOptions = <TError = NotFoundResponse | InputSpecMismatchResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolvePublicView>>, TError,ResolvePublicViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof resolvePublicView>>, TError,ResolvePublicViewMutationVariables, TContext> => {
 
-const mutationKey = getResolvePublicViewMutationKey();
+/** getListViewOverridesQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListViewOverridesQueryOptions = <TData = Awaited<ReturnType<typeof listViewOverrides>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listViewOverrides>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListViewOverridesQueryKey(tenantSlug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listViewOverrides>>> = ({ signal }) => listViewOverrides(toValue(tenantSlug), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listViewOverrides>>, TError, TData>
+}
+
+/** ListViewOverridesQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListViewOverridesQueryResult = NonNullable<Awaited<ReturnType<typeof listViewOverrides>>>
+/** ListViewOverridesQueryError is the error type returned by its generated Vue Query hook. */
+export type ListViewOverridesQueryError = ErrorResponse
+
+
+
+/** useListViewOverrides executes its OpenAPI operation through TanStack Vue Query. */
+export function useListViewOverrides<TData = Awaited<ReturnType<typeof listViewOverrides>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listViewOverrides>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListViewOverridesQueryOptions(tenantSlug,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** deleteViewOverrideResponse204 represents a declared HTTP response from the delete view override response204 operation. */
+export type deleteViewOverrideResponse204 = {
+  /** Data contains the decoded response payload. */
+  data: void
+  /** Status is the HTTP response status code. */
+  status: 204
+}
+
+/** deleteViewOverrideResponse404 represents a declared HTTP response from the delete view override response404 operation. */
+export type deleteViewOverrideResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** deleteViewOverrideResponse412 represents a declared HTTP response from the delete view override response412 operation. */
+export type deleteViewOverrideResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** deleteViewOverrideResponseSuccess represents a declared HTTP response from the delete view override response success operation. */
+export type deleteViewOverrideResponseSuccess = (deleteViewOverrideResponse204) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** deleteViewOverrideResponseError represents a declared HTTP response from the delete view override response error operation. */
+export type deleteViewOverrideResponseError = (deleteViewOverrideResponse404 | deleteViewOverrideResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** deleteViewOverrideResponse represents a declared HTTP response from the delete view override response operation. */
+export type deleteViewOverrideResponse = (deleteViewOverrideResponseSuccess | deleteViewOverrideResponseError)
+
+/** getDeleteViewOverrideUrl builds the relative URL for its OpenAPI operation. */
+export const getDeleteViewOverrideUrl = (tenantSlug: string,
+    viewId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/view-overrides/${viewId}`
+}
+
+/**
+ * Deletes the selected view override within the authorized request scope.
+ */
+export const deleteViewOverride = async (tenantSlug: string,
+    viewId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<deleteViewOverrideResponse> => {
+
+  return meridianFetch<deleteViewOverrideResponse>(getDeleteViewOverrideUrl(tenantSlug,viewId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+/** getDeleteViewOverrideMutationKey is generated from the Meridian OpenAPI contract for get delete view override mutation key. */
+export const getDeleteViewOverrideMutationKey = () => ['deleteViewOverride'] as const;
+
+/** getDeleteViewOverrideMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getDeleteViewOverrideMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteViewOverride>>, TError,DeleteViewOverrideMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteViewOverride>>, TError,DeleteViewOverrideMutationVariables, TContext> => {
+
+const mutationKey = getDeleteViewOverrideMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -1897,10 +1537,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolvePublicView>>, ResolvePublicViewMutationVariables> = (props) => {
-          const {tenantSlug,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteViewOverride>>, DeleteViewOverrideMutationVariables> = (props) => {
+          const {tenantSlug,viewId} = props ?? {};
 
-          return  resolvePublicView(tenantSlug,data,requestOptions)
+          return  deleteViewOverride(tenantSlug,viewId,requestOptions)
         }
 
 
@@ -1910,23 +1550,380 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    /** ResolvePublicViewMutationResult is generated from the Meridian OpenAPI contract for resolve public view mutation result. */
-    export type ResolvePublicViewMutationResult = NonNullable<Awaited<ReturnType<typeof resolvePublicView>>>
-    /** ResolvePublicViewMutationBody is the request body type for its generated OpenAPI operation. */
-    export type ResolvePublicViewMutationBody = PublicViewResolveBody
-    /** ResolvePublicViewMutationError is generated from the Meridian OpenAPI contract for resolve public view mutation error. */
-    export type ResolvePublicViewMutationError = NotFoundResponse | InputSpecMismatchResponse
-    /** ResolvePublicViewMutationVariables is generated from the Meridian OpenAPI contract for resolve public view mutation variables. */
-    export type ResolvePublicViewMutationVariables = {/** TenantSlug carries the tenant slug value for ResolvePublicViewMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: PublicViewResolveBody}
+    /** DeleteViewOverrideMutationResult is generated from the Meridian OpenAPI contract for delete view override mutation result. */
+    export type DeleteViewOverrideMutationResult = NonNullable<Awaited<ReturnType<typeof deleteViewOverride>>>
 
-    /** useResolvePublicView executes its OpenAPI operation through TanStack Vue Query. */
-    export const useResolvePublicView = <TError = NotFoundResponse | InputSpecMismatchResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolvePublicView>>, TError,ResolvePublicViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+    /** DeleteViewOverrideMutationError is generated from the Meridian OpenAPI contract for delete view override mutation error. */
+    export type DeleteViewOverrideMutationError = ErrorResponse
+    /** DeleteViewOverrideMutationVariables is generated from the Meridian OpenAPI contract for delete view override mutation variables. */
+    export type DeleteViewOverrideMutationVariables = {/** TenantSlug carries the tenant slug value for DeleteViewOverrideMutationVariables. */ tenantSlug: string;/** ViewId carries the view id value for DeleteViewOverrideMutationVariables. */ viewId: string}
+
+    /** useDeleteViewOverride executes its OpenAPI operation through TanStack Vue Query. */
+    export const useDeleteViewOverride = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteViewOverride>>, TError,DeleteViewOverrideMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof resolvePublicView>>,
+        Awaited<ReturnType<typeof deleteViewOverride>>,
         TError,
-        ResolvePublicViewMutationVariables,
+        DeleteViewOverrideMutationVariables,
         TContext
       > => {
-      return useMutation(getResolvePublicViewMutationOptions(options), queryClient);
+      return useMutation(getDeleteViewOverrideMutationOptions(options), queryClient);
+    }
+    /** putViewOverrideResponse200 represents a declared HTTP response from the put view override response200 operation. */
+    export type putViewOverrideResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ViewOverride
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** putViewOverrideResponse404 represents a declared HTTP response from the put view override response404 operation. */
+export type putViewOverrideResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** putViewOverrideResponse412 represents a declared HTTP response from the put view override response412 operation. */
+export type putViewOverrideResponse412 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 412
+}
+
+/** putViewOverrideResponseSuccess represents a declared HTTP response from the put view override response success operation. */
+export type putViewOverrideResponseSuccess = (putViewOverrideResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** putViewOverrideResponseError represents a declared HTTP response from the put view override response error operation. */
+export type putViewOverrideResponseError = (putViewOverrideResponse404 | putViewOverrideResponse412) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** putViewOverrideResponse represents a declared HTTP response from the put view override response operation. */
+export type putViewOverrideResponse = (putViewOverrideResponseSuccess | putViewOverrideResponseError)
+
+/** getPutViewOverrideUrl builds the relative URL for its OpenAPI operation. */
+export const getPutViewOverrideUrl = (tenantSlug: string,
+    viewId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/view-overrides/${viewId}`
+}
+
+/**
+ * Creates or replaces the selected view override within the authorized request scope.
+ */
+export const putViewOverride = async (tenantSlug: string,
+    viewId: string,
+    viewOverridePutRequest: ViewOverridePutRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<putViewOverrideResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<putViewOverrideResponse>(getPutViewOverrideUrl(tenantSlug,viewId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(viewOverridePutRequest)
+  }
+);}
+
+
+
+
+
+/** getPutViewOverrideMutationKey is generated from the Meridian OpenAPI contract for get put view override mutation key. */
+export const getPutViewOverrideMutationKey = () => ['putViewOverride'] as const;
+
+/** getPutViewOverrideMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getPutViewOverrideMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putViewOverride>>, TError,PutViewOverrideMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putViewOverride>>, TError,PutViewOverrideMutationVariables, TContext> => {
+
+const mutationKey = getPutViewOverrideMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putViewOverride>>, PutViewOverrideMutationVariables> = (props) => {
+          const {tenantSlug,viewId,data} = props ?? {};
+
+          return  putViewOverride(tenantSlug,viewId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** PutViewOverrideMutationResult is generated from the Meridian OpenAPI contract for put view override mutation result. */
+    export type PutViewOverrideMutationResult = NonNullable<Awaited<ReturnType<typeof putViewOverride>>>
+    /** PutViewOverrideMutationBody is the request body type for its generated OpenAPI operation. */
+    export type PutViewOverrideMutationBody = ViewOverridePutRequest
+    /** PutViewOverrideMutationError is generated from the Meridian OpenAPI contract for put view override mutation error. */
+    export type PutViewOverrideMutationError = ErrorResponse
+    /** PutViewOverrideMutationVariables is generated from the Meridian OpenAPI contract for put view override mutation variables. */
+    export type PutViewOverrideMutationVariables = {/** TenantSlug carries the tenant slug value for PutViewOverrideMutationVariables. */ tenantSlug: string;/** ViewId carries the view id value for PutViewOverrideMutationVariables. */ viewId: string;/** Data contains the decoded response payload. */ data: ViewOverridePutRequest}
+
+    /** usePutViewOverride executes its OpenAPI operation through TanStack Vue Query. */
+    export const usePutViewOverride = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putViewOverride>>, TError,PutViewOverrideMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof putViewOverride>>,
+        TError,
+        PutViewOverrideMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutViewOverrideMutationOptions(options), queryClient);
+    }
+    /** listViewsResponse200 represents a declared HTTP response from the list views response200 operation. */
+    export type listViewsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ViewList
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listViewsResponse404 represents a declared HTTP response from the list views response404 operation. */
+export type listViewsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listViewsResponseSuccess represents a declared HTTP response from the list views response success operation. */
+export type listViewsResponseSuccess = (listViewsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listViewsResponseError represents a declared HTTP response from the list views response error operation. */
+export type listViewsResponseError = (listViewsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listViewsResponse represents a declared HTTP response from the list views response operation. */
+export type listViewsResponse = (listViewsResponseSuccess | listViewsResponseError)
+
+/** getListViewsUrl builds the relative URL for its OpenAPI operation. */
+export const getListViewsUrl = (tenantSlug: string,
+    params?: ListViewsParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
+
+  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/views?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/views`
+}
+
+/**
+ * Returns the requested page of views within the authorized request scope.
+ */
+export const listViews = async (tenantSlug: string,
+    params?: ListViewsParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listViewsResponse> => {
+
+  return meridianFetch<listViewsResponse>(getListViewsUrl(tenantSlug,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListViewsQueryKey is generated from the Meridian OpenAPI contract for get list views query key. */
+export const getListViewsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListViewsParams>,) => {
+    return [
+    'api','v1','t',tenantSlug,'views', ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+/** getListViewsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListViewsQueryOptions = <TData = Awaited<ReturnType<typeof listViews>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListViewsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listViews>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListViewsQueryKey(tenantSlug,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listViews>>> = ({ signal }) => listViews(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listViews>>, TError, TData>
+}
+
+/** ListViewsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListViewsQueryResult = NonNullable<Awaited<ReturnType<typeof listViews>>>
+/** ListViewsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListViewsQueryError = ErrorResponse
+
+
+
+/** useListViews executes its OpenAPI operation through TanStack Vue Query. */
+export function useListViews<TData = Awaited<ReturnType<typeof listViews>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListViewsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listViews>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListViewsQueryOptions(tenantSlug,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
+
+
+
+/** resolveViewResponse200 represents a declared HTTP response from the resolve view response200 operation. */
+export type resolveViewResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ViewResolution
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** resolveViewResponse404 represents a declared HTTP response from the resolve view response404 operation. */
+export type resolveViewResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** resolveViewResponse422 represents a declared HTTP response from the resolve view response422 operation. */
+export type resolveViewResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** resolveViewResponseSuccess represents a declared HTTP response from the resolve view response success operation. */
+export type resolveViewResponseSuccess = (resolveViewResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** resolveViewResponseError represents a declared HTTP response from the resolve view response error operation. */
+export type resolveViewResponseError = (resolveViewResponse404 | resolveViewResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** resolveViewResponse represents a declared HTTP response from the resolve view response operation. */
+export type resolveViewResponse = (resolveViewResponseSuccess | resolveViewResponseError)
+
+/** getResolveViewUrl builds the relative URL for its OpenAPI operation. */
+export const getResolveViewUrl = (tenantSlug: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/views:resolve`
+}
+
+/**
+ * Resolves view within the authorized request scope.
+ */
+export const resolveView = async (tenantSlug: string,
+    viewResolveRequest: ViewResolveRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<resolveViewResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<resolveViewResponse>(getResolveViewUrl(tenantSlug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(viewResolveRequest)
+  }
+);}
+
+
+
+
+
+/** getResolveViewMutationKey is generated from the Meridian OpenAPI contract for get resolve view mutation key. */
+export const getResolveViewMutationKey = () => ['resolveView'] as const;
+
+/** getResolveViewMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getResolveViewMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveView>>, TError,ResolveViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolveView>>, TError,ResolveViewMutationVariables, TContext> => {
+
+const mutationKey = getResolveViewMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveView>>, ResolveViewMutationVariables> = (props) => {
+          const {tenantSlug,data} = props ?? {};
+
+          return  resolveView(tenantSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** ResolveViewMutationResult is generated from the Meridian OpenAPI contract for resolve view mutation result. */
+    export type ResolveViewMutationResult = NonNullable<Awaited<ReturnType<typeof resolveView>>>
+    /** ResolveViewMutationBody is the request body type for its generated OpenAPI operation. */
+    export type ResolveViewMutationBody = ViewResolveRequest
+    /** ResolveViewMutationError is generated from the Meridian OpenAPI contract for resolve view mutation error. */
+    export type ResolveViewMutationError = ErrorResponse
+    /** ResolveViewMutationVariables is generated from the Meridian OpenAPI contract for resolve view mutation variables. */
+    export type ResolveViewMutationVariables = {/** TenantSlug carries the tenant slug value for ResolveViewMutationVariables. */ tenantSlug: string;/** Data contains the decoded response payload. */ data: ViewResolveRequest}
+
+    /** useResolveView executes its OpenAPI operation through TanStack Vue Query. */
+    export const useResolveView = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveView>>, TError,ResolveViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof resolveView>>,
+        TError,
+        ResolveViewMutationVariables,
+        TContext
+      > => {
+      return useMutation(getResolveViewMutationOptions(options), queryClient);
     }

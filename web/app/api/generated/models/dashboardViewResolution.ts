@@ -5,6 +5,7 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
+import type { DashboardViewResolutionKind } from './dashboardViewResolutionKind.ts';
 import type { DashboardViewResolutionMetrics } from './dashboardViewResolutionMetrics.ts';
 import type { ViewDefinition } from './viewDefinition.ts';
 
@@ -13,7 +14,7 @@ import type { ViewDefinition } from './viewDefinition.ts';
  */
 export interface DashboardViewResolution {
   /** specifies the kind associated with this dashboard view resolution. */
-  kind: 'catalog_dashboard';
+  kind: DashboardViewResolutionKind;
   /** contains the view definition associated with this dashboard view resolution. */
   view: ViewDefinition;
   /** specifies the metrics associated with this dashboard view resolution. */

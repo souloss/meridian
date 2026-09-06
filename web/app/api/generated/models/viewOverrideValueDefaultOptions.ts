@@ -9,4 +9,4 @@
 /**
  * specifies the default options associated with this view override value.
  */
-export type ViewOverrideValueDefaultOptions = { [key: string]: unknown };
+export type ViewOverrideValueDefaultOptions = {[key: string]: unknown};

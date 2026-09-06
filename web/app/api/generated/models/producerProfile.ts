@@ -38,13 +38,9 @@ export interface ProducerProfile {
   /**
      * contains the ordered args associated with this producer profile.
      * @maxItems 64
-     * @items.maxLength 512
      */
   args: string[];
-  /**
-     * Names only; every name must be in the deployment PRODUCER_ENV_ALLOWLIST. Values are never stored or returned.
-     * @items.pattern ^[A-Z][A-Z0-9_]*$
-     */
+  /** Names only; every name must be in the deployment PRODUCER_ENV_ALLOWLIST. Values are never stored or returned. */
   envAllowlist: string[];
   /**
      * contains the ordered supported kinds associated with this producer profile.
@@ -83,10 +79,7 @@ export interface ProducerProfile {
   enabled: boolean;
   /** contains the producer dependency status associated with this producer profile. */
   dependencyStatus: ProducerDependencyStatus;
-  /**
-     * specifies the unavailable reason associated with this producer profile.
-     * @nullable
-     */
+  /** specifies the unavailable reason associated with this producer profile. */
   unavailableReason: string | null;
   /**
      * is the monotonic optimistic-concurrency version of this resource.

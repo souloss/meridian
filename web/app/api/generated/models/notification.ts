@@ -21,10 +21,7 @@ export interface Notification {
   title: string;
   /** specifies the body associated with this notification. */
   body: string;
-  /**
-     * specifies the resource url associated with this notification.
-     * @nullable
-     */
+  /** specifies the resource url associated with this notification. */
   resourceUrl: string | null;
   /** specifies the read at associated with this notification. */
   readAt: Timestamp | null;

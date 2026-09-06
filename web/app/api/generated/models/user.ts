@@ -30,10 +30,7 @@ export interface User {
      * @maxLength 128
      */
   displayName: string;
-  /**
-     * specifies the email associated with this user.
-     * @nullable
-     */
+  /** specifies the email associated with this user. */
   email: string | null;
   /** is the current lifecycle or processing state. */
   status: UserStatus;

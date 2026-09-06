@@ -27,7 +27,9 @@ type operationAuthPolicy struct {
 
 var authPolicies = sync.OnceValue(loadOperationAuthPolicies)
 
-func (s *Server) authenticate(next api.StrictHandlerFunc, operationID string) api.StrictHandlerFunc {
+type strictHandlerFunc func(context.Context, http.ResponseWriter, *http.Request, any) (any, error)
+
+func (s *Server) authenticateOperation(next strictHandlerFunc, operationID string) strictHandlerFunc {
 	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
 		if s.identity == nil {
 			return next(ctx, w, r, request)

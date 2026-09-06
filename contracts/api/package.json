@@ -1,0 +1,1 @@
+{"name":"@meridian/api-contracts","private":true,"type":"module","packageManager":"pnpm@11.20.0","dependencies":{"@typespec/compiler":"1.15.0","@typespec/http":"1.15.0","@typespec/openapi":"1.15.0","@typespec/openapi3":"1.15.0"}}

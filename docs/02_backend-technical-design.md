@@ -28,7 +28,7 @@
 
 后端采用 Go 模块化单体、PostgreSQL、本地持久卷上的 content-addressed blob store、River PostgreSQL 队列和 Git CLI。建议目录：
 
-基础实现栈固定为 Go 1.27.1、`oapi-codegen >=2.8,<3` 的 strict server/client/models、`chi/v5` 路由及 `nethttp-middleware` 请求校验、`pgx/v5` + `sqlc` 数据访问、goose v3 内嵌 SQL 迁移、River PostgreSQL 队列、标准库 `slog` JSON 日志和 Prometheus client 指标。OpenAPI 资产使用 `pb33f/libopenapi` 解析、规范化输入和结构化 diff，RFC 6902/7386 patch 使用 `evanphx/json-patch/v5` 执行。使用构造函数手工组装依赖，不引入运行时 DI 容器、ORM、Redis 或独立消息中间件；版本范围见 manifest，具体版本由 `go.mod/go.sum` 精确锁定。
+基础实现栈固定为 Go 1.27.1、`oapi-codegen >=2.8,<3` 的 strict server/models、`chi/v5` 路由及 `nethttp-middleware` 请求校验、`pgx/v5` + `sqlc` 数据访问、goose v3 内嵌 SQL 迁移、River PostgreSQL 队列、标准库 `slog` JSON 日志和 Prometheus client 指标。OpenAPI 资产使用 `pb33f/libopenapi` 解析、规范化输入和结构化 diff，RFC 6902/7386 patch 使用 `evanphx/json-patch/v5` 执行。使用构造函数手工组装依赖，不引入运行时 DI 容器、ORM、Redis 或独立消息中间件；版本范围见 manifest，具体版本由 `go.mod/go.sum` 精确锁定。
 
 Go 1.27.1 的使用边界固定如下：
 
@@ -43,7 +43,11 @@ cmd/meridian               唯一二进制入口，Cobra 编排 serve 与业务�
 configs                    oapi-codegen 等生成器配置
 contracts                  唯一机器可读契约源
 internal/command           Cobra 命令、参数与进程生命周期
-internal/generated/api     oapi-codegen 生成的 types/server/client/spec，只读
+internal/generated/api     oapi-codegen 生成的领域 transport，只读
+internal/generated/api
+                          跨领域共享 models、错误哨兵和嵌入式 canonical spec
+internal/generated/api/<domain>
+                          各 API 领域的 models、strict server、路由注册与 spec
 internal/generated/repository sqlc 生成的 models/queries/DBTX，只读
 internal/handler           HTTP 适配与生成接口实现，按业务域拆文件
 internal/domain            纯领域模型、状态机和不变量
@@ -57,9 +61,9 @@ internal/storage           本地 CAS blob 与签名下载
 migrations                 goose SQL 与 sqlc 查询源
 ```
 
-依赖方向固定为 `cmd -> command -> handler -> service`，repository 实现 service 声明的持久化端口；handler 只把 `internal/generated/api` DTO 映射到用例输入，具体适配器在 `internal/command` 装配。跨仓储用例事务由 service 通过事务端口编排，单仓储原子写可封装在 repository 内；纯算法包不得依赖数据库、HTTP、生成 DTO 或任务实现。外部工具、Git、对象存储、AI producer 都通过端口适配器接入。
+依赖方向固定为 `cmd -> command -> handler -> service`，repository 实现 service 声明的持久化端口；各领域 handler 只依赖本领域生成 transport 和根 `api` 包中的共享 models，并将其映射到用例输入，领域注册适配器集中在 `internal/handler/domain_adapters.gen.go`。领域生成包之间不得互相依赖；跨领域共享类型必须下沉到根 `internal/generated/api`。跨仓储用例事务由 service 通过事务端口编排，单仓储原子写可封装在 repository 内；纯算法包不得依赖数据库、HTTP、生成 DTO 或任务实现。外部工具、Git、对象存储、AI producer 都通过端口适配器接入。
 
-`oapi-codegen` 从同一份 OpenAPI 通过独立配置生成 `types.gen.go`、`server.gen.go`、`client.gen.go` 与 `spec.gen.go`，共用一个 `api` 包和一套 DTO。所有 operation、schema、属性和参数必须在 OpenAPI 提供语义描述；描述直接传播为 GoDoc/JSDoc，生成器自身产生的 transport 包装类型再由确定性后处理补注释。契约测试检查 OpenAPI 描述、全部 Go 导出声明/字段以及 TypeScript 生成物，禁止手改生成文件。服务从 M0 起始终装配 Strict Server；确定性生成的 `strict_unimplemented.gen.go` 为尚未进入当前实现阶段的 operation 返回 501，当前阶段实现通过编译期覆盖对应方法。
+`contracts/api/` 是唯一可编辑的 TypeSpec 源：`main.tsp` 汇总公共模型和所有领域入口，`common/models.tsp` 是共享模型的唯一 import-mapping 边界，`domains/*.tsp` 按领域维护 HTTP operation。脚本把 TypeSpec 编译为 `contracts/openapi.yaml` 以及 `build/contracts/api/{common,domains}`，不在源目录维护任何重复 YAML，也不使用单大文档的 `include-tags` 过滤。common spec 只生成根包共享 models，12 个领域 spec 通过 `import-mapping` 引用 common schema，并由自动遍历脚本生成各自的 models/strict server；canonical spec 生成根包的嵌入式运行时校验文档。每个领域 server 只注册本领域路径，应用启动时由 `internal/handler/domain_adapters.gen.go` 将各领域注册器装配到同一个 Chi router。所有 operation、schema、属性和参数必须在 TypeSpec 提供语义描述；描述传播为 GoDoc/JSDoc，生成器自身产生的 transport 包装类型再由确定性后处理补注释。契约测试检查 TypeSpec 源、canonical bundle、领域 operation 集合、全部 Go 导出声明/字段以及 TypeScript 生成物，禁止手改生成文件。服务从 M0 起始终装配各领域 Strict Server；确定性生成的领域 `strict_unimplemented.gen.go` 为尚未进入当前实现阶段的 operation 返回 501，当前阶段实现通过编译期覆盖对应方法。
 
 浏览器静态产物固定从 `web/.output/public` embed 到同一 Go 二进制。Go HTTP 层先匹配 `/api/*`、下载制品和真实静态文件；只对已登记的前端路由回退 `index.html`，不得让 API 404 被 SPA fallback 吞掉。带内容 hash 的资源使用一年 immutable cache，`index.html` 使用 no-cache。
 
@@ -194,8 +198,8 @@ MVP blob 实现固定为 `domain.yaml#/storage/blobStore`：`MERIDIAN_BLOB_ROOT`
 所有 HTTP operation 均定义在 `openapi.yaml`。实现流程：
 
 1. lint OpenAPI 3.1、解析全部 `$ref`、检查 operationId 唯一；
-2. 生成 Go server interface/models 和 TypeScript client/types；
-3. transport adapter 实现生成接口，业务层不得直接使用框架 request；
+2. 对 common 与各 API 领域分别运行 `oapi-codegen`，生成领域 server interface/models/spec；
+3. 各领域 transport adapter 实现本领域生成接口，业务层不得直接使用框架 request；
 4. CI 重新生成并断言工作区无差异；
 5. 以契约中的 examples 和 `acceptance.yaml` 生成 contract tests。
 

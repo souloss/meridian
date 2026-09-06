@@ -34,34 +34,19 @@ export interface LayerRevision {
   contentType: ContentType;
   /** specifies the content url associated with this layer revision. */
   contentUrl?: string;
-  /**
-     * specifies the dialect associated with this layer revision.
-     * @nullable
-     */
+  /** specifies the dialect associated with this layer revision. */
   dialect: string | null;
-  /**
-     * specifies the source branch associated with this layer revision.
-     * @nullable
-     */
+  /** specifies the source branch associated with this layer revision. */
   sourceBranch: string | null;
-  /**
-     * specifies the git commit associated with this layer revision.
-     * @nullable
-     */
+  /** specifies the git commit associated with this layer revision. */
   gitCommit: string | null;
   /** specifies the created by associated with this layer revision. */
   createdBy: Uuid | null;
-  /**
-     * specifies the ai meta associated with this layer revision.
-     * @nullable
-     */
+  /** specifies the ai meta associated with this layer revision. */
   aiMeta: LayerRevisionAiMeta;
   /** contains the revision status associated with this layer revision. */
   reviewStatus: RevisionStatus;
-  /**
-     * specifies the review comment associated with this layer revision.
-     * @nullable
-     */
+  /** specifies the review comment associated with this layer revision. */
   reviewComment: string | null;
   /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;

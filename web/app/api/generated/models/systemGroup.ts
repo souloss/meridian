@@ -5,7 +5,7 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
-import type { CapabilityList } from './capabilityList.ts';
+import type { CapabilityListItem } from './capabilityListItem.ts';
 import type { ETag } from './eTag.ts';
 import type { Slug } from './slug.ts';
 import type { Timestamp } from './timestamp.ts';
@@ -25,15 +25,12 @@ export interface SystemGroup {
   slug: Slug;
   /** specifies the display name associated with this system group. */
   displayName: string;
-  /**
-     * specifies the description associated with this system group.
-     * @nullable
-     */
+  /** specifies the description associated with this system group. */
   description: string | null;
   /** contains the ordered service ids associated with this system group. */
   serviceIds: Uuid[];
   /** lists actions the authenticated principal may perform on this resource. */
-  capabilities: CapabilityList;
+  capabilities: CapabilityListItem;
   /** is the RFC 3339 UTC instant when this resource was created. */
   createdAt: Timestamp;
   /** is the RFC 3339 UTC instant when this resource was last updated. */

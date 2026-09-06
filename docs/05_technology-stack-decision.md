@@ -101,7 +101,7 @@ v1 不引入 Next.js/React、独立 Vite SPA、Naive UI、UnoCSS、shadcn-vue �
 M0 必须先完成以下 executable spike，全部通过才允许业务模块铺开：
 
 1. Go 1.27.1 编译单二进制，embed Nuxt SPA；任意动态深链刷新成功，API 404 不回退 HTML；
-2. 同一 OpenAPI 同时生成 oapi-codegen server/client 与 Orval Vue Query client/MSW，重新生成无 diff，fixture 请求通过；
+2. canonical OpenAPI bundle 同时驱动各领域的 oapi-codegen server/models/spec 与 Orval Vue Query client/MSW，重新生成无 diff，fixture 请求通过；
 3. pgx 事务内写业务行、outbox 和 River job，故障回滚后三者均不可见；空库 goose/River up、显式 down、再次 up 通过；
 4. CodeMirror fixture 覆盖 1 MiB 编辑/preview 和 5/10 MiB 只读，交互期间没有超过 50 ms 的重复 long task；
 5. Nuxt UI Table 覆盖 10k 虚拟行、键盘焦点和明确 action；Cytoscape fixture 覆盖 500 节点/5000 边并达到首屏 2 秒；

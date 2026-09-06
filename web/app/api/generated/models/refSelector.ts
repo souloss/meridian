@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { RefName } from './refName.ts';
+import type { RefSelectorType } from './refSelectorType.ts';
 import type { RefType } from './refType.ts';
 import type { Uuid } from './uuid.ts';
 
@@ -14,7 +15,7 @@ import type { Uuid } from './uuid.ts';
  */
 export interface RefSelector {
   /** specifies the type associated with this ref selector. */
-  type: 'ref';
+  type: RefSelectorType;
   /** identifies the asset associated with this resource. */
   assetId: Uuid;
   /** contains the ref type associated with this ref selector. */

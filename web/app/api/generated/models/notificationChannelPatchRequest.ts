@@ -21,7 +21,6 @@ export interface NotificationChannelPatchRequest {
   /**
      * specifies the endpoint associated with this notification channel patch request.
      * @maxLength 2048
-     * @nullable
      */
   endpoint?: string | null;
 }

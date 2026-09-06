@@ -18,7 +18,6 @@ export interface TagPatchRequest {
   name?: string;
   /**
      * specifies the color associated with this tag patch request.
-     * @nullable
      * @pattern ^#[0-9A-Fa-f]{6}$
      */
   color?: string | null;

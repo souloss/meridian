@@ -26,17 +26,13 @@ import {
 } from 'vue';
 
 import type {
-  CsrfInvalidResponse,
   CsrfToken,
+  ErrorResponse,
   LoginRequest,
   LoginResult,
   Me,
-  PreconditionFailedResponse,
-  RateLimitedResponse,
-  UnauthenticatedResponse,
-  UserPreferencesPatchBody,
-  UserPreferencesResponse,
-  ValidationErrorResponse
+  UserPreferences,
+  UserPreferencesPatchRequest
 } from '../models';
 
 import { meridianFetch } from '../../fetcher.ts';
@@ -58,7 +54,7 @@ export type getCsrfTokenResponse200 = {
 /** getCsrfTokenResponse401 represents a declared HTTP response from the get csrf token response401 operation. */
 export type getCsrfTokenResponse401 = {
   /** Data contains the decoded response payload. */
-  data: UnauthenticatedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 401
 }
@@ -111,7 +107,7 @@ export const getGetCsrfTokenQueryKey = () => {
 
 
 /** getGetCsrfTokenQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetCsrfTokenQueryOptions = <TData = Awaited<ReturnType<typeof getCsrfToken>>, TError = UnauthenticatedResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+export const getGetCsrfTokenQueryOptions = <TData = Awaited<ReturnType<typeof getCsrfToken>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -132,12 +128,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** GetCsrfTokenQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetCsrfTokenQueryResult = NonNullable<Awaited<ReturnType<typeof getCsrfToken>>>
 /** GetCsrfTokenQueryError is the error type returned by its generated Vue Query hook. */
-export type GetCsrfTokenQueryError = UnauthenticatedResponse
+export type GetCsrfTokenQueryError = ErrorResponse
 
 
 
 /** useGetCsrfToken executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetCsrfToken<TData = Awaited<ReturnType<typeof getCsrfToken>>, TError = UnauthenticatedResponse>(
+export function useGetCsrfToken<TData = Awaited<ReturnType<typeof getCsrfToken>>, TError = ErrorResponse>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -167,7 +163,7 @@ export type loginResponse200 = {
 /** loginResponse401 represents a declared HTTP response from the login response401 operation. */
 export type loginResponse401 = {
   /** Data contains the decoded response payload. */
-  data: UnauthenticatedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 401
 }
@@ -175,7 +171,7 @@ export type loginResponse401 = {
 /** loginResponse429 represents a declared HTTP response from the login response429 operation. */
 export type loginResponse429 = {
   /** Data contains the decoded response payload. */
-  data: RateLimitedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 429
 }
@@ -229,7 +225,7 @@ return meridianFetch<loginResponse>(getLoginUrl(),
 export const getLoginMutationKey = () => ['login'] as const;
 
 /** getLoginMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getLoginMutationOptions = <TError = UnauthenticatedResponse | RateLimitedResponse,
+export const getLoginMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,LoginMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,LoginMutationVariables, TContext> => {
 
@@ -261,12 +257,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** LoginMutationBody is the request body type for its generated OpenAPI operation. */
     export type LoginMutationBody = LoginRequest
     /** LoginMutationError is generated from the Meridian OpenAPI contract for login mutation error. */
-    export type LoginMutationError = UnauthenticatedResponse | RateLimitedResponse
+    export type LoginMutationError = ErrorResponse
     /** LoginMutationVariables is generated from the Meridian OpenAPI contract for login mutation variables. */
     export type LoginMutationVariables = {/** Data contains the decoded response payload. */ data: LoginRequest}
 
     /** useLogin executes its OpenAPI operation through TanStack Vue Query. */
-    export const useLogin = <TError = UnauthenticatedResponse | RateLimitedResponse,
+    export const useLogin = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,LoginMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof login>>,
@@ -287,7 +283,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** logoutResponse401 represents a declared HTTP response from the logout response401 operation. */
 export type logoutResponse401 = {
   /** Data contains the decoded response payload. */
-  data: UnauthenticatedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 401
 }
@@ -295,7 +291,7 @@ export type logoutResponse401 = {
 /** logoutResponse403 represents a declared HTTP response from the logout response403 operation. */
 export type logoutResponse403 = {
   /** Data contains the decoded response payload. */
-  data: CsrfInvalidResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 403
 }
@@ -343,7 +339,7 @@ export const logout = async ( options?: Parameters<typeof meridianFetch>[1]): Pr
 export const getLogoutMutationKey = () => ['logout'] as const;
 
 /** getLogoutMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getLogoutMutationOptions = <TError = UnauthenticatedResponse | CsrfInvalidResponse,
+export const getLogoutMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext> => {
 
@@ -374,11 +370,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>
 
     /** LogoutMutationError is generated from the Meridian OpenAPI contract for logout mutation error. */
-    export type LogoutMutationError = UnauthenticatedResponse | CsrfInvalidResponse
+    export type LogoutMutationError = ErrorResponse
 
 
     /** useLogout executes its OpenAPI operation through TanStack Vue Query. */
-    export const useLogout = <TError = UnauthenticatedResponse | CsrfInvalidResponse,
+    export const useLogout = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof logout>>,
@@ -399,7 +395,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 /** getMeResponse401 represents a declared HTTP response from the get me response401 operation. */
 export type getMeResponse401 = {
   /** Data contains the decoded response payload. */
-  data: UnauthenticatedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 401
 }
@@ -452,7 +448,7 @@ export const getGetMeQueryKey = () => {
 
 
 /** getGetMeQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetMeQueryOptions = <TData = Awaited<ReturnType<typeof getMe>>, TError = UnauthenticatedResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+export const getGetMeQueryOptions = <TData = Awaited<ReturnType<typeof getMe>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -473,12 +469,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 /** GetMeQueryResult is the resolved data returned by its generated Vue Query hook. */
 export type GetMeQueryResult = NonNullable<Awaited<ReturnType<typeof getMe>>>
 /** GetMeQueryError is the error type returned by its generated Vue Query hook. */
-export type GetMeQueryError = UnauthenticatedResponse
+export type GetMeQueryError = ErrorResponse
 
 
 
 /** useGetMe executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = UnauthenticatedResponse>(
+export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = ErrorResponse>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -500,7 +496,7 @@ export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = Una
 /** getMyPreferencesResponse200 represents a declared HTTP response from the get my preferences response200 operation. */
 export type getMyPreferencesResponse200 = {
   /** Data contains the decoded response payload. */
-  data: UserPreferencesResponse
+  data: UserPreferences
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -597,7 +593,7 @@ export function useGetMyPreferences<TData = Awaited<ReturnType<typeof getMyPrefe
 /** updateMyPreferencesResponse200 represents a declared HTTP response from the update my preferences response200 operation. */
 export type updateMyPreferencesResponse200 = {
   /** Data contains the decoded response payload. */
-  data: UserPreferencesResponse
+  data: UserPreferences
   /** Status is the HTTP response status code. */
   status: 200
 }
@@ -605,7 +601,7 @@ export type updateMyPreferencesResponse200 = {
 /** updateMyPreferencesResponse412 represents a declared HTTP response from the update my preferences response412 operation. */
 export type updateMyPreferencesResponse412 = {
   /** Data contains the decoded response payload. */
-  data: PreconditionFailedResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 412
 }
@@ -613,7 +609,7 @@ export type updateMyPreferencesResponse412 = {
 /** updateMyPreferencesResponse422 represents a declared HTTP response from the update my preferences response422 operation. */
 export type updateMyPreferencesResponse422 = {
   /** Data contains the decoded response payload. */
-  data: ValidationErrorResponse
+  data: ErrorResponse
   /** Status is the HTTP response status code. */
   status: 422
 }
@@ -642,7 +638,7 @@ export const getUpdateMyPreferencesUrl = () => {
 /**
  * Updates the selected my preferences within the authorized request scope.
  */
-export const updateMyPreferences = async (userPreferencesPatchBody: UserPreferencesPatchBody, options?: Parameters<typeof meridianFetch>[1]): Promise<updateMyPreferencesResponse> => {
+export const updateMyPreferences = async (userPreferencesPatchRequest: UserPreferencesPatchRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<updateMyPreferencesResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -655,7 +651,7 @@ return meridianFetch<updateMyPreferencesResponse>(getUpdateMyPreferencesUrl(),
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(userPreferencesPatchBody)
+    body: JSON.stringify(userPreferencesPatchRequest)
   }
 );}
 
@@ -667,7 +663,7 @@ return meridianFetch<updateMyPreferencesResponse>(getUpdateMyPreferencesUrl(),
 export const getUpdateMyPreferencesMutationKey = () => ['updateMyPreferences'] as const;
 
 /** getUpdateMyPreferencesMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
-export const getUpdateMyPreferencesMutationOptions = <TError = PreconditionFailedResponse | ValidationErrorResponse,
+export const getUpdateMyPreferencesMutationOptions = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMyPreferences>>, TError,UpdateMyPreferencesMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateMyPreferences>>, TError,UpdateMyPreferencesMutationVariables, TContext> => {
 
@@ -697,14 +693,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     /** UpdateMyPreferencesMutationResult is generated from the Meridian OpenAPI contract for update my preferences mutation result. */
     export type UpdateMyPreferencesMutationResult = NonNullable<Awaited<ReturnType<typeof updateMyPreferences>>>
     /** UpdateMyPreferencesMutationBody is the request body type for its generated OpenAPI operation. */
-    export type UpdateMyPreferencesMutationBody = UserPreferencesPatchBody
+    export type UpdateMyPreferencesMutationBody = UserPreferencesPatchRequest
     /** UpdateMyPreferencesMutationError is generated from the Meridian OpenAPI contract for update my preferences mutation error. */
-    export type UpdateMyPreferencesMutationError = PreconditionFailedResponse | ValidationErrorResponse
+    export type UpdateMyPreferencesMutationError = ErrorResponse
     /** UpdateMyPreferencesMutationVariables is generated from the Meridian OpenAPI contract for update my preferences mutation variables. */
-    export type UpdateMyPreferencesMutationVariables = {/** Data contains the decoded response payload. */ data: UserPreferencesPatchBody}
+    export type UpdateMyPreferencesMutationVariables = {/** Data contains the decoded response payload. */ data: UserPreferencesPatchRequest}
 
     /** useUpdateMyPreferences executes its OpenAPI operation through TanStack Vue Query. */
-    export const useUpdateMyPreferences = <TError = PreconditionFailedResponse | ValidationErrorResponse,
+    export const useUpdateMyPreferences = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMyPreferences>>, TError,UpdateMyPreferencesMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof updateMyPreferences>>,

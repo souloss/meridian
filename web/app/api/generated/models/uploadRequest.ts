@@ -9,7 +9,7 @@ import type { ContentType } from './contentType.ts';
 import type { KindId } from './kindId.ts';
 
 /**
- * defines validated input for the corresponding Meridian API operation.
+ * defines the multipart upload payload for an asset source.
  */
 export interface UploadRequest {
   /** specifies the file associated with this upload request. */

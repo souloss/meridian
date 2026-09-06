@@ -16,10 +16,7 @@ export interface ErrorResponse {
   code: ErrorCode;
   /** is a safe human-readable explanation and never contains a stack trace or secret. */
   message: string;
-  /**
-     * contains error-code-specific structured diagnostics, or null when no detail is available.
-     * @nullable
-     */
+  /** contains error-code-specific structured diagnostics, or null when no detail is available. */
   details?: ErrorResponseDetails;
   /**
      * correlates this result with server logs and audit records.

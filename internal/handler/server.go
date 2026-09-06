@@ -17,7 +17,6 @@ import (
 )
 
 type Server struct {
-	api.UnimplementedStrictServer
 	ready         atomic.Bool
 	assets        fs.FS
 	identity      *service.Identity
@@ -81,59 +80,58 @@ func (s *Server) Handler() http.Handler {
 	r.Use(middleware.RequestID)
 	r.Use(requestIDHeader)
 	r.Use(openAPIRequestValidator())
-	strict := api.NewStrictHandlerWithOptions(s, []api.StrictMiddlewareFunc{s.authenticate}, api.StrictHTTPServerOptions{
-		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, _ error) {
-			writeError(w, r, http.StatusBadRequest, "validation_error", "request does not satisfy the API contract")
-		},
-		ResponseErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
-			if quotaErr, ok := errors.AsType[*service.QuotaExceededError](err); ok {
-				writeErrorDetails(w, r, http.StatusConflict, "quota_exceeded", "tenant resource quota would be exceeded", map[string]any{
-					"quota": quotaErr.Resource, "current": quotaErr.Current, "limit": quotaErr.Limit,
-				})
-				return
-			}
-			switch {
-			case errors.Is(err, service.ErrUnauthenticated):
-				writeError(w, r, http.StatusUnauthorized, "unauthenticated", "authentication required")
-				return
-			case errors.Is(err, service.ErrCSRFInvalid):
-				writeError(w, r, http.StatusForbidden, "csrf_invalid", "CSRF token is missing or invalid")
-				return
-			case errors.Is(err, service.ErrNotFound):
-				writeError(w, r, http.StatusNotFound, "not_found", "resource not found")
-				return
-			case errors.Is(err, service.ErrDuplicate):
-				writeError(w, r, http.StatusConflict, "duplicate", "resource already exists")
-				return
-			case errors.Is(err, service.ErrValidation):
-				writeError(w, r, http.StatusUnprocessableEntity, "validation_error", "request violates a domain rule")
-				return
-			case errors.Is(err, service.ErrPrecondition):
-				writeError(w, r, http.StatusPreconditionFailed, "precondition_failed", "resource changed; refresh and retry")
-				return
-			case errors.Is(err, service.ErrCredentialInUse):
-				writeError(w, r, http.StatusConflict, "credential_in_use", "credential is still referenced by a repository")
-				return
-			case errors.Is(err, service.ErrIdempotencyConflict):
-				writeError(w, r, http.StatusConflict, "idempotency_conflict", "idempotency key was already used for a different request")
-				return
-			case errors.Is(err, service.ErrJobNotCancellable):
-				writeError(w, r, http.StatusConflict, "job_not_cancellable", "job has already reached a terminal state")
-				return
-			case errors.Is(err, service.ErrJobNotRetryable):
-				writeError(w, r, http.StatusConflict, "invalid_state", "job cannot be retried from its current state")
-				return
-			}
-			if errors.Is(err, api.ErrStrictOperationNotImplemented) {
-				writeError(w, r, http.StatusNotImplemented, "internal_error", "operation is not implemented")
-				return
-			}
-			writeError(w, r, http.StatusInternalServerError, "internal_error", "request failed")
-		},
-	})
-	api.HandlerFromMux(strict, r)
+	registerDomainHandlers(s, r)
 	r.NotFound(s.static)
 	return r
+}
+
+func requestErrorHandler(w http.ResponseWriter, r *http.Request, _ error) {
+	writeError(w, r, http.StatusBadRequest, "validation_error", "request does not satisfy the API contract")
+}
+
+func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
+	if quotaErr, ok := errors.AsType[*service.QuotaExceededError](err); ok {
+		writeErrorDetails(w, r, http.StatusConflict, "quota_exceeded", "tenant resource quota would be exceeded", map[string]any{
+			"quota": quotaErr.Resource, "current": quotaErr.Current, "limit": quotaErr.Limit,
+		})
+		return
+	}
+	switch {
+	case errors.Is(err, service.ErrUnauthenticated):
+		writeError(w, r, http.StatusUnauthorized, "unauthenticated", "authentication required")
+		return
+	case errors.Is(err, service.ErrCSRFInvalid):
+		writeError(w, r, http.StatusForbidden, "csrf_invalid", "CSRF token is missing or invalid")
+		return
+	case errors.Is(err, service.ErrNotFound):
+		writeError(w, r, http.StatusNotFound, "not_found", "resource not found")
+		return
+	case errors.Is(err, service.ErrDuplicate):
+		writeError(w, r, http.StatusConflict, "duplicate", "resource already exists")
+		return
+	case errors.Is(err, service.ErrValidation):
+		writeError(w, r, http.StatusUnprocessableEntity, "validation_error", "request violates a domain rule")
+		return
+	case errors.Is(err, service.ErrPrecondition):
+		writeError(w, r, http.StatusPreconditionFailed, "precondition_failed", "resource changed; refresh and retry")
+		return
+	case errors.Is(err, service.ErrCredentialInUse):
+		writeError(w, r, http.StatusConflict, "credential_in_use", "credential is still referenced by a repository")
+		return
+	case errors.Is(err, service.ErrIdempotencyConflict):
+		writeError(w, r, http.StatusConflict, "idempotency_conflict", "idempotency key was already used for a different request")
+		return
+	case errors.Is(err, service.ErrJobNotCancellable):
+		writeError(w, r, http.StatusConflict, "job_not_cancellable", "job has already reached a terminal state")
+		return
+	case errors.Is(err, service.ErrJobNotRetryable):
+		writeError(w, r, http.StatusConflict, "invalid_state", "job cannot be retried from its current state")
+		return
+	case errors.Is(err, api.ErrStrictOperationNotImplemented):
+		writeError(w, r, http.StatusNotImplemented, "internal_error", "operation is not implemented")
+		return
+	}
+	writeError(w, r, http.StatusInternalServerError, "internal_error", "request failed")
 }
 
 func openAPIRequestValidator() func(http.Handler) http.Handler {
