@@ -3,6 +3,10 @@ web/node_modules/
 web/.nuxt/
 web/.output/
 web/dist/
+web/test-results/
+web/tests/spikes/harness/.nuxt/
+web/tests/spikes/harness/.output/
+web/tests/spikes/harness/dist
 bin/
 *.log
 artifacts/smoke/

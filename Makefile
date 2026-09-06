@@ -5,7 +5,7 @@ MERIDIAN_DEV_MASTER_KEY_VERSION ?= 1
 MERIDIAN_DEV_CREDENTIAL_FINGERPRINT_KEY ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 MILESTONE ?= $(if $(ITEM),$(firstword $(subst -, ,$(ITEM))),M5)
 
-.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint smoke smoke-all smoke-m0-credentials smoke-runner-test agent-protocol-test agent-preflight quality-gate
+.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint smoke smoke-all smoke-m0-credentials smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 quality-gate
 
 all: build
 
@@ -92,8 +92,20 @@ agent-protocol-test:
 agent-preflight:
 	ITEM="$(ITEM)" vfox exec golang@1.27.1 -- go test -count=1 -v ./internal/contracttest -run '^TestAgentGateAvailability$$'
 
+spike-harness: frontend-install
+	vfox exec nodejs@24.20.0 -- pnpm --dir web exec nuxi generate tests/spikes/harness
+
+perf-table-cytoscape: spike-harness
+	vfox exec nodejs@24.20.0 -- pnpm --dir web exec node scripts/run-spike.mjs perf-table-cytoscape perf-table-cytoscape.spec.ts desktop
+
+perf-editor: spike-harness
+	vfox exec nodejs@24.20.0 -- pnpm --dir web exec node scripts/run-spike.mjs perf-editor perf-editor.spec.ts desktop
+
+a11y-m0: spike-harness
+	vfox exec nodejs@24.20.0 -- pnpm --dir web exec node scripts/run-spike.mjs a11y-m0 a11y-m0.spec.ts all
+
 quality-gate:
 	@case "$(ITEM)" in \
-		M0-AGENT-003) $(MAKE) contracts-validate contracts-generate-then-git-diff-exit-code backend-test smoke-all MILESTONE=M0 ;; \
+		M0-AGENT-003) $(MAKE) contracts-validate contracts-generate-then-git-diff-exit-code backend-test frontend-typecheck frontend-generate smoke-all perf-table-cytoscape perf-editor a11y-m0 MILESTONE=M0 ;; \
 		*) echo "quality-gate is not defined for ITEM=$(ITEM)" >&2; exit 2 ;; \
 	esac

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"encoding/json/v2"
+	"errors"
 	"fmt"
 	"time"
 	"uuid"
@@ -134,7 +135,20 @@ func (store *RepositoryStore) UpdateRepository(ctx context.Context, input servic
 	if setGlobal && *input.GlobalCredID != nil {
 		globalCredentialID = new(**input.GlobalCredID)
 	}
-	row, err := store.queries.UpdateRepository(ctx, generated.UpdateRepositoryParams{
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return service.RepositoryRecord{}, fmt.Errorf("begin update repository transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	queries := store.queries.WithTx(tx)
+	current, err := queries.GetRepository(ctx, generated.GetRepositoryParams{TenantID: input.TenantID, ID: input.ID})
+	if err != nil {
+		return service.RepositoryRecord{}, normalizeError(err)
+	}
+	if current.Revision != input.ExpectedRevision {
+		return service.RepositoryRecord{}, service.ErrPrecondition
+	}
+	row, err := queries.UpdateRepository(ctx, generated.UpdateRepositoryParams{
 		SetCredentialID: setCredential, CredentialID: credentialID,
 		SetGlobalCredentialID: setGlobal, GlobalCredentialID: globalCredentialID,
 		DefaultBranch: input.DefaultBranch, BranchPolicy: branchPolicy, FetchConfig: fetchConfig,
@@ -143,9 +157,12 @@ func (store *RepositoryStore) UpdateRepository(ctx context.Context, input servic
 		UpdatedAt: timestamp(input.UpdatedAt), TenantID: input.TenantID, ID: input.ID, ExpectedRevision: input.ExpectedRevision,
 	})
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return service.RepositoryRecord{}, service.ErrPrecondition
 		}
+		return service.RepositoryRecord{}, normalizeError(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
 		return service.RepositoryRecord{}, normalizeError(err)
 	}
 	return repositoryFromRow(row)
@@ -153,14 +170,27 @@ func (store *RepositoryStore) UpdateRepository(ctx context.Context, input servic
 
 // DeleteRepository soft-deletes one active repository under the expected revision.
 func (store *RepositoryStore) DeleteRepository(ctx context.Context, tenantID, id uuid.UUID, expectedRevision int64, deletedAt time.Time) error {
-	changed, err := store.queries.DeleteRepository(ctx, generated.DeleteRepositoryParams{DeletedAt: timestamp(deletedAt), UpdatedAt: timestamp(deletedAt), TenantID: tenantID, ID: id, ExpectedRevision: expectedRevision})
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return fmt.Errorf("begin delete repository transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	queries := store.queries.WithTx(tx)
+	current, err := queries.GetRepository(ctx, generated.GetRepositoryParams{TenantID: tenantID, ID: id})
+	if err != nil {
+		return normalizeError(err)
+	}
+	if current.Revision != expectedRevision {
+		return service.ErrPrecondition
+	}
+	changed, err := queries.DeleteRepository(ctx, generated.DeleteRepositoryParams{DeletedAt: timestamp(deletedAt), UpdatedAt: timestamp(deletedAt), TenantID: tenantID, ID: id, ExpectedRevision: expectedRevision})
 	if err != nil {
 		return normalizeError(err)
 	}
 	if changed != 1 {
 		return service.ErrPrecondition
 	}
-	return nil
+	return normalizeError(tx.Commit(ctx))
 }
 
 func optionalRepositoryJSON(value any) ([]byte, error) {

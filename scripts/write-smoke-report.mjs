@@ -12,9 +12,9 @@ export function digestSourceFiles(paths) {
   return `sha256:${hash.digest('hex')}`
 }
 
-export function assessGoTest(events, test, exitCode) {
-  const relevant = events.filter(event => event.Package === 'github.com/meridian-labs/meridian/internal/handler'
-    && (event.Test === test || event.Test?.startsWith(`${test}/`)))
+export function assessGoTest(events, fixture, exitCode) {
+  const relevant = events.filter(event => event.Package === fixture.package
+    && (event.Test === fixture.test || event.Test?.startsWith(`${fixture.test}/`)))
   if (exitCode !== 0) return { result: 'fail', failureKind: 'code_failure', reason: 'fixture command failed' }
   if (relevant.some(event => event.Action === 'skip')) {
     return { result: 'fail', failureKind: 'tooling_gap', reason: 'required test was skipped' }
@@ -22,10 +22,28 @@ export function assessGoTest(events, test, exitCode) {
   if (relevant.some(event => event.Action === 'fail')) {
     return { result: 'fail', failureKind: 'code_failure', reason: 'required assertion failed' }
   }
-  if (!relevant.some(event => event.Test === test && event.Action === 'pass')) {
+  if (!relevant.some(event => event.Test === fixture.test && event.Action === 'pass')) {
     return { result: 'fail', failureKind: 'tooling_gap', reason: 'required test did not run' }
   }
   return { result: 'pass', failureKind: null, reason: null }
+}
+
+export function smokeFixtureStatus(fixture, fixtureExists) {
+  if (!fixture || typeof fixture !== 'object' || !fixture.fixture || !fixture.test || !fixture.package) {
+    return { result: 'fail', failureKind: 'tooling_gap', reason: 'catalog entry has no executable fixture, test, and package mapping' }
+  }
+  if (!fixtureExists) {
+    return { result: 'fail', failureKind: 'tooling_gap', reason: `catalog fixture does not exist: ${fixture.fixture}` }
+  }
+  return null
+}
+
+export function goTestSelector(test) {
+  const components = test.split('/')
+  if (components.some(component => !component || !/^[A-Za-z0-9_-]+$/.test(component))) {
+    throw new Error(`invalid catalog test name: ${test}`)
+  }
+  return components.map(component => `^${component.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`).join('/')
 }
 
 function escapeXML(value) {

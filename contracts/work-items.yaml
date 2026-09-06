@@ -129,7 +129,7 @@ items:
   - id: M0-AGENT-003
     milestone: M0
     priority: P0
-    status: needs_retry
+    status: verifying
     title: pass-m0-preflight-spikes-and-gates
     dependsOn: [M0-AGENT-001, M0-AGENT-002, M0-CONTRACT-001]
     operationIds: []
@@ -137,17 +137,17 @@ items:
     assertions: [SMK-001, SMK-002, SMK-003, SMK-004, SMK-005, SMK-029, SMK-031, SMK-035]
     verify: [smoke-all, perf-table-cytoscape, perf-editor, a11y-m0, quality-gate]
     owner: coding-agent
-    attempt: 1
+    attempt: 2
     maxAttempts: 3
-    leaseUntil: null
-    failureKind: tooling_gap
+    failureKind: null
     blockedReason: null
-    startedAt: '2026-09-06T17:18:00Z'
-    baseCommit: 4b5959f9c7896b397d846aab21cfeb608445a655
-    contractDigest: sha256:99ace23f86ecccb7f91c6f268ea737e312de53e1094e7ad8e8e3f2999a0c70b7
-    reportPath: artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json
+    leaseUntil: null
+    startedAt: '2026-09-06T17:47:58Z'
+    baseCommit: c79986ac13a05db5bf3beb13c2a0b3b6461f6667
+    contractDigest: sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
+    reportPath: artifacts/agent/M0-AGENT-003/20260907T-verifying/report.json
     lastEvidence: artifacts/agent/M0-AGENT-003/20260906T172625Z/report.json
-    nextAction: claim attempt 2 and implement the independent M0 fixtures and executable spike targets
+    nextAction: run declared verify gates and baseline on stable source checkpoint
 
   - id: M0-CONTRACT-001
     milestone: M0

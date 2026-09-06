@@ -1,0 +1,34 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+:root { color-scheme: light; font-family: system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f7f8fa; color: #17202a; }
+button, input { font: inherit; }
+.shell { width: min(100%, 1440px); margin: 0 auto; padding: 16px; }
+.band { margin-block: 0 20px; border-bottom: 1px solid #d8dee6; padding-block-end: 20px; }
+.band h1, .band h2 { margin: 0 0 12px; letter-spacing: 0; }
+.muted { color: #536273; }
+.table-frame { height: 440px; overflow: hidden; border: 1px solid #aeb8c4; background: white; }
+.table-scroll { height: 100%; overflow: auto; }
+.table-frame button { border: 1px solid #52606d; background: white; color: #17202a; padding: 4px 8px; }
+.table-frame button:focus-visible, .login input:focus-visible { outline: 3px solid #006b5f; outline-offset: 2px; }
+.graph { width: 100%; height: 520px; border: 1px solid #aeb8c4; background: white; }
+.graph-summary { max-height: 120px; overflow: auto; }
+.editor-host { min-height: 220px; border: 1px solid #aeb8c4; background: white; }
+.editor-host .cm-editor { height: 360px; max-width: 100%; }
+.editor-host .cm-scroller { max-width: 100%; overflow: auto; }
+.editor-grid { display: grid; gap: 16px; }
+.login { display: grid; gap: 12px; max-width: 420px; }
+.login label { display: grid; gap: 4px; }
+.login input { min-width: 0; padding: 8px; }
+.login button { background: #17202a; color: white; }
+.split-panel { min-height: 180px; padding: 12px; overflow: auto; background: white; }
+.status { min-height: 24px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 600px) {
+  .shell { padding: 10px; }
+  .graph { height: 360px; }
+  .table-frame { height: 360px; }
+  .split-panel { min-width: 0; }
+}

@@ -3,9 +3,10 @@ import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { assessGoTest, digestSourceFiles, writeSmokeReport } from './write-smoke-report.mjs'
+import { assessGoTest, digestSourceFiles, goTestSelector, smokeFixtureStatus, writeSmokeReport } from './write-smoke-report.mjs'
 
 const name = 'TestM0CredentialSmoke/SMK-005'
+const fixture = { package: 'github.com/meridian-labs/meridian/internal/handler', test: name }
 const event = (Action, Test = name) => ({ Package: 'github.com/meridian-labs/meridian/internal/handler', Test, Action })
 for (const scenario of [
   { name: 'named test passes', events: [event('run'), event('pass')], exitCode: 0, result: 'pass' },
@@ -18,8 +19,27 @@ for (const scenario of [
   { name: 'signal or timeout cannot pass', events: [event('pass')], exitCode: null, result: 'fail' },
   { name: 'wrong package cannot pass', events: [{ ...event('pass'), Package: 'other' }], exitCode: 0, result: 'fail' }
 ]) {
-  test(scenario.name, () => assert.equal(assessGoTest(scenario.events, name, scenario.exitCode).result, scenario.result))
+  test(scenario.name, () => assert.equal(assessGoTest(scenario.events, fixture, scenario.exitCode).result, scenario.result))
 }
+
+test('catalog package is part of the fixture identity', () => {
+  assert.equal(assessGoTest([event('pass')], { ...fixture, package: 'other' }, 0).result, 'fail')
+})
+
+test('future catalog entries remain tooling gaps until all execution fields exist', () => {
+  assert.deepEqual(smokeFixtureStatus({ milestone: 'M5' }, false), {
+    result: 'fail', failureKind: 'tooling_gap', reason: 'catalog entry has no executable fixture, test, and package mapping'
+  })
+  assert.deepEqual(smokeFixtureStatus({ ...fixture, fixture: 'missing.go' }, false), {
+    result: 'fail', failureKind: 'tooling_gap', reason: 'catalog fixture does not exist: missing.go'
+  })
+  assert.equal(smokeFixtureStatus({ ...fixture, fixture: 'fixture.go' }, true), null)
+})
+
+test('Go test selector targets every test path component exactly', () => {
+  assert.equal(goTestSelector('TestM0Smoke/SMK-003'), '^TestM0Smoke$/^SMK-003$')
+  assert.throws(() => goTestSelector('TestM0Smoke/bad fixture'), /invalid catalog test name/)
+})
 
 test('report preserves evidence and escapes JUnit failure messages', t => {
   const directory = mkdtempSync(join(tmpdir(), 'meridian-smoke-report-'))
