@@ -1,7 +1,7 @@
 # Meridian 开发就绪结论
 
 > 审查日期：2026-09-05
-> 结论：技术栈已完成评估并冻结；业务契约中的上一轮阻塞点已补齐，可开始 M0 编码。机器入口为 [contracts/manifest.yaml](../contracts/manifest.yaml)，完整技术决策见 [05_technology-stack-decision.md](./05_technology-stack-decision.md)。
+> 结论：技术栈已完成评估并冻结；业务契约中的上一轮阻塞点已补齐，可开始 M0 编码。机器入口为 [contracts/manifest.yaml](../contracts/manifest.yaml)，长程自动开发入口为 [contracts/work-items.yaml](../contracts/work-items.yaml) 和 [07_coding-agent-runbook.md](./07_coding-agent-runbook.md)。
 
 > 实施状态：M0 正在开发，尚未宣告完成。契约生成、静态单二进制、数据库/River 迁移、强类型 sqlc 仓储以及身份/租户/PAT 主链路已经通过自动化门禁；凭据、仓库连接、job/audit/outbox 和 M0 控制面仍按 `acceptance.yaml` 推进。文档“可开始编码”表示设计无产品决策阻塞，不表示全部 M0 operation 已实现。
 
@@ -81,6 +81,6 @@ Go 泛型方法只用于具体 helper 类型的类型保持/变换；不得放�
 
 执行环境必须满足 `contracts/manifest.yaml`：Go `>=1.27.1,<1.28`、Node `>=24.20.0,<25`、pnpm `>=11,<12`。仓库已提交 `.vfox.toml`，M0 构建统一通过 vfox 使用 Go 1.27.1、Node 24.20.0 和 pnpm 11.20.0，不依赖调用终端原有的全局版本。
 
-## 未决项
+## 自动开发边界
 
-没有会要求产品、前端或后端在编码时自行选择的业务或架构未决项。依赖 patch 只能在 manifest 范围内升级，并通过 ADR 第 8 节门禁；视觉稿细节、部署域名和生产密钥属于环境配置，不改变契约。`package.json`、`pnpm-lock.yaml`、`go.mod` 和 `go.sum` 必须在 M0 建立并纳入版本控制，不能以未锁定的 `latest` 作为实现依据。
+业务和架构选择不得由 Agent 临时猜测；若契约未覆盖，工作项必须进入 `blocked` 或 `needs_human_acceptance`。依赖 patch 只能在 manifest 范围内升级，并通过 ADR 第 8 节门禁。移动端视觉精修、部署域名和生产密钥可以按运行手册后置，但不能改变功能、安全和可访问性验收。`package.json`、`pnpm-lock.yaml`、`go.mod` 和 `go.sum` 必须纳入版本控制，不能以未锁定的 `latest` 作为实现依据。

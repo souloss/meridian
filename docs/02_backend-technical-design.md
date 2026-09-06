@@ -201,7 +201,7 @@ MVP blob 实现固定为 `domain.yaml#/storage/blobStore`：`MERIDIAN_BLOB_ROOT`
 
 全局错误体为 `{code,message,details?,requestId}`。列表使用 `page/pageSize`，排序使用 `sort/order`。资源写操作使用 `If-Match` 或显式 expected head；可重试副作用使用 `Idempotency-Key`。内容超限返回 413 `content_too_large`，语义校验返回 422。
 
-长任务统一返回 202 JobAccepted。前端轮询 Job；SSE 只用于可丢失的进度体验，数据库状态才是事实源。
+长任务统一返回 202 JobAccepted。数据库状态是事实源；前端同时使用 Job 状态查询和持久化日志 SSE。SSE 必须支持状态快照、持久 sequence、`Last-Event-ID` 断线重放、15 秒 heartbeat 和终态后关闭；断线时先按游标重连，无法恢复时退化为状态轮询。
 
 ## 9. 任务、并发与恢复
 

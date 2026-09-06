@@ -109,7 +109,7 @@ SystemGroup 系统分组（跨仓库把多个 Service 组织成"系统"，全局
 
 ## 3. 功能需求
 
-> 优先级：P0 = MVP 必须有；P1 = 首个可用版本需要；P2 = 后续迭代
+> 重要性标签：P0/P1/P2 仅用于描述产品重要性；交付顺序以 `contracts/work-items.yaml` 的 milestone 和依赖为唯一准则。任何未绑定工作项、operation、story 和 assertion 的 P0/P1 条目不得被标记为完成。
 
 ### F1 身份、租户与权限（P0）
 
@@ -332,6 +332,8 @@ resolve（拉代码/读缓存）
 - F13.5 重新生成与增量（P1）：repo base 更新后一键"基于新代码重新生成 AI overlay"，并展示新旧 AI 修订的 diff
 - F13.6 AI command 在受限工作目录执行，支持禁网选项；provenance 只存 prompt 摘要不存全文
 
+AI 产出质量必须通过固定 fixture 验收：生成文档必须通过 kind schema 和 lint，关键 fixture 的端点召回、HTTP method/path、参数和响应结构满足 `ai-quality-gate` 的最低阈值；任何 schema/lint 失败或无法解释的产出不得进入 approved/effective。
+
 ### F14 AssetKind 扩展机制（P0 定接口，P1 完善）
 
 **新增一种资产类型的成本 ≤ 1 人周（验收指标）。** kind 注册包含：
@@ -367,6 +369,8 @@ resolve（拉代码/读缓存）
 | 国际化 | 前后端文案抽离，v1 中英文，先中文 |
 | 主题 | 亮/暗主题，viewer 主题跟随 |
 | 部署 | 生产/标准体验使用单 Go 二进制（内嵌前端）+ PostgreSQL 16；docker-compose 一条命令启动。M5 体验镜像是在同一容器受控拉起 PostgreSQL 16 进程，不引入第二种数据库引擎，禁止生产使用 |
+
+所有性能、容量、恢复和覆盖率指标必须通过固定 fixture、固定并发模型、固定工具链和报告文件测量；测量协议与门禁命令由 `docs/07_coding-agent-runbook.md` 和工作项 `verify` 字段定义。未有报告的数字只视为目标，不视为已验收。
 
 ---
 

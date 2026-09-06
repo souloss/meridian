@@ -207,17 +207,19 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND credential_id = sqlc.arg(credential_id)
   AND deleted_at IS NULL;
 
--- UnbindCredentialRepositories clears tenant credential references for forced deletion.
+-- UnbindCredentialRepositories clears all references after the active-reference policy check.
+-- Archived repositories retain their health and history but cannot retain a deleted credential FK.
 -- name: UnbindCredentialRepositories :exec
 UPDATE repositories
 SET
   credential_id = NULL,
   revision = revision + 1,
   updated_at = sqlc.arg(updated_at),
-  health = jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"credential was deleted"}'::jsonb, true)
+  health = CASE WHEN deleted_at IS NULL
+    THEN jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"credential was deleted"}'::jsonb, true)
+    ELSE health END
 WHERE tenant_id = sqlc.arg(tenant_id)
-  AND credential_id = sqlc.arg(credential_id)
-  AND deleted_at IS NULL;
+  AND credential_id = sqlc.arg(credential_id);
 
 -- DeleteCredential removes a tenant credential after the caller has applied reference and ETag checks.
 -- name: DeleteCredential :execrows
@@ -401,16 +403,18 @@ FROM repositories
 WHERE global_credential_id = sqlc.arg(credential_id)
   AND deleted_at IS NULL;
 
--- UnbindGlobalCredentialRepositories clears global credential references and marks authentication required.
+-- UnbindGlobalCredentialRepositories clears active and archived references before credential deletion.
+-- Only active repositories receive an authentication-required health error.
 -- name: UnbindGlobalCredentialRepositories :exec
 UPDATE repositories
 SET
   global_credential_id = NULL,
   revision = revision + 1,
   updated_at = sqlc.arg(updated_at),
-  health = jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"global credential was deleted"}'::jsonb, true)
-WHERE global_credential_id = sqlc.arg(credential_id)
-  AND deleted_at IS NULL;
+  health = CASE WHEN deleted_at IS NULL
+    THEN jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"global credential was deleted"}'::jsonb, true)
+    ELSE health END
+WHERE global_credential_id = sqlc.arg(credential_id);
 
 -- DeleteGlobalCredential removes one platform credential after reference and ETag checks.
 -- name: DeleteGlobalCredential :execrows

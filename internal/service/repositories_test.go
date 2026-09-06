@@ -97,3 +97,29 @@ func TestRepositoryCredentialPointersPreserveExplicitNull(t *testing.T) {
 		t.Fatal("quota error does not unwrap to ErrQuotaExceeded")
 	}
 }
+
+func TestRepositoryCredentialStorageIDs(t *testing.T) {
+	t.Parallel()
+	id := uuid.NewV7()
+	for _, test := range []struct {
+		name      string
+		reference CredentialReference
+		local     bool
+		global    bool
+	}{
+		{name: "unbound"},
+		{name: "empty global", reference: CredentialReference{IsGlobal: true}},
+		{name: "tenant", reference: CredentialReference{ID: id}, local: true},
+		{name: "global", reference: CredentialReference{ID: id, IsGlobal: true}, global: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			local, global := credentialIDForStorage(test.reference), globalCredentialIDForStorage(test.reference)
+			if (local != nil) != test.local || (global != nil) != test.global {
+				t.Fatalf("credential storage pointers = %v/%v, want presence %t/%t", local, global, test.local, test.global)
+			}
+			if local != nil && *local != id || global != nil && *global != id {
+				t.Fatal("credential storage ID differs from selected credential")
+			}
+		})
+	}
+}

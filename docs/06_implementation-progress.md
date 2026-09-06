@@ -4,9 +4,9 @@
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
 > 最新稳定提交：`ee9fcd9 feat(M0-AGENT-001): implement tenant control-plane update`
-> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（待人工验收）
+> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（门禁修复后待重试）
 
-本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项和依赖以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml) 和工作项门禁为准。
+本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 
 ## 状态规则
 
@@ -21,9 +21,9 @@
 | 外部阻塞 | 需要产品决策、外部权限或人工提供环境信息 |
 | 待验收 | 自动门禁通过，等待用户验收 |
 
-技术门禁失败使用 `needs_retry`；连续三次相同根因失败使用 `blocked_technical`；外部依赖使用 `blocked_external`；证据对应的契约或源代码变化后使用 `stale`，不得继续沿用旧证据。
+这些中文状态是人工可读投影，不是工作项队列枚举。技术失败未耗尽尝试时为 `needs_retry`，耗尽后为 `failed` 并填写 `failureKind`；历史 `blocked_technical` 标签对应这个技术失败投影。外部依赖使用 `blocked`，历史 `blocked_external` 只是投影标签。`待验收` 对应 `milestoneGates.<M#>.status=needs_human_acceptance`，只有自动门禁全部通过的阶段才能进入；技术失败不能当作成品待验收。`stale` 是证据有效性，不是工作项状态；契约或相关代码变化后，旧证据不得继续作为当前通过依据。
 
-不使用主观完成百分比。只有对应用户故事、Smoke、负向用例和里程碑门禁全部通过，才把里程碑标记为“已完成”。生成代码和数据库表已经存在，也不能单独视为业务能力完成。
+不使用主观完成百分比。只有对应用户故事、Smoke、负向用例和里程碑门禁全部通过，并且 `milestoneGates.<M#>.status=accepted`，才把里程碑标记为“已完成”。生成代码和数据库表已经存在，也不能单独视为业务能力完成。同阶段 `passed` 的后继项可以继续开发；跨阶段必须等待用户明确放行，未回复不等于通过。
 
 ## 里程碑总览
 
@@ -37,6 +37,10 @@
 | M5 协作与开放集成 | 通用订阅、Inbox、Webhook、AsyncAPI、合规和运维加固 | 未开始业务实现 |
 
 `M0-M3` 是 MVP，`M4-M5` 是 v1 扩展；`M6+` 不在 v1 交付范围内。
+
+目前 M0-M5 的 `milestoneGates` 均为 `pending`，没有任何阶段被人工放行。每阶段所有工作项为 `passed` 后，Agent 必须提交独立阶段报告，包含桌面入口、可演示用户主路径、自动门禁和断言证据、延期事项，再转为 `needs_human_acceptance` 等待用户；反馈 `changes_requested` 时先新增本阶段修复项，不能直接跳到下一阶段。
+
+M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画和细间距可延期到具名后续工作项。功能、权限、错误状态、键盘可用性、A11y 和契约已声明的移动功能不能后置，延期不能减弱验收。
 
 ## M0 当前状态
 
@@ -118,7 +122,7 @@
 
 ## 下一步顺序
 
-下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前队列为：`M0-AGENT-001`（passed）→ `M0-AGENT-002`（needs_human_acceptance）→ `M0-AGENT-003`，完成 M0 放行后进入 M1。每个工作项的命令、断言和报告路径以该文件为准。
+下一项不再由本节文字推断，按 `contracts/work-items.yaml` 的选择规则领取。当前队列为：`M0-AGENT-001`（passed）→ `M0-AGENT-002`（needs_retry，本次用户授权恢复到 attempt=0）→ `M0-AGENT-003`。M0 的八项 Smoke 与全部自动门禁通过后先向用户报告，只有 M0 gate 为 `accepted` 才能进入 M1；M2 首项依赖 M1 最后一项 `M1-AGENT-003`，M3 首项依赖 `M2-AGENT-002`。每个工作项的命令、断言和报告路径以队列为准，SMK-033 属于 M3，SMK-030 体验镜像属于 M5。
 
 ## 更新流程
 
@@ -129,8 +133,8 @@
 3. 门禁失败时，在“当前工作区快照”记录首个有效阻塞，不提前标记完成。
 4. 门禁通过后，将切片状态改为“已完成”或“部分完成”，记录实际覆盖与尚未满足的验收断言。
 5. 进度更新与代码一起提交，并把“最新稳定提交”更新为该提交 SHA。
-6. 提交后重新执行生成无漂移检查，再自动进入下一切片。
-7. 只有需要产品决策、外部权限或人工环境输入时才标记“阻塞”并暂停。
+6. 提交后重新执行生成无漂移检查；同阶段有可领取项则继续，全阶段自动门禁通过则提交阶段报告并等待用户验收，禁止自动跨阶段。
+7. 产品决策、外部权限或人工环境输入使用 `blocked`；技术失败耗尽使用 `failed` 和 `failureKind` 并请求技术介入。仓库内缺 target/fixture 是当前项的 `tooling_gap`，须实际修复，禁止无变化重复或自动清零计数。
 
 默认切片门禁：
 
@@ -143,10 +147,12 @@ make contracts-generate-then-git-diff-exit-code
 git diff --check
 ```
 
-每次门禁必须生成工作项证据 JSON；命令失败不得标记“已完成”。前端、迁移、性能和安全附加门禁必须在工作项 `verify` 字段中列出并产生报告。
+每次门禁必须生成工作项证据 JSON；命令失败不得标记“已完成”。前端、迁移、性能和安全附加门禁必须在工作项 `verify` 中以 Make target 名称数组声明，并依次执行 `make <target> ITEM=<工作项 ID>`。报告统一使用 `workItem`、`status`、`commands[]` 等队列 `evidence` 字段，具体格式见运行手册第 7 节；不得将旧报告字段或普通集成测试结果视为缺失 Smoke 断言已通过。
 
-涉及前端时还必须执行生成、类型检查、Playwright、移动/桌面视口和 axe；涉及迁移时必须额外执行空库 up、显式 down、再次 up 和事务回滚验证。
+涉及前端时还必须执行生成、类型检查、桌面 Playwright 和 axe，移动端执行契约声明的功能/权限断言，视觉精修可以按上述规则延期；涉及迁移时必须额外执行空库 up、显式 down、再次 up 和事务回滚验证。
 
 ## 当前阻塞
 
-`M0-AGENT-002` 的声明门禁 `make smoke-m0-credentials` 当前不存在，已按运行手册完成 3 次相同根因失败并转 `needs_human_acceptance`，不能用已有集成测试替代。需要提供该 Make target/对应 Smoke fixture，或由人工更新队列契约；随后必须从该工作项重新领取并重跑全部声明门禁。
+`M0-AGENT-002` 的声明门禁曾经缺失，属于仓库内 `tooling_gap`，不是外部依赖。本次用户授权补齐可执行入口和真实断言，队列恢复为 `needs_retry/attempt=0`；一次性恢复原因及原 attempt=3 保存在 `recovery`。这不代表工作项已经通过：下一次 Agent 必须重新领取、检查 `make smoke-m0-credentials ITEM=M0-AGENT-002` 和全部声明门禁，补齐任何仍缺少的断言后再形成新证据。历史失败报告保留在 `artifacts/agent/M0-AGENT-002/`，不得改写或复用为通过证据。
+
+后续阶段尚未实现的 target/fixture 同样属于对应工作项交付物，不能因此反复要求用户提供命令。若实际修复后仍达到重试上限，Agent 应给出明确技术失败报告；只有阶段自动门禁全绿时，才提交成品阶段验收报告。

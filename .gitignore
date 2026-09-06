@@ -5,3 +5,4 @@ web/.output/
 web/dist/
 bin/
 *.log
+artifacts/smoke/

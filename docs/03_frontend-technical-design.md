@@ -101,7 +101,7 @@ web/app/components/ui       无业务语义的基础组件
 
 当前租户以 URL 的 `:tenant` 为唯一事实源，auth/me、membership、用户偏好和 capability 都属于 Query server state。Pinia 只保存移动导航展开、JobDrawer 当前选择、未提交的本地草稿等无需后端持久化的 UI 状态；主题由 Nuxt color mode 管理，locale 由 i18n 与用户偏好同步。刷新页面后必须能只凭 URL 和 API 恢复业务页面，不能依赖 Pinia 中残留的 tenant/entity。
 
-所有错误通过生成的 ErrorResponse 处理：401 跳登录并保留 return URL；404 显示统一不可用状态；409 保留用户输入并提示刷新；412 提示资源已更新；413 标出容量限制；422 映射字段或编辑器 line/column；其余展示 requestId。
+所有错误通过生成的 ErrorResponse 处理：401 跳登录并保留 return URL；404 显示统一不可用状态；409 保留用户输入并提示刷新；412 提示资源已更新；413 标出容量限制；422 映射字段或编辑器 line/column；429 使用 `retryAfterSec` 倒计时且不自动重试写请求；503、网络错误和超时显示可重试状态并保留 requestId。Job SSE 断线按 `Last-Event-ID` 重连，终态关闭后停止轮询；只有用户主动取消才发送取消请求。
 
 ## 5. 核心用户流程
 

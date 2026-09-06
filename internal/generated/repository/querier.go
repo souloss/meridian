@@ -275,9 +275,11 @@ type Querier interface {
 	TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error
 	// TouchSession records the latest accepted request time for a non-revoked browser session.
 	TouchSession(ctx context.Context, arg TouchSessionParams) error
-	// UnbindCredentialRepositories clears tenant credential references for forced deletion.
+	// UnbindCredentialRepositories clears all references after the active-reference policy check.
+	// Archived repositories retain their health and history but cannot retain a deleted credential FK.
 	UnbindCredentialRepositories(ctx context.Context, arg UnbindCredentialRepositoriesParams) error
-	// UnbindGlobalCredentialRepositories clears global credential references and marks authentication required.
+	// UnbindGlobalCredentialRepositories clears active and archived references before credential deletion.
+	// Only active repositories receive an authentication-required health error.
 	UnbindGlobalCredentialRepositories(ctx context.Context, arg UnbindGlobalCredentialRepositoriesParams) error
 	// UpdateCredentialMetadata conditionally updates tenant credential metadata and advances its revision.
 	UpdateCredentialMetadata(ctx context.Context, arg UpdateCredentialMetadataParams) (Credential, error)

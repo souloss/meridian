@@ -2,15 +2,20 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"net"
 	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 	"uuid"
+
+	"golang.org/x/crypto/ssh"
 )
 
 const defaultConnectionProbeTimeout = 10 * time.Second
@@ -95,7 +100,74 @@ func (probe GitConnectionProbe) Probe(parent context.Context, remote string, sec
 		return ConnectionTestResult{ErrorClass: "timeout", Message: "repository connection timed out"}, nil
 	}
 	errorClass := classifyProbeError(string(output))
-	return ConnectionTestResult{ErrorClass: errorClass, Message: probeMessage(errorClass)}, nil
+	result := ConnectionTestResult{ErrorClass: errorClass, Message: probeMessage(errorClass)}
+	if errorClass == "host_key" {
+		result.HostKeyCandidate = probeHostKeyCandidate(ctx, remote)
+	}
+	return result, nil
+}
+
+// probeHostKeyCandidate performs a bounded unauthenticated SSH handshake to
+// capture the server key after Git reports an untrusted host key. The key is
+// returned only as a derived candidate; it is never accepted or persisted.
+func probeHostKeyCandidate(ctx context.Context, remote string) *ConnectionHostKeyCandidate {
+	ctx, cancel := context.WithTimeout(ctx, defaultConnectionProbeTimeout)
+	defer cancel()
+	host, port, ok := sshRemoteAddress(remote)
+	if !ok {
+		return nil
+	}
+	dialer := net.Dialer{}
+	conn, err := dialer.DialContext(ctx, "tcp", net.JoinHostPort(host, strconv.Itoa(port)))
+	if err != nil {
+		return nil
+	}
+	defer conn.Close()
+	stop := context.AfterFunc(ctx, func() { _ = conn.Close() })
+	defer stop()
+	if deadline, ok := ctx.Deadline(); ok {
+		_ = conn.SetDeadline(deadline)
+	}
+	var candidate *ConnectionHostKeyCandidate
+	config := &ssh.ClientConfig{
+		User: "git",
+		HostKeyCallback: func(_ string, _ net.Addr, key ssh.PublicKey) error {
+			identity, parseErr := ParseKnownHostPublicKey(base64.StdEncoding.EncodeToString(key.Marshal()))
+			if parseErr != nil {
+				return parseErr
+			}
+			candidate = &ConnectionHostKeyCandidate{Host: host, Port: port, KeyType: identity.KeyType, PublicKey: base64.StdEncoding.EncodeToString(identity.PublicKey), Fingerprint: identity.Fingerprint}
+			return errors.New("untrusted host key candidate captured")
+		},
+	}
+	_, _, _, _ = ssh.NewClientConn(conn, net.JoinHostPort(host, strconv.Itoa(port)), config)
+	return candidate
+}
+
+func sshRemoteAddress(remote string) (host string, port int, ok bool) {
+	if strings.HasPrefix(remote, "ssh://") {
+		parsed, err := url.ParseRequestURI(remote)
+		if err != nil || parsed.Hostname() == "" || parsed.User != nil {
+			return "", 0, false
+		}
+		port = 22
+		if parsed.Port() != "" {
+			port, err = strconv.Atoi(parsed.Port())
+			if err != nil || port < 1 || port > 65535 {
+				return "", 0, false
+			}
+		}
+		return strings.ToLower(parsed.Hostname()), port, true
+	}
+	left, _, found := strings.Cut(remote, ":")
+	if !found {
+		return "", 0, false
+	}
+	_, host, found = strings.Cut(left, "@")
+	if !found || host == "" {
+		return "", 0, false
+	}
+	return strings.ToLower(host), 22, true
 }
 
 func validateGitRemote(remote string) error {

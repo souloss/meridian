@@ -15,6 +15,7 @@
 | [acceptance.yaml](./acceptance.yaml) | fixture、用户故事、Smoke 和 assertion 映射 |
 | [cli.yaml](./cli.yaml) | `meridian` CLI 参数、selector、API 映射、输出与退出码 |
 | [repository-config.schema.yaml](./repository-config.schema.yaml) | `.asset-platform.yaml` JSON Schema |
+| [work-items.yaml](./work-items.yaml) | Coding Agent 原子工作项、依赖、门禁和证据索引 |
 
 ## 使用规则
 
@@ -26,5 +27,6 @@
 6. `$ref`、operationId、view/kind/event/acceptance 交叉引用必须由 CI 校验；
 7. 冲突是构建错误，不通过覆盖顺序解决；
 8. Markdown 只解释业务和实现，不成为第二份契约。
+9. `work-items.yaml` 只引用其它契约的 operation/story/assertion，不复制其语义；工作项状态和证据必须与 git 提交绑定。
 
 `status: frozen` 表示已允许编码，不表示永不变更。破坏性变更按 manifest 的兼容策略升级版本并保留旧 API 一个发布周期。

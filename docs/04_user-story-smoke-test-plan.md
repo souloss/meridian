@@ -167,6 +167,8 @@ Smoke ID、里程碑、用户故事和 assertion 的完整映射在 `acceptance.
 5. 每例输出 assertion ID、requestId、jobId、versionId 和失败证据；
 6. 全套 Smoke 目标 15 分钟内完成，体验基准图像测试可独立 nightly 运行。
 
+本地和 CI 的唯一入口是 `make smoke SMK=SMK-xxx`；当前阶段累计回归使用 `make smoke-all MILESTONE=M0`（或 `ITEM=M0-AGENT-003`），无参数 `make smoke-all` 表示 M0-M5 全套。runner 由各工作项逐步补齐 fixture，输出带时间目录的不可覆盖报告，以及 `artifacts/smoke/<smk>.json` 最新索引与 JUnit XML。当前凭据三项使用隔离 PostgreSQL、本地 TLS Git 和 SSH fixture；其它未实现条目返回 `tooling_gap`，由所属工作项实现，不是外部阻塞。零测试、跳过或只覆盖部分断言的测试不得作为 Smoke 通过证据；后续 webhook/fake producer 等 fixture 随对应工作项接入。
+
 重点回归：SMK-013 必须断言 rollback 后 version +1/revision 不变；SMK-016 必须断言 candidate 阻止 publish；SMK-027 必须断言 successor 实际处理最新 generation，而不只是“同时一个 worker”；SMK-034 必须断言 public/lifecycle 门禁、deprecated outbox 事务与 retired 运行中任务 fencing；SMK-035～038 分别锁定 known host 派生、幂等首次并发、Service 删除和仓库根目录规范化。
 
 ## 4. API 反向矩阵
@@ -199,7 +201,7 @@ Smoke ID、里程碑、用户故事和 assertion 的完整映射在 `acceptance.
 
 | 里程碑 | 必过故事/范围 |
 | --- | --- |
-| M0 | US-01、US-11 的身份/隔离/PAT/配额基础 |
+| M0 | US-01、US-11 的身份/隔离/PAT/配额基础 + 05 文档第 8 节六项 spike |
 | M1 | US-02、US-03、US-12 的仓库主链、互斥与恢复基础 |
 | M2 | US-04、US-07 的 Layer/overlay/字段级 GitOps |
 | M3 | US-05、US-06、US-09、US-12 的 AI 失败恢复，含 diff share、todo、最小审批通知 |

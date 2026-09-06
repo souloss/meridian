@@ -175,12 +175,10 @@ func (store *CredentialStore) DeleteCredential(ctx context.Context, tenantID, id
 	if count > 0 && !force {
 		return service.ErrCredentialInUse
 	}
-	if force {
-		if err := queries.UnbindCredentialRepositories(ctx, generated.UnbindCredentialRepositoriesParams{
-			UpdatedAt: timestamp(updatedAt), TenantID: tenantID, CredentialID: new(id),
-		}); err != nil {
-			return normalizeError(err)
-		}
+	if err := queries.UnbindCredentialRepositories(ctx, generated.UnbindCredentialRepositoriesParams{
+		UpdatedAt: timestamp(updatedAt), TenantID: tenantID, CredentialID: new(id),
+	}); err != nil {
+		return normalizeError(err)
 	}
 	deleted, err := queries.DeleteCredential(ctx, generated.DeleteCredentialParams{TenantID: tenantID, ID: id, ExpectedRevision: expectedRevision})
 	if err != nil {
@@ -354,12 +352,10 @@ func (store *CredentialStore) DeleteGlobalCredential(ctx context.Context, id uui
 	if count > 0 && !force {
 		return service.ErrCredentialInUse
 	}
-	if force {
-		if err := queries.UnbindGlobalCredentialRepositories(ctx, generated.UnbindGlobalCredentialRepositoriesParams{
-			UpdatedAt: timestamp(updatedAt), CredentialID: new(id),
-		}); err != nil {
-			return normalizeError(err)
-		}
+	if err := queries.UnbindGlobalCredentialRepositories(ctx, generated.UnbindGlobalCredentialRepositoriesParams{
+		UpdatedAt: timestamp(updatedAt), CredentialID: new(id),
+	}); err != nil {
+		return normalizeError(err)
 	}
 	deleted, err := queries.DeleteGlobalCredential(ctx, generated.DeleteGlobalCredentialParams{ID: id, ExpectedRevision: expectedRevision})
 	if err != nil {

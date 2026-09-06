@@ -2,11 +2,18 @@ package service
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/rand"
+	"encoding/base64"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
+
+	"golang.org/x/crypto/ssh"
 )
 
 func TestGitConnectionProbeReturnsRedactedResults(t *testing.T) {
@@ -66,6 +73,74 @@ func TestGitConnectionProbeTimeoutIsClassified(t *testing.T) {
 	}
 	if result.OK || result.ErrorClass != "timeout" || result.Message != "repository connection timed out" {
 		t.Fatalf("probe timeout result = %#v", result)
+	}
+}
+
+func TestGitConnectionProbeDerivesHostKeyCandidate(t *testing.T) {
+	_, privateKey, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("generate SSH host key: %v", err)
+	}
+	signer, err := ssh.NewSignerFromKey(privateKey)
+	if err != nil {
+		t.Fatalf("create SSH host signer: %v", err)
+	}
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("listen for SSH probe: %v", err)
+	}
+	var server sync.WaitGroup
+	server.Go(func() {
+		conn, err := listener.Accept()
+		if err != nil {
+			return
+		}
+		defer conn.Close()
+		_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
+		config := &ssh.ServerConfig{NoClientAuth: true}
+		config.AddHostKey(signer)
+		_, _, _, _ = ssh.NewServerConn(conn, config)
+	})
+	t.Cleanup(func() {
+		_ = listener.Close()
+		server.Wait()
+	})
+	remote := "ssh://" + listener.Addr().String() + "/repository.git"
+	probe := GitConnectionProbe{GitBinary: writeProbeScript(t, "Host key verification failed.\n", "1"), Timeout: 5 * time.Second}
+	result, err := probe.Probe(t.Context(), remote, nil)
+	if err != nil {
+		t.Fatalf("probe: %v", err)
+	}
+	if result.OK || result.ErrorClass != "host_key" || result.HostKeyCandidate == nil {
+		t.Fatalf("result = %#v, want untrusted host key candidate", result)
+	}
+	candidate := result.HostKeyCandidate
+	if candidate.Host != "127.0.0.1" || candidate.Port != listener.Addr().(*net.TCPAddr).Port || candidate.KeyType != signer.PublicKey().Type() {
+		t.Fatalf("candidate identity = %#v", candidate)
+	}
+	if candidate.PublicKey != base64.StdEncoding.EncodeToString(signer.PublicKey().Marshal()) || candidate.Fingerprint != ssh.FingerprintSHA256(signer.PublicKey()) {
+		t.Fatalf("candidate key derivation = %#v", candidate)
+	}
+}
+
+func TestSSHRemoteAddress(t *testing.T) {
+	t.Parallel()
+	for _, test := range []struct {
+		remote string
+		host   string
+		port   int
+		ok     bool
+	}{
+		{remote: "ssh://git.example.com/repository.git", host: "git.example.com", port: 22, ok: true},
+		{remote: "ssh://[::1]:2222/repository.git", host: "::1", port: 2222, ok: true},
+		{remote: "git@git.example.com:repository.git", host: "git.example.com", port: 22, ok: true},
+		{remote: "https://git.example.com/repository.git"},
+		{remote: "ssh://git.example.com:70000/repository.git"},
+	} {
+		host, port, ok := sshRemoteAddress(test.remote)
+		if host != test.host || port != test.port || ok != test.ok {
+			t.Errorf("sshRemoteAddress(%q) = %q, %d, %t; want %q, %d, %t", test.remote, host, port, ok, test.host, test.port, test.ok)
+		}
 	}
 }
 

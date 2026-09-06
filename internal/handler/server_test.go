@@ -4,6 +4,7 @@ import (
 	"encoding/json/v2"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
@@ -163,5 +164,30 @@ func TestGlobalCredentialInputAcceptsHTTPUnion(t *testing.T) {
 	}
 	if input.Name != "global" || input.Secret.Kind != "http_token" || input.Secret.HTTPToken != "global-first-token" {
 		t.Fatalf("global credential input = %#v", input)
+	}
+}
+
+func TestKnownHostContractViolationsReturn422(t *testing.T) {
+	t.Parallel()
+	for _, body := range []string{
+		`{"host":"git.example.com","publicKey":"AAAA","keyType":"ssh-rsa","fingerprint":"SHA256:forged"}`,
+		`{"host":"git.example.com","publicKey":"invalid base64"}`,
+	} {
+		request := httptest.NewRequest(http.MethodPost, "/api/v1/t/acme/known-hosts", strings.NewReader(body))
+		request.Header.Set("Content-Type", "application/json")
+		response := httptest.NewRecorder()
+		New().Handler().ServeHTTP(response, request)
+		if response.Code != http.StatusUnprocessableEntity {
+			t.Fatalf("status = %d, want 422; body = %s", response.Code, response.Body.String())
+		}
+		var payload struct {
+			Code string `json:"code"`
+		}
+		if err := json.Unmarshal(response.Body.Bytes(), &payload); err != nil {
+			t.Fatalf("decode validation error: %v", err)
+		}
+		if payload.Code != "validation_error" {
+			t.Fatalf("error code = %q, want validation_error", payload.Code)
+		}
 	}
 }

@@ -1478,10 +1478,11 @@ SET
   credential_id = NULL,
   revision = revision + 1,
   updated_at = $1,
-  health = jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"credential was deleted"}'::jsonb, true)
+  health = CASE WHEN deleted_at IS NULL
+    THEN jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"credential was deleted"}'::jsonb, true)
+    ELSE health END
 WHERE tenant_id = $2
   AND credential_id = $3
-  AND deleted_at IS NULL
 `
 
 // UnbindCredentialRepositoriesParams contains the strongly typed arguments for the UnbindCredentialRepositories query.
@@ -1494,7 +1495,8 @@ type UnbindCredentialRepositoriesParams struct {
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// UnbindCredentialRepositories clears tenant credential references for forced deletion.
+// UnbindCredentialRepositories clears all references after the active-reference policy check.
+// Archived repositories retain their health and history but cannot retain a deleted credential FK.
 func (q *Queries) UnbindCredentialRepositories(ctx context.Context, arg UnbindCredentialRepositoriesParams) error {
 	_, err := q.db.Exec(ctx, unbindCredentialRepositories, arg.UpdatedAt, arg.TenantID, arg.CredentialID)
 	return err
@@ -1506,9 +1508,10 @@ SET
   global_credential_id = NULL,
   revision = revision + 1,
   updated_at = $1,
-  health = jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"global credential was deleted"}'::jsonb, true)
+  health = CASE WHEN deleted_at IS NULL
+    THEN jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"global credential was deleted"}'::jsonb, true)
+    ELSE health END
 WHERE global_credential_id = $2
-  AND deleted_at IS NULL
 `
 
 // UnbindGlobalCredentialRepositoriesParams contains the strongly typed arguments for the UnbindGlobalCredentialRepositories query.
@@ -1519,7 +1522,8 @@ type UnbindGlobalCredentialRepositoriesParams struct {
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// UnbindGlobalCredentialRepositories clears global credential references and marks authentication required.
+// UnbindGlobalCredentialRepositories clears active and archived references before credential deletion.
+// Only active repositories receive an authentication-required health error.
 func (q *Queries) UnbindGlobalCredentialRepositories(ctx context.Context, arg UnbindGlobalCredentialRepositoriesParams) error {
 	_, err := q.db.Exec(ctx, unbindGlobalCredentialRepositories, arg.UpdatedAt, arg.CredentialID)
 	return err

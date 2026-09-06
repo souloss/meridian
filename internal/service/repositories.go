@@ -424,14 +424,14 @@ func (repositories *Repositories) resolveCredential(ctx context.Context, members
 }
 
 func credentialIDForStorage(reference CredentialReference) *uuid.UUID {
-	if reference.IsGlobal {
+	if reference.IsGlobal || reference.ID == uuid.Nil() {
 		return nil
 	}
 	return new(reference.ID)
 }
 
 func globalCredentialIDForStorage(reference CredentialReference) *uuid.UUID {
-	if !reference.IsGlobal {
+	if !reference.IsGlobal || reference.ID == uuid.Nil() {
 		return nil
 	}
 	return new(reference.ID)

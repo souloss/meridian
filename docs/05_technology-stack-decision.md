@@ -107,6 +107,8 @@ M0 必须先完成以下 executable spike，全部通过才允许业务模块铺
 5. Nuxt UI Table 覆盖 10k 虚拟行、键盘焦点和明确 action；Cytoscape fixture 覆盖 500 节点/5000 边并达到首屏 2 秒；
 6. Playwright 在桌面和移动端验证登录壳、Viewer/Splitter、表格、图和深链无溢出，并执行 axe 主路径。
 
+每项 spike 必须有固定 `make` target、fixture 路径、机器可解析 JSON 报告和硬阈值；报告纳入 `artifacts/spikes/<id>.json`。未通过或没有报告时，M0 只能保持进行中。M0-M3 先验证移动端功能可用和无溢出，视觉精修与截图基准放到 M4/M5。
+
 依赖 patch 可在上述门禁全绿后更新；minor/major、同职责替换或引入排除项必须提交新 ADR，给出 Meridian fixture 的 build time、bundle、交互、A11y、实现代码量和维护面数据，并同步修改 manifest。不得以“生态更流行”作为变更依据。
 
 ## 9. 调研依据

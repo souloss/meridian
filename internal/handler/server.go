@@ -148,7 +148,12 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 				writeError(w, r, http.StatusNotFound, "not_found", "resource not found")
 				return
 			}
-			writeError(w, r, http.StatusBadRequest, "validation_error", "request does not satisfy the API contract")
+			status := http.StatusBadRequest
+			// Known Host key validation may fail before the domain handler runs.
+			if route := options.MatchedRoute.Route; route != nil && route.Method == http.MethodPost && route.Path == "/api/v1/t/{tenantSlug}/known-hosts" {
+				status = http.StatusUnprocessableEntity
+			}
+			writeError(w, r, status, "validation_error", "request does not satisfy the API contract")
 		},
 		DoNotValidateServers: true,
 		Skipper: func(r *http.Request) bool {
