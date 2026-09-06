@@ -1,0 +1,29 @@
+?   	github.com/meridian-labs/meridian	[no test files]
+?   	github.com/meridian-labs/meridian/cmd/meridian	[no test files]
+?   	github.com/meridian-labs/meridian/internal/buildinfo	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/domainadapter	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/godoc	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/strictstub	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/command	(cached)
+ok  	github.com/meridian-labs/meridian/internal/contracttest	(cached)
+?   	github.com/meridian-labs/meridian/internal/database	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/asset	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/auth	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/collaboration	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/diff	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/job	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/layer	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/platform	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/repository	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/service	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/system	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/tenant	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/view	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/repository	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/handler	(cached)
+?   	github.com/meridian-labs/meridian/internal/repository	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/service	(cached)
+ok  	github.com/meridian-labs/meridian/internal/storage	(cached)
+ok  	github.com/meridian-labs/meridian/internal/task	(cached)
+?   	github.com/meridian-labs/meridian/migrations	[no test files]

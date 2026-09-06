@@ -3,8 +3,8 @@
 > 最后核对：2026-09-06
 > 当前里程碑：M0（foundation）
 > 里程碑状态：进行中，尚未放行
-> 最新稳定提交：`ee9fcd9 feat(M0-AGENT-001): implement tenant control-plane update`
-> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（门禁修复后待重试）
+> 最新稳定提交：`04554a2444dbf2a09753cae1245d7a717e056b84 fix(M0-AGENT-002): reject client-derived known host fields`
+> 当前开发切片：M0-AGENT-002 凭据、Known Host 与 Smoke（待重试，attempt 1）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 
@@ -53,11 +53,11 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 | Goose 应用迁移、River 迁移及 up/down/up 生命周期 | 已完成 | SMK-001 的数据库主路径已有集成覆盖，里程碑 Smoke 尚未统一放行 | `ab1635f`、`7ef39f8`，`internal/database/database_integration_test.go` |
 | sqlc + pgx 强类型持久化基础 | 已完成 | 切片门禁已通过 | `ddeae8d` |
 | 登录、CSRF、用户、租户、成员、RBAC 和 PAT | 已完成 | US-01、SMK-002/003/004 部分覆盖；全租户 operation 隔离矩阵和控制面 E2E 未完成 | `ac8da08`，`internal/handler/identity_integration_test.go` |
-| 凭据加密、服务端指纹和非回显 | 已完成 | SMK-005 部分覆盖，正式独立 fixture 尚未统一放行 | `31e3440`、`d976cde`、`66f473c` |
-| 凭据轮换、原子仓库同步任务投递和幂等重放 | 已完成 | SMK-005/031 部分覆盖；平台 Job 查询和 Worker 终态执行已接入 | `394ffe7`、`b270b9d`、`b8d2ef6`、`147b155` |
-| 租户/全局凭据连接探测和仓库连接预检 | 已完成 | 成功、分类失败、超时和秘密脱敏已有单元/集成覆盖 | `354af57` |
-| 全局凭据管理及强制删除 | 部分完成 | CRUD/轮换/删除、引用仓库解绑健康状态和平台 Job 投影已实现；正式 Smoke fixture 仍待统一放行 | `66f473c`、`394ffe7`、`b270b9d`、`b8d2ef6` |
-| Known Host 创建、派生指纹和列表 | 部分完成 | 服务端派生规则已有单测和 handler；SMK-035 独立 API 场景尚未统一放行 | `31e3440`、`66f473c` |
+| 凭据加密、服务端指纹和非回显 | 部分完成 | SMK-005 已通过；工作项被全量集成门禁中的既有审计过滤断言阻塞 | `31e3440`、`d976cde`、`66f473c`、`04554a2` |
+| 凭据轮换、原子仓库同步任务投递和幂等重放 | 部分完成 | SMK-005/031 轮换、幂等和同步任务断言已通过；待重跑完整集成门禁 | `394ffe7`、`b270b9d`、`b8d2ef6`、`147b155`、`04554a2` |
+| 租户/全局凭据连接探测和仓库连接预检 | 部分完成 | SMK-005 真实 Git 探测已通过；完整集成门禁仍待重试 | `354af57`、`04554a2` |
+| 全局凭据管理及强制删除 | 部分完成 | SMK-031 生命周期、解绑和平台 Job 投影已通过；完整集成门禁仍待重试 | `66f473c`、`394ffe7`、`b270b9d`、`b8d2ef6`、`04554a2` |
+| Known Host 创建、派生指纹和列表 | 部分完成 | SMK-035 已通过；完整集成门禁仍待重试 | `31e3440`、`66f473c`、`04554a2` |
 | 仓库 CRUD、凭据绑定、URL 规范化、ETag 和配额 | 已完成 | SMK-029 的原子配额/409 details/计数不变及 SMK-031 的全局凭据解绑健康状态已有 HTTP 集成断言；统一 Smoke 仍随 M0 放行 | `bd954d4`、`internal/handler/identity_integration_test.go` |
 | River Worker 与通用 Job 控制面 | 部分完成 | 已接入事务内 River 入队、`river_job_id` 关联、Worker attempt fencing、六阶段状态推进和可重放阶段日志；已完成租户 Job 查询/详情、取消、SSE 重放/心跳/终态关闭、`repo.sync` 手工重试代际和 24 小时幂等；其它 Job 类型的手工重试需等对应 Worker 参数契约 | `147b155`、`ea589ad` |
 | Audit 查询与权限边界 | 已完成 | 租户和平台查询、过滤、分页、元数据脱敏、租户隔离及平台 404 边界已有单元和真实 HTTP/PG 集成覆盖 | `db920bc` |
@@ -83,7 +83,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 当前工作区快照
 
-最后稳定基线是 `ee9fcd9`。该提交完成时，平台租户 PATCH 已实现显式字段更新、平台管理员权限、If-Match 乐观并发控制和 412 陈旧版本响应；对应 PostgreSQL/HTTP 集成断言已通过。提交后的生成无漂移检查、go vet 和 `git diff --check` 随后通过。
+最后稳定基线是 `04554a2444dbf2a09753cae1245d7a717e056b84`。本次提交补齐 Known Host 创建请求对客户端伪造 `keyType`/`fingerprint` 的 422 校验；提交后的三项 M0 credential Smoke 已通过。`backend-test-integration` 连续执行仍在 `TestIdentityHTTPWorkflow` 的平台审计 `filter[tenantSlug]` 断言失败：未带租户的 `runtime.started` 被返回到 `tenantSlug=acme` 结果中；该诊断不属于本凭据工作项实现范围，保留在待重试报告中。
 
 2026-09-05 核对时，仓库、平台 Job、River Worker、审计查询、M0 Outbox 与本地 CAS Blob 基础切片已通过门禁，包含：
 
@@ -153,6 +153,6 @@ git diff --check
 
 ## 当前阻塞
 
-`M0-AGENT-002` 的声明门禁曾经缺失，属于仓库内 `tooling_gap`，不是外部依赖。本次用户授权补齐可执行入口和真实断言，队列恢复为 `needs_retry/attempt=0`；一次性恢复原因及原 attempt=3 保存在 `recovery`。这不代表工作项已经通过：下一次 Agent 必须重新领取、检查 `make smoke-m0-credentials ITEM=M0-AGENT-002` 和全部声明门禁，补齐任何仍缺少的断言后再形成新证据。历史失败报告保留在 `artifacts/agent/M0-AGENT-002/`，不得改写或复用为通过证据。
+`M0-AGENT-002` 的声明门禁曾经缺失，属于仓库内 `tooling_gap`，不是外部依赖。本次用户授权补齐可执行入口和真实断言后，attempt=1 已领取并提交 `04554a2`：SMK-005、SMK-031、SMK-035 通过，但 `backend-test-integration` 连续复现 `TestIdentityHTTPWorkflow` 平台审计租户过滤失败，队列已按规则回到 `needs_retry`。下一次 Agent 必须先核对本报告和当前 HEAD，修复或获得该集成失败的新诊断后重新领取；不得复用通过的 Smoke 证据冒充完整门禁通过。历史失败报告保留在 `artifacts/agent/M0-AGENT-002/`，不得改写。
 
 后续阶段尚未实现的 target/fixture 同样属于对应工作项交付物，不能因此反复要求用户提供命令。若实际修复后仍达到重试上限，Agent 应给出明确技术失败报告；只有阶段自动门禁全绿时，才提交成品阶段验收报告。

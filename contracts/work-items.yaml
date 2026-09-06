@@ -109,22 +109,22 @@ items:
     assertions: [SMK-005, SMK-031, SMK-035]
     verify: [smoke-m0-credentials, backend-test-integration]
     owner: coding-agent
-    attempt: 0
+    attempt: 1
     maxAttempts: 3
     leaseUntil: null
-    failureKind: tooling_gap
-    startedAt: null
-    baseCommit: null
-    contractDigest: null
-    reportPath: null
-    lastEvidence: artifacts/agent/M0-AGENT-002/20260905T190906Z/report.json
+    failureKind: code_failure
+    startedAt: '2026-09-06T14:13:58Z'
+    baseCommit: 854455c94a6aa4e7bd36184c320c53d460a7b375
+    contractDigest: sha256:a33074aa3d0621b993c96bfa4f4d112e6461a727dc3433e7b2d147405a2a19b7
+    reportPath: artifacts/agent/M0-AGENT-002/20260906T144900Z/report.json
+    lastEvidence: artifacts/agent/M0-AGENT-002/20260906T144900Z/report.json
     recovery:
       authorizedBy: user
       authorizedOn: '2026-09-06'
       previousAttempt: 3
       previousStatus: needs_human_acceptance
       reason: one-time recovery authorized to repair the missing repository smoke gate; preserve historical failures and do not reset again automatically
-    nextAction: rerun declared smoke and integration gates after repository tooling-gap fix
+    nextAction: fix the reproducible platform audit tenant filter failure, then rerun all declared gates on a new attempt
 
   - id: M0-AGENT-003
     milestone: M0

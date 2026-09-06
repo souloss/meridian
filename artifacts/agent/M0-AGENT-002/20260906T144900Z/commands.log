@@ -1,0 +1,40 @@
+workItem=M0-AGENT-002
+attempt=1
+toolchain=go1.27.1 node24.20.0 pnpm11.20.0
+baseCommit=854455c94a6aa4e7bd36184c320c53d460a7b375
+command=make smoke-m0-credentials ITEM=M0-AGENT-002
+exitCode=0
+durationSeconds=13
+stdout=smoke-m0-credentials.log
+command=make backend-test-integration ITEM=M0-AGENT-002
+exitCode=2
+durationSeconds=16
+stdout=backend-test-integration.log
+command=make smoke-m0-credentials ITEM=M0-AGENT-002 (post-commit 04554a2444dbf2a09753cae1245d7a717e056b84)
+exitCode=0
+durationSeconds=15
+stdout=post-commit-smoke-m0-credentials.log
+command=make backend-test-integration ITEM=M0-AGENT-002 (post-commit 04554a2444dbf2a09753cae1245d7a717e056b84)
+exitCode=2
+durationSeconds=18
+stdout=post-commit-backend-test-integration.log
+command=make contracts-generate-then-git-diff-exit-code
+exitCode=0
+durationSeconds=69
+stdout=post-commit-contracts-generate.log
+command=make contracts-validate ITEM=M0-AGENT-002
+exitCode=0
+durationSeconds=52
+stdout=post-commit-contracts-validate.log
+command=go test ./...
+exitCode=0
+durationSeconds=0
+stdout=post-commit-go-test.log
+command=go vet ./...
+exitCode=0
+durationSeconds=0
+stdout=post-commit-go-vet.log
+command=git diff --check
+exitCode=0
+durationSeconds=0
+stdout=post-commit-git-diff-check.log

@@ -1,0 +1,17 @@
+./scripts/test-integration.sh
+ Network meridian-it-tmp-g3xgm1mjv5_default  Creating
+ Network meridian-it-tmp-g3xgm1mjv5_default  Created
+ Container meridian-it-tmp-g3xgm1mjv5-postgres-test-1  Creating
+ Container meridian-it-tmp-g3xgm1mjv5-postgres-test-1  Created
+ Container meridian-it-tmp-g3xgm1mjv5-postgres-test-1  Starting
+ Container meridian-it-tmp-g3xgm1mjv5-postgres-test-1  Started
+ Container meridian-it-tmp-g3xgm1mjv5-postgres-test-1  Waiting
+ Container meridian-it-tmp-g3xgm1mjv5-postgres-test-1  Healthy
+ok  	github.com/meridian-labs/meridian/internal/database	2.610s
+--- FAIL: TestIdentityHTTPWorkflow (0.87s)
+    identity_integration_test.go:195: audit page = struct { Total int "json:\"total\""; Items []struct { TenantSlug string "json:\"tenantSlug\""; Action string "json:\"action\""; Metadata map[string]interface {} "json:\"metadata\"" } "json:\"items\"" }{Total:2, Items:[]struct { TenantSlug string "json:\"tenantSlug\""; Action string "json:\"action\""; Metadata map[string]interface {} "json:\"metadata\"" }{struct { TenantSlug string "json:\"tenantSlug\""; Action string "json:\"action\""; Metadata map[string]interface {} "json:\"metadata\"" }{TenantSlug:"", Action:"runtime.started", Metadata:map[string]interface {}{"workers":4}}, struct { TenantSlug string "json:\"tenantSlug\""; Action string "json:\"action\""; Metadata map[string]interface {} "json:\"metadata\"" }{TenantSlug:"acme", Action:"repository.created", Metadata:map[string]interface {}{"source":"api"}}}}, want one redacted acme/repository.created fact
+FAIL
+FAIL	github.com/meridian-labs/meridian/internal/handler	5.326s
+FAIL
+exit status 1
+make: *** [Makefile:33: backend-test-integration] Error 1

@@ -1,0 +1,35 @@
+{
+  "workItem": "M0-AGENT-002",
+  "status": "needs_retry",
+  "commit": "04554a2444dbf2a09753cae1245d7a717e056b84",
+  "baseCommit": "854455c94a6aa4e7bd36184c320c53d460a7b375",
+  "contractDigest": "sha256:a33074aa3d0621b993c96bfa4f4d112e6461a727dc3433e7b2d147405a2a19b7",
+  "sourceDigest": "sha256:dac629b077d8d1eb09b7862acc4360456bee5975c8d4d2469384644c6460d9c9",
+  "startedAt": "2026-09-06T14:13:58Z",
+  "reportPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/report.json",
+  "stories": ["US-11"],
+  "assertions": [
+    {"id": "SMK-005", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T15-29-44-352Zz41Q5Z/SMK-005.json"},
+    {"id": "SMK-031", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T15-29-44-352Zz41Q5Z/SMK-031.json"},
+    {"id": "SMK-035", "status": "passed", "evidence": "artifacts/smoke/2026-09-06T15-29-44-352Zz41Q5Z/SMK-035.json"}
+  ],
+  "commands": [
+    {"command": "make smoke-m0-credentials ITEM=M0-AGENT-002", "exitCode": 0, "durationSeconds": 13, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/smoke-m0-credentials.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/smoke-m0-credentials.log"},
+    {"command": "make backend-test-integration ITEM=M0-AGENT-002", "exitCode": 2, "durationSeconds": 16, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/backend-test-integration.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/backend-test-integration.log"},
+    {"command": "make smoke-m0-credentials ITEM=M0-AGENT-002 (post-commit)", "exitCode": 0, "durationSeconds": 15, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-smoke-m0-credentials.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-smoke-m0-credentials.log"},
+    {"command": "make backend-test-integration ITEM=M0-AGENT-002 (post-commit)", "exitCode": 2, "durationSeconds": 18, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-backend-test-integration.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-backend-test-integration.log"},
+    {"command": "make contracts-generate-then-git-diff-exit-code", "exitCode": 0, "durationSeconds": 69, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-contracts-generate.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-contracts-generate.log"},
+    {"command": "make contracts-validate ITEM=M0-AGENT-002", "exitCode": 0, "durationSeconds": 52, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-contracts-validate.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-contracts-validate.log"},
+    {"command": "go test ./...", "exitCode": 0, "durationSeconds": 0, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-go-test.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-go-test.log"},
+    {"command": "go vet ./...", "exitCode": 0, "durationSeconds": 0, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-go-vet.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-go-vet.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0, "stdoutPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-git-diff-check.log", "stderrPath": "artifacts/agent/M0-AGENT-002/20260906T144900Z/post-commit-git-diff-check.log"}
+  ],
+  "changedFiles": ["internal/handler/server.go"],
+  "deferred": ["Fix existing platform audit tenant filter integration failure before retry"],
+  "failures": [
+    {"category": "code_failure", "command": "make backend-test-integration ITEM=M0-AGENT-002", "reason": "TestIdentityHTTPWorkflow returns tenantless runtime.started alongside tenantSlug=acme despite filter[tenantSlug]=acme; reproduced on three executions (including post-commit)."}
+  ],
+  "failureKind": "code_failure",
+  "workingTreeDirty": true,
+  "nextAction": "claim M0-AGENT-002 retry after fixing the reproducible platform audit tenant filter failure"
+}
