@@ -262,7 +262,7 @@ func (siw *ServerInterfaceWrapper) ListPlatformAuditLogs(w http.ResponseWriter, 
 
 	// ------------- Optional query parameter "filter" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "filter", r.URL.Query(), &params.Filter, runtime.BindQueryParameterOptions{Type: "object", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("deepObject", true, false, "filter", r.URL.Query(), &params.Filter, runtime.BindQueryParameterOptions{Type: "object", Format: ""})
 	if err != nil {
 		var requiredError *runtime.RequiredParameterError
 		if errors.As(err, &requiredError) {
@@ -605,7 +605,7 @@ func (siw *ServerInterfaceWrapper) ListPlatformJobs(w http.ResponseWriter, r *ht
 
 	// ------------- Optional query parameter "filter" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "filter", r.URL.Query(), &params.Filter, runtime.BindQueryParameterOptions{Type: "object", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("deepObject", true, false, "filter", r.URL.Query(), &params.Filter, runtime.BindQueryParameterOptions{Type: "object", Format: ""})
 	if err != nil {
 		var requiredError *runtime.RequiredParameterError
 		if errors.As(err, &requiredError) {

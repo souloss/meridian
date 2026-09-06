@@ -53,7 +53,7 @@ type ListAuditLogsParams struct {
 	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 
 	// Filter identifies or filters the filter value in the query.
-	Filter *AuditFilters `form:"filter,omitempty" json:"filter,omitempty"`
+	Filter *AuditFilters `json:"filter,omitempty"`
 }
 
 // ListBreakingTodosParams defines parameters for ListBreakingTodos.

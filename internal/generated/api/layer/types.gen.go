@@ -110,7 +110,7 @@ type ListReviewsParams struct {
 	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 
 	// Filter identifies or filters the filter value in the query.
-	Filter *ReviewFilters `form:"filter,omitempty" json:"filter,omitempty"`
+	Filter *ReviewFilters `json:"filter,omitempty"`
 }
 
 // ReorderAssetLayersJSONRequestBody defines body for ReorderAssetLayers for application/json ContentType.

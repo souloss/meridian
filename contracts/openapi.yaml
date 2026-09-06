@@ -7831,6 +7831,8 @@ components:
       description: identifies or filters the filter value in the query.
       schema:
         $ref: '#/components/schemas/AuditFilter'
+      style: deepObject
+      explode: true
     CandidateId:
       name: candidateId
       in: path
@@ -7907,6 +7909,8 @@ components:
       description: identifies or filters the filter value in the query.
       schema:
         $ref: '#/components/schemas/JobFilter'
+      style: deepObject
+      explode: true
     JobId:
       name: jobId
       in: path
@@ -7977,6 +7981,8 @@ components:
       description: identifies or filters the filter value in the query.
       schema:
         $ref: '#/components/schemas/PlatformAuditFilter'
+      style: deepObject
+      explode: true
     PlatformJobFilters:
       name: filter
       in: query
@@ -7984,6 +7990,8 @@ components:
       description: identifies or filters the filter value in the query.
       schema:
         $ref: '#/components/schemas/PlatformJobFilter'
+      style: deepObject
+      explode: true
     PreviewId:
       name: previewId
       in: path
@@ -8044,6 +8052,8 @@ components:
       description: identifies or filters the filter value in the query.
       schema:
         $ref: '#/components/schemas/ReviewFilter'
+      style: deepObject
+      explode: true
     RevisionId:
       name: revisionId
       in: path
@@ -8065,6 +8075,8 @@ components:
       description: identifies or filters the filter value in the query.
       schema:
         $ref: '#/components/schemas/SearchFilter'
+      style: deepObject
+      explode: true
     ServiceSlug:
       name: serviceSlug
       in: path

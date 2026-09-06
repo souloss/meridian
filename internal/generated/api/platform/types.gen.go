@@ -56,7 +56,7 @@ type ListPlatformAuditLogsParams struct {
 	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 
 	// Filter identifies or filters the filter value in the query.
-	Filter *PlatformAuditFilters `form:"filter,omitempty" json:"filter,omitempty"`
+	Filter *PlatformAuditFilters `json:"filter,omitempty"`
 }
 
 // ListGlobalCredentialsParams defines parameters for ListGlobalCredentials.
@@ -101,7 +101,7 @@ type ListPlatformJobsParams struct {
 	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 
 	// Filter identifies or filters the filter value in the query.
-	Filter *PlatformJobFilters `form:"filter,omitempty" json:"filter,omitempty"`
+	Filter *PlatformJobFilters `json:"filter,omitempty"`
 }
 
 // ListProducerProfilesParams defines parameters for ListProducerProfiles.

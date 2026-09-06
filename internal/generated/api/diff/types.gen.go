@@ -112,7 +112,7 @@ type SearchParams struct {
 	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 
 	// Filter identifies or filters the filter value in the query.
-	Filter *SearchFacets `form:"filter,omitempty" json:"filter,omitempty"`
+	Filter *SearchFacets `json:"filter,omitempty"`
 }
 
 // RunDiffJSONRequestBody defines body for RunDiff for application/json ContentType.

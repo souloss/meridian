@@ -38,7 +38,7 @@ type ListJobsParams struct {
 	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
 
 	// Filter identifies or filters the filter value in the query.
-	Filter *JobFilters `form:"filter,omitempty" json:"filter,omitempty"`
+	Filter *JobFilters `json:"filter,omitempty"`
 }
 
 // StreamJobLogsParams defines parameters for StreamJobLogs.

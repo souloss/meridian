@@ -220,9 +220,29 @@ def normalize_document(document: dict[str, Any], title: str) -> dict[str, Any]:
         )
     result["servers"] = [{"url": "/"}]
     rewrite_security(result)
+    normalize_query_parameter_styles(result)
     annotate_generated_schema_descriptions(result)
     normalize_multipart(result)
     return result
+
+
+def normalize_query_parameter_styles(document: dict[str, Any]) -> None:
+    """Preserve the shared deep-object query convention in OpenAPI output.
+
+    TypeSpec's HTTP query decorator models exploded object values, while the
+    OpenAPI projection needs to name the wire serialization explicitly so
+    generated clients and servers agree on ``filter[field]=value``.  Every
+    shared object filter is emitted with the same deepObject style.
+    """
+    parameters = document.get("components", {}).get("parameters", {})
+    if not isinstance(parameters, dict):
+        return
+    for parameter in parameters.values():
+        if not isinstance(parameter, dict):
+            continue
+        if parameter.get("in") == "query" and parameter.get("name") == "filter":
+            parameter["style"] = "deepObject"
+            parameter["explode"] = True
 
 
 def annotate_generated_schema_descriptions(document: dict[str, Any]) -> None:
