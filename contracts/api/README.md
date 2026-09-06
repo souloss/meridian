@@ -8,7 +8,7 @@ file.
 | --- | --- |
 | `main.tsp` | Complete service entry point. Imports every domain and defines global API metadata. |
 | `common/models.tsp` | Stable facade imported by all entries; delegates shared wire models to focused `common/*.tsp` modules. |
-| `domains/<domain>.tsp` | One domain's operations. Each file imports the shared model graph and owns its routes, operation IDs, tags and extensions. |
+| `domains/<domain>/routes.tsp` | One domain's operations. Each route file imports the shared model graph and owns its routes, operation IDs, tags and extensions. |
 | `tspconfig.yaml` | Pinned TypeSpec OpenAPI 3.1 emitter configuration. |
 | `package.json`, `pnpm-lock.yaml` | Exact compiler dependency boundary for reproducible contract builds. |
 
@@ -23,7 +23,7 @@ The generated graph is:
 TypeSpec sources
   |-- main.tsp ----------------------> contracts/openapi.yaml
   |-- common/models.tsp -------------> build/contracts/api/common/openapi.yaml
-  `-- domains/*.tsp -----------------> build/contracts/api/domains/*.yaml
+  `-- domains/*/routes.tsp ----------> build/contracts/api/domains/*.yaml
                                             |
                                             `--> oapi-codegen domain Go packages
 ```

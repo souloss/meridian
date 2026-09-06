@@ -32,7 +32,7 @@ func TestOpenAPIOperationsArePartitionedByDomain(t *testing.T) {
 
 	sourceIDs := make(map[string]string, len(canonicalIDs))
 	sourcePaths := make(map[string]string)
-	domainFiles, err := filepath.Glob(filepath.Join("..", "..", "contracts", "api", "domains", "*.tsp"))
+	domainFiles, err := filepath.Glob(filepath.Join("..", "..", "contracts", "api", "domains", "*", "routes.tsp"))
 	if err != nil {
 		t.Fatalf("find domain OpenAPI contracts: %v", err)
 	}
@@ -40,7 +40,7 @@ func TestOpenAPIOperationsArePartitionedByDomain(t *testing.T) {
 		t.Fatal("no domain OpenAPI contracts found")
 	}
 	for _, filename := range domainFiles {
-		domain := filepath.Base(filename[:len(filename)-len(filepath.Ext(filename))])
+		domain := filepath.Base(filepath.Dir(filename))
 		contract := loadOpenAPIContract(t, filepath.Join("..", "..", "build", "contracts", "api", "domains", domain+".yaml"))
 		for path := range contract.Paths {
 			if previous, exists := sourcePaths[path]; exists {

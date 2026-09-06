@@ -40,12 +40,13 @@ def main() -> int:
         with tempfile.TemporaryDirectory(prefix="meridian-tsp-") as temporary:
             temporary_root = Path(temporary)
             common = compile_entry(API_ROOT / "common" / "models.tsp", temporary_root / "common")
+            domain_entries = sorted(DOMAINS_ROOT.glob("*/routes.tsp"))
             domains = {
-                domain.stem: compile_entry(domain, temporary_root / "domains" / domain.stem)
-                for domain in sorted(DOMAINS_ROOT.glob("*.tsp"))
+                domain.parent.name: compile_entry(domain, temporary_root / "domains" / domain.parent.name)
+                for domain in domain_entries
             }
             if not domains:
-                raise ContractError(f"no TypeSpec domain files found in {DOMAINS_ROOT}")
+                raise ContractError(f"no TypeSpec domain route files found in {DOMAINS_ROOT}")
             main_document = compile_entry(API_ROOT / "main.tsp", temporary_root / "main")
 
             common_document = normalize_common(common, domains.values())
@@ -360,7 +361,7 @@ def validate_documents(
     for domain, document in domains.items():
         current = document.get("paths")
         if not isinstance(current, dict) or not current:
-            raise ContractError(f"domains/{domain}.tsp did not produce any paths")
+            raise ContractError(f"domains/{domain}/routes.tsp did not produce any paths")
         for path, item in current.items():
             if path in domain_paths:
                 raise ContractError(f"path {path!r} is emitted by more than one domain")

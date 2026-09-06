@@ -25,7 +25,7 @@ must import `models.tsp`, not individual modules, so internal reorganization
 does not alter the generation chain.
 
 Keep definitions here only when they are part of the public cross-domain wire
-contract. Domain-specific operations remain in `../domains/*.tsp`; do not copy
+contract. Domain-specific operations remain in `../domains/*/routes.tsp`; do not copy
 models into a domain file.
 
 Adding a new module is safe when its symbols remain in the `MeridianApi`
