@@ -67,7 +67,7 @@ def main() -> int:
             )
 
             if args.check:
-                return check_outputs(generated)
+                return check_outputs(generated, materialize=set(generated) - {CANONICAL})
             write_outputs(generated)
             return 0
     except ContractError as error:
@@ -424,10 +424,16 @@ def write_outputs(generated: dict[Path, str]) -> None:
         print(f"generated {filename.relative_to(REPOSITORY_ROOT)}")
 
 
-def check_outputs(generated: dict[Path, str]) -> int:
+def check_outputs(generated: dict[Path, str], *, materialize: set[Path] | None = None) -> int:
     result = 0
+    materialize = materialize or set()
     for filename, expected in generated.items():
-        result |= check_output(filename, expected)
+        if filename in materialize:
+            filename.parent.mkdir(parents=True, exist_ok=True)
+            filename.write_text(expected, encoding="utf-8")
+            print(f"generated {filename.relative_to(REPOSITORY_ROOT)}")
+        else:
+            result |= check_output(filename, expected)
     if result == 0:
         print("checked TypeSpec projections")
     return result

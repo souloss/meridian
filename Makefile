@@ -5,7 +5,7 @@ MERIDIAN_DEV_MASTER_KEY_VERSION ?= 1
 MERIDIAN_DEV_CREDENTIAL_FINGERPRINT_KEY ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 MILESTONE ?= $(if $(ITEM),$(firstword $(subst -, ,$(ITEM))),M5)
 
-.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint smoke smoke-all smoke-m0-credentials smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 quality-gate
+.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 quality-gate
 
 all: build
 
@@ -65,13 +65,16 @@ contracts-generate-then-git-diff-exit-code: contracts-generate
 	git diff --exit-code -- internal/generated/api internal/generated/repository web/app/api/generated
 
 contracts-validate:
-	$(MAKE) agent-protocol-test smoke-runner-test
+	$(MAKE) agent-protocol-test smoke-runner-test contract-tooling-test
 	vfox exec golang@1.27.1 -- go tool sqlc vet
 	$(MAKE) contracts-check
 	vfox exec nodejs@24.20.0 -- pnpm --dir web exec redocly lint --config ../contracts/.redocly.yaml ../contracts/openapi.yaml
 	vfox exec nodejs@24.20.0 -- pnpm --dir web check:generated-docs
 
 contracts-lint: contracts-validate
+
+contract-tooling-test:
+	python3 -m unittest scripts/sync_openapi_test.py
 
 smoke:
 	SMK="$(SMK)" sh ./scripts/smoke.sh

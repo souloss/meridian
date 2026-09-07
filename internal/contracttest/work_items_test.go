@@ -38,6 +38,11 @@ type agentQueue struct {
 	Items []agentWorkItem `yaml:"items"`
 }
 
+type smokeRequirement struct {
+	Milestone            string   `yaml:"milestone"`
+	RequiredOperationIDs []string `yaml:"requiredOperationIds"`
+}
+
 func readAgentQueue(t *testing.T) agentQueue {
 	t.Helper()
 	contents, err := os.ReadFile("../../contracts/work-items.yaml")
@@ -51,7 +56,7 @@ func readAgentQueue(t *testing.T) agentQueue {
 	return queue
 }
 
-func readSmokeMilestones(t *testing.T) map[string]string {
+func readSmokeRequirements(t *testing.T) map[string]smokeRequirement {
 	t.Helper()
 	contents, err := os.ReadFile("../../contracts/acceptance.yaml")
 	if err != nil {
@@ -59,25 +64,21 @@ func readSmokeMilestones(t *testing.T) map[string]string {
 	}
 	var acceptance struct {
 		SmokeSuite struct {
-			Cases map[string]struct{ Milestone string } `yaml:"cases"`
+			Cases map[string]smokeRequirement `yaml:"cases"`
 		} `yaml:"smokeSuite"`
 	}
 	if err := yaml.Unmarshal(contents, &acceptance); err != nil {
 		t.Fatal(err)
 	}
-	result := make(map[string]string)
-	for id, smoke := range acceptance.SmokeSuite.Cases {
-		result[id] = smoke.Milestone
-	}
-	if len(result) == 0 {
+	if len(acceptance.SmokeSuite.Cases) == 0 {
 		t.Fatal("acceptance Smoke suite is empty")
 	}
-	return result
+	return acceptance.SmokeSuite.Cases
 }
 
 func TestAgentQueueReferencesAndMilestoneGates(t *testing.T) {
 	queue := readAgentQueue(t)
-	smokes := readSmokeMilestones(t)
+	smokes := readSmokeRequirements(t)
 	if !slices.Equal(queue.Selection.OnlyStatuses, []string{"ready", "needs_retry"}) || !queue.Selection.RequirePreviousMilestoneAccepted {
 		t.Fatal("selection must exclude active leases and require previous-stage acceptance")
 	}
@@ -116,11 +117,11 @@ func TestAgentQueueReferencesAndMilestoneGates(t *testing.T) {
 			}
 		}
 		for _, assertion := range item.Assertions {
-			milestone, exists := smokes[assertion]
+			smoke, exists := smokes[assertion]
 			if !exists {
 				t.Errorf("%s references unknown Smoke %s", item.ID, assertion)
 			}
-			if milestone == item.Milestone {
+			if smoke.Milestone == item.Milestone {
 				covered[assertion] = true
 			}
 		}
@@ -153,6 +154,28 @@ func TestAgentQueueReferencesAndMilestoneGates(t *testing.T) {
 	for id := range items {
 		visit(id)
 	}
+	for _, item := range queue.Items {
+		available := make(map[string]bool)
+		var collect func(string)
+		collect = func(id string) {
+			for _, operation := range items[id].OperationIDs {
+				available[operation] = true
+			}
+			for _, dependency := range items[id].DependsOn {
+				collect(dependency)
+			}
+		}
+		collect(item.ID)
+		for _, assertion := range item.Assertions {
+			for _, operation := range smokes[assertion].RequiredOperationIDs {
+				if !operations[operation] {
+					t.Errorf("Smoke %s references unknown required operation %s", assertion, operation)
+				} else if !available[operation] {
+					t.Errorf("%s cannot complete %s: operation %s is not owned by the item or its dependencies", item.ID, assertion, operation)
+				}
+			}
+		}
+	}
 	for _, milestone := range []string{"M0", "M1", "M2", "M3", "M4", "M5"} {
 		gate, exists := queue.MilestoneGates[milestone]
 		if !exists || !slices.Contains([]string{"pending", "needs_human_acceptance", "accepted", "changes_requested"}, gate.Status) {
@@ -177,12 +200,12 @@ func TestSmokeCatalogMatchesAcceptance(t *testing.T) {
 	if err := json.Unmarshal(contents, &catalog); err != nil {
 		t.Fatal(err)
 	}
-	acceptance := readSmokeMilestones(t)
+	acceptance := readSmokeRequirements(t)
 	if len(catalog) != len(acceptance) {
 		t.Fatal("Smoke catalog must include every acceptance case, including unimplemented fixtures")
 	}
 	for id, entry := range catalog {
-		if acceptance[id] != entry.Milestone {
+		if acceptance[id].Milestone != entry.Milestone {
 			t.Errorf("Smoke %s has wrong or unknown milestone %s", id, entry.Milestone)
 		}
 		if entry.Test != "" {

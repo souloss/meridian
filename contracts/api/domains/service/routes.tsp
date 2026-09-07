@@ -85,7 +85,7 @@ op listServices(
 @extension("x-idempotency", #{ mode: "optional", ttlHours: 24 })
 @extension("x-tenant-scope", "tenant")
 @extension("x-permissions", #["service:write"])
-@extension("x-milestone", "M0")
+@extension("x-milestone", "M1")
 @route("/api/v1/t/{tenantSlug}/services/{serviceSlug}")
 @delete
 op deleteService(...Parameters.TenantSlug, ...Parameters.ServiceSlug, ...Parameters.IfMatch):
@@ -127,7 +127,7 @@ op getService(...Parameters.TenantSlug, ...Parameters.ServiceSlug):
 @extension("x-idempotency", #{ mode: "optional", ttlHours: 24 })
 @extension("x-tenant-scope", "tenant")
 @extension("x-permissions", #["service:write"])
-@extension("x-milestone", "M0")
+@extension("x-milestone", "M1")
 @route("/api/v1/t/{tenantSlug}/services/{serviceSlug}")
 @patch
 op updateService(

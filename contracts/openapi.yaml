@@ -4826,7 +4826,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       tags:
       - Repository
-      x-milestone: M0
+      x-milestone: M1
       x-permissions:
       - repository:read
       x-tenant-scope: tenant
@@ -4910,7 +4910,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CandidatesAcceptRequest'
-      x-milestone: M0
+      x-milestone: M1
       x-idempotency:
         mode: required
         ttlHours: 24
@@ -5113,7 +5113,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RepositoryDiscoverRequest'
-      x-milestone: M0
+      x-milestone: M1
       x-idempotency:
         mode: required
         ttlHours: 24
@@ -5406,7 +5406,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       tags:
       - Service
-      x-milestone: M0
+      x-milestone: M1
       x-permissions:
       - service:write
       x-tenant-scope: tenant
@@ -5511,7 +5511,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ServicePatchRequest'
-      x-milestone: M0
+      x-milestone: M1
       x-permissions:
       - service:write
       x-tenant-scope: tenant

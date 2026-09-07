@@ -63,7 +63,7 @@ milestoneGatePolicy:
   nextMilestoneRequiresPreviousAccepted: true
 
 milestoneGates:
-  M0: {status: accepted, reportPath: artifacts/agent/milestones/M0/20260906T182703Z/report.json, acceptedBy: souloss, acceptedAt: '2026-09-07T23:40:01+08:00', acceptedCommit: 036c9bcaea05dd6e94e0b16b5accc94427f481d9, contractDigest: 'sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b'}
+  M0: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M1: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M2: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M3: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
@@ -177,9 +177,9 @@ items:
     status: needs_retry
     title: repository-discovery-and-source-bindings
     dependsOn: [M0-AGENT-003, M1-CONTRACT-001]
-    operationIds: [createRepository, discoverRepository, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
-    stories: [US-02, US-03]
-    assertions: [SMK-006, SMK-008, SMK-009, SMK-032, SMK-034, SMK-037]
+    operationIds: [createProducerProfile, listAvailableProducerProfiles, checkRepositoryConnection, createRepository, discoverRepository, listDiscoveryCandidates, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
+    stories: [US-02]
+    assertions: [SMK-032, SMK-040]
     verify: [smoke-m1-repository]
     owner: coding-agent
     attempt: 1
@@ -197,20 +197,20 @@ items:
   - id: M1-CONTRACT-001
     milestone: M1
     priority: P0
-    status: claimed
+    status: verifying
     title: repair-m1-operation-assertion-ownership-and-source-expansion
     dependsOn: [M0-AGENT-003]
     operationIds: []
     stories: [US-02, US-03]
-    assertions: [SMK-006, SMK-008, SMK-009, SMK-032, SMK-034, SMK-037]
+    assertions: []
     verify: [contracts-validate, contracts-generate-then-git-diff-exit-code]
     owner: coding-agent
     attempt: 1
     maxAttempts: 3
-    leaseUntil: '2026-09-07T16:54:23Z'
+    leaseUntil: '2026-09-07T17:13:55Z'
     startedAt: '2026-09-07T16:24:23Z'
     baseCommit: 099ce7dac633be5c0d254139f867046b5d09d9a6
-    contractDigest: sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
+    contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
     failureKind: null
     blockedReason: null
     reportPath: null
@@ -220,7 +220,7 @@ items:
       authorizedOn: '2026-09-08'
       previousStatus: blocked
       reason: user selected the proposed M1 work-item split and confirmed configuredEntity, materializedEntity, and expansion as children of sourceExpansion
-    nextAction: implement contract repair
+    nextAction: run declared gates on committed source checkpoint
 
   - id: M1-AGENT-002
     milestone: M1
@@ -228,9 +228,9 @@ items:
     status: ready
     title: openapi-pipeline-viewer-and-public-read
     dependsOn: [M1-AGENT-001]
-    operationIds: [syncRepository, getService, getAsset, getAssetVersion, listAssetVersionItems, resolveView, getPublicService]
+    operationIds: [syncRepository, updateSourceSpec, getService, listRecentServices, getAsset, getAssetVersion, listAssetVersionItems, resolveView]
     stories: [US-02, US-03]
-    assertions: [SMK-006, SMK-007, SMK-008, SMK-010]
+    assertions: [SMK-006, SMK-007, SMK-008, SMK-009, SMK-010]
     verify: [smoke-m1-golden-path, perf-openapi-pipeline, e2e-viewer]
     reportPath: null
 
@@ -239,11 +239,23 @@ items:
     priority: P0
     status: ready
     title: job-recovery-mutex-and-sse-reconnect
-    dependsOn: [M1-AGENT-002]
+    dependsOn: [M1-AGENT-004]
     operationIds: [retryJob, getJob, streamJobLogs]
     stories: [US-12]
     assertions: [SMK-027, SMK-036]
     verify: [smoke-m1-concurrency, job-recovery-tests]
+    reportPath: null
+
+  - id: M1-AGENT-004
+    milestone: M1
+    priority: P0
+    status: ready
+    title: service-lifecycle-public-read-and-delete
+    dependsOn: [M1-AGENT-002]
+    operationIds: [updateService, deleteService, getPublicService]
+    stories: [US-02]
+    assertions: [SMK-034, SMK-037]
+    verify: [smoke-m1-service-lifecycle]
     reportPath: null
 
   - id: M2-AGENT-001

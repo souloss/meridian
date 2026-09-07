@@ -178,7 +178,7 @@ op syncRepository(
 @extension("x-tenant-scope", "tenant")
 @extension("x-permissions", #["repository:sync"])
 @extension("x-idempotency", #{ mode: "required", ttlHours: 24 })
-@extension("x-milestone", "M0")
+@extension("x-milestone", "M1")
 @route("/api/v1/t/{tenantSlug}/repositories/{repositoryId}:discover")
 @post
 op discoverRepository(
@@ -203,7 +203,7 @@ op discoverRepository(
 @tag("Repository")
 @extension("x-tenant-scope", "tenant")
 @extension("x-permissions", #["repository:read"])
-@extension("x-milestone", "M0")
+@extension("x-milestone", "M1")
 @route("/api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates")
 @get
 op listDiscoveryCandidates(
@@ -224,7 +224,7 @@ op listDiscoveryCandidates(
 @extension("x-tenant-scope", "tenant")
 @extension("x-permissions", #["service:create"])
 @extension("x-idempotency", #{ mode: "required", ttlHours: 24 })
-@extension("x-milestone", "M0")
+@extension("x-milestone", "M1")
 @route("/api/v1/t/{tenantSlug}/repositories/{repositoryId}/candidates:accept")
 @post
 op acceptDiscoveryCandidates(

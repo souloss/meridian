@@ -883,7 +883,7 @@ sourceCompatibility:
       - increment-all-affected-track-generations
     failureWithoutFlag: base_layer_exists
 
-  sourceExpansion:
+sourceExpansion:
   configuredEntity: source_specs
   materializedEntity: source_bindings
   relation: one-source-spec-to-many-source-bindings

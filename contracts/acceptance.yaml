@@ -271,6 +271,7 @@ smokeSuite:
       milestone: M1
       story: US-02
       assertion: golden-path
+      requiredOperationIds: [checkRepositoryConnection, createRepository, discoverRepository, listDiscoveryCandidates, acceptDiscoveryCandidates, createSourceSpec, syncRepository, getService, listRecentServices, getAsset, getAssetVersion, listAssetVersionItems]
       expected:
         timing: {elapsedSecondsLessThan: 300}
         operations:
@@ -308,6 +309,7 @@ smokeSuite:
       milestone: M1
       story: US-02
       assertion: immediate-input-noop
+      requiredOperationIds: [syncRepository]
       expected:
         procedure:
           before: capture-track-latest-id-inputFingerprint-layerRevisionCount-versionCount
@@ -323,6 +325,7 @@ smokeSuite:
       milestone: M1
       story: US-03
       assertion: path-self-healing
+      requiredOperationIds: [updateSourceSpec, syncRepository, getAssetVersion]
       expected:
         failure:
           - {operationId: updateSourceSpec, httpStatus: 200}
@@ -340,6 +343,7 @@ smokeSuite:
       milestone: M1
       story: US-02
       assertion: glob-definition-materializes-three-bindings
+      requiredOperationIds: [createSourceSpec, syncRepository, listSourceBindings]
       expected:
         setup: {fixtureGlobMatchesThreeFilesOnMain: true, assetNameTemplate: '{parent_dir}'}
         operations:
@@ -361,6 +365,7 @@ smokeSuite:
       milestone: M1
       story: US-02
       assertion: descriptor-four-mode-contract
+      requiredOperationIds: [resolveView]
       expected:
         valid:
           single: {operationId: resolveView, httpStatus: 200, responseKind: document}
@@ -671,6 +676,7 @@ smokeSuite:
       milestone: M1
       story: US-12
       assertion: repository-mutex-and-dirty-successor
+      requiredOperationIds: [syncRepository, getJob]
       expected:
         duplicateRequests:
           operationId: syncRepository
@@ -761,6 +767,7 @@ smokeSuite:
       milestone: M1
       story: US-02
       assertion: controlled-producer-profile-selection
+      requiredOperationIds: [createProducerProfile, listAvailableProducerProfiles, createSourceSpec]
       expected:
         operation: {operationId: listAvailableProducerProfiles, httpStatus: 200}
         selection:
@@ -790,6 +797,7 @@ smokeSuite:
       milestone: M1
       story: US-02
       assertion: service-lifecycle-is-executable-and-independent-from-version-lifecycle
+      requiredOperationIds: [createSourceSpec, updateService, getPublicService]
       expected:
         setup:
           serviceLifecycle: draft
@@ -841,6 +849,7 @@ smokeSuite:
       milestone: M1
       story: US-12
       assertion: required-idempotency-request-digest-and-first-arrival-concurrency
+      requiredOperationIds: [syncRepository]
       expected:
         operationId: syncRepository
         concurrentSameKeyAndCanonicalRequest:
@@ -860,6 +869,7 @@ smokeSuite:
       milestone: M1
       story: US-02
       assertion: service-soft-delete-cascade-history-and-running-work-fence
+      requiredOperationIds: [deleteService, getService, getAssetVersion, getPublicService]
       expected:
         operation: {operationId: deleteService, httpStatus: 204, requestHeader: If-Match}
         logicalState:
@@ -908,3 +918,27 @@ smokeSuite:
           leakedTenantFields: false
         authorization:
           viewerBusinessMutation: {httpStatus: 404, errorCode: not_found}
+    SMK-040:
+      milestone: M1
+      story: US-02
+      assertion: repository-discovery-and-source-configuration
+      requiredOperationIds: [checkRepositoryConnection, createRepository, discoverRepository, listDiscoveryCandidates, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
+      expected:
+        operations:
+          - {operationId: checkRepositoryConnection, httpStatus: 200, response: {ok: true, errorClass: null}}
+          - {operationId: createRepository, httpStatus: 201}
+          - {operationId: discoverRepository, httpStatus: 202, response: {jobId: present}}
+          - {operationId: listDiscoveryCandidates, httpStatus: 200, response: {rootDirs: sorted-ascending-bytewise}}
+          - {operationId: acceptDiscoveryCandidates, httpStatus: 200, response: {itemsContainServiceSlugs: [order-service, pay-service]}}
+          - {operationId: createSourceSpec, httpStatus: 201, response: {bindingsCount: 0, initialLayerId: null}}
+          - {operationId: listSourceBindings, httpStatus: 200, response: {itemsLength: 0}}
+        discoveryJob:
+          terminalStatus: succeeded
+          resolvedCommit: fixture-main-commit
+          requiredStages: [resolve, discover]
+          eachRequiredStage: succeeded
+        candidates:
+          markerFilesAndDirectoriesFollowDomainContract: true
+          rootRepositoryUsesEmptyRootDir: true
+          repeatedCommitDoesNotDuplicateCandidates: true
+          changedCommitResetsMatchingCandidateToPending: true
