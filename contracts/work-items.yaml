@@ -63,7 +63,7 @@ milestoneGatePolicy:
   nextMilestoneRequiresPreviousAccepted: true
 
 milestoneGates:
-  M0: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
+  M0: {status: needs_human_acceptance, reportPath: artifacts/agent/milestones/M0/20260907T171647Z/report.json, acceptedBy: null, acceptedAt: null, acceptedCommit: 5ac8110e7b60db7ea0bcec4fc5e2958ead519f98, contractDigest: 'sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb'}
   M1: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M2: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M3: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
@@ -192,12 +192,12 @@ items:
     blockedReason: assertion ownership and dependency ordering cannot satisfy the declared Smoke without implementing unowned or downstream operations
     reportPath: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
     lastEvidence: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
-    nextAction: resolve and accept M1-CONTRACT-001 before retrying
+    nextAction: wait for explicit M0 reacceptance, then claim attempt 2
 
   - id: M1-CONTRACT-001
     milestone: M1
     priority: P0
-    status: verifying
+    status: passed
     title: repair-m1-operation-assertion-ownership-and-source-expansion
     dependsOn: [M0-AGENT-003]
     operationIds: []
@@ -207,20 +207,20 @@ items:
     owner: coding-agent
     attempt: 2
     maxAttempts: 3
-    leaseUntil: '2026-09-07T17:26:27Z'
+    leaseUntil: null
     startedAt: '2026-09-07T16:56:27Z'
     baseCommit: 19cc43864b217e5ff2b756181dbd2d93fc7b02f2
     contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
     failureKind: null
     blockedReason: null
-    reportPath: artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json
-    lastEvidence: artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json
+    reportPath: artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json
+    lastEvidence: artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json
     recovery:
       authorizedBy: souloss
       authorizedOn: '2026-09-08'
       previousStatus: blocked
       reason: user selected the proposed M1 work-item split and confirmed configuredEntity, materializedEntity, and expansion as children of sourceExpansion
-    nextAction: commit the repaired tooling and generated projections, then run the declared gates
+    nextAction: wait for explicit M0 milestone reacceptance before resuming M1-AGENT-001
 
   - id: M1-AGENT-002
     milestone: M1

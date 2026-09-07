@@ -1,0 +1,55 @@
+{
+  "workItem": "M1-CONTRACT-001",
+  "status": "passed",
+  "commit": "5ac8110e7b60db7ea0bcec4fc5e2958ead519f98",
+  "baseCommit": "19cc43864b217e5ff2b756181dbd2d93fc7b02f2",
+  "contractDigest": "sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb",
+  "sourceDigest": "sha256:68bcd96ff0dc9b6d31622383bebc8997d34003d2c21ad3d3a8384f77700ed62d",
+  "startedAt": "2026-09-07T16:56:27Z",
+  "finishedAt": "2026-09-07T17:16:47Z",
+  "reportPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json",
+  "stories": ["US-02", "US-03"],
+  "assertions": [
+    {"id": "source-expansion-structure", "status": "passed", "evidence": "internal/contracttest/domain_semantics_test.go"},
+    {"id": "work-item-operation-closure", "status": "passed", "evidence": "internal/contracttest/work_items_test.go"},
+    {"id": "clean-checkout-contract-projections", "status": "passed", "evidence": "scripts/sync_openapi_test.py"},
+    {"id": "frontend-generation-prepares-nuxt", "status": "passed", "evidence": "scripts/frontend_tooling_test.py"}
+  ],
+  "commands": [
+    {"command": "make contracts-validate ITEM=M1-CONTRACT-001", "exitCode": 0, "durationSeconds": 81.18, "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log"},
+    {"command": "make contracts-generate-then-git-diff-exit-code ITEM=M1-CONTRACT-001", "exitCode": 0, "durationSeconds": 97.32, "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log"},
+    {"command": "go test ./...", "exitCode": 0, "durationSeconds": 11.99, "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log"},
+    {"command": "go vet ./...", "exitCode": 0, "durationSeconds": 3.25, "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0.01, "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log"},
+    {"command": "make quality-gate ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 394.21, "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log"}
+  ],
+  "changedFiles": [
+    "Makefile",
+    "contracts/acceptance.yaml",
+    "contracts/api/domains/repository/routes.tsp",
+    "contracts/api/domains/service/routes.tsp",
+    "contracts/domain.yaml",
+    "contracts/openapi.yaml",
+    "contracts/work-items.yaml",
+    "docs/06_implementation-progress.md",
+    "internal/contracttest/domain_semantics_test.go",
+    "internal/contracttest/work_items_test.go",
+    "internal/generated/api/spec.gen.go",
+    "scripts/frontend_tooling_test.py",
+    "scripts/smoke-cases.json",
+    "scripts/sync-openapi.py",
+    "scripts/sync_openapi_test.py",
+    "web/package.json"
+  ],
+  "compatibility": {
+    "sourceExpansion": "configuredEntity, materializedEntity, relation, fields, and expansion are children of sourceExpansion",
+    "milestones": "repository discovery and service update/delete operations move from M0 to M1 to match implementation ownership",
+    "workItems": "M1 is split into discovery/source configuration, sync/read, service lifecycle/public read/delete, and OpenAPI UI items with transitive operation closure",
+    "acceptance": "M1 Smoke cases declare requiredOperationIds; SMK-040 covers repository discovery through initial source configuration",
+    "generation": "clean worktrees materialize ignored TypeSpec projections and prepare Nuxt before Orval"
+  },
+  "deferred": ["M1 production implementation remains gated by explicit M0 reacceptance"],
+  "failures": [],
+  "failureKind": null,
+  "nextAction": "wait for explicit M0 milestone reacceptance before resuming M1-AGENT-001"
+}

@@ -1,0 +1,2549 @@
+Script started on 2026-09-08 01:03:45+08:00 [COMMAND="time -p make contracts-validate ITEM=M1-CONTRACT-001" <not executed on terminal>]
+zsh:1: command not found: -p
+-p make contracts-validate ITEM=M1-CONTRACT-001  0.00s user 0.00s system 0% cpu 0.003 total
+
+Script done on 2026-09-08 01:03:45+08:00 [COMMAND_EXIT_CODE="127"]
+Script started on 2026-09-08 01:04:08+08:00 [COMMAND="/usr/bin/time -p make contracts-validate ITEM=M1-CONTRACT-001" <not executed on terminal>]
+make agent-protocol-test smoke-runner-test contract-tooling-test
+make[1]: Entering directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+vfox exec golang@1.27.1 -- go test ./internal/contracttest -run 'TestAgentQueue|TestSmokeCatalog'
+ok  	github.com/meridian-labs/meridian/internal/contracttest	(cached)
+vfox exec nodejs@24.20.0 -- node --test scripts/smoke-runner.test.mjs
+✔ named test passes (2.110082ms)
+✔ zero tests cannot pass (0.342029ms)
+✔ parent pass is insufficient (0.261486ms)
+✔ skip cannot pass (0.16358ms)
+✔ skipped nested assertion cannot pass (2.304ms)
+✔ failing nested assertion cannot pass (0.16906ms)
+✔ command failure overrides test pass (0.194909ms)
+✔ signal or timeout cannot pass (0.17411ms)
+✔ wrong package cannot pass (0.196142ms)
+✔ catalog package is part of the fixture identity (0.362938ms)
+✔ future catalog entries remain tooling gaps until all execution fields exist (1.161032ms)
+✔ Go test selector targets every test path component exactly (0.940945ms)
+✔ report preserves evidence and escapes JUnit failure messages (2.332033ms)
+✔ source digest handles directory symlinks, changed and deleted files (2.022255ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 149.717514
+python3 -m unittest scripts/sync_openapi_test.py scripts/frontend_tooling_test.py
+--- contracts/openapi.yaml
++++ contracts/openapi.yaml (generated)
+@@ -1 +1 @@
+-stale
++generated
+contracts sync: generated output contracts/openapi.yaml is stale
+.checked contracts/openapi.yaml
+generated build/contracts/api/common/openapi.yaml
+checked TypeSpec projections
+..
+----------------------------------------------------------------------
+Ran 3 tests in 0.004s
+
+OK
+make[1]: Leaving directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+vfox exec golang@1.27.1 -- go tool sqlc vet
+make contracts-check
+make[1]: Entering directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+sh ./scripts/bundle-openapi.sh --check
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 512ms ../../../../../../tmp/meridian-tsp-7tja2g54/common/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 561ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/asset/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/asset/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 488ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/auth/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/auth/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 492ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/collaboration/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 425ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/diff/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 376ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/job/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 517ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/layer/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 584ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/platform/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 565ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/repository/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/repository/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 441ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/service/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/service/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 441ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/system/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/system/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 619ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/tenant/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 711ms ../../../../../../tmp/meridian-tsp-7tja2g54/domains/view/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/view/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 682ms ../../../../../../tmp/meridian-tsp-7tja2g54/main/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gmain.tsp:39:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 39 | namespace MeridianApi;
+     |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+checked contracts/openapi.yaml
+generated build/contracts/api/common/openapi.yaml
+generated build/contracts/api/domains/asset.yaml
+generated build/contracts/api/domains/auth.yaml
+generated build/contracts/api/domains/collaboration.yaml
+generated build/contracts/api/domains/diff.yaml
+generated build/contracts/api/domains/job.yaml
+generated build/contracts/api/domains/layer.yaml
+generated build/contracts/api/domains/platform.yaml
+generated build/contracts/api/domains/repository.yaml
+generated build/contracts/api/domains/service.yaml
+generated build/contracts/api/domains/system.yaml
+generated build/contracts/api/domains/tenant.yaml
+generated build/contracts/api/domains/view.yaml
+checked TypeSpec projections
+
+    ╔═══════════════════════════════════════════════════════╗
+    ║                                                       ║
+    ║  A new version of Redocly CLI (2.51.2) is available.  ║
+    ║  Update now: `npm i -g @redocly/cli@latest`.          ║
+    ║  Changelog: https://redocly.com/docs/cli/changelog/   ║
+    ║                                                       ║
+    ╚═══════════════════════════════════════════════════════╝
+
+validating ../contracts/openapi.yaml...
+[1] ../contracts/openapi.yaml:2:1 at #/info
+
+Info object should contain `license` field.
+
+1 | openapi: 3.1.0
+2 | info:
+  | ^^^^
+3 |   title: Meridian API
+4 |   version: 1.0.0
+
+Warning was generated by the info-license rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/info-license
+
+
+[2] ../contracts/openapi.yaml:61:7 at #/paths/~1api~1v1~1admin~1global-credentials/get/responses
+
+Operation must have at least one `4XX` response.
+
+59 | - $ref: '#/components/parameters/Page'
+60 | - $ref: '#/components/parameters/PageSize'
+61 | responses:
+   | ^^^^^^^^^
+62 |   '200':
+63 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[3] ../contracts/openapi.yaml:9317:13 at #/components/schemas/ConnectionTest/properties/errorClass/anyOf/2
+
+Schema in `anyOf` duplicates the schema at position 2.
+
+9315 |     - other
+9316 |   - type: 'null'
+9317 |   - type: 'null'
+     |     ^^^^^^^^^^^^
+9318 |   description: specifies the error class associated with this connection test.
+9319 | message:
+
+Warning was generated by the no-illogical-composition-keywords rule.
+
+
+[4] ../contracts/openapi.yaml:426:7 at #/paths/~1api~1v1~1admin~1producer-profiles/get/responses
+
+Operation must have at least one `4XX` response.
+
+424 | - $ref: '#/components/parameters/Page'
+425 | - $ref: '#/components/parameters/PageSize'
+426 | responses:
+    | ^^^^^^^^^
+427 |   '200':
+428 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[5] ../contracts/openapi.yaml:642:7 at #/paths/~1api~1v1~1admin~1settings/get/responses
+
+Operation must have at least one `4XX` response.
+
+640 | description: Returns the selected platform settings within the authorized request scope.
+641 | parameters: []
+642 | responses:
+    | ^^^^^^^^^
+643 |   '200':
+644 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[6] ../contracts/openapi.yaml:712:7 at #/paths/~1api~1v1~1admin~1tenants/get/responses
+
+Operation must have at least one `4XX` response.
+
+710 | - $ref: '#/components/parameters/Page'
+711 | - $ref: '#/components/parameters/PageSize'
+712 | responses:
+    | ^^^^^^^^^
+713 |   '200':
+714 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[7] ../contracts/openapi.yaml:1320:7 at #/paths/~1api~1v1~1auth~1me~1preferences/get/responses
+
+Operation must have at least one `4XX` response.
+
+1318 | description: Returns the selected my preferences within the authorized request scope.
+1319 | parameters: []
+1320 | responses:
+     | ^^^^^^^^^
+1321 |   '200':
+1322 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[8] ../contracts/openapi.yaml:1427:7 at #/paths/~1api~1v1~1openapi.yaml/get/responses
+
+Operation must have at least one `4XX` response.
+
+1425 | description: Returns the exact OpenAPI contract embedded in this server build.
+1426 | parameters: []
+1427 | responses:
+     | ^^^^^^^^^
+1428 |   '200':
+1429 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[9] ../contracts/openapi.yaml:7677:7 at #/paths/~1api~1v1~1version/get/responses
+
+Operation must have at least one `4XX` response.
+
+7675 | description: Returns the server build, API, and contract versions.
+7676 | parameters: []
+7677 | responses:
+     | ^^^^^^^^^
+7678 |   '200':
+7679 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[10] ../contracts/openapi.yaml:7748:7 at #/paths/~1healthz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7746 | description: Reports whether the Meridian process is alive.
+7747 | parameters: []
+7748 | responses:
+     | ^^^^^^^^^
+7749 |   '200':
+7750 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[11] ../contracts/openapi.yaml:7766:7 at #/paths/~1metrics/get/responses
+
+Operation must have at least one `4XX` response.
+
+7764 | description: Returns deployment metrics in Prometheus text exposition format.
+7765 | parameters: []
+7766 | responses:
+     | ^^^^^^^^^
+7767 |   '200':
+7768 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[12] ../contracts/openapi.yaml:7784:7 at #/paths/~1readyz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7782 | description: Reports whether Meridian dependencies are ready to serve traffic.
+7783 | parameters: []
+7784 | responses:
+     | ^^^^^^^^^
+7785 |   '200':
+7786 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[13] ../contracts/openapi.yaml:11845:5 at #/components/schemas/PageInfo
+
+Component: "PageInfo" is never used.
+
+11843 |       description: contains the ordered team ids associated with this owner refs.
+11844 |   description: represents owner refs data exchanged through the Meridian API.
+11845 | PageInfo:
+      | ^^^^^^^^
+11846 |   type: object
+11847 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[14] ../contracts/openapi.yaml:14156:5 at #/components/schemas/SourceSpecInput
+
+Component: "SourceSpecInput" is never used.
+
+14154 |       description: Required only for manual mode; the asset must belong to the path service and match kind.
+14155 |   description: defines validated input for the corresponding Meridian API operation.
+14156 | SourceSpecInput:
+      | ^^^^^^^^^^^^^^^
+14157 |   type: object
+14158 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[15] ../contracts/openapi.yaml:14398:5 at #/components/schemas/SubscriptionScopeConstraints
+
+Component: "SubscriptionScopeConstraints" is never used.
+
+14396 |       description: indicates whether enabled applies to this subscription put request.
+14397 |   description: defines validated input for the corresponding Meridian API operation.
+14398 | SubscriptionScopeConstraints:
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+14399 |   type: object
+14400 |   description: represents subscription scope constraints data exchanged through the Meridian API.
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+../contracts/openapi.yaml: validated in 482ms
+
+Woohoo! Your API description is valid. 🎉
+You have 15 warnings.
+
+make[1]: Leaving directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+vfox exec nodejs@24.20.0 -- pnpm --dir web exec redocly lint --config ../contracts/.redocly.yaml ../contracts/openapi.yaml
+
+    ╔═══════════════════════════════════════════════════════╗
+    ║                                                       ║
+    ║  A new version of Redocly CLI (2.51.2) is available.  ║
+    ║  Update now: `npm i -g @redocly/cli@latest`.          ║
+    ║  Changelog: https://redocly.com/docs/cli/changelog/   ║
+    ║                                                       ║
+    ╚═══════════════════════════════════════════════════════╝
+
+validating ../contracts/openapi.yaml...
+[1] ../contracts/openapi.yaml:2:1 at #/info
+
+Info object should contain `license` field.
+
+1 | openapi: 3.1.0
+2 | info:
+  | ^^^^
+3 |   title: Meridian API
+4 |   version: 1.0.0
+
+Warning was generated by the info-license rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/info-license
+
+
+[2] ../contracts/openapi.yaml:61:7 at #/paths/~1api~1v1~1admin~1global-credentials/get/responses
+
+Operation must have at least one `4XX` response.
+
+59 | - $ref: '#/components/parameters/Page'
+60 | - $ref: '#/components/parameters/PageSize'
+61 | responses:
+   | ^^^^^^^^^
+62 |   '200':
+63 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[3] ../contracts/openapi.yaml:9317:13 at #/components/schemas/ConnectionTest/properties/errorClass/anyOf/2
+
+Schema in `anyOf` duplicates the schema at position 2.
+
+9315 |     - other
+9316 |   - type: 'null'
+9317 |   - type: 'null'
+     |     ^^^^^^^^^^^^
+9318 |   description: specifies the error class associated with this connection test.
+9319 | message:
+
+Warning was generated by the no-illogical-composition-keywords rule.
+
+
+[4] ../contracts/openapi.yaml:426:7 at #/paths/~1api~1v1~1admin~1producer-profiles/get/responses
+
+Operation must have at least one `4XX` response.
+
+424 | - $ref: '#/components/parameters/Page'
+425 | - $ref: '#/components/parameters/PageSize'
+426 | responses:
+    | ^^^^^^^^^
+427 |   '200':
+428 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[5] ../contracts/openapi.yaml:642:7 at #/paths/~1api~1v1~1admin~1settings/get/responses
+
+Operation must have at least one `4XX` response.
+
+640 | description: Returns the selected platform settings within the authorized request scope.
+641 | parameters: []
+642 | responses:
+    | ^^^^^^^^^
+643 |   '200':
+644 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[6] ../contracts/openapi.yaml:712:7 at #/paths/~1api~1v1~1admin~1tenants/get/responses
+
+Operation must have at least one `4XX` response.
+
+710 | - $ref: '#/components/parameters/Page'
+711 | - $ref: '#/components/parameters/PageSize'
+712 | responses:
+    | ^^^^^^^^^
+713 |   '200':
+714 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[7] ../contracts/openapi.yaml:1320:7 at #/paths/~1api~1v1~1auth~1me~1preferences/get/responses
+
+Operation must have at least one `4XX` response.
+
+1318 | description: Returns the selected my preferences within the authorized request scope.
+1319 | parameters: []
+1320 | responses:
+     | ^^^^^^^^^
+1321 |   '200':
+1322 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[8] ../contracts/openapi.yaml:1427:7 at #/paths/~1api~1v1~1openapi.yaml/get/responses
+
+Operation must have at least one `4XX` response.
+
+1425 | description: Returns the exact OpenAPI contract embedded in this server build.
+1426 | parameters: []
+1427 | responses:
+     | ^^^^^^^^^
+1428 |   '200':
+1429 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[9] ../contracts/openapi.yaml:7677:7 at #/paths/~1api~1v1~1version/get/responses
+
+Operation must have at least one `4XX` response.
+
+7675 | description: Returns the server build, API, and contract versions.
+7676 | parameters: []
+7677 | responses:
+     | ^^^^^^^^^
+7678 |   '200':
+7679 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[10] ../contracts/openapi.yaml:7748:7 at #/paths/~1healthz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7746 | description: Reports whether the Meridian process is alive.
+7747 | parameters: []
+7748 | responses:
+     | ^^^^^^^^^
+7749 |   '200':
+7750 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[11] ../contracts/openapi.yaml:7766:7 at #/paths/~1metrics/get/responses
+
+Operation must have at least one `4XX` response.
+
+7764 | description: Returns deployment metrics in Prometheus text exposition format.
+7765 | parameters: []
+7766 | responses:
+     | ^^^^^^^^^
+7767 |   '200':
+7768 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[12] ../contracts/openapi.yaml:7784:7 at #/paths/~1readyz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7782 | description: Reports whether Meridian dependencies are ready to serve traffic.
+7783 | parameters: []
+7784 | responses:
+     | ^^^^^^^^^
+7785 |   '200':
+7786 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[13] ../contracts/openapi.yaml:11845:5 at #/components/schemas/PageInfo
+
+Component: "PageInfo" is never used.
+
+11843 |       description: contains the ordered team ids associated with this owner refs.
+11844 |   description: represents owner refs data exchanged through the Meridian API.
+11845 | PageInfo:
+      | ^^^^^^^^
+11846 |   type: object
+11847 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[14] ../contracts/openapi.yaml:14156:5 at #/components/schemas/SourceSpecInput
+
+Component: "SourceSpecInput" is never used.
+
+14154 |       description: Required only for manual mode; the asset must belong to the path service and match kind.
+14155 |   description: defines validated input for the corresponding Meridian API operation.
+14156 | SourceSpecInput:
+      | ^^^^^^^^^^^^^^^
+14157 |   type: object
+14158 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[15] ../contracts/openapi.yaml:14398:5 at #/components/schemas/SubscriptionScopeConstraints
+
+Component: "SubscriptionScopeConstraints" is never used.
+
+14396 |       description: indicates whether enabled applies to this subscription put request.
+14397 |   description: defines validated input for the corresponding Meridian API operation.
+14398 | SubscriptionScopeConstraints:
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+14399 |   type: object
+14400 |   description: represents subscription scope constraints data exchanged through the Meridian API.
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+../contracts/openapi.yaml: validated in 567ms
+
+Woohoo! Your API description is valid. 🎉
+You have 15 warnings.
+
+vfox exec nodejs@24.20.0 -- pnpm --dir web check:generated-docs
+$ node scripts/document-generated-api.mjs --check
+real 81.18
+user 80.28
+sys 18.99
+
+Script done on 2026-09-08 01:05:29+08:00 [COMMAND_EXIT_CODE="0"]
+Script started on 2026-09-08 01:05:39+08:00 [COMMAND="/usr/bin/time -p make contracts-generate-then-git-diff-exit-code ITEM=M1-CONTRACT-001" <not executed on terminal>]
+sh ./scripts/bundle-openapi.sh
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 510ms ../../../../../../tmp/meridian-tsp-0p3ql220/common/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 593ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/asset/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/asset/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 491ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/auth/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/auth/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 484ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/collaboration/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 456ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/diff/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 495ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/job/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 472ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/layer/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 537ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/platform/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 444ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/repository/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/repository/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 437ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/service/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/service/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 456ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/system/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/system/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 637ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/tenant/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 712ms ../../../../../../tmp/meridian-tsp-0p3ql220/domains/view/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/view/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 732ms ../../../../../../tmp/meridian-tsp-0p3ql220/main/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gmain.tsp:39:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 39 | namespace MeridianApi;
+     |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+generated contracts/openapi.yaml
+generated build/contracts/api/common/openapi.yaml
+generated build/contracts/api/domains/asset.yaml
+generated build/contracts/api/domains/auth.yaml
+generated build/contracts/api/domains/collaboration.yaml
+generated build/contracts/api/domains/diff.yaml
+generated build/contracts/api/domains/job.yaml
+generated build/contracts/api/domains/layer.yaml
+generated build/contracts/api/domains/platform.yaml
+generated build/contracts/api/domains/repository.yaml
+generated build/contracts/api/domains/service.yaml
+generated build/contracts/api/domains/system.yaml
+generated build/contracts/api/domains/tenant.yaml
+generated build/contracts/api/domains/view.yaml
+
+    ╔═══════════════════════════════════════════════════════╗
+    ║                                                       ║
+    ║  A new version of Redocly CLI (2.51.2) is available.  ║
+    ║  Update now: `npm i -g @redocly/cli@latest`.          ║
+    ║  Changelog: https://redocly.com/docs/cli/changelog/   ║
+    ║                                                       ║
+    ╚═══════════════════════════════════════════════════════╝
+
+validating ../contracts/openapi.yaml...
+[1] ../contracts/openapi.yaml:2:1 at #/info
+
+Info object should contain `license` field.
+
+1 | openapi: 3.1.0
+2 | info:
+  | ^^^^
+3 |   title: Meridian API
+4 |   version: 1.0.0
+
+Warning was generated by the info-license rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/info-license
+
+
+[2] ../contracts/openapi.yaml:61:7 at #/paths/~1api~1v1~1admin~1global-credentials/get/responses
+
+Operation must have at least one `4XX` response.
+
+59 | - $ref: '#/components/parameters/Page'
+60 | - $ref: '#/components/parameters/PageSize'
+61 | responses:
+   | ^^^^^^^^^
+62 |   '200':
+63 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[3] ../contracts/openapi.yaml:9317:13 at #/components/schemas/ConnectionTest/properties/errorClass/anyOf/2
+
+Schema in `anyOf` duplicates the schema at position 2.
+
+9315 |     - other
+9316 |   - type: 'null'
+9317 |   - type: 'null'
+     |     ^^^^^^^^^^^^
+9318 |   description: specifies the error class associated with this connection test.
+9319 | message:
+
+Warning was generated by the no-illogical-composition-keywords rule.
+
+
+[4] ../contracts/openapi.yaml:426:7 at #/paths/~1api~1v1~1admin~1producer-profiles/get/responses
+
+Operation must have at least one `4XX` response.
+
+424 | - $ref: '#/components/parameters/Page'
+425 | - $ref: '#/components/parameters/PageSize'
+426 | responses:
+    | ^^^^^^^^^
+427 |   '200':
+428 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[5] ../contracts/openapi.yaml:642:7 at #/paths/~1api~1v1~1admin~1settings/get/responses
+
+Operation must have at least one `4XX` response.
+
+640 | description: Returns the selected platform settings within the authorized request scope.
+641 | parameters: []
+642 | responses:
+    | ^^^^^^^^^
+643 |   '200':
+644 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[6] ../contracts/openapi.yaml:712:7 at #/paths/~1api~1v1~1admin~1tenants/get/responses
+
+Operation must have at least one `4XX` response.
+
+710 | - $ref: '#/components/parameters/Page'
+711 | - $ref: '#/components/parameters/PageSize'
+712 | responses:
+    | ^^^^^^^^^
+713 |   '200':
+714 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[7] ../contracts/openapi.yaml:1320:7 at #/paths/~1api~1v1~1auth~1me~1preferences/get/responses
+
+Operation must have at least one `4XX` response.
+
+1318 | description: Returns the selected my preferences within the authorized request scope.
+1319 | parameters: []
+1320 | responses:
+     | ^^^^^^^^^
+1321 |   '200':
+1322 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[8] ../contracts/openapi.yaml:1427:7 at #/paths/~1api~1v1~1openapi.yaml/get/responses
+
+Operation must have at least one `4XX` response.
+
+1425 | description: Returns the exact OpenAPI contract embedded in this server build.
+1426 | parameters: []
+1427 | responses:
+     | ^^^^^^^^^
+1428 |   '200':
+1429 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[9] ../contracts/openapi.yaml:7677:7 at #/paths/~1api~1v1~1version/get/responses
+
+Operation must have at least one `4XX` response.
+
+7675 | description: Returns the server build, API, and contract versions.
+7676 | parameters: []
+7677 | responses:
+     | ^^^^^^^^^
+7678 |   '200':
+7679 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[10] ../contracts/openapi.yaml:7748:7 at #/paths/~1healthz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7746 | description: Reports whether the Meridian process is alive.
+7747 | parameters: []
+7748 | responses:
+     | ^^^^^^^^^
+7749 |   '200':
+7750 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[11] ../contracts/openapi.yaml:7766:7 at #/paths/~1metrics/get/responses
+
+Operation must have at least one `4XX` response.
+
+7764 | description: Returns deployment metrics in Prometheus text exposition format.
+7765 | parameters: []
+7766 | responses:
+     | ^^^^^^^^^
+7767 |   '200':
+7768 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[12] ../contracts/openapi.yaml:7784:7 at #/paths/~1readyz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7782 | description: Reports whether Meridian dependencies are ready to serve traffic.
+7783 | parameters: []
+7784 | responses:
+     | ^^^^^^^^^
+7785 |   '200':
+7786 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[13] ../contracts/openapi.yaml:11845:5 at #/components/schemas/PageInfo
+
+Component: "PageInfo" is never used.
+
+11843 |       description: contains the ordered team ids associated with this owner refs.
+11844 |   description: represents owner refs data exchanged through the Meridian API.
+11845 | PageInfo:
+      | ^^^^^^^^
+11846 |   type: object
+11847 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[14] ../contracts/openapi.yaml:14156:5 at #/components/schemas/SourceSpecInput
+
+Component: "SourceSpecInput" is never used.
+
+14154 |       description: Required only for manual mode; the asset must belong to the path service and match kind.
+14155 |   description: defines validated input for the corresponding Meridian API operation.
+14156 | SourceSpecInput:
+      | ^^^^^^^^^^^^^^^
+14157 |   type: object
+14158 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[15] ../contracts/openapi.yaml:14398:5 at #/components/schemas/SubscriptionScopeConstraints
+
+Component: "SubscriptionScopeConstraints" is never used.
+
+14396 |       description: indicates whether enabled applies to this subscription put request.
+14397 |   description: defines validated input for the corresponding Meridian API operation.
+14398 | SubscriptionScopeConstraints:
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+14399 |   type: object
+14400 |   description: represents subscription scope constraints data exchanged through the Meridian API.
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+../contracts/openapi.yaml: validated in 469ms
+
+Woohoo! Your API description is valid. 🎉
+You have 15 warnings.
+
+vfox exec golang@1.27.1 -- go generate ./...
+vfox exec nodejs@24.20.0 -- pnpm --dir web install --frozen-lockfile
+Already up to date
+[K[0JDone in 689ms using pnpm v11.20.0
+[K[0Jvfox exec nodejs@24.20.0 -- pnpm --dir web generate:api
+$ nuxt prepare && orval --config orval.config.ts && node scripts/document-generated-api.mjs
+ℹ Nuxt Icon client bundle consist of 60 icons with 15.39KB(uncompressed) in size
+│
+◆  Types generated in .nuxt.
+🍻 orval v8.28.1 - A swagger client generator for typescript
+meridian Cleaning output folder
+🎉 meridian - Your OpenAPI spec has been converted into ready to use orval!
+git diff --exit-code -- internal/generated/api internal/generated/repository web/app/api/generated
+real 97.32
+user 100.71
+sys 34.20
+
+Script done on 2026-09-08 01:07:16+08:00 [COMMAND_EXIT_CODE="0"]
+Script started on 2026-09-08 01:07:35+08:00 [COMMAND="/usr/bin/time -p go test ./..." <not executed on terminal>]
+?   	github.com/meridian-labs/meridian	[no test files]
+?   	github.com/meridian-labs/meridian/cmd/meridian	[no test files]
+?   	github.com/meridian-labs/meridian/internal/buildinfo	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/domainadapter	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/godoc	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/strictstub	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/command	0.048s
+ok  	github.com/meridian-labs/meridian/internal/contracttest	0.721s
+?   	github.com/meridian-labs/meridian/internal/database	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/asset	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/auth	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/collaboration	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/diff	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/job	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/layer	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/platform	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/repository	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/service	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/system	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/tenant	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/view	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/repository	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/handler	0.745s
+?   	github.com/meridian-labs/meridian/internal/repository	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/service	2.148s
+ok  	github.com/meridian-labs/meridian/internal/storage	0.015s
+ok  	github.com/meridian-labs/meridian/internal/task	0.014s
+?   	github.com/meridian-labs/meridian/migrations	[no test files]
+real 11.99
+user 63.56
+sys 35.94
+
+Script done on 2026-09-08 01:07:47+08:00 [COMMAND_EXIT_CODE="0"]
+Script started on 2026-09-08 01:08:02+08:00 [COMMAND="/usr/bin/time -p go vet ./..." <not executed on terminal>]
+real 3.25
+user 14.16
+sys 14.70
+
+Script done on 2026-09-08 01:08:06+08:00 [COMMAND_EXIT_CODE="0"]
+Script started on 2026-09-08 01:08:15+08:00 [COMMAND="/usr/bin/time -p git diff --check" <not executed on terminal>]
+real 0.01
+user 0.00
+sys 0.00
+
+Script done on 2026-09-08 01:08:15+08:00 [COMMAND_EXIT_CODE="0"]
+Script started on 2026-09-08 01:08:31+08:00 [COMMAND="/usr/bin/time -p make quality-gate ITEM=M0-AGENT-003" <not executed on terminal>]
+make[1]: Entering directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+make agent-protocol-test smoke-runner-test contract-tooling-test
+make[2]: Entering directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+vfox exec golang@1.27.1 -- go test ./internal/contracttest -run 'TestAgentQueue|TestSmokeCatalog'
+ok  	github.com/meridian-labs/meridian/internal/contracttest	0.079s
+vfox exec nodejs@24.20.0 -- node --test scripts/smoke-runner.test.mjs
+✔ named test passes (1.24456ms)
+✔ zero tests cannot pass (0.177797ms)
+✔ parent pass is insufficient (0.227802ms)
+✔ skip cannot pass (0.194178ms)
+✔ skipped nested assertion cannot pass (1.679295ms)
+✔ failing nested assertion cannot pass (0.172448ms)
+✔ command failure overrides test pass (0.109157ms)
+✔ signal or timeout cannot pass (0.176215ms)
+✔ wrong package cannot pass (0.187375ms)
+✔ catalog package is part of the fixture identity (0.376905ms)
+✔ future catalog entries remain tooling gaps until all execution fields exist (0.999746ms)
+✔ Go test selector targets every test path component exactly (0.684458ms)
+✔ report preserves evidence and escapes JUnit failure messages (1.827386ms)
+✔ source digest handles directory symlinks, changed and deleted files (4.035419ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 114.429983
+python3 -m unittest scripts/sync_openapi_test.py scripts/frontend_tooling_test.py
+--- contracts/openapi.yaml
++++ contracts/openapi.yaml (generated)
+@@ -1 +1 @@
+-stale
++generated
+contracts sync: generated output contracts/openapi.yaml is stale
+.checked contracts/openapi.yaml
+generated build/contracts/api/common/openapi.yaml
+checked TypeSpec projections
+..
+----------------------------------------------------------------------
+Ran 3 tests in 0.003s
+
+OK
+make[2]: Leaving directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+vfox exec golang@1.27.1 -- go tool sqlc vet
+make contracts-check
+make[2]: Entering directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+sh ./scripts/bundle-openapi.sh --check
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 391ms ../../../../../../tmp/meridian-tsp-wme1czmj/common/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 573ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/asset/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/asset/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[1G[2K⠙ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 643ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/auth/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/auth/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 723ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/collaboration/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 579ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/diff/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 552ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/job/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 521ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/layer/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 840ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/platform/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 444ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/repository/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/repository/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 522ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/service/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/service/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 405ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/system/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/system/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 615ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/tenant/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 561ms ../../../../../../tmp/meridian-tsp-wme1czmj/domains/view/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/view/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 1051ms ../../../../../../tmp/meridian-tsp-wme1czmj/main/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gmain.tsp:39:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 39 | namespace MeridianApi;
+     |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+checked contracts/openapi.yaml
+generated build/contracts/api/common/openapi.yaml
+generated build/contracts/api/domains/asset.yaml
+generated build/contracts/api/domains/auth.yaml
+generated build/contracts/api/domains/collaboration.yaml
+generated build/contracts/api/domains/diff.yaml
+generated build/contracts/api/domains/job.yaml
+generated build/contracts/api/domains/layer.yaml
+generated build/contracts/api/domains/platform.yaml
+generated build/contracts/api/domains/repository.yaml
+generated build/contracts/api/domains/service.yaml
+generated build/contracts/api/domains/system.yaml
+generated build/contracts/api/domains/tenant.yaml
+generated build/contracts/api/domains/view.yaml
+checked TypeSpec projections
+
+    ╔═══════════════════════════════════════════════════════╗
+    ║                                                       ║
+    ║  A new version of Redocly CLI (2.51.2) is available.  ║
+    ║  Update now: `npm i -g @redocly/cli@latest`.          ║
+    ║  Changelog: https://redocly.com/docs/cli/changelog/   ║
+    ║                                                       ║
+    ╚═══════════════════════════════════════════════════════╝
+
+validating ../contracts/openapi.yaml...
+[1] ../contracts/openapi.yaml:2:1 at #/info
+
+Info object should contain `license` field.
+
+1 | openapi: 3.1.0
+2 | info:
+  | ^^^^
+3 |   title: Meridian API
+4 |   version: 1.0.0
+
+Warning was generated by the info-license rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/info-license
+
+
+[2] ../contracts/openapi.yaml:61:7 at #/paths/~1api~1v1~1admin~1global-credentials/get/responses
+
+Operation must have at least one `4XX` response.
+
+59 | - $ref: '#/components/parameters/Page'
+60 | - $ref: '#/components/parameters/PageSize'
+61 | responses:
+   | ^^^^^^^^^
+62 |   '200':
+63 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[3] ../contracts/openapi.yaml:9317:13 at #/components/schemas/ConnectionTest/properties/errorClass/anyOf/2
+
+Schema in `anyOf` duplicates the schema at position 2.
+
+9315 |     - other
+9316 |   - type: 'null'
+9317 |   - type: 'null'
+     |     ^^^^^^^^^^^^
+9318 |   description: specifies the error class associated with this connection test.
+9319 | message:
+
+Warning was generated by the no-illogical-composition-keywords rule.
+
+
+[4] ../contracts/openapi.yaml:426:7 at #/paths/~1api~1v1~1admin~1producer-profiles/get/responses
+
+Operation must have at least one `4XX` response.
+
+424 | - $ref: '#/components/parameters/Page'
+425 | - $ref: '#/components/parameters/PageSize'
+426 | responses:
+    | ^^^^^^^^^
+427 |   '200':
+428 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[5] ../contracts/openapi.yaml:642:7 at #/paths/~1api~1v1~1admin~1settings/get/responses
+
+Operation must have at least one `4XX` response.
+
+640 | description: Returns the selected platform settings within the authorized request scope.
+641 | parameters: []
+642 | responses:
+    | ^^^^^^^^^
+643 |   '200':
+644 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[6] ../contracts/openapi.yaml:712:7 at #/paths/~1api~1v1~1admin~1tenants/get/responses
+
+Operation must have at least one `4XX` response.
+
+710 | - $ref: '#/components/parameters/Page'
+711 | - $ref: '#/components/parameters/PageSize'
+712 | responses:
+    | ^^^^^^^^^
+713 |   '200':
+714 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[7] ../contracts/openapi.yaml:1320:7 at #/paths/~1api~1v1~1auth~1me~1preferences/get/responses
+
+Operation must have at least one `4XX` response.
+
+1318 | description: Returns the selected my preferences within the authorized request scope.
+1319 | parameters: []
+1320 | responses:
+     | ^^^^^^^^^
+1321 |   '200':
+1322 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[8] ../contracts/openapi.yaml:1427:7 at #/paths/~1api~1v1~1openapi.yaml/get/responses
+
+Operation must have at least one `4XX` response.
+
+1425 | description: Returns the exact OpenAPI contract embedded in this server build.
+1426 | parameters: []
+1427 | responses:
+     | ^^^^^^^^^
+1428 |   '200':
+1429 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[9] ../contracts/openapi.yaml:7677:7 at #/paths/~1api~1v1~1version/get/responses
+
+Operation must have at least one `4XX` response.
+
+7675 | description: Returns the server build, API, and contract versions.
+7676 | parameters: []
+7677 | responses:
+     | ^^^^^^^^^
+7678 |   '200':
+7679 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[10] ../contracts/openapi.yaml:7748:7 at #/paths/~1healthz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7746 | description: Reports whether the Meridian process is alive.
+7747 | parameters: []
+7748 | responses:
+     | ^^^^^^^^^
+7749 |   '200':
+7750 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[11] ../contracts/openapi.yaml:7766:7 at #/paths/~1metrics/get/responses
+
+Operation must have at least one `4XX` response.
+
+7764 | description: Returns deployment metrics in Prometheus text exposition format.
+7765 | parameters: []
+7766 | responses:
+     | ^^^^^^^^^
+7767 |   '200':
+7768 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[12] ../contracts/openapi.yaml:7784:7 at #/paths/~1readyz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7782 | description: Reports whether Meridian dependencies are ready to serve traffic.
+7783 | parameters: []
+7784 | responses:
+     | ^^^^^^^^^
+7785 |   '200':
+7786 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[13] ../contracts/openapi.yaml:11845:5 at #/components/schemas/PageInfo
+
+Component: "PageInfo" is never used.
+
+11843 |       description: contains the ordered team ids associated with this owner refs.
+11844 |   description: represents owner refs data exchanged through the Meridian API.
+11845 | PageInfo:
+      | ^^^^^^^^
+11846 |   type: object
+11847 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[14] ../contracts/openapi.yaml:14156:5 at #/components/schemas/SourceSpecInput
+
+Component: "SourceSpecInput" is never used.
+
+14154 |       description: Required only for manual mode; the asset must belong to the path service and match kind.
+14155 |   description: defines validated input for the corresponding Meridian API operation.
+14156 | SourceSpecInput:
+      | ^^^^^^^^^^^^^^^
+14157 |   type: object
+14158 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[15] ../contracts/openapi.yaml:14398:5 at #/components/schemas/SubscriptionScopeConstraints
+
+Component: "SubscriptionScopeConstraints" is never used.
+
+14396 |       description: indicates whether enabled applies to this subscription put request.
+14397 |   description: defines validated input for the corresponding Meridian API operation.
+14398 | SubscriptionScopeConstraints:
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+14399 |   type: object
+14400 |   description: represents subscription scope constraints data exchanged through the Meridian API.
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+../contracts/openapi.yaml: validated in 615ms
+
+Woohoo! Your API description is valid. 🎉
+You have 15 warnings.
+
+make[2]: Leaving directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+vfox exec nodejs@24.20.0 -- pnpm --dir web exec redocly lint --config ../contracts/.redocly.yaml ../contracts/openapi.yaml
+
+    ╔═══════════════════════════════════════════════════════╗
+    ║                                                       ║
+    ║  A new version of Redocly CLI (2.51.2) is available.  ║
+    ║  Update now: `npm i -g @redocly/cli@latest`.          ║
+    ║  Changelog: https://redocly.com/docs/cli/changelog/   ║
+    ║                                                       ║
+    ╚═══════════════════════════════════════════════════════╝
+
+validating ../contracts/openapi.yaml...
+[1] ../contracts/openapi.yaml:2:1 at #/info
+
+Info object should contain `license` field.
+
+1 | openapi: 3.1.0
+2 | info:
+  | ^^^^
+3 |   title: Meridian API
+4 |   version: 1.0.0
+
+Warning was generated by the info-license rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/info-license
+
+
+[2] ../contracts/openapi.yaml:61:7 at #/paths/~1api~1v1~1admin~1global-credentials/get/responses
+
+Operation must have at least one `4XX` response.
+
+59 | - $ref: '#/components/parameters/Page'
+60 | - $ref: '#/components/parameters/PageSize'
+61 | responses:
+   | ^^^^^^^^^
+62 |   '200':
+63 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[3] ../contracts/openapi.yaml:9317:13 at #/components/schemas/ConnectionTest/properties/errorClass/anyOf/2
+
+Schema in `anyOf` duplicates the schema at position 2.
+
+9315 |     - other
+9316 |   - type: 'null'
+9317 |   - type: 'null'
+     |     ^^^^^^^^^^^^
+9318 |   description: specifies the error class associated with this connection test.
+9319 | message:
+
+Warning was generated by the no-illogical-composition-keywords rule.
+
+
+[4] ../contracts/openapi.yaml:426:7 at #/paths/~1api~1v1~1admin~1producer-profiles/get/responses
+
+Operation must have at least one `4XX` response.
+
+424 | - $ref: '#/components/parameters/Page'
+425 | - $ref: '#/components/parameters/PageSize'
+426 | responses:
+    | ^^^^^^^^^
+427 |   '200':
+428 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[5] ../contracts/openapi.yaml:642:7 at #/paths/~1api~1v1~1admin~1settings/get/responses
+
+Operation must have at least one `4XX` response.
+
+640 | description: Returns the selected platform settings within the authorized request scope.
+641 | parameters: []
+642 | responses:
+    | ^^^^^^^^^
+643 |   '200':
+644 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[6] ../contracts/openapi.yaml:712:7 at #/paths/~1api~1v1~1admin~1tenants/get/responses
+
+Operation must have at least one `4XX` response.
+
+710 | - $ref: '#/components/parameters/Page'
+711 | - $ref: '#/components/parameters/PageSize'
+712 | responses:
+    | ^^^^^^^^^
+713 |   '200':
+714 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[7] ../contracts/openapi.yaml:1320:7 at #/paths/~1api~1v1~1auth~1me~1preferences/get/responses
+
+Operation must have at least one `4XX` response.
+
+1318 | description: Returns the selected my preferences within the authorized request scope.
+1319 | parameters: []
+1320 | responses:
+     | ^^^^^^^^^
+1321 |   '200':
+1322 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[8] ../contracts/openapi.yaml:1427:7 at #/paths/~1api~1v1~1openapi.yaml/get/responses
+
+Operation must have at least one `4XX` response.
+
+1425 | description: Returns the exact OpenAPI contract embedded in this server build.
+1426 | parameters: []
+1427 | responses:
+     | ^^^^^^^^^
+1428 |   '200':
+1429 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[9] ../contracts/openapi.yaml:7677:7 at #/paths/~1api~1v1~1version/get/responses
+
+Operation must have at least one `4XX` response.
+
+7675 | description: Returns the server build, API, and contract versions.
+7676 | parameters: []
+7677 | responses:
+     | ^^^^^^^^^
+7678 |   '200':
+7679 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[10] ../contracts/openapi.yaml:7748:7 at #/paths/~1healthz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7746 | description: Reports whether the Meridian process is alive.
+7747 | parameters: []
+7748 | responses:
+     | ^^^^^^^^^
+7749 |   '200':
+7750 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[11] ../contracts/openapi.yaml:7766:7 at #/paths/~1metrics/get/responses
+
+Operation must have at least one `4XX` response.
+
+7764 | description: Returns deployment metrics in Prometheus text exposition format.
+7765 | parameters: []
+7766 | responses:
+     | ^^^^^^^^^
+7767 |   '200':
+7768 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[12] ../contracts/openapi.yaml:7784:7 at #/paths/~1readyz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7782 | description: Reports whether Meridian dependencies are ready to serve traffic.
+7783 | parameters: []
+7784 | responses:
+     | ^^^^^^^^^
+7785 |   '200':
+7786 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[13] ../contracts/openapi.yaml:11845:5 at #/components/schemas/PageInfo
+
+Component: "PageInfo" is never used.
+
+11843 |       description: contains the ordered team ids associated with this owner refs.
+11844 |   description: represents owner refs data exchanged through the Meridian API.
+11845 | PageInfo:
+      | ^^^^^^^^
+11846 |   type: object
+11847 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[14] ../contracts/openapi.yaml:14156:5 at #/components/schemas/SourceSpecInput
+
+Component: "SourceSpecInput" is never used.
+
+14154 |       description: Required only for manual mode; the asset must belong to the path service and match kind.
+14155 |   description: defines validated input for the corresponding Meridian API operation.
+14156 | SourceSpecInput:
+      | ^^^^^^^^^^^^^^^
+14157 |   type: object
+14158 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[15] ../contracts/openapi.yaml:14398:5 at #/components/schemas/SubscriptionScopeConstraints
+
+Component: "SubscriptionScopeConstraints" is never used.
+
+14396 |       description: indicates whether enabled applies to this subscription put request.
+14397 |   description: defines validated input for the corresponding Meridian API operation.
+14398 | SubscriptionScopeConstraints:
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+14399 |   type: object
+14400 |   description: represents subscription scope constraints data exchanged through the Meridian API.
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+../contracts/openapi.yaml: validated in 717ms
+
+Woohoo! Your API description is valid. 🎉
+You have 15 warnings.
+
+vfox exec nodejs@24.20.0 -- pnpm --dir web check:generated-docs
+$ node scripts/document-generated-api.mjs --check
+sh ./scripts/bundle-openapi.sh
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 397ms ../../../../../../tmp/meridian-tsp-er48dbhb/common/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 719ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/asset/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/asset/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 494ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/auth/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/auth/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 682ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/collaboration/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[1G[2K⠙ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 540ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/diff/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 459ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/job/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 515ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/layer/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 529ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/platform/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 662ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/repository/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/repository/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 612ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/service/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/service/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 439ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/system/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/system/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h✔ @typespec/openapi3 672ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/tenant/@typespec/openapi3/
+
+Compilation completed successfully.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 510ms ../../../../../../tmp/meridian-tsp-er48dbhb/domains/view/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gdomains/view/routes.tsp:9:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 9 | namespace MeridianApi;
+    |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+TypeSpec compiler v1.15.0
+
+[?25l[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[1G[2K⠸ Compiling...[1G[2K[1G[2K⠼ Compiling...[1G[2K[1G[2K⠴ Compiling...[1G[2K[1G[2K⠦ Compiling...[1G[2K[1G[2K⠧ Compiling...[1G[2K[1G[2K⠇ Compiling...[1G[2K[1G[2K⠏ Compiling...[1G[2K[1G[2K⠋ Compiling...[1G[2K[1G[2K⠙ Compiling...[1G[2K[1G[2K⠹ Compiling...[1G[2K[?25h✔ Compiling
+[?25l[1G[2K[1G[2K⠙ Running @typespec/openapi3...[1G[2K[?25h⚠ @typespec/openapi3 797ms ../../../../../../tmp/meridian-tsp-er48dbhb/main/@typespec/openapi3/
+Diagnostics were reported during compilation:
+
+[2K[1Gmain.tsp:39:11 - warning @typespec/openapi3/unsupported-auth: Authentication "" is not a known authentication by the openapi3 emitter, it will be ignored.
+> 39 | namespace MeridianApi;
+     |           ^^^^^^^^^^^
+
+Found 1 warning.
+
+generated contracts/openapi.yaml
+generated build/contracts/api/common/openapi.yaml
+generated build/contracts/api/domains/asset.yaml
+generated build/contracts/api/domains/auth.yaml
+generated build/contracts/api/domains/collaboration.yaml
+generated build/contracts/api/domains/diff.yaml
+generated build/contracts/api/domains/job.yaml
+generated build/contracts/api/domains/layer.yaml
+generated build/contracts/api/domains/platform.yaml
+generated build/contracts/api/domains/repository.yaml
+generated build/contracts/api/domains/service.yaml
+generated build/contracts/api/domains/system.yaml
+generated build/contracts/api/domains/tenant.yaml
+generated build/contracts/api/domains/view.yaml
+
+    ╔═══════════════════════════════════════════════════════╗
+    ║                                                       ║
+    ║  A new version of Redocly CLI (2.51.2) is available.  ║
+    ║  Update now: `npm i -g @redocly/cli@latest`.          ║
+    ║  Changelog: https://redocly.com/docs/cli/changelog/   ║
+    ║                                                       ║
+    ╚═══════════════════════════════════════════════════════╝
+
+validating ../contracts/openapi.yaml...
+[1] ../contracts/openapi.yaml:2:1 at #/info
+
+Info object should contain `license` field.
+
+1 | openapi: 3.1.0
+2 | info:
+  | ^^^^
+3 |   title: Meridian API
+4 |   version: 1.0.0
+
+Warning was generated by the info-license rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/info-license
+
+
+[2] ../contracts/openapi.yaml:61:7 at #/paths/~1api~1v1~1admin~1global-credentials/get/responses
+
+Operation must have at least one `4XX` response.
+
+59 | - $ref: '#/components/parameters/Page'
+60 | - $ref: '#/components/parameters/PageSize'
+61 | responses:
+   | ^^^^^^^^^
+62 |   '200':
+63 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[3] ../contracts/openapi.yaml:9317:13 at #/components/schemas/ConnectionTest/properties/errorClass/anyOf/2
+
+Schema in `anyOf` duplicates the schema at position 2.
+
+9315 |     - other
+9316 |   - type: 'null'
+9317 |   - type: 'null'
+     |     ^^^^^^^^^^^^
+9318 |   description: specifies the error class associated with this connection test.
+9319 | message:
+
+Warning was generated by the no-illogical-composition-keywords rule.
+
+
+[4] ../contracts/openapi.yaml:426:7 at #/paths/~1api~1v1~1admin~1producer-profiles/get/responses
+
+Operation must have at least one `4XX` response.
+
+424 | - $ref: '#/components/parameters/Page'
+425 | - $ref: '#/components/parameters/PageSize'
+426 | responses:
+    | ^^^^^^^^^
+427 |   '200':
+428 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[5] ../contracts/openapi.yaml:642:7 at #/paths/~1api~1v1~1admin~1settings/get/responses
+
+Operation must have at least one `4XX` response.
+
+640 | description: Returns the selected platform settings within the authorized request scope.
+641 | parameters: []
+642 | responses:
+    | ^^^^^^^^^
+643 |   '200':
+644 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[6] ../contracts/openapi.yaml:712:7 at #/paths/~1api~1v1~1admin~1tenants/get/responses
+
+Operation must have at least one `4XX` response.
+
+710 | - $ref: '#/components/parameters/Page'
+711 | - $ref: '#/components/parameters/PageSize'
+712 | responses:
+    | ^^^^^^^^^
+713 |   '200':
+714 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[7] ../contracts/openapi.yaml:1320:7 at #/paths/~1api~1v1~1auth~1me~1preferences/get/responses
+
+Operation must have at least one `4XX` response.
+
+1318 | description: Returns the selected my preferences within the authorized request scope.
+1319 | parameters: []
+1320 | responses:
+     | ^^^^^^^^^
+1321 |   '200':
+1322 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[8] ../contracts/openapi.yaml:1427:7 at #/paths/~1api~1v1~1openapi.yaml/get/responses
+
+Operation must have at least one `4XX` response.
+
+1425 | description: Returns the exact OpenAPI contract embedded in this server build.
+1426 | parameters: []
+1427 | responses:
+     | ^^^^^^^^^
+1428 |   '200':
+1429 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[9] ../contracts/openapi.yaml:7677:7 at #/paths/~1api~1v1~1version/get/responses
+
+Operation must have at least one `4XX` response.
+
+7675 | description: Returns the server build, API, and contract versions.
+7676 | parameters: []
+7677 | responses:
+     | ^^^^^^^^^
+7678 |   '200':
+7679 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[10] ../contracts/openapi.yaml:7748:7 at #/paths/~1healthz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7746 | description: Reports whether the Meridian process is alive.
+7747 | parameters: []
+7748 | responses:
+     | ^^^^^^^^^
+7749 |   '200':
+7750 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[11] ../contracts/openapi.yaml:7766:7 at #/paths/~1metrics/get/responses
+
+Operation must have at least one `4XX` response.
+
+7764 | description: Returns deployment metrics in Prometheus text exposition format.
+7765 | parameters: []
+7766 | responses:
+     | ^^^^^^^^^
+7767 |   '200':
+7768 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[12] ../contracts/openapi.yaml:7784:7 at #/paths/~1readyz/get/responses
+
+Operation must have at least one `4XX` response.
+
+7782 | description: Reports whether Meridian dependencies are ready to serve traffic.
+7783 | parameters: []
+7784 | responses:
+     | ^^^^^^^^^
+7785 |   '200':
+7786 |     description: The request has succeeded.
+
+Warning was generated by the operation-4xx-response rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/operation-4xx-response
+
+
+[13] ../contracts/openapi.yaml:11845:5 at #/components/schemas/PageInfo
+
+Component: "PageInfo" is never used.
+
+11843 |       description: contains the ordered team ids associated with this owner refs.
+11844 |   description: represents owner refs data exchanged through the Meridian API.
+11845 | PageInfo:
+      | ^^^^^^^^
+11846 |   type: object
+11847 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[14] ../contracts/openapi.yaml:14156:5 at #/components/schemas/SourceSpecInput
+
+Component: "SourceSpecInput" is never used.
+
+14154 |       description: Required only for manual mode; the asset must belong to the path service and match kind.
+14155 |   description: defines validated input for the corresponding Meridian API operation.
+14156 | SourceSpecInput:
+      | ^^^^^^^^^^^^^^^
+14157 |   type: object
+14158 |   required:
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+[15] ../contracts/openapi.yaml:14398:5 at #/components/schemas/SubscriptionScopeConstraints
+
+Component: "SubscriptionScopeConstraints" is never used.
+
+14396 |       description: indicates whether enabled applies to this subscription put request.
+14397 |   description: defines validated input for the corresponding Meridian API operation.
+14398 | SubscriptionScopeConstraints:
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+14399 |   type: object
+14400 |   description: represents subscription scope constraints data exchanged through the Meridian API.
+
+Warning was generated by the no-unused-components rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-unused-components
+
+
+../contracts/openapi.yaml: validated in 382ms
+
+Woohoo! Your API description is valid. 🎉
+You have 15 warnings.
+
+vfox exec golang@1.27.1 -- go generate ./...
+vfox exec nodejs@24.20.0 -- pnpm --dir web install --frozen-lockfile
+Already up to date
+[K[0JDone in 831ms using pnpm v11.20.0
+[K[0Jvfox exec nodejs@24.20.0 -- pnpm --dir web generate:api
+$ nuxt prepare && orval --config orval.config.ts && node scripts/document-generated-api.mjs
+ℹ Nuxt Icon client bundle consist of 60 icons with 15.39KB(uncompressed) in size
+│
+◆  Types generated in .nuxt.
+🍻 orval v8.28.1 - A swagger client generator for typescript
+meridian Cleaning output folder
+🎉 meridian - Your OpenAPI spec has been converted into ready to use orval!
+git diff --exit-code -- internal/generated/api internal/generated/repository web/app/api/generated
+vfox exec golang@1.27.1 -- go test ./...
+?   	github.com/meridian-labs/meridian	[no test files]
+?   	github.com/meridian-labs/meridian/cmd/meridian	[no test files]
+?   	github.com/meridian-labs/meridian/internal/buildinfo	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/domainadapter	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/godoc	[no test files]
+?   	github.com/meridian-labs/meridian/internal/codegen/strictstub	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/command	0.050s
+ok  	github.com/meridian-labs/meridian/internal/contracttest	0.634s
+?   	github.com/meridian-labs/meridian/internal/database	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/asset	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/auth	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/collaboration	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/diff	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/job	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/layer	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/platform	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/repository	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/service	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/system	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/tenant	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/api/view	[no test files]
+?   	github.com/meridian-labs/meridian/internal/generated/repository	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/handler	0.819s
+?   	github.com/meridian-labs/meridian/internal/repository	[no test files]
+ok  	github.com/meridian-labs/meridian/internal/service	2.177s
+ok  	github.com/meridian-labs/meridian/internal/storage	0.028s
+ok  	github.com/meridian-labs/meridian/internal/task	0.027s
+?   	github.com/meridian-labs/meridian/migrations	[no test files]
+vfox exec nodejs@24.20.0 -- pnpm --dir web typecheck
+$ nuxt typecheck
+ℹ Nuxt Icon client bundle consist of 60 icons with 15.39KB(uncompressed) in size
+│
+◆  Type check passed in 16656ms.
+vfox exec nodejs@24.20.0 -- pnpm --dir web generate
+$ nuxt generate
+┌  Building Nuxt for production...
+│
+●  Nuxt 4.5.2 (with Nitro 2.13.4, Vite 8.2.2 and Vue 3.5.42)
+│
+●  Nitro preset: static
+ℹ Nuxt Icon client bundle consist of 60 icons with 15.39KB(uncompressed) in size
+ℹ Building client...
+ℹ vite v8.2.2 building client environment for production...
+[2Ktransforming (13) ../node_modules/.pnpm/@nuxt+nitro-server@4.5.2_22532427affa5b59495edc61b3412d7a/node_modules/@nuxt/nitro-server/dist/h3.mjs[2Ktransforming (12) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fplugins.client.mjs[2Ktransforming (25) ../node_modules/.pnpm/@vue+shared@3.5.42/node_modules/@vue/shared/dist/shared.esm-bundler.js[2Ktransforming (26) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fpaths.mjs[2Ktransforming (53) ../node_modules/.pnpm/@vue+runtime-core@3.5.42/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js[2Ktransforming (55) ../ vite/preload-helper.js[2Ktransforming (56) ../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/config.js[2Ktransforming (102) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fcolor-mode-options.mjs[2Ktransforming (117) ../node_modules/.pnpm/@vue+devtools-api@7.7.10/node_modules/@vue/devtools-api/dist/index.js[2Ktransforming (185) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fapp.config.mjs[2Ktransforming (194) ../node_modules/.pnpm/@tanstack+query-core@5.102.8/node_modules/@tanstack/query-core/build/modern/timeoutManager.js[2Ktransforming (193) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Froute-rules.mjs[2Ktransforming (195) ../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/components/client-only.js[2Ktransforming (264) ../ plugin-vue:export-helper[2Ktransforming (266) ../node_modules/.pnpm/@nuxt+icon@2.5.1_magic-string@1.2.3_magicast@0.5.4_oxc-parser@0.141.0_rolldown@1.2.7_un_53849df91763bbca149d7540641b2eca/node_modules/@nuxt/icon/dist/runtime/components/index.js[2Ktransforming (265) ../i18n/locales/zh-CN.json[2Ktransforming (289) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fpages.mjs[2Ktransforming (302) ../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/components/route-provider.js[2Ktransforming (303) ../node_modules/.pnpm/@nuxtjs+i18n@10.6.0_@vue+compiler-dom@3.5.42_db0@0.3.4_esbuild@0.28.2_eslint@10.9.1_jit_7f0b2d789394ad49f6ff7c0b8048ba2d/node_modules/@nuxtjs/i18n/dist/runtime/routing/utils.js[2Ktransforming (304) ../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/components/server-placeholder.js[2Ktransforming (346) ../node_modules/.pnpm/@nuxt+ui@4.11.0_c76b91203aa5240d9ed5d9c30f785bd3/node_modules/@nuxt/ui/dist/runtime/components/Badge.vue[2Ktransforming (351) composables/useResponseData.ts[2Ktransforming (352) ../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/diagnostics/rendered-records.js[2Ktransforming (442) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fui%2Ftoaster.ts[2Ktransforming (444) ../node_modules/.pnpm/reka-ui@2.10.3_vue@3.5.42_typescript@5.9.3_/node_modules/reka-ui/dist/Dialog/DialogPortal.js[2Ktransforming (443) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fnuxt-icon-client-bundle.mjs[2Ktransforming (959) ../node_modules/.pnpm/@iconify+utils@3.1.4/node_modules/@iconify/utils/lib/css/format.js[2Ktransforming (974) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fui%2Fform-field.ts[2Ktransforming (975) ../node_modules/.pnpm/@internationalized+number@3.6.8/node_modules/@internationalized/number/dist/index.mjs[2Ktransforming (976) ../virtual:nuxt:node_modules%2F.cache%2Fnuxt%2F.nuxt%2Fui%2Fskeleton.ts[2Ktransforming (990) ../node_modules/.pnpm/@internationalized+date@3.12.4/node_modules/@internationalized/date/dist/private/calendars/BuddhistCalendar.mjs[2Ktransforming (991) ../node_modules/.pnpm/@internationalized+date@3.12.4/node_modules/@internationalized/date/dist/private/calendars/GregorianCalendar.mjs[2K✓ 1037 modules transformed.
+[2Krendering chunks (1)...[2Krendering chunks (2)...[2Krendering chunks (3)...[2Krendering chunks (4)...[2Krendering chunks (5)...[2Krendering chunks (6)...[2Krendering chunks (7)...[2Krendering chunks (8)...[2Krendering chunks (9)...[2Krendering chunks (10)...[2Krendering chunks (11)...[2Krendering chunks (12)...[2Krendering chunks (13)...[2Krendering chunks (14)...[2Krendering chunks (15)...[2Krendering chunks (16)...[2Krendering chunks (17)...[2Krendering chunks (18)...[2Krendering chunks (19)...[2Krendering chunks (20)...[2Krendering chunks (21)...[2Krendering chunks (22)...[2Krendering chunks (23)...[2Krendering chunks (24)...[2Krendering chunks (25)...[2Krendering chunks (26)...[2Krendering chunks (27)...[2Krendering chunks (28)...[2Krendering chunks (29)...[2Krendering chunks (30)...[2Krendering chunks (31)...[2Krendering chunks (32)...[2Krendering chunks (33)...[2Krendering chunks (34)...[2Krendering chunks (35)...[2Krendering chunks (36)...[2Krendering chunks (37)...[2Krendering chunks (38)...[2Krendering chunks (39)...[2Krendering chunks (40)...[2Kcomputing gzip size...
+[2Kℹ node_modules/.cache/nuxt/.nuxt/dist/client/manifest.json                  14.14 kB │ gzip:  1.62 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/error-500.CA-T2Zb_.css    1.90 kB │ gzip:  0.72 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/error-404.SU7QtcSm.css    2.42 kB │ gzip:  0.85 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/entry.b3lsKdAZ.css       23.83 kB │ gzip:  5.40 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/CNs_Ozdc.js               0.02 kB │ gzip:  0.04 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/7W1Ba1D7.js               0.03 kB │ gzip:  0.05 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DOwCrGXH.js               0.03 kB │ gzip:  0.05 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DK3Fl9T5.js               0.15 kB │ gzip:  0.15 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/M7ZuGIXV.js               0.16 kB │ gzip:  0.14 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DlSjw4AV.js               0.35 kB │ gzip:  0.26 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DUrJADJi.js               0.52 kB │ gzip:  0.33 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/D9o1nyoH.js               0.55 kB │ gzip:  0.36 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/D4xdTpZd.js               0.65 kB │ gzip:  0.42 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/De1DuCNm.js               0.72 kB │ gzip:  0.43 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/Cu3FNKS6.js               0.83 kB │ gzip:  0.56 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/UAGeXZYM.js               0.86 kB │ gzip:  0.44 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/T4txJl-n.js               1.11 kB │ gzip:  0.60 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/BFDbEhel.js               1.14 kB │ gzip:  0.77 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/Dd1sxxgS.js               1.28 kB │ gzip:  0.59 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DDaUNVTB.js               1.35 kB │ gzip:  0.61 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DmSIVqVg.js               2.37 kB │ gzip:  0.95 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/sdlcxh5A.js               3.36 kB │ gzip:  1.78 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/NV40_PXE.js               3.37 kB │ gzip:  1.52 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/Cfxh6UWe.js               3.72 kB │ gzip:  1.69 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/BUkDTLV3.js               4.18 kB │ gzip:  1.92 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/BxApgPPM.js               4.87 kB │ gzip:  2.14 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/Bc3LweAt.js               5.70 kB │ gzip:  1.58 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/GvbBvOp8.js               6.23 kB │ gzip:  2.27 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DZNOJ-A3.js               6.27 kB │ gzip:  1.75 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DQGegRt8.js               7.27 kB │ gzip:  2.89 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/ZZuQd4qu.js               8.76 kB │ gzip:  3.31 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DvTmeQEw.js               9.29 kB │ gzip:  3.92 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DY5QJW67.js              10.01 kB │ gzip:  3.97 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/C6DFZo6f.js              10.79 kB │ gzip:  3.42 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/B1m6pm-X.js              11.88 kB │ gzip:  4.24 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DXQWUKDg.js              13.28 kB │ gzip:  3.80 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/CSPJmptr.js              13.91 kB │ gzip:  4.82 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/4SaxfkgW.js              25.72 kB │ gzip:  6.71 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/ZaejWgmq.js              32.54 kB │ gzip: 12.69 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/CqHh2nCC.js              57.95 kB │ gzip: 19.27 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/4hR7yU-7.js              63.32 kB │ gzip: 20.13 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/D6IFvAYx.js              85.19 kB │ gzip: 26.36 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/lo7gs9Ry.js              94.45 kB │ gzip: 36.71 kB
+node_modules/.cache/nuxt/.nuxt/dist/client/_nuxt/DVxM_QqY.js             270.42 kB │ gzip: 88.28 kB
+
+ℹ ✓ built in 7.04s
+✔ Client built in 7075ms
+ℹ Building server...
+ℹ vite v8.2.2 building ssr environment for production...
+[2K✓ 2 modules transformed.
+[2Krendering chunks (1)...[2K[2Kℹ node_modules/.cache/nuxt/.nuxt/dist/server/styles.mjs  0.06 kB
+node_modules/.cache/nuxt/.nuxt/dist/server/server.mjs  0.31 kB │ map: 0.44 kB
+
+ℹ ✓ built in 83ms
+✔ Server built in 127ms
+[nitro] ℹ Initializing prerenderer
+
+ WARN  "H3Error", "H3Event" and "deleteCookie" are imported from external module "file:///root/project/meridian-worktrees/M1-CONTRACT-001/web/node_modules/.pnpm/h3@1.15.11/node_modules/h3/dist/index.mjs" but never used in "node_modules/.pnpm/@nuxt+nitro-server@4.5.2_22532427affa5b59495edc61b3412d7a/node_modules/@nuxt/nitro-server/dist/h3.mjs".
+
+[nitro] ℹ Prerendering 7 initial routes with crawler
+[nitro]   ├─ /admin (496ms)
+[nitro]   ├─ /no-tenant (494ms)
+[nitro]   ├─ /login (494ms)
+[nitro]   ├─ /200.html (495ms)
+[nitro]   ├─ /404.html (491ms)
+[nitro]   ├─ / (494ms)
+[nitro]   ├─ /index.html (491ms)
+[nitro] ℹ Prerendered 7 routes in 3.447 seconds
+[nitro] ✔ Generated public .output/public
+[nitro] ✔ You can preview this build using npx serve .output/public
+│
+▲  HTML content not prerendered because ssr: false was set.
+│
+●  You can read more in https://nuxt.com/docs/getting-started/deployment#static-hosting.
+│
+└  ✨ You can now deploy .output/public to any static hosting!
+MILESTONE="M0" sh ./scripts/smoke.sh --all
+SMK-001: pass; artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-001.json
+SMK-002: pass; artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-002.json
+SMK-003: pass; artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-003.json
+SMK-004: pass; artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-004.json
+SMK-005: pass; artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-005.json
+SMK-029: pass; artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-029.json
+SMK-031: pass; artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-031.json
+SMK-035: pass; artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-035.json
+vfox exec nodejs@24.20.0 -- pnpm --dir web exec nuxi generate tests/spikes/harness
+┌  Building Nuxt for production...
+│
+●  Nuxt 4.5.2 (with Nitro 2.13.4, Vite 8.2.2 and Vue 3.5.42)
+ℹ Nuxt Icon server bundle mode is set to local
+│
+●  Nitro preset: static
+ℹ Nuxt Icon client bundle consist of 43 icons with 10.40KB(uncompressed) in size
+ℹ Building client...
+ℹ vite v8.2.2 building client environment for production...
+[2Ktransforming (3) ../../../../virtual:nuxt:.nuxt%2Fplugins.client.mjs[2Ktransforming (14) ../../../../node_modules/.pnpm/@vue+runtime-dom@3.5.42/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js[2Ktransforming (15) ../../../../node_modules/.pnpm/@nuxt+nitro-server@4.5.2_22532427affa5b59495edc61b3412d7a/node_modules/@nuxt/nitro-server/dist/h3.mjs[2Ktransforming (42) ../../../../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/composables/state.js[2Ktransforming (43) ../../../../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/composables/cookie.js[2Ktransforming (59) ../../../../node_modules/.pnpm/tailwindcss@4.3.3/node_modules/tailwindcss/dist/chunk-DCG7AFIE.mjs[2Ktransforming (60) ../../../../node_modules/.pnpm/klona@2.0.6/node_modules/klona/dist/index.mjs[2Ktransforming (112) ../../../../node_modules/.pnpm/unhead@3.4.0_esbuild@0.28.2_rolldown@1.2.7_rollup@4.63.1_vite@8.2.2_@types+node@26.4.1__54d0eb957f1b8ac89339c61a8d96cd41/node_modules/unhead/dist/legacy.mjs[2Ktransforming (113) ../../../../node_modules/.pnpm/unhead@3.4.0_esbuild@0.28.2_rolldown@1.2.7_rollup@4.63.1_vite@8.2.2_@types+node@26.4.1__54d0eb957f1b8ac89339c61a8d96cd41/node_modules/unhead/dist/server.mjs[2Ktransforming (114) ../../../../node_modules/.pnpm/@unhead+vue@3.4.0_@oxc-project+types@0.148.0_esbuild@0.28.2_lightningcss@1.33.0_oxc-par_f52cb03cfb6c3991c4b35785e3e908b9/node_modules/@unhead/vue/dist/server.mjs[2Ktransforming (135) ../../../../node_modules/.pnpm/@iconify+utils@3.1.4/node_modules/@iconify/utils/lib/icon/defaults.js[2Ktransforming (136) ../../../../node_modules/.pnpm/@iconify+utils@3.1.4/node_modules/@iconify/utils/lib/css/common.js[2Ktransforming (140) ../../../../ plugin-vue:export-helper[2Ktransforming (154) ../../../../node_modules/.pnpm/@iconify+utils@3.1.4/node_modules/@iconify/utils/lib/svg/html.js[2Ktransforming (155) ../../../../node_modules/.pnpm/@iconify+utils@3.1.4/node_modules/@iconify/utils/lib/icon/square.js[2Ktransforming (170) ../../../../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/components/server-placeholder.js[2Ktransforming (171) ../../../../node_modules/.pnpm/nuxt@4.5.2_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7_supports-color@10.2.2___@_d01479322d944e00ddef780bdcc9f023/node_modules/nuxt/dist/app/composables/preload.js[2Ktransforming (193) ../../../../virtual:nuxt:.nuxt%2Fui%2Fsplitter.ts[2Ktransforming (194) ../../../../virtual:nuxt:.nuxt%2Fui%2Fbutton.ts[2Ktransforming (206) ../../../../node_modules/.pnpm/@nuxt+ui@4.11.0_c76b91203aa5240d9ed5d9c30f785bd3/node_modules/@nuxt/ui/dist/runtime/utils/content.js[2Ktransforming (778) ../../../../virtual:nuxt:.nuxt%2Fpages.mjs[2Ktransforming (779) ../../../../node_modules/.pnpm/@nuxt+ui@4.11.0_c76b91203aa5240d9ed5d9c30f785bd3/node_modules/@nuxt/ui/dist/runtime/composables/useAvatarGroup.js[2Ktransforming (784) ../../../../node_modules/.pnpm/@tanstack+virtual-core@3.17.8/node_modules/@tanstack/virtual-core/dist/esm/lazy-measurements.js[2Ktransforming (793) ../../../../node_modules/.pnpm/@internationalized+number@3.6.8/node_modules/@internationalized/number/dist/private/NumberParser.mjs[2Ktransforming (794) ../../../../node_modules/.pnpm/@internationalized+date@3.12.4/node_modules/@internationalized/date/dist/private/DateFormatter.mjs[2K✓ 819 modules transformed.
+[2Krendering chunks (1)...[2Krendering chunks (2)...[2Krendering chunks (3)...[2Krendering chunks (4)...[2Krendering chunks (5)...[2Krendering chunks (6)...[2Kcomputing gzip size...
+[2Kℹ tests/spikes/harness/.nuxt/dist/client/manifest.json                     3.22 kB │ gzip:   0.50 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/error-500.BqqOFpHs.css      1.90 kB │ gzip:   0.72 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/error-404.DQBEz3Cb.css      2.42 kB │ gzip:   0.85 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/entry.Dju6JHAI.css        194.78 kB │ gzip:  25.95 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/BDNMzG2s.js                 0.08 kB │ gzip:   0.09 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/Bdxv3rM6.js                 3.40 kB │ gzip:   1.54 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/CbTEHC1z.js                 3.72 kB │ gzip:   1.69 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/DrX8MAKE.js                 9.62 kB │ gzip:   4.05 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/DwD5HbpA.js                93.70 kB │ gzip:  36.44 kB
+tests/spikes/harness/.nuxt/dist/client/_nuxt/Dtbek1vo.js             1,194.52 kB │ gzip: 381.49 kB
+
+ℹ ✓ built in 5.61s
+[2K[1G
+ WARN  [plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+✔ Client built in 5649ms
+ℹ Building server...
+ℹ vite v8.2.2 building ssr environment for production...
+[2Ktransforming (1) ../../../../ rolldown/runtime.js[2K✓ 2 modules transformed.
+[2Krendering chunks (1)...[2K[2Kℹ tests/spikes/harness/.nuxt/dist/server/styles.mjs  0.06 kB
+tests/spikes/harness/.nuxt/dist/server/server.mjs  0.31 kB │ map: 0.46 kB
+
+ℹ ✓ built in 316ms
+✔ Server built in 358ms
+[nitro] ℹ Initializing prerenderer
+
+ WARN  "H3Error", "H3Event", "deleteCookie", "getCookie", "sanitizeStatusCode" and "setCookie" are imported from external module "file:///root/project/meridian-worktrees/M1-CONTRACT-001/web/node_modules/.pnpm/h3@1.15.11/node_modules/h3/dist/index.mjs" but never used in "node_modules/.pnpm/@nuxt+nitro-server@4.5.2_22532427affa5b59495edc61b3412d7a/node_modules/@nuxt/nitro-server/dist/h3.mjs".
+
+[nitro] ℹ Prerendering 3 initial routes with crawler
+[nitro]   ├─ /200.html (45ms)
+[nitro]   ├─ /404.html (44ms)
+[nitro]   ├─ /index.html (45ms)
+[nitro] ℹ Prerendered 3 routes in 2.447 seconds
+[nitro] ✔ Generated public tests/spikes/harness/.output/public
+[nitro] ✔ You can preview this build using npx serve tests/spikes/harness/.output/public
+│
+▲  HTML content not prerendered because ssr: false was set.
+│
+●  You can read more in https://nuxt.com/docs/getting-started/deployment#static-hosting.
+│
+└  ✨ You can now deploy tests/spikes/harness/.output/public to any static hosting!
+vfox exec nodejs@24.20.0 -- pnpm --dir web exec node scripts/run-spike.mjs perf-table-cytoscape perf-table-cytoscape.spec.ts desktop
+[WebServer] (node:2482984) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 1 test using 1 worker
+
+(node:2482997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/1] [desktop] › tests/spikes/perf-table-cytoscape.spec.ts:4:1 › virtual table and dependency graph meet capacity and interaction gates
+[desktop] › tests/spikes/perf-table-cytoscape.spec.ts:4:1 › virtual table and dependency graph meet capacity and interaction gates
+
+
+  1 passed (7.3s)
+vfox exec nodejs@24.20.0 -- pnpm --dir web exec node scripts/run-spike.mjs perf-editor perf-editor.spec.ts desktop
+[WebServer] (node:2483659) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 1 test using 1 worker
+
+(node:2483690) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/1] [desktop] › tests/spikes/perf-editor.spec.ts:4:1 › CodeMirror enforces editable and read-only large document modes
+[desktop] › tests/spikes/perf-editor.spec.ts:4:1 › CodeMirror enforces editable and read-only large document modes
+
+
+  1 passed (19.0s)
+vfox exec nodejs@24.20.0 -- pnpm --dir web exec node scripts/run-spike.mjs a11y-m0 a11y-m0.spec.ts all
+[WebServer] (node:2484744) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 2 tests using 1 worker
+
+(node:2484773) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/2] [desktop] › tests/spikes/a11y-m0.spec.ts:5:1 › M0 spike surfaces are keyboard accessible without viewport overflow
+[desktop] › tests/spikes/a11y-m0.spec.ts:5:1 › M0 spike surfaces are keyboard accessible without viewport overflow
+
+
+(node:2485166) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[2/2] [mobile] › tests/spikes/a11y-m0.spec.ts:5:1 › M0 spike surfaces are keyboard accessible without viewport overflow
+[mobile] › tests/spikes/a11y-m0.spec.ts:5:1 › M0 spike surfaces are keyboard accessible without viewport overflow
+
+
+  2 passed (14.4s)
+make[1]: Leaving directory '/root/project/meridian-worktrees/M1-CONTRACT-001'
+real 394.21
+user 359.02
+sys 115.64
+
+Script done on 2026-09-08 01:15:05+08:00 [COMMAND_EXIT_CODE="0"]

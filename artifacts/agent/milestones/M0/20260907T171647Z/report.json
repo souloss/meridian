@@ -1,0 +1,74 @@
+{
+  "milestone": "M0",
+  "status": "needs_human_acceptance",
+  "commit": "5ac8110e7b60db7ea0bcec4fc5e2958ead519f98",
+  "contractDigest": "sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb",
+  "reportPath": "artifacts/agent/milestones/M0/20260907T171647Z/report.json",
+  "previousAcceptance": {
+    "acceptedBy": "souloss",
+    "acceptedAt": "2026-09-07T23:40:01+08:00",
+    "reportPath": "artifacts/agent/milestones/M0/20260906T182703Z/report.json",
+    "invalidatedBy": "M1-CONTRACT-001 changed the global contract digest"
+  },
+  "desktopEntry": {
+    "bootstrap": "MERIDIAN_DATABASE_URL=postgres://meridian:meridian@127.0.0.1:54329/meridian?sslmode=disable vfox exec golang@1.27.1 -- go run ./cmd/meridian admin create --username padmin",
+    "start": "make backend-run",
+    "url": "http://127.0.0.1:8080/login"
+  },
+  "demoPath": [
+    "bootstrap and sign in as the platform administrator",
+    "create users and tenants, assign tenant membership, and verify a platform admin without membership receives tenant-business 404",
+    "sign in as a tenant administrator and exercise repository, credential, job, and audit control-plane paths",
+    "switch tenant context and verify disabled or unauthorized tenant data is absent"
+  ],
+  "workItems": [
+    {"id": "M0-AGENT-001", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-001/20260905T183222Z/report.json"},
+    {"id": "M0-AGENT-002", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-002/20260906T170406Z/report.json"},
+    {"id": "M0-CONTRACT-001", "status": "passed", "evidence": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/report.json"},
+    {"id": "M0-AGENT-003", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-003/20260906T182703Z/report.json"},
+    {"id": "M1-CONTRACT-001", "status": "passed", "evidence": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json", "impact": "global contract and generation tooling"}
+  ],
+  "stories": [
+    {"id": "US-01", "status": "passed", "evidence": ["SMK-002", "SMK-004"]},
+    {"id": "US-11", "status": "passed", "evidence": ["SMK-003", "SMK-005", "SMK-031", "SMK-035"]}
+  ],
+  "assertions": [
+    {"id": "SMK-001", "status": "passed", "evidence": "artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-001.json"},
+    {"id": "SMK-002", "status": "passed", "evidence": "artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-002.json"},
+    {"id": "SMK-003", "status": "passed", "evidence": "artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-003.json"},
+    {"id": "SMK-004", "status": "passed", "evidence": "artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-004.json"},
+    {"id": "SMK-005", "status": "passed", "evidence": "artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-005.json"},
+    {"id": "SMK-029", "status": "passed", "evidence": "artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-029.json"},
+    {"id": "SMK-031", "status": "passed", "evidence": "artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-031.json"},
+    {"id": "SMK-035", "status": "passed", "evidence": "artifacts/smoke/2026-09-07T17-12-27-203ZsE4cRp/SMK-035.json"},
+    {"id": "perf-table-cytoscape", "status": "passed", "evidence": "artifacts/spikes/perf-table-cytoscape.json"},
+    {"id": "perf-editor", "status": "passed", "evidence": "artifacts/spikes/perf-editor.json"},
+    {"id": "a11y-m0", "status": "passed", "evidence": "artifacts/spikes/a11y-m0.json"}
+  ],
+  "commands": [
+    {"command": "make quality-gate ITEM=M0-AGENT-003", "exitCode": 0, "durationSeconds": 394.21, "evidence": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/commands.log"}
+  ],
+  "measurements": {
+    "graphFirstPaintMs": 1453.2,
+    "virtualTableRenderedRows": 23,
+    "editorRepeatedLongTasksOver50Ms": 0,
+    "desktopAxeViolations": 0,
+    "mobileAxeViolations": 0
+  },
+  "contractChangesForAcceptance": [
+    "repository discovery and service update/delete x-milestone values changed from M0 to M1",
+    "sourceExpansion now owns configuredEntity, materializedEntity, relation, fields, and expansion",
+    "M1 operation ownership was split and Smoke required-operation closure is machine validated"
+  ],
+  "deferred": [
+    {"id": "SMK-039", "milestone": "M5", "reason": "run the full generated tenant resource-ID operation isolation matrix after all M5 operations are implemented"}
+  ],
+  "failures": [],
+  "risks": ["Redocly and TypeSpec emit existing non-blocking warnings while returning successful validation results"],
+  "humanAcceptance": {
+    "state": "waiting",
+    "focus": ["M0 behavior remains green after the contract milestone corrections", "sourceExpansion structure", "M1 work-item split and operation ownership"],
+    "requiredResponse": "accepted or changes_requested, with accepter identity, acceptance time, this report path, and affected assertion IDs"
+  },
+  "nextAction": "do not claim M1-AGENT-001 until this renewed M0 milestone report is explicitly accepted"
+}
