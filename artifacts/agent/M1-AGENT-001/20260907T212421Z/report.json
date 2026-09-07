@@ -1,0 +1,46 @@
+{
+  "workItem": "M1-AGENT-001",
+  "status": "needs_retry",
+  "commit": "21400f5bfa30e8df3c1674b992914efeacb40be6",
+  "baseCommit": "6f2f98422a3899dd9b9fb803dad6be02b06464f8",
+  "contractDigest": "sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb",
+  "startedAt": "2026-09-07T21:10:31Z",
+  "finishedAt": "2026-09-07T21:24:21Z",
+  "reportPath": "artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json",
+  "stories": ["US-02"],
+  "assertions": [
+    {"id": "SMK-032", "status": "not_run", "evidence": "blocked by undefined requested-kind input and producer dependency detection"},
+    {"id": "SMK-040", "status": "not_run", "evidence": "blocked by conflicting candidate identity, undefined service visibility, and unresolved discover dedupe semantics"}
+  ],
+  "commands": [
+    {"command": "make contracts-validate ITEM=M1-AGENT-001", "exitCode": 0, "durationSeconds": 47.72, "stdoutPath": "artifacts/agent/M1-AGENT-001/20260907T212421Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-001/20260907T212421Z/commands.log"},
+    {"command": "make -n smoke-m1-repository ITEM=M1-AGENT-001", "exitCode": 2, "durationSeconds": 0, "stdoutPath": "artifacts/agent/M1-AGENT-001/20260907T212421Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-001/20260907T212421Z/commands.log"},
+    {"command": "contract authority audit", "exitCode": 1, "durationSeconds": 0, "stdoutPath": "artifacts/agent/M1-AGENT-001/20260907T212421Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-001/20260907T212421Z/commands.log"}
+  ],
+  "changedFiles": [
+    "contracts/work-items.yaml",
+    "docs/06_implementation-progress.md",
+    "artifacts/agent/M1-AGENT-001/20260907T212421Z/commands.log",
+    "artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json"
+  ],
+  "deferred": ["all M1-AGENT-001 production implementation and the owned Smoke target/fixtures"],
+  "failures": [
+    {
+      "kind": "contract_failure",
+      "summary": "The frozen contracts do not provide deterministic inputs or defaults required to implement SMK-032 and SMK-040.",
+      "details": [
+        "listAvailableProducerProfiles has no requested kind parameter",
+        "accepted services have no default visibility when the optional override is omitted",
+        "candidateKey includes commit but changed commits are required to update an existing candidate",
+        "repo.discover dedupe requires a commit that is only available after resolve",
+        "producer dependency availability has no creation-time detection rule"
+      ]
+    },
+    {
+      "kind": "tooling_gap",
+      "summary": "smoke-m1-repository and the SMK-032/SMK-040 fixtures remain owned implementation deliverables after the contract repair."
+    }
+  ],
+  "failureKind": "contract_failure",
+  "nextAction": "obtain explicit product decisions, complete M1-CONTRACT-002, then claim M1-AGENT-001 attempt 3"
+}

@@ -1,0 +1,27 @@
+[2026-09-07T21:10:31Z] make contracts-validate
+exitCode: 0
+result: PASS (contract validation baseline before claim)
+
+[2026-09-07T21:10:31Z] make -n smoke-m1-repository ITEM=M1-AGENT-001
+exitCode: 2
+stderr: make: *** No rule to make target 'smoke-m1-repository'. Stop.
+classification: tooling_gap owned by M1-AGENT-001; not treated as the blocking condition
+
+[2026-09-07T21:12:00Z] contract authority audit
+exitCode: 1
+result: FAIL
+details:
+- SMK-032 requires profiles for the requested kind, but listAvailableProducerProfiles accepts no kind input.
+- CandidateOverride.visibility is optional, while services.visibility is required and has no default.
+- discovery candidateKey includes commit, while repeatedCandidateBehavior requires an existing candidate to update when commit changes.
+- repo.discover uniqueKey requires commit, while the commit is first resolved inside the durable job.
+- ProducerProfileCreateRequest omits dependencyStatus, and no executable dependency detection rule is defined.
+
+[2026-09-07T21:24:21Z] production source modification check
+exitCode: 0
+result: PASS (no production source or migration files changed)
+
+[2026-09-07T21:24:45Z] make contracts-validate ITEM=M1-AGENT-001
+exitCode: 0
+durationSeconds: 47.72
+result: PASS (queue protocol, Smoke runner tests, contract tooling, sqlc vet, TypeSpec checks, and Redocly lint)

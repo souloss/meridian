@@ -122,7 +122,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 下一步顺序
 
-M0 自动门禁和 Agent checkpoint 已完成。下一项按队列领取 M1-AGENT-001 attempt 2；M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并补齐 `sourceExpansion` 结构，M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
+M0 自动门禁和 Agent checkpoint 已完成。M1-AGENT-001 attempt 2 在实现前契约审计中发现 SMK-032/SMK-040 所需的五项行为没有确定定义，已保留为 `contract_failure` 并登记 M1-CONTRACT-002；M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
 
 ## 更新流程
 
@@ -153,6 +153,6 @@ git diff --check
 
 ## 当前阻塞
 
-M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并采用 `sourceExpansion` 子结构。attempt 1 的干净 worktree 生成前置缺口已保留在 `artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json`；attempt 2 补齐 Nuxt prepare 和生成投影后通过，最终证据见 `artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json`。当前没有产品或外部阻塞，M0 autonomous checkpoint 已完成，可继续领取 M1-AGENT-001。
+M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并采用 `sourceExpansion` 子结构。attempt 1 的干净 worktree 生成前置缺口已保留在 `artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json`；attempt 2 补齐 Nuxt prepare 和生成投影后通过，最终证据见 `artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json`。M1-AGENT-001 attempt 2 的只读契约审计确认：Profile 列表缺少 requested kind 输入、候选接受缺少 Service visibility 默认值、候选 commit 身份规则互相冲突、discover 去重键在 resolve 前无法构造、Profile 创建时 dependencyStatus 的判定方式未定义。M1-CONTRACT-002 因这些产品口径进入 `blocked`；证据见 `artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json`。
 
 后续阶段尚未实现的 target/fixture 同样属于对应工作项交付物，不能因此反复要求用户提供命令。若实际修复后仍达到重试上限，Agent 应给出明确技术失败报告；只有阶段自动门禁全绿时，Agent 才能完成里程碑 checkpoint。

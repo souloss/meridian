@@ -201,9 +201,9 @@ items:
   - id: M1-AGENT-001
     milestone: M1
     priority: P0
-    status: claimed
+    status: needs_retry
     title: repository-discovery-and-source-bindings
-    dependsOn: [M0-AGENT-003, M1-CONTRACT-001]
+    dependsOn: [M0-AGENT-003, M1-CONTRACT-001, M1-CONTRACT-002]
     operationIds: [createProducerProfile, listAvailableProducerProfiles, checkRepositoryConnection, createRepository, discoverRepository, listDiscoveryCandidates, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
     stories: [US-02]
     assertions: [SMK-032, SMK-040]
@@ -211,20 +211,43 @@ items:
     owner: coding-agent
     attempt: 2
     maxAttempts: 3
-    leaseUntil: '2026-09-07T21:40:31Z'
+    leaseUntil: null
     startedAt: '2026-09-07T21:10:31Z'
     baseCommit: 6f2f98422a3899dd9b9fb803dad6be02b06464f8
     contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
-    failureKind: null
+    failureKind: contract_failure
     blockedReason: null
-    reportPath: null
-    lastEvidence: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
+    reportPath: artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json
+    lastEvidence: artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json
     retry:
       previousAttempt: 1
       previousStatus: needs_retry
       changedSinceFailure: M1-CONTRACT-001 split assertion ownership, completed sourceExpansion semantics, and made generation self-contained; M0 autonomous checkpoint is completed
       toolingGap: smoke-m1-repository target and SMK-032/SMK-040 fixtures are owned by this attempt
-    nextAction: implement the repository discovery/source configuration operations and their Smoke gate
+    nextAction: resolve and pass M1-CONTRACT-002 before claiming attempt 3
+
+  - id: M1-CONTRACT-002
+    milestone: M1
+    priority: P0
+    status: blocked
+    title: define-repository-discovery-and-producer-selection-semantics
+    dependsOn: [M1-CONTRACT-001]
+    operationIds: []
+    stories: [US-02]
+    assertions: []
+    verify: [contracts-validate, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 0
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: null
+    baseCommit: 21400f5bfa30e8df3c1674b992914efeacb40be6
+    contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
+    failureKind: product_decision
+    blockedReason: The frozen contracts do not define five behaviors required by SMK-032 and SMK-040; explicit product decisions are required before contract repair.
+    reportPath: null
+    lastEvidence: null
+    nextAction: obtain explicit decisions for profile filtering, service visibility default, candidate identity, discover deduplication, and executable dependency detection
 
   - id: M1-CONTRACT-001
     milestone: M1
