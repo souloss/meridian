@@ -1,0 +1,33 @@
+{
+  "workItem": "M1-CONTRACT-001",
+  "status": "blocked",
+  "commit": "5416069101d2cf9c815f3aca8f4abf90c552c2ae",
+  "baseCommit": "df2482855585626402d81f038023bfd08d764828",
+  "contractDigest": "sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b",
+  "startedAt": "2026-09-07T15:45:04Z",
+  "finishedAt": "2026-09-07T16:02:08Z",
+  "reportPath": "artifacts/agent/M1-CONTRACT-001/20260907T160208Z/report.json",
+  "stories": ["US-02", "US-03"],
+  "assertions": [
+    {"id": "SMK-006", "status": "not_run", "evidence": "operation ownership decision required"},
+    {"id": "SMK-008", "status": "not_run", "evidence": "operation ownership decision required"},
+    {"id": "SMK-009", "status": "not_run", "evidence": "operation ownership decision required"},
+    {"id": "SMK-032", "status": "not_run", "evidence": "operation ownership decision required"},
+    {"id": "SMK-034", "status": "not_run", "evidence": "operation ownership decision required"},
+    {"id": "SMK-037", "status": "not_run", "evidence": "operation ownership decision required"}
+  ],
+  "commands": [
+    {"command": "make agent-protocol-test", "exitCode": 0, "durationSeconds": 1.2, "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T160208Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T160208Z/commands.log"},
+    {"command": "make contracts-validate", "exitCode": 2, "durationSeconds": 31.0, "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T160208Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T160208Z/commands.log"}
+  ],
+  "changedFiles": ["contracts/work-items.yaml", "docs/06_implementation-progress.md"],
+  "deferred": ["contract edits and all M1 production implementation"],
+  "failures": [
+    {"kind": "product_decision", "summary": "Multiple valid queue repairs change implementation order and ownership.", "options": ["Split M1 into repository discovery/source configuration, sync pipeline, and service lifecycle/delete items, assigning only complete Smoke cases to each item.", "Expand M1-AGENT-001 to own all operations required by its six Smoke cases and reorder later dependencies."]},
+    {"kind": "contract_failure", "summary": "contracts/domain.yaml sourceExpansion is empty and does not own the apparent configured/materialized expansion rules."},
+    {"kind": "tooling_gap", "summary": "contracts-validate requires ignored build/contracts/api projections in a clean worktree."}
+  ],
+  "failureKind": "product_decision",
+  "blockedReason": "Explicit direction is required for M1 operation/assertion ownership and sourceExpansion semantics.",
+  "nextAction": "obtain explicit user direction, implement the contract repair as a separate work item, run compatibility gates, and request acceptance before resuming M1-AGENT-001"
+}

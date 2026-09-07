@@ -1,0 +1,32 @@
+workItem=M1-AGENT-001
+baseCommit=df2482855585626402d81f038023bfd08d764828
+commit=5416069101d2cf9c815f3aca8f4abf90c552c2ae
+go=go1.27.1 linux/amd64
+node=v24.20.0
+pnpm=11.20.0
+contractDigest=sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
+
+$ make -n smoke-m1-repository ITEM=M1-AGENT-001
+exitCode=2 durationSeconds=0.01
+stderr: make: *** No rule to make target 'smoke-m1-repository'.  Stop.
+
+$ make agent-protocol-test
+exitCode=0 durationSeconds=1.8
+stdout: ok github.com/meridian-labs/meridian/internal/contracttest
+
+$ make contracts-validate
+exitCode=2 durationSeconds=31.0
+stdout: agent protocol and smoke runner tests passed; TypeSpec compilation completed with existing unsupported-auth warnings
+stderr: contracts sync cannot read the ignored build/contracts/api/common and domain OpenAPI projections in this clean worktree
+stderr: make[1]: *** [Makefile:24: contracts-check] Error 1
+stderr: make: *** [Makefile:70: contracts-validate] Error 2
+
+Contract audit:
+- SMK-006 additionally requires syncRepository, getService, listRecentServices, getAsset, getAssetVersion, and listAssetVersionItems.
+- SMK-008 requires updateSourceSpec and syncRepository.
+- SMK-009 requires syncRepository.
+- SMK-032 requires producer profile operations.
+- SMK-034 requires updateService and getPublicService plus lifecycle, event, and job fencing behavior.
+- SMK-037 requires deleteService plus logical cascade and job fencing behavior.
+- Several required operations have no owner in contracts/work-items.yaml.
+- contracts/domain.yaml sourceExpansion is null while its apparent rules are siblings.

@@ -174,9 +174,9 @@ items:
   - id: M1-AGENT-001
     milestone: M1
     priority: P0
-    status: claimed
+    status: needs_retry
     title: repository-discovery-and-source-bindings
-    dependsOn: [M0-AGENT-003]
+    dependsOn: [M0-AGENT-003, M1-CONTRACT-001]
     operationIds: [createRepository, discoverRepository, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
     stories: [US-02, US-03]
     assertions: [SMK-006, SMK-008, SMK-009, SMK-032, SMK-034, SMK-037]
@@ -184,15 +184,35 @@ items:
     owner: coding-agent
     attempt: 1
     maxAttempts: 3
-    leaseUntil: '2026-09-07T16:15:04Z'
+    leaseUntil: null
     startedAt: '2026-09-07T15:45:04Z'
     baseCommit: df2482855585626402d81f038023bfd08d764828
     contractDigest: sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
-    failureKind: null
-    blockedReason: null
-    reportPath: null
-    lastEvidence: null
-    nextAction: implement
+    failureKind: contract_failure
+    blockedReason: assertion ownership and dependency ordering cannot satisfy the declared Smoke without implementing unowned or downstream operations
+    reportPath: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
+    lastEvidence: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
+    nextAction: resolve and accept M1-CONTRACT-001 before retrying
+
+  - id: M1-CONTRACT-001
+    milestone: M1
+    priority: P0
+    status: blocked
+    title: repair-m1-operation-assertion-ownership-and-source-expansion
+    dependsOn: [M0-AGENT-003]
+    operationIds: []
+    stories: [US-02, US-03]
+    assertions: [SMK-006, SMK-008, SMK-009, SMK-032, SMK-034, SMK-037]
+    verify: [contracts-validate, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 0
+    maxAttempts: 3
+    leaseUntil: null
+    failureKind: product_decision
+    blockedReason: choose whether to split M1 work items and reassign complete Smoke cases, or expand and reorder existing item scopes; also define the empty domain.sourceExpansion node
+    reportPath: artifacts/agent/M1-CONTRACT-001/20260907T160208Z/report.json
+    lastEvidence: artifacts/agent/M1-CONTRACT-001/20260907T160208Z/report.json
+    nextAction: obtain explicit contract repair direction and human acceptance
 
   - id: M1-AGENT-002
     milestone: M1

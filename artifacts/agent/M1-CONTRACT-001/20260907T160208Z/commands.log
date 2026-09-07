@@ -1,0 +1,16 @@
+workItem=M1-CONTRACT-001
+commit=5416069101d2cf9c815f3aca8f4abf90c552c2ae
+contractDigest=sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
+
+$ make agent-protocol-test
+exitCode=0 durationSeconds=1.2
+stdout: ok github.com/meridian-labs/meridian/internal/contracttest
+
+$ make contracts-validate
+exitCode=2 durationSeconds=31.0
+stderr: contracts-check cannot read ignored build/contracts/api projections in a clean worktree
+
+Decision required:
+1. Split M1 work items so each owns complete Smoke cases and all required operations.
+2. Expand M1-AGENT-001 to own all operations required by its existing six Smoke cases and reorder dependencies.
+3. Define whether configuredEntity, materializedEntity, and expansion are children of domain.sourceExpansion or replace that empty node with another explicit structure.

@@ -1,0 +1,39 @@
+{
+  "workItem": "M1-AGENT-001",
+  "status": "needs_retry",
+  "commit": "5416069101d2cf9c815f3aca8f4abf90c552c2ae",
+  "baseCommit": "df2482855585626402d81f038023bfd08d764828",
+  "contractDigest": "sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b",
+  "sourceDigest": "sha256:b7f16abee2c9653f91d6232f4e90bf158d9a66a7296028971053835e3565f6fc",
+  "startedAt": "2026-09-07T15:45:04Z",
+  "finishedAt": "2026-09-07T16:02:08Z",
+  "reportPath": "artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json",
+  "stories": ["US-02", "US-03"],
+  "assertions": [
+    {"id": "SMK-006", "status": "not_run", "evidence": "requires downstream sync and asset read operations"},
+    {"id": "SMK-008", "status": "not_run", "evidence": "requires unowned updateSourceSpec and downstream syncRepository"},
+    {"id": "SMK-009", "status": "not_run", "evidence": "requires downstream syncRepository to materialize bindings"},
+    {"id": "SMK-032", "status": "not_run", "evidence": "requires unowned producer profile operations"},
+    {"id": "SMK-034", "status": "not_run", "evidence": "requires unowned Service lifecycle operations"},
+    {"id": "SMK-037", "status": "not_run", "evidence": "requires unowned deleteService and cascade behavior"}
+  ],
+  "commands": [
+    {"command": "make -n smoke-m1-repository ITEM=M1-AGENT-001", "exitCode": 2, "durationSeconds": 0.01, "stdoutPath": "artifacts/agent/M1-AGENT-001/20260907T160208Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-001/20260907T160208Z/commands.log"},
+    {"command": "make agent-protocol-test", "exitCode": 0, "durationSeconds": 1.8, "stdoutPath": "artifacts/agent/M1-AGENT-001/20260907T160208Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-001/20260907T160208Z/commands.log"},
+    {"command": "make contracts-validate", "exitCode": 2, "durationSeconds": 31.0, "stdoutPath": "artifacts/agent/M1-AGENT-001/20260907T160208Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-001/20260907T160208Z/commands.log"}
+  ],
+  "changedFiles": [
+    "contracts/work-items.yaml",
+    "docs/06_implementation-progress.md",
+    "artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json",
+    "artifacts/agent/M1-AGENT-001/20260907T160208Z/commands.log"
+  ],
+  "deferred": ["all production implementation pending M1-CONTRACT-001"],
+  "failures": [
+    {"kind": "contract_failure", "summary": "The work item cannot complete its declared Smoke cases using its declared operations and dependency order.", "details": ["SMK-006, SMK-008, and SMK-009 require syncRepository owned by downstream M1-AGENT-002", "updateSourceSpec, listRecentServices, producer profile operations, updateService, and deleteService have no work-item owner", "contracts/domain.yaml defines sourceExpansion as an empty node with apparent child rules at the parent level", "discoverRepository and acceptDiscoveryCandidates are marked M0 in OpenAPI but remained 501 when M0 was accepted"]},
+    {"kind": "tooling_gap", "summary": "smoke-m1-repository and all six registered fixtures are missing."},
+    {"kind": "tooling_gap", "summary": "contracts-validate is not self-contained in a clean worktree because contracts-check requires ignored build/contracts/api projections."}
+  ],
+  "failureKind": "contract_failure",
+  "nextAction": "resolve blocked M1-CONTRACT-001, obtain explicit acceptance for the contract repair, then retry M1-AGENT-001 with changed contracts/tooling"
+}

@@ -2,9 +2,9 @@
 
 > 最后核对：2026-09-07
 > 当前里程碑：M1（asset-mainline）
-> 里程碑状态：M0 已由 souloss 于 2026-09-07T23:40:01+08:00 验收；M1 开发中
+> 里程碑状态：M0 已由 souloss 于 2026-09-07T23:40:01+08:00 验收；M1 契约修复待决策
 > 最新稳定提交：`036c9bcaea05dd6e94e0b16b5accc94427f481d9 feat(M0-AGENT-003): add executable smoke and frontend spike gates`
-> 当前开发切片：M1-AGENT-001 已领取（attempt 1，租约至 2026-09-07T16:15:04Z）
+> 当前开发切片：M1-AGENT-001 `needs_retry`（attempt 1，`contract_failure`）；M1-CONTRACT-001 等待产品决策
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 
@@ -38,7 +38,7 @@
 
 `M0-M3` 是 MVP，`M4-M5` 是 v1 扩展；`M6+` 不在 v1 交付范围内。
 
-M0 的 `milestoneGates` 已由 souloss 于 `2026-09-07T23:40:01+08:00` 置为 `accepted`，验收报告位于 `artifacts/agent/milestones/M0/20260906T182703Z/report.json`。M1-M5 仍为 `pending`，当前可按队列领取 M1-AGENT-001。
+M0 的 `milestoneGates` 已由 souloss 于 `2026-09-07T23:40:01+08:00` 置为 `accepted`，验收报告位于 `artifacts/agent/milestones/M0/20260906T182703Z/report.json`。M1-M5 仍为 `pending`。M1-AGENT-001 首次领取后发现 operation、Smoke 归属和依赖顺序存在不可满足的契约冲突，已创建 M1-CONTRACT-001 并暂停实现。
 
 M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画和细间距可延期到具名后续工作项。功能、权限、错误状态、键盘可用性、A11y 和契约已声明的移动功能不能后置，延期不能减弱验收。
 
@@ -122,7 +122,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 下一步顺序
 
-M0 自动门禁和阶段报告已完成，并由 souloss 于 `2026-09-07T23:40:01+08:00` 明确验收。下一工作项为 M1-AGENT-001；M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
+M0 自动门禁和阶段报告已完成，并由 souloss 于 `2026-09-07T23:40:01+08:00` 明确验收。M1-AGENT-001 绑定的完整 Smoke 依赖后置或无 owner 的 operation，且 `domain.yaml` 中 `sourceExpansion` 语义节点为空；必须先决定 M1-CONTRACT-001 的拆分、归属和领域结构，再重试实现。M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
 
 ## 更新流程
 
@@ -153,6 +153,6 @@ git diff --check
 
 ## 当前阻塞
 
-当前没有自动门禁阻塞。M0-AGENT-002 与 M0-AGENT-003 的历史失败报告继续保留，不复用旧证据；M0 已完成人工验收，M1-AGENT-001 可在干净 checkpoint 上领取。
+M1 当前因 M1-CONTRACT-001 的产品决策而暂停。M1-AGENT-001 仅声明 `createRepository`、`discoverRepository`、`acceptDiscoveryCandidates`、`createSourceSpec`、`listSourceBindings`，但其六个 Smoke 还需要 `syncRepository`、`updateSourceSpec`、producer profile、Service 生命周期/删除和资产读取；其中多项 operation 在队列中没有 owner，且 M1-AGENT-002 的后置依赖造成前向验收环。完整证据见 `artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json`。
 
 后续阶段尚未实现的 target/fixture 同样属于对应工作项交付物，不能因此反复要求用户提供命令。若实际修复后仍达到重试上限，Agent 应给出明确技术失败报告；只有阶段自动门禁全绿时，才提交成品阶段验收报告。
