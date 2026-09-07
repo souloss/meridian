@@ -1,0 +1,25 @@
+{
+  "smokeId": "SMK-005",
+  "result": "pass",
+  "failureKind": null,
+  "reason": null,
+  "assertions": [
+    {
+      "id": "SMK-005",
+      "status": "passed"
+    }
+  ],
+  "fixture": "internal/handler/credential_smoke_integration_test.go",
+  "test": "TestM0CredentialSmoke/SMK-005",
+  "package": "github.com/meridian-labs/meridian/internal/handler",
+  "coverage": "required-fixture-executed",
+  "command": "'sh' 'scripts/test-integration.sh' '-json' '-run' '^TestM0CredentialSmoke$/^SMK-005$' 'github.com/meridian-labs/meridian/internal/handler'",
+  "exitCode": 0,
+  "startedAt": "2026-09-07T20:54:36.808Z",
+  "durationSeconds": 9.843,
+  "commit": "0869beec21827bfa3984698828b536d3f8aa5398",
+  "contractDigest": "sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb",
+  "sourceDigest": "sha256:8ea41ed2ae221a5ba14d81a8e872fe8c9ab73af5955f6926271150dc093e0a44",
+  "workingTreeDirty": false,
+  "logPath": "artifacts/smoke/2026-09-07T20-54-36-808ZEQSesa/SMK-005.log"
+}

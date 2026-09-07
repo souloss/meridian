@@ -1,0 +1,13 @@
+M0-CONTRACT-002 verification on 0869beec21827bfa3984698828b536d3f8aa5398
+
+PASS make contracts-validate ITEM=M0-CONTRACT-002 (49.27s)
+PASS make contracts-generate-then-git-diff-exit-code ITEM=M0-CONTRACT-002 (60.20s)
+PASS vfox exec golang@1.27.1 -- go test ./... (1.26s)
+PASS vfox exec golang@1.27.1 -- go vet ./... (0.27s)
+PASS git diff --check (0.01s)
+DIAGNOSTIC make quality-gate ITEM=M0-CONTRACT-002 (exit 2): the aggregate gate is owned by M0-AGENT-003
+PASS make quality-gate ITEM=M0-AGENT-003 (230.50s)
+
+The aggregate gate passed all eight M0 Smoke fixtures, frontend typecheck and generate,
+10k-row/500-node/5000-edge performance, 1/5/10 MiB editor policy, and desktop/mobile A11y.
+Existing TypeSpec and Redocly warnings remained non-blocking; no generated-code drift was found.

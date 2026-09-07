@@ -1,7 +1,7 @@
 {
   "id": "perf-table-cytoscape",
   "status": "passed",
-  "commit": "5ac8110e7b60db7ea0bcec4fc5e2958ead519f98",
+  "commit": "0869beec21827bfa3984698828b536d3f8aa5398",
   "sourceDigest": "sha256:68bcd96ff0dc9b6d31622383bebc8997d34003d2c21ad3d3a8384f77700ed62d",
   "contractDigest": "sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb",
   "browser": "chromium",
@@ -28,7 +28,7 @@
       "ready": true,
       "nodes": 500,
       "edges": 5000,
-      "firstPaintMs": 1453.2000000476837,
+      "firstPaintMs": 851.6000000238419,
       "selected": true,
       "neighborhood": 40,
       "destroyed": false
@@ -69,7 +69,7 @@
     {
       "id": "graph-first-paint-under-2s",
       "status": "passed",
-      "actual": 1453.2000000476837,
+      "actual": 851.6000000238419,
       "threshold": "<2000ms"
     },
     {

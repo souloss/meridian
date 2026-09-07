@@ -1,10 +1,10 @@
 # Meridian 实施进度
 
-> 最后核对：2026-09-07
+> 最后核对：2026-09-08
 > 当前里程碑：M1（asset-mainline）
-> 里程碑状态：M0 Agent 自主 checkpoint 协议迁移中；M1 契约修复已通过
-> 最新稳定提交：`5ac8110e7b60db7ea0bcec4fc5e2958ead519f98 fix(M1-CONTRACT-001): make contract generation self-contained`
-> 当前开发切片：M0-CONTRACT-002 verifying（attempt 1）
+> 里程碑状态：M0 自主 checkpoint 已完成；M1 开始继续推进
+> 最新稳定提交：`0869beec21827bfa3984698828b536d3f8aa5398 feat(M0-CONTRACT-002): automate milestone checkpoints`
+> 当前开发切片：M0-CONTRACT-002 passed；下一项 M1-AGENT-001 attempt 2
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段完成记录 `milestoneCheckpoints` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和 Agent 证据 checkpoint 为准。
 
@@ -29,7 +29,7 @@
 
 | 里程碑 | 交付范围 | 当前状态 |
 | --- | --- | --- |
-| M0 地基 | 契约与生成、迁移、身份/租户/RBAC/PAT、凭据、仓库骨架、Blob、Job、Audit、Outbox、控制面基础 | 自动 checkpoint 协议迁移中 |
+| M0 地基 | 契约与生成、迁移、身份/租户/RBAC/PAT、凭据、仓库骨架、Blob、Job、Audit、Outbox、控制面基础 | 已完成（Agent checkpoint） |
 | M1 资产主链路 | Repository/Service/Source、发现与同步、默认分支 Track、OpenAPI normalize/index、Viewer/public read | 未开始业务实现；只有契约和生成接口，M0 仓库骨架除外 |
 | M2 Layer 与 Overlay | LayerHead/Revision、Overlay、人工编辑、Provenance、Rollback、字段级 GitOps | 未开始业务实现 |
 | M3 AI、Diff 与门禁 | AI producer/review、生命周期、分支版本、Diff、分享、Todo、CLI push/diff、最小通知 | 未开始业务实现 |
@@ -38,7 +38,7 @@
 
 `M0-M3` 是 MVP，`M4-M5` 是 v1 扩展；`M6+` 不在 v1 交付范围内。
 
-M0 曾由 souloss 于 `2026-09-07T23:40:01+08:00` 验收，历史报告保留在 `artifacts/agent/milestones/M0/20260906T182703Z/report.json`。M1-CONTRACT-001 修正了原属 M0、实际在 M1 实现的 operation 元数据并改变全局契约摘要；完整 M0 quality gate 已在源码提交 `5ac8110e7b60db7ea0bcec4fc5e2958ead519f98` 上重跑通过，新报告为 `artifacts/agent/milestones/M0/20260907T171647Z/report.json`。M0-CONTRACT-002 正在把后续里程碑切换为 Agent 自主、证据驱动的 checkpoint；M1-M5 仍为 `pending`。
+M0 曾由 souloss 于 `2026-09-07T23:40:01+08:00` 验收，历史报告保留在 `artifacts/agent/milestones/M0/20260906T182703Z/report.json`。M0-CONTRACT-002 已把后续里程碑切换为 Agent 自主、证据驱动的 checkpoint；完整 M0 quality gate 在源码提交 `0869beec21827bfa3984698828b536d3f8aa5398` 上重跑通过，完成报告为 `artifacts/agent/milestones/M0/20260907T205730Z/report.json`。M1-M5 仍为 `pending`。
 
 M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画和细间距可延期到具名后续工作项。功能、权限、错误状态、键盘可用性、A11y 和契约已声明的移动功能不能后置，延期不能减弱验收。
 
@@ -122,7 +122,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 下一步顺序
 
-M0 自动门禁和阶段报告已完成；M0-CONTRACT-002 完成协议迁移和受影响门禁后，由 Agent 固化 M0 checkpoint 并立即重试 M1-AGENT-001。M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并补齐 `sourceExpansion` 结构，M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
+M0 自动门禁和 Agent checkpoint 已完成。下一项按队列领取 M1-AGENT-001 attempt 2；M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并补齐 `sourceExpansion` 结构，M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
 
 ## 更新流程
 
@@ -153,6 +153,6 @@ git diff --check
 
 ## 当前阻塞
 
-M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并采用 `sourceExpansion` 子结构。attempt 1 的干净 worktree 生成前置缺口已保留在 `artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json`；attempt 2 补齐 Nuxt prepare 和生成投影后，声明门禁、通用基线及受影响的完整 M0 quality gate 全部通过，最终证据见 `artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json`。当前没有产品或外部阻塞；M0-CONTRACT-002 正在固化自主 checkpoint 协议。
+M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并采用 `sourceExpansion` 子结构。attempt 1 的干净 worktree 生成前置缺口已保留在 `artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json`；attempt 2 补齐 Nuxt prepare 和生成投影后通过，最终证据见 `artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json`。当前没有产品或外部阻塞，M0 autonomous checkpoint 已完成，可继续领取 M1-AGENT-001。
 
 后续阶段尚未实现的 target/fixture 同样属于对应工作项交付物，不能因此反复要求用户提供命令。若实际修复后仍达到重试上限，Agent 应给出明确技术失败报告；只有阶段自动门禁全绿时，Agent 才能完成里程碑 checkpoint。
