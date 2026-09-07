@@ -2,9 +2,9 @@
 
 > 最后核对：2026-09-07
 > 当前里程碑：M1（asset-mainline）
-> 里程碑状态：M0 已由 souloss 于 2026-09-07T23:40:01+08:00 验收；M1 契约修复待决策
+> 里程碑状态：M0 已由 souloss 于 2026-09-07T23:40:01+08:00 验收；M1 契约修复开发中
 > 最新稳定提交：`036c9bcaea05dd6e94e0b16b5accc94427f481d9 feat(M0-AGENT-003): add executable smoke and frontend spike gates`
-> 当前开发切片：M1-AGENT-001 `needs_retry`（attempt 1，`contract_failure`）；M1-CONTRACT-001 等待产品决策
+> 当前开发切片：M1-CONTRACT-001 已领取（attempt 1，租约至 2026-09-07T16:54:23Z）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 
