@@ -83,4 +83,4 @@ Go 泛型方法只用于具体 helper 类型的类型保持/变换；不得放�
 
 ## 自动开发边界
 
-业务和架构选择不得由 Agent 临时猜测；若契约未覆盖，工作项必须进入 `blocked` 或 `needs_human_acceptance`。依赖 patch 只能在 manifest 范围内升级，并通过 ADR 第 8 节门禁。移动端视觉精修、部署域名和生产密钥可以按运行手册后置，但不能改变功能、安全和可访问性验收。`package.json`、`pnpm-lock.yaml`、`go.mod` 和 `go.sum` 必须纳入版本控制，不能以未锁定的 `latest` 作为实现依据。
+业务和架构选择不得由 Agent 临时猜测；若契约未覆盖，工作项必须进入 `blocked`。依赖 patch 只能在 manifest 范围内升级，并通过 ADR 第 8 节门禁。移动端视觉精修、部署域名和生产密钥可以按运行手册后置，但不能改变功能、安全和可访问性验收。`package.json`、`pnpm-lock.yaml`、`go.mod` 和 `go.sum` 必须纳入版本控制，不能以未锁定的 `latest` 作为实现依据。

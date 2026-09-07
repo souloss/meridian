@@ -12,9 +12,9 @@ selection:
   oneActiveItemPerWorkspace: true
   neverSkipFailedGate: true
   requireCleanCheckpointBeforeClaim: true
-  requirePreviousMilestoneAccepted: true
+  requireEarlierMilestonesCompleted: true
   sameMilestoneDependencyStatus: passed
-  crossMilestoneDependencyStatus: passed-with-milestone-accepted
+  crossMilestoneDependencyStatus: passed-with-earlier-milestones-completed
 
 statuses:
   - planned
@@ -23,8 +23,6 @@ statuses:
   - in_progress
   - verifying
   - passed
-  - needs_human_acceptance
-  - accepted
   - failed
   - needs_retry
   - blocked
@@ -55,20 +53,21 @@ retryPolicy:
   failureKinds: [code_failure, tooling_gap, contract_failure, environment_failure, flaky_failure, product_decision]
   resetRequires: explicit-user-authorization-with-preserved-history
 
-milestoneGatePolicy:
-  statuses: [pending, needs_human_acceptance, accepted, changes_requested]
-  allMilestoneItemsMustPassBeforeReport: true
-  acceptedRequires: [acceptedBy, acceptedAt, reportPath, acceptedCommit, contractDigest]
-  changesRequestedCreatesRepairItems: true
-  nextMilestoneRequiresPreviousAccepted: true
+milestoneCheckpointPolicy:
+  statuses: [pending, completed]
+  completionAuthority: coding-agent
+  allMilestoneItemsMustPassBeforeCompletion: true
+  completedRequires: [completedBy, completedAt, reportPath, completedCommit, contractDigest]
+  nextMilestoneRequiresPreviousCompleted: true
+  staleSourceOrContractReturnsTo: pending
 
-milestoneGates:
-  M0: {status: pending, reportPath: artifacts/agent/milestones/M0/20260907T171647Z/report.json, acceptedBy: null, acceptedAt: null, acceptedCommit: 5ac8110e7b60db7ea0bcec4fc5e2958ead519f98, contractDigest: 'sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb'}
-  M1: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
-  M2: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
-  M3: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
-  M4: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
-  M5: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
+milestoneCheckpoints:
+  M0: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
+  M1: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
+  M2: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
+  M3: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
+  M4: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
+  M5: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
 
 defaults:
   owner: coding-agent
@@ -147,7 +146,7 @@ items:
     contractDigest: sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
     reportPath: artifacts/agent/M0-AGENT-003/20260906T182703Z/report.json
     lastEvidence: artifacts/agent/M0-AGENT-003/20260906T182703Z/report.json
-    nextAction: wait for explicit M0 milestone acceptance before claiming M1-AGENT-001
+    nextAction: complete M0-CONTRACT-002 and the M0 autonomous checkpoint
 
   - id: M0-CONTRACT-001
     milestone: M0
@@ -174,7 +173,7 @@ items:
   - id: M0-CONTRACT-002
     milestone: M0
     priority: P0
-    status: claimed
+    status: verifying
     title: replace-human-milestone-gates-with-agent-checkpoints
     dependsOn: [M0-AGENT-003]
     operationIds: []
@@ -184,7 +183,7 @@ items:
     owner: coding-agent
     attempt: 1
     maxAttempts: 3
-    leaseUntil: '2026-09-07T20:51:02Z'
+    leaseUntil: null
     startedAt: '2026-09-07T20:21:02Z'
     baseCommit: e39c5d83e4da51dec9a5cf87cd2e0186871f4690
     contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
@@ -197,7 +196,7 @@ items:
       authorizedOn: '2026-09-08'
       previousMilestoneStatus: needs_human_acceptance
       reason: remove human milestone gates, allow coding-agent to validate milestone evidence autonomously, and continue without waiting for manual acceptance
-    nextAction: replace the human milestone gate state machine with autonomous evidence checkpoints
+    nextAction: run declared verification gates and create the autonomous M0 checkpoint
 
   - id: M1-AGENT-001
     milestone: M1
@@ -220,7 +219,7 @@ items:
     blockedReason: assertion ownership and dependency ordering cannot satisfy the declared Smoke without implementing unowned or downstream operations
     reportPath: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
     lastEvidence: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
-    nextAction: wait for explicit M0 reacceptance, then claim attempt 2
+    nextAction: claim attempt 2 after the M0 autonomous checkpoint is completed
 
   - id: M1-CONTRACT-001
     milestone: M1
@@ -248,7 +247,7 @@ items:
       authorizedOn: '2026-09-08'
       previousStatus: blocked
       reason: user selected the proposed M1 work-item split and confirmed configuredEntity, materializedEntity, and expansion as children of sourceExpansion
-    nextAction: wait for explicit M0 milestone reacceptance before resuming M1-AGENT-001
+    nextAction: resume M1-AGENT-001 after the M0 autonomous checkpoint is completed
 
   - id: M1-AGENT-002
     milestone: M1

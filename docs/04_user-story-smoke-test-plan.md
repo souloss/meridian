@@ -3,7 +3,7 @@
 > 状态：可执行基线（2026-09-04）
 > 需求来源：[01_requirement-specification.md](./01_requirement-specification.md)
 > 验收权威：[contracts/acceptance.yaml](../contracts/acceptance.yaml)
-> API operation、fixture、里程碑和断言 ID 只在 YAML 中维护；本文解释用户目标与人工验收路径。
+> API operation、fixture、里程碑和断言 ID 只在 YAML 中维护；本文解释用户目标与验收路径。
 
 ## 1. 完成定义
 

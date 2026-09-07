@@ -1,13 +1,17 @@
 package contracttest
 
 import (
+	"crypto/sha256"
 	"encoding/json/v2"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strings"
 	"testing"
+	"time"
 
 	"go.yaml.in/yaml/v3"
 )
@@ -24,18 +28,74 @@ type agentWorkItem struct {
 
 type agentQueue struct {
 	Selection struct {
-		OnlyStatuses                     []string `yaml:"onlyStatuses"`
-		RequirePreviousMilestoneAccepted bool     `yaml:"requirePreviousMilestoneAccepted"`
+		OnlyStatuses                      []string `yaml:"onlyStatuses"`
+		RequireEarlierMilestonesCompleted bool     `yaml:"requireEarlierMilestonesCompleted"`
 	} `yaml:"selection"`
-	MilestoneGates map[string]struct {
-		Status         string `yaml:"status"`
-		ReportPath     string `yaml:"reportPath"`
-		AcceptedBy     string `yaml:"acceptedBy"`
-		AcceptedAt     string `yaml:"acceptedAt"`
-		AcceptedCommit string `yaml:"acceptedCommit"`
-		ContractDigest string `yaml:"contractDigest"`
-	} `yaml:"milestoneGates"`
+	MilestoneCheckpointPolicy struct {
+		Statuses                                  []string `yaml:"statuses"`
+		CompletionAuthority                       string   `yaml:"completionAuthority"`
+		AllMilestoneItemsMustPassBeforeCompletion bool     `yaml:"allMilestoneItemsMustPassBeforeCompletion"`
+		CompletedRequires                         []string `yaml:"completedRequires"`
+		NextMilestoneRequiresPreviousCompleted    bool     `yaml:"nextMilestoneRequiresPreviousCompleted"`
+		StaleSourceOrContractReturnsTo            string   `yaml:"staleSourceOrContractReturnsTo"`
+	} `yaml:"milestoneCheckpointPolicy"`
+	MilestoneCheckpoints map[string]struct {
+		Status          string `yaml:"status"`
+		ReportPath      string `yaml:"reportPath"`
+		CompletedBy     string `yaml:"completedBy"`
+		CompletedAt     string `yaml:"completedAt"`
+		CompletedCommit string `yaml:"completedCommit"`
+		ContractDigest  string `yaml:"contractDigest"`
+	} `yaml:"milestoneCheckpoints"`
 	Items []agentWorkItem `yaml:"items"`
+}
+
+type milestoneCompletionReport struct {
+	Milestone      string `json:"milestone"`
+	Status         string `json:"status"`
+	Commit         string `json:"commit"`
+	ContractDigest string `json:"contractDigest"`
+	ReportPath     string `json:"reportPath"`
+	CompletedBy    string `json:"completedBy"`
+	CompletedAt    string `json:"completedAt"`
+	WorkItems      []struct {
+		ID       string `json:"id"`
+		Status   string `json:"status"`
+		Evidence string `json:"evidence"`
+	} `json:"workItems"`
+	Stories []struct {
+		ID       string   `json:"id"`
+		Status   string   `json:"status"`
+		Evidence []string `json:"evidence"`
+	} `json:"stories"`
+	Assertions []struct {
+		ID       string `json:"id"`
+		Status   string `json:"status"`
+		Evidence string `json:"evidence"`
+	} `json:"assertions"`
+	Commands []struct {
+		Command  string `json:"command"`
+		ExitCode int    `json:"exitCode"`
+		Evidence string `json:"evidence"`
+	} `json:"commands"`
+	Failures []any `json:"failures"`
+	Deferred []any `json:"deferred"`
+}
+
+type workItemEvidenceReport struct {
+	WorkItem string `json:"workItem"`
+	Status   string `json:"status"`
+}
+
+type smokeEvidenceReport struct {
+	Result         string `json:"result"`
+	Commit         string `json:"commit"`
+	ContractDigest string `json:"contractDigest"`
+}
+
+type evidenceReference struct {
+	Status   string
+	Evidence string
 }
 
 type smokeRequirement struct {
@@ -76,11 +136,59 @@ func readSmokeRequirements(t *testing.T) map[string]smokeRequirement {
 	return acceptance.SmokeSuite.Cases
 }
 
-func TestAgentQueueReferencesAndMilestoneGates(t *testing.T) {
+func currentContractDigest(t *testing.T) string {
+	t.Helper()
+	entries, err := os.ReadDir("../../contracts")
+	if err != nil {
+		t.Fatal(err)
+	}
+	hash := sha256.New()
+	for _, entry := range entries {
+		name := entry.Name()
+		if entry.IsDir() || !strings.HasSuffix(name, ".yaml") || name == "work-items.yaml" {
+			continue
+		}
+		contents, err := os.ReadFile(filepath.Join("../../contracts", name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		hash.Write([]byte(name))
+		hash.Write([]byte{0})
+		hash.Write(contents)
+		hash.Write([]byte{0})
+	}
+	return fmt.Sprintf("sha256:%x", hash.Sum(nil))
+}
+
+func localEvidencePath(t *testing.T, path, prefix string) string {
+	t.Helper()
+	cleaned := filepath.ToSlash(filepath.Clean(path))
+	if !filepath.IsLocal(path) || !strings.HasPrefix(cleaned, prefix) || cleaned == strings.TrimSuffix(prefix, "/") {
+		t.Errorf("evidence %q must be a local file below %s", path, prefix)
+		return ""
+	}
+	fullPath := filepath.Join("../..", filepath.FromSlash(cleaned))
+	if info, err := os.Stat(fullPath); err != nil || info.IsDir() {
+		t.Errorf("evidence %q is not a readable file: %v", path, err)
+		return ""
+	}
+	return fullPath
+}
+
+func TestAgentQueueReferencesAndMilestoneCheckpoints(t *testing.T) {
 	queue := readAgentQueue(t)
 	smokes := readSmokeRequirements(t)
-	if !slices.Equal(queue.Selection.OnlyStatuses, []string{"ready", "needs_retry"}) || !queue.Selection.RequirePreviousMilestoneAccepted {
-		t.Fatal("selection must exclude active leases and require previous-stage acceptance")
+	if !slices.Equal(queue.Selection.OnlyStatuses, []string{"ready", "needs_retry"}) || !queue.Selection.RequireEarlierMilestonesCompleted {
+		t.Fatal("selection must exclude active leases and require earlier milestone completion")
+	}
+	policy := queue.MilestoneCheckpointPolicy
+	if !slices.Equal(policy.Statuses, []string{"pending", "completed"}) ||
+		policy.CompletionAuthority != "coding-agent" ||
+		!policy.AllMilestoneItemsMustPassBeforeCompletion ||
+		!policy.NextMilestoneRequiresPreviousCompleted ||
+		policy.StaleSourceOrContractReturnsTo != "pending" ||
+		!slices.Equal(policy.CompletedRequires, []string{"completedBy", "completedAt", "reportPath", "completedCommit", "contractDigest"}) {
+		t.Fatal("milestone checkpoint policy must require evidence-backed coding-agent completion")
 	}
 	operations := make(map[string]bool)
 	for _, pathValue := range mapping(t, readOpenAPI(t), "paths") {
@@ -100,8 +208,8 @@ func TestAgentQueueReferencesAndMilestoneGates(t *testing.T) {
 			t.Fatalf("duplicate or empty work item: %q", item.ID)
 		}
 		items[item.ID] = item
-		if _, exists := queue.MilestoneGates[item.Milestone]; !exists {
-			t.Errorf("%s has no milestone acceptance record", item.ID)
+		if _, exists := queue.MilestoneCheckpoints[item.Milestone]; !exists {
+			t.Errorf("%s has no milestone checkpoint", item.ID)
 		}
 		if len(item.Verify) == 0 {
 			t.Errorf("%s has no gates", item.ID)
@@ -176,13 +284,158 @@ func TestAgentQueueReferencesAndMilestoneGates(t *testing.T) {
 			}
 		}
 	}
-	for _, milestone := range []string{"M0", "M1", "M2", "M3", "M4", "M5"} {
-		gate, exists := queue.MilestoneGates[milestone]
-		if !exists || !slices.Contains([]string{"pending", "needs_human_acceptance", "accepted", "changes_requested"}, gate.Status) {
-			t.Errorf("missing or invalid milestone gate %s", milestone)
+	milestones := []string{"M0", "M1", "M2", "M3", "M4", "M5"}
+	commitPattern := regexp.MustCompile(`^[0-9a-f]{40}$`)
+	digestPattern := regexp.MustCompile(`^sha256:[0-9a-f]{64}$`)
+	activeStatuses := []string{"claimed", "in_progress", "verifying"}
+	currentDigest := currentContractDigest(t)
+	for index, milestone := range milestones {
+		checkpoint, exists := queue.MilestoneCheckpoints[milestone]
+		if !exists || !slices.Contains(policy.Statuses, checkpoint.Status) {
+			t.Errorf("missing or invalid milestone checkpoint %s", milestone)
+			continue
 		}
-		if gate.Status == "accepted" && (gate.AcceptedBy == "" || gate.AcceptedAt == "" || gate.ReportPath == "" || gate.AcceptedCommit == "" || gate.ContractDigest == "") {
-			t.Errorf("%s acceptance is missing human identity or evidence", milestone)
+		if checkpoint.Status == "completed" {
+			if checkpoint.CompletedBy != policy.CompletionAuthority {
+				t.Errorf("%s checkpoint must be completed by %s", milestone, policy.CompletionAuthority)
+			}
+			if _, err := time.Parse(time.RFC3339, checkpoint.CompletedAt); err != nil {
+				t.Errorf("%s checkpoint has invalid completedAt: %v", milestone, err)
+			}
+			if !commitPattern.MatchString(checkpoint.CompletedCommit) || !digestPattern.MatchString(checkpoint.ContractDigest) {
+				t.Errorf("%s checkpoint has invalid commit or contract digest", milestone)
+			} else if checkpoint.ContractDigest != currentDigest {
+				t.Errorf("%s checkpoint contract digest is stale", milestone)
+			} else {
+				command := exec.CommandContext(t.Context(), "git", "merge-base", "--is-ancestor", checkpoint.CompletedCommit, "HEAD")
+				command.Dir = "../.."
+				if output, err := command.CombinedOutput(); err != nil {
+					t.Errorf("%s checkpoint commit is not in the current history: %v: %s", milestone, err, output)
+				}
+			}
+			expectedPrefix := "artifacts/agent/milestones/" + milestone + "/"
+			reportFile := localEvidencePath(t, checkpoint.ReportPath, expectedPrefix)
+			if reportFile != "" {
+				contents, err := os.ReadFile(reportFile)
+				if err != nil {
+					t.Errorf("%s checkpoint report: %v", milestone, err)
+				} else {
+					var report milestoneCompletionReport
+					if err := json.Unmarshal(contents, &report); err != nil {
+						t.Errorf("%s checkpoint report: %v", milestone, err)
+					} else if report.Milestone != milestone || report.Status != "completed" ||
+						report.Commit != checkpoint.CompletedCommit || report.ContractDigest != checkpoint.ContractDigest ||
+						report.ReportPath != checkpoint.ReportPath || report.CompletedBy != checkpoint.CompletedBy ||
+						report.CompletedAt != checkpoint.CompletedAt {
+						t.Errorf("%s checkpoint report does not match queue metadata", milestone)
+					} else {
+						validateMilestoneCompletionEvidence(t, queue, smokes, report, currentDigest)
+					}
+				}
+			}
+			for _, item := range queue.Items {
+				if item.Milestone == milestone && !slices.Contains([]string{"passed", "superseded", "cancelled"}, item.Status) {
+					t.Errorf("%s cannot be completed while %s is %s", milestone, item.ID, item.Status)
+				}
+			}
+			for _, earlier := range milestones[:index] {
+				if queue.MilestoneCheckpoints[earlier].Status != "completed" {
+					t.Errorf("%s cannot be completed before %s", milestone, earlier)
+				}
+			}
+		}
+		for _, item := range queue.Items {
+			if item.Milestone != milestone || !slices.Contains(activeStatuses, item.Status) {
+				continue
+			}
+			for _, earlier := range milestones[:index] {
+				if queue.MilestoneCheckpoints[earlier].Status != "completed" {
+					t.Errorf("%s cannot be %s before %s is completed", item.ID, item.Status, earlier)
+				}
+			}
+		}
+	}
+}
+
+func validateMilestoneCompletionEvidence(t *testing.T, queue agentQueue, smokes map[string]smokeRequirement, report milestoneCompletionReport, currentDigest string) {
+	t.Helper()
+	if len(report.Stories) == 0 || len(report.Commands) == 0 || report.Failures == nil || len(report.Failures) != 0 || report.Deferred == nil {
+		t.Errorf("%s completion report must include passed stories and commands with no failures", report.Milestone)
+	}
+	workItemEvidence := make(map[string]evidenceReference)
+	for _, entry := range report.WorkItems {
+		if _, duplicate := workItemEvidence[entry.ID]; duplicate || entry.ID == "" {
+			t.Errorf("%s completion report contains duplicate or empty work item evidence", report.Milestone)
+		}
+		workItemEvidence[entry.ID] = evidenceReference{entry.Status, entry.Evidence}
+	}
+	for _, item := range queue.Items {
+		if item.Milestone != report.Milestone || slices.Contains([]string{"superseded", "cancelled"}, item.Status) {
+			continue
+		}
+		entry, exists := workItemEvidence[item.ID]
+		if !exists || entry.Status != "passed" {
+			t.Errorf("%s completion report is missing passed work item %s", report.Milestone, item.ID)
+			continue
+		}
+		file := localEvidencePath(t, entry.Evidence, "artifacts/agent/"+item.ID+"/")
+		if file == "" {
+			continue
+		}
+		contents, err := os.ReadFile(file)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		var evidence workItemEvidenceReport
+		if err := json.Unmarshal(contents, &evidence); err != nil || evidence.WorkItem != item.ID || evidence.Status != "passed" {
+			t.Errorf("%s work item evidence is not a matching passed report: %v", item.ID, err)
+		}
+	}
+	assertionEvidence := make(map[string]evidenceReference)
+	for _, entry := range report.Assertions {
+		if _, duplicate := assertionEvidence[entry.ID]; duplicate || entry.ID == "" {
+			t.Errorf("%s completion report contains duplicate or empty assertion evidence", report.Milestone)
+		}
+		assertionEvidence[entry.ID] = evidenceReference{entry.Status, entry.Evidence}
+	}
+	for id, requirement := range smokes {
+		if requirement.Milestone != report.Milestone {
+			continue
+		}
+		entry, exists := assertionEvidence[id]
+		if !exists || entry.Status != "passed" {
+			t.Errorf("%s completion report is missing passed assertion %s", report.Milestone, id)
+			continue
+		}
+		file := localEvidencePath(t, entry.Evidence, "artifacts/smoke/")
+		if file == "" {
+			continue
+		}
+		contents, err := os.ReadFile(file)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		var evidence smokeEvidenceReport
+		if err := json.Unmarshal(contents, &evidence); err != nil || evidence.Result != "pass" ||
+			evidence.Commit != report.Commit || evidence.ContractDigest != currentDigest {
+			t.Errorf("%s assertion evidence is stale or did not pass: %v", id, err)
+		}
+	}
+	for _, story := range report.Stories {
+		if story.ID == "" || story.Status != "passed" || len(story.Evidence) == 0 {
+			t.Errorf("%s completion report contains incomplete story evidence", report.Milestone)
+		}
+		for _, assertion := range story.Evidence {
+			if entry, exists := assertionEvidence[assertion]; !exists || entry.Status != "passed" {
+				t.Errorf("%s story %s references missing or failed assertion %s", report.Milestone, story.ID, assertion)
+			}
+		}
+	}
+	for _, command := range report.Commands {
+		if command.Command == "" || command.ExitCode != 0 || localEvidencePath(t, command.Evidence, "artifacts/") == "" {
+			t.Errorf("%s completion report contains invalid command evidence", report.Milestone)
 		}
 	}
 }

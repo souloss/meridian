@@ -13,7 +13,7 @@ Agent 每次开始工作都必须读取以下内容，并记录本次执行的 g
 3. `docs/01_requirement-specification.md`、`docs/02_backend-technical-design.md`、`docs/03_frontend-technical-design.md`、`docs/04_user-story-smoke-test-plan.md`：只用于理解背景和实现边界。
 4. `docs/06_implementation-progress.md`：只用于了解已有实现和证据，不得把叙述中的“已完成”当作验收通过。
 
-发生冲突时停止当前工作项，运行契约校验并报告冲突；不得自行猜测或用 Markdown 覆盖 YAML。契约变更必须单独作为工作项，经过兼容性规则和人工验收后才能继续依赖它的实现。
+发生冲突时停止当前工作项，运行契约校验并报告冲突；不得自行猜测或用 Markdown 覆盖 YAML。契约变更必须单独作为工作项，经过兼容性规则、受影响门禁和 Agent checkpoint 后才能继续依赖它的实现。
 
 ## 2. 工作项协议
 
@@ -46,7 +46,7 @@ nextAction: claim
 
 `make smoke`、`make smoke-all` 和 `make quality-gate` 是工作项 `M0-AGENT-003` 的交付物。队列中的 `verify` 必须是 Make target 名称数组，不得写裸 shell 命令或临时替代命令。每个门禁按 `make <target> ITEM=<work-item-id>` 执行，领取前按 `make -n <target> ITEM=<work-item-id>` 做存在性预检，并把完整命令写入报告。Make target 可以封装仓库内脚本；需要额外参数的通用命令须由具名 target 固定参数，不得在 `verify` 中含糊引用。
 
-`make agent-preflight ITEM=<ID>` 只诊断声明入口，输出 `tooling_gap` 不表示需要人工，也不是验收通过。`make contracts-validate` 已校验队列依赖、阶段验收记录及 Smoke 所属映射。`make smoke-all ITEM=<ID>` 从 ID 推导累计阶段，也可显式设置 `MILESTONE=M0`；无 ITEM/MILESTONE 时检查 M0-M5 全套。`scripts/smoke-cases.json` 注册全部 Smoke，尚未有 fixture 的条目必须失败并指出归属工作项，不能删除。扩展新 fixture 时同步扩展 runner 与防假通过测试；零测试、skip、失败和执行中源码变化均不能放行。
+`make agent-preflight ITEM=<ID>` 只诊断声明入口，输出 `tooling_gap` 不表示需要人工，也不是验收通过。`make contracts-validate` 已校验队列依赖、里程碑 checkpoint 及 Smoke 所属映射。`make smoke-all ITEM=<ID>` 从 ID 推导累计阶段，也可显式设置 `MILESTONE=M0`；无 ITEM/MILESTONE 时检查 M0-M5 全套。`scripts/smoke-cases.json` 注册全部 Smoke，尚未有 fixture 的条目必须失败并指出归属工作项，不能删除。扩展新 fixture 时同步扩展 runner 与防假通过测试；零测试、skip、失败和执行中源码变化均不能放行。
 
 Smoke 的 `contractDigest` 对 `contracts/*.yaml` 按文件名排序后，以 `文件名 + NUL + 内容 + NUL` 计算 SHA-256；排除仅记录执行状态的 `work-items.yaml`。`sourceDigest` 记录当前实现树内容，包含未提交源码。`workingTreeDirty=true` 的预检报告不能冒充已提交稳定 checkpoint。
 
@@ -56,7 +56,7 @@ Smoke 的 `contractDigest` 对 `contracts/*.yaml` 按文件名排序后，以 `�
 
 ## 3. 状态机、租约与并发
 
-工作项自动状态和里程碑人工验收状态分离：
+工作项状态和里程碑自动 checkpoint 状态分离：
 
 ```text
 planned -> ready -> claimed -> in_progress -> verifying -> passed
@@ -68,17 +68,16 @@ planned -> ready -> claimed -> in_progress -> verifying -> passed
                                   +--> failed（技术重试耗尽）
                                   +--> blocked（缺少外部输入）
 
-milestoneGates: pending -> needs_human_acceptance -> accepted
-                                      |
-                                      +--> changes_requested -> pending（新增修复工作项）
+milestoneCheckpoints: pending -> completed（coding-agent，证据完整）
+                               +-> pending（源码/契约变化使证据 stale）
 ```
 
-- `planned`：尚需细化的工作项；`ready`：定义完整且可参与筛选，但只有依赖满足才能领取。同里程碑依赖 `passed` 即可；跨里程碑还必须满足前一里程碑 `milestoneGates.<M#>.status=accepted`。
+- `planned`：尚需细化的工作项；`ready`：定义完整且可参与筛选，但只有依赖满足才能领取。同里程碑依赖 `passed` 即可；跨里程碑还必须满足所有较早里程碑 `milestoneCheckpoints.<M#>.status=completed`。
 - `claimed`：Agent 已写入 `owner`、`attempt`、`leaseUntil`；租约默认 30 分钟，每完成一个阶段续租。租约过期后，其他 Agent 可恢复，但必须先检查最新 HEAD、工作区和证据。
 - `in_progress`：允许修改代码；`verifying`：禁止继续扩展范围，只运行声明的验证。
-- `passed`：全部声明自动门禁通过且断言证据完整，可以继续同里程碑依赖项，但不能自动放行下一里程碑。
+- `passed`：全部声明自动门禁通过且断言证据完整，可以继续同里程碑依赖项；全里程碑工作项通过后按第 8 节自动完成 checkpoint。
 - `needs_retry`：有下一次有效修复尝试；`failed`：技术失败达到 `maxAttempts`，保留 `failureKind` 并向用户报告技术升级请求，不等于产品待验收；`blocked` 只用于产品决策、外部权限或环境输入。
-- `needs_human_acceptance`、`accepted` 是 `milestoneGates` 的状态；队列 `statuses` 中同名工作项值仅兼容历史记录（见 `legacyWorkItemStatuses`），新执行不得写入。`superseded`/`cancelled` 只能用于明确获准的范围替代/取消，必须有替代项和验收映射，不能用来移除未通过的门禁。
+- `needs_human_acceptance`、`accepted` 仅是历史工作项兼容值（见 `legacyWorkItemStatuses`），新执行不得写入。`superseded`/`cancelled` 只能用于明确获准的范围替代/取消，必须有替代项和验收映射，不能用来移除未通过的门禁。
 
 同一时刻一个工作项只能有一个有效租约。Agent 在开始写入前执行 `git status --short`，确认文件所有权并将工作项 ID 写入执行报告。发现不属于自己的改动时保留它们，缩小文件范围；只有无法安全避让的实际冲突才暂停并请求协调，不得因无关改动阻塞整个队列或重置工作区。
 
@@ -87,8 +86,8 @@ milestoneGates: pending -> needs_human_acceptance -> accepted
 每次领取工作项按以下顺序执行，排序相同则使用字典序工作项 ID：
 
 1. 运行 `make contracts-validate`；失败时只处理契约/工具链门禁工作项。
-2. 找到最早尚未 `accepted` 的里程碑（`M0` 至 `M5`）。若它是 `needs_human_acceptance`，发送阶段报告并停止领取；若为 `changes_requested`，先把用户反馈转为该阶段的修复工作项并置回 `pending`。
-3. 仅在该里程碑过滤 `status=ready/needs_retry`、租约未占用且所有 `dependsOn` 已满足的项，先处理阻塞依赖链的 `needs_retry`，再按 `priority`、ID 排序。同里程碑所有项通过后进入第 8 节，不得越过阶段验收。
+2. 找到最早尚未 `completed` 的里程碑（`M0` 至 `M5`）。若该里程碑全部有效工作项已为 `passed`，按第 8 节生成并完成 checkpoint，然后立即继续下一里程碑。
+3. 仅在该里程碑过滤 `status=ready/needs_retry`、租约未占用且所有 `dependsOn` 已满足的项，先处理阻塞依赖链的 `needs_retry`，再按 `priority`、ID 排序。不得在较早里程碑 checkpoint 完成前领取较晚里程碑。
 4. 每次重试必须记录代码、工具链、环境的有效变化或能推动修复的新诊断；同一未改变的根因不得空跑三次。达到 `maxAttempts` 后转 `failed` 并报告，不得无限重置计数。
 5. 领取前检查 operation 是否仍为 501、assertion 是否已有有效证据、代码是否已被其他提交覆盖。即使实现已存在也必须运行本项声明门禁；不能仅凭已有代码标记 `superseded`。
 
@@ -124,7 +123,7 @@ M0-M3 默认 desktop-first：先交付固定桌面主路径，再优化移动视
 
 ### 5.4 通过、失败与提交
 
-- 全部命令通过且断言有证据：生成结构化报告，更新队列为 `passed` 和 `06_implementation-progress.md`，提交 checkpoint。同阶段仍有项则继续；全阶段通过则生成阶段报告，等待人工放行。
+- 全部命令通过且断言有证据：生成结构化报告，更新队列为 `passed` 和 `06_implementation-progress.md`，提交 checkpoint。同阶段仍有项则继续；全阶段通过则按第 8 节自动完成里程碑 checkpoint 后继续。
 - 命令失败：保留失败产物和最短复现命令，按第 6 节分类；不得以“环境偶发”直接标记通过。
 - 提交前必须重新生成代码并确认无生成漂移。一个 checkpoint 只包含一个工作项及其进度/证据，不混入下一项或他人未提交修改。
 
@@ -191,11 +190,11 @@ M0-M3 默认 desktop-first：先交付固定桌面主路径，再优化移动视
 下一工作项：<ID、依赖和预计验收目标>
 ```
 
-## 8. 人工验收节点与里程碑放行
+## 8. Agent 自主验收与里程碑完成
 
-Agent 在以下节点必须暂停领取后续里程碑，并发送报告供人工验收：
+Agent 在以下节点必须核对完整证据并生成里程碑 checkpoint：
 
-| 节点 | 必须通过的范围 | 人工重点 |
+| 节点 | 必须通过的范围 | 验收重点 |
 | --- | --- | --- |
 | M0 | US-01、US-11、M0 Smoke、负向隔离矩阵、六项 executable spike | 登录租户切换、凭据非回显、跨租户 404、桌面控制面主路径 |
 | M1 | US-02、US-03、US-12 的 M1 断言及对应 Smoke | Golden Path、同步恢复、互斥和 SSE 重连、OpenAPI Viewer/public read |
@@ -204,11 +203,11 @@ Agent 在以下节点必须暂停领取后续里程碑，并发送报告供人�
 | M4 | US-08 及多 kind/search/group Smoke | 搜索 deep link、租户/分组图范围、覆盖率 |
 | M5 | US-10、US-02 的体验镜像断言（SMK-030）及协作/合规 Smoke | 通知投递、Webhook 重试、订阅取消、运维恢复、体验镜像五分钟首文档 |
 
-每个里程碑的全部有效工作项（包括新增修复项）必须先为 `passed`；`acceptance.yaml` 映射的所有 assertion、Smoke、负向用例、生成无漂移和必要性能/A11y/安全门禁必须有当前有效证据。然后生成 `artifacts/agent/milestones/<M#>/<timestamp>/report.json` 和用户报告，把 `milestoneGates.<M#>.status` 从 `pending` 改为 `needs_human_acceptance`，写入 `reportPath`、候选 `acceptedCommit` 和 `contractDigest`，暂停领取下一里程碑。
+每个里程碑的全部有效工作项（包括新增修复项）必须先为 `passed`；`acceptance.yaml` 映射的所有 assertion、Smoke、负向用例、生成无漂移和必要性能/A11y/安全门禁必须有当前有效证据。然后生成 `artifacts/agent/milestones/<M#>/<timestamp>/report.json` 和用户报告，把 `milestoneCheckpoints.<M#>.status` 从 `pending` 改为 `completed`，写入 `completedBy: coding-agent`、`completedAt`、`reportPath`、`completedCommit` 和 `contractDigest`，提交 evidence checkpoint 后立即按确定性算法继续。
 
-阶段报告必须包含可运行的桌面入口/启动命令、演示主路径、所有工作项及断言证据索引、失败/延期项和风险，且明确写出等待验收的阶段。用户明确 `accepted` 后记录 `acceptedBy`、`acceptedAt`，核对报告提交和契约仍有效，再将状态置为 `accepted` 并领取下一里程碑。未回复不能视为默认通过；不允许预填验收人。`changes_requested` 必须保留反馈和原报告，生成同阶段修复工作项并置回 `pending`，完成后再报告。人工验收不能替代缺失的自动断言。
+阶段报告必须包含可运行的桌面入口/启动命令、演示主路径、所有工作项及断言证据索引、失败/延期项和风险。自主完成不能替代缺失的自动断言，也不授权 Agent 猜测未定义的产品行为、忽略契约冲突或绕过外部依赖。源码或契约变化影响已完成里程碑时，将其 checkpoint 置回 `pending`，重跑受影响门禁后生成新报告；历史报告不可改写。
 
-人工验收回复应包含：`accepted` 或 `changes_requested`、验收人、时间、报告路径和具体断言 ID。`changes_requested` 必须生成新的修复工作项，保留原报告，不直接改写历史状态。
+用户后续提出修改时，保留反馈和原报告，生成受影响里程碑的修复工作项并把 checkpoint 置回 `pending`。用户反馈不会直接改写历史状态，也不能用来移除失败门禁。
 
 ## 9. 进度文件和队列的原子更新
 
@@ -221,15 +220,14 @@ Agent 在以下节点必须暂停领取后续里程碑，并发送报告供人�
 5. 仅提交证据索引、工作项结果和 `06_implementation-progress.md`。这个 evidence checkpoint 的 SHA 可以不同于报告的被测源码 SHA；不反复修改报告追赶自身提交哈希。
 6. 再次检查生成无漂移及被测源码未变；通过后才领取下一工作项。崩溃在步骤 3 后则继续验证，不将 `verifying` 当成已完成。
 
-提交后若验证失败，按尝试次数回到 `needs_retry` 或 `failed`，不得把已提交 SHA 标成稳定提交，直到修复产生新的通过证据。报告中的 `commit` 是已验证的代码 checkpoint 完整 SHA，后续记录状态的提交可引用它，不能填写尚不存在的自身提交 SHA。任何契约或工具链变更都必须在报告中列出兼容性影响，并重新运行所有受影响里程碑门禁；若影响已验收阶段，其 gate 必须回到 `pending` 并重新报告。
+提交后若验证失败，按尝试次数回到 `needs_retry` 或 `failed`，不得把已提交 SHA 标成稳定提交，直到修复产生新的通过证据。报告中的 `commit` 是已验证的代码 checkpoint 完整 SHA，后续记录状态的提交可引用它，不能填写尚不存在的自身提交 SHA。任何契约或工具链变更都必须在报告中列出兼容性影响，并重新运行所有受影响里程碑门禁；若影响已完成阶段，其 checkpoint 必须回到 `pending` 并重新报告。
 
 ## 10. 长程停止条件
 
 Agent 可以持续运行，直到满足下列任一条件：
 
-- 某里程碑已达到 `needs_human_acceptance`，阶段报告已交给用户，等待明确放行；
-- 所有 `M0-M5` 工作项为 `passed`、六个 `milestoneGates` 均为 `accepted`，且 `06_implementation-progress.md` 与 acceptance 门禁一致，此时才可宣告项目完成；
+- 所有 `M0-M5` 工作项为 `passed`、六个 `milestoneCheckpoints` 均为 `completed`，且 `06_implementation-progress.md` 与 acceptance 门禁一致，此时才可宣告项目完成；
 - 遇到 `product_decision`、外部权限或环境输入导致的 `blocked`，并已发送完整报告；
 - 技术失败达到上限，已标记 `failed`、填写 `failureKind`、报告技术升级请求并保留可复现证据。
 
-除上述条件外不得自行宣告项目完成、跳过未实现的 operation、删除失败 fixture 或将移动端视觉延期误报为功能完成。每次自动循环结束都必须留下“下一工作项”或明确的人工阻塞原因，保证下一次 Agent 能从持久化状态继续。
+除上述条件外不得自行宣告项目完成、跳过未实现的 operation、删除失败 fixture 或将移动端视觉延期误报为功能完成。Agent 在工作项和里程碑 checkpoint 之间持续推进；只有 `blocked`、`failed` 或全部完成时停止。每次自动循环结束都必须留下“下一工作项”或明确的阻塞原因，保证下一次 Agent 能从持久化状态继续。
