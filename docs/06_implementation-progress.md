@@ -2,9 +2,9 @@
 
 > 最后核对：2026-09-07
 > 当前里程碑：M1（asset-mainline）
-> 里程碑状态：M0 契约变更后自动门禁已重跑，等待重新人工验收；M1 契约修复已通过
+> 里程碑状态：M0 人工放行协议正在迁移为 Agent 自主验收；M1 契约修复已通过
 > 最新稳定提交：`5ac8110e7b60db7ea0bcec4fc5e2958ead519f98 fix(M1-CONTRACT-001): make contract generation self-contained`
-> 当前开发切片：M1-CONTRACT-001 passed；暂停领取，等待 M0 明确重新验收
+> 当前开发切片：M0-CONTRACT-002 已领取（attempt 1，租约至 2026-09-07T20:51:02Z）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 

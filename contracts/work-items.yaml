@@ -63,7 +63,7 @@ milestoneGatePolicy:
   nextMilestoneRequiresPreviousAccepted: true
 
 milestoneGates:
-  M0: {status: needs_human_acceptance, reportPath: artifacts/agent/milestones/M0/20260907T171647Z/report.json, acceptedBy: null, acceptedAt: null, acceptedCommit: 5ac8110e7b60db7ea0bcec4fc5e2958ead519f98, contractDigest: 'sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb'}
+  M0: {status: pending, reportPath: artifacts/agent/milestones/M0/20260907T171647Z/report.json, acceptedBy: null, acceptedAt: null, acceptedCommit: 5ac8110e7b60db7ea0bcec4fc5e2958ead519f98, contractDigest: 'sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb'}
   M1: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M2: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M3: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
@@ -170,6 +170,34 @@ items:
     reportPath: artifacts/agent/M0-CONTRACT-001/20260906T174209Z/report.json
     lastEvidence: artifacts/agent/M0-CONTRACT-001/20260906T174209Z/report.json
     nextAction: resume M0-AGENT-003
+
+  - id: M0-CONTRACT-002
+    milestone: M0
+    priority: P0
+    status: claimed
+    title: replace-human-milestone-gates-with-agent-checkpoints
+    dependsOn: [M0-AGENT-003]
+    operationIds: []
+    stories: []
+    assertions: []
+    verify: [contracts-validate, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    leaseUntil: '2026-09-07T20:51:02Z'
+    startedAt: '2026-09-07T20:21:02Z'
+    baseCommit: e39c5d83e4da51dec9a5cf87cd2e0186871f4690
+    contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
+    failureKind: null
+    blockedReason: null
+    reportPath: null
+    lastEvidence: null
+    recovery:
+      authorizedBy: user
+      authorizedOn: '2026-09-08'
+      previousMilestoneStatus: needs_human_acceptance
+      reason: remove human milestone gates, allow coding-agent to validate milestone evidence autonomously, and continue without waiting for manual acceptance
+    nextAction: replace the human milestone gate state machine with autonomous evidence checkpoints
 
   - id: M1-AGENT-001
     milestone: M1
