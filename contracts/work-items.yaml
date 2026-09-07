@@ -63,7 +63,7 @@ milestoneGatePolicy:
   nextMilestoneRequiresPreviousAccepted: true
 
 milestoneGates:
-  M0: {status: needs_human_acceptance, reportPath: artifacts/agent/milestones/M0/20260906T182703Z/report.json, acceptedBy: null, acceptedAt: null, acceptedCommit: 036c9bcaea05dd6e94e0b16b5accc94427f481d9, contractDigest: 'sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b'}
+  M0: {status: accepted, reportPath: artifacts/agent/milestones/M0/20260906T182703Z/report.json, acceptedBy: souloss, acceptedAt: '2026-09-07T23:40:01+08:00', acceptedCommit: 036c9bcaea05dd6e94e0b16b5accc94427f481d9, contractDigest: 'sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b'}
   M1: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M2: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
   M3: {status: pending, reportPath: null, acceptedBy: null, acceptedAt: null, acceptedCommit: null, contractDigest: null}
