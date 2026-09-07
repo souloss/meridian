@@ -174,7 +174,7 @@ items:
   - id: M1-AGENT-001
     milestone: M1
     priority: P0
-    status: claimed
+    status: needs_retry
     title: repository-discovery-and-source-bindings
     dependsOn: [M0-AGENT-003, M1-CONTRACT-001]
     operationIds: [createProducerProfile, listAvailableProducerProfiles, checkRepositoryConnection, createRepository, discoverRepository, listDiscoveryCandidates, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
@@ -182,7 +182,7 @@ items:
     assertions: [SMK-032, SMK-040]
     verify: [smoke-m1-repository]
     owner: coding-agent
-    attempt: 2
+    attempt: 1
     maxAttempts: 3
     leaseUntil: null
     startedAt: '2026-09-07T15:45:04Z'
@@ -197,7 +197,7 @@ items:
   - id: M1-CONTRACT-001
     milestone: M1
     priority: P0
-    status: needs_retry
+    status: verifying
     title: repair-m1-operation-assertion-ownership-and-source-expansion
     dependsOn: [M0-AGENT-003]
     operationIds: []
@@ -205,7 +205,7 @@ items:
     assertions: []
     verify: [contracts-validate, contracts-generate-then-git-diff-exit-code]
     owner: coding-agent
-    attempt: 1
+    attempt: 2
     maxAttempts: 3
     leaseUntil: '2026-09-07T17:26:27Z'
     startedAt: '2026-09-07T16:56:27Z'
@@ -220,7 +220,7 @@ items:
       authorizedOn: '2026-09-08'
       previousStatus: blocked
       reason: user selected the proposed M1 work-item split and confirmed configuredEntity, materializedEntity, and expansion as children of sourceExpansion
-    nextAction: add the Nuxt prepare prerequisite and commit all generated contract projections
+    nextAction: commit the repaired tooling and generated projections, then run the declared gates
 
   - id: M1-AGENT-002
     milestone: M1

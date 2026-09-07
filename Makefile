@@ -74,7 +74,7 @@ contracts-validate:
 contracts-lint: contracts-validate
 
 contract-tooling-test:
-	python3 -m unittest scripts/sync_openapi_test.py
+	python3 -m unittest scripts/sync_openapi_test.py scripts/frontend_tooling_test.py
 
 smoke:
 	SMK="$(SMK)" sh ./scripts/smoke.sh
