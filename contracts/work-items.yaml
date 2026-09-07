@@ -174,14 +174,25 @@ items:
   - id: M1-AGENT-001
     milestone: M1
     priority: P0
-    status: ready
+    status: claimed
     title: repository-discovery-and-source-bindings
     dependsOn: [M0-AGENT-003]
     operationIds: [createRepository, discoverRepository, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
     stories: [US-02, US-03]
     assertions: [SMK-006, SMK-008, SMK-009, SMK-032, SMK-034, SMK-037]
     verify: [smoke-m1-repository]
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    leaseUntil: '2026-09-07T16:15:04Z'
+    startedAt: '2026-09-07T15:45:04Z'
+    baseCommit: df2482855585626402d81f038023bfd08d764828
+    contractDigest: sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
+    failureKind: null
+    blockedReason: null
     reportPath: null
+    lastEvidence: null
+    nextAction: implement
 
   - id: M1-AGENT-002
     milestone: M1
