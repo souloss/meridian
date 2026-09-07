@@ -4,7 +4,7 @@
 > 当前里程碑：M1（asset-mainline）
 > 里程碑状态：M0 已由 souloss 于 2026-09-07T23:40:01+08:00 验收；M1 契约修复开发中
 > 最新稳定提交：`036c9bcaea05dd6e94e0b16b5accc94427f481d9 feat(M0-AGENT-003): add executable smoke and frontend spike gates`
-> 当前开发切片：M1-CONTRACT-001 验证中（attempt 1，租约至 2026-09-07T17:13:55Z）
+> 当前开发切片：M1-CONTRACT-001 needs_retry（attempt 1；前端 API 生成缺少 Nuxt prepare 前置步骤）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段人工放行记录 `milestoneGates` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和用户明确验收为准。
 
@@ -153,6 +153,6 @@ git diff --check
 
 ## 当前阻塞
 
-M1 当前因 M1-CONTRACT-001 的产品决策而暂停。M1-AGENT-001 仅声明 `createRepository`、`discoverRepository`、`acceptDiscoveryCandidates`、`createSourceSpec`、`listSourceBindings`，但其六个 Smoke 还需要 `syncRepository`、`updateSourceSpec`、producer profile、Service 生命周期/删除和资产读取；其中多项 operation 在队列中没有 owner，且 M1-AGENT-002 的后置依赖造成前向验收环。完整证据见 `artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json`。
+M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并采用 `sourceExpansion` 子结构。attempt 1 的 `contracts-validate` 通过，但生成一致性门禁在干净 worktree 中因缺少 `web/.nuxt/tsconfig.json` 失败，分类为仓库内可修复的 `tooling_gap`；失败证据见 `artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json`。M1 实现项继续暂停，待 attempt 2 补齐 Nuxt prepare 前置步骤、提交全部生成产物并通过契约修复门禁。
 
 后续阶段尚未实现的 target/fixture 同样属于对应工作项交付物，不能因此反复要求用户提供命令。若实际修复后仍达到重试上限，Agent 应给出明确技术失败报告；只有阶段自动门禁全绿时，才提交成品阶段验收报告。

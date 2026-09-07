@@ -1,0 +1,24 @@
+M1-CONTRACT-001 attempt 1 verification
+toolchain: go1.27.1, node v24.20.0, pnpm 11.20.0
+
+$ make contracts-validate ITEM=M1-CONTRACT-001
+exitCode: 0
+durationSeconds: 41.7
+result: contract tests, sqlc vet, TypeSpec/OpenAPI generation checks, Redocly lint, and generated-doc checks passed. Existing TypeSpec authentication and 15 Redocly warnings were non-blocking.
+
+$ make contracts-generate-then-git-diff-exit-code ITEM=M1-CONTRACT-001
+exitCode: 2
+durationSeconds: 60.2
+result: TypeSpec bundle, Go generation, and dependency installation completed. Frontend API generation failed before Orval output.
+stderr:
+Error: File './.nuxt/tsconfig.json' not found.
+    at resolveExtends
+    at _parseTsconfig
+    at parseTsconfig
+    at loadTsconfig
+Node.js v24.20.0
+[ELIFECYCLE] Command failed with exit code 1.
+make: *** [Makefile:54: frontend-api] Error 1
+
+post-failure observation:
+internal/generated/api/spec.gen.go changed after Go generation, confirming that the source checkpoint omitted a generated contract projection.

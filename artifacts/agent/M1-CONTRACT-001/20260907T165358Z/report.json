@@ -1,0 +1,58 @@
+{
+  "workItem": "M1-CONTRACT-001",
+  "status": "needs_retry",
+  "commit": "eaa1101e42c2687f4acbda3e943066d0a5bbb909",
+  "baseCommit": "099ce7dac633be5c0d254139f867046b5d09d9a6",
+  "contractDigest": "sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb",
+  "startedAt": "2026-09-07T16:24:23Z",
+  "finishedAt": "2026-09-07T16:53:58Z",
+  "reportPath": "artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json",
+  "stories": ["US-02", "US-03"],
+  "assertions": [],
+  "commands": [
+    {
+      "command": "make contracts-validate ITEM=M1-CONTRACT-001",
+      "exitCode": 0,
+      "durationSeconds": 41.7,
+      "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T165358Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T165358Z/commands.log"
+    },
+    {
+      "command": "make contracts-generate-then-git-diff-exit-code ITEM=M1-CONTRACT-001",
+      "exitCode": 2,
+      "durationSeconds": 60.2,
+      "stdoutPath": "artifacts/agent/M1-CONTRACT-001/20260907T165358Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-CONTRACT-001/20260907T165358Z/commands.log"
+    }
+  ],
+  "changedFiles": [
+    "Makefile",
+    "contracts/acceptance.yaml",
+    "contracts/api/domains/repository/routes.tsp",
+    "contracts/api/domains/service/routes.tsp",
+    "contracts/domain.yaml",
+    "contracts/openapi.yaml",
+    "contracts/work-items.yaml",
+    "docs/06_implementation-progress.md",
+    "internal/contracttest/domain_semantics_test.go",
+    "internal/contracttest/work_items_test.go",
+    "scripts/smoke-cases.json",
+    "scripts/sync-openapi.py",
+    "scripts/sync_openapi_test.py"
+  ],
+  "deferred": ["M1 implementation remains paused until this contract repair passes and M0 is reaccepted"],
+  "failures": [
+    {
+      "kind": "tooling_gap",
+      "summary": "The declared generation gate is not self-contained in a clean worktree because Orval loads web/tsconfig.json before Nuxt has generated web/.nuxt/tsconfig.json.",
+      "reproduce": "make contracts-generate-then-git-diff-exit-code ITEM=M1-CONTRACT-001",
+      "error": "Error: File './.nuxt/tsconfig.json' not found."
+    },
+    {
+      "kind": "code_failure",
+      "summary": "The failed gate generated a changed internal/generated/api/spec.gen.go, so the source checkpoint did not include all contract projections."
+    }
+  ],
+  "failureKind": "tooling_gap",
+  "nextAction": "claim attempt 2 after adding the missing Nuxt prepare prerequisite and committing generated contract code"
+}
