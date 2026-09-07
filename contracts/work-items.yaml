@@ -201,7 +201,7 @@ items:
   - id: M1-AGENT-001
     milestone: M1
     priority: P0
-    status: needs_retry
+    status: claimed
     title: repository-discovery-and-source-bindings
     dependsOn: [M0-AGENT-003, M1-CONTRACT-001]
     operationIds: [createProducerProfile, listAvailableProducerProfiles, checkRepositoryConnection, createRepository, discoverRepository, listDiscoveryCandidates, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
@@ -209,17 +209,22 @@ items:
     assertions: [SMK-032, SMK-040]
     verify: [smoke-m1-repository]
     owner: coding-agent
-    attempt: 1
+    attempt: 2
     maxAttempts: 3
-    leaseUntil: null
-    startedAt: '2026-09-07T15:45:04Z'
-    baseCommit: df2482855585626402d81f038023bfd08d764828
-    contractDigest: sha256:793d688970ff2611367f3a8320c11d2c945b0ae355eb12a680790ee0524ea99b
-    failureKind: contract_failure
-    blockedReason: assertion ownership and dependency ordering cannot satisfy the declared Smoke without implementing unowned or downstream operations
-    reportPath: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
+    leaseUntil: '2026-09-07T21:40:31Z'
+    startedAt: '2026-09-07T21:10:31Z'
+    baseCommit: 6f2f98422a3899dd9b9fb803dad6be02b06464f8
+    contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
+    failureKind: null
+    blockedReason: null
+    reportPath: null
     lastEvidence: artifacts/agent/M1-AGENT-001/20260907T160208Z/report.json
-    nextAction: claim attempt 2 after the M0 autonomous checkpoint is completed
+    retry:
+      previousAttempt: 1
+      previousStatus: needs_retry
+      changedSinceFailure: M1-CONTRACT-001 split assertion ownership, completed sourceExpansion semantics, and made generation self-contained; M0 autonomous checkpoint is completed
+      toolingGap: smoke-m1-repository target and SMK-032/SMK-040 fixtures are owned by this attempt
+    nextAction: implement the repository discovery/source configuration operations and their Smoke gate
 
   - id: M1-CONTRACT-001
     milestone: M1

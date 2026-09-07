@@ -4,7 +4,7 @@
 > 当前里程碑：M1（asset-mainline）
 > 里程碑状态：M0 自主 checkpoint 已完成；M1 开始继续推进
 > 最新稳定提交：`0869beec21827bfa3984698828b536d3f8aa5398 feat(M0-CONTRACT-002): automate milestone checkpoints`
-> 当前开发切片：M0-CONTRACT-002 passed；下一项 M1-AGENT-001 attempt 2
+> 当前开发切片：M1-AGENT-001 claimed（attempt 2，租约至 2026-09-07T21:40:31Z）
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段完成记录 `milestoneCheckpoints` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和 Agent 证据 checkpoint 为准。
 
