@@ -174,7 +174,7 @@ items:
   - id: M1-AGENT-001
     milestone: M1
     priority: P0
-    status: needs_retry
+    status: claimed
     title: repository-discovery-and-source-bindings
     dependsOn: [M0-AGENT-003, M1-CONTRACT-001]
     operationIds: [createProducerProfile, listAvailableProducerProfiles, checkRepositoryConnection, createRepository, discoverRepository, listDiscoveryCandidates, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
@@ -182,7 +182,7 @@ items:
     assertions: [SMK-032, SMK-040]
     verify: [smoke-m1-repository]
     owner: coding-agent
-    attempt: 1
+    attempt: 2
     maxAttempts: 3
     leaseUntil: null
     startedAt: '2026-09-07T15:45:04Z'
@@ -207,11 +207,11 @@ items:
     owner: coding-agent
     attempt: 1
     maxAttempts: 3
-    leaseUntil: null
-    startedAt: '2026-09-07T16:24:23Z'
-    baseCommit: 099ce7dac633be5c0d254139f867046b5d09d9a6
+    leaseUntil: '2026-09-07T17:26:27Z'
+    startedAt: '2026-09-07T16:56:27Z'
+    baseCommit: 19cc43864b217e5ff2b756181dbd2d93fc7b02f2
     contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
-    failureKind: tooling_gap
+    failureKind: null
     blockedReason: null
     reportPath: artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json
     lastEvidence: artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json
@@ -220,7 +220,7 @@ items:
       authorizedOn: '2026-09-08'
       previousStatus: blocked
       reason: user selected the proposed M1 work-item split and confirmed configuredEntity, materializedEntity, and expansion as children of sourceExpansion
-    nextAction: claim attempt 2 after adding the missing Nuxt prepare prerequisite and committing generated contract code
+    nextAction: add the Nuxt prepare prerequisite and commit all generated contract projections
 
   - id: M1-AGENT-002
     milestone: M1
