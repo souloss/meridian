@@ -17,6 +17,89 @@ services:
       timeout: 3s
       retries: 30
 
+  # 构建 Nuxt SPA，并将静态文件嵌入 Go HTTP 服务镜像。
+  meridian:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: meridian:local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      bootstrap:
+        condition: service_completed_successfully
+      seed:
+        condition: service_completed_successfully
+    environment:
+      MERIDIAN_DATABASE_URL: postgres://meridian:meridian@postgres:5432/meridian?sslmode=disable
+      MERIDIAN_TOKEN_PEPPER: ${MERIDIAN_TOKEN_PEPPER:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA}
+      MERIDIAN_MASTER_KEY: ${MERIDIAN_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+      MERIDIAN_MASTER_KEY_VERSION: ${MERIDIAN_MASTER_KEY_VERSION:-1}
+      MERIDIAN_CREDENTIAL_FINGERPRINT_KEY: ${MERIDIAN_CREDENTIAL_FINGERPRINT_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA}
+    command: ["serve", "--addr", "0.0.0.0:8080"]
+    ports:
+      - "127.0.0.1:${MERIDIAN_HTTP_PORT:-18080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8080/readyz >/dev/null"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  # 幂等创建平台管理员，执行 `docker compose up --build` 后即可体验 M0 界面。
+  bootstrap:
+    image: meridian:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      MERIDIAN_DATABASE_URL: postgres://meridian:meridian@postgres:5432/meridian?sslmode=disable
+      MERIDIAN_ADMIN_USERNAME: ${MERIDIAN_ADMIN_USERNAME:-padmin}
+      MERIDIAN_ADMIN_DISPLAY_NAME: ${MERIDIAN_ADMIN_DISPLAY_NAME:-Platform Admin}
+      MERIDIAN_ADMIN_PASSWORD: ${MERIDIAN_ADMIN_PASSWORD:-correct horse battery staple}
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        password_file=$$(mktemp)
+        trap 'rm -f "$$password_file"' EXIT
+        printf '%s\n' "$$MERIDIAN_ADMIN_PASSWORD" >"$$password_file"
+        meridian admin create \
+          --database-url "$$MERIDIAN_DATABASE_URL" \
+          --username "$$MERIDIAN_ADMIN_USERNAME" \
+          --display-name "$$MERIDIAN_ADMIN_DISPLAY_NAME" \
+          --password-file "$$password_file"
+    restart: "no"
+
+  # 预置租户和成员关系，让浏览器演示无需额外配置。
+  seed:
+    image: postgres:16.15-alpine3.24
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: meridian
+      PGUSER: meridian
+      PGPASSWORD: meridian
+      MERIDIAN_ADMIN_USERNAME: ${MERIDIAN_ADMIN_USERNAME:-padmin}
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        psql -v ON_ERROR_STOP=1 <<SQL
+        INSERT INTO tenants (id, slug, display_name, quota, settings)
+        VALUES ('00000000-0000-0000-0000-000000000001', 'acme', 'Acme',
+          '{"maxRepositories":10,"maxServices":20,"maxStorageBytes":1073741824,"maxCollectConcurrency":2}', '{}')
+        ON CONFLICT (slug) DO NOTHING;
+        INSERT INTO tenant_members (tenant_id, user_id, role)
+        SELECT '00000000-0000-0000-0000-000000000001', id, 'tenant_admin'
+        FROM users WHERE username = '$$MERIDIAN_ADMIN_USERNAME'
+        ON CONFLICT (tenant_id, user_id) DO NOTHING;
+        SQL
+    restart: "no"
+
   postgres-test:
     image: postgres:16.15-alpine3.24
     profiles: [integration]
