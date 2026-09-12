@@ -130,14 +130,11 @@ func branchPolicyInput(value *api.BranchPolicy) *service.RepositoryBranchPolicy 
 	if value == nil {
 		return nil
 	}
+	// 复制请求切片，避免服务层持有或修改 HTTP DTO 的底层数组。
 	branchPatterns := make([]string, len(value.BranchPatterns))
-	for index, pattern := range value.BranchPatterns {
-		branchPatterns[index] = pattern
-	}
+	copy(branchPatterns, value.BranchPatterns)
 	tagPatterns := make([]string, len(value.TagPatterns))
-	for index, pattern := range value.TagPatterns {
-		tagPatterns[index] = pattern
-	}
+	copy(tagPatterns, value.TagPatterns)
 	return new(service.RepositoryBranchPolicy{BranchPatterns: branchPatterns, TagPatterns: tagPatterns})
 }
 

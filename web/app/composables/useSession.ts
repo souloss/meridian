@@ -46,7 +46,8 @@ export function useSession() {
     }
     csrf.value = response.data.csrfToken
     setCsrfToken(csrf.value)
-    queryClient.setQueryData(getGetMeQueryKey(), response)
+    // 保持 get-me 缓存的数据形状为 Me；登录接口返回的是 LoginResult。
+    queryClient.setQueryData(getGetMeQueryKey(), { ...response, data: response.data.me })
     return response.data.me
   }
 
