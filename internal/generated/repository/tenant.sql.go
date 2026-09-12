@@ -17,7 +17,8 @@ SELECT count(*)::bigint
 FROM tenants
 `
 
-// CountTenants returns the number of tenant lifecycle records visible to platform administration.
+// CountTenants executes the generated CountTenants database query.
+// 返回平台管理可见的租户生命周期记录数量。
 func (q *Queries) CountTenants(ctx context.Context) (int64, error) {
 	row := q.db.QueryRow(ctx, countTenants)
 	var column_1 int64
@@ -56,7 +57,8 @@ type CreateTenantParams struct {
 	Settings []byte `json:"settings"`
 }
 
-// CreateTenant inserts one tenant with explicit quota and settings snapshots copied from platform defaults.
+// CreateTenant executes the generated CreateTenant database query.
+// 使用明确的配额和设置快照创建租户，快照来自平台默认配置。
 func (q *Queries) CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error) {
 	row := q.db.QueryRow(ctx, createTenant,
 		arg.ID,
@@ -87,7 +89,8 @@ WHERE slug = $1
   AND status = 'active'
 `
 
-// GetActiveTenantBySlug returns only an active tenant for tenant-scoped business access.
+// GetActiveTenantBySlug executes the generated GetActiveTenantBySlug database query.
+// 仅按 slug 返回有效租户，供租户范围业务访问使用。
 func (q *Queries) GetActiveTenantBySlug(ctx context.Context, slug string) (Tenant, error) {
 	row := q.db.QueryRow(ctx, getActiveTenantBySlug, slug)
 	var i Tenant
@@ -138,7 +141,8 @@ type GetActiveTenantMembershipRow struct {
 	Role string `json:"role"`
 }
 
-// GetActiveTenantMembership returns one active tenant membership without revealing disabled tenant records.
+// GetActiveTenantMembership executes the generated GetActiveTenantMembership database query.
+// 返回一条有效租户成员关系，不泄露已停用租户记录。
 func (q *Queries) GetActiveTenantMembership(ctx context.Context, arg GetActiveTenantMembershipParams) (GetActiveTenantMembershipRow, error) {
 	row := q.db.QueryRow(ctx, getActiveTenantMembership, arg.UserID, arg.TenantSlug)
 	var i GetActiveTenantMembershipRow
@@ -157,7 +161,8 @@ FROM platform_settings
 WHERE id = 'default'
 `
 
-// GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
+// GetPlatformSettingsForTenantCreate executes the generated GetPlatformSettingsForTenantCreate database query.
+// 返回创建租户时原子复制到新租户的单例 JSON 默认配置。
 func (q *Queries) GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error) {
 	row := q.db.QueryRow(ctx, getPlatformSettingsForTenantCreate)
 	var settings []byte
@@ -171,7 +176,8 @@ FROM tenants
 WHERE slug = $1
 `
 
-// GetTenantBySlug returns a tenant in any lifecycle state for platform administration.
+// GetTenantBySlug executes the generated GetTenantBySlug database query.
+// 按 slug 返回任意生命周期状态的租户，供平台管理使用。
 func (q *Queries) GetTenantBySlug(ctx context.Context, slug string) (Tenant, error) {
 	row := q.db.QueryRow(ctx, getTenantBySlug, slug)
 	var i Tenant
@@ -214,7 +220,8 @@ type ListActiveTenantMembershipsRow struct {
 	Role string `json:"role"`
 }
 
-// ListActiveTenantMemberships returns a user's active tenant memberships in stable slug and UUID order.
+// ListActiveTenantMemberships executes the generated ListActiveTenantMemberships database query.
+// 按稳定 slug 和 UUID 顺序返回用户的有效租户成员关系。
 func (q *Queries) ListActiveTenantMemberships(ctx context.Context, userID uuid.UUID) ([]ListActiveTenantMembershipsRow, error) {
 	rows, err := q.db.Query(ctx, listActiveTenantMemberships, userID)
 	if err != nil {
@@ -276,7 +283,8 @@ type ListTenantsRow struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
-// ListTenants returns all tenant lifecycle records in stable slug and UUID order for platform administration.
+// ListTenants executes the generated ListTenants database query.
+// 按稳定 slug 和 UUID 顺序返回全部租户生命周期记录，供平台管理使用。
 func (q *Queries) ListTenants(ctx context.Context, arg ListTenantsParams) ([]ListTenantsRow, error) {
 	rows, err := q.db.Query(ctx, listTenants, arg.PageOffset, arg.PageLimit)
 	if err != nil {
@@ -341,8 +349,9 @@ type UpdateTenantParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateTenant conditionally updates platform-controlled tenant fields and advances its revision.
-// Set flags preserve omitted PATCH fields while allowing complete quota replacement.
+// UpdateTenant executes the generated UpdateTenant database query.
+// 有条件地更新平台控制的租户字段并递增版本号。
+// 字段 set 标志保留 PATCH 字段省略状态，同时允许完整替换配额。
 func (q *Queries) UpdateTenant(ctx context.Context, arg UpdateTenantParams) (Tenant, error) {
 	row := q.db.QueryRow(ctx, updateTenant,
 		arg.SetDisplayName,
@@ -399,7 +408,8 @@ type UpsertTenantMemberParams struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
-// UpsertTenantMember creates or replaces a tenant role assignment and records the caller-supplied update time.
+// UpsertTenantMember executes the generated UpsertTenantMember database query.
+// 创建或替换租户角色关系，并记录调用方提供的更新时间。
 func (q *Queries) UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error) {
 	row := q.db.QueryRow(ctx, upsertTenantMember,
 		arg.TenantID,

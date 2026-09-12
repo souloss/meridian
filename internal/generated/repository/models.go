@@ -12,781 +12,782 @@ import (
 )
 
 // ApiToken is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Tenant-scoped personal access tokens stored only as keyed digests.
+// 租户内个人访问令牌，仅保存加密摘要。
 type ApiToken struct {
 	// TenantID is the generated tenant id database value for ApiToken.
-	// Tenant to which the token and all of its scopes are restricted.
+	// 令牌及其全部权限所限制的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// ID is the generated id database value for ApiToken.
-	// Application-generated UUID v7 identifying token metadata.
+	// 应用生成的 UUID v7 令牌元数据标识。
 	ID uuid.UUID `json:"id"`
 	// UserID is the generated user id database value for ApiToken.
-	// Same-tenant user who owns the token.
+	// 拥有令牌的同租户用户。
 	UserID uuid.UUID `json:"user_id"`
 	// Name is the generated name database value for ApiToken.
-	// User-provided label for identifying the token without revealing it.
+	// 用于识别令牌且不泄露令牌内容的用户标签。
 	Name string `json:"name"`
 	// TokenHash is the generated token hash database value for ApiToken.
-	// Globally unique HMAC-SHA-256 digest of the PAT secret.
+	// 全局唯一的 PAT 令牌 HMAC-SHA-256 摘要。
 	TokenHash []byte `json:"token_hash"`
 	// Scopes is the generated scopes database value for ApiToken.
-	// Deduplicated set of allowed PAT scopes from the domain contract.
+	// 来自领域契约且已去重的 PAT 权限集合。
 	Scopes []string `json:"scopes"`
 	// ExpiresAt is the generated expires at database value for ApiToken.
-	// Optional UTC expiry instant; null means no scheduled expiry.
+	// 可选的 UTC 过期时间；为空表示没有计划过期时间。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 	// LastUsedAt is the generated last used at database value for ApiToken.
-	// UTC instant of the latest successful authentication, or null if unused.
+	// 最近一次认证成功的 UTC 时间，未使用时为空。
 	LastUsedAt pgtype.Timestamptz `json:"last_used_at"`
 	// RevokedAt is the generated revoked at database value for ApiToken.
-	// UTC instant of explicit revocation, or null while not revoked.
+	// 主动撤销令牌的 UTC 时间，未撤销时为空。
 	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
 	// CreatedAt is the generated created at database value for ApiToken.
-	// UTC transaction timestamp when token metadata was created.
+	// 创建令牌元数据时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for ApiToken.
-	// UTC transaction timestamp of the latest token metadata update.
+	// 最近一次更新令牌元数据时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // AuditLog is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Append-only security and business audit metadata with secret and content values excluded.
+// 不包含秘密和业务内容的追加式安全及业务审计元数据。
 type AuditLog struct {
 	// ID is the generated id database value for AuditLog.
-	// Application-generated UUID v7 identifying the audit entry.
+	// 应用生成的 UUID v7 审计记录标识。
 	ID uuid.UUID `json:"id"`
 	// TenantID is the generated tenant id database value for AuditLog.
-	// Optional tenant context; null denotes a platform-scoped action.
+	// 可选的租户上下文；为空表示平台范围操作。
 	TenantID *uuid.UUID `json:"tenant_id"`
 	// ActorID is the generated actor id database value for AuditLog.
-	// Optional user identity; null is retained for system or deleted actors.
+	// 可选的用户身份；系统操作或用户删除后保留为空。
 	ActorID *uuid.UUID `json:"actor_id"`
 	// ActorType is the generated actor type database value for AuditLog.
-	// Actor category: user, system, or anonymous.
+	// 主体类别：user、system 或 anonymous。
 	ActorType string `json:"actor_type"`
 	// Action is the generated action database value for AuditLog.
-	// Stable action identifier describing what occurred.
+	// 描述发生事件的稳定动作标识。
 	Action string `json:"action"`
 	// TargetType is the generated target type database value for AuditLog.
-	// Resource category affected by the action.
+	// 受影响资源的类别。
 	TargetType string `json:"target_type"`
 	// TargetID is the generated target id database value for AuditLog.
-	// Optional UUID of the affected resource.
+	// 受影响资源的可选 UUID。
 	TargetID *uuid.UUID `json:"target_id"`
 	// Detail is the generated detail database value for AuditLog.
-	// Redacted JSON identifiers, counters, and hashes; business content and secrets are forbidden.
+	// 仅允许标识、计数和摘要的脱敏 JSON，禁止业务内容和秘密。
 	Detail []byte `json:"detail"`
 	// Ip is the generated ip database value for AuditLog.
-	// Optional network address associated with the request.
+	// 与请求关联的可选网络地址。
 	Ip *netip.Addr `json:"ip"`
 	// RequestID is the generated request id database value for AuditLog.
-	// Optional request UUID correlating the audit row with logs and API errors.
+	// 用于关联日志和 API 错误的可选请求 UUID。
 	RequestID *uuid.UUID `json:"request_id"`
 	// CreatedAt is the generated created at database value for AuditLog.
-	// UTC transaction timestamp when the audited action committed.
+	// 审计动作提交时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 // Blob is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Global content-addressed metadata for immutable binary objects stored outside PostgreSQL.
+// 存储在 PostgreSQL 外部的不可变二进制对象的全局内容寻址元数据。
 type Blob struct {
 	// BlobDigest is the generated blob digest database value for Blob.
-	// Lowercase SHA-256 digest that uniquely identifies the blob content.
+	// 唯一标识对象内容的小写 SHA-256 摘要。
 	BlobDigest string `json:"blob_digest"`
 	// StorageKey is the generated storage key database value for Blob.
-	// Unique opaque key used by the configured blob storage driver.
+	// 由对象存储驱动使用的唯一不透明键。
 	StorageKey string `json:"storage_key"`
 	// SizeBytes is the generated size bytes database value for Blob.
-	// Exact uncompressed blob size in bytes.
+	// 对象的准确未压缩字节数。
 	SizeBytes int64 `json:"size_bytes"`
 	// MediaType is the generated media type database value for Blob.
-	// IANA media type recorded when the blob was accepted.
+	// 接收对象时记录的 IANA 媒体类型。
 	MediaType string `json:"media_type"`
 	// CreatedAt is the generated created at database value for Blob.
-	// UTC transaction timestamp when the blob metadata was first inserted.
+	// 首次写入对象元数据时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 // Credential is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Tenant-owned encrypted SSH or HTTP credentials; secret plaintext is never persisted.
+// 租户拥有的加密 SSH 或 HTTP 凭据，绝不持久化秘密明文。
 type Credential struct {
 	// TenantID is the generated tenant id database value for Credential.
-	// Tenant that owns and authorizes access to the credential.
+	// 拥有凭据并授权其访问的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// ID is the generated id database value for Credential.
-	// Application-generated UUID v7 identifying the credential within its tenant.
+	// 应用生成的 UUID v7 租户内凭据标识。
 	ID uuid.UUID `json:"id"`
 	// Name is the generated name database value for Credential.
-	// Tenant-unique operator label for the credential.
+	// 租户内唯一的凭据操作标签。
 	Name string `json:"name"`
 	// Kind is the generated kind database value for Credential.
-	// Secret representation kind: ssh_key or http_token.
+	// 秘密表示类型：ssh_key 或 http_token。
 	Kind string `json:"kind"`
 	// Ciphertext is the generated ciphertext database value for Credential.
-	// AEAD ciphertext including its authentication tag.
+	// 包含认证标签的 AEAD 密文。
 	Ciphertext []byte `json:"ciphertext"`
 	// Nonce is the generated nonce database value for Credential.
-	// Unique 12-byte AEAD nonce used for this encryption.
+	// 本次加密使用的唯一 12 字节 AEAD nonce。
 	Nonce []byte `json:"nonce"`
 	// KeyVersion is the generated key version database value for Credential.
-	// Master-key version used to derive the row encryption key.
+	// 用于派生行加密密钥的主密钥版本。
 	KeyVersion int32 `json:"key_version"`
 	// Fingerprint is the generated fingerprint database value for Credential.
-	// Stable non-secret server-derived fingerprint for rotation comparison.
+	// 用于轮换比较的稳定、非敏感服务端指纹。
 	Fingerprint string `json:"fingerprint"`
 	// SharedScope is the generated shared scope database value for Credential.
-	// Visibility boundary: private, team, or tenant.
+	// 可见性范围：private、team 或 tenant。
 	SharedScope string `json:"shared_scope"`
 	// CreatedBy is the generated created by database value for Credential.
-	// Global user who created the credential.
+	// 创建凭据的全局用户。
 	CreatedBy uuid.UUID `json:"created_by"`
 	// LastUsedAt is the generated last used at database value for Credential.
-	// UTC instant when the credential was last used successfully, or null if unused.
+	// 最近一次成功使用凭据的 UTC 时间，未使用时为空。
 	LastUsedAt pgtype.Timestamptz `json:"last_used_at"`
 	// Revision is the generated revision database value for Credential.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// CreatedAt is the generated created at database value for Credential.
-	// UTC transaction timestamp when credential metadata was created.
+	// 创建凭据元数据时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for Credential.
-	// UTC transaction timestamp of the latest credential update or rotation.
+	// 最近一次更新或轮换凭据时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // CredentialTeamShare is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Explicit team visibility grants for credentials whose shared scope is team.
+// 当凭据共享范围为 team 时授予的明确团队可见性。
 type CredentialTeamShare struct {
 	// TenantID is the generated tenant id database value for CredentialTeamShare.
-	// Owning tenant shared by both referenced resources.
+	// 两个被引用资源共同所属的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// CredentialID is the generated credential id database value for CredentialTeamShare.
-	// Tenant credential made visible to the team.
+	// 向团队开放可见性的租户凭据。
 	CredentialID uuid.UUID `json:"credential_id"`
 	// TeamID is the generated team id database value for CredentialTeamShare.
-	// Tenant team receiving visibility of the credential.
+	// 获得凭据可见性的租户内团队。
 	TeamID uuid.UUID `json:"team_id"`
 	// CreatedAt is the generated created at database value for CredentialTeamShare.
-	// UTC transaction timestamp when the share was granted.
+	// 授予共享关系时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 // GlobalCredential is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Platform-managed encrypted credentials selectable by tenants but mutable only by platform administrators.
+// 由平台管理、租户可选择但仅平台管理员可修改的加密凭据。
 type GlobalCredential struct {
 	// ID is the generated id database value for GlobalCredential.
-	// Application-generated UUID v7 identifying the global credential.
+	// 应用生成的 UUID v7 全局凭据标识。
 	ID uuid.UUID `json:"id"`
 	// Name is the generated name database value for GlobalCredential.
-	// Globally unique operator label for the credential.
+	// 全局唯一的凭据操作标签。
 	Name string `json:"name"`
 	// Kind is the generated kind database value for GlobalCredential.
-	// Secret representation kind: ssh_key or http_token.
+	// 秘密表示类型：ssh_key 或 http_token。
 	Kind string `json:"kind"`
 	// Ciphertext is the generated ciphertext database value for GlobalCredential.
-	// AEAD ciphertext including its authentication tag.
+	// 包含认证标签的 AEAD 密文。
 	Ciphertext []byte `json:"ciphertext"`
 	// Nonce is the generated nonce database value for GlobalCredential.
-	// Unique 12-byte AEAD nonce used for this encryption.
+	// 本次加密使用的唯一 12 字节 AEAD nonce。
 	Nonce []byte `json:"nonce"`
 	// KeyVersion is the generated key version database value for GlobalCredential.
-	// Master-key version used to derive the row encryption key.
+	// 用于派生行加密密钥的主密钥版本。
 	KeyVersion int32 `json:"key_version"`
 	// Fingerprint is the generated fingerprint database value for GlobalCredential.
-	// Stable non-secret server-derived fingerprint for rotation comparison.
+	// 用于轮换比较的稳定、非敏感服务端指纹。
 	Fingerprint string `json:"fingerprint"`
 	// CreatedBy is the generated created by database value for GlobalCredential.
-	// Platform administrator who created the credential.
+	// 创建凭据的平台管理员。
 	CreatedBy uuid.UUID `json:"created_by"`
 	// LastUsedAt is the generated last used at database value for GlobalCredential.
-	// UTC instant when the credential was last used successfully, or null if unused.
+	// 最近一次成功使用凭据的 UTC 时间，未使用时为空。
 	LastUsedAt pgtype.Timestamptz `json:"last_used_at"`
 	// Revision is the generated revision database value for GlobalCredential.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// CreatedAt is the generated created at database value for GlobalCredential.
-	// UTC transaction timestamp when credential metadata was created.
+	// 创建凭据元数据时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for GlobalCredential.
-	// UTC transaction timestamp of the latest credential update or rotation.
+	// 最近一次更新或轮换凭据时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // GlobalIdempotencyRecord is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Completed identity or platform scoped idempotent results retained for exact replay.
+// 按身份或平台范围保存、用于精确重放的幂等请求结果。
 type GlobalIdempotencyRecord struct {
 	// ContextType is the generated context type database value for GlobalIdempotencyRecord.
-	// Replay context boundary: identity or platform.
+	// 重放上下文边界：identity 或 platform。
 	ContextType string `json:"context_type"`
 	// PrincipalType is the generated principal type database value for GlobalIdempotencyRecord.
-	// Authenticated principal category used in the replay identity.
+	// 用于重放身份的认证主体类别。
 	PrincipalType string `json:"principal_type"`
 	// PrincipalID is the generated principal id database value for GlobalIdempotencyRecord.
-	// Identifier of the authenticated principal used in the replay identity.
+	// 用于重放身份的认证主体标识。
 	PrincipalID uuid.UUID `json:"principal_id"`
 	// OperationID is the generated operation id database value for GlobalIdempotencyRecord.
-	// Exact OpenAPI operationId protected by the idempotency key.
+	// 受幂等键保护的准确 OpenAPI operationId。
 	OperationID string `json:"operation_id"`
 	// IdempotencyKey is the generated idempotency key database value for GlobalIdempotencyRecord.
-	// Client-supplied UUID that identifies one semantic request.
+	// 客户端提供、标识一次语义请求的 UUID。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 	// RequestHash is the generated request hash database value for GlobalIdempotencyRecord.
-	// Raw 32-byte SHA-256 digest of the RFC 8785 canonical request object.
+	// 请求对象按 RFC 8785 规范化后的原始 32 字节 SHA-256 摘要。
 	RequestHash []byte `json:"request_hash"`
 	// ResponseStatus is the generated response status database value for GlobalIdempotencyRecord.
-	// Original HTTP status code returned by the completed request.
+	// 完成请求首次返回的 HTTP 状态码。
 	ResponseStatus int32 `json:"response_status"`
 	// ResponseBody is the generated response body database value for GlobalIdempotencyRecord.
-	// Original JSON response value returned during exact replay.
+	// 精确重放时返回的原始 JSON 响应值。
 	ResponseBody []byte `json:"response_body"`
 	// ExpiresAt is the generated expires at database value for GlobalIdempotencyRecord.
-	// UTC instant after which the replay record may be removed.
+	// 允许删除重放记录的 UTC 时间点。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 	// CreatedAt is the generated created at database value for GlobalIdempotencyRecord.
-	// UTC transaction timestamp when the winning request committed.
+	// 成功请求提交时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 // IdempotencyRecord is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Completed tenant-scoped idempotent request results retained for exact replay.
+// 按租户保存、用于精确重放的幂等请求结果。
 type IdempotencyRecord struct {
 	// TenantID is the generated tenant id database value for IdempotencyRecord.
-	// Tenant forming the outer boundary of the replay identity.
+	// 构成重放身份外层边界的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// PrincipalType is the generated principal type database value for IdempotencyRecord.
-	// Authenticated principal category used in the replay identity.
+	// 用于重放身份的认证主体类别。
 	PrincipalType string `json:"principal_type"`
 	// PrincipalID is the generated principal id database value for IdempotencyRecord.
-	// Identifier of the authenticated principal used in the replay identity.
+	// 用于重放身份的认证主体标识。
 	PrincipalID uuid.UUID `json:"principal_id"`
 	// OperationID is the generated operation id database value for IdempotencyRecord.
-	// Exact OpenAPI operationId protected by the idempotency key.
+	// 受幂等键保护的准确 OpenAPI operationId。
 	OperationID string `json:"operation_id"`
 	// IdempotencyKey is the generated idempotency key database value for IdempotencyRecord.
-	// Client-supplied UUID that identifies one semantic request.
+	// 客户端提供、标识一次语义请求的 UUID。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 	// RequestHash is the generated request hash database value for IdempotencyRecord.
-	// Raw 32-byte SHA-256 digest of the RFC 8785 canonical request object.
+	// 请求对象按 RFC 8785 规范化后的原始 32 字节 SHA-256 摘要。
 	RequestHash []byte `json:"request_hash"`
 	// ResponseStatus is the generated response status database value for IdempotencyRecord.
-	// Original HTTP status code returned by the completed request.
+	// 完成请求首次返回的 HTTP 状态码。
 	ResponseStatus int32 `json:"response_status"`
 	// ResponseBody is the generated response body database value for IdempotencyRecord.
-	// Original JSON response value returned during exact replay.
+	// 精确重放时返回的原始 JSON 响应值。
 	ResponseBody []byte `json:"response_body"`
 	// ExpiresAt is the generated expires at database value for IdempotencyRecord.
-	// UTC instant after which the replay record may be removed.
+	// 允许删除重放记录的 UTC 时间点。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 	// CreatedAt is the generated created at database value for IdempotencyRecord.
-	// UTC transaction timestamp when the winning request committed.
+	// 成功请求提交时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 // Job is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Tenant-visible durable job metadata linked to River execution records.
+// 租户可见、与 River 执行记录关联的持久化任务元数据。
 type Job struct {
 	// TenantID is the generated tenant id database value for Job.
-	// Tenant that owns the job and bounds all job visibility.
+	// 拥有任务并限定全部任务可见性的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// ID is the generated id database value for Job.
-	// Application-generated UUID v7 exposed by the Meridian API.
+	// 对外暴露的应用生成 UUID v7 任务标识。
 	ID uuid.UUID `json:"id"`
 	// RetryOfJobID is the generated retry of job id database value for Job.
-	// Optional same-tenant predecessor job that this job retries.
+	// 该任务重试的同租户前置任务，可为空。
 	RetryOfJobID *uuid.UUID `json:"retry_of_job_id"`
 	// RiverJobID is the generated river job id database value for Job.
-	// Optional internal River job identifier after queue insertion.
+	// 写入队列后可选的内部 River 任务标识。
 	RiverJobID *int64 `json:"river_job_id"`
 	// Type is the generated type database value for Job.
-	// Job behavior identifier from the OpenAPI JobType contract.
+	// 来自 OpenAPI JobType 契约的任务行为标识。
 	Type string `json:"type"`
 	// ScopeType is the generated scope type database value for Job.
-	// Resource category used for authorization, deduplication, and display.
+	// 用于授权、去重和展示的资源类别。
 	ScopeType string `json:"scope_type"`
 	// ScopeID is the generated scope id database value for Job.
-	// Optional UUID of the scoped resource; null for system scope.
+	// 被作用资源的 UUID；系统范围任务为空。
 	ScopeID *uuid.UUID `json:"scope_id"`
 	// RefType is the generated ref type database value for Job.
-	// Optional Git reference category: branch or tag.
+	// 可选的 Git 引用类别：branch 或 tag。
 	RefType *string `json:"ref_type"`
 	// RefName is the generated ref name database value for Job.
-	// Optional normalized Git reference name.
+	// 可选的规范化 Git 引用名。
 	RefName *string `json:"ref_name"`
 	// Trigger is the generated trigger database value for Job.
-	// Origin of the request: manual, schedule, webhook, api, cli, system, retry, or credential-rotated.
+	// 请求来源：manual、schedule、webhook、api、cli、system、retry 或 credential-rotated。
 	Trigger string `json:"trigger"`
 	// Input is the generated input database value for Job.
-	// Non-secret immutable JSON input needed to execute the job.
+	// 执行任务所需的不可变、非敏感 JSON 输入。
 	Input []byte `json:"input"`
 	// Result is the generated result database value for Job.
-	// Optional non-secret JSON result identifiers and counters.
+	// 可选的非敏感 JSON 结果标识和计数。
 	Result []byte `json:"result"`
 	// Status is the generated status database value for Job.
-	// Current durable state from the domain job state machine.
+	// 来自领域任务状态机的当前持久化状态。
 	Status string `json:"status"`
 	// Stage is the generated stage database value for Job.
-	// Optional active or final pipeline stage.
+	// 当前或最终的可选流水线阶段。
 	Stage *string `json:"stage"`
 	// Attempt is the generated attempt database value for Job.
-	// Zero-based count of job execution attempts already started.
+	// 已经开始的任务执行次数，从零开始计数。
 	Attempt int32 `json:"attempt"`
 	// MaxAttempts is the generated max attempts database value for Job.
-	// Maximum number of permitted execution attempts.
+	// 允许的最大执行次数。
 	MaxAttempts int32 `json:"max_attempts"`
 	// NextAttemptAt is the generated next attempt at database value for Job.
-	// Optional UTC instant when a retry becomes eligible.
+	// 重试变为可执行状态的可选 UTC 时间。
 	NextAttemptAt pgtype.Timestamptz `json:"next_attempt_at"`
 	// DedupeKey is the generated dedupe key database value for Job.
-	// Stable semantic key used to collapse concurrent equivalent work.
+	// 用于合并并发等价任务的稳定语义键。
 	DedupeKey string `json:"dedupe_key"`
 	// ActiveGeneration is the generated active generation database value for Job.
-	// Positive generation participating in the active-job uniqueness constraint.
+	// 参与活跃任务唯一约束的正数代次。
 	ActiveGeneration int64 `json:"active_generation"`
 	// Dirty is the generated dirty database value for Job.
-	// Whether newer requested work arrived while this generation was running.
+	// 任务运行期间是否收到更新的工作请求。
 	Dirty bool `json:"dirty"`
 	// ReplaySafe is the generated replay safe database value for Job.
-	// Whether an interrupted external producer may be safely executed again.
+	// 中断的外部生产者是否可以安全再次执行。
 	ReplaySafe bool `json:"replay_safe"`
 	// Error is the generated error database value for Job.
-	// Optional structured non-secret terminal or retryable error.
+	// 可选的结构化、非敏感终态或可重试错误。
 	Error []byte `json:"error"`
 	// StartedAt is the generated started at database value for Job.
-	// UTC instant when execution first entered running state.
+	// 执行首次进入 running 状态的 UTC 时间。
 	StartedAt pgtype.Timestamptz `json:"started_at"`
 	// FinishedAt is the generated finished at database value for Job.
-	// UTC instant when execution reached a terminal state.
+	// 执行进入终态的 UTC 时间。
 	FinishedAt pgtype.Timestamptz `json:"finished_at"`
 	// CreatedAt is the generated created at database value for Job.
-	// UTC transaction timestamp when the job was accepted.
+	// 接受任务时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for Job.
-	// UTC transaction timestamp of the latest job state update.
+	// 最近一次更新任务状态时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // JobStageLog is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Ordered persisted log events for replayable job progress streams.
+// 用于回放任务进度流的有序持久化日志事件。
 type JobStageLog struct {
 	// TenantID is the generated tenant id database value for JobStageLog.
-	// Tenant that owns both the job and this log entry.
+	// 同时拥有任务和日志记录的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// JobID is the generated job id database value for JobStageLog.
-	// Same-tenant Meridian job producing the log entry.
+	// 产生该日志记录的同租户 Meridian 任务。
 	JobID uuid.UUID `json:"job_id"`
 	// Sequence is the generated sequence database value for JobStageLog.
-	// Strictly increasing per-job cursor used by SSE Last-Event-ID replay.
+	// 用于 SSE Last-Event-ID 回放的任务内严格递增游标。
 	Sequence int64 `json:"sequence"`
 	// Stage is the generated stage database value for JobStageLog.
-	// Optional pipeline stage active when the message was emitted.
+	// 写入消息时所在的可选流水线阶段。
 	Stage *string `json:"stage"`
 	// Level is the generated level database value for JobStageLog.
-	// Structured severity: debug, info, warn, or error.
+	// 结构化日志级别：debug、info、warn 或 error。
 	Level string `json:"level"`
 	// Message is the generated message database value for JobStageLog.
-	// Human-readable diagnostic with secrets removed.
+	// 已移除秘密材料的人类可读诊断信息。
 	Message string `json:"message"`
 	// OccurredAt is the generated occurred at database value for JobStageLog.
-	// UTC transaction timestamp when the event was persisted.
+	// 持久化事件时的 UTC 事务时间。
 	OccurredAt pgtype.Timestamptz `json:"occurred_at"`
 	// Attempt is the generated attempt database value for JobStageLog.
-	// One-based River execution attempt that emitted this persisted stage event.
+	// 写入该持久化阶段事件的 River 执行尝试次数，从一开始计数。
 	Attempt int32 `json:"attempt"`
 }
 
 // KnownHost is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Tenant-approved SSH host keys used to prevent repository host impersonation.
+// 租户认可的 SSH 主机密钥，用于防止仓库主机冒充。
 type KnownHost struct {
 	// TenantID is the generated tenant id database value for KnownHost.
-	// Tenant that trusts this host-key identity.
+	// 信任该主机密钥身份的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// ID is the generated id database value for KnownHost.
-	// Application-generated UUID v7 identifying the known-host record.
+	// 应用生成的 UUID v7 known-host 记录标识。
 	ID uuid.UUID `json:"id"`
 	// Host is the generated host database value for KnownHost.
-	// Normalized lowercase DNS name or IP address without brackets.
+	// 不含方括号的规范化小写 DNS 名称或 IP 地址。
 	Host string `json:"host"`
 	// Port is the generated port database value for KnownHost.
-	// SSH TCP port in the inclusive range 1 through 65535.
+	// 取值范围为 1 至 65535 的 SSH TCP 端口。
 	Port int32 `json:"port"`
 	// KeyType is the generated key type database value for KnownHost.
-	// SSH public-key algorithm parsed from the RFC 4253 blob.
+	// 从 RFC 4253 公钥数据解析出的 SSH 算法。
 	KeyType string `json:"key_type"`
 	// PublicKey is the generated public key database value for KnownHost.
-	// Decoded RFC 4253 public-key blob; this contains no private key material.
+	// 解码后的 RFC 4253 公钥数据，不包含私钥材料。
 	PublicKey []byte `json:"public_key"`
 	// Fingerprint is the generated fingerprint database value for KnownHost.
-	// OpenSSH SHA256 fingerprint derived from the complete public-key blob.
+	// 根据完整公钥数据生成的 OpenSSH SHA256 指纹。
 	Fingerprint string `json:"fingerprint"`
 	// Source is the generated source database value for KnownHost.
-	// Trust origin: explicit manual entry or accept_new policy.
+	// 信任来源：手动录入或 accept_new 策略。
 	Source string `json:"source"`
 	// CreatedBy is the generated created by database value for KnownHost.
-	// User who accepted the host key, or null for system-created records.
+	// 接受该主机密钥的用户，系统创建时为空。
 	CreatedBy *uuid.UUID `json:"created_by"`
 	// CreatedAt is the generated created at database value for KnownHost.
-	// UTC transaction timestamp when the host key was trusted.
+	// 信任主机密钥时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for KnownHost.
-	// UTC transaction timestamp of the latest known-host metadata update.
+	// 最近一次更新 known-host 元数据时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // NotificationChannel is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Tenant-owned delivery channel configuration with encrypted webhook secrets.
+// 租户拥有的通知投递通道配置，webhook 秘密使用加密值。
 type NotificationChannel struct {
 	// TenantID is the generated tenant id database value for NotificationChannel.
-	// Tenant that owns and authorizes use of the channel.
+	// 拥有通道并授权使用的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// ID is the generated id database value for NotificationChannel.
-	// Application-generated UUID v7 identifying the channel within its tenant.
+	// 应用生成的 UUID v7 租户内通道标识。
 	ID uuid.UUID `json:"id"`
 	// Type is the generated type database value for NotificationChannel.
-	// Delivery kind: in_app, webhook, or email.
+	// 投递类型：in_app、webhook 或 email。
 	Type string `json:"type"`
 	// Name is the generated name database value for NotificationChannel.
-	// Human-readable tenant-local channel name.
+	// 租户内展示的通道名称。
 	Name string `json:"name"`
 	// EncryptedConfig is the generated encrypted config database value for NotificationChannel.
-	// Encrypted endpoint and secret configuration; no plaintext secret is stored.
+	// 加密后的端点和秘密配置，不保存秘密明文。
 	EncryptedConfig []byte `json:"encrypted_config"`
 	// Enabled is the generated enabled database value for NotificationChannel.
-	// Whether future matching events may be delivered through the channel.
+	// 未来匹配事件是否可以通过该通道投递。
 	Enabled bool `json:"enabled"`
 	// Revision is the generated revision database value for NotificationChannel.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// CreatedAt is the generated created at database value for NotificationChannel.
-	// UTC transaction timestamp when the channel was created.
+	// 创建通道时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for NotificationChannel.
-	// UTC transaction timestamp of the latest channel update or rotation.
+	// 最近一次更新或轮换通道时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // NotifyOutbox is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Transactional outbox entries for at-least-once external and in-app event delivery.
+// 用于至少一次外部和站内事件投递的事务 outbox 记录。
 type NotifyOutbox struct {
 	// TenantID is the generated tenant id database value for NotifyOutbox.
-	// Tenant that owns the event and delivery channel.
+	// 拥有事件和投递通道的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// ID is the generated id database value for NotifyOutbox.
-	// Application-generated UUID v7 identifying this delivery attempt stream.
+	// 应用生成的 UUID v7 投递流标识。
 	ID uuid.UUID `json:"id"`
 	// EventID is the generated event id database value for NotifyOutbox.
-	// Stable UUID shared by all deliveries of one domain event.
+	// 同一领域事件所有投递记录共享的稳定 UUID。
 	EventID uuid.UUID `json:"event_id"`
 	// EventType is the generated event type database value for NotifyOutbox.
-	// Domain event type from the event contract.
+	// 来自事件契约的领域事件类型。
 	EventType string `json:"event_type"`
 	// AggregateID is the generated aggregate id database value for NotifyOutbox.
-	// UUID of the aggregate whose version emitted the event.
+	// 产生事件的聚合根 UUID。
 	AggregateID uuid.UUID `json:"aggregate_id"`
 	// AggregateVersion is the generated aggregate version database value for NotifyOutbox.
-	// Positive aggregate version used for ordering and deduplication.
+	// 用于排序和去重的正数聚合版本。
 	AggregateVersion int64 `json:"aggregate_version"`
 	// Payload is the generated payload database value for NotifyOutbox.
-	// Versioned JSON event payload containing no credential or token secrets.
+	// 不含凭据或令牌秘密的版本化 JSON 事件负载。
 	Payload []byte `json:"payload"`
 	// ChannelID is the generated channel id database value for NotifyOutbox.
-	// Same-tenant notification channel selected for this delivery.
+	// 为本次投递选定的同租户通知通道。
 	ChannelID uuid.UUID `json:"channel_id"`
 	// Status is the generated status database value for NotifyOutbox.
-	// Delivery state: pending, delivering, delivered, or failed.
+	// 投递状态：pending、delivering、delivered 或 failed。
 	Status string `json:"status"`
 	// RetryCount is the generated retry count database value for NotifyOutbox.
-	// Number of failed delivery attempts already completed.
+	// 已经完成的失败投递次数。
 	RetryCount int32 `json:"retry_count"`
 	// NextAttemptAt is the generated next attempt at database value for NotifyOutbox.
-	// UTC instant when the delivery becomes eligible for its next attempt.
+	// 投递下一次变为可执行状态的 UTC 时间。
 	NextAttemptAt pgtype.Timestamptz `json:"next_attempt_at"`
 	// LastError is the generated last error database value for NotifyOutbox.
-	// Latest redacted delivery error, or an empty string before any failure.
+	// 最近一次脱敏投递错误；未失败前为空字符串。
 	LastError string `json:"last_error"`
 	// CreatedAt is the generated created at database value for NotifyOutbox.
-	// UTC transaction timestamp when the event delivery was enqueued.
+	// 创建事件投递记录时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for NotifyOutbox.
-	// UTC transaction timestamp of the latest delivery state update.
+	// 最近一次更新投递状态时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // PlatformSetting is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Singleton platform defaults copied into each tenant at creation time.
+// 平台默认配置；创建租户时复制为租户配置快照。
 type PlatformSetting struct {
 	// ID is the generated id database value for PlatformSetting.
-	// Stable singleton key; the only allowed value is default.
+	// 稳定的单例键，唯一允许的值为 default。
 	ID string `json:"id"`
 	// Settings is the generated settings database value for PlatformSetting.
-	// JSON object containing default quota, tenant settings, view overrides, and notification channel templates.
+	// 包含默认配额、租户设置、视图覆盖和通知通道模板的 JSON 对象。
 	Settings []byte `json:"settings"`
 	// Revision is the generated revision database value for PlatformSetting.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// CreatedAt is the generated created at database value for PlatformSetting.
-	// UTC transaction timestamp when the singleton row was created.
+	// 创建单例记录时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for PlatformSetting.
-	// UTC transaction timestamp of the latest settings update.
+	// 最近一次更新配置时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // Repository is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Tenant-scoped Git repository connections and synchronization configuration.
+// 租户范围内的 Git 仓库连接和同步配置。
 type Repository struct {
 	// TenantID is the generated tenant id database value for Repository.
-	// Tenant that owns the repository configuration.
+	// 拥有仓库配置的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// ID is the generated id database value for Repository.
-	// Application-generated UUID v7 identifying the repository within its tenant.
+	// 应用生成的 UUID v7 租户内仓库标识。
 	ID uuid.UUID `json:"id"`
 	// Url is the generated url database value for Repository.
-	// Credential-free repository URL as submitted for display.
+	// 用于展示的、已去除凭据的仓库 URL。
 	Url string `json:"url"`
 	// CanonicalUrl is the generated canonical url database value for Repository.
-	// Normalized credential-free URL used for uniqueness comparisons.
+	// 用于唯一性比较的规范化、已去除凭据的 URL。
 	CanonicalUrl string `json:"canonical_url"`
 	// CredentialID is the generated credential id database value for Repository.
-	// Optional same-tenant credential used to fetch this repository.
+	// 用于抓取该仓库的可选同租户凭据。
 	CredentialID *uuid.UUID `json:"credential_id"`
 	// GlobalCredentialID is the generated global credential id database value for Repository.
-	// Optional platform credential used to fetch this repository.
+	// 用于抓取该仓库的可选平台凭据。
 	GlobalCredentialID *uuid.UUID `json:"global_credential_id"`
 	// DefaultBranch is the generated default branch database value for Repository.
-	// Default Git branch or ref name used when a request omits a ref.
+	// 请求未指定引用时使用的默认 Git 分支或引用名。
 	DefaultBranch string `json:"default_branch"`
 	// BranchPolicy is the generated branch policy database value for Repository.
-	// JSON branch and tag inclusion policy.
+	// 分支和标签包含规则的 JSON 配置。
 	BranchPolicy []byte `json:"branch_policy"`
 	// FetchConfig is the generated fetch config database value for Repository.
-	// JSON checkout settings including depth, submodules, paths, and host-key policy.
+	// 包含深度、子模块、路径和主机密钥策略的 JSON 检出配置。
 	FetchConfig []byte `json:"fetch_config"`
 	// SyncCron is the generated sync cron database value for Repository.
-	// Optional five-field UTC cron expression; null disables scheduled sync.
+	// 可选的五字段 UTC cron 表达式；为空表示关闭定时同步。
 	SyncCron *string `json:"sync_cron"`
 	// Note is the generated note database value for Repository.
-	// Optional operator note with no secret material.
+	// 不包含秘密材料的可选操作备注。
 	Note *string `json:"note"`
 	// WebhookSecretHash is the generated webhook secret hash database value for Repository.
-	// Optional HMAC verification secret digest; plaintext is not stored.
+	// 可选的 webhook 校验秘密摘要，绝不保存明文。
 	WebhookSecretHash []byte `json:"webhook_secret_hash"`
 	// Health is the generated health database value for Repository.
-	// JSON summary of the latest synchronization health and failure streak.
+	// 最近同步健康状态和连续失败次数的 JSON 摘要。
 	Health []byte `json:"health"`
 	// Revision is the generated revision database value for Repository.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// DeletedAt is the generated deleted at database value for Repository.
-	// UTC soft-deletion instant, or null while the repository is active.
+	// 软删除时间；仓库活跃时为空。
 	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
 	// CreatedAt is the generated created at database value for Repository.
-	// UTC transaction timestamp when the repository was created.
+	// 创建仓库记录时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for Repository.
-	// UTC transaction timestamp of the latest repository update.
+	// 最近一次更新仓库时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // Session is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Browser authentication sessions storing only keyed token and CSRF digests.
+// 浏览器认证会话，只保存令牌和 CSRF 摘要。
 type Session struct {
 	// ID is the generated id database value for Session.
-	// Application-generated UUID v7 identifying the browser session.
+	// 应用生成的 UUID v7 会话标识。
 	ID uuid.UUID `json:"id"`
 	// UserID is the generated user id database value for Session.
-	// Global user authenticated by the session.
+	// 通过该会话认证的全局用户。
 	UserID uuid.UUID `json:"user_id"`
 	// TokenHash is the generated token hash database value for Session.
-	// HMAC-SHA-256 digest of the opaque session token.
+	// 不透明会话令牌的 HMAC-SHA-256 摘要。
 	TokenHash []byte `json:"token_hash"`
 	// CsrfHash is the generated csrf hash database value for Session.
-	// HMAC-SHA-256 digest of the CSRF token paired with the session.
+	// 与会话绑定的 CSRF 令牌 HMAC-SHA-256 摘要。
 	CsrfHash []byte `json:"csrf_hash"`
 	// ExpiresAt is the generated expires at database value for Session.
-	// UTC instant after which the session is invalid.
+	// 会话失效的 UTC 时间点。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 	// RevokedAt is the generated revoked at database value for Session.
-	// UTC instant when the session was explicitly revoked, or null while active.
+	// 主动撤销会话的 UTC 时间点，未撤销时为空。
 	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
 	// LastSeenAt is the generated last seen at database value for Session.
-	// UTC instant of the latest accepted request, or null before first use.
+	// 最近一次接受请求的 UTC 时间，首次使用前为空。
 	LastSeenAt pgtype.Timestamptz `json:"last_seen_at"`
 	// CreatedAt is the generated created at database value for Session.
-	// UTC transaction timestamp when the session was created.
+	// 创建会话记录时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for Session.
-	// UTC transaction timestamp of the latest session metadata update.
+	// 最近一次更新会话元数据时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // Team is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Tenant-scoped groups used for grants and credential sharing.
+// 租户内用于授权和凭据共享的团队。
 type Team struct {
 	// TenantID is the generated tenant id database value for Team.
-	// Owning tenant and first component of every team identity.
+	// 团队所属租户，也是团队标识的第一部分。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// ID is the generated id database value for Team.
-	// Application-generated UUID v7 identifying the team within its tenant.
+	// 应用生成的 UUID v7 团队标识。
 	ID uuid.UUID `json:"id"`
 	// Slug is the generated slug database value for Team.
-	// Tenant-unique lowercase team slug.
+	// 租户内唯一的小写团队标识。
 	Slug string `json:"slug"`
 	// DisplayName is the generated display name database value for Team.
-	// Human-readable team name.
+	// 界面展示的团队名称。
 	DisplayName string `json:"display_name"`
 	// Revision is the generated revision database value for Team.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// CreatedAt is the generated created at database value for Team.
-	// UTC transaction timestamp when the team was created.
+	// 创建团队记录时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for Team.
-	// UTC transaction timestamp of the latest team update.
+	// 最近一次更新团队元数据时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // TeamMember is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Tenant-enforced membership of users in teams.
+// 由租户约束的用户与团队成员关系。
 type TeamMember struct {
 	// TenantID is the generated tenant id database value for TeamMember.
-	// Owning tenant shared by the team and user membership foreign keys.
+	// 团队和成员外键共同所属的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// TeamID is the generated team id database value for TeamMember.
-	// Tenant-scoped team receiving the member.
+	// 接收该成员的租户内团队。
 	TeamID uuid.UUID `json:"team_id"`
 	// UserID is the generated user id database value for TeamMember.
-	// User who must already be a member of the same tenant.
+	// 必须先属于同一租户的用户。
 	UserID uuid.UUID `json:"user_id"`
 	// CreatedAt is the generated created at database value for TeamMember.
-	// UTC transaction timestamp when the user joined the team.
+	// 用户加入团队时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
-// Tenant control-plane records and copied platform defaults.
+// Tenant is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 租户控制面记录及创建时复制的平台默认配置。
 type Tenant struct {
 	// ID is the generated id database value for Tenant.
-	// Application-generated UUID v7 identifying the tenant.
+	// 应用生成的 UUID v7 租户标识。
 	ID uuid.UUID `json:"id"`
 	// Slug is the generated slug database value for Tenant.
-	// Globally unique lowercase slug used in tenant-scoped URLs.
+	// 用于租户 URL 的全局唯一小写标识。
 	Slug string `json:"slug"`
 	// DisplayName is the generated display name database value for Tenant.
-	// Human-readable tenant name shown in the user interface.
+	// 界面展示的租户名称。
 	DisplayName string `json:"display_name"`
 	// Status is the generated status database value for Tenant.
-	// Tenant access state: active or disabled, sourced from the domain contract.
+	// 租户访问状态：active 或 disabled。
 	Status string `json:"status"`
 	// Quota is the generated quota database value for Tenant.
-	// Tenant quota snapshot copied from platform defaults at creation.
+	// 创建租户时复制的平台配额快照。
 	Quota []byte `json:"quota"`
 	// Settings is the generated settings database value for Tenant.
-	// Tenant runtime settings snapshot copied from platform defaults at creation.
+	// 创建租户时复制的平台运行设置快照。
 	Settings []byte `json:"settings"`
 	// Revision is the generated revision database value for Tenant.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// CreatedAt is the generated created at database value for Tenant.
-	// UTC transaction timestamp when the tenant was created.
+	// 创建租户记录时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for Tenant.
-	// UTC transaction timestamp of the latest tenant update.
+	// 最近一次更新租户时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // TenantBlobRef is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Per-tenant reference counts that authorize blob access and support garbage collection.
+// 按租户统计的对象引用数，用于访问控制和垃圾回收。
 type TenantBlobRef struct {
 	// TenantID is the generated tenant id database value for TenantBlobRef.
-	// Tenant that owns the logical references to this blob.
+	// 拥有该对象逻辑引用的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// BlobDigest is the generated blob digest database value for TenantBlobRef.
-	// SHA-256 digest of the referenced global blob.
+	// 被引用全局对象的 SHA-256 摘要。
 	BlobDigest string `json:"blob_digest"`
 	// RefCount is the generated ref count database value for TenantBlobRef.
-	// Number of live tenant-owned rows that reference the blob.
+	// 仍存活的租户数据行对该对象的引用数。
 	RefCount int64 `json:"ref_count"`
 	// LastReferencedAt is the generated last referenced at database value for TenantBlobRef.
-	// UTC timestamp when the tenant most recently added or refreshed a reference.
+	// 租户最近新增或刷新引用时的 UTC 时间。
 	LastReferencedAt pgtype.Timestamptz `json:"last_referenced_at"`
 }
 
 // TenantMember is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Active role assignment joining a global user to a tenant.
+// 用户加入租户后的有效角色关系。
 type TenantMember struct {
 	// TenantID is the generated tenant id database value for TenantMember.
-	// Tenant in which the membership grants permissions.
+	// 授予成员权限的租户。
 	TenantID uuid.UUID `json:"tenant_id"`
 	// UserID is the generated user id database value for TenantMember.
-	// Global user receiving the tenant role.
+	// 获得租户角色的全局用户。
 	UserID uuid.UUID `json:"user_id"`
 	// Role is the generated role database value for TenantMember.
-	// Tenant role: tenant_admin, maintainer, or viewer.
+	// 租户角色：tenant_admin、maintainer 或 viewer。
 	Role string `json:"role"`
 	// CreatedAt is the generated created at database value for TenantMember.
-	// UTC transaction timestamp when membership was granted.
+	// 授予成员关系时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for TenantMember.
-	// UTC transaction timestamp of the latest role change.
+	// 最近一次变更成员角色时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // User is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Global user identities that may hold memberships in multiple tenants.
+// 可加入多个租户的全局用户身份记录。
 type User struct {
 	// ID is the generated id database value for User.
-	// Application-generated UUID v7 identifying the user.
+	// 应用生成的 UUID v7 用户标识。
 	ID uuid.UUID `json:"id"`
 	// Username is the generated username database value for User.
-	// Globally unique login name.
+	// 全局唯一的登录名。
 	Username string `json:"username"`
 	// PasswordHash is the generated password hash database value for User.
-	// Argon2id PHC password verifier; plaintext passwords are never stored.
+	// 密码的 Argon2id PHC 校验值，绝不保存明文密码。
 	PasswordHash string `json:"password_hash"`
 	// DisplayName is the generated display name database value for User.
-	// Human-readable name displayed to other authorized users.
+	// 展示给其他授权用户的名称。
 	DisplayName string `json:"display_name"`
 	// Email is the generated email database value for User.
-	// Optional globally unique email address.
+	// 可选的全局唯一电子邮件地址。
 	Email *string `json:"email"`
 	// Status is the generated status database value for User.
-	// Authentication state: active or disabled.
+	// 认证状态：active 或 disabled。
 	Status string `json:"status"`
 	// IsPlatformAdmin is the generated is platform admin database value for User.
-	// Whether the user has platform control-plane privileges; it does not grant tenant data access.
+	// 是否拥有平台控制面权限，不代表拥有租户数据访问权。
 	IsPlatformAdmin bool `json:"is_platform_admin"`
 	// Revision is the generated revision database value for User.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// CreatedAt is the generated created at database value for User.
-	// UTC transaction timestamp when the user was created.
+	// 创建用户记录时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for User.
-	// UTC transaction timestamp of the latest user update.
+	// 最近一次更新用户元数据时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // UserPreference is the generated PostgreSQL representation of the corresponding Meridian table row.
-// Per-user locale, theme, and default-view preferences created atomically with the user.
+// 与用户一同原子创建的语言、主题和默认视图偏好。
 type UserPreference struct {
 	// UserID is the generated user id database value for UserPreference.
-	// Global user to whom these preferences belong.
+	// 拥有这些偏好的全局用户。
 	UserID uuid.UUID `json:"user_id"`
 	// Locale is the generated locale database value for UserPreference.
-	// Preferred interface locale: zh-CN or en.
+	// 界面语言：zh-CN 或 en。
 	Locale string `json:"locale"`
 	// Theme is the generated theme database value for UserPreference.
-	// Preferred color mode: light, dark, or system.
+	// 颜色模式：light、dark 或 system。
 	Theme string `json:"theme"`
 	// DefaultViews is the generated default views database value for UserPreference.
-	// JSON mapping from asset kind or context to preferred view identifier.
+	// 从资产类型或上下文映射到默认视图标识的 JSON。
 	DefaultViews []byte `json:"default_views"`
 	// Revision is the generated revision database value for UserPreference.
-	// Monotonic optimistic-concurrency revision used to construct the HTTP ETag.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
 	Revision int64 `json:"revision"`
 	// CreatedAt is the generated created at database value for UserPreference.
-	// UTC transaction timestamp when preferences were created.
+	// 创建用户偏好时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for UserPreference.
-	// UTC transaction timestamp of the latest preference update.
+	// 最近一次更新用户偏好时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }

@@ -17,7 +17,10 @@ SELECT count(*)::bigint
 FROM audit_logs
 LEFT JOIN tenants ON tenants.id = audit_logs.tenant_id
 WHERE (NOT $1::boolean OR audit_logs.actor_id = $2::uuid)
-  AND (COALESCE(array_length($3::text[], 1), 0) = 0 OR audit_logs.action = ANY($3::text[]))
+  AND (
+    COALESCE(array_length($3::text[], 1), 0) = 0
+    OR audit_logs.action = ANY($3::text[])
+  )
   AND ($4::text = '' OR audit_logs.target_type = $4::text)
   AND ($5::text = '' OR audit_logs.target_id::text = $5::text)
   AND (NOT $6::boolean OR audit_logs.created_at >= $7::timestamptz)
@@ -49,8 +52,8 @@ type CountPlatformAuditLogsParams struct {
 	TenantSlug string `json:"tenant_slug"`
 }
 
-// CountPlatformAuditLogs returns the exact total for ListPlatformAuditLogs by
-// repeating its cross-tenant predicates and every optional filter.
+// CountPlatformAuditLogs executes the generated CountPlatformAuditLogs database query.
+// 按照 ListPlatformAuditLogs 的跨租户条件和全部可选过滤条件返回准确总数。
 func (q *Queries) CountPlatformAuditLogs(ctx context.Context, arg CountPlatformAuditLogsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countPlatformAuditLogs,
 		arg.ActorIDSet,
@@ -74,7 +77,10 @@ SELECT count(*)::bigint
 FROM audit_logs
 WHERE audit_logs.tenant_id = $1
   AND (NOT $2::boolean OR audit_logs.actor_id = $3::uuid)
-  AND (COALESCE(array_length($4::text[], 1), 0) = 0 OR audit_logs.action = ANY($4::text[]))
+  AND (
+    COALESCE(array_length($4::text[], 1), 0) = 0
+    OR audit_logs.action = ANY($4::text[])
+  )
   AND ($5::text = '' OR audit_logs.target_type = $5::text)
   AND ($6::text = '' OR audit_logs.target_id::text = $6::text)
   AND (NOT $7::boolean OR audit_logs.created_at >= $8::timestamptz)
@@ -105,8 +111,8 @@ type CountTenantAuditLogsParams struct {
 	ToTime pgtype.Timestamptz `json:"to_time"`
 }
 
-// CountTenantAuditLogs returns the exact total for ListTenantAuditLogs by
-// repeating its tenant predicate and every optional filter.
+// CountTenantAuditLogs executes the generated CountTenantAuditLogs database query.
+// 按照 ListTenantAuditLogs 的租户条件和全部可选过滤条件返回准确总数。
 func (q *Queries) CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countTenantAuditLogs,
 		arg.TenantID,
@@ -139,7 +145,10 @@ SELECT
 FROM audit_logs
 LEFT JOIN tenants ON tenants.id = audit_logs.tenant_id
 WHERE (NOT $1::boolean OR audit_logs.actor_id = $2::uuid)
-  AND (COALESCE(array_length($3::text[], 1), 0) = 0 OR audit_logs.action = ANY($3::text[]))
+  AND (
+    COALESCE(array_length($3::text[], 1), 0) = 0
+    OR audit_logs.action = ANY($3::text[])
+  )
   AND ($4::text = '' OR audit_logs.target_type = $4::text)
   AND ($5::text = '' OR audit_logs.target_id::text = $5::text)
   AND (NOT $6::boolean OR audit_logs.created_at >= $7::timestamptz)
@@ -200,8 +209,9 @@ type ListPlatformAuditLogsRow struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
-// ListPlatformAuditLogs returns one newest-first cross-tenant page for the
-// platform control plane. Nullable tenant ownership is retained for platform facts.
+// ListPlatformAuditLogs executes the generated ListPlatformAuditLogs database query.
+// 为平台控制面返回一页按最新时间优先排列的跨租户审计元数据。
+// 平台级记录的可空租户归属会保留在结果中。
 func (q *Queries) ListPlatformAuditLogs(ctx context.Context, arg ListPlatformAuditLogsParams) ([]ListPlatformAuditLogsRow, error) {
 	rows, err := q.db.Query(ctx, listPlatformAuditLogs,
 		arg.ActorIDSet,
@@ -260,7 +270,10 @@ FROM audit_logs
 JOIN tenants ON tenants.id = audit_logs.tenant_id
 WHERE audit_logs.tenant_id = $1
   AND (NOT $2::boolean OR audit_logs.actor_id = $3::uuid)
-  AND (COALESCE(array_length($4::text[], 1), 0) = 0 OR audit_logs.action = ANY($4::text[]))
+  AND (
+    COALESCE(array_length($4::text[], 1), 0) = 0
+    OR audit_logs.action = ANY($4::text[])
+  )
   AND ($5::text = '' OR audit_logs.target_type = $5::text)
   AND ($6::text = '' OR audit_logs.target_id::text = $6::text)
   AND (NOT $7::boolean OR audit_logs.created_at >= $8::timestamptz)
@@ -320,9 +333,9 @@ type ListTenantAuditLogsRow struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
-// ListTenantAuditLogs returns one newest-first page of append-only audit metadata
-// inside an explicit tenant boundary. Business content and secret-bearing columns
-// do not exist in this projection.
+// ListTenantAuditLogs executes the generated ListTenantAuditLogs database query.
+// 返回租户范围内按最新时间优先排列的一页追加式审计元数据。
+// 查询始终受 tenant_id 限制，结果不包含业务内容或携带秘密的字段。
 func (q *Queries) ListTenantAuditLogs(ctx context.Context, arg ListTenantAuditLogsParams) ([]ListTenantAuditLogsRow, error) {
 	rows, err := q.db.Query(ctx, listTenantAuditLogs,
 		arg.TenantID,

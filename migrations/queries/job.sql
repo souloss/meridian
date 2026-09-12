@@ -1,6 +1,6 @@
--- ListPlatformJobs returns redacted cross-tenant job metadata in newest-first order.
--- Inputs, results, errors, attempts, refs, River identifiers, and logs are intentionally excluded.
--- Empty filter arrays and strings mean no restriction; scope identifiers are exposed only for tenant/repository jobs.
+-- 按最新时间优先返回脱敏的跨租户任务元数据。
+-- 结果刻意排除输入、结果、错误、尝试次数、引用、River 标识和日志。
+-- 空过滤数组和空字符串表示不限制；只有租户和仓库范围任务暴露作用域标识。
 -- name: ListPlatformJobs :many
 SELECT
   jobs.id,
@@ -10,14 +10,26 @@ SELECT
   jobs.status,
   jobs.stage,
   jobs.scope_type,
-  COALESCE(CASE WHEN jobs.scope_type IN ('tenant', 'repository') THEN jobs.scope_id::text ELSE NULL::text END, ''::text)::text AS scope_id,
+  COALESCE(
+    CASE
+      WHEN jobs.scope_type IN ('tenant', 'repository') THEN jobs.scope_id::text
+      ELSE NULL::text
+    END,
+    ''::text
+  )::text AS scope_id,
   jobs.created_at,
   jobs.started_at,
   jobs.finished_at
 FROM jobs
 JOIN tenants ON tenants.id = jobs.tenant_id
-WHERE (COALESCE(array_length(sqlc.arg(type_filter)::text[], 1), 0) = 0 OR jobs.type = ANY(sqlc.arg(type_filter)::text[]))
-  AND (COALESCE(array_length(sqlc.arg(status_filter)::text[], 1), 0) = 0 OR jobs.status = ANY(sqlc.arg(status_filter)::text[]))
+WHERE (
+  COALESCE(array_length(sqlc.arg(type_filter)::text[], 1), 0) = 0
+  OR jobs.type = ANY(sqlc.arg(type_filter)::text[])
+)
+  AND (
+    COALESCE(array_length(sqlc.arg(status_filter)::text[], 1), 0) = 0
+    OR jobs.status = ANY(sqlc.arg(status_filter)::text[])
+  )
   AND (sqlc.arg(scope_type)::text = '' OR jobs.scope_type = sqlc.arg(scope_type)::text)
   AND (sqlc.arg(scope_id)::text = '' OR jobs.scope_id::text = sqlc.arg(scope_id)::text)
   AND (sqlc.arg(tenant_slug)::text = '' OR tenants.slug = sqlc.arg(tenant_slug)::text)
@@ -25,20 +37,26 @@ ORDER BY jobs.created_at DESC, jobs.id DESC
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- CountPlatformJobs returns the total redacted platform-job rows matching the supplied filters.
--- It repeats the exact predicates used by ListPlatformJobs so page totals cannot drift from the result set.
+-- 返回匹配给定条件的脱敏平台任务总数。
+-- 复用 ListPlatformJobs 的完整谓词，避免分页总数与结果集不一致。
 -- name: CountPlatformJobs :one
 SELECT count(*)::bigint
 FROM jobs
 JOIN tenants ON tenants.id = jobs.tenant_id
-WHERE (COALESCE(array_length(sqlc.arg(type_filter)::text[], 1), 0) = 0 OR jobs.type = ANY(sqlc.arg(type_filter)::text[]))
-  AND (COALESCE(array_length(sqlc.arg(status_filter)::text[], 1), 0) = 0 OR jobs.status = ANY(sqlc.arg(status_filter)::text[]))
+WHERE (
+  COALESCE(array_length(sqlc.arg(type_filter)::text[], 1), 0) = 0
+  OR jobs.type = ANY(sqlc.arg(type_filter)::text[])
+)
+  AND (
+    COALESCE(array_length(sqlc.arg(status_filter)::text[], 1), 0) = 0
+    OR jobs.status = ANY(sqlc.arg(status_filter)::text[])
+  )
   AND (sqlc.arg(scope_type)::text = '' OR jobs.scope_type = sqlc.arg(scope_type)::text)
   AND (sqlc.arg(scope_id)::text = '' OR jobs.scope_id::text = sqlc.arg(scope_id)::text)
   AND (sqlc.arg(tenant_slug)::text = '' OR tenants.slug = sqlc.arg(tenant_slug)::text);
 
--- GetPlatformJob returns one redacted platform job without tenant-owned payload or execution details.
--- Scope identifiers are retained only for tenant and repository scopes, matching the public PlatformJob contract.
+-- 返回一条脱敏平台任务，不包含租户拥有的负载或执行详情。
+-- 保留租户和仓库范围的作用域标识，与公开 PlatformJob 契约一致。
 -- name: GetPlatformJob :one
 SELECT
   jobs.id,
@@ -48,7 +66,13 @@ SELECT
   jobs.status,
   jobs.stage,
   jobs.scope_type,
-  COALESCE(CASE WHEN jobs.scope_type IN ('tenant', 'repository') THEN jobs.scope_id::text ELSE NULL::text END, ''::text)::text AS scope_id,
+  COALESCE(
+    CASE
+      WHEN jobs.scope_type IN ('tenant', 'repository') THEN jobs.scope_id::text
+      ELSE NULL::text
+    END,
+    ''::text
+  )::text AS scope_id,
   jobs.created_at,
   jobs.started_at,
   jobs.finished_at
@@ -56,39 +80,51 @@ FROM jobs
 JOIN tenants ON tenants.id = jobs.tenant_id
 WHERE jobs.id = sqlc.arg(id);
 
--- ListTenantJobs returns a newest-first page bounded by one tenant identifier.
--- Empty filter arrays and strings mean no restriction; execution input and River identifiers remain internal.
+-- 在一个租户标识边界内按最新时间优先返回任务分页。
+-- 空过滤数组和空字符串表示不限制；执行输入和 River 标识仍为内部字段。
 -- name: ListTenantJobs :many
 SELECT jobs.*
 FROM jobs
 WHERE jobs.tenant_id = sqlc.arg(tenant_id)
-  AND (COALESCE(array_length(sqlc.arg(type_filter)::text[], 1), 0) = 0 OR jobs.type = ANY(sqlc.arg(type_filter)::text[]))
-  AND (COALESCE(array_length(sqlc.arg(status_filter)::text[], 1), 0) = 0 OR jobs.status = ANY(sqlc.arg(status_filter)::text[]))
+  AND (
+    COALESCE(array_length(sqlc.arg(type_filter)::text[], 1), 0) = 0
+    OR jobs.type = ANY(sqlc.arg(type_filter)::text[])
+  )
+  AND (
+    COALESCE(array_length(sqlc.arg(status_filter)::text[], 1), 0) = 0
+    OR jobs.status = ANY(sqlc.arg(status_filter)::text[])
+  )
   AND (sqlc.arg(scope_type)::text = '' OR jobs.scope_type = sqlc.arg(scope_type)::text)
   AND (sqlc.arg(scope_id)::text = '' OR jobs.scope_id::text = sqlc.arg(scope_id)::text)
 ORDER BY jobs.created_at DESC, jobs.id DESC
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- CountTenantJobs returns the exact total for the predicates used by ListTenantJobs.
+-- 返回 ListTenantJobs 所用谓词对应的准确总数。
 -- name: CountTenantJobs :one
 SELECT count(*)::bigint
 FROM jobs
 WHERE jobs.tenant_id = sqlc.arg(tenant_id)
-  AND (COALESCE(array_length(sqlc.arg(type_filter)::text[], 1), 0) = 0 OR jobs.type = ANY(sqlc.arg(type_filter)::text[]))
-  AND (COALESCE(array_length(sqlc.arg(status_filter)::text[], 1), 0) = 0 OR jobs.status = ANY(sqlc.arg(status_filter)::text[]))
+  AND (
+    COALESCE(array_length(sqlc.arg(type_filter)::text[], 1), 0) = 0
+    OR jobs.type = ANY(sqlc.arg(type_filter)::text[])
+  )
+  AND (
+    COALESCE(array_length(sqlc.arg(status_filter)::text[], 1), 0) = 0
+    OR jobs.status = ANY(sqlc.arg(status_filter)::text[])
+  )
   AND (sqlc.arg(scope_type)::text = '' OR jobs.scope_type = sqlc.arg(scope_type)::text)
   AND (sqlc.arg(scope_id)::text = '' OR jobs.scope_id::text = sqlc.arg(scope_id)::text);
 
--- GetTenantJob returns one full tenant-visible job row while retaining the tenant predicate.
+-- 保留租户条件，返回一条租户可见的完整任务记录。
 -- name: GetTenantJob :one
 SELECT *
 FROM jobs
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id);
 
--- GetTenantJobStreamState returns one state row plus the greatest persisted log cursor
--- from a single PostgreSQL statement so SSE never emits a state ahead of its logs.
+-- 在一条 PostgreSQL 语句中返回任务状态和已持久化日志的最大游标，
+-- 确保 SSE 不会发送领先于日志记录的状态。
 -- name: GetTenantJobStreamState :one
 SELECT jobs.*,
   COALESCE((
@@ -101,8 +137,8 @@ FROM jobs
 WHERE jobs.tenant_id = sqlc.arg(tenant_id)
   AND jobs.id = sqlc.arg(id);
 
--- ListTenantJobAttemptLogs batch-loads persisted events for a page of jobs without an N+1 query.
--- The caller groups rows by job, one-based attempt, and stage to construct the API attempt projection.
+-- 批量加载一页任务的持久化事件，避免 N+1 查询。
+-- 调用方按任务、一基尝试次数和阶段分组，构造 API 尝试投影。
 -- name: ListTenantJobAttemptLogs :many
 SELECT *
 FROM job_stage_logs
@@ -110,7 +146,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND job_id = ANY(sqlc.arg(job_ids)::uuid[])
 ORDER BY job_id, attempt, sequence;
 
--- ListTenantJobLogsAfter returns bounded SSE replay rows strictly after a persisted sequence cursor.
+-- 返回持久化序号游标之后、数量受限的 SSE 回放记录。
 -- name: ListTenantJobLogsAfter :many
 SELECT *
 FROM job_stage_logs
@@ -120,7 +156,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
 ORDER BY sequence
 LIMIT sqlc.arg(event_limit);
 
--- LockTenantJobForControl serializes cancellation and manual retry decisions for one tenant job.
+-- 串行化一个租户任务的取消和手动重试决策。
 -- name: LockTenantJobForControl :one
 SELECT *
 FROM jobs
@@ -128,7 +164,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
 FOR UPDATE;
 
--- CancelTenantJob moves only a pending or running tenant job to its durable cancelled terminal state.
+-- 仅将 pending 或 running 的租户任务转为持久化的 cancelled 终态。
 -- name: CancelTenantJob :one
 UPDATE jobs
 SET status = 'cancelled',
@@ -140,7 +176,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND status IN ('pending', 'running')
 RETURNING *;
 
--- LockLatestTenantJobGeneration returns the newest semantic generation while holding its row lock.
+-- 持有行锁时返回最新的语义代次。
 -- name: LockLatestTenantJobGeneration :one
 SELECT *
 FROM jobs
@@ -150,27 +186,40 @@ ORDER BY active_generation DESC
 LIMIT 1
 FOR UPDATE;
 
--- CreateRetriedTenantJob creates a new pending generation from immutable source execution inputs.
--- Result, error, stage, attempt, and timestamps are deliberately reset for the independent retry.
+-- 根据不可变的源执行输入创建一个新的 pending 代次。
+-- 结果、错误、阶段、尝试次数和时间戳会重置，形成独立重试。
 -- name: CreateRetriedTenantJob :one
 INSERT INTO jobs (
   tenant_id, id, retry_of_job_id, type, scope_type, scope_id, ref_type, ref_name,
   trigger, input, status, max_attempts, dedupe_key, active_generation, replay_safe
 )
 SELECT
-  source.tenant_id, sqlc.arg(new_job_id), source.id, source.type, source.scope_type, source.scope_id, source.ref_type, source.ref_name,
-  'retry', source.input, 'pending', source.max_attempts, source.dedupe_key, sqlc.arg(active_generation), source.replay_safe
+  source.tenant_id,
+  sqlc.arg(new_job_id),
+  source.id,
+  source.type,
+  source.scope_type,
+  source.scope_id,
+  source.ref_type,
+  source.ref_name,
+  'retry',
+  source.input,
+  'pending',
+  source.max_attempts,
+  source.dedupe_key,
+  sqlc.arg(active_generation),
+  source.replay_safe
 FROM jobs AS source
 WHERE source.tenant_id = sqlc.arg(tenant_id)
   AND source.id = sqlc.arg(source_job_id)
   AND source.status IN ('failed', 'cancelled')
 RETURNING *;
 
--- LockRetryJobIdempotency serializes one retry key for an authenticated tenant principal.
+-- 为已认证的租户主体串行化一个重试幂等键。
 -- name: LockRetryJobIdempotency :exec
 SELECT pg_advisory_xact_lock(hashtextextended(sqlc.arg(lock_key), 0));
 
--- GetRetryJobIdempotency returns the retained exact response for a retryJob request.
+-- 返回 retryJob 请求保留的准确响应。
 -- name: GetRetryJobIdempotency :one
 SELECT request_hash, response_body, expires_at
 FROM idempotency_records
@@ -181,7 +230,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND idempotency_key = sqlc.arg(idempotency_key)
 FOR UPDATE;
 
--- DeleteRetryJobIdempotency removes an expired retry replay record before key reuse.
+-- 在重新使用幂等键前删除已过期的重试重放记录。
 -- name: DeleteRetryJobIdempotency :exec
 DELETE FROM idempotency_records
 WHERE tenant_id = sqlc.arg(tenant_id)
@@ -190,7 +239,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND operation_id = 'retryJob'
   AND idempotency_key = sqlc.arg(idempotency_key);
 
--- CreateRetryJobIdempotency stores the exact non-secret 202 response for 24-hour replay.
+-- 保存可重放 24 小时的准确、非敏感 202 响应。
 -- name: CreateRetryJobIdempotency :exec
 INSERT INTO idempotency_records (
   tenant_id, principal_type, principal_id, operation_id, idempotency_key,

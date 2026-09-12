@@ -1,4 +1,4 @@
--- CreateUser inserts one global identity with an Argon2id PHC verifier and no plaintext password.
+-- 创建一个全局身份，保存 Argon2id PHC 校验值，不保存密码明文。
 -- name: CreateUser :one
 INSERT INTO users (
   id,
@@ -17,26 +17,26 @@ INSERT INTO users (
 )
 RETURNING *;
 
--- CreateDefaultUserPreferences creates the locale, theme, and view defaults required for a new identity.
+-- 为新身份创建语言、主题和默认视图偏好。
 -- name: CreateDefaultUserPreferences :one
 INSERT INTO user_preferences (user_id)
 VALUES (sqlc.arg(user_id))
 RETURNING *;
 
--- GetUserByUsername returns the global identity matching the exact unique login name.
+-- 按准确且唯一的登录名返回全局身份。
 -- name: GetUserByUsername :one
 SELECT *
 FROM users
 WHERE username = sqlc.arg(username);
 
--- GetUserByID returns the global identity matching the supplied UUID.
+-- 按传入 UUID 返回对应的全局身份。
 -- name: GetUserByID :one
 SELECT *
 FROM users
 WHERE id = sqlc.arg(id);
 
--- ListUsers returns a stable platform-admin page of identities without password or session secrets.
--- The optional search value is intentionally limited to username and display name.
+-- 为平台管理员返回稳定分页的身份元数据，不包含密码或会话秘密。
+-- 可选搜索值只匹配 username 和 display_name。
 -- name: ListUsers :many
 SELECT id, username, display_name, email, status, is_platform_admin, revision, created_at, updated_at
 FROM users
@@ -49,7 +49,7 @@ ORDER BY username, id
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- CountUsers returns the number of identities matching one platform search.
+-- 返回匹配一次平台搜索的身份数量。
 -- name: CountUsers :one
 SELECT count(*)::bigint
 FROM users
@@ -59,7 +59,7 @@ WHERE (
   OR display_name ILIKE '%' || sqlc.arg(search_query)::text || '%'
 );
 
--- PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
+-- 授予平台控制面权限，并递增用户版本号。
 -- name: PromoteUserToPlatformAdmin :one
 UPDATE users
 SET
@@ -69,7 +69,7 @@ SET
 WHERE id = sqlc.arg(id)
 RETURNING *;
 
--- CreateSession persists keyed session and CSRF digests without storing either plaintext token.
+-- 保存会话令牌和 CSRF 摘要，不保存任一令牌的明文。
 -- name: CreateSession :one
 INSERT INTO sessions (
   id,
@@ -86,7 +86,7 @@ INSERT INTO sessions (
 )
 RETURNING *;
 
--- GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
+-- 在调用方指定的时间点，根据令牌摘要认证一个有效浏览器会话和有效用户。
 -- name: GetSessionPrincipalByTokenHash :one
 SELECT
   sessions.id AS session_id,
@@ -108,7 +108,7 @@ WHERE sessions.token_hash = sqlc.arg(token_hash)
   AND sessions.expires_at > sqlc.arg(authenticated_at)
   AND users.status = 'active';
 
--- TouchSession records the latest accepted request time for a non-revoked browser session.
+-- 记录未撤销浏览器会话最近一次被接受请求的时间。
 -- name: TouchSession :exec
 UPDATE sessions
 SET
@@ -117,7 +117,7 @@ SET
 WHERE id = sqlc.arg(id)
   AND revoked_at IS NULL;
 
--- RotateSessionCSRFHash replaces the keyed CSRF digest for one active browser session.
+-- 替换一个有效浏览器会话的 CSRF 摘要。
 -- name: RotateSessionCSRFHash :execrows
 UPDATE sessions
 SET
@@ -127,7 +127,7 @@ WHERE id = sqlc.arg(id)
   AND revoked_at IS NULL
   AND expires_at > sqlc.arg(updated_at);
 
--- RevokeSession atomically revokes one active browser session and reports whether a row changed.
+-- 原子撤销一个有效浏览器会话，并返回是否有记录发生变化。
 -- name: RevokeSession :execrows
 UPDATE sessions
 SET
@@ -136,7 +136,7 @@ SET
 WHERE id = sqlc.arg(id)
   AND revoked_at IS NULL;
 
--- CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
+-- 保存租户范围内的 PAT 元数据和令牌摘要，不保存令牌明文。
 -- name: CreateAPIToken :one
 INSERT INTO api_tokens (
   tenant_id,
@@ -157,7 +157,7 @@ INSERT INTO api_tokens (
 )
 RETURNING *;
 
--- GetAPITokenPrincipalByTokenHash authenticates one active PAT whose user, membership, and tenant remain active.
+-- 根据令牌摘要认证一个用户、成员关系和租户均有效的 PAT。
 -- name: GetAPITokenPrincipalByTokenHash :one
 SELECT
   api_tokens.tenant_id,
@@ -186,7 +186,7 @@ WHERE api_tokens.token_hash = sqlc.arg(token_hash)
   AND users.status = 'active'
   AND tenants.status = 'active';
 
--- TouchAPIToken records the latest successful use of a non-revoked tenant PAT.
+-- 记录未撤销租户 PAT 最近一次成功使用的时间。
 -- name: TouchAPIToken :exec
 UPDATE api_tokens
 SET
@@ -196,14 +196,14 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND revoked_at IS NULL;
 
--- CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
+-- 返回一个用户在一个租户内拥有的 PAT 元数据总数。
 -- name: CountAPITokensByUser :one
 SELECT count(*)
 FROM api_tokens
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND user_id = sqlc.arg(user_id);
 
--- ListAPITokensByUser returns one stable page of PAT metadata for one user inside one explicit tenant boundary.
+-- 在明确的租户边界内，返回一个用户的稳定分页 PAT 元数据。
 -- name: ListAPITokensByUser :many
 SELECT *
 FROM api_tokens
@@ -213,8 +213,8 @@ ORDER BY created_at DESC, id DESC
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- RevokeAPIToken idempotently revokes a PAT owned by one user in one tenant and returns its identifier.
--- Returning an already-revoked matching row preserves idempotency while an absent or foreign row remains not found.
+-- 幂等撤销一个租户内用户拥有的 PAT，并返回其标识。
+-- 返回已经撤销的匹配记录以保持幂等；不存在或属于其他主体的记录仍视为未找到。
 -- name: RevokeAPIToken :one
 UPDATE api_tokens
 SET

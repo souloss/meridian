@@ -1,11 +1,10 @@
--- GetTenantSlugForEvent resolves the stable tenant slug embedded in a domain event envelope.
+-- 解析领域事件信封中使用的稳定租户标识。
 -- name: GetTenantSlugForEvent :one
 SELECT slug
 FROM tenants
 WHERE id = sqlc.arg(tenant_id);
 
--- AppendJobFailureAudit records one append-only, redacted system fact in the
--- same transaction as the job terminal state and its outbound event rows.
+-- 与任务终态和出站事件行在同一事务中记录一条追加式、脱敏的系统事实。
 -- name: AppendJobFailureAudit :one
 INSERT INTO audit_logs (id, tenant_id, actor_id, actor_type, action, target_type, target_id, detail, ip, request_id)
 VALUES (
@@ -14,8 +13,7 @@ VALUES (
 )
 RETURNING *;
 
--- ListEnabledNotificationChannelIDs returns deterministic channel targets for
--- an M0 operational event. M5 subscription routing will provide the narrower target set.
+-- 为 M0 运维事件返回确定性的通道目标；M5 订阅路由会提供更精确的目标集合。
 -- name: ListEnabledNotificationChannelIDs :many
 SELECT id
 FROM notification_channels
@@ -23,8 +21,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND enabled = true
 ORDER BY id;
 
--- CreateNotifyOutbox inserts one channel-specific delivery row while preserving
--- the shared event identifier used by receivers for at-least-once deduplication.
+-- 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 -- name: CreateNotifyOutbox :one
 INSERT INTO notify_outbox (
   tenant_id, id, event_id, event_type, aggregate_id, aggregate_version,
@@ -38,8 +35,8 @@ VALUES (
 ON CONFLICT (tenant_id, event_id, channel_id) DO NOTHING
 RETURNING *;
 
--- ClaimNextOutboxDelivery atomically leases one due delivery with SKIP LOCKED.
--- A stale delivering row is eligible after its lease expires, providing crash recovery.
+-- 使用 SKIP LOCKED 原子租约领取一条到期投递。
+-- 状态为 delivering 的记录在租约过期后重新变为可领取，以便从崩溃中恢复。
 -- name: ClaimNextOutboxDelivery :one
 WITH candidate AS (
   SELECT outbox.tenant_id, outbox.id
@@ -75,8 +72,7 @@ RETURNING
   outbox.retry_count,
   outbox.updated_at AS claimed_at;
 
--- MarkOutboxDelivered completes only the exact active lease so a stale worker
--- cannot overwrite a delivery reclaimed by a newer dispatcher.
+-- 只完成准确的当前租约，防止旧 worker 覆盖新调度器重新领取的投递。
 -- name: MarkOutboxDelivered :execrows
 UPDATE notify_outbox
 SET status = 'delivered',
@@ -87,8 +83,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND status = 'delivering'
   AND updated_at = sqlc.arg(claimed_at)::timestamptz;
 
--- MarkOutboxFailed records one redacted failed attempt and its next eligible
--- time while fencing updates from expired delivery leases.
+-- 记录一次脱敏失败尝试及下一次可执行时间，并隔离已过期租约的更新。
 -- name: MarkOutboxFailed :execrows
 UPDATE notify_outbox
 SET status = 'failed',

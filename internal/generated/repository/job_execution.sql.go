@@ -41,7 +41,8 @@ type AppendJobStageLogParams struct {
 	OccurredAt pgtype.Timestamptz `json:"occurred_at"`
 }
 
-// AppendJobStageLog persists one redacted stage event with its caller-supplied cursor.
+// AppendJobStageLog executes the generated AppendJobStageLog database query.
+// 使用调用方提供的游标持久化一条脱敏阶段事件。
 func (q *Queries) AppendJobStageLog(ctx context.Context, arg AppendJobStageLogParams) (JobStageLog, error) {
 	row := q.db.QueryRow(ctx, appendJobStageLog,
 		arg.TenantID,
@@ -88,8 +89,8 @@ type AttachRiverJobIDParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// AttachRiverJobID links the application UUID job to the internal River sequence
-// in the same transaction that inserted both rows.
+// AttachRiverJobID executes the generated AttachRiverJobID database query.
+// 在插入两行的同一事务中，将应用 UUID 任务关联到内部 River 序号。
 func (q *Queries) AttachRiverJobID(ctx context.Context, arg AttachRiverJobIDParams) (int64, error) {
 	result, err := q.db.Exec(ctx, attachRiverJobID,
 		arg.RiverJobID,
@@ -139,9 +140,9 @@ type FinishJobExecutionParams struct {
 	ExpectedAttempt int32 `json:"expected_attempt"`
 }
 
-// FinishJobExecution records either a terminal result or a retryable failure.
-// Retryable failures remain pending for River's next attempt; terminal failures
-// receive a finished timestamp and a durable failed status.
+// FinishJobExecution executes the generated FinishJobExecution database query.
+// 记录终态结果或可重试失败。
+// 可重试失败保持 pending，等待 River 下一次尝试；终态失败会写入完成时间和 failed 状态。
 func (q *Queries) FinishJobExecution(ctx context.Context, arg FinishJobExecutionParams) (Job, error) {
 	row := q.db.QueryRow(ctx, finishJobExecution,
 		arg.Status,
@@ -190,8 +191,9 @@ const lockJobStageSequence = `-- name: LockJobStageSequence :exec
 SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
 `
 
-// LockJobStageSequence serializes the per-job log cursor inside the caller's transaction.
-// The lock key is derived from tenant and job UUIDs and never contains user content.
+// LockJobStageSequence executes the generated LockJobStageSequence database query.
+// 在调用方事务内串行化单个任务的日志游标。
+// 锁键由租户和任务 UUID 派生，不包含用户内容。
 func (q *Queries) LockJobStageSequence(ctx context.Context, lockKey string) error {
 	_, err := q.db.Exec(ctx, lockJobStageSequence, lockKey)
 	return err
@@ -212,8 +214,8 @@ type NextJobStageSequenceParams struct {
 	JobID uuid.UUID `json:"job_id"`
 }
 
-// NextJobStageSequence returns the next replay cursor after the caller acquires
-// the job-specific advisory transaction lock.
+// NextJobStageSequence executes the generated NextJobStageSequence database query.
+// 调用方取得任务专属事务 advisory lock 后，返回下一个回放游标。
 func (q *Queries) NextJobStageSequence(ctx context.Context, arg NextJobStageSequenceParams) (int64, error) {
 	row := q.db.QueryRow(ctx, nextJobStageSequence, arg.TenantID, arg.JobID)
 	var next_sequence int64
@@ -245,8 +247,9 @@ type SetJobExecutionStageParams struct {
 	ExpectedAttempt int32 `json:"expected_attempt"`
 }
 
-// SetJobExecutionStage records the active pipeline stage without changing the
-// durable lifecycle state. Stage values are constrained by the application DDL.
+// SetJobExecutionStage executes the generated SetJobExecutionStage database query.
+// 记录当前流水线阶段，不改变持久化生命周期状态。
+// 阶段取值受应用 DDL 约束。
 func (q *Queries) SetJobExecutionStage(ctx context.Context, arg SetJobExecutionStageParams) (int64, error) {
 	result, err := q.db.Exec(ctx, setJobExecutionStage,
 		arg.Stage,
@@ -294,9 +297,9 @@ type StartJobExecutionParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// StartJobExecution claims a durable Meridian job for one River attempt.
-// A terminal domain row is intentionally not claimed again; this makes River retries
-// harmless after a worker already committed a terminal result.
+// StartJobExecution executes the generated StartJobExecution database query.
+// 为一次 River 尝试领取持久化 Meridian 任务。
+// 终态领域记录不会再次领取，因此 worker 已提交终态后发生 River 重试也不会产生副作用。
 func (q *Queries) StartJobExecution(ctx context.Context, arg StartJobExecutionParams) (Job, error) {
 	row := q.db.QueryRow(ctx, startJobExecution,
 		arg.Stage,

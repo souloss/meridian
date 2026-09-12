@@ -33,8 +33,8 @@ type AppendJobFailureAuditParams struct {
 	Detail []byte `json:"detail"`
 }
 
-// AppendJobFailureAudit records one append-only, redacted system fact in the
-// same transaction as the job terminal state and its outbound event rows.
+// AppendJobFailureAudit executes the generated AppendJobFailureAudit database query.
+// 与任务终态和出站事件行在同一事务中记录一条追加式、脱敏的系统事实。
 func (q *Queries) AppendJobFailureAudit(ctx context.Context, arg AppendJobFailureAuditParams) (AuditLog, error) {
 	row := q.db.QueryRow(ctx, appendJobFailureAudit,
 		arg.ID,
@@ -133,8 +133,9 @@ type ClaimNextOutboxDeliveryRow struct {
 	ClaimedAt pgtype.Timestamptz `json:"claimed_at"`
 }
 
-// ClaimNextOutboxDelivery atomically leases one due delivery with SKIP LOCKED.
-// A stale delivering row is eligible after its lease expires, providing crash recovery.
+// ClaimNextOutboxDelivery executes the generated ClaimNextOutboxDelivery database query.
+// 使用 SKIP LOCKED 原子租约领取一条到期投递。
+// 状态为 delivering 的记录在租约过期后重新变为可领取，以便从崩溃中恢复。
 func (q *Queries) ClaimNextOutboxDelivery(ctx context.Context, arg ClaimNextOutboxDeliveryParams) (ClaimNextOutboxDeliveryRow, error) {
 	row := q.db.QueryRow(ctx, claimNextOutboxDelivery, arg.ClaimedAt, arg.MaxAttempts, arg.LeaseExpiredAt)
 	var i ClaimNextOutboxDeliveryRow
@@ -189,8 +190,8 @@ type CreateNotifyOutboxParams struct {
 	ChannelID uuid.UUID `json:"channel_id"`
 }
 
-// CreateNotifyOutbox inserts one channel-specific delivery row while preserving
-// the shared event identifier used by receivers for at-least-once deduplication.
+// CreateNotifyOutbox executes the generated CreateNotifyOutbox database query.
+// 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 func (q *Queries) CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error) {
 	row := q.db.QueryRow(ctx, createNotifyOutbox,
 		arg.TenantID,
@@ -228,7 +229,8 @@ FROM tenants
 WHERE id = $1
 `
 
-// GetTenantSlugForEvent resolves the stable tenant slug embedded in a domain event envelope.
+// GetTenantSlugForEvent executes the generated GetTenantSlugForEvent database query.
+// 解析领域事件信封中使用的稳定租户标识。
 func (q *Queries) GetTenantSlugForEvent(ctx context.Context, tenantID uuid.UUID) (string, error) {
 	row := q.db.QueryRow(ctx, getTenantSlugForEvent, tenantID)
 	var slug string
@@ -244,8 +246,8 @@ WHERE tenant_id = $1
 ORDER BY id
 `
 
-// ListEnabledNotificationChannelIDs returns deterministic channel targets for
-// an M0 operational event. M5 subscription routing will provide the narrower target set.
+// ListEnabledNotificationChannelIDs executes the generated ListEnabledNotificationChannelIDs database query.
+// 为 M0 运维事件返回确定性的通道目标；M5 订阅路由会提供更精确的目标集合。
 func (q *Queries) ListEnabledNotificationChannelIDs(ctx context.Context, tenantID uuid.UUID) ([]uuid.UUID, error) {
 	rows, err := q.db.Query(ctx, listEnabledNotificationChannelIDs, tenantID)
 	if err != nil {
@@ -289,8 +291,8 @@ type MarkOutboxDeliveredParams struct {
 	ClaimedAt pgtype.Timestamptz `json:"claimed_at"`
 }
 
-// MarkOutboxDelivered completes only the exact active lease so a stale worker
-// cannot overwrite a delivery reclaimed by a newer dispatcher.
+// MarkOutboxDelivered executes the generated MarkOutboxDelivered database query.
+// 只完成准确的当前租约，防止旧 worker 覆盖新调度器重新领取的投递。
 func (q *Queries) MarkOutboxDelivered(ctx context.Context, arg MarkOutboxDeliveredParams) (int64, error) {
 	result, err := q.db.Exec(ctx, markOutboxDelivered,
 		arg.CompletedAt,
@@ -333,8 +335,8 @@ type MarkOutboxFailedParams struct {
 	ClaimedAt pgtype.Timestamptz `json:"claimed_at"`
 }
 
-// MarkOutboxFailed records one redacted failed attempt and its next eligible
-// time while fencing updates from expired delivery leases.
+// MarkOutboxFailed executes the generated MarkOutboxFailed database query.
+// 记录一次脱敏失败尝试及下一次可执行时间，并隔离已过期租约的更新。
 func (q *Queries) MarkOutboxFailed(ctx context.Context, arg MarkOutboxFailedParams) (int64, error) {
 	result, err := q.db.Exec(ctx, markOutboxFailed,
 		arg.NextAttemptAt,

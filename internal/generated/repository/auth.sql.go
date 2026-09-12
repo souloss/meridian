@@ -27,7 +27,8 @@ type CountAPITokensByUserParams struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
+// CountAPITokensByUser executes the generated CountAPITokensByUser database query.
+// 返回一个用户在一个租户内拥有的 PAT 元数据总数。
 func (q *Queries) CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countAPITokensByUser, arg.TenantID, arg.UserID)
 	var count int64
@@ -45,7 +46,8 @@ WHERE (
 )
 `
 
-// CountUsers returns the number of identities matching one platform search.
+// CountUsers executes the generated CountUsers database query.
+// 返回匹配一次平台搜索的身份数量。
 func (q *Queries) CountUsers(ctx context.Context, searchQuery string) (int64, error) {
 	row := q.db.QueryRow(ctx, countUsers, searchQuery)
 	var column_1 int64
@@ -92,7 +94,8 @@ type CreateAPITokenParams struct {
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
+// CreateAPIToken executes the generated CreateAPIToken database query.
+// 保存租户范围内的 PAT 元数据和令牌摘要，不保存令牌明文。
 func (q *Queries) CreateAPIToken(ctx context.Context, arg CreateAPITokenParams) (ApiToken, error) {
 	row := q.db.QueryRow(ctx, createAPIToken,
 		arg.TenantID,
@@ -126,7 +129,8 @@ VALUES ($1)
 RETURNING user_id, locale, theme, default_views, revision, created_at, updated_at
 `
 
-// CreateDefaultUserPreferences creates the locale, theme, and view defaults required for a new identity.
+// CreateDefaultUserPreferences executes the generated CreateDefaultUserPreferences database query.
+// 为新身份创建语言、主题和默认视图偏好。
 func (q *Queries) CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error) {
 	row := q.db.QueryRow(ctx, createDefaultUserPreferences, userID)
 	var i UserPreference
@@ -173,7 +177,8 @@ type CreateSessionParams struct {
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// CreateSession persists keyed session and CSRF digests without storing either plaintext token.
+// CreateSession executes the generated CreateSession database query.
+// 保存会话令牌和 CSRF 摘要，不保存任一令牌的明文。
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
 	row := q.db.QueryRow(ctx, createSession,
 		arg.ID,
@@ -232,7 +237,8 @@ type CreateUserParams struct {
 	IsPlatformAdmin bool `json:"is_platform_admin"`
 }
 
-// CreateUser inserts one global identity with an Argon2id PHC verifier and no plaintext password.
+// CreateUser executes the generated CreateUser database query.
+// 创建一个全局身份，保存 Argon2id PHC 校验值，不保存密码明文。
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser,
 		arg.ID,
@@ -327,7 +333,8 @@ type GetAPITokenPrincipalByTokenHashRow struct {
 	TenantSlug string `json:"tenant_slug"`
 }
 
-// GetAPITokenPrincipalByTokenHash authenticates one active PAT whose user, membership, and tenant remain active.
+// GetAPITokenPrincipalByTokenHash executes the generated GetAPITokenPrincipalByTokenHash database query.
+// 根据令牌摘要认证一个用户、成员关系和租户均有效的 PAT。
 func (q *Queries) GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAPITokenPrincipalByTokenHashParams) (GetAPITokenPrincipalByTokenHashRow, error) {
 	row := q.db.QueryRow(ctx, getAPITokenPrincipalByTokenHash, arg.TokenHash, arg.AuthenticatedAt)
 	var i GetAPITokenPrincipalByTokenHashRow
@@ -408,7 +415,8 @@ type GetSessionPrincipalByTokenHashRow struct {
 	UserUpdatedAt pgtype.Timestamptz `json:"user_updated_at"`
 }
 
-// GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
+// GetSessionPrincipalByTokenHash executes the generated GetSessionPrincipalByTokenHash database query.
+// 在调用方指定的时间点，根据令牌摘要认证一个有效浏览器会话和有效用户。
 func (q *Queries) GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error) {
 	row := q.db.QueryRow(ctx, getSessionPrincipalByTokenHash, arg.TokenHash, arg.AuthenticatedAt)
 	var i GetSessionPrincipalByTokenHashRow
@@ -435,7 +443,8 @@ FROM users
 WHERE id = $1
 `
 
-// GetUserByID returns the global identity matching the supplied UUID.
+// GetUserByID executes the generated GetUserByID database query.
+// 按传入 UUID 返回对应的全局身份。
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i User
@@ -460,7 +469,8 @@ FROM users
 WHERE username = $1
 `
 
-// GetUserByUsername returns the global identity matching the exact unique login name.
+// GetUserByUsername executes the generated GetUserByUsername database query.
+// 按准确且唯一的登录名返回全局身份。
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByUsername, username)
 	var i User
@@ -501,7 +511,8 @@ type ListAPITokensByUserParams struct {
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListAPITokensByUser returns one stable page of PAT metadata for one user inside one explicit tenant boundary.
+// ListAPITokensByUser executes the generated ListAPITokensByUser database query.
+// 在明确的租户边界内，返回一个用户的稳定分页 PAT 元数据。
 func (q *Queries) ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUserParams) ([]ApiToken, error) {
 	rows, err := q.db.Query(ctx, listAPITokensByUser,
 		arg.TenantID,
@@ -584,8 +595,9 @@ type ListUsersRow struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
-// ListUsers returns a stable platform-admin page of identities without password or session secrets.
-// The optional search value is intentionally limited to username and display name.
+// ListUsers executes the generated ListUsers database query.
+// 为平台管理员返回稳定分页的身份元数据，不包含密码或会话秘密。
+// 可选搜索值只匹配 username 和 display_name。
 func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error) {
 	rows, err := q.db.Query(ctx, listUsers, arg.SearchQuery, arg.PageOffset, arg.PageLimit)
 	if err != nil {
@@ -634,7 +646,8 @@ type PromoteUserToPlatformAdminParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
+// PromoteUserToPlatformAdmin executes the generated PromoteUserToPlatformAdmin database query.
+// 授予平台控制面权限，并递增用户版本号。
 func (q *Queries) PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error) {
 	row := q.db.QueryRow(ctx, promoteUserToPlatformAdmin, arg.UpdatedAt, arg.ID)
 	var i User
@@ -676,8 +689,9 @@ type RevokeAPITokenParams struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// RevokeAPIToken idempotently revokes a PAT owned by one user in one tenant and returns its identifier.
-// Returning an already-revoked matching row preserves idempotency while an absent or foreign row remains not found.
+// RevokeAPIToken executes the generated RevokeAPIToken database query.
+// 幂等撤销一个租户内用户拥有的 PAT，并返回其标识。
+// 返回已经撤销的匹配记录以保持幂等；不存在或属于其他主体的记录仍视为未找到。
 func (q *Queries) RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error) {
 	row := q.db.QueryRow(ctx, revokeAPIToken,
 		arg.RevokedAt,
@@ -707,7 +721,8 @@ type RevokeSessionParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// RevokeSession atomically revokes one active browser session and reports whether a row changed.
+// RevokeSession executes the generated RevokeSession database query.
+// 原子撤销一个有效浏览器会话，并返回是否有记录发生变化。
 func (q *Queries) RevokeSession(ctx context.Context, arg RevokeSessionParams) (int64, error) {
 	result, err := q.db.Exec(ctx, revokeSession, arg.RevokedAt, arg.ID)
 	if err != nil {
@@ -736,7 +751,8 @@ type RotateSessionCSRFHashParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// RotateSessionCSRFHash replaces the keyed CSRF digest for one active browser session.
+// RotateSessionCSRFHash executes the generated RotateSessionCSRFHash database query.
+// 替换一个有效浏览器会话的 CSRF 摘要。
 func (q *Queries) RotateSessionCSRFHash(ctx context.Context, arg RotateSessionCSRFHashParams) (int64, error) {
 	result, err := q.db.Exec(ctx, rotateSessionCSRFHash, arg.CsrfHash, arg.UpdatedAt, arg.ID)
 	if err != nil {
@@ -765,7 +781,8 @@ type TouchAPITokenParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// TouchAPIToken records the latest successful use of a non-revoked tenant PAT.
+// TouchAPIToken executes the generated TouchAPIToken database query.
+// 记录未撤销租户 PAT 最近一次成功使用的时间。
 func (q *Queries) TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error {
 	_, err := q.db.Exec(ctx, touchAPIToken, arg.UsedAt, arg.TenantID, arg.ID)
 	return err
@@ -788,7 +805,8 @@ type TouchSessionParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// TouchSession records the latest accepted request time for a non-revoked browser session.
+// TouchSession executes the generated TouchSession database query.
+// 记录未撤销浏览器会话最近一次被接受请求的时间。
 func (q *Queries) TouchSession(ctx context.Context, arg TouchSessionParams) error {
 	_, err := q.db.Exec(ctx, touchSession, arg.SeenAt, arg.ID)
 	return err

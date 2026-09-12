@@ -32,7 +32,8 @@ type CountListedRepositoriesParams struct {
 	SearchQuery string `json:"search_query"`
 }
 
-// CountListedRepositories returns the number of active repositories matching one tenant search.
+// CountListedRepositories executes the generated CountListedRepositories database query.
+// 返回匹配一次租户搜索的有效仓库数量。
 func (q *Queries) CountListedRepositories(ctx context.Context, arg CountListedRepositoriesParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countListedRepositories, arg.TenantID, arg.SearchQuery)
 	var column_1 int64
@@ -59,8 +60,9 @@ type CountRepositoriesRow struct {
 	LimitCount int64 `json:"limit_count"`
 }
 
-// CountRepositories returns active repository count and the tenant's frozen repository quota.
-// The quota is read from the tenant snapshot, never from a mutable platform default.
+// CountRepositories executes the generated CountRepositories database query.
+// 返回有效仓库数量和租户固定的仓库配额。
+// 配额读取租户快照，不读取可变的平台默认值。
 func (q *Queries) CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error) {
 	row := q.db.QueryRow(ctx, countRepositories, tenantID)
 	var i CountRepositoriesRow
@@ -106,8 +108,9 @@ type CreateRepositoryParams struct {
 	Note *string `json:"note"`
 }
 
-// CreateRepository persists repository configuration and initializes an empty health summary.
-// URL fields are credential-free; credentials are referenced only by UUID foreign keys.
+// CreateRepository executes the generated CreateRepository database query.
+// 持久化仓库配置，并初始化空的健康状态摘要。
+// 仓库 URL 字段不含凭据，凭据只通过 UUID 外键引用。
 func (q *Queries) CreateRepository(ctx context.Context, arg CreateRepositoryParams) (Repository, error) {
 	row := q.db.QueryRow(ctx, createRepository,
 		arg.TenantID,
@@ -168,8 +171,9 @@ type DeleteRepositoryParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// DeleteRepository soft-deletes a repository and makes its URL/branch reusable only per policy.
-// Historical job and audit rows remain tenant-scoped after this update.
+// DeleteRepository executes the generated DeleteRepository database query.
+// 软删除仓库；URL 和分支能否复用由策略决定。
+// 历史任务和审计记录在更新后仍保持租户范围。
 func (q *Queries) DeleteRepository(ctx context.Context, arg DeleteRepositoryParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteRepository,
 		arg.DeletedAt,
@@ -200,7 +204,8 @@ type GetRepositoryParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// GetRepository returns one active repository; soft-deleted rows intentionally appear absent.
+// GetRepository executes the generated GetRepository database query.
+// 返回一条有效仓库；软删除记录按设计视为不存在。
 func (q *Queries) GetRepository(ctx context.Context, arg GetRepositoryParams) (Repository, error) {
 	row := q.db.QueryRow(ctx, getRepository, arg.TenantID, arg.ID)
 	var i Repository
@@ -253,8 +258,9 @@ type ListRepositoriesParams struct {
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListRepositories returns active repositories in deterministic canonical URL and UUID order.
-// The query and all predicates retain the tenant boundary even when the search string is empty.
+// ListRepositories executes the generated ListRepositories database query.
+// 按规范化 URL 和 UUID 的确定顺序返回有效仓库。
+// 即使搜索字符串为空，查询及全部谓词仍保留租户边界。
 func (q *Queries) ListRepositories(ctx context.Context, arg ListRepositoriesParams) ([]Repository, error) {
 	rows, err := q.db.Query(ctx, listRepositories,
 		arg.TenantID,
@@ -305,8 +311,9 @@ WHERE id = $1
 FOR UPDATE
 `
 
-// LockRepositoryQuota serializes repository creation against the tenant's repository quota.
-// The repository adapter holds this row lock while counting and inserting, so concurrent creates cannot oversubscribe a quota.
+// LockRepositoryQuota executes the generated LockRepositoryQuota database query.
+// 使用租户配额行锁串行化仓库创建。
+// 适配器在计数和插入期间持有该锁，避免并发创建超过租户配额。
 func (q *Queries) LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, lockRepositoryQuota, tenantID)
 	var limit_count int64
@@ -361,9 +368,9 @@ type ResolveRepositoryCredentialRow struct {
 	IsGlobal bool `json:"is_global"`
 }
 
-// ResolveRepositoryCredential resolves one tenant-visible credential UUID to exactly one owning table.
-// Tenant credentials are filtered by the same visibility predicate as the credential list endpoint;
-// global credentials are selectable by every active member but remain platform-admin managed.
+// ResolveRepositoryCredential executes the generated ResolveRepositoryCredential database query.
+// 将一个租户可见的凭据 UUID 解析到唯一的所属表。
+// 租户凭据使用与凭据列表相同的可见性条件；平台凭据可被有效成员选择，但仍由平台管理员管理。
 func (q *Queries) ResolveRepositoryCredential(ctx context.Context, arg ResolveRepositoryCredentialParams) (ResolveRepositoryCredentialRow, error) {
 	row := q.db.QueryRow(ctx, resolveRepositoryCredential, arg.TenantID, arg.CredentialID, arg.UserID)
 	var i ResolveRepositoryCredentialRow
@@ -374,13 +381,25 @@ func (q *Queries) ResolveRepositoryCredential(ctx context.Context, arg ResolveRe
 const updateRepository = `-- name: UpdateRepository :one
 UPDATE repositories
 SET
-  credential_id = CASE WHEN $1::boolean THEN $2 ELSE credential_id END,
-  global_credential_id = CASE WHEN $3::boolean THEN $4 ELSE global_credential_id END,
+  credential_id = CASE
+    WHEN $1::boolean THEN $2
+    ELSE credential_id
+  END,
+  global_credential_id = CASE
+    WHEN $3::boolean THEN $4
+    ELSE global_credential_id
+  END,
   default_branch = COALESCE($5, default_branch),
   branch_policy = COALESCE($6, branch_policy),
   fetch_config = COALESCE($7, fetch_config),
-  sync_cron = CASE WHEN $8::boolean THEN $9 ELSE sync_cron END,
-  note = CASE WHEN $10::boolean THEN $11 ELSE note END,
+  sync_cron = CASE
+    WHEN $8::boolean THEN $9
+    ELSE sync_cron
+  END,
+  note = CASE
+    WHEN $10::boolean THEN $11
+    ELSE note
+  END,
   revision = revision + 1,
   updated_at = $12
 WHERE tenant_id = $13
@@ -424,8 +443,9 @@ type UpdateRepositoryParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateRepository conditionally updates explicit repository fields and advances its revision.
-// Set flags preserve the distinction between omitted fields and explicit JSON null values.
+// UpdateRepository executes the generated UpdateRepository database query.
+// 有条件地更新明确提供的仓库字段并递增版本号。
+// 字段 set 标志保留字段省略和显式 JSON null 之间的区别。
 func (q *Queries) UpdateRepository(ctx context.Context, arg UpdateRepositoryParams) (Repository, error) {
 	row := q.db.QueryRow(ctx, updateRepository,
 		arg.SetCredentialID,

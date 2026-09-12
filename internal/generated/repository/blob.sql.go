@@ -31,8 +31,8 @@ type AddTenantBlobReferenceParams struct {
 	ReferencedAt pgtype.Timestamptz `json:"referenced_at"`
 }
 
-// AddTenantBlobReference creates or increments one tenant reference after the
-// caller has serialized and validated unique-byte quota accounting.
+// AddTenantBlobReference executes the generated AddTenantBlobReference database query.
+// 调用方完成串行化并校验唯一字节配额后，创建或递增一条租户对象引用。
 func (q *Queries) AddTenantBlobReference(ctx context.Context, arg AddTenantBlobReferenceParams) (TenantBlobRef, error) {
 	row := q.db.QueryRow(ctx, addTenantBlobReference, arg.TenantID, arg.BlobDigest, arg.ReferencedAt)
 	var i TenantBlobRef
@@ -53,8 +53,8 @@ WHERE tenant_blob_refs.tenant_id = $1
   AND tenant_blob_refs.ref_count > 0
 `
 
-// CountTenantUniqueBlobBytes sums each positively referenced global blob once
-// so repeated revisions of identical content do not consume quota again.
+// CountTenantUniqueBlobBytes executes the generated CountTenantUniqueBlobBytes database query.
+// 每个有正引用的全局对象只计入一次，避免相同内容的重复版本重复消耗配额。
 func (q *Queries) CountTenantUniqueBlobBytes(ctx context.Context, tenantID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countTenantUniqueBlobBytes, tenantID)
 	var current_bytes int64
@@ -81,8 +81,8 @@ type CreateBlobMetadataParams struct {
 	MediaType string `json:"media_type"`
 }
 
-// CreateBlobMetadata inserts immutable content-addressed metadata and returns
-// no row when another tenant or request already registered the same digest.
+// CreateBlobMetadata executes the generated CreateBlobMetadata database query.
+// 写入不可变的内容寻址元数据；其他租户或请求已登记相同摘要时不返回记录。
 func (q *Queries) CreateBlobMetadata(ctx context.Context, arg CreateBlobMetadataParams) (Blob, error) {
 	row := q.db.QueryRow(ctx, createBlobMetadata,
 		arg.BlobDigest,
@@ -107,7 +107,8 @@ FROM blobs
 WHERE blob_digest = $1
 `
 
-// GetBlobMetadata returns immutable metadata for validating a reused digest.
+// GetBlobMetadata executes the generated GetBlobMetadata database query.
+// 返回不可变对象元数据，用于校验重复使用的摘要。
 func (q *Queries) GetBlobMetadata(ctx context.Context, blobDigest string) (Blob, error) {
 	row := q.db.QueryRow(ctx, getBlobMetadata, blobDigest)
 	var i Blob
@@ -136,7 +137,8 @@ type GetTenantBlobReferenceParams struct {
 	BlobDigest string `json:"blob_digest"`
 }
 
-// GetTenantBlobReference returns the current count after the caller locks the tenant quota row.
+// GetTenantBlobReference executes the generated GetTenantBlobReference database query.
+// 调用方锁定租户配额行后，返回当前对象引用数。
 func (q *Queries) GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error) {
 	row := q.db.QueryRow(ctx, getTenantBlobReference, arg.TenantID, arg.BlobDigest)
 	var i TenantBlobRef
@@ -157,8 +159,8 @@ WHERE id = $1
 FOR UPDATE
 `
 
-// LockTenantStorageQuota serializes all tenant blob-reference accounting and
-// returns the frozen unique-byte quota copied into the tenant snapshot.
+// LockTenantStorageQuota executes the generated LockTenantStorageQuota database query.
+// 串行化租户对象引用的全部配额核算，并返回复制到租户快照中的固定字节配额。
 func (q *Queries) LockTenantStorageQuota(ctx context.Context, tenantID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, lockTenantStorageQuota, tenantID)
 	var limit_bytes int64

@@ -1,5 +1,5 @@
--- CreateCredential inserts one tenant-owned encrypted credential and returns metadata plus ciphertext.
--- Secret plaintext is never accepted by SQL; the service supplies the encrypted projection only.
+-- 写入一条租户拥有的加密凭据，并返回元数据和密文。
+-- 查询不会接收秘密明文，服务层只提供加密后的投影。
 -- name: CreateCredential :one
 INSERT INTO credentials (
   tenant_id, id, name, kind, ciphertext, nonce, key_version, fingerprint,
@@ -11,9 +11,8 @@ INSERT INTO credentials (
 )
 RETURNING *;
 
--- ListTenantCredentials returns credentials visible to one user inside one active tenant.
--- Team visibility is evaluated by a same-tenant team membership predicate. Global credentials are
--- appended as tenant-visible records with is_global=true and a tenant-wide sharing projection.
+-- 返回一个用户在一个有效租户内可见的凭据。
+-- 团队可见性通过同租户团队成员条件判断；平台凭据以 is_global=true 和租户共享投影追加返回。
 -- name: ListTenantCredentials :many
 SELECT *
 FROM (
@@ -86,7 +85,7 @@ ORDER BY visible_credentials.created_at DESC, visible_credentials.id DESC
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- CountTenantCredentials counts visible tenant-owned and global credentials for one tenant member.
+-- 统计一个租户成员可见的租户凭据和平台凭据数量。
 -- name: CountTenantCredentials :one
 SELECT (
   SELECT count(*)
@@ -111,7 +110,7 @@ SELECT (
     )
 )::bigint + (SELECT count(*) FROM global_credentials)::bigint;
 
--- GetTenantCredential returns one visible tenant credential and its team-share identifiers.
+-- 返回一条可见的租户凭据及其团队共享标识。
 -- name: GetTenantCredential :one
 SELECT
   c.tenant_id,
@@ -159,15 +158,15 @@ GROUP BY c.tenant_id, c.id, c.name, c.kind, c.ciphertext, c.nonce, c.key_version
   c.fingerprint, c.shared_scope, c.created_by, c.last_used_at, c.revision,
   c.created_at, c.updated_at;
 
--- GetTenantCredentialForMutation returns one tenant credential without visibility filtering.
--- The service has already authorized the tenant operation; this query preserves a 404/412 distinction.
+-- 返回一条不经过可见性过滤的租户凭据。
+-- 服务层已完成租户操作授权，本查询保留 404 与 412 的区别。
 -- name: GetTenantCredentialForMutation :one
 SELECT *
 FROM credentials
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id);
 
--- UpdateCredentialMetadata conditionally updates tenant credential metadata and advances its revision.
+-- 有条件地更新租户凭据元数据并递增版本号。
 -- name: UpdateCredentialMetadata :one
 UPDATE credentials
 SET
@@ -180,18 +179,18 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND revision = sqlc.arg(expected_revision)
 RETURNING *;
 
--- ReplaceCredentialTeamShares removes and recreates the complete team-share projection in one transaction.
+-- 在一个事务内删除并重建完整的凭据团队共享投影。
 -- name: ReplaceCredentialTeamShares :exec
 DELETE FROM credential_team_shares
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND credential_id = sqlc.arg(credential_id);
 
--- AddCredentialTeamShare grants one same-tenant team visibility entry.
+-- 授予一条同租户团队可见性关系。
 -- name: AddCredentialTeamShare :exec
 INSERT INTO credential_team_shares (tenant_id, credential_id, team_id)
 VALUES (sqlc.arg(tenant_id), sqlc.arg(credential_id), sqlc.arg(team_id));
 
--- ListCredentialTeamShares returns the complete ordered team-share set for one tenant credential.
+-- 返回一条租户凭据完整且有序的团队共享集合。
 -- name: ListCredentialTeamShares :many
 SELECT team_id
 FROM credential_team_shares
@@ -199,7 +198,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND credential_id = sqlc.arg(credential_id)
 ORDER BY team_id;
 
--- CountCredentialRepositories counts active repositories referencing a tenant credential.
+-- 统计引用某条租户凭据的有效仓库数量。
 -- name: CountCredentialRepositories :one
 SELECT count(*)
 FROM repositories
@@ -207,28 +206,34 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND credential_id = sqlc.arg(credential_id)
   AND deleted_at IS NULL;
 
--- UnbindCredentialRepositories clears all references after the active-reference policy check.
--- Archived repositories retain their health and history but cannot retain a deleted credential FK.
+-- 通过有效引用策略检查后，清除所有仓库引用。
+-- 归档仓库保留健康状态和历史，但不能继续持有已删除凭据的外键。
 -- name: UnbindCredentialRepositories :exec
 UPDATE repositories
 SET
   credential_id = NULL,
   revision = revision + 1,
   updated_at = sqlc.arg(updated_at),
-  health = CASE WHEN deleted_at IS NULL
-    THEN jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"credential was deleted"}'::jsonb, true)
-    ELSE health END
+  health = CASE
+    WHEN deleted_at IS NULL THEN jsonb_set(
+      COALESCE(health, '{}'::jsonb),
+      '{lastError}',
+      '{"class":"auth","message":"credential was deleted"}'::jsonb,
+      true
+    )
+    ELSE health
+  END
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND credential_id = sqlc.arg(credential_id);
 
--- DeleteCredential removes a tenant credential after the caller has applied reference and ETag checks.
+-- 调用方完成引用和 ETag 检查后，删除一条租户凭据。
 -- name: DeleteCredential :execrows
 DELETE FROM credentials
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND revision = sqlc.arg(expected_revision);
 
--- RotateCredentialSecret conditionally replaces encrypted secret material and advances its revision.
+-- 有条件地替换加密秘密材料并递增凭据版本号。
 -- name: RotateCredentialSecret :one
 UPDATE credentials
 SET
@@ -243,7 +248,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND revision = sqlc.arg(expected_revision)
 RETURNING *;
 
--- ListRepositoriesForCredential returns non-deleted repository references in contract response order.
+-- 按契约响应顺序返回未删除仓库对该凭据的引用。
 -- name: ListRepositoriesForCredential :many
 SELECT
   repositories.tenant_id,
@@ -257,8 +262,8 @@ WHERE repositories.tenant_id = sqlc.arg(tenant_id)
   AND repositories.deleted_at IS NULL
 ORDER BY tenants.slug, repositories.id;
 
--- LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
--- A pending or running row is reused; terminal rows advance active_generation for new work.
+-- 串行化一个仓库分支的凭据轮换去重。
+-- 状态为 pending 或 running 的记录会复用；终态记录会递增 active_generation 以接受新工作。
 -- name: LockLatestCredentialSyncJob :one
 SELECT id, tenant_id, status, active_generation
 FROM jobs
@@ -268,8 +273,8 @@ ORDER BY active_generation DESC
 LIMIT 1
 FOR UPDATE;
 
--- CreateCredentialSyncJob records one durable default-branch repository sync request.
--- The input contains only the non-secret credential identifier and rotation reason.
+-- 记录一条持久化的默认分支仓库同步请求。
+-- 输入只包含非敏感凭据标识和轮换原因。
 -- name: CreateCredentialSyncJob :one
 INSERT INTO jobs (
   tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
@@ -282,12 +287,12 @@ INSERT INTO jobs (
 ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
 RETURNING *;
 
--- LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
--- The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
+-- 在并发 HTTP 请求之间串行化一个轮换幂等键。
+-- 锁键由认证主体和操作派生，绝不来自秘密明文。
 -- name: LockCredentialRotationIdempotency :exec
 SELECT pg_advisory_xact_lock(hashtextextended(sqlc.arg(lock_key), 0));
 
--- GetCredentialRotationIdempotency returns a retained tenant rotation replay record, including its expiry.
+-- 返回保留的租户凭据轮换重放记录及其过期时间。
 -- name: GetCredentialRotationIdempotency :one
 SELECT request_hash, response_body, expires_at
 FROM idempotency_records
@@ -298,7 +303,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND idempotency_key = sqlc.arg(idempotency_key)
 FOR UPDATE;
 
--- DeleteCredentialRotationIdempotency removes an expired tenant rotation replay before reuse.
+-- 在重新使用前删除已过期的租户凭据轮换重放记录。
 -- name: DeleteCredentialRotationIdempotency :exec
 DELETE FROM idempotency_records
 WHERE tenant_id = sqlc.arg(tenant_id)
@@ -307,8 +312,8 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND operation_id = 'rotateCredential'
   AND idempotency_key = sqlc.arg(idempotency_key);
 
--- CreateCredentialRotationIdempotency stores a safe tenant rotation response for 24-hour exact replay.
--- Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+-- 保存可安全精确重放 24 小时的租户凭据轮换响应。
+-- 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 -- name: CreateCredentialRotationIdempotency :exec
 INSERT INTO idempotency_records (
   tenant_id, principal_type, principal_id, operation_id, idempotency_key,
@@ -318,7 +323,7 @@ INSERT INTO idempotency_records (
   sqlc.arg(request_hash), 200, sqlc.arg(response_body)::jsonb, now() + interval '24 hours'
 );
 
--- GetGlobalCredentialRotationIdempotency returns a retained platform rotation replay record.
+-- 返回保留的平台凭据轮换重放记录。
 -- name: GetGlobalCredentialRotationIdempotency :one
 SELECT request_hash, response_body, expires_at
 FROM global_idempotency_records
@@ -329,7 +334,7 @@ WHERE context_type = 'platform'
   AND idempotency_key = sqlc.arg(idempotency_key)
 FOR UPDATE;
 
--- DeleteGlobalCredentialRotationIdempotency removes an expired platform rotation replay before reuse.
+-- 在重新使用前删除已过期的平台凭据轮换重放记录。
 -- name: DeleteGlobalCredentialRotationIdempotency :exec
 DELETE FROM global_idempotency_records
 WHERE context_type = 'platform'
@@ -338,8 +343,8 @@ WHERE context_type = 'platform'
   AND operation_id = 'rotateGlobalCredential'
   AND idempotency_key = sqlc.arg(idempotency_key);
 
--- CreateGlobalCredentialRotationIdempotency stores a safe platform rotation response for 24-hour exact replay.
--- Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+-- 保存可安全精确重放 24 小时的平台凭据轮换响应。
+-- 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 -- name: CreateGlobalCredentialRotationIdempotency :exec
 INSERT INTO global_idempotency_records (
   context_type, principal_type, principal_id, operation_id, idempotency_key,
@@ -349,7 +354,7 @@ INSERT INTO global_idempotency_records (
   sqlc.arg(request_hash), 200, sqlc.arg(response_body)::jsonb, now() + interval '24 hours'
 );
 
--- ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
+-- 返回引用某条平台凭据的未删除仓库。
 -- name: ListRepositoriesForGlobalCredential :many
 SELECT
   repositories.tenant_id,
@@ -362,7 +367,7 @@ WHERE repositories.global_credential_id = sqlc.arg(credential_id)
   AND repositories.deleted_at IS NULL
 ORDER BY tenants.slug, repositories.id;
 
--- CreateGlobalCredential inserts one platform-owned encrypted credential.
+-- 写入一条平台拥有的加密凭据。
 -- name: CreateGlobalCredential :one
 INSERT INTO global_credentials (
   id, name, kind, ciphertext, nonce, key_version, fingerprint, created_by
@@ -372,7 +377,7 @@ INSERT INTO global_credentials (
 )
 RETURNING *;
 
--- ListGlobalCredentials returns one stable page of platform-owned credentials.
+-- 返回平台凭据的稳定分页结果。
 -- name: ListGlobalCredentials :many
 SELECT *
 FROM global_credentials
@@ -380,15 +385,15 @@ ORDER BY created_at DESC, id DESC
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- CountGlobalCredentials counts all platform-owned credentials.
+-- 统计全部平台凭据数量。
 -- name: CountGlobalCredentials :one
 SELECT count(*) FROM global_credentials;
 
--- GetGlobalCredential returns one platform-owned credential.
+-- 返回一条平台凭据。
 -- name: GetGlobalCredential :one
 SELECT * FROM global_credentials WHERE id = sqlc.arg(id);
 
--- UpdateGlobalCredentialMetadata conditionally updates a global credential name and advances its revision.
+-- 有条件地更新平台凭据名称并递增版本号。
 -- name: UpdateGlobalCredentialMetadata :one
 UPDATE global_credentials
 SET name = sqlc.arg(name), revision = revision + 1, updated_at = sqlc.arg(updated_at)
@@ -396,33 +401,39 @@ WHERE id = sqlc.arg(id)
   AND revision = sqlc.arg(expected_revision)
 RETURNING *;
 
--- CountGlobalCredentialRepositories counts active repositories referencing a global credential.
+-- 统计引用某条平台凭据的有效仓库数量。
 -- name: CountGlobalCredentialRepositories :one
 SELECT count(*)
 FROM repositories
 WHERE global_credential_id = sqlc.arg(credential_id)
   AND deleted_at IS NULL;
 
--- UnbindGlobalCredentialRepositories clears active and archived references before credential deletion.
--- Only active repositories receive an authentication-required health error.
+-- 在删除平台凭据前清除有效和归档仓库的引用。
+-- 只有有效仓库会记录需要重新认证的健康错误。
 -- name: UnbindGlobalCredentialRepositories :exec
 UPDATE repositories
 SET
   global_credential_id = NULL,
   revision = revision + 1,
   updated_at = sqlc.arg(updated_at),
-  health = CASE WHEN deleted_at IS NULL
-    THEN jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"global credential was deleted"}'::jsonb, true)
-    ELSE health END
+  health = CASE
+    WHEN deleted_at IS NULL THEN jsonb_set(
+      COALESCE(health, '{}'::jsonb),
+      '{lastError}',
+      '{"class":"auth","message":"global credential was deleted"}'::jsonb,
+      true
+    )
+    ELSE health
+  END
 WHERE global_credential_id = sqlc.arg(credential_id);
 
--- DeleteGlobalCredential removes one platform credential after reference and ETag checks.
+-- 完成引用和 ETag 检查后，删除一条平台凭据。
 -- name: DeleteGlobalCredential :execrows
 DELETE FROM global_credentials
 WHERE id = sqlc.arg(id)
   AND revision = sqlc.arg(expected_revision);
 
--- RotateGlobalCredentialSecret conditionally replaces global encrypted secret material and advances revision.
+-- 有条件地替换平台加密秘密材料并递增版本号。
 -- name: RotateGlobalCredentialSecret :one
 UPDATE global_credentials
 SET
@@ -436,7 +447,7 @@ WHERE id = sqlc.arg(id)
   AND revision = sqlc.arg(expected_revision)
 RETURNING *;
 
--- ListKnownHosts returns one stable page of tenant-approved SSH host identities.
+-- 返回租户认可的 SSH 主机身份稳定分页结果。
 -- name: ListKnownHosts :many
 SELECT *
 FROM known_hosts
@@ -445,11 +456,11 @@ ORDER BY host, port, key_type, fingerprint, id
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- CountKnownHosts counts approved host identities in one tenant.
+-- 统计一个租户认可的主机身份数量。
 -- name: CountKnownHosts :one
 SELECT count(*) FROM known_hosts WHERE tenant_id = sqlc.arg(tenant_id);
 
--- CreateKnownHost inserts a server-derived approved SSH host identity.
+-- 写入一条由服务端派生的已认可 SSH 主机身份。
 -- name: CreateKnownHost :one
 INSERT INTO known_hosts (
   tenant_id, id, host, port, key_type, public_key, fingerprint, source, created_by

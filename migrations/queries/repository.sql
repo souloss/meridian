@@ -1,5 +1,5 @@
--- CountRepositories returns active repository count and the tenant's frozen repository quota.
--- The quota is read from the tenant snapshot, never from a mutable platform default.
+-- 返回有效仓库数量和租户固定的仓库配额。
+-- 配额读取租户快照，不读取可变的平台默认值。
 -- name: CountRepositories :one
 SELECT
   (SELECT count(*)::bigint
@@ -10,17 +10,16 @@ SELECT
             FROM tenants
             WHERE id = sqlc.arg(tenant_id)), 0)::bigint AS limit_count;
 
--- LockRepositoryQuota serializes repository creation against the tenant's repository quota.
--- The repository adapter holds this row lock while counting and inserting, so concurrent creates cannot oversubscribe a quota.
+-- 使用租户配额行锁串行化仓库创建。
+-- 适配器在计数和插入期间持有该锁，避免并发创建超过租户配额。
 -- name: LockRepositoryQuota :one
 SELECT COALESCE((quota ->> 'maxRepositories')::bigint, 0)::bigint AS limit_count
 FROM tenants
 WHERE id = sqlc.arg(tenant_id)
 FOR UPDATE;
 
--- ResolveRepositoryCredential resolves one tenant-visible credential UUID to exactly one owning table.
--- Tenant credentials are filtered by the same visibility predicate as the credential list endpoint;
--- global credentials are selectable by every active member but remain platform-admin managed.
+-- 将一个租户可见的凭据 UUID 解析到唯一的所属表。
+-- 租户凭据使用与凭据列表相同的可见性条件；平台凭据可被有效成员选择，但仍由平台管理员管理。
 -- name: ResolveRepositoryCredential :one
 SELECT c.id AS resolved_id, false AS is_global
 FROM credentials AS c
@@ -49,8 +48,8 @@ FROM global_credentials
 WHERE global_credentials.id = sqlc.arg(credential_id)
 LIMIT 1;
 
--- ListRepositories returns active repositories in deterministic canonical URL and UUID order.
--- The query and all predicates retain the tenant boundary even when the search string is empty.
+-- 按规范化 URL 和 UUID 的确定顺序返回有效仓库。
+-- 即使搜索字符串为空，查询及全部谓词仍保留租户边界。
 -- name: ListRepositories :many
 SELECT *
 FROM repositories
@@ -65,7 +64,7 @@ ORDER BY canonical_url, id
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- CountListedRepositories returns the number of active repositories matching one tenant search.
+-- 返回匹配一次租户搜索的有效仓库数量。
 -- name: CountListedRepositories :one
 SELECT count(*)::bigint
 FROM repositories
@@ -77,7 +76,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
     OR canonical_url ILIKE '%' || sqlc.arg(search_query)::text || '%'
   );
 
--- GetRepository returns one active repository; soft-deleted rows intentionally appear absent.
+-- 返回一条有效仓库；软删除记录按设计视为不存在。
 -- name: GetRepository :one
 SELECT *
 FROM repositories
@@ -85,8 +84,8 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND deleted_at IS NULL;
 
--- CreateRepository persists repository configuration and initializes an empty health summary.
--- URL fields are credential-free; credentials are referenced only by UUID foreign keys.
+-- 持久化仓库配置，并初始化空的健康状态摘要。
+-- 仓库 URL 字段不含凭据，凭据只通过 UUID 外键引用。
 -- name: CreateRepository :one
 INSERT INTO repositories (
   tenant_id, id, url, canonical_url, credential_id, global_credential_id,
@@ -98,18 +97,30 @@ INSERT INTO repositories (
 )
 RETURNING *;
 
--- UpdateRepository conditionally updates explicit repository fields and advances its revision.
--- Set flags preserve the distinction between omitted fields and explicit JSON null values.
+-- 有条件地更新明确提供的仓库字段并递增版本号。
+-- 字段 set 标志保留字段省略和显式 JSON null 之间的区别。
 -- name: UpdateRepository :one
 UPDATE repositories
 SET
-  credential_id = CASE WHEN sqlc.arg(set_credential_id)::boolean THEN sqlc.narg(credential_id) ELSE credential_id END,
-  global_credential_id = CASE WHEN sqlc.arg(set_global_credential_id)::boolean THEN sqlc.narg(global_credential_id) ELSE global_credential_id END,
+  credential_id = CASE
+    WHEN sqlc.arg(set_credential_id)::boolean THEN sqlc.narg(credential_id)
+    ELSE credential_id
+  END,
+  global_credential_id = CASE
+    WHEN sqlc.arg(set_global_credential_id)::boolean THEN sqlc.narg(global_credential_id)
+    ELSE global_credential_id
+  END,
   default_branch = COALESCE(sqlc.narg(default_branch), default_branch),
   branch_policy = COALESCE(sqlc.narg(branch_policy), branch_policy),
   fetch_config = COALESCE(sqlc.narg(fetch_config), fetch_config),
-  sync_cron = CASE WHEN sqlc.arg(set_sync_cron)::boolean THEN sqlc.narg(sync_cron) ELSE sync_cron END,
-  note = CASE WHEN sqlc.arg(set_note)::boolean THEN sqlc.narg(note) ELSE note END,
+  sync_cron = CASE
+    WHEN sqlc.arg(set_sync_cron)::boolean THEN sqlc.narg(sync_cron)
+    ELSE sync_cron
+  END,
+  note = CASE
+    WHEN sqlc.arg(set_note)::boolean THEN sqlc.narg(note)
+    ELSE note
+  END,
   revision = revision + 1,
   updated_at = sqlc.arg(updated_at)
 WHERE tenant_id = sqlc.arg(tenant_id)
@@ -118,8 +129,8 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND revision = sqlc.arg(expected_revision)
 RETURNING *;
 
--- DeleteRepository soft-deletes a repository and makes its URL/branch reusable only per policy.
--- Historical job and audit rows remain tenant-scoped after this update.
+-- 软删除仓库；URL 和分支能否复用由策略决定。
+-- 历史任务和审计记录在更新后仍保持租户范围。
 -- name: DeleteRepository :execrows
 UPDATE repositories
 SET deleted_at = sqlc.arg(deleted_at), revision = revision + 1, updated_at = sqlc.arg(updated_at)

@@ -34,7 +34,8 @@ type CancelTenantJobParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// CancelTenantJob moves only a pending or running tenant job to its durable cancelled terminal state.
+// CancelTenantJob executes the generated CancelTenantJob database query.
+// 仅将 pending 或 running 的租户任务转为持久化的 cancelled 终态。
 func (q *Queries) CancelTenantJob(ctx context.Context, arg CancelTenantJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, cancelTenantJob, arg.FinishedAt, arg.TenantID, arg.ID)
 	var i Job
@@ -73,8 +74,14 @@ const countPlatformJobs = `-- name: CountPlatformJobs :one
 SELECT count(*)::bigint
 FROM jobs
 JOIN tenants ON tenants.id = jobs.tenant_id
-WHERE (COALESCE(array_length($1::text[], 1), 0) = 0 OR jobs.type = ANY($1::text[]))
-  AND (COALESCE(array_length($2::text[], 1), 0) = 0 OR jobs.status = ANY($2::text[]))
+WHERE (
+  COALESCE(array_length($1::text[], 1), 0) = 0
+  OR jobs.type = ANY($1::text[])
+)
+  AND (
+    COALESCE(array_length($2::text[], 1), 0) = 0
+    OR jobs.status = ANY($2::text[])
+  )
   AND ($3::text = '' OR jobs.scope_type = $3::text)
   AND ($4::text = '' OR jobs.scope_id::text = $4::text)
   AND ($5::text = '' OR tenants.slug = $5::text)
@@ -94,8 +101,9 @@ type CountPlatformJobsParams struct {
 	TenantSlug string `json:"tenant_slug"`
 }
 
-// CountPlatformJobs returns the total redacted platform-job rows matching the supplied filters.
-// It repeats the exact predicates used by ListPlatformJobs so page totals cannot drift from the result set.
+// CountPlatformJobs executes the generated CountPlatformJobs database query.
+// 返回匹配给定条件的脱敏平台任务总数。
+// 复用 ListPlatformJobs 的完整谓词，避免分页总数与结果集不一致。
 func (q *Queries) CountPlatformJobs(ctx context.Context, arg CountPlatformJobsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countPlatformJobs,
 		arg.TypeFilter,
@@ -113,8 +121,14 @@ const countTenantJobs = `-- name: CountTenantJobs :one
 SELECT count(*)::bigint
 FROM jobs
 WHERE jobs.tenant_id = $1
-  AND (COALESCE(array_length($2::text[], 1), 0) = 0 OR jobs.type = ANY($2::text[]))
-  AND (COALESCE(array_length($3::text[], 1), 0) = 0 OR jobs.status = ANY($3::text[]))
+  AND (
+    COALESCE(array_length($2::text[], 1), 0) = 0
+    OR jobs.type = ANY($2::text[])
+  )
+  AND (
+    COALESCE(array_length($3::text[], 1), 0) = 0
+    OR jobs.status = ANY($3::text[])
+  )
   AND ($4::text = '' OR jobs.scope_type = $4::text)
   AND ($5::text = '' OR jobs.scope_id::text = $5::text)
 `
@@ -133,7 +147,8 @@ type CountTenantJobsParams struct {
 	ScopeID string `json:"scope_id"`
 }
 
-// CountTenantJobs returns the exact total for the predicates used by ListTenantJobs.
+// CountTenantJobs executes the generated CountTenantJobs database query.
+// 返回 ListTenantJobs 所用谓词对应的准确总数。
 func (q *Queries) CountTenantJobs(ctx context.Context, arg CountTenantJobsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countTenantJobs,
 		arg.TenantID,
@@ -153,8 +168,21 @@ INSERT INTO jobs (
   trigger, input, status, max_attempts, dedupe_key, active_generation, replay_safe
 )
 SELECT
-  source.tenant_id, $1, source.id, source.type, source.scope_type, source.scope_id, source.ref_type, source.ref_name,
-  'retry', source.input, 'pending', source.max_attempts, source.dedupe_key, $2, source.replay_safe
+  source.tenant_id,
+  $1,
+  source.id,
+  source.type,
+  source.scope_type,
+  source.scope_id,
+  source.ref_type,
+  source.ref_name,
+  'retry',
+  source.input,
+  'pending',
+  source.max_attempts,
+  source.dedupe_key,
+  $2,
+  source.replay_safe
 FROM jobs AS source
 WHERE source.tenant_id = $3
   AND source.id = $4
@@ -174,8 +202,9 @@ type CreateRetriedTenantJobParams struct {
 	SourceJobID uuid.UUID `json:"source_job_id"`
 }
 
-// CreateRetriedTenantJob creates a new pending generation from immutable source execution inputs.
-// Result, error, stage, attempt, and timestamps are deliberately reset for the independent retry.
+// CreateRetriedTenantJob executes the generated CreateRetriedTenantJob database query.
+// 根据不可变的源执行输入创建一个新的 pending 代次。
+// 结果、错误、阶段、尝试次数和时间戳会重置，形成独立重试。
 func (q *Queries) CreateRetriedTenantJob(ctx context.Context, arg CreateRetriedTenantJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, createRetriedTenantJob,
 		arg.NewJobID,
@@ -241,7 +270,8 @@ type CreateRetryJobIdempotencyParams struct {
 	ResponseBody []byte `json:"response_body"`
 }
 
-// CreateRetryJobIdempotency stores the exact non-secret 202 response for 24-hour replay.
+// CreateRetryJobIdempotency executes the generated CreateRetryJobIdempotency database query.
+// 保存可重放 24 小时的准确、非敏感 202 响应。
 func (q *Queries) CreateRetryJobIdempotency(ctx context.Context, arg CreateRetryJobIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, createRetryJobIdempotency,
 		arg.TenantID,
@@ -275,7 +305,8 @@ type DeleteRetryJobIdempotencyParams struct {
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// DeleteRetryJobIdempotency removes an expired retry replay record before key reuse.
+// DeleteRetryJobIdempotency executes the generated DeleteRetryJobIdempotency database query.
+// 在重新使用幂等键前删除已过期的重试重放记录。
 func (q *Queries) DeleteRetryJobIdempotency(ctx context.Context, arg DeleteRetryJobIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, deleteRetryJobIdempotency,
 		arg.TenantID,
@@ -295,7 +326,13 @@ SELECT
   jobs.status,
   jobs.stage,
   jobs.scope_type,
-  COALESCE(CASE WHEN jobs.scope_type IN ('tenant', 'repository') THEN jobs.scope_id::text ELSE NULL::text END, ''::text)::text AS scope_id,
+  COALESCE(
+    CASE
+      WHEN jobs.scope_type IN ('tenant', 'repository') THEN jobs.scope_id::text
+      ELSE NULL::text
+    END,
+    ''::text
+  )::text AS scope_id,
   jobs.created_at,
   jobs.started_at,
   jobs.finished_at
@@ -330,8 +367,9 @@ type GetPlatformJobRow struct {
 	FinishedAt pgtype.Timestamptz `json:"finished_at"`
 }
 
-// GetPlatformJob returns one redacted platform job without tenant-owned payload or execution details.
-// Scope identifiers are retained only for tenant and repository scopes, matching the public PlatformJob contract.
+// GetPlatformJob executes the generated GetPlatformJob database query.
+// 返回一条脱敏平台任务，不包含租户拥有的负载或执行详情。
+// 保留租户和仓库范围的作用域标识，与公开 PlatformJob 契约一致。
 func (q *Queries) GetPlatformJob(ctx context.Context, id uuid.UUID) (GetPlatformJobRow, error) {
 	row := q.db.QueryRow(ctx, getPlatformJob, id)
 	var i GetPlatformJobRow
@@ -384,7 +422,8 @@ type GetRetryJobIdempotencyRow struct {
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// GetRetryJobIdempotency returns the retained exact response for a retryJob request.
+// GetRetryJobIdempotency executes the generated GetRetryJobIdempotency database query.
+// 返回 retryJob 请求保留的准确响应。
 func (q *Queries) GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error) {
 	row := q.db.QueryRow(ctx, getRetryJobIdempotency,
 		arg.TenantID,
@@ -412,7 +451,8 @@ type GetTenantJobParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// GetTenantJob returns one full tenant-visible job row while retaining the tenant predicate.
+// GetTenantJob executes the generated GetTenantJob database query.
+// 保留租户条件，返回一条租户可见的完整任务记录。
 func (q *Queries) GetTenantJob(ctx context.Context, arg GetTenantJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, getTenantJob, arg.TenantID, arg.ID)
 	var i Job
@@ -526,8 +566,9 @@ type GetTenantJobStreamStateRow struct {
 	LogCursor int64 `json:"log_cursor"`
 }
 
-// GetTenantJobStreamState returns one state row plus the greatest persisted log cursor
-// from a single PostgreSQL statement so SSE never emits a state ahead of its logs.
+// GetTenantJobStreamState executes the generated GetTenantJobStreamState database query.
+// 在一条 PostgreSQL 语句中返回任务状态和已持久化日志的最大游标，
+// 确保 SSE 不会发送领先于日志记录的状态。
 func (q *Queries) GetTenantJobStreamState(ctx context.Context, arg GetTenantJobStreamStateParams) (GetTenantJobStreamStateRow, error) {
 	row := q.db.QueryRow(ctx, getTenantJobStreamState, arg.TenantID, arg.ID)
 	var i GetTenantJobStreamStateRow
@@ -572,14 +613,26 @@ SELECT
   jobs.status,
   jobs.stage,
   jobs.scope_type,
-  COALESCE(CASE WHEN jobs.scope_type IN ('tenant', 'repository') THEN jobs.scope_id::text ELSE NULL::text END, ''::text)::text AS scope_id,
+  COALESCE(
+    CASE
+      WHEN jobs.scope_type IN ('tenant', 'repository') THEN jobs.scope_id::text
+      ELSE NULL::text
+    END,
+    ''::text
+  )::text AS scope_id,
   jobs.created_at,
   jobs.started_at,
   jobs.finished_at
 FROM jobs
 JOIN tenants ON tenants.id = jobs.tenant_id
-WHERE (COALESCE(array_length($1::text[], 1), 0) = 0 OR jobs.type = ANY($1::text[]))
-  AND (COALESCE(array_length($2::text[], 1), 0) = 0 OR jobs.status = ANY($2::text[]))
+WHERE (
+  COALESCE(array_length($1::text[], 1), 0) = 0
+  OR jobs.type = ANY($1::text[])
+)
+  AND (
+    COALESCE(array_length($2::text[], 1), 0) = 0
+    OR jobs.status = ANY($2::text[])
+  )
   AND ($3::text = '' OR jobs.scope_type = $3::text)
   AND ($4::text = '' OR jobs.scope_id::text = $4::text)
   AND ($5::text = '' OR tenants.slug = $5::text)
@@ -632,9 +685,10 @@ type ListPlatformJobsRow struct {
 	FinishedAt pgtype.Timestamptz `json:"finished_at"`
 }
 
-// ListPlatformJobs returns redacted cross-tenant job metadata in newest-first order.
-// Inputs, results, errors, attempts, refs, River identifiers, and logs are intentionally excluded.
-// Empty filter arrays and strings mean no restriction; scope identifiers are exposed only for tenant/repository jobs.
+// ListPlatformJobs executes the generated ListPlatformJobs database query.
+// 按最新时间优先返回脱敏的跨租户任务元数据。
+// 结果刻意排除输入、结果、错误、尝试次数、引用、River 标识和日志。
+// 空过滤数组和空字符串表示不限制；只有租户和仓库范围任务暴露作用域标识。
 func (q *Queries) ListPlatformJobs(ctx context.Context, arg ListPlatformJobsParams) ([]ListPlatformJobsRow, error) {
 	rows, err := q.db.Query(ctx, listPlatformJobs,
 		arg.TypeFilter,
@@ -691,8 +745,9 @@ type ListTenantJobAttemptLogsParams struct {
 	JobIds []uuid.UUID `json:"job_ids"`
 }
 
-// ListTenantJobAttemptLogs batch-loads persisted events for a page of jobs without an N+1 query.
-// The caller groups rows by job, one-based attempt, and stage to construct the API attempt projection.
+// ListTenantJobAttemptLogs executes the generated ListTenantJobAttemptLogs database query.
+// 批量加载一页任务的持久化事件，避免 N+1 查询。
+// 调用方按任务、一基尝试次数和阶段分组，构造 API 尝试投影。
 func (q *Queries) ListTenantJobAttemptLogs(ctx context.Context, arg ListTenantJobAttemptLogsParams) ([]JobStageLog, error) {
 	rows, err := q.db.Query(ctx, listTenantJobAttemptLogs, arg.TenantID, arg.JobIds)
 	if err != nil {
@@ -744,7 +799,8 @@ type ListTenantJobLogsAfterParams struct {
 	EventLimit int32 `json:"event_limit"`
 }
 
-// ListTenantJobLogsAfter returns bounded SSE replay rows strictly after a persisted sequence cursor.
+// ListTenantJobLogsAfter executes the generated ListTenantJobLogsAfter database query.
+// 返回持久化序号游标之后、数量受限的 SSE 回放记录。
 func (q *Queries) ListTenantJobLogsAfter(ctx context.Context, arg ListTenantJobLogsAfterParams) ([]JobStageLog, error) {
 	rows, err := q.db.Query(ctx, listTenantJobLogsAfter,
 		arg.TenantID,
@@ -783,8 +839,14 @@ const listTenantJobs = `-- name: ListTenantJobs :many
 SELECT jobs.tenant_id, jobs.id, jobs.retry_of_job_id, jobs.river_job_id, jobs.type, jobs.scope_type, jobs.scope_id, jobs.ref_type, jobs.ref_name, jobs.trigger, jobs.input, jobs.result, jobs.status, jobs.stage, jobs.attempt, jobs.max_attempts, jobs.next_attempt_at, jobs.dedupe_key, jobs.active_generation, jobs.dirty, jobs.replay_safe, jobs.error, jobs.started_at, jobs.finished_at, jobs.created_at, jobs.updated_at
 FROM jobs
 WHERE jobs.tenant_id = $1
-  AND (COALESCE(array_length($2::text[], 1), 0) = 0 OR jobs.type = ANY($2::text[]))
-  AND (COALESCE(array_length($3::text[], 1), 0) = 0 OR jobs.status = ANY($3::text[]))
+  AND (
+    COALESCE(array_length($2::text[], 1), 0) = 0
+    OR jobs.type = ANY($2::text[])
+  )
+  AND (
+    COALESCE(array_length($3::text[], 1), 0) = 0
+    OR jobs.status = ANY($3::text[])
+  )
   AND ($4::text = '' OR jobs.scope_type = $4::text)
   AND ($5::text = '' OR jobs.scope_id::text = $5::text)
 ORDER BY jobs.created_at DESC, jobs.id DESC
@@ -810,8 +872,9 @@ type ListTenantJobsParams struct {
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListTenantJobs returns a newest-first page bounded by one tenant identifier.
-// Empty filter arrays and strings mean no restriction; execution input and River identifiers remain internal.
+// ListTenantJobs executes the generated ListTenantJobs database query.
+// 在一个租户标识边界内按最新时间优先返回任务分页。
+// 空过滤数组和空字符串表示不限制；执行输入和 River 标识仍为内部字段。
 func (q *Queries) ListTenantJobs(ctx context.Context, arg ListTenantJobsParams) ([]Job, error) {
 	rows, err := q.db.Query(ctx, listTenantJobs,
 		arg.TenantID,
@@ -885,7 +948,8 @@ type LockLatestTenantJobGenerationParams struct {
 	DedupeKey string `json:"dedupe_key"`
 }
 
-// LockLatestTenantJobGeneration returns the newest semantic generation while holding its row lock.
+// LockLatestTenantJobGeneration executes the generated LockLatestTenantJobGeneration database query.
+// 持有行锁时返回最新的语义代次。
 func (q *Queries) LockLatestTenantJobGeneration(ctx context.Context, arg LockLatestTenantJobGenerationParams) (Job, error) {
 	row := q.db.QueryRow(ctx, lockLatestTenantJobGeneration, arg.TenantID, arg.DedupeKey)
 	var i Job
@@ -924,7 +988,8 @@ const lockRetryJobIdempotency = `-- name: LockRetryJobIdempotency :exec
 SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
 `
 
-// LockRetryJobIdempotency serializes one retry key for an authenticated tenant principal.
+// LockRetryJobIdempotency executes the generated LockRetryJobIdempotency database query.
+// 为已认证的租户主体串行化一个重试幂等键。
 func (q *Queries) LockRetryJobIdempotency(ctx context.Context, lockKey string) error {
 	_, err := q.db.Exec(ctx, lockRetryJobIdempotency, lockKey)
 	return err
@@ -946,7 +1011,8 @@ type LockTenantJobForControlParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// LockTenantJobForControl serializes cancellation and manual retry decisions for one tenant job.
+// LockTenantJobForControl executes the generated LockTenantJobForControl database query.
+// 串行化一个租户任务的取消和手动重试决策。
 func (q *Queries) LockTenantJobForControl(ctx context.Context, arg LockTenantJobForControlParams) (Job, error) {
 	row := q.db.QueryRow(ctx, lockTenantJobForControl, arg.TenantID, arg.ID)
 	var i Job

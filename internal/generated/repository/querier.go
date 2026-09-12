@@ -12,286 +12,382 @@ import (
 
 // Querier exposes every generated Meridian database query for dependency injection and tests.
 type Querier interface {
-	// AddCredentialTeamShare grants one same-tenant team visibility entry.
+	// AddCredentialTeamShare exposes the corresponding strongly typed database operation.
+	// 授予一条同租户团队可见性关系。
 	AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error
-	// AddTenantBlobReference creates or increments one tenant reference after the
-	// caller has serialized and validated unique-byte quota accounting.
+	// AddTenantBlobReference exposes the corresponding strongly typed database operation.
+	// 调用方完成串行化并校验唯一字节配额后，创建或递增一条租户对象引用。
 	AddTenantBlobReference(ctx context.Context, arg AddTenantBlobReferenceParams) (TenantBlobRef, error)
-	// AppendJobFailureAudit records one append-only, redacted system fact in the
-	// same transaction as the job terminal state and its outbound event rows.
+	// AppendJobFailureAudit exposes the corresponding strongly typed database operation.
+	// 与任务终态和出站事件行在同一事务中记录一条追加式、脱敏的系统事实。
 	AppendJobFailureAudit(ctx context.Context, arg AppendJobFailureAuditParams) (AuditLog, error)
-	// AppendJobStageLog persists one redacted stage event with its caller-supplied cursor.
+	// AppendJobStageLog exposes the corresponding strongly typed database operation.
+	// 使用调用方提供的游标持久化一条脱敏阶段事件。
 	AppendJobStageLog(ctx context.Context, arg AppendJobStageLogParams) (JobStageLog, error)
-	// AttachRiverJobID links the application UUID job to the internal River sequence
-	// in the same transaction that inserted both rows.
+	// AttachRiverJobID exposes the corresponding strongly typed database operation.
+	// 在插入两行的同一事务中，将应用 UUID 任务关联到内部 River 序号。
 	AttachRiverJobID(ctx context.Context, arg AttachRiverJobIDParams) (int64, error)
-	// CancelTenantJob moves only a pending or running tenant job to its durable cancelled terminal state.
+	// CancelTenantJob exposes the corresponding strongly typed database operation.
+	// 仅将 pending 或 running 的租户任务转为持久化的 cancelled 终态。
 	CancelTenantJob(ctx context.Context, arg CancelTenantJobParams) (Job, error)
-	// ClaimNextOutboxDelivery atomically leases one due delivery with SKIP LOCKED.
-	// A stale delivering row is eligible after its lease expires, providing crash recovery.
+	// ClaimNextOutboxDelivery exposes the corresponding strongly typed database operation.
+	// 使用 SKIP LOCKED 原子租约领取一条到期投递。
+	// 状态为 delivering 的记录在租约过期后重新变为可领取，以便从崩溃中恢复。
 	ClaimNextOutboxDelivery(ctx context.Context, arg ClaimNextOutboxDeliveryParams) (ClaimNextOutboxDeliveryRow, error)
-	// CountAPITokensByUser returns the total PAT metadata rows owned by one user inside one tenant.
+	// CountAPITokensByUser exposes the corresponding strongly typed database operation.
+	// 返回一个用户在一个租户内拥有的 PAT 元数据总数。
 	CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error)
-	// CountCredentialRepositories counts active repositories referencing a tenant credential.
+	// CountCredentialRepositories exposes the corresponding strongly typed database operation.
+	// 统计引用某条租户凭据的有效仓库数量。
 	CountCredentialRepositories(ctx context.Context, arg CountCredentialRepositoriesParams) (int64, error)
-	// CountGlobalCredentialRepositories counts active repositories referencing a global credential.
+	// CountGlobalCredentialRepositories exposes the corresponding strongly typed database operation.
+	// 统计引用某条平台凭据的有效仓库数量。
 	CountGlobalCredentialRepositories(ctx context.Context, credentialID *uuid.UUID) (int64, error)
-	// CountGlobalCredentials counts all platform-owned credentials.
+	// CountGlobalCredentials exposes the corresponding strongly typed database operation.
+	// 统计全部平台凭据数量。
 	CountGlobalCredentials(ctx context.Context) (int64, error)
-	// CountKnownHosts counts approved host identities in one tenant.
+	// CountKnownHosts exposes the corresponding strongly typed database operation.
+	// 统计一个租户认可的主机身份数量。
 	CountKnownHosts(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// CountListedRepositories returns the number of active repositories matching one tenant search.
+	// CountListedRepositories exposes the corresponding strongly typed database operation.
+	// 返回匹配一次租户搜索的有效仓库数量。
 	CountListedRepositories(ctx context.Context, arg CountListedRepositoriesParams) (int64, error)
-	// CountPlatformAuditLogs returns the exact total for ListPlatformAuditLogs by
-	// repeating its cross-tenant predicates and every optional filter.
+	// CountPlatformAuditLogs exposes the corresponding strongly typed database operation.
+	// 按照 ListPlatformAuditLogs 的跨租户条件和全部可选过滤条件返回准确总数。
 	CountPlatformAuditLogs(ctx context.Context, arg CountPlatformAuditLogsParams) (int64, error)
-	// CountPlatformJobs returns the total redacted platform-job rows matching the supplied filters.
-	// It repeats the exact predicates used by ListPlatformJobs so page totals cannot drift from the result set.
+	// CountPlatformJobs exposes the corresponding strongly typed database operation.
+	// 返回匹配给定条件的脱敏平台任务总数。
+	// 复用 ListPlatformJobs 的完整谓词，避免分页总数与结果集不一致。
 	CountPlatformJobs(ctx context.Context, arg CountPlatformJobsParams) (int64, error)
-	// CountRepositories returns active repository count and the tenant's frozen repository quota.
-	// The quota is read from the tenant snapshot, never from a mutable platform default.
+	// CountRepositories exposes the corresponding strongly typed database operation.
+	// 返回有效仓库数量和租户固定的仓库配额。
+	// 配额读取租户快照，不读取可变的平台默认值。
 	CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error)
-	// CountTenantAuditLogs returns the exact total for ListTenantAuditLogs by
-	// repeating its tenant predicate and every optional filter.
+	// CountTenantAuditLogs exposes the corresponding strongly typed database operation.
+	// 按照 ListTenantAuditLogs 的租户条件和全部可选过滤条件返回准确总数。
 	CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error)
-	// CountTenantCredentials counts visible tenant-owned and global credentials for one tenant member.
+	// CountTenantCredentials exposes the corresponding strongly typed database operation.
+	// 统计一个租户成员可见的租户凭据和平台凭据数量。
 	CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error)
-	// CountTenantJobs returns the exact total for the predicates used by ListTenantJobs.
+	// CountTenantJobs exposes the corresponding strongly typed database operation.
+	// 返回 ListTenantJobs 所用谓词对应的准确总数。
 	CountTenantJobs(ctx context.Context, arg CountTenantJobsParams) (int64, error)
-	// CountTenantUniqueBlobBytes sums each positively referenced global blob once
-	// so repeated revisions of identical content do not consume quota again.
+	// CountTenantUniqueBlobBytes exposes the corresponding strongly typed database operation.
+	// 每个有正引用的全局对象只计入一次，避免相同内容的重复版本重复消耗配额。
 	CountTenantUniqueBlobBytes(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// CountTenants returns the number of tenant lifecycle records visible to platform administration.
+	// CountTenants exposes the corresponding strongly typed database operation.
+	// 返回平台管理可见的租户生命周期记录数量。
 	CountTenants(ctx context.Context) (int64, error)
-	// CountUsers returns the number of identities matching one platform search.
+	// CountUsers exposes the corresponding strongly typed database operation.
+	// 返回匹配一次平台搜索的身份数量。
 	CountUsers(ctx context.Context, searchQuery string) (int64, error)
-	// CreateAPIToken persists tenant-scoped PAT metadata and a keyed token digest without storing plaintext.
+	// CreateAPIToken exposes the corresponding strongly typed database operation.
+	// 保存租户范围内的 PAT 元数据和令牌摘要，不保存令牌明文。
 	CreateAPIToken(ctx context.Context, arg CreateAPITokenParams) (ApiToken, error)
-	// CreateBlobMetadata inserts immutable content-addressed metadata and returns
-	// no row when another tenant or request already registered the same digest.
+	// CreateBlobMetadata exposes the corresponding strongly typed database operation.
+	// 写入不可变的内容寻址元数据；其他租户或请求已登记相同摘要时不返回记录。
 	CreateBlobMetadata(ctx context.Context, arg CreateBlobMetadataParams) (Blob, error)
-	// CreateCredential inserts one tenant-owned encrypted credential and returns metadata plus ciphertext.
-	// Secret plaintext is never accepted by SQL; the service supplies the encrypted projection only.
+	// CreateCredential exposes the corresponding strongly typed database operation.
+	// 写入一条租户拥有的加密凭据，并返回元数据和密文。
+	// 查询不会接收秘密明文，服务层只提供加密后的投影。
 	CreateCredential(ctx context.Context, arg CreateCredentialParams) (Credential, error)
-	// CreateCredentialRotationIdempotency stores a safe tenant rotation response for 24-hour exact replay.
-	// Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+	// CreateCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// 保存可安全精确重放 24 小时的租户凭据轮换响应。
+	// 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 	CreateCredentialRotationIdempotency(ctx context.Context, arg CreateCredentialRotationIdempotencyParams) error
-	// CreateCredentialSyncJob records one durable default-branch repository sync request.
-	// The input contains only the non-secret credential identifier and rotation reason.
+	// CreateCredentialSyncJob exposes the corresponding strongly typed database operation.
+	// 记录一条持久化的默认分支仓库同步请求。
+	// 输入只包含非敏感凭据标识和轮换原因。
 	CreateCredentialSyncJob(ctx context.Context, arg CreateCredentialSyncJobParams) (Job, error)
-	// CreateDefaultUserPreferences creates the locale, theme, and view defaults required for a new identity.
+	// CreateDefaultUserPreferences exposes the corresponding strongly typed database operation.
+	// 为新身份创建语言、主题和默认视图偏好。
 	CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
-	// CreateGlobalCredential inserts one platform-owned encrypted credential.
+	// CreateGlobalCredential exposes the corresponding strongly typed database operation.
+	// 写入一条平台拥有的加密凭据。
 	CreateGlobalCredential(ctx context.Context, arg CreateGlobalCredentialParams) (GlobalCredential, error)
-	// CreateGlobalCredentialRotationIdempotency stores a safe platform rotation response for 24-hour exact replay.
-	// Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+	// CreateGlobalCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// 保存可安全精确重放 24 小时的平台凭据轮换响应。
+	// 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 	CreateGlobalCredentialRotationIdempotency(ctx context.Context, arg CreateGlobalCredentialRotationIdempotencyParams) error
-	// CreateKnownHost inserts a server-derived approved SSH host identity.
+	// CreateKnownHost exposes the corresponding strongly typed database operation.
+	// 写入一条由服务端派生的已认可 SSH 主机身份。
 	CreateKnownHost(ctx context.Context, arg CreateKnownHostParams) (KnownHost, error)
-	// CreateNotifyOutbox inserts one channel-specific delivery row while preserving
-	// the shared event identifier used by receivers for at-least-once deduplication.
+	// CreateNotifyOutbox exposes the corresponding strongly typed database operation.
+	// 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 	CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error)
-	// CreateRepository persists repository configuration and initializes an empty health summary.
-	// URL fields are credential-free; credentials are referenced only by UUID foreign keys.
+	// CreateRepository exposes the corresponding strongly typed database operation.
+	// 持久化仓库配置，并初始化空的健康状态摘要。
+	// 仓库 URL 字段不含凭据，凭据只通过 UUID 外键引用。
 	CreateRepository(ctx context.Context, arg CreateRepositoryParams) (Repository, error)
-	// CreateRetriedTenantJob creates a new pending generation from immutable source execution inputs.
-	// Result, error, stage, attempt, and timestamps are deliberately reset for the independent retry.
+	// CreateRetriedTenantJob exposes the corresponding strongly typed database operation.
+	// 根据不可变的源执行输入创建一个新的 pending 代次。
+	// 结果、错误、阶段、尝试次数和时间戳会重置，形成独立重试。
 	CreateRetriedTenantJob(ctx context.Context, arg CreateRetriedTenantJobParams) (Job, error)
-	// CreateRetryJobIdempotency stores the exact non-secret 202 response for 24-hour replay.
+	// CreateRetryJobIdempotency exposes the corresponding strongly typed database operation.
+	// 保存可重放 24 小时的准确、非敏感 202 响应。
 	CreateRetryJobIdempotency(ctx context.Context, arg CreateRetryJobIdempotencyParams) error
-	// CreateSession persists keyed session and CSRF digests without storing either plaintext token.
+	// CreateSession exposes the corresponding strongly typed database operation.
+	// 保存会话令牌和 CSRF 摘要，不保存任一令牌的明文。
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
-	// CreateTenant inserts one tenant with explicit quota and settings snapshots copied from platform defaults.
+	// CreateTenant exposes the corresponding strongly typed database operation.
+	// 使用明确的配额和设置快照创建租户，快照来自平台默认配置。
 	CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error)
-	// CreateUser inserts one global identity with an Argon2id PHC verifier and no plaintext password.
+	// CreateUser exposes the corresponding strongly typed database operation.
+	// 创建一个全局身份，保存 Argon2id PHC 校验值，不保存密码明文。
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	// DeleteCredential removes a tenant credential after the caller has applied reference and ETag checks.
+	// DeleteCredential exposes the corresponding strongly typed database operation.
+	// 调用方完成引用和 ETag 检查后，删除一条租户凭据。
 	DeleteCredential(ctx context.Context, arg DeleteCredentialParams) (int64, error)
-	// DeleteCredentialRotationIdempotency removes an expired tenant rotation replay before reuse.
+	// DeleteCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// 在重新使用前删除已过期的租户凭据轮换重放记录。
 	DeleteCredentialRotationIdempotency(ctx context.Context, arg DeleteCredentialRotationIdempotencyParams) error
-	// DeleteGlobalCredential removes one platform credential after reference and ETag checks.
+	// DeleteGlobalCredential exposes the corresponding strongly typed database operation.
+	// 完成引用和 ETag 检查后，删除一条平台凭据。
 	DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCredentialParams) (int64, error)
-	// DeleteGlobalCredentialRotationIdempotency removes an expired platform rotation replay before reuse.
+	// DeleteGlobalCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// 在重新使用前删除已过期的平台凭据轮换重放记录。
 	DeleteGlobalCredentialRotationIdempotency(ctx context.Context, arg DeleteGlobalCredentialRotationIdempotencyParams) error
-	// DeleteRepository soft-deletes a repository and makes its URL/branch reusable only per policy.
-	// Historical job and audit rows remain tenant-scoped after this update.
+	// DeleteRepository exposes the corresponding strongly typed database operation.
+	// 软删除仓库；URL 和分支能否复用由策略决定。
+	// 历史任务和审计记录在更新后仍保持租户范围。
 	DeleteRepository(ctx context.Context, arg DeleteRepositoryParams) (int64, error)
-	// DeleteRetryJobIdempotency removes an expired retry replay record before key reuse.
+	// DeleteRetryJobIdempotency exposes the corresponding strongly typed database operation.
+	// 在重新使用幂等键前删除已过期的重试重放记录。
 	DeleteRetryJobIdempotency(ctx context.Context, arg DeleteRetryJobIdempotencyParams) error
-	// FinishJobExecution records either a terminal result or a retryable failure.
-	// Retryable failures remain pending for River's next attempt; terminal failures
-	// receive a finished timestamp and a durable failed status.
+	// FinishJobExecution exposes the corresponding strongly typed database operation.
+	// 记录终态结果或可重试失败。
+	// 可重试失败保持 pending，等待 River 下一次尝试；终态失败会写入完成时间和 failed 状态。
 	FinishJobExecution(ctx context.Context, arg FinishJobExecutionParams) (Job, error)
-	// GetAPITokenPrincipalByTokenHash authenticates one active PAT whose user, membership, and tenant remain active.
+	// GetAPITokenPrincipalByTokenHash exposes the corresponding strongly typed database operation.
+	// 根据令牌摘要认证一个用户、成员关系和租户均有效的 PAT。
 	GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAPITokenPrincipalByTokenHashParams) (GetAPITokenPrincipalByTokenHashRow, error)
-	// GetActiveTenantBySlug returns only an active tenant for tenant-scoped business access.
+	// GetActiveTenantBySlug exposes the corresponding strongly typed database operation.
+	// 仅按 slug 返回有效租户，供租户范围业务访问使用。
 	GetActiveTenantBySlug(ctx context.Context, slug string) (Tenant, error)
-	// GetActiveTenantMembership returns one active tenant membership without revealing disabled tenant records.
+	// GetActiveTenantMembership exposes the corresponding strongly typed database operation.
+	// 返回一条有效租户成员关系，不泄露已停用租户记录。
 	GetActiveTenantMembership(ctx context.Context, arg GetActiveTenantMembershipParams) (GetActiveTenantMembershipRow, error)
-	// GetBlobMetadata returns immutable metadata for validating a reused digest.
+	// GetBlobMetadata exposes the corresponding strongly typed database operation.
+	// 返回不可变对象元数据，用于校验重复使用的摘要。
 	GetBlobMetadata(ctx context.Context, blobDigest string) (Blob, error)
-	// GetCredentialRotationIdempotency returns a retained tenant rotation replay record, including its expiry.
+	// GetCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// 返回保留的租户凭据轮换重放记录及其过期时间。
 	GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error)
-	// GetGlobalCredential returns one platform-owned credential.
+	// GetGlobalCredential exposes the corresponding strongly typed database operation.
+	// 返回一条平台凭据。
 	GetGlobalCredential(ctx context.Context, id uuid.UUID) (GlobalCredential, error)
-	// GetGlobalCredentialRotationIdempotency returns a retained platform rotation replay record.
+	// GetGlobalCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// 返回保留的平台凭据轮换重放记录。
 	GetGlobalCredentialRotationIdempotency(ctx context.Context, arg GetGlobalCredentialRotationIdempotencyParams) (GetGlobalCredentialRotationIdempotencyRow, error)
-	// GetPlatformJob returns one redacted platform job without tenant-owned payload or execution details.
-	// Scope identifiers are retained only for tenant and repository scopes, matching the public PlatformJob contract.
+	// GetPlatformJob exposes the corresponding strongly typed database operation.
+	// 返回一条脱敏平台任务，不包含租户拥有的负载或执行详情。
+	// 保留租户和仓库范围的作用域标识，与公开 PlatformJob 契约一致。
 	GetPlatformJob(ctx context.Context, id uuid.UUID) (GetPlatformJobRow, error)
-	// GetPlatformSettingsForTenantCreate returns the singleton JSON defaults copied atomically into a new tenant.
+	// GetPlatformSettingsForTenantCreate exposes the corresponding strongly typed database operation.
+	// 返回创建租户时原子复制到新租户的单例 JSON 默认配置。
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
-	// GetRepository returns one active repository; soft-deleted rows intentionally appear absent.
+	// GetRepository exposes the corresponding strongly typed database operation.
+	// 返回一条有效仓库；软删除记录按设计视为不存在。
 	GetRepository(ctx context.Context, arg GetRepositoryParams) (Repository, error)
-	// GetRetryJobIdempotency returns the retained exact response for a retryJob request.
+	// GetRetryJobIdempotency exposes the corresponding strongly typed database operation.
+	// 返回 retryJob 请求保留的准确响应。
 	GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error)
-	// GetSessionPrincipalByTokenHash authenticates one active browser session and active user at a caller-supplied instant.
+	// GetSessionPrincipalByTokenHash exposes the corresponding strongly typed database operation.
+	// 在调用方指定的时间点，根据令牌摘要认证一个有效浏览器会话和有效用户。
 	GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error)
-	// GetTenantBlobReference returns the current count after the caller locks the tenant quota row.
+	// GetTenantBlobReference exposes the corresponding strongly typed database operation.
+	// 调用方锁定租户配额行后，返回当前对象引用数。
 	GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error)
-	// GetTenantBySlug returns a tenant in any lifecycle state for platform administration.
+	// GetTenantBySlug exposes the corresponding strongly typed database operation.
+	// 按 slug 返回任意生命周期状态的租户，供平台管理使用。
 	GetTenantBySlug(ctx context.Context, slug string) (Tenant, error)
-	// GetTenantCredential returns one visible tenant credential and its team-share identifiers.
+	// GetTenantCredential exposes the corresponding strongly typed database operation.
+	// 返回一条可见的租户凭据及其团队共享标识。
 	GetTenantCredential(ctx context.Context, arg GetTenantCredentialParams) (GetTenantCredentialRow, error)
-	// GetTenantCredentialForMutation returns one tenant credential without visibility filtering.
-	// The service has already authorized the tenant operation; this query preserves a 404/412 distinction.
+	// GetTenantCredentialForMutation exposes the corresponding strongly typed database operation.
+	// 返回一条不经过可见性过滤的租户凭据。
+	// 服务层已完成租户操作授权，本查询保留 404 与 412 的区别。
 	GetTenantCredentialForMutation(ctx context.Context, arg GetTenantCredentialForMutationParams) (Credential, error)
-	// GetTenantJob returns one full tenant-visible job row while retaining the tenant predicate.
+	// GetTenantJob exposes the corresponding strongly typed database operation.
+	// 保留租户条件，返回一条租户可见的完整任务记录。
 	GetTenantJob(ctx context.Context, arg GetTenantJobParams) (Job, error)
-	// GetTenantJobStreamState returns one state row plus the greatest persisted log cursor
-	// from a single PostgreSQL statement so SSE never emits a state ahead of its logs.
+	// GetTenantJobStreamState exposes the corresponding strongly typed database operation.
+	// 在一条 PostgreSQL 语句中返回任务状态和已持久化日志的最大游标，
+	// 确保 SSE 不会发送领先于日志记录的状态。
 	GetTenantJobStreamState(ctx context.Context, arg GetTenantJobStreamStateParams) (GetTenantJobStreamStateRow, error)
-	// GetTenantSlugForEvent resolves the stable tenant slug embedded in a domain event envelope.
+	// GetTenantSlugForEvent exposes the corresponding strongly typed database operation.
+	// 解析领域事件信封中使用的稳定租户标识。
 	GetTenantSlugForEvent(ctx context.Context, tenantID uuid.UUID) (string, error)
-	// GetUserByID returns the global identity matching the supplied UUID.
+	// GetUserByID exposes the corresponding strongly typed database operation.
+	// 按传入 UUID 返回对应的全局身份。
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
-	// GetUserByUsername returns the global identity matching the exact unique login name.
+	// GetUserByUsername exposes the corresponding strongly typed database operation.
+	// 按准确且唯一的登录名返回全局身份。
 	GetUserByUsername(ctx context.Context, username string) (User, error)
-	// ListAPITokensByUser returns one stable page of PAT metadata for one user inside one explicit tenant boundary.
+	// ListAPITokensByUser exposes the corresponding strongly typed database operation.
+	// 在明确的租户边界内，返回一个用户的稳定分页 PAT 元数据。
 	ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUserParams) ([]ApiToken, error)
-	// ListActiveTenantMemberships returns a user's active tenant memberships in stable slug and UUID order.
+	// ListActiveTenantMemberships exposes the corresponding strongly typed database operation.
+	// 按稳定 slug 和 UUID 顺序返回用户的有效租户成员关系。
 	ListActiveTenantMemberships(ctx context.Context, userID uuid.UUID) ([]ListActiveTenantMembershipsRow, error)
-	// ListCredentialTeamShares returns the complete ordered team-share set for one tenant credential.
+	// ListCredentialTeamShares exposes the corresponding strongly typed database operation.
+	// 返回一条租户凭据完整且有序的团队共享集合。
 	ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error)
-	// ListEnabledNotificationChannelIDs returns deterministic channel targets for
-	// an M0 operational event. M5 subscription routing will provide the narrower target set.
+	// ListEnabledNotificationChannelIDs exposes the corresponding strongly typed database operation.
+	// 为 M0 运维事件返回确定性的通道目标；M5 订阅路由会提供更精确的目标集合。
 	ListEnabledNotificationChannelIDs(ctx context.Context, tenantID uuid.UUID) ([]uuid.UUID, error)
-	// ListGlobalCredentials returns one stable page of platform-owned credentials.
+	// ListGlobalCredentials exposes the corresponding strongly typed database operation.
+	// 返回平台凭据的稳定分页结果。
 	ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error)
-	// ListKnownHosts returns one stable page of tenant-approved SSH host identities.
+	// ListKnownHosts exposes the corresponding strongly typed database operation.
+	// 返回租户认可的 SSH 主机身份稳定分页结果。
 	ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error)
-	// ListPlatformAuditLogs returns one newest-first cross-tenant page for the
-	// platform control plane. Nullable tenant ownership is retained for platform facts.
+	// ListPlatformAuditLogs exposes the corresponding strongly typed database operation.
+	// 为平台控制面返回一页按最新时间优先排列的跨租户审计元数据。
+	// 平台级记录的可空租户归属会保留在结果中。
 	ListPlatformAuditLogs(ctx context.Context, arg ListPlatformAuditLogsParams) ([]ListPlatformAuditLogsRow, error)
-	// ListPlatformJobs returns redacted cross-tenant job metadata in newest-first order.
-	// Inputs, results, errors, attempts, refs, River identifiers, and logs are intentionally excluded.
-	// Empty filter arrays and strings mean no restriction; scope identifiers are exposed only for tenant/repository jobs.
+	// ListPlatformJobs exposes the corresponding strongly typed database operation.
+	// 按最新时间优先返回脱敏的跨租户任务元数据。
+	// 结果刻意排除输入、结果、错误、尝试次数、引用、River 标识和日志。
+	// 空过滤数组和空字符串表示不限制；只有租户和仓库范围任务暴露作用域标识。
 	ListPlatformJobs(ctx context.Context, arg ListPlatformJobsParams) ([]ListPlatformJobsRow, error)
-	// ListRepositories returns active repositories in deterministic canonical URL and UUID order.
-	// The query and all predicates retain the tenant boundary even when the search string is empty.
+	// ListRepositories exposes the corresponding strongly typed database operation.
+	// 按规范化 URL 和 UUID 的确定顺序返回有效仓库。
+	// 即使搜索字符串为空，查询及全部谓词仍保留租户边界。
 	ListRepositories(ctx context.Context, arg ListRepositoriesParams) ([]Repository, error)
-	// ListRepositoriesForCredential returns non-deleted repository references in contract response order.
+	// ListRepositoriesForCredential exposes the corresponding strongly typed database operation.
+	// 按契约响应顺序返回未删除仓库对该凭据的引用。
 	ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error)
-	// ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
+	// ListRepositoriesForGlobalCredential exposes the corresponding strongly typed database operation.
+	// 返回引用某条平台凭据的未删除仓库。
 	ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error)
-	// ListTenantAuditLogs returns one newest-first page of append-only audit metadata
-	// inside an explicit tenant boundary. Business content and secret-bearing columns
-	// do not exist in this projection.
+	// ListTenantAuditLogs exposes the corresponding strongly typed database operation.
+	// 返回租户范围内按最新时间优先排列的一页追加式审计元数据。
+	// 查询始终受 tenant_id 限制，结果不包含业务内容或携带秘密的字段。
 	ListTenantAuditLogs(ctx context.Context, arg ListTenantAuditLogsParams) ([]ListTenantAuditLogsRow, error)
-	// ListTenantCredentials returns credentials visible to one user inside one active tenant.
-	// Team visibility is evaluated by a same-tenant team membership predicate. Global credentials are
-	// appended as tenant-visible records with is_global=true and a tenant-wide sharing projection.
+	// ListTenantCredentials exposes the corresponding strongly typed database operation.
+	// 返回一个用户在一个有效租户内可见的凭据。
+	// 团队可见性通过同租户团队成员条件判断；平台凭据以 is_global=true 和租户共享投影追加返回。
 	ListTenantCredentials(ctx context.Context, arg ListTenantCredentialsParams) ([]ListTenantCredentialsRow, error)
-	// ListTenantJobAttemptLogs batch-loads persisted events for a page of jobs without an N+1 query.
-	// The caller groups rows by job, one-based attempt, and stage to construct the API attempt projection.
+	// ListTenantJobAttemptLogs exposes the corresponding strongly typed database operation.
+	// 批量加载一页任务的持久化事件，避免 N+1 查询。
+	// 调用方按任务、一基尝试次数和阶段分组，构造 API 尝试投影。
 	ListTenantJobAttemptLogs(ctx context.Context, arg ListTenantJobAttemptLogsParams) ([]JobStageLog, error)
-	// ListTenantJobLogsAfter returns bounded SSE replay rows strictly after a persisted sequence cursor.
+	// ListTenantJobLogsAfter exposes the corresponding strongly typed database operation.
+	// 返回持久化序号游标之后、数量受限的 SSE 回放记录。
 	ListTenantJobLogsAfter(ctx context.Context, arg ListTenantJobLogsAfterParams) ([]JobStageLog, error)
-	// ListTenantJobs returns a newest-first page bounded by one tenant identifier.
-	// Empty filter arrays and strings mean no restriction; execution input and River identifiers remain internal.
+	// ListTenantJobs exposes the corresponding strongly typed database operation.
+	// 在一个租户标识边界内按最新时间优先返回任务分页。
+	// 空过滤数组和空字符串表示不限制；执行输入和 River 标识仍为内部字段。
 	ListTenantJobs(ctx context.Context, arg ListTenantJobsParams) ([]Job, error)
-	// ListTenants returns all tenant lifecycle records in stable slug and UUID order for platform administration.
+	// ListTenants exposes the corresponding strongly typed database operation.
+	// 按稳定 slug 和 UUID 顺序返回全部租户生命周期记录，供平台管理使用。
 	ListTenants(ctx context.Context, arg ListTenantsParams) ([]ListTenantsRow, error)
-	// ListUsers returns a stable platform-admin page of identities without password or session secrets.
-	// The optional search value is intentionally limited to username and display name.
+	// ListUsers exposes the corresponding strongly typed database operation.
+	// 为平台管理员返回稳定分页的身份元数据，不包含密码或会话秘密。
+	// 可选搜索值只匹配 username 和 display_name。
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
-	// LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
-	// The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
+	// LockCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// 在并发 HTTP 请求之间串行化一个轮换幂等键。
+	// 锁键由认证主体和操作派生，绝不来自秘密明文。
 	LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error
-	// LockJobStageSequence serializes the per-job log cursor inside the caller's transaction.
-	// The lock key is derived from tenant and job UUIDs and never contains user content.
+	// LockJobStageSequence exposes the corresponding strongly typed database operation.
+	// 在调用方事务内串行化单个任务的日志游标。
+	// 锁键由租户和任务 UUID 派生，不包含用户内容。
 	LockJobStageSequence(ctx context.Context, lockKey string) error
-	// LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
-	// A pending or running row is reused; terminal rows advance active_generation for new work.
+	// LockLatestCredentialSyncJob exposes the corresponding strongly typed database operation.
+	// 串行化一个仓库分支的凭据轮换去重。
+	// 状态为 pending 或 running 的记录会复用；终态记录会递增 active_generation 以接受新工作。
 	LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error)
-	// LockLatestTenantJobGeneration returns the newest semantic generation while holding its row lock.
+	// LockLatestTenantJobGeneration exposes the corresponding strongly typed database operation.
+	// 持有行锁时返回最新的语义代次。
 	LockLatestTenantJobGeneration(ctx context.Context, arg LockLatestTenantJobGenerationParams) (Job, error)
-	// LockRepositoryQuota serializes repository creation against the tenant's repository quota.
-	// The repository adapter holds this row lock while counting and inserting, so concurrent creates cannot oversubscribe a quota.
+	// LockRepositoryQuota exposes the corresponding strongly typed database operation.
+	// 使用租户配额行锁串行化仓库创建。
+	// 适配器在计数和插入期间持有该锁，避免并发创建超过租户配额。
 	LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// LockRetryJobIdempotency serializes one retry key for an authenticated tenant principal.
+	// LockRetryJobIdempotency exposes the corresponding strongly typed database operation.
+	// 为已认证的租户主体串行化一个重试幂等键。
 	LockRetryJobIdempotency(ctx context.Context, lockKey string) error
-	// LockTenantJobForControl serializes cancellation and manual retry decisions for one tenant job.
+	// LockTenantJobForControl exposes the corresponding strongly typed database operation.
+	// 串行化一个租户任务的取消和手动重试决策。
 	LockTenantJobForControl(ctx context.Context, arg LockTenantJobForControlParams) (Job, error)
-	// LockTenantStorageQuota serializes all tenant blob-reference accounting and
-	// returns the frozen unique-byte quota copied into the tenant snapshot.
+	// LockTenantStorageQuota exposes the corresponding strongly typed database operation.
+	// 串行化租户对象引用的全部配额核算，并返回复制到租户快照中的固定字节配额。
 	LockTenantStorageQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// MarkOutboxDelivered completes only the exact active lease so a stale worker
-	// cannot overwrite a delivery reclaimed by a newer dispatcher.
+	// MarkOutboxDelivered exposes the corresponding strongly typed database operation.
+	// 只完成准确的当前租约，防止旧 worker 覆盖新调度器重新领取的投递。
 	MarkOutboxDelivered(ctx context.Context, arg MarkOutboxDeliveredParams) (int64, error)
-	// MarkOutboxFailed records one redacted failed attempt and its next eligible
-	// time while fencing updates from expired delivery leases.
+	// MarkOutboxFailed exposes the corresponding strongly typed database operation.
+	// 记录一次脱敏失败尝试及下一次可执行时间，并隔离已过期租约的更新。
 	MarkOutboxFailed(ctx context.Context, arg MarkOutboxFailedParams) (int64, error)
-	// NextJobStageSequence returns the next replay cursor after the caller acquires
-	// the job-specific advisory transaction lock.
+	// NextJobStageSequence exposes the corresponding strongly typed database operation.
+	// 调用方取得任务专属事务 advisory lock 后，返回下一个回放游标。
 	NextJobStageSequence(ctx context.Context, arg NextJobStageSequenceParams) (int64, error)
-	// PromoteUserToPlatformAdmin grants platform control-plane privileges and advances the user revision.
+	// PromoteUserToPlatformAdmin exposes the corresponding strongly typed database operation.
+	// 授予平台控制面权限，并递增用户版本号。
 	PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error)
-	// ReplaceCredentialTeamShares removes and recreates the complete team-share projection in one transaction.
+	// ReplaceCredentialTeamShares exposes the corresponding strongly typed database operation.
+	// 在一个事务内删除并重建完整的凭据团队共享投影。
 	ReplaceCredentialTeamShares(ctx context.Context, arg ReplaceCredentialTeamSharesParams) error
-	// ResolveRepositoryCredential resolves one tenant-visible credential UUID to exactly one owning table.
-	// Tenant credentials are filtered by the same visibility predicate as the credential list endpoint;
-	// global credentials are selectable by every active member but remain platform-admin managed.
+	// ResolveRepositoryCredential exposes the corresponding strongly typed database operation.
+	// 将一个租户可见的凭据 UUID 解析到唯一的所属表。
+	// 租户凭据使用与凭据列表相同的可见性条件；平台凭据可被有效成员选择，但仍由平台管理员管理。
 	ResolveRepositoryCredential(ctx context.Context, arg ResolveRepositoryCredentialParams) (ResolveRepositoryCredentialRow, error)
-	// RevokeAPIToken idempotently revokes a PAT owned by one user in one tenant and returns its identifier.
-	// Returning an already-revoked matching row preserves idempotency while an absent or foreign row remains not found.
+	// RevokeAPIToken exposes the corresponding strongly typed database operation.
+	// 幂等撤销一个租户内用户拥有的 PAT，并返回其标识。
+	// 返回已经撤销的匹配记录以保持幂等；不存在或属于其他主体的记录仍视为未找到。
 	RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error)
-	// RevokeSession atomically revokes one active browser session and reports whether a row changed.
+	// RevokeSession exposes the corresponding strongly typed database operation.
+	// 原子撤销一个有效浏览器会话，并返回是否有记录发生变化。
 	RevokeSession(ctx context.Context, arg RevokeSessionParams) (int64, error)
-	// RotateCredentialSecret conditionally replaces encrypted secret material and advances its revision.
+	// RotateCredentialSecret exposes the corresponding strongly typed database operation.
+	// 有条件地替换加密秘密材料并递增凭据版本号。
 	RotateCredentialSecret(ctx context.Context, arg RotateCredentialSecretParams) (Credential, error)
-	// RotateGlobalCredentialSecret conditionally replaces global encrypted secret material and advances revision.
+	// RotateGlobalCredentialSecret exposes the corresponding strongly typed database operation.
+	// 有条件地替换平台加密秘密材料并递增版本号。
 	RotateGlobalCredentialSecret(ctx context.Context, arg RotateGlobalCredentialSecretParams) (GlobalCredential, error)
-	// RotateSessionCSRFHash replaces the keyed CSRF digest for one active browser session.
+	// RotateSessionCSRFHash exposes the corresponding strongly typed database operation.
+	// 替换一个有效浏览器会话的 CSRF 摘要。
 	RotateSessionCSRFHash(ctx context.Context, arg RotateSessionCSRFHashParams) (int64, error)
-	// SetJobExecutionStage records the active pipeline stage without changing the
-	// durable lifecycle state. Stage values are constrained by the application DDL.
+	// SetJobExecutionStage exposes the corresponding strongly typed database operation.
+	// 记录当前流水线阶段，不改变持久化生命周期状态。
+	// 阶段取值受应用 DDL 约束。
 	SetJobExecutionStage(ctx context.Context, arg SetJobExecutionStageParams) (int64, error)
-	// StartJobExecution claims a durable Meridian job for one River attempt.
-	// A terminal domain row is intentionally not claimed again; this makes River retries
-	// harmless after a worker already committed a terminal result.
+	// StartJobExecution exposes the corresponding strongly typed database operation.
+	// 为一次 River 尝试领取持久化 Meridian 任务。
+	// 终态领域记录不会再次领取，因此 worker 已提交终态后发生 River 重试也不会产生副作用。
 	StartJobExecution(ctx context.Context, arg StartJobExecutionParams) (Job, error)
-	// TouchAPIToken records the latest successful use of a non-revoked tenant PAT.
+	// TouchAPIToken exposes the corresponding strongly typed database operation.
+	// 记录未撤销租户 PAT 最近一次成功使用的时间。
 	TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error
-	// TouchSession records the latest accepted request time for a non-revoked browser session.
+	// TouchSession exposes the corresponding strongly typed database operation.
+	// 记录未撤销浏览器会话最近一次被接受请求的时间。
 	TouchSession(ctx context.Context, arg TouchSessionParams) error
-	// UnbindCredentialRepositories clears all references after the active-reference policy check.
-	// Archived repositories retain their health and history but cannot retain a deleted credential FK.
+	// UnbindCredentialRepositories exposes the corresponding strongly typed database operation.
+	// 通过有效引用策略检查后，清除所有仓库引用。
+	// 归档仓库保留健康状态和历史，但不能继续持有已删除凭据的外键。
 	UnbindCredentialRepositories(ctx context.Context, arg UnbindCredentialRepositoriesParams) error
-	// UnbindGlobalCredentialRepositories clears active and archived references before credential deletion.
-	// Only active repositories receive an authentication-required health error.
+	// UnbindGlobalCredentialRepositories exposes the corresponding strongly typed database operation.
+	// 在删除平台凭据前清除有效和归档仓库的引用。
+	// 只有有效仓库会记录需要重新认证的健康错误。
 	UnbindGlobalCredentialRepositories(ctx context.Context, arg UnbindGlobalCredentialRepositoriesParams) error
-	// UpdateCredentialMetadata conditionally updates tenant credential metadata and advances its revision.
+	// UpdateCredentialMetadata exposes the corresponding strongly typed database operation.
+	// 有条件地更新租户凭据元数据并递增版本号。
 	UpdateCredentialMetadata(ctx context.Context, arg UpdateCredentialMetadataParams) (Credential, error)
-	// UpdateGlobalCredentialMetadata conditionally updates a global credential name and advances its revision.
+	// UpdateGlobalCredentialMetadata exposes the corresponding strongly typed database operation.
+	// 有条件地更新平台凭据名称并递增版本号。
 	UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error)
-	// UpdateRepository conditionally updates explicit repository fields and advances its revision.
-	// Set flags preserve the distinction between omitted fields and explicit JSON null values.
+	// UpdateRepository exposes the corresponding strongly typed database operation.
+	// 有条件地更新明确提供的仓库字段并递增版本号。
+	// 字段 set 标志保留字段省略和显式 JSON null 之间的区别。
 	UpdateRepository(ctx context.Context, arg UpdateRepositoryParams) (Repository, error)
-	// UpdateTenant conditionally updates platform-controlled tenant fields and advances its revision.
-	// Set flags preserve omitted PATCH fields while allowing complete quota replacement.
+	// UpdateTenant exposes the corresponding strongly typed database operation.
+	// 有条件地更新平台控制的租户字段并递增版本号。
+	// 字段 set 标志保留 PATCH 字段省略状态，同时允许完整替换配额。
 	UpdateTenant(ctx context.Context, arg UpdateTenantParams) (Tenant, error)
-	// UpsertTenantMember creates or replaces a tenant role assignment and records the caller-supplied update time.
+	// UpsertTenantMember exposes the corresponding strongly typed database operation.
+	// 创建或替换租户角色关系，并记录调用方提供的更新时间。
 	UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error)
 }
 

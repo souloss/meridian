@@ -27,7 +27,8 @@ type AddCredentialTeamShareParams struct {
 	TeamID uuid.UUID `json:"team_id"`
 }
 
-// AddCredentialTeamShare grants one same-tenant team visibility entry.
+// AddCredentialTeamShare executes the generated AddCredentialTeamShare database query.
+// 授予一条同租户团队可见性关系。
 func (q *Queries) AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error {
 	_, err := q.db.Exec(ctx, addCredentialTeamShare, arg.TenantID, arg.CredentialID, arg.TeamID)
 	return err
@@ -49,7 +50,8 @@ type CountCredentialRepositoriesParams struct {
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// CountCredentialRepositories counts active repositories referencing a tenant credential.
+// CountCredentialRepositories executes the generated CountCredentialRepositories database query.
+// 统计引用某条租户凭据的有效仓库数量。
 func (q *Queries) CountCredentialRepositories(ctx context.Context, arg CountCredentialRepositoriesParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countCredentialRepositories, arg.TenantID, arg.CredentialID)
 	var count int64
@@ -64,7 +66,8 @@ WHERE global_credential_id = $1
   AND deleted_at IS NULL
 `
 
-// CountGlobalCredentialRepositories counts active repositories referencing a global credential.
+// CountGlobalCredentialRepositories executes the generated CountGlobalCredentialRepositories database query.
+// 统计引用某条平台凭据的有效仓库数量。
 func (q *Queries) CountGlobalCredentialRepositories(ctx context.Context, credentialID *uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countGlobalCredentialRepositories, credentialID)
 	var count int64
@@ -76,7 +79,8 @@ const countGlobalCredentials = `-- name: CountGlobalCredentials :one
 SELECT count(*) FROM global_credentials
 `
 
-// CountGlobalCredentials counts all platform-owned credentials.
+// CountGlobalCredentials executes the generated CountGlobalCredentials database query.
+// 统计全部平台凭据数量。
 func (q *Queries) CountGlobalCredentials(ctx context.Context) (int64, error) {
 	row := q.db.QueryRow(ctx, countGlobalCredentials)
 	var count int64
@@ -88,7 +92,8 @@ const countKnownHosts = `-- name: CountKnownHosts :one
 SELECT count(*) FROM known_hosts WHERE tenant_id = $1
 `
 
-// CountKnownHosts counts approved host identities in one tenant.
+// CountKnownHosts executes the generated CountKnownHosts database query.
+// 统计一个租户认可的主机身份数量。
 func (q *Queries) CountKnownHosts(ctx context.Context, tenantID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countKnownHosts, tenantID)
 	var count int64
@@ -129,7 +134,8 @@ type CountTenantCredentialsParams struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// CountTenantCredentials counts visible tenant-owned and global credentials for one tenant member.
+// CountTenantCredentials executes the generated CountTenantCredentials database query.
+// 统计一个租户成员可见的租户凭据和平台凭据数量。
 func (q *Queries) CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error) {
 	row := q.db.QueryRow(ctx, countTenantCredentials, arg.TenantID, arg.UserID)
 	var column_1 int32
@@ -173,8 +179,9 @@ type CreateCredentialParams struct {
 	CreatedBy uuid.UUID `json:"created_by"`
 }
 
-// CreateCredential inserts one tenant-owned encrypted credential and returns metadata plus ciphertext.
-// Secret plaintext is never accepted by SQL; the service supplies the encrypted projection only.
+// CreateCredential executes the generated CreateCredential database query.
+// 写入一条租户拥有的加密凭据，并返回元数据和密文。
+// 查询不会接收秘密明文，服务层只提供加密后的投影。
 func (q *Queries) CreateCredential(ctx context.Context, arg CreateCredentialParams) (Credential, error) {
 	row := q.db.QueryRow(ctx, createCredential,
 		arg.TenantID,
@@ -234,8 +241,9 @@ type CreateCredentialRotationIdempotencyParams struct {
 	ResponseBody []byte `json:"response_body"`
 }
 
-// CreateCredentialRotationIdempotency stores a safe tenant rotation response for 24-hour exact replay.
-// Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+// CreateCredentialRotationIdempotency executes the generated CreateCredentialRotationIdempotency database query.
+// 保存可安全精确重放 24 小时的租户凭据轮换响应。
+// 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 func (q *Queries) CreateCredentialRotationIdempotency(ctx context.Context, arg CreateCredentialRotationIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, createCredentialRotationIdempotency,
 		arg.TenantID,
@@ -279,8 +287,9 @@ type CreateCredentialSyncJobParams struct {
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// CreateCredentialSyncJob records one durable default-branch repository sync request.
-// The input contains only the non-secret credential identifier and rotation reason.
+// CreateCredentialSyncJob executes the generated CreateCredentialSyncJob database query.
+// 记录一条持久化的默认分支仓库同步请求。
+// 输入只包含非敏感凭据标识和轮换原因。
 func (q *Queries) CreateCredentialSyncJob(ctx context.Context, arg CreateCredentialSyncJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, createCredentialSyncJob,
 		arg.TenantID,
@@ -353,7 +362,8 @@ type CreateGlobalCredentialParams struct {
 	CreatedBy uuid.UUID `json:"created_by"`
 }
 
-// CreateGlobalCredential inserts one platform-owned encrypted credential.
+// CreateGlobalCredential executes the generated CreateGlobalCredential database query.
+// 写入一条平台拥有的加密凭据。
 func (q *Queries) CreateGlobalCredential(ctx context.Context, arg CreateGlobalCredentialParams) (GlobalCredential, error) {
 	row := q.db.QueryRow(ctx, createGlobalCredential,
 		arg.ID,
@@ -407,8 +417,9 @@ type CreateGlobalCredentialRotationIdempotencyParams struct {
 	ResponseBody []byte `json:"response_body"`
 }
 
-// CreateGlobalCredentialRotationIdempotency stores a safe platform rotation response for 24-hour exact replay.
-// Ciphertext, nonces, and every other secret-bearing field are excluded from response_body by the adapter.
+// CreateGlobalCredentialRotationIdempotency executes the generated CreateGlobalCredentialRotationIdempotency database query.
+// 保存可安全精确重放 24 小时的平台凭据轮换响应。
+// 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 func (q *Queries) CreateGlobalCredentialRotationIdempotency(ctx context.Context, arg CreateGlobalCredentialRotationIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, createGlobalCredentialRotationIdempotency,
 		arg.PrincipalType,
@@ -452,7 +463,8 @@ type CreateKnownHostParams struct {
 	CreatedBy *uuid.UUID `json:"created_by"`
 }
 
-// CreateKnownHost inserts a server-derived approved SSH host identity.
+// CreateKnownHost executes the generated CreateKnownHost database query.
+// 写入一条由服务端派生的已认可 SSH 主机身份。
 func (q *Queries) CreateKnownHost(ctx context.Context, arg CreateKnownHostParams) (KnownHost, error) {
 	row := q.db.QueryRow(ctx, createKnownHost,
 		arg.TenantID,
@@ -499,7 +511,8 @@ type DeleteCredentialParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// DeleteCredential removes a tenant credential after the caller has applied reference and ETag checks.
+// DeleteCredential executes the generated DeleteCredential database query.
+// 调用方完成引用和 ETag 检查后，删除一条租户凭据。
 func (q *Queries) DeleteCredential(ctx context.Context, arg DeleteCredentialParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteCredential, arg.TenantID, arg.ID, arg.ExpectedRevision)
 	if err != nil {
@@ -529,7 +542,8 @@ type DeleteCredentialRotationIdempotencyParams struct {
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// DeleteCredentialRotationIdempotency removes an expired tenant rotation replay before reuse.
+// DeleteCredentialRotationIdempotency executes the generated DeleteCredentialRotationIdempotency database query.
+// 在重新使用前删除已过期的租户凭据轮换重放记录。
 func (q *Queries) DeleteCredentialRotationIdempotency(ctx context.Context, arg DeleteCredentialRotationIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, deleteCredentialRotationIdempotency,
 		arg.TenantID,
@@ -554,7 +568,8 @@ type DeleteGlobalCredentialParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// DeleteGlobalCredential removes one platform credential after reference and ETag checks.
+// DeleteGlobalCredential executes the generated DeleteGlobalCredential database query.
+// 完成引用和 ETag 检查后，删除一条平台凭据。
 func (q *Queries) DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCredentialParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteGlobalCredential, arg.ID, arg.ExpectedRevision)
 	if err != nil {
@@ -582,7 +597,8 @@ type DeleteGlobalCredentialRotationIdempotencyParams struct {
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// DeleteGlobalCredentialRotationIdempotency removes an expired platform rotation replay before reuse.
+// DeleteGlobalCredentialRotationIdempotency executes the generated DeleteGlobalCredentialRotationIdempotency database query.
+// 在重新使用前删除已过期的平台凭据轮换重放记录。
 func (q *Queries) DeleteGlobalCredentialRotationIdempotency(ctx context.Context, arg DeleteGlobalCredentialRotationIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, deleteGlobalCredentialRotationIdempotency, arg.PrincipalType, arg.PrincipalID, arg.IdempotencyKey)
 	return err
@@ -621,7 +637,8 @@ type GetCredentialRotationIdempotencyRow struct {
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// GetCredentialRotationIdempotency returns a retained tenant rotation replay record, including its expiry.
+// GetCredentialRotationIdempotency executes the generated GetCredentialRotationIdempotency database query.
+// 返回保留的租户凭据轮换重放记录及其过期时间。
 func (q *Queries) GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error) {
 	row := q.db.QueryRow(ctx, getCredentialRotationIdempotency,
 		arg.TenantID,
@@ -638,7 +655,8 @@ const getGlobalCredential = `-- name: GetGlobalCredential :one
 SELECT id, name, kind, ciphertext, nonce, key_version, fingerprint, created_by, last_used_at, revision, created_at, updated_at FROM global_credentials WHERE id = $1
 `
 
-// GetGlobalCredential returns one platform-owned credential.
+// GetGlobalCredential executes the generated GetGlobalCredential database query.
+// 返回一条平台凭据。
 func (q *Queries) GetGlobalCredential(ctx context.Context, id uuid.UUID) (GlobalCredential, error) {
 	row := q.db.QueryRow(ctx, getGlobalCredential, id)
 	var i GlobalCredential
@@ -690,7 +708,8 @@ type GetGlobalCredentialRotationIdempotencyRow struct {
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// GetGlobalCredentialRotationIdempotency returns a retained platform rotation replay record.
+// GetGlobalCredentialRotationIdempotency executes the generated GetGlobalCredentialRotationIdempotency database query.
+// 返回保留的平台凭据轮换重放记录。
 func (q *Queries) GetGlobalCredentialRotationIdempotency(ctx context.Context, arg GetGlobalCredentialRotationIdempotencyParams) (GetGlobalCredentialRotationIdempotencyRow, error) {
 	row := q.db.QueryRow(ctx, getGlobalCredentialRotationIdempotency, arg.PrincipalType, arg.PrincipalID, arg.IdempotencyKey)
 	var i GetGlobalCredentialRotationIdempotencyRow
@@ -790,7 +809,8 @@ type GetTenantCredentialRow struct {
 	TeamIds string `json:"team_ids"`
 }
 
-// GetTenantCredential returns one visible tenant credential and its team-share identifiers.
+// GetTenantCredential executes the generated GetTenantCredential database query.
+// 返回一条可见的租户凭据及其团队共享标识。
 func (q *Queries) GetTenantCredential(ctx context.Context, arg GetTenantCredentialParams) (GetTenantCredentialRow, error) {
 	row := q.db.QueryRow(ctx, getTenantCredential, arg.TenantID, arg.ID, arg.UserID)
 	var i GetTenantCredentialRow
@@ -829,8 +849,9 @@ type GetTenantCredentialForMutationParams struct {
 	ID uuid.UUID `json:"id"`
 }
 
-// GetTenantCredentialForMutation returns one tenant credential without visibility filtering.
-// The service has already authorized the tenant operation; this query preserves a 404/412 distinction.
+// GetTenantCredentialForMutation executes the generated GetTenantCredentialForMutation database query.
+// 返回一条不经过可见性过滤的租户凭据。
+// 服务层已完成租户操作授权，本查询保留 404 与 412 的区别。
 func (q *Queries) GetTenantCredentialForMutation(ctx context.Context, arg GetTenantCredentialForMutationParams) (Credential, error) {
 	row := q.db.QueryRow(ctx, getTenantCredentialForMutation, arg.TenantID, arg.ID)
 	var i Credential
@@ -869,7 +890,8 @@ type ListCredentialTeamSharesParams struct {
 	CredentialID uuid.UUID `json:"credential_id"`
 }
 
-// ListCredentialTeamShares returns the complete ordered team-share set for one tenant credential.
+// ListCredentialTeamShares executes the generated ListCredentialTeamShares database query.
+// 返回一条租户凭据完整且有序的团队共享集合。
 func (q *Queries) ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error) {
 	rows, err := q.db.Query(ctx, listCredentialTeamShares, arg.TenantID, arg.CredentialID)
 	if err != nil {
@@ -906,7 +928,8 @@ type ListGlobalCredentialsParams struct {
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListGlobalCredentials returns one stable page of platform-owned credentials.
+// ListGlobalCredentials executes the generated ListGlobalCredentials database query.
+// 返回平台凭据的稳定分页结果。
 func (q *Queries) ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error) {
 	rows, err := q.db.Query(ctx, listGlobalCredentials, arg.PageOffset, arg.PageLimit)
 	if err != nil {
@@ -959,7 +982,8 @@ type ListKnownHostsParams struct {
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListKnownHosts returns one stable page of tenant-approved SSH host identities.
+// ListKnownHosts executes the generated ListKnownHosts database query.
+// 返回租户认可的 SSH 主机身份稳定分页结果。
 func (q *Queries) ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error) {
 	rows, err := q.db.Query(ctx, listKnownHosts, arg.TenantID, arg.PageOffset, arg.PageLimit)
 	if err != nil {
@@ -1026,7 +1050,8 @@ type ListRepositoriesForCredentialRow struct {
 	DefaultBranch string `json:"default_branch"`
 }
 
-// ListRepositoriesForCredential returns non-deleted repository references in contract response order.
+// ListRepositoriesForCredential executes the generated ListRepositoriesForCredential database query.
+// 按契约响应顺序返回未删除仓库对该凭据的引用。
 func (q *Queries) ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error) {
 	rows, err := q.db.Query(ctx, listRepositoriesForCredential, arg.TenantID, arg.CredentialID)
 	if err != nil {
@@ -1077,7 +1102,8 @@ type ListRepositoriesForGlobalCredentialRow struct {
 	DefaultBranch string `json:"default_branch"`
 }
 
-// ListRepositoriesForGlobalCredential returns non-deleted repository references for a platform credential.
+// ListRepositoriesForGlobalCredential executes the generated ListRepositoriesForGlobalCredential database query.
+// 返回引用某条平台凭据的未删除仓库。
 func (q *Queries) ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error) {
 	rows, err := q.db.Query(ctx, listRepositoriesForGlobalCredential, credentialID)
 	if err != nil {
@@ -1224,9 +1250,9 @@ type ListTenantCredentialsRow struct {
 	TeamIds string `json:"team_ids"`
 }
 
-// ListTenantCredentials returns credentials visible to one user inside one active tenant.
-// Team visibility is evaluated by a same-tenant team membership predicate. Global credentials are
-// appended as tenant-visible records with is_global=true and a tenant-wide sharing projection.
+// ListTenantCredentials executes the generated ListTenantCredentials database query.
+// 返回一个用户在一个有效租户内可见的凭据。
+// 团队可见性通过同租户团队成员条件判断；平台凭据以 is_global=true 和租户共享投影追加返回。
 func (q *Queries) ListTenantCredentials(ctx context.Context, arg ListTenantCredentialsParams) ([]ListTenantCredentialsRow, error) {
 	rows, err := q.db.Query(ctx, listTenantCredentials,
 		arg.TenantID,
@@ -1273,8 +1299,9 @@ const lockCredentialRotationIdempotency = `-- name: LockCredentialRotationIdempo
 SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
 `
 
-// LockCredentialRotationIdempotency serializes one rotation key across concurrent HTTP requests.
-// The lock key is derived from the authenticated principal and operation, never from plaintext secrets.
+// LockCredentialRotationIdempotency executes the generated LockCredentialRotationIdempotency database query.
+// 在并发 HTTP 请求之间串行化一个轮换幂等键。
+// 锁键由认证主体和操作派生，绝不来自秘密明文。
 func (q *Queries) LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error {
 	_, err := q.db.Exec(ctx, lockCredentialRotationIdempotency, lockKey)
 	return err
@@ -1310,8 +1337,9 @@ type LockLatestCredentialSyncJobRow struct {
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// LockLatestCredentialSyncJob serializes credential-rotation deduplication for one repository branch.
-// A pending or running row is reused; terminal rows advance active_generation for new work.
+// LockLatestCredentialSyncJob executes the generated LockLatestCredentialSyncJob database query.
+// 串行化一个仓库分支的凭据轮换去重。
+// 状态为 pending 或 running 的记录会复用；终态记录会递增 active_generation 以接受新工作。
 func (q *Queries) LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error) {
 	row := q.db.QueryRow(ctx, lockLatestCredentialSyncJob, arg.TenantID, arg.DedupeKey)
 	var i LockLatestCredentialSyncJobRow
@@ -1338,7 +1366,8 @@ type ReplaceCredentialTeamSharesParams struct {
 	CredentialID uuid.UUID `json:"credential_id"`
 }
 
-// ReplaceCredentialTeamShares removes and recreates the complete team-share projection in one transaction.
+// ReplaceCredentialTeamShares executes the generated ReplaceCredentialTeamShares database query.
+// 在一个事务内删除并重建完整的凭据团队共享投影。
 func (q *Queries) ReplaceCredentialTeamShares(ctx context.Context, arg ReplaceCredentialTeamSharesParams) error {
 	_, err := q.db.Exec(ctx, replaceCredentialTeamShares, arg.TenantID, arg.CredentialID)
 	return err
@@ -1379,7 +1408,8 @@ type RotateCredentialSecretParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// RotateCredentialSecret conditionally replaces encrypted secret material and advances its revision.
+// RotateCredentialSecret executes the generated RotateCredentialSecret database query.
+// 有条件地替换加密秘密材料并递增凭据版本号。
 func (q *Queries) RotateCredentialSecret(ctx context.Context, arg RotateCredentialSecretParams) (Credential, error) {
 	row := q.db.QueryRow(ctx, rotateCredentialSecret,
 		arg.Ciphertext,
@@ -1443,7 +1473,8 @@ type RotateGlobalCredentialSecretParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// RotateGlobalCredentialSecret conditionally replaces global encrypted secret material and advances revision.
+// RotateGlobalCredentialSecret executes the generated RotateGlobalCredentialSecret database query.
+// 有条件地替换平台加密秘密材料并递增版本号。
 func (q *Queries) RotateGlobalCredentialSecret(ctx context.Context, arg RotateGlobalCredentialSecretParams) (GlobalCredential, error) {
 	row := q.db.QueryRow(ctx, rotateGlobalCredentialSecret,
 		arg.Ciphertext,
@@ -1478,9 +1509,15 @@ SET
   credential_id = NULL,
   revision = revision + 1,
   updated_at = $1,
-  health = CASE WHEN deleted_at IS NULL
-    THEN jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"credential was deleted"}'::jsonb, true)
-    ELSE health END
+  health = CASE
+    WHEN deleted_at IS NULL THEN jsonb_set(
+      COALESCE(health, '{}'::jsonb),
+      '{lastError}',
+      '{"class":"auth","message":"credential was deleted"}'::jsonb,
+      true
+    )
+    ELSE health
+  END
 WHERE tenant_id = $2
   AND credential_id = $3
 `
@@ -1495,8 +1532,9 @@ type UnbindCredentialRepositoriesParams struct {
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// UnbindCredentialRepositories clears all references after the active-reference policy check.
-// Archived repositories retain their health and history but cannot retain a deleted credential FK.
+// UnbindCredentialRepositories executes the generated UnbindCredentialRepositories database query.
+// 通过有效引用策略检查后，清除所有仓库引用。
+// 归档仓库保留健康状态和历史，但不能继续持有已删除凭据的外键。
 func (q *Queries) UnbindCredentialRepositories(ctx context.Context, arg UnbindCredentialRepositoriesParams) error {
 	_, err := q.db.Exec(ctx, unbindCredentialRepositories, arg.UpdatedAt, arg.TenantID, arg.CredentialID)
 	return err
@@ -1508,9 +1546,15 @@ SET
   global_credential_id = NULL,
   revision = revision + 1,
   updated_at = $1,
-  health = CASE WHEN deleted_at IS NULL
-    THEN jsonb_set(COALESCE(health, '{}'::jsonb), '{lastError}', '{"class":"auth","message":"global credential was deleted"}'::jsonb, true)
-    ELSE health END
+  health = CASE
+    WHEN deleted_at IS NULL THEN jsonb_set(
+      COALESCE(health, '{}'::jsonb),
+      '{lastError}',
+      '{"class":"auth","message":"global credential was deleted"}'::jsonb,
+      true
+    )
+    ELSE health
+  END
 WHERE global_credential_id = $2
 `
 
@@ -1522,8 +1566,9 @@ type UnbindGlobalCredentialRepositoriesParams struct {
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// UnbindGlobalCredentialRepositories clears active and archived references before credential deletion.
-// Only active repositories receive an authentication-required health error.
+// UnbindGlobalCredentialRepositories executes the generated UnbindGlobalCredentialRepositories database query.
+// 在删除平台凭据前清除有效和归档仓库的引用。
+// 只有有效仓库会记录需要重新认证的健康错误。
 func (q *Queries) UnbindGlobalCredentialRepositories(ctx context.Context, arg UnbindGlobalCredentialRepositoriesParams) error {
 	_, err := q.db.Exec(ctx, unbindGlobalCredentialRepositories, arg.UpdatedAt, arg.CredentialID)
 	return err
@@ -1558,7 +1603,8 @@ type UpdateCredentialMetadataParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateCredentialMetadata conditionally updates tenant credential metadata and advances its revision.
+// UpdateCredentialMetadata executes the generated UpdateCredentialMetadata database query.
+// 有条件地更新租户凭据元数据并递增版本号。
 func (q *Queries) UpdateCredentialMetadata(ctx context.Context, arg UpdateCredentialMetadataParams) (Credential, error) {
 	row := q.db.QueryRow(ctx, updateCredentialMetadata,
 		arg.Name,
@@ -1608,7 +1654,8 @@ type UpdateGlobalCredentialMetadataParams struct {
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateGlobalCredentialMetadata conditionally updates a global credential name and advances its revision.
+// UpdateGlobalCredentialMetadata executes the generated UpdateGlobalCredentialMetadata database query.
+// 有条件地更新平台凭据名称并递增版本号。
 func (q *Queries) UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error) {
 	row := q.db.QueryRow(ctx, updateGlobalCredentialMetadata,
 		arg.Name,
