@@ -1,17 +1,48 @@
-.vfox/
-web/node_modules/
-web/.nuxt/
-web/.output/
-web/dist/
-web/test-results/
-web/tests/spikes/harness/.nuxt/
-web/tests/spikes/harness/.output/
-web/tests/spikes/harness/dist
-bin/
-*.log
-artifacts/smoke/
+# 系统与编辑器
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
 
-node_modules
-build/contracts/api/
+# 本地工具链与 Agent 运行时
+.vfox/
+.codex/
+.agents/
+.codegraph/
+skills-lock.json
+
+# 环境变量、凭据和临时密钥
+.env
+.env.*
+!.env.example
+passwd
+*.pem
+*.key
+
+# Go 构建、测试与覆盖率产物
+bin/
+build/
+*.test
+coverage.out
+
+# Node/Nuxt 依赖与构建产物（适用于仓库内所有层级）
+node_modules/
+.nuxt/
+.output/
+dist/
+**/dist
+web/test-results/
+
+# 契约生成缓存
 contracts/api/tsp-output/
+
+# 测试截图、Smoke 与本地报告
+artifacts/smoke/
+artifacts/prototype/
+docs.tar
+web/public/mockServiceWorker.js
+
+# 日志与 Python 缓存
+*.log
 __pycache__/
