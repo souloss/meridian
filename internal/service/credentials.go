@@ -280,7 +280,7 @@ func rotationPrincipal(actor Principal) (string, uuid.UUID) {
 	if actor.Kind == PrincipalPAT {
 		return string(actor.Kind), actor.TokenID
 	}
-	return string(actor.Kind), actor.SessionID
+	return string(actor.Kind), actor.User.ID
 }
 
 func validateCredentialRotationReplay(rotation CredentialRotation) error {
@@ -343,7 +343,7 @@ func (credentials *Credentials) tenantMembership(ctx context.Context, actor Prin
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
 	}
-	if actor.Kind != PrincipalSession || credentials.identities == nil {
+	if actor.Kind != PrincipalJWT || credentials.identities == nil {
 		return Membership{}, ErrNotFound
 	}
 	membership, err := credentials.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)

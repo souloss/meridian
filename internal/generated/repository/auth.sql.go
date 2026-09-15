@@ -146,12 +146,12 @@ func (q *Queries) CreateDefaultUserPreferences(ctx context.Context, userID uuid.
 	return i, err
 }
 
-const createSession = `-- name: CreateSession :one
-INSERT INTO sessions (
+const createRefreshToken = `-- name: CreateRefreshToken :one
+INSERT INTO refresh_tokens (
   id,
   user_id,
   token_hash,
-  csrf_hash,
+  family_id,
   expires_at
 ) VALUES (
   $1,
@@ -160,44 +160,43 @@ INSERT INTO sessions (
   $4,
   $5
 )
-RETURNING id, user_id, token_hash, csrf_hash, expires_at, revoked_at, last_seen_at, created_at, updated_at
+RETURNING id, user_id, token_hash, family_id, expires_at, revoked_at, replaced_by, created_at
 `
 
-// CreateSessionParams contains the strongly typed arguments for the CreateSession query.
-type CreateSessionParams struct {
-	// ID is the id value supplied to the CreateSession query.
+// CreateRefreshTokenParams contains the strongly typed arguments for the CreateRefreshToken query.
+type CreateRefreshTokenParams struct {
+	// ID is the id value supplied to the CreateRefreshToken query.
 	ID uuid.UUID `json:"id"`
-	// UserID is the user id value supplied to the CreateSession query.
+	// UserID is the user id value supplied to the CreateRefreshToken query.
 	UserID uuid.UUID `json:"user_id"`
-	// TokenHash is the token hash value supplied to the CreateSession query.
+	// TokenHash is the token hash value supplied to the CreateRefreshToken query.
 	TokenHash []byte `json:"token_hash"`
-	// CsrfHash is the csrf hash value supplied to the CreateSession query.
-	CsrfHash []byte `json:"csrf_hash"`
-	// ExpiresAt is the expires at value supplied to the CreateSession query.
+	// FamilyID is the family id value supplied to the CreateRefreshToken query.
+	FamilyID uuid.UUID `json:"family_id"`
+	// ExpiresAt is the expires at value supplied to the CreateRefreshToken query.
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// CreateSession executes the generated CreateSession database query.
-// 保存会话令牌和 CSRF 摘要，不保存任一令牌的明文。
-func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
-	row := q.db.QueryRow(ctx, createSession,
+// CreateRefreshToken executes the generated CreateRefreshToken database query.
+// 保存刷新令牌摘要，不保存明文；family_id 用于轮换家族与重放检测。
+func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error) {
+	row := q.db.QueryRow(ctx, createRefreshToken,
 		arg.ID,
 		arg.UserID,
 		arg.TokenHash,
-		arg.CsrfHash,
+		arg.FamilyID,
 		arg.ExpiresAt,
 	)
-	var i Session
+	var i RefreshToken
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
 		&i.TokenHash,
-		&i.CsrfHash,
+		&i.FamilyID,
 		&i.ExpiresAt,
 		&i.RevokedAt,
-		&i.LastSeenAt,
+		&i.ReplacedBy,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -357,73 +356,76 @@ func (q *Queries) GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAP
 	return i, err
 }
 
-const getSessionPrincipalByTokenHash = `-- name: GetSessionPrincipalByTokenHash :one
+const getRefreshTokenPrincipalByTokenHash = `-- name: GetRefreshTokenPrincipalByTokenHash :one
 SELECT
-  sessions.id AS session_id,
-  sessions.user_id,
-  sessions.csrf_hash,
-  sessions.expires_at,
+  refresh_tokens.id AS token_id,
+  refresh_tokens.user_id,
+  refresh_tokens.family_id,
+  refresh_tokens.revoked_at,
+  refresh_tokens.expires_at,
   users.username,
   users.display_name,
   users.email,
-	users.status AS user_status,
-	users.is_platform_admin,
-	users.revision AS user_revision,
-	users.created_at AS user_created_at,
-	users.updated_at AS user_updated_at
-FROM sessions
-JOIN users ON users.id = sessions.user_id
-WHERE sessions.token_hash = $1
-  AND sessions.revoked_at IS NULL
-  AND sessions.expires_at > $2
+  users.status AS user_status,
+  users.is_platform_admin,
+  users.revision AS user_revision,
+  users.created_at AS user_created_at,
+  users.updated_at AS user_updated_at
+FROM refresh_tokens
+JOIN users ON users.id = refresh_tokens.user_id
+WHERE refresh_tokens.token_hash = $1
+  AND refresh_tokens.expires_at > $2
   AND users.status = 'active'
 `
 
-// GetSessionPrincipalByTokenHashParams contains the strongly typed arguments for the GetSessionPrincipalByTokenHash query.
-type GetSessionPrincipalByTokenHashParams struct {
-	// TokenHash is the token hash value supplied to the GetSessionPrincipalByTokenHash query.
+// GetRefreshTokenPrincipalByTokenHashParams contains the strongly typed arguments for the GetRefreshTokenPrincipalByTokenHash query.
+type GetRefreshTokenPrincipalByTokenHashParams struct {
+	// TokenHash is the token hash value supplied to the GetRefreshTokenPrincipalByTokenHash query.
 	TokenHash []byte `json:"token_hash"`
-	// AuthenticatedAt is the authenticated at value supplied to the GetSessionPrincipalByTokenHash query.
+	// AuthenticatedAt is the authenticated at value supplied to the GetRefreshTokenPrincipalByTokenHash query.
 	AuthenticatedAt pgtype.Timestamptz `json:"authenticated_at"`
 }
 
-// GetSessionPrincipalByTokenHashRow contains the columns returned by the GetSessionPrincipalByTokenHash query.
-type GetSessionPrincipalByTokenHashRow struct {
-	// SessionID is the session id value returned by the GetSessionPrincipalByTokenHash query.
-	SessionID uuid.UUID `json:"session_id"`
-	// UserID is the user id value returned by the GetSessionPrincipalByTokenHash query.
+// GetRefreshTokenPrincipalByTokenHashRow contains the columns returned by the GetRefreshTokenPrincipalByTokenHash query.
+type GetRefreshTokenPrincipalByTokenHashRow struct {
+	// TokenID is the token id value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	TokenID uuid.UUID `json:"token_id"`
+	// UserID is the user id value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	UserID uuid.UUID `json:"user_id"`
-	// CsrfHash is the csrf hash value returned by the GetSessionPrincipalByTokenHash query.
-	CsrfHash []byte `json:"csrf_hash"`
-	// ExpiresAt is the expires at value returned by the GetSessionPrincipalByTokenHash query.
+	// FamilyID is the family id value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	FamilyID uuid.UUID `json:"family_id"`
+	// RevokedAt is the revoked at value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
+	// ExpiresAt is the expires at value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
-	// Username is the username value returned by the GetSessionPrincipalByTokenHash query.
+	// Username is the username value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	Username string `json:"username"`
-	// DisplayName is the display name value returned by the GetSessionPrincipalByTokenHash query.
+	// DisplayName is the display name value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	DisplayName string `json:"display_name"`
-	// Email is the email value returned by the GetSessionPrincipalByTokenHash query.
+	// Email is the email value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	Email *string `json:"email"`
-	// UserStatus is the user status value returned by the GetSessionPrincipalByTokenHash query.
+	// UserStatus is the user status value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	UserStatus string `json:"user_status"`
-	// IsPlatformAdmin is the is platform admin value returned by the GetSessionPrincipalByTokenHash query.
+	// IsPlatformAdmin is the is platform admin value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	IsPlatformAdmin bool `json:"is_platform_admin"`
-	// UserRevision is the user revision value returned by the GetSessionPrincipalByTokenHash query.
+	// UserRevision is the user revision value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	UserRevision int64 `json:"user_revision"`
-	// UserCreatedAt is the user created at value returned by the GetSessionPrincipalByTokenHash query.
+	// UserCreatedAt is the user created at value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	UserCreatedAt pgtype.Timestamptz `json:"user_created_at"`
-	// UserUpdatedAt is the user updated at value returned by the GetSessionPrincipalByTokenHash query.
+	// UserUpdatedAt is the user updated at value returned by the GetRefreshTokenPrincipalByTokenHash query.
 	UserUpdatedAt pgtype.Timestamptz `json:"user_updated_at"`
 }
 
-// GetSessionPrincipalByTokenHash executes the generated GetSessionPrincipalByTokenHash database query.
-// 在调用方指定的时间点，根据令牌摘要认证一个有效浏览器会话和有效用户。
-func (q *Queries) GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error) {
-	row := q.db.QueryRow(ctx, getSessionPrincipalByTokenHash, arg.TokenHash, arg.AuthenticatedAt)
-	var i GetSessionPrincipalByTokenHashRow
+// GetRefreshTokenPrincipalByTokenHash executes the generated GetRefreshTokenPrincipalByTokenHash database query.
+// 在调用方指定的时间点，根据令牌摘要认证一个有效刷新令牌和有效用户。
+func (q *Queries) GetRefreshTokenPrincipalByTokenHash(ctx context.Context, arg GetRefreshTokenPrincipalByTokenHashParams) (GetRefreshTokenPrincipalByTokenHashRow, error) {
+	row := q.db.QueryRow(ctx, getRefreshTokenPrincipalByTokenHash, arg.TokenHash, arg.AuthenticatedAt)
+	var i GetRefreshTokenPrincipalByTokenHashRow
 	err := row.Scan(
-		&i.SessionID,
+		&i.TokenID,
 		&i.UserID,
-		&i.CsrfHash,
+		&i.FamilyID,
+		&i.RevokedAt,
 		&i.ExpiresAt,
 		&i.Username,
 		&i.DisplayName,
@@ -704,57 +706,55 @@ func (q *Queries) RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) 
 	return id, err
 }
 
-const revokeSession = `-- name: RevokeSession :execrows
-UPDATE sessions
+const revokeRefreshTokenFamily = `-- name: RevokeRefreshTokenFamily :execrows
+UPDATE refresh_tokens
 SET
-  revoked_at = $1,
-  updated_at = $1
-WHERE id = $2
+  revoked_at = $1
+WHERE family_id = $2
   AND revoked_at IS NULL
 `
 
-// RevokeSessionParams contains the strongly typed arguments for the RevokeSession query.
-type RevokeSessionParams struct {
-	// RevokedAt is the revoked at value supplied to the RevokeSession query.
+// RevokeRefreshTokenFamilyParams contains the strongly typed arguments for the RevokeRefreshTokenFamily query.
+type RevokeRefreshTokenFamilyParams struct {
+	// RevokedAt is the revoked at value supplied to the RevokeRefreshTokenFamily query.
 	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
-	// ID is the id value supplied to the RevokeSession query.
-	ID uuid.UUID `json:"id"`
+	// FamilyID is the family id value supplied to the RevokeRefreshTokenFamily query.
+	FamilyID uuid.UUID `json:"family_id"`
 }
 
-// RevokeSession executes the generated RevokeSession database query.
-// 原子撤销一个有效浏览器会话，并返回是否有记录发生变化。
-func (q *Queries) RevokeSession(ctx context.Context, arg RevokeSessionParams) (int64, error) {
-	result, err := q.db.Exec(ctx, revokeSession, arg.RevokedAt, arg.ID)
+// RevokeRefreshTokenFamily executes the generated RevokeRefreshTokenFamily database query.
+// 撤销一个刷新令牌家族的全部有效令牌，用于登出或重放检测。
+func (q *Queries) RevokeRefreshTokenFamily(ctx context.Context, arg RevokeRefreshTokenFamilyParams) (int64, error) {
+	result, err := q.db.Exec(ctx, revokeRefreshTokenFamily, arg.RevokedAt, arg.FamilyID)
 	if err != nil {
 		return 0, err
 	}
 	return result.RowsAffected(), nil
 }
 
-const rotateSessionCSRFHash = `-- name: RotateSessionCSRFHash :execrows
-UPDATE sessions
+const rotateRefreshToken = `-- name: RotateRefreshToken :execrows
+UPDATE refresh_tokens
 SET
-  csrf_hash = $1,
-  updated_at = $2
+  revoked_at = $1,
+  replaced_by = $2
 WHERE id = $3
   AND revoked_at IS NULL
-  AND expires_at > $2
 `
 
-// RotateSessionCSRFHashParams contains the strongly typed arguments for the RotateSessionCSRFHash query.
-type RotateSessionCSRFHashParams struct {
-	// CsrfHash is the csrf hash value supplied to the RotateSessionCSRFHash query.
-	CsrfHash []byte `json:"csrf_hash"`
-	// UpdatedAt is the updated at value supplied to the RotateSessionCSRFHash query.
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// ID is the id value supplied to the RotateSessionCSRFHash query.
+// RotateRefreshTokenParams contains the strongly typed arguments for the RotateRefreshToken query.
+type RotateRefreshTokenParams struct {
+	// RevokedAt is the revoked at value supplied to the RotateRefreshToken query.
+	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
+	// ReplacedBy is the replaced by value supplied to the RotateRefreshToken query.
+	ReplacedBy *uuid.UUID `json:"replaced_by"`
+	// ID is the id value supplied to the RotateRefreshToken query.
 	ID uuid.UUID `json:"id"`
 }
 
-// RotateSessionCSRFHash executes the generated RotateSessionCSRFHash database query.
-// 替换一个有效浏览器会话的 CSRF 摘要。
-func (q *Queries) RotateSessionCSRFHash(ctx context.Context, arg RotateSessionCSRFHashParams) (int64, error) {
-	result, err := q.db.Exec(ctx, rotateSessionCSRFHash, arg.CsrfHash, arg.UpdatedAt, arg.ID)
+// RotateRefreshToken executes the generated RotateRefreshToken database query.
+// 原子轮换一个刷新令牌：撤销旧令牌并记录替换的新令牌，返回是否有记录发生变化。
+func (q *Queries) RotateRefreshToken(ctx context.Context, arg RotateRefreshTokenParams) (int64, error) {
+	result, err := q.db.Exec(ctx, rotateRefreshToken, arg.RevokedAt, arg.ReplacedBy, arg.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -785,29 +785,5 @@ type TouchAPITokenParams struct {
 // 记录未撤销租户 PAT 最近一次成功使用的时间。
 func (q *Queries) TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error {
 	_, err := q.db.Exec(ctx, touchAPIToken, arg.UsedAt, arg.TenantID, arg.ID)
-	return err
-}
-
-const touchSession = `-- name: TouchSession :exec
-UPDATE sessions
-SET
-  last_seen_at = $1,
-  updated_at = $1
-WHERE id = $2
-  AND revoked_at IS NULL
-`
-
-// TouchSessionParams contains the strongly typed arguments for the TouchSession query.
-type TouchSessionParams struct {
-	// SeenAt is the seen at value supplied to the TouchSession query.
-	SeenAt pgtype.Timestamptz `json:"seen_at"`
-	// ID is the id value supplied to the TouchSession query.
-	ID uuid.UUID `json:"id"`
-}
-
-// TouchSession executes the generated TouchSession database query.
-// 记录未撤销浏览器会话最近一次被接受请求的时间。
-func (q *Queries) TouchSession(ctx context.Context, arg TouchSessionParams) error {
-	_, err := q.db.Exec(ctx, touchSession, arg.SeenAt, arg.ID)
 	return err
 }

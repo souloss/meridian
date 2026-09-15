@@ -55,8 +55,11 @@ func TestOpenAPIOperationsHaveAuthenticationPolicies(t *testing.T) {
 	if policies["Healthz"].required || policies["Login"].required || policies["ReceiveGitWebhook"].required {
 		t.Fatal("a contract-public operation requires authentication")
 	}
-	if !policies["GetMe"].required || !policies["GetMe"].allowCookie || policies["GetMe"].allowPAT {
+	if !policies["GetMe"].required || !policies["GetMe"].allowBearer || policies["GetMe"].allowRefreshCookie {
 		t.Fatalf("GetMe policy = %#v", policies["GetMe"])
+	}
+	if !policies["Refresh"].required || !policies["Refresh"].allowRefreshCookie || policies["Refresh"].allowBearer {
+		t.Fatalf("Refresh policy = %#v", policies["Refresh"])
 	}
 }
 

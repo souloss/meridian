@@ -42,21 +42,6 @@ func (UnimplementedStrictServer) UpdateService(ctx context.Context, request Upda
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetServiceAccess returns ErrStrictOperationNotImplemented until its milestone is implemented.
-func (UnimplementedStrictServer) GetServiceAccess(ctx context.Context, request GetServiceAccessRequestObject) (GetServiceAccessResponseObject, error) {
-	return nil, rootapi.ErrStrictOperationNotImplemented
-}
-
-// PutServiceAccess returns ErrStrictOperationNotImplemented until its milestone is implemented.
-func (UnimplementedStrictServer) PutServiceAccess(ctx context.Context, request PutServiceAccessRequestObject) (PutServiceAccessResponseObject, error) {
-	return nil, rootapi.ErrStrictOperationNotImplemented
-}
-
-// ResolveServiceDrift returns ErrStrictOperationNotImplemented until its milestone is implemented.
-func (UnimplementedStrictServer) ResolveServiceDrift(ctx context.Context, request ResolveServiceDriftRequestObject) (ResolveServiceDriftResponseObject, error) {
-	return nil, rootapi.ErrStrictOperationNotImplemented
-}
-
 // StarService returns ErrStrictOperationNotImplemented until its milestone is implemented.
 func (UnimplementedStrictServer) StarService(ctx context.Context, request StarServiceRequestObject) (StarServiceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented

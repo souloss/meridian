@@ -19,6 +19,9 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// (GET /api/v1/t/{tenantSlug}/assets/{assetId}/layer-contents)
+	ListAssetLayerContents(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId)
+
 	// (PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order)
 	ReorderAssetLayers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params ReorderAssetLayersParams)
 
@@ -56,6 +59,11 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// (GET /api/v1/t/{tenantSlug}/assets/{assetId}/layer-contents)
+func (_ Unimplemented) ListAssetLayerContents(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // (PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order)
 func (_ Unimplemented) ReorderAssetLayers(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId, params ReorderAssetLayersParams) {
@@ -120,6 +128,41 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListAssetLayerContents operation middleware
+func (siw *ServerInterfaceWrapper) ListAssetLayerContents(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "tenantSlug" -------------
+	var tenantSlug TenantSlug
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tenantSlug", chi.URLParam(r, "tenantSlug"), &tenantSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "tenantSlug", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId AssetId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", chi.URLParam(r, "assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "assetId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAssetLayerContents(w, r, tenantSlug, assetId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ReorderAssetLayers operation middleware
 func (siw *ServerInterfaceWrapper) ReorderAssetLayers(w http.ResponseWriter, r *http.Request) {
@@ -905,6 +948,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/t/{tenantSlug}/assets/{assetId}/layer-contents", wrapper.ListAssetLayerContents)
+	})
+	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/api/v1/t/{tenantSlug}/assets/{assetId}/layers/order", wrapper.ReorderAssetLayers)
 	})
 	r.Group(func(r chi.Router) {
@@ -939,6 +985,53 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 
 	return r
+}
+
+type ListAssetLayerContentsRequestObject struct {
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	AssetId    AssetId    `json:"assetId"`
+}
+
+type ListAssetLayerContentsResponseObject interface {
+	VisitListAssetLayerContentsResponse(w http.ResponseWriter) error
+}
+
+type ListAssetLayerContents200JSONResponse externalRef0.AssetLayerContents
+
+func (response ListAssetLayerContents200JSONResponse) VisitListAssetLayerContentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAssetLayerContents404ResponseHeaders struct {
+	XRequestId *string
+}
+
+type ListAssetLayerContents404JSONResponse struct {
+	Body    externalRef0.ErrorResponse
+	Headers ListAssetLayerContents404ResponseHeaders
+}
+
+func (response ListAssetLayerContents404JSONResponse) VisitListAssetLayerContentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
 }
 
 type ReorderAssetLayersRequestObject struct {
@@ -1855,6 +1948,9 @@ func (response ListReviews404JSONResponse) VisitListReviewsResponse(w http.Respo
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 
+	// (GET /api/v1/t/{tenantSlug}/assets/{assetId}/layer-contents)
+	ListAssetLayerContents(ctx context.Context, request ListAssetLayerContentsRequestObject) (ListAssetLayerContentsResponseObject, error)
+
 	// (PUT /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order)
 	ReorderAssetLayers(ctx context.Context, request ReorderAssetLayersRequestObject) (ReorderAssetLayersResponseObject, error)
 
@@ -1926,6 +2022,33 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ListAssetLayerContents operation middleware
+func (sh *strictHandler) ListAssetLayerContents(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId) {
+	var request ListAssetLayerContentsRequestObject
+
+	request.TenantSlug = tenantSlug
+	request.AssetId = assetId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListAssetLayerContents(ctx, request.(ListAssetLayerContentsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAssetLayerContents")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAssetLayerContentsResponseObject); ok {
+		if err := validResponse.VisitListAssetLayerContentsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ReorderAssetLayers operation middleware

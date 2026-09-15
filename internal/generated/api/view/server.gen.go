@@ -25,6 +25,9 @@ type ServerInterface interface {
 	// (GET /api/v1/shared/{shareToken})
 	GetSharedView(w http.ResponseWriter, r *http.Request, shareToken ShareToken)
 
+	// (POST /api/v1/t/{tenantSlug}/assets/{assetId}/views:preview)
+	PreviewAssetView(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId)
+
 	// (GET /api/v1/t/{tenantSlug}/share-links)
 	ListShareLinks(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListShareLinksParams)
 
@@ -79,6 +82,11 @@ func (_ Unimplemented) ResolvePublicView(w http.ResponseWriter, r *http.Request,
 
 // (GET /api/v1/shared/{shareToken})
 func (_ Unimplemented) GetSharedView(w http.ResponseWriter, r *http.Request, shareToken ShareToken) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (POST /api/v1/t/{tenantSlug}/assets/{assetId}/views:preview)
+func (_ Unimplemented) PreviewAssetView(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -204,6 +212,41 @@ func (siw *ServerInterfaceWrapper) GetSharedView(w http.ResponseWriter, r *http.
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetSharedView(w, r, shareToken)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PreviewAssetView operation middleware
+func (siw *ServerInterfaceWrapper) PreviewAssetView(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "tenantSlug" -------------
+	var tenantSlug TenantSlug
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tenantSlug", chi.URLParam(r, "tenantSlug"), &tenantSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "tenantSlug", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId AssetId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", chi.URLParam(r, "assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "assetId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PreviewAssetView(w, r, tenantSlug, assetId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -945,6 +988,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/api/v1/shared/{shareToken}", wrapper.GetSharedView)
 	})
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/t/{tenantSlug}/assets/{assetId}/views:preview", wrapper.PreviewAssetView)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/t/{tenantSlug}/share-links", wrapper.ListShareLinks)
 	})
 	r.Group(func(r chi.Router) {
@@ -1111,6 +1157,78 @@ func (response GetSharedView404JSONResponse) VisitGetSharedViewResponse(w http.R
 		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
 	}
 	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PreviewAssetViewRequestObject struct {
+	TenantSlug TenantSlug `json:"tenantSlug"`
+	AssetId    AssetId    `json:"assetId"`
+	Body       *PreviewAssetViewJSONRequestBody
+}
+
+type PreviewAssetViewResponseObject interface {
+	VisitPreviewAssetViewResponse(w http.ResponseWriter) error
+}
+
+type PreviewAssetView200JSONResponse externalRef0.ViewPreviewResult
+
+func (response PreviewAssetView200JSONResponse) VisitPreviewAssetViewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PreviewAssetView404ResponseHeaders struct {
+	XRequestId *string
+}
+
+type PreviewAssetView404JSONResponse struct {
+	Body    externalRef0.ErrorResponse
+	Headers PreviewAssetView404ResponseHeaders
+}
+
+func (response PreviewAssetView404JSONResponse) VisitPreviewAssetViewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PreviewAssetView422ResponseHeaders struct {
+	XRequestId *string
+}
+
+type PreviewAssetView422JSONResponse struct {
+	Body    externalRef0.ErrorResponse
+	Headers PreviewAssetView422ResponseHeaders
+}
+
+func (response PreviewAssetView422JSONResponse) VisitPreviewAssetViewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(422)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -2044,6 +2162,9 @@ type StrictServerInterface interface {
 	// (GET /api/v1/shared/{shareToken})
 	GetSharedView(ctx context.Context, request GetSharedViewRequestObject) (GetSharedViewResponseObject, error)
 
+	// (POST /api/v1/t/{tenantSlug}/assets/{assetId}/views:preview)
+	PreviewAssetView(ctx context.Context, request PreviewAssetViewRequestObject) (PreviewAssetViewResponseObject, error)
+
 	// (GET /api/v1/t/{tenantSlug}/share-links)
 	ListShareLinks(ctx context.Context, request ListShareLinksRequestObject) (ListShareLinksResponseObject, error)
 
@@ -2178,6 +2299,40 @@ func (sh *strictHandler) GetSharedView(w http.ResponseWriter, r *http.Request, s
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetSharedViewResponseObject); ok {
 		if err := validResponse.VisitGetSharedViewResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PreviewAssetView operation middleware
+func (sh *strictHandler) PreviewAssetView(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, assetId AssetId) {
+	var request PreviewAssetViewRequestObject
+
+	request.TenantSlug = tenantSlug
+	request.AssetId = assetId
+
+	var body PreviewAssetViewJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PreviewAssetView(ctx, request.(PreviewAssetViewRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PreviewAssetView")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PreviewAssetViewResponseObject); ok {
+		if err := validResponse.VisitPreviewAssetViewResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

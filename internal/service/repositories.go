@@ -459,7 +459,7 @@ func (repositories *Repositories) tenantMembership(ctx context.Context, actor Pr
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
 	}
-	if actor.Kind != PrincipalSession || repositories.identities == nil {
+	if actor.Kind != PrincipalJWT || repositories.identities == nil {
 		return Membership{}, ErrNotFound
 	}
 	membership, err := repositories.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)

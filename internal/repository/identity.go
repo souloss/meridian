@@ -105,51 +105,54 @@ func (store *IdentityStore) PromotePlatformAdmin(ctx context.Context, id uuid.UU
 	return userFromRow(row), nil
 }
 
-// CreateSession persists keyed browser credential digests.
-func (store *IdentityStore) CreateSession(ctx context.Context, input service.NewSession) error {
-	_, err := store.queries.CreateSession(ctx, generated.CreateSessionParams{
+// CreateRefreshToken persists a keyed browser refresh token digest.
+func (store *IdentityStore) CreateRefreshToken(ctx context.Context, input service.NewRefreshToken) error {
+	_, err := store.queries.CreateRefreshToken(ctx, generated.CreateRefreshTokenParams{
 		ID:        input.ID,
 		UserID:    input.UserID,
 		TokenHash: input.TokenHash,
-		CsrfHash:  input.CSRFHash,
+		FamilyID:  input.FamilyID,
 		ExpiresAt: timestamp(input.ExpiresAt),
 	})
 	return normalizeError(err)
 }
 
-// SessionPrincipalByDigest resolves one active browser session at the supplied instant.
-func (store *IdentityStore) SessionPrincipalByDigest(ctx context.Context, digest []byte, authenticatedAt time.Time) (service.Principal, error) {
-	row, err := store.queries.GetSessionPrincipalByTokenHash(ctx, generated.GetSessionPrincipalByTokenHashParams{
+// RefreshTokenPrincipalByDigest resolves one refresh token to its user and rotation family.
+func (store *IdentityStore) RefreshTokenPrincipalByDigest(ctx context.Context, digest []byte, authenticatedAt time.Time) (service.RefreshTokenPrincipal, error) {
+	row, err := store.queries.GetRefreshTokenPrincipalByTokenHash(ctx, generated.GetRefreshTokenPrincipalByTokenHashParams{
 		TokenHash:       digest,
 		AuthenticatedAt: timestamp(authenticatedAt),
 	})
 	if err != nil {
-		return service.Principal{}, normalizeError(err)
+		return service.RefreshTokenPrincipal{}, normalizeError(err)
 	}
-	return service.Principal{
-		Kind:      service.PrincipalSession,
-		SessionID: row.SessionID,
-		CSRFHash:  row.CsrfHash,
-		User: service.User{
-			ID:              row.UserID,
-			Username:        row.Username,
-			DisplayName:     row.DisplayName,
-			Email:           row.Email,
-			Status:          row.UserStatus,
-			IsPlatformAdmin: row.IsPlatformAdmin,
-			Revision:        row.UserRevision,
-			CreatedAt:       row.UserCreatedAt.Time,
-			UpdatedAt:       row.UserUpdatedAt.Time,
+	return service.RefreshTokenPrincipal{
+		FamilyID: row.FamilyID,
+		Revoked:  row.RevokedAt.Valid,
+		Principal: service.Principal{
+			Kind:    service.PrincipalJWT,
+			TokenID: row.TokenID,
+			User: service.User{
+				ID:              row.UserID,
+				Username:        row.Username,
+				DisplayName:     row.DisplayName,
+				Email:           row.Email,
+				Status:          row.UserStatus,
+				IsPlatformAdmin: row.IsPlatformAdmin,
+				Revision:        row.UserRevision,
+				CreatedAt:       row.UserCreatedAt.Time,
+				UpdatedAt:       row.UserUpdatedAt.Time,
+			},
 		},
 	}, nil
 }
 
-// RotateSessionCSRF replaces the digest used by one active browser session.
-func (store *IdentityStore) RotateSessionCSRF(ctx context.Context, id uuid.UUID, digest []byte, updatedAt time.Time) error {
-	changed, err := store.queries.RotateSessionCSRFHash(ctx, generated.RotateSessionCSRFHashParams{
-		CsrfHash:  digest,
-		UpdatedAt: timestamp(updatedAt),
-		ID:        id,
+// RotateRefreshToken revokes the consumed token and records its replacement in one atomic update.
+func (store *IdentityStore) RotateRefreshToken(ctx context.Context, id, replacedBy uuid.UUID, revokedAt time.Time) error {
+	changed, err := store.queries.RotateRefreshToken(ctx, generated.RotateRefreshTokenParams{
+		RevokedAt:  timestamp(revokedAt),
+		ReplacedBy: &replacedBy,
+		ID:         id,
 	})
 	if err != nil {
 		return normalizeError(err)
@@ -160,27 +163,13 @@ func (store *IdentityStore) RotateSessionCSRF(ctx context.Context, id uuid.UUID,
 	return nil
 }
 
-// TouchSession records successful browser session activity.
-func (store *IdentityStore) TouchSession(ctx context.Context, id uuid.UUID, seenAt time.Time) error {
-	return normalizeError(store.queries.TouchSession(ctx, generated.TouchSessionParams{
-		SeenAt: timestamp(seenAt),
-		ID:     id,
-	}))
-}
-
-// RevokeSession makes one browser session unusable.
-func (store *IdentityStore) RevokeSession(ctx context.Context, id uuid.UUID, revokedAt time.Time) error {
-	changed, err := store.queries.RevokeSession(ctx, generated.RevokeSessionParams{
+// RevokeRefreshTokenFamily revokes every unrevoked token in one rotation family.
+func (store *IdentityStore) RevokeRefreshTokenFamily(ctx context.Context, familyID uuid.UUID, revokedAt time.Time) error {
+	_, err := store.queries.RevokeRefreshTokenFamily(ctx, generated.RevokeRefreshTokenFamilyParams{
 		RevokedAt: timestamp(revokedAt),
-		ID:        id,
+		FamilyID:  familyID,
 	})
-	if err != nil {
-		return normalizeError(err)
-	}
-	if changed == 0 {
-		return service.ErrNotFound
-	}
-	return nil
+	return normalizeError(err)
 }
 
 // ActiveMemberships returns stable active tenant contexts for one user.

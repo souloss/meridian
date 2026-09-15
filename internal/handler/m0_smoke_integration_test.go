@@ -42,8 +42,7 @@ type m0SmokeFixture struct {
 }
 
 type m0SmokeSession struct {
-	cookie *http.Cookie
-	csrf   string
+	token string
 }
 
 func newM0SmokeFixture(t *testing.T) *m0SmokeFixture {
@@ -73,7 +72,11 @@ func newM0SmokeFixture(t *testing.T) *m0SmokeFixture {
 	if err != nil {
 		t.Fatalf("construct M0 smoke token digester: %v", err)
 	}
-	identity := service.NewIdentity(identityStore, digester)
+	jwtIssuer, err := service.NewJWTIssuer(integrationTokenPepper)
+	if err != nil {
+		t.Fatalf("construct JWT issuer: %v", err)
+	}
+	identity := service.NewIdentity(identityStore, digester, jwtIssuer)
 	administrator, err := identity.BootstrapPlatformAdmin(t.Context(), service.CreateUserInput{
 		Username: "padmin", DisplayName: "Platform Admin", Password: "smoke platform password",
 	})
@@ -82,7 +85,7 @@ func newM0SmokeFixture(t *testing.T) *m0SmokeFixture {
 	}
 	f := &m0SmokeFixture{
 		db: db, identity: identity,
-		admin: service.Principal{Kind: service.PrincipalSession, User: administrator},
+		admin: service.Principal{Kind: service.PrincipalJWT, User: administrator},
 	}
 	f.handler = NewWithAllServices(
 		identity,
@@ -100,23 +103,19 @@ func (f *m0SmokeFixture) login(t *testing.T, username, password string) m0SmokeS
 		"username": username, "password": password,
 	}, nil)
 	assertStatus(t, response, http.StatusOK)
-	return m0SmokeSession{cookie: responseCookie(t, response, sessionCookieName), csrf: responseString(t, response, "csrfToken")}
+	return m0SmokeSession{token: responseString(t, response, "accessToken")}
 }
 
 func (f *m0SmokeFixture) request(t *testing.T, session *m0SmokeSession, method, path string, body any, headers map[string]string) *httptest.ResponseRecorder {
 	t.Helper()
-	cookies := []*http.Cookie(nil)
 	requestHeaders := make(map[string]string, len(headers)+1)
 	for name, value := range headers {
 		requestHeaders[name] = value
 	}
 	if session != nil {
-		cookies = []*http.Cookie{session.cookie}
-		if method != http.MethodGet && method != http.MethodHead {
-			requestHeaders[csrfHeaderName] = session.csrf
-		}
+		requestHeaders["Authorization"] = "Bearer " + session.token
 	}
-	return requestJSONWithHeaders(t, f.handler, method, path, body, cookies, requestHeaders)
+	return requestJSONWithHeaders(t, f.handler, method, path, body, nil, requestHeaders)
 }
 
 func (f *m0SmokeFixture) provisionTenantUser(t *testing.T, tenantSlug, username, role string) m0SmokeSession {

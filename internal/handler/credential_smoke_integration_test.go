@@ -58,8 +58,7 @@ type credentialSmokeFixture struct {
 }
 
 type credentialSmokeSession struct {
-	cookie *http.Cookie
-	csrf   string
+	token string
 }
 
 type credentialSmokeRepository struct {
@@ -94,7 +93,11 @@ func newCredentialSmokeFixture(t *testing.T) *credentialSmokeFixture {
 	if err != nil {
 		t.Fatalf("create token digester: %v", err)
 	}
-	identity := service.NewIdentity(store, digester)
+	jwtIssuer, err := service.NewJWTIssuer(integrationTokenPepper)
+	if err != nil {
+		t.Fatalf("construct JWT issuer: %v", err)
+	}
+	identity := service.NewIdentity(store, digester, jwtIssuer)
 	keyring, err := service.NewCredentialKeyring(base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{0x11}, 32)), 1,
 		base64.RawURLEncoding.EncodeToString(bytes.Repeat([]byte{0x22}, 32)))
 	if err != nil {
@@ -106,7 +109,7 @@ func newCredentialSmokeFixture(t *testing.T) *credentialSmokeFixture {
 	if err != nil {
 		t.Fatalf("bootstrap administrator: %v", err)
 	}
-	actor := service.Principal{Kind: service.PrincipalSession, User: admin}
+	actor := service.Principal{Kind: service.PrincipalJWT, User: admin}
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{}, logger)
 	if err != nil {
 		t.Fatalf("create smoke queue runtime: %v", err)
@@ -141,7 +144,7 @@ func newCredentialSmokeFixture(t *testing.T) *credentialSmokeFixture {
 			"username": username, "password": "smoke secure password",
 		}, nil)
 		assertStatus(t, response, http.StatusOK)
-		f.users[username] = credentialSmokeSession{cookie: responseCookie(t, response, sessionCookieName), csrf: responseString(t, response, "csrfToken")}
+		f.users[username] = credentialSmokeSession{token: responseString(t, response, "accessToken")}
 	}
 	return f
 }
@@ -149,14 +152,14 @@ func newCredentialSmokeFixture(t *testing.T) *credentialSmokeFixture {
 func (f *credentialSmokeFixture) request(t *testing.T, user, method, path string, body any, etag string) *httptest.ResponseRecorder {
 	t.Helper()
 	session := f.users[user]
-	headers := map[string]string{csrfHeaderName: session.csrf}
+	headers := map[string]string{"Authorization": "Bearer " + session.token}
 	if etag != "" {
 		headers["If-Match"] = etag
 	}
 	if strings.HasSuffix(path, ":rotate") {
 		headers["Idempotency-Key"] = uuid.NewV7().String()
 	}
-	return requestJSONWithHeaders(t, f.handler, method, path, body, []*http.Cookie{session.cookie}, headers)
+	return requestJSONWithHeaders(t, f.handler, method, path, body, nil, headers)
 }
 
 func smokeTenantCredential(t *testing.T) {

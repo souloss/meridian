@@ -18,9 +18,6 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (GET /api/v1/auth/csrf)
-	GetCsrfToken(w http.ResponseWriter, r *http.Request)
-
 	// (POST /api/v1/auth/login)
 	Login(w http.ResponseWriter, r *http.Request)
 
@@ -35,16 +32,14 @@ type ServerInterface interface {
 
 	// (PATCH /api/v1/auth/me/preferences)
 	UpdateMyPreferences(w http.ResponseWriter, r *http.Request, params UpdateMyPreferencesParams)
+
+	// (POST /api/v1/auth/refresh)
+	Refresh(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
-
-// (GET /api/v1/auth/csrf)
-func (_ Unimplemented) GetCsrfToken(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
 
 // (POST /api/v1/auth/login)
 func (_ Unimplemented) Login(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +66,11 @@ func (_ Unimplemented) UpdateMyPreferences(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// (POST /api/v1/auth/refresh)
+func (_ Unimplemented) Refresh(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // ServerInterfaceWrapper converts contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler            ServerInterface
@@ -79,20 +79,6 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
-
-// GetCsrfToken operation middleware
-func (siw *ServerInterfaceWrapper) GetCsrfToken(w http.ResponseWriter, r *http.Request) {
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetCsrfToken(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
 
 // Login operation middleware
 func (siw *ServerInterfaceWrapper) Login(w http.ResponseWriter, r *http.Request) {
@@ -186,6 +172,20 @@ func (siw *ServerInterfaceWrapper) UpdateMyPreferences(w http.ResponseWriter, r 
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateMyPreferences(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// Refresh operation middleware
+func (siw *ServerInterfaceWrapper) Refresh(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.Refresh(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -309,9 +309,6 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/auth/csrf", wrapper.GetCsrfToken)
-	})
-	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/v1/auth/login", wrapper.Login)
 	})
 	r.Group(func(r chi.Router) {
@@ -326,53 +323,11 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Patch(options.BaseURL+"/api/v1/auth/me/preferences", wrapper.UpdateMyPreferences)
 	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/auth/refresh", wrapper.Refresh)
+	})
 
 	return r
-}
-
-type GetCsrfTokenRequestObject struct {
-}
-
-type GetCsrfTokenResponseObject interface {
-	VisitGetCsrfTokenResponse(w http.ResponseWriter) error
-}
-
-type GetCsrfToken200JSONResponse externalRef0.CsrfToken
-
-func (response GetCsrfToken200JSONResponse) VisitGetCsrfTokenResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type GetCsrfToken401ResponseHeaders struct {
-	XRequestId *string
-}
-
-type GetCsrfToken401JSONResponse struct {
-	Body    externalRef0.ErrorResponse
-	Headers GetCsrfToken401ResponseHeaders
-}
-
-func (response GetCsrfToken401JSONResponse) VisitGetCsrfTokenResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	if response.Headers.XRequestId != nil {
-		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
-	}
-	w.WriteHeader(401)
-	_, err := buf.WriteTo(w)
-	return err
 }
 
 type LoginRequestObject struct {
@@ -687,11 +642,63 @@ func (response UpdateMyPreferences422JSONResponse) VisitUpdateMyPreferencesRespo
 	return err
 }
 
+type RefreshRequestObject struct {
+}
+
+type RefreshResponseObject interface {
+	VisitRefreshResponse(w http.ResponseWriter) error
+}
+
+type Refresh200ResponseHeaders struct {
+	SetCookie *string
+}
+
+type Refresh200JSONResponse struct {
+	Body    externalRef0.RefreshResult
+	Headers Refresh200ResponseHeaders
+}
+
+func (response Refresh200JSONResponse) VisitRefreshResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.SetCookie != nil {
+		w.Header().Set("Set-Cookie", fmt.Sprint(*response.Headers.SetCookie))
+	}
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type Refresh401ResponseHeaders struct {
+	XRequestId *string
+}
+
+type Refresh401JSONResponse struct {
+	Body    externalRef0.ErrorResponse
+	Headers Refresh401ResponseHeaders
+}
+
+func (response Refresh401JSONResponse) VisitRefreshResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.XRequestId != nil {
+		w.Header().Set("X-Request-Id", fmt.Sprint(*response.Headers.XRequestId))
+	}
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-
-	// (GET /api/v1/auth/csrf)
-	GetCsrfToken(ctx context.Context, request GetCsrfTokenRequestObject) (GetCsrfTokenResponseObject, error)
 
 	// (POST /api/v1/auth/login)
 	Login(ctx context.Context, request LoginRequestObject) (LoginResponseObject, error)
@@ -707,6 +714,9 @@ type StrictServerInterface interface {
 
 	// (PATCH /api/v1/auth/me/preferences)
 	UpdateMyPreferences(ctx context.Context, request UpdateMyPreferencesRequestObject) (UpdateMyPreferencesResponseObject, error)
+
+	// (POST /api/v1/auth/refresh)
+	Refresh(ctx context.Context, request RefreshRequestObject) (RefreshResponseObject, error)
 }
 
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
@@ -746,30 +756,6 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
-}
-
-// GetCsrfToken operation middleware
-func (sh *strictHandler) GetCsrfToken(w http.ResponseWriter, r *http.Request) {
-	var request GetCsrfTokenRequestObject
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.GetCsrfToken(ctx, request.(GetCsrfTokenRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetCsrfToken")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(GetCsrfTokenResponseObject); ok {
-		if err := validResponse.VisitGetCsrfTokenResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
 }
 
 // Login operation middleware
@@ -901,6 +887,30 @@ func (sh *strictHandler) UpdateMyPreferences(w http.ResponseWriter, r *http.Requ
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(UpdateMyPreferencesResponseObject); ok {
 		if err := validResponse.VisitUpdateMyPreferencesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// Refresh operation middleware
+func (sh *strictHandler) Refresh(w http.ResponseWriter, r *http.Request) {
+	var request RefreshRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.Refresh(ctx, request.(RefreshRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "Refresh")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RefreshResponseObject); ok {
+		if err := validResponse.VisitRefreshResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

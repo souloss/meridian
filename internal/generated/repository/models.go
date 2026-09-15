@@ -531,6 +531,35 @@ type PlatformSetting struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+// RefreshToken is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 浏览器刷新令牌，只保存 HMAC 摘要并支持轮换家族。
+type RefreshToken struct {
+	// ID is the generated id database value for RefreshToken.
+	// 应用生成的 UUID v7 刷新令牌标识。
+	ID uuid.UUID `json:"id"`
+	// UserID is the generated user id database value for RefreshToken.
+	// 通过该刷新令牌续期的全局用户。
+	UserID uuid.UUID `json:"user_id"`
+	// TokenHash is the generated token hash database value for RefreshToken.
+	// 刷新令牌明文的 HMAC-SHA-256 摘要。
+	TokenHash []byte `json:"token_hash"`
+	// FamilyID is the generated family id database value for RefreshToken.
+	// 轮换家族标识，同一登录会话的多次轮换共享，用于检测重放。
+	FamilyID uuid.UUID `json:"family_id"`
+	// ExpiresAt is the generated expires at database value for RefreshToken.
+	// 刷新令牌失效的 UTC 时间点。
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	// RevokedAt is the generated revoked at database value for RefreshToken.
+	// 主动撤销或检测到重放时置为当前时间，未撤销时为空。
+	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
+	// ReplacedBy is the generated replaced by database value for RefreshToken.
+	// 轮换后新令牌的 id，仅被替换的旧令牌非空。
+	ReplacedBy *uuid.UUID `json:"replaced_by"`
+	// CreatedAt is the generated created at database value for RefreshToken.
+	// 创建刷新令牌记录时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
 // Repository is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 租户范围内的 Git 仓库连接和同步配置。
 type Repository struct {
@@ -584,38 +613,6 @@ type Repository struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for Repository.
 	// 最近一次更新仓库时的 UTC 事务时间。
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-}
-
-// Session is the generated PostgreSQL representation of the corresponding Meridian table row.
-// 浏览器认证会话，只保存令牌和 CSRF 摘要。
-type Session struct {
-	// ID is the generated id database value for Session.
-	// 应用生成的 UUID v7 会话标识。
-	ID uuid.UUID `json:"id"`
-	// UserID is the generated user id database value for Session.
-	// 通过该会话认证的全局用户。
-	UserID uuid.UUID `json:"user_id"`
-	// TokenHash is the generated token hash database value for Session.
-	// 不透明会话令牌的 HMAC-SHA-256 摘要。
-	TokenHash []byte `json:"token_hash"`
-	// CsrfHash is the generated csrf hash database value for Session.
-	// 与会话绑定的 CSRF 令牌 HMAC-SHA-256 摘要。
-	CsrfHash []byte `json:"csrf_hash"`
-	// ExpiresAt is the generated expires at database value for Session.
-	// 会话失效的 UTC 时间点。
-	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
-	// RevokedAt is the generated revoked at database value for Session.
-	// 主动撤销会话的 UTC 时间点，未撤销时为空。
-	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
-	// LastSeenAt is the generated last seen at database value for Session.
-	// 最近一次接受请求的 UTC 时间，首次使用前为空。
-	LastSeenAt pgtype.Timestamptz `json:"last_seen_at"`
-	// CreatedAt is the generated created at database value for Session.
-	// 创建会话记录时的 UTC 事务时间。
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// UpdatedAt is the generated updated at database value for Session.
-	// 最近一次更新会话元数据时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 

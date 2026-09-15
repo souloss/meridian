@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"io/fs"
+	"log/slog"
 	"net/http"
 	"strings"
 	"sync/atomic"
@@ -83,6 +84,9 @@ func (s *Server) Handler() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(requestIDHeader)
+	r.Use(traceRequests)
+	r.Use(logRequests(slog.Default()))
+	r.Use(measureRequests)
 	r.Use(openAPIRequestValidator())
 	registerDomainHandlers(s, r)
 	r.NotFound(s.static)
@@ -103,9 +107,6 @@ func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 	switch {
 	case errors.Is(err, service.ErrUnauthenticated):
 		writeError(w, r, http.StatusUnauthorized, "unauthenticated", "authentication required")
-		return
-	case errors.Is(err, service.ErrCSRFInvalid):
-		writeError(w, r, http.StatusForbidden, "csrf_invalid", "CSRF token is missing or invalid")
 		return
 	case errors.Is(err, service.ErrNotFound):
 		writeError(w, r, http.StatusNotFound, "not_found", "resource not found")

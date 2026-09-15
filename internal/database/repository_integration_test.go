@@ -265,7 +265,7 @@ func TestJobControlCoordinatesRiverCancellationRetryAndIdempotency(t *testing.T)
 		t.Fatalf("create retry source stage logs: %v", err)
 	}
 	request := service.RetryJobRequest{
-		TenantID: tenantID, SourceJobID: sourceJobID, PrincipalType: "session", PrincipalID: uuid.NewV7(),
+		TenantID: tenantID, SourceJobID: sourceJobID, PrincipalType: "jwt", PrincipalID: uuid.NewV7(),
 		IdempotencyKey: uuid.NewV7(), RequestHash: bytes.Repeat([]byte{0x42}, 32), RequestedAt: time.Now().UTC(),
 	}
 	retried, err := control.RetryTenantJob(t.Context(), request)
@@ -377,7 +377,7 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 		TenantID: tenantID, ID: credentialID, ExpectedRevision: 1,
 		Encrypted:          service.EncryptedCredential{Ciphertext: []byte("new-ciphertext"), Nonce: bytes.Repeat([]byte{0x02}, 12), KeyVersion: 1, Fingerprint: "fingerprint-new"},
 		ResyncRepositories: true,
-		IdempotencyKey:     idempotencyKey, RequestHash: requestHash, PrincipalType: "session", PrincipalID: userID,
+		IdempotencyKey:     idempotencyKey, RequestHash: requestHash, PrincipalType: "jwt", PrincipalID: userID,
 	})
 	if err != nil {
 		t.Fatalf("rotate credential: %v", err)
@@ -414,7 +414,7 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 	replayed, replayJobs, err := store.RotateCredential(t.Context(), service.RotateCredential{
 		TenantID: tenantID, ID: credentialID, ExpectedRevision: 999,
 		Encrypted:      service.EncryptedCredential{Ciphertext: []byte("must-not-write"), Nonce: bytes.Repeat([]byte{0x09}, 12), KeyVersion: 1, Fingerprint: "must-not-write"},
-		IdempotencyKey: idempotencyKey, RequestHash: requestHash, PrincipalType: "session", PrincipalID: userID,
+		IdempotencyKey: idempotencyKey, RequestHash: requestHash, PrincipalType: "jwt", PrincipalID: userID,
 	})
 	if err != nil {
 		t.Fatalf("replay credential rotation: %v", err)
@@ -425,7 +425,7 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 	if _, _, err := store.RotateCredential(t.Context(), service.RotateCredential{
 		TenantID: tenantID, ID: credentialID, ExpectedRevision: 999,
 		Encrypted:      service.EncryptedCredential{Ciphertext: []byte("different"), Nonce: bytes.Repeat([]byte{0x08}, 12), KeyVersion: 1, Fingerprint: "different"},
-		IdempotencyKey: idempotencyKey, RequestHash: bytes.Repeat([]byte{0x77}, 32), PrincipalType: "session", PrincipalID: userID,
+		IdempotencyKey: idempotencyKey, RequestHash: bytes.Repeat([]byte{0x77}, 32), PrincipalType: "jwt", PrincipalID: userID,
 	}); !errors.Is(err, service.ErrIdempotencyConflict) {
 		t.Fatalf("different rotation request error = %v, want ErrIdempotencyConflict", err)
 	}
@@ -434,7 +434,7 @@ func TestCredentialRotationEnqueuesAtomicSyncJob(t *testing.T) {
 		TenantID: tenantID, ID: credentialID, ExpectedRevision: rotated.Revision,
 		Encrypted:          service.EncryptedCredential{Ciphertext: []byte("third-ciphertext"), Nonce: bytes.Repeat([]byte{0x03}, 12), KeyVersion: 1, Fingerprint: "fingerprint-third"},
 		ResyncRepositories: true,
-		IdempotencyKey:     uuid.NewV7(), RequestHash: bytes.Repeat([]byte{0x66}, 32), PrincipalType: "session", PrincipalID: userID,
+		IdempotencyKey:     uuid.NewV7(), RequestHash: bytes.Repeat([]byte{0x66}, 32), PrincipalType: "jwt", PrincipalID: userID,
 	})
 	if err != nil {
 		t.Fatalf("rotate credential with active dedupe job: %v", err)

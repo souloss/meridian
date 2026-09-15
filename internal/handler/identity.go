@@ -25,29 +25,53 @@ func (s *Server) Login(ctx context.Context, request auth.LoginRequestObject) (au
 	if err != nil {
 		return nil, err
 	}
-	cookie := sessionCookie(result.SessionToken, result.ExpiresAt, s.secureCookies)
+	cookie := refreshCookie(result.RefreshToken, result.RefreshExpiresAt, s.secureCookies)
 	return auth.Login200JSONResponse{
 		Body: api.LoginResult{
-			CsrfToken: result.CSRFToken,
-			Me:        meResponse(result.Principal.User, result.Memberships),
+			AccessToken:      result.AccessToken,
+			ExpiresInSeconds: result.ExpiresInSeconds,
+			Me:               meResponse(result.Principal.User, result.Memberships),
 		},
 		Headers: auth.Login200ResponseHeaders{SetCookie: new(cookie.String())},
 	}, nil
 }
 
-// Logout revokes and clears the current browser session.
+// Refresh exchanges the refresh cookie for a fresh access token and a rotated refresh token.
+func (s *Server) Refresh(ctx context.Context, request auth.RefreshRequestObject) (auth.RefreshResponseObject, error) {
+	if s.identity == nil {
+		return nil, service.ErrUnauthenticated
+	}
+	token, err := refreshTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.identity.Refresh(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	cookie := refreshCookie(result.RefreshToken, result.RefreshExpiresAt, s.secureCookies)
+	return auth.Refresh200JSONResponse{
+		Body: api.RefreshResult{
+			AccessToken:      result.AccessToken,
+			ExpiresInSeconds: result.ExpiresInSeconds,
+		},
+		Headers: auth.Refresh200ResponseHeaders{SetCookie: new(cookie.String())},
+	}, nil
+}
+
+// Logout revokes the refresh cookie family and clears the cookie.
 func (s *Server) Logout(ctx context.Context, _ auth.LogoutRequestObject) (auth.LogoutResponseObject, error) {
 	if s.identity == nil {
 		return nil, service.ErrUnauthenticated
 	}
-	principal, err := principalFromContext(ctx)
+	token, err := refreshTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if err := s.identity.Logout(ctx, principal); err != nil {
+	if err := s.identity.Logout(ctx, token); err != nil {
 		return nil, err
 	}
-	cookie := expiredSessionCookie(s.secureCookies)
+	cookie := expiredRefreshCookie(s.secureCookies)
 	return auth.Logout204Response{Headers: auth.Logout204ResponseHeaders{SetCookie: new(cookie.String())}}, nil
 }
 
@@ -65,22 +89,6 @@ func (s *Server) GetMe(ctx context.Context, _ auth.GetMeRequestObject) (auth.Get
 		return nil, err
 	}
 	return auth.GetMe200JSONResponse(meResponse(user, memberships)), nil
-}
-
-// GetCsrfToken rotates and returns the anti-forgery token for a browser session.
-func (s *Server) GetCsrfToken(ctx context.Context, _ auth.GetCsrfTokenRequestObject) (auth.GetCsrfTokenResponseObject, error) {
-	if s.identity == nil {
-		return nil, service.ErrUnauthenticated
-	}
-	principal, err := principalFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	token, err := s.identity.RotateCSRF(ctx, principal)
-	if err != nil {
-		return nil, err
-	}
-	return auth.GetCsrfToken200JSONResponse{CsrfToken: token}, nil
 }
 
 // CreateUser creates a local identity through the platform administration boundary.
@@ -284,16 +292,16 @@ func (s *Server) RevokeToken(ctx context.Context, request tenant.RevokeTokenRequ
 	return tenant.RevokeToken204Response{}, nil
 }
 
-func sessionCookie(token string, expiresAt time.Time, secure bool) http.Cookie {
+func refreshCookie(token string, expiresAt time.Time, secure bool) http.Cookie {
 	return http.Cookie{
-		Name: sessionCookieName, Value: token, Path: "/", HttpOnly: true,
+		Name: refreshCookieName, Value: token, Path: "/api/v1/auth", HttpOnly: true,
 		Secure: secure, SameSite: http.SameSiteLaxMode, Expires: expiresAt, MaxAge: int(time.Until(expiresAt).Seconds()),
 	}
 }
 
-func expiredSessionCookie(secure bool) http.Cookie {
+func expiredRefreshCookie(secure bool) http.Cookie {
 	return http.Cookie{
-		Name: sessionCookieName, Path: "/", HttpOnly: true, Secure: secure,
+		Name: refreshCookieName, Path: "/api/v1/auth", HttpOnly: true, Secure: secure,
 		SameSite: http.SameSiteLaxMode, Expires: time.Unix(1, 0).UTC(), MaxAge: -1,
 	}
 }

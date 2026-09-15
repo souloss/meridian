@@ -73,45 +73,6 @@ func (e AssetVersionOverlayMode) Valid() bool {
 	}
 }
 
-// Defines values for ConfigImportApplyRequestDefaultResolution.
-const (
-	ConfigImportApplyRequestDefaultResolutionKeepDb   ConfigImportApplyRequestDefaultResolution = "keep_db"
-	ConfigImportApplyRequestDefaultResolutionTakeFile ConfigImportApplyRequestDefaultResolution = "take_file"
-)
-
-// Valid indicates whether the value is a known member of the ConfigImportApplyRequestDefaultResolution enum.
-func (e ConfigImportApplyRequestDefaultResolution) Valid() bool {
-	switch e {
-	case ConfigImportApplyRequestDefaultResolutionKeepDb:
-		return true
-	case ConfigImportApplyRequestDefaultResolutionTakeFile:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for ConfigSource.
-const (
-	DbManual      ConfigSource = "db_manual"
-	RepoBootstrap ConfigSource = "repo_bootstrap"
-	RepoFile      ConfigSource = "repo_file"
-)
-
-// Valid indicates whether the value is a known member of the ConfigSource enum.
-func (e ConfigSource) Valid() bool {
-	switch e {
-	case DbManual:
-		return true
-	case RepoBootstrap:
-		return true
-	case RepoFile:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for ConnectionTestErrorClass.
 const (
 	ConnectionTestErrorClassAuth    ConnectionTestErrorClass = "auth"
@@ -412,27 +373,6 @@ func (e DomainEventType) Valid() bool {
 	}
 }
 
-// Defines values for DriftResolutionRequestResolution.
-const (
-	DriftResolutionRequestResolutionIgnore   DriftResolutionRequestResolution = "ignore"
-	DriftResolutionRequestResolutionKeepDb   DriftResolutionRequestResolution = "keep_db"
-	DriftResolutionRequestResolutionTakeFile DriftResolutionRequestResolution = "take_file"
-)
-
-// Valid indicates whether the value is a known member of the DriftResolutionRequestResolution enum.
-func (e DriftResolutionRequestResolution) Valid() bool {
-	switch e {
-	case DriftResolutionRequestResolutionIgnore:
-		return true
-	case DriftResolutionRequestResolutionKeepDb:
-		return true
-	case DriftResolutionRequestResolutionTakeFile:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for ErrorCode.
 const (
 	AiDisabled                 ErrorCode = "ai_disabled"
@@ -442,7 +382,6 @@ const (
 	ConfigImportConflict       ErrorCode = "config_import_conflict"
 	ContentTooLarge            ErrorCode = "content_too_large"
 	CredentialInUse            ErrorCode = "credential_in_use"
-	CsrfInvalid                ErrorCode = "csrf_invalid"
 	Duplicate                  ErrorCode = "duplicate"
 	IdempotencyConflict        ErrorCode = "idempotency_conflict"
 	InputSpecMismatch          ErrorCode = "input_spec_mismatch"
@@ -481,8 +420,6 @@ func (e ErrorCode) Valid() bool {
 	case ContentTooLarge:
 		return true
 	case CredentialInUse:
-		return true
-	case CsrfInvalid:
 		return true
 	case Duplicate:
 		return true
@@ -1339,66 +1276,6 @@ func (e SearchHitType) Valid() bool {
 	}
 }
 
-// Defines values for ServiceGrantPermissions.
-const (
-	AssetPublish ServiceGrantPermissions = "asset:publish"
-	LayerApprove ServiceGrantPermissions = "layer:approve"
-	LayerEdit    ServiceGrantPermissions = "layer:edit"
-)
-
-// Valid indicates whether the value is a known member of the ServiceGrantPermissions enum.
-func (e ServiceGrantPermissions) Valid() bool {
-	switch e {
-	case AssetPublish:
-		return true
-	case LayerApprove:
-		return true
-	case LayerEdit:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for ServiceGrantPrincipalType.
-const (
-	ServiceGrantPrincipalTypeTeam ServiceGrantPrincipalType = "team"
-	ServiceGrantPrincipalTypeUser ServiceGrantPrincipalType = "user"
-)
-
-// Valid indicates whether the value is a known member of the ServiceGrantPrincipalType enum.
-func (e ServiceGrantPrincipalType) Valid() bool {
-	switch e {
-	case ServiceGrantPrincipalTypeTeam:
-		return true
-	case ServiceGrantPrincipalTypeUser:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for ServiceRole.
-const (
-	ServiceRoleMaintainer ServiceRole = "maintainer"
-	ServiceRoleOwner      ServiceRole = "owner"
-	ServiceRoleViewer     ServiceRole = "viewer"
-)
-
-// Valid indicates whether the value is a known member of the ServiceRole enum.
-func (e ServiceRole) Valid() bool {
-	switch e {
-	case ServiceRoleMaintainer:
-		return true
-	case ServiceRoleOwner:
-		return true
-	case ServiceRoleViewer:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for ServiceVisibility.
 const (
 	ServiceVisibilityInternal ServiceVisibility = "internal"
@@ -1584,19 +1461,19 @@ func (e SubscriptionScopeType) Valid() bool {
 
 // Defines values for TenantRole.
 const (
-	TenantRoleMaintainer  TenantRole = "maintainer"
-	TenantRoleTenantAdmin TenantRole = "tenant_admin"
-	TenantRoleViewer      TenantRole = "viewer"
+	Maintainer  TenantRole = "maintainer"
+	TenantAdmin TenantRole = "tenant_admin"
+	Viewer      TenantRole = "viewer"
 )
 
 // Valid indicates whether the value is a known member of the TenantRole enum.
 func (e TenantRole) Valid() bool {
 	switch e {
-	case TenantRoleMaintainer:
+	case Maintainer:
 		return true
-	case TenantRoleTenantAdmin:
+	case TenantAdmin:
 		return true
-	case TenantRoleViewer:
+	case Viewer:
 		return true
 	default:
 		return false
@@ -2197,6 +2074,15 @@ type AssetKindPatchRequest struct {
 	Enabled bool `json:"enabled"`
 }
 
+// AssetLayerContents contains one batch of layer contents for all layers of an asset.
+type AssetLayerContents struct {
+	// AssetId uniquely identifies this resource.
+	AssetId Uuid `json:"assetId"`
+
+	// Layers contains the ordered layers associated with this asset layer contents.
+	Layers []LayerContent `json:"layers"`
+}
+
 // AssetName is a stable lowercase asset identifier within one service and kind.
 type AssetName = string
 
@@ -2469,14 +2355,14 @@ type BranchPolicy struct {
 
 // BreakingTodo represents breaking todo data exchanged through the Meridian API.
 type BreakingTodo struct {
+	// AckedBy contains the user id that acknowledged this breaking todo.
+	AckedBy nullable.Nullable[Uuid] `json:"ackedBy"`
+
 	// AcknowledgedAt specifies the acknowledged at associated with this breaking todo.
 	AcknowledgedAt nullable.Nullable[Timestamp] `json:"acknowledgedAt"`
 
 	// AssetVersionId contains the uuid associated with this breaking todo.
 	AssetVersionId Uuid `json:"assetVersionId"`
-
-	// AssigneeId contains the uuid associated with this breaking todo.
-	AssigneeId Uuid `json:"assigneeId"`
 
 	// Comment specifies the comment associated with this breaking todo.
 	Comment nullable.Nullable[string] `json:"comment"`
@@ -2486,6 +2372,9 @@ type BreakingTodo struct {
 
 	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
+
+	// ServiceId identifies the service associated with this resource.
+	ServiceId Uuid `json:"serviceId"`
 
 	// Status is the current lifecycle or processing state.
 	Status TodoStatus `json:"status"`
@@ -2608,38 +2497,14 @@ type CommentPage struct {
 	Total int `json:"total"`
 }
 
-// ConfigFieldDiff represents config field diff data exchanged through the Meridian API.
-type ConfigFieldDiff struct {
-	// DatabaseValue specifies the database value associated with this config field diff.
-	DatabaseValue any `json:"databaseValue"`
-
-	// FileValue specifies the file value associated with this config field diff.
-	FileValue any `json:"fileValue"`
-
-	// Pointer specifies the pointer associated with this config field diff.
-	Pointer string `json:"pointer"`
-
-	// Source contains the config source associated with this config field diff.
-	Source ConfigSource `json:"source"`
-}
-
 // ConfigImportApplyRequest defines validated input for the corresponding Meridian API operation.
 type ConfigImportApplyRequest struct {
 	// ConfigDigest is the lowercase SHA-256 digest of the normalized configuration.
 	ConfigDigest string `json:"configDigest"`
 
-	// DefaultResolution specifies the default resolution associated with this config import apply request.
-	DefaultResolution ConfigImportApplyRequestDefaultResolution `json:"defaultResolution"`
-
-	// FieldResolutions specifies the field resolutions associated with this config import apply request.
-	FieldResolutions *map[string]any `json:"fieldResolutions,omitempty"`
-
 	// ReplaceAiBases Explicitly applies the domain baseReplacement transaction for matching repository bases.
 	ReplaceAiBases *bool `json:"replaceAiBases,omitempty"`
 }
-
-// ConfigImportApplyRequestDefaultResolution specifies the default resolution associated with this config import apply request.
-type ConfigImportApplyRequestDefaultResolution string
 
 // ConfigImportPreview represents config import preview data exchanged through the Meridian API.
 type ConfigImportPreview struct {
@@ -2648,9 +2513,6 @@ type ConfigImportPreview struct {
 
 	// ConfigDigest is the lowercase SHA-256 digest of the normalized configuration.
 	ConfigDigest string `json:"configDigest"`
-
-	// Drift contains the ordered drift associated with this config import preview.
-	Drift []ConfigFieldDiff `json:"drift"`
 
 	// ExpiresAt is the RFC 3339 UTC instant after which this value is invalid.
 	ExpiresAt Timestamp `json:"expiresAt"`
@@ -2697,9 +2559,6 @@ type ConfigImportResult struct {
 	// UpdatedServiceIds contains the ordered updated service ids associated with this config import result.
 	UpdatedServiceIds []Uuid `json:"updatedServiceIds"`
 }
-
-// ConfigSource identifies one supported config source value.
-type ConfigSource string
 
 // ConnectionTest represents connection test data exchanged through the Meridian API.
 type ConnectionTest struct {
@@ -2904,12 +2763,6 @@ type CredentialSyncJob struct {
 
 	// TenantSlug contains the slug associated with this credential sync job.
 	TenantSlug Slug `json:"tenantSlug"`
-}
-
-// CsrfToken carries the anti-forgery token bound to the current cookie session.
-type CsrfToken struct {
-	// CsrfToken binds a state-changing browser request to the current session.
-	CsrfToken string `json:"csrfToken"`
 }
 
 // DashboardViewResolution represents dashboard view resolution data exchanged through the Meridian API.
@@ -3190,32 +3043,26 @@ type DocumentViewResolutionKind string
 // DomainEventType identifies one supported domain event type value.
 type DomainEventType string
 
-// DriftInfo represents drift info data exchanged through the Meridian API.
-type DriftInfo struct {
-	// Fields contains the ordered fields associated with this drift info.
-	Fields []FieldSource `json:"fields"`
+// DraftLayerInput represents an inline draft layer that participates in preview without being persisted.
+type DraftLayerInput struct {
+	// Content contains the content associated with this draft layer input.
+	Content string `json:"content"`
 
-	// FileCommit specifies the file commit associated with this drift info.
-	FileCommit nullable.Nullable[string] `json:"fileCommit"`
+	// ContentType contains the content type associated with this draft layer input.
+	ContentType ContentType `json:"contentType"`
 
-	// HasDrift indicates whether drift applies to this drift info.
-	HasDrift bool `json:"hasDrift"`
+	// Dialect specifies the dialect associated with this draft layer input.
+	Dialect nullable.Nullable[string] `json:"dialect,omitempty"`
+
+	// Ord specifies the ord associated with this draft layer input.
+	Ord int `json:"ord"`
+
+	// Origin specifies the layer origin associated with this draft layer input.
+	Origin LayerOrigin `json:"origin"`
+
+	// Role specifies the layer role associated with this draft layer input.
+	Role LayerRole `json:"role"`
 }
-
-// DriftResolutionRequest defines validated input for the corresponding Meridian API operation.
-type DriftResolutionRequest struct {
-	// ConfigDigest is the lowercase SHA-256 digest of the normalized configuration.
-	ConfigDigest string `json:"configDigest"`
-
-	// Fields specifies the fields associated with this drift resolution request.
-	Fields *map[string]any `json:"fields,omitempty"`
-
-	// Resolution specifies the resolution associated with this drift resolution request.
-	Resolution DriftResolutionRequestResolution `json:"resolution"`
-}
-
-// DriftResolutionRequestResolution specifies the resolution associated with this drift resolution request.
-type DriftResolutionRequestResolution string
 
 // ETag Opaque HTTP entity tag including quotes
 type ETag = string
@@ -3270,15 +3117,6 @@ type FetchConfig struct {
 
 // FetchConfigKnownHostPolicy specifies the known host policy associated with this fetch config.
 type FetchConfigKnownHostPolicy string
-
-// FieldSource represents field source data exchanged through the Meridian API.
-type FieldSource struct {
-	// Pointer specifies the pointer associated with this field source.
-	Pointer string `json:"pointer"`
-
-	// Source contains the config source associated with this field source.
-	Source ConfigSource `json:"source"`
-}
 
 // Force defines model for Force.
 type Force = bool
@@ -3821,6 +3659,33 @@ type Layer struct {
 	UpdatedAt Timestamp `json:"updatedAt"`
 }
 
+// LayerContent returns one layer's effective content and metadata for preview and rendering.
+type LayerContent struct {
+	// AssetId identifies the asset associated with this resource.
+	AssetId Uuid `json:"assetId"`
+
+	// Content contains the content associated with this layer content.
+	Content string `json:"content"`
+
+	// ContentType contains the content type associated with this layer content.
+	ContentType ContentType `json:"contentType"`
+
+	// EffectiveRevision contains the effective revision associated with this layer content.
+	EffectiveRevision nullable.Nullable[LayerRevision] `json:"effectiveRevision"`
+
+	// LayerId uniquely identifies this resource.
+	LayerId Uuid `json:"layerId"`
+
+	// Ord specifies the ord associated with this layer content.
+	Ord int `json:"ord"`
+
+	// Origin contains the layer origin associated with this layer content.
+	Origin LayerOrigin `json:"origin"`
+
+	// Role contains the layer role associated with this layer content.
+	Role LayerRole `json:"role"`
+}
+
 // LayerHead represents layer head data exchanged through the Meridian API.
 type LayerHead struct {
 	// CandidateRevisionId indicates whether candidate revision id applies to this layer head.
@@ -4067,10 +3932,13 @@ type LoginRequest struct {
 	Username string `json:"username"`
 }
 
-// LoginResult returns the authenticated principal and the initial session-bound CSRF token.
+// LoginResult returns the authenticated principal and a short-lived access token. The refresh token is delivered as an HttpOnly cookie.
 type LoginResult struct {
-	// CsrfToken binds a state-changing browser request to the current session.
-	CsrfToken string `json:"csrfToken"`
+	// AccessToken is the short-lived access token the client sends in the Authorization header.
+	AccessToken string `json:"accessToken"`
+
+	// ExpiresInSeconds is the access token lifetime in seconds; the client refreshes before this elapses.
+	ExpiresInSeconds int `json:"expiresInSeconds"`
 
 	// Me contains the authenticated user, memberships, and platform role.
 	Me Me `json:"me"`
@@ -4802,6 +4670,15 @@ type RefSelectorType string
 // RefType identifies one supported ref type value.
 type RefType string
 
+// RefreshResult returns a fresh access token after silent refresh.
+type RefreshResult struct {
+	// AccessToken is the newly issued short-lived access token.
+	AccessToken string `json:"accessToken"`
+
+	// ExpiresInSeconds is the access token lifetime in seconds.
+	ExpiresInSeconds int `json:"expiresInSeconds"`
+}
+
 // Repository represents repository data exchanged through the Meridian API.
 type Repository struct {
 	// BranchPolicy contains the branch policy associated with this repository.
@@ -5287,9 +5164,6 @@ type Service struct {
 	// DisplayName specifies the display name associated with this service.
 	DisplayName string `json:"displayName"`
 
-	// Drift contains the drift info associated with this service.
-	Drift DriftInfo `json:"drift"`
-
 	// Etag is the opaque entity tag required for optimistic concurrency control.
 	Etag ETag `json:"etag"`
 
@@ -5304,6 +5178,9 @@ type Service struct {
 
 	// Lifecycle contains the lifecycle associated with this service.
 	Lifecycle Lifecycle `json:"lifecycle"`
+
+	// Maintainers contains the maintainer refs associated with this service.
+	Maintainers OwnerRefs `json:"maintainers"`
 
 	// MissingKinds contains the ordered missing kinds associated with this service.
 	MissingKinds []MissingKind `json:"missingKinds"`
@@ -5331,21 +5208,6 @@ type Service struct {
 
 	// Visibility contains the service visibility associated with this service.
 	Visibility ServiceVisibility `json:"visibility"`
-}
-
-// ServiceAccess represents service access data exchanged through the Meridian API.
-type ServiceAccess struct {
-	// Grants contains the ordered grants associated with this service access.
-	Grants []ServiceGrant `json:"grants"`
-
-	// UpdatedAt is the RFC 3339 UTC instant when this resource was last updated.
-	UpdatedAt Timestamp `json:"updatedAt"`
-}
-
-// ServiceAccessPutRequest defines validated input for the corresponding Meridian API operation.
-type ServiceAccessPutRequest struct {
-	// Grants contains the ordered grants associated with this service access put request.
-	Grants []ServiceGrant `json:"grants"`
 }
 
 // ServiceAiGenerateRequest defines validated input for the corresponding Meridian API operation.
@@ -5377,6 +5239,9 @@ type ServiceCreateRequest struct {
 	// DisplayName specifies the display name associated with this service create request.
 	DisplayName string `json:"displayName"`
 
+	// Maintainers contains the maintainer refs associated with this service create request.
+	Maintainers *OwnerRefs `json:"maintainers,omitempty"`
+
 	// Owners contains the owner refs associated with this service create request.
 	Owners *OwnerRefs `json:"owners,omitempty"`
 
@@ -5392,27 +5257,6 @@ type ServiceCreateRequest struct {
 	// Visibility specifies the visibility associated with this service create request.
 	Visibility *ServiceVisibility `json:"visibility,omitempty"`
 }
-
-// ServiceGrant represents service grant data exchanged through the Meridian API.
-type ServiceGrant struct {
-	// Permissions contains the ordered permissions associated with this service grant.
-	Permissions []ServiceGrantPermissions `json:"permissions"`
-
-	// PrincipalId contains the uuid associated with this service grant.
-	PrincipalId Uuid `json:"principalId"`
-
-	// PrincipalType specifies the principal type associated with this service grant.
-	PrincipalType ServiceGrantPrincipalType `json:"principalType"`
-
-	// Role contains the service role associated with this service grant.
-	Role ServiceRole `json:"role"`
-}
-
-// ServiceGrantPermissions defines model for ServiceGrant.Permissions.
-type ServiceGrantPermissions string
-
-// ServiceGrantPrincipalType specifies the principal type associated with this service grant.
-type ServiceGrantPrincipalType string
 
 // ServiceList contains an ordered collection of service values.
 type ServiceList struct {
@@ -5446,6 +5290,9 @@ type ServicePatchRequest struct {
 	// Lifecycle contains the lifecycle associated with this service patch request.
 	Lifecycle *Lifecycle `json:"lifecycle,omitempty"`
 
+	// Maintainers contains the maintainer refs associated with this service patch request.
+	Maintainers *OwnerRefs `json:"maintainers,omitempty"`
+
 	// Owners contains the owner refs associated with this service patch request.
 	Owners *OwnerRefs `json:"owners,omitempty"`
 
@@ -5467,9 +5314,6 @@ type ServiceRef struct {
 	// Slug contains the slug associated with this service ref.
 	Slug Slug `json:"slug"`
 }
-
-// ServiceRole identifies one supported service role value.
-type ServiceRole string
 
 // ServiceSlug is a stable lowercase URL identifier containing letters, digits, and hyphens.
 type ServiceSlug = Slug
@@ -5696,12 +5540,6 @@ type SourceSpec struct {
 
 	// BranchPatterns contains the ordered branch patterns associated with this source spec.
 	BranchPatterns []RefGlob `json:"branchPatterns"`
-
-	// ConfigFieldSources contains the ordered config field sources associated with this source spec.
-	ConfigFieldSources []FieldSource `json:"configFieldSources"`
-
-	// ConfigOrigin contains the config source associated with this source spec.
-	ConfigOrigin ConfigSource `json:"configOrigin"`
 
 	// CreatedAt is the RFC 3339 UTC instant when this resource was created.
 	CreatedAt Timestamp `json:"createdAt"`
@@ -5980,9 +5818,6 @@ type SystemGroup struct {
 	// Id uniquely identifies this resource.
 	Id Uuid `json:"id"`
 
-	// ParentId specifies the parent id associated with this system group.
-	ParentId nullable.Nullable[Uuid] `json:"parentId"`
-
 	// ServiceIds contains the ordered service ids associated with this system group.
 	ServiceIds []Uuid `json:"serviceIds"`
 
@@ -6000,9 +5835,6 @@ type SystemGroupCreateRequest struct {
 
 	// DisplayName specifies the display name associated with this system group create request.
 	DisplayName string `json:"displayName"`
-
-	// ParentId specifies the parent id associated with this system group create request.
-	ParentId nullable.Nullable[Uuid] `json:"parentId,omitempty"`
 
 	// ServiceIds contains the ordered service ids associated with this system group create request.
 	ServiceIds *[]Uuid `json:"serviceIds,omitempty"`
@@ -6030,9 +5862,6 @@ type SystemGroupPatchRequest struct {
 
 	// DisplayName specifies the display name associated with this system group patch request.
 	DisplayName *string `json:"displayName,omitempty"`
-
-	// ParentId specifies the parent id associated with this system group patch request.
-	ParentId nullable.Nullable[Uuid] `json:"parentId,omitempty"`
 }
 
 // Tag represents tag data exchanged through the Meridian API.
@@ -6776,6 +6605,33 @@ type ViewOverrideValue struct {
 
 	// Enabled indicates whether enabled applies to this view override value.
 	Enabled *bool `json:"enabled,omitempty"`
+}
+
+// ViewPreviewRequest Frontend selects which layers to merge and may add inline draft layers; the backend runs the same merge engine and returns the result without persisting anything.
+type ViewPreviewRequest struct {
+	// ContentType specifies the content type associated with this view preview request.
+	ContentType ContentType `json:"contentType"`
+
+	// DraftLayers contains the ordered draft layers associated with this view preview request.
+	DraftLayers *[]DraftLayerInput `json:"draftLayers,omitempty"`
+
+	// EnabledLayerIds contains the ordered enabled layer ids associated with this view preview request.
+	EnabledLayerIds []Uuid `json:"enabledLayerIds"`
+}
+
+// ViewPreviewResult returns the merged preview result inline; nothing is persisted.
+type ViewPreviewResult struct {
+	// EngineVersion specifies the engine version associated with this view preview result.
+	EngineVersion string `json:"engineVersion"`
+
+	// MediaType specifies the media type associated with this view preview result.
+	MediaType string `json:"mediaType"`
+
+	// MergedContent contains the merged content associated with this view preview result.
+	MergedContent string `json:"mergedContent"`
+
+	// Provenance contains the provenance associated with this view preview result.
+	Provenance map[string]any `json:"provenance"`
 }
 
 // ViewResolution represents view resolution data exchanged through the Meridian API.

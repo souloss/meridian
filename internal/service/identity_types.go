@@ -11,8 +11,6 @@ import (
 var (
 	// ErrUnauthenticated means no active principal could be established.
 	ErrUnauthenticated = errors.New("principal is not authenticated")
-	// ErrCSRFInvalid means a browser mutation did not prove session-bound intent.
-	ErrCSRFInvalid = errors.New("CSRF token is missing or invalid")
 	// ErrNotFound intentionally combines absent and unauthorized resources.
 	ErrNotFound = errors.New("resource is absent or unauthorized")
 	// ErrDuplicate means a contract-defined unique identity already exists.
@@ -90,12 +88,12 @@ type Membership struct {
 	JoinedAt          time.Time
 }
 
-// PrincipalKind identifies whether authentication used a browser session or PAT.
+// PrincipalKind identifies whether authentication used a browser JWT or PAT.
 type PrincipalKind string
 
 const (
-	// PrincipalSession is a browser session subject to CSRF protection.
-	PrincipalSession PrincipalKind = "session"
+	// PrincipalJWT is a browser subject authenticated with a short-lived access token.
+	PrincipalJWT PrincipalKind = "jwt"
 	// PrincipalPAT is a tenant-bound personal access token.
 	PrincipalPAT PrincipalKind = "pat"
 )
@@ -104,9 +102,7 @@ const (
 type Principal struct {
 	Kind       PrincipalKind
 	User       User
-	SessionID  uuid.UUID
 	TokenID    uuid.UUID
-	CSRFHash   []byte
 	TenantID   uuid.UUID
 	TenantSlug string
 	Role       string
@@ -115,11 +111,12 @@ type Principal struct {
 
 // LoginResult contains the one-time browser credentials and identity projection.
 type LoginResult struct {
-	SessionToken string
-	CSRFToken    string
-	ExpiresAt    time.Time
-	Principal    Principal
-	Memberships  []Membership
+	AccessToken      string
+	ExpiresInSeconds int
+	RefreshToken     string
+	RefreshExpiresAt time.Time
+	Principal        Principal
+	Memberships      []Membership
 }
 
 // Token is PAT metadata that never includes plaintext bearer material.
@@ -151,13 +148,20 @@ type NewUser struct {
 	IsPlatformAdmin bool
 }
 
-// NewSession contains digest-only browser session persistence inputs.
-type NewSession struct {
+// NewRefreshToken contains digest-only browser refresh token persistence inputs.
+type NewRefreshToken struct {
 	ID        uuid.UUID
 	UserID    uuid.UUID
 	TokenHash []byte
-	CSRFHash  []byte
+	FamilyID  uuid.UUID
 	ExpiresAt time.Time
+}
+
+// RefreshTokenPrincipal resolves one refresh token to its user and rotation family.
+type RefreshTokenPrincipal struct {
+	Principal Principal
+	FamilyID  uuid.UUID
+	Revoked   bool
 }
 
 // NewTenant contains tenant values ready for atomic default resolution and insertion.
@@ -235,11 +239,10 @@ type IdentityStore interface {
 	UserByID(context.Context, uuid.UUID) (User, error)
 	ListUsers(context.Context, string, int32, int32) ([]User, int64, error)
 	PromotePlatformAdmin(context.Context, uuid.UUID, time.Time) (User, error)
-	CreateSession(context.Context, NewSession) error
-	SessionPrincipalByDigest(context.Context, []byte, time.Time) (Principal, error)
-	RotateSessionCSRF(context.Context, uuid.UUID, []byte, time.Time) error
-	TouchSession(context.Context, uuid.UUID, time.Time) error
-	RevokeSession(context.Context, uuid.UUID, time.Time) error
+	CreateRefreshToken(context.Context, NewRefreshToken) error
+	RefreshTokenPrincipalByDigest(context.Context, []byte, time.Time) (RefreshTokenPrincipal, error)
+	RotateRefreshToken(context.Context, uuid.UUID, uuid.UUID, time.Time) error
+	RevokeRefreshTokenFamily(context.Context, uuid.UUID, time.Time) error
 	ActiveMemberships(context.Context, uuid.UUID) ([]Membership, error)
 	ActiveMembership(context.Context, uuid.UUID, string) (Membership, error)
 	CreateTenant(context.Context, NewTenant) (Tenant, error)

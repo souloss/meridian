@@ -36,16 +36,23 @@ func newServeCommand() *cobra.Command {
 	}
 	command.Flags().StringVar(&addr, "addr", ":8080", "HTTP listen address")
 	command.Flags().StringVar(&databaseURL, "database-url", os.Getenv("MERIDIAN_DATABASE_URL"), "PostgreSQL connection URL (or MERIDIAN_DATABASE_URL)")
-	command.Flags().BoolVar(&insecureCookies, "insecure-cookies", false, "allow session cookies over HTTP for loopback development")
+	command.Flags().BoolVar(&insecureCookies, "insecure-cookies", false, "allow refresh cookies over HTTP for loopback development")
 	return command
 }
 
 func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, secureCookies bool, output io.Writer) (err error) {
 	logger := slog.New(slog.NewJSONHandler(output, nil))
+	if err := handler.ConfigureTracer(); err != nil {
+		return err
+	}
 	if !secureCookies && !isLoopbackAddress(addr) {
 		return errors.New("--insecure-cookies requires an explicit loopback --addr")
 	}
 	digester, err := service.NewTokenDigester(encodedPepper)
+	if err != nil {
+		return err
+	}
+	jwtIssuer, err := service.NewJWTIssuer(os.Getenv("MERIDIAN_JWT_SIGNING_KEY"))
 	if err != nil {
 		return err
 	}
@@ -63,7 +70,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	}
 
 	identityStore := repository.NewIdentityStore(db.Pool)
-	identity := service.NewIdentity(identityStore, digester)
+	identity := service.NewIdentity(identityStore, digester, jwtIssuer)
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
 		Executions: repositoryStore, Outbox: repositoryStore,

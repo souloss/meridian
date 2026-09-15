@@ -30,10 +30,6 @@ type authServer struct {
 	server *Server
 }
 
-func (adapter authServer) GetCsrfToken(ctx context.Context, request auth.GetCsrfTokenRequestObject) (auth.GetCsrfTokenResponseObject, error) {
-	return adapter.server.GetCsrfToken(ctx, request)
-}
-
 func (adapter authServer) GetMe(ctx context.Context, request auth.GetMeRequestObject) (auth.GetMeResponseObject, error) {
 	return adapter.server.GetMe(ctx, request)
 }
@@ -44,6 +40,10 @@ func (adapter authServer) Login(ctx context.Context, request auth.LoginRequestOb
 
 func (adapter authServer) Logout(ctx context.Context, request auth.LogoutRequestObject) (auth.LogoutResponseObject, error) {
 	return adapter.server.Logout(ctx, request)
+}
+
+func (adapter authServer) Refresh(ctx context.Context, request auth.RefreshRequestObject) (auth.RefreshResponseObject, error) {
+	return adapter.server.Refresh(ctx, request)
 }
 
 type collaborationServer struct {
@@ -204,6 +204,10 @@ func (adapter systemServer) GetVersion(ctx context.Context, request system.GetVe
 
 func (adapter systemServer) Healthz(ctx context.Context, request system.HealthzRequestObject) (system.HealthzResponseObject, error) {
 	return adapter.server.Healthz(ctx, request)
+}
+
+func (adapter systemServer) Metrics(ctx context.Context, request system.MetricsRequestObject) (system.MetricsResponseObject, error) {
+	return adapter.server.Metrics(ctx, request)
 }
 
 func (adapter systemServer) Readyz(ctx context.Context, request system.ReadyzRequestObject) (system.ReadyzResponseObject, error) {

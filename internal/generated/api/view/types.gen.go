@@ -7,6 +7,9 @@ import (
 	externalRef0 "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
+// AssetId UUID v7
+type AssetId = externalRef0.Uuid
+
 // GroupId UUID v7
 type GroupId = externalRef0.Uuid
 
@@ -81,6 +84,9 @@ type ListViewsParams struct {
 
 // ResolvePublicViewJSONRequestBody defines body for ResolvePublicView for application/json ContentType.
 type ResolvePublicViewJSONRequestBody = externalRef0.PublicViewResolveRequest
+
+// PreviewAssetViewJSONRequestBody defines body for PreviewAssetView for application/json ContentType.
+type PreviewAssetViewJSONRequestBody = externalRef0.ViewPreviewRequest
 
 // CreateShareLinkJSONRequestBody defines body for CreateShareLink for application/json ContentType.
 type CreateShareLinkJSONRequestBody = externalRef0.ShareLinkCreateRequest

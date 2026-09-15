@@ -77,7 +77,7 @@ func TestJobsRequirePlatformSessionAdministrator(t *testing.T) {
 	if _, _, err := jobs.ListPlatform(t.Context(), principal, PlatformJobFilter{}, 1, 20); err != ErrNotFound {
 		t.Fatalf("ListPlatform PAT error = %v, want ErrNotFound", err)
 	}
-	principal.Kind = PrincipalSession
+	principal.Kind = PrincipalJWT
 	if _, _, err := jobs.ListPlatform(t.Context(), principal, PlatformJobFilter{}, 1, 20); err != nil {
 		t.Fatalf("ListPlatform platform session error = %v", err)
 	}
@@ -90,7 +90,7 @@ func TestJobsValidateAndForwardFilters(t *testing.T) {
 	t.Parallel()
 	store := &jobStoreStub{}
 	jobs := NewJobs(store, nil)
-	principal := Principal{Kind: PrincipalSession, User: User{IsPlatformAdmin: true}}
+	principal := Principal{Kind: PrincipalJWT, User: User{IsPlatformAdmin: true}}
 	filter := PlatformJobFilter{Types: []string{"repo.sync"}, Statuses: []string{"pending"}, ScopeType: "repository", ScopeID: "018f0b7a-3b54-7c2e-b7ef-3baf9709a2a1", TenantSlug: "acme"}
 	if _, _, err := jobs.ListPlatform(t.Context(), principal, filter, 2, 10); err != nil {
 		t.Fatalf("ListPlatform filtered error = %v", err)
@@ -116,7 +116,7 @@ func TestJobsTenantAuthorizationAndPATScopeExpansion(t *testing.T) {
 	tenantID := uuid.NewV7()
 	store := &jobStoreStub{tenantJob: JobRecord{ID: uuid.NewV7(), Status: "pending", CreatedAt: time.Now(), UpdatedAt: time.Now()}}
 	jobs := NewJobs(store, jobIdentityStub{membership: Membership{TenantID: tenantID, TenantSlug: "acme", Role: "maintainer"}})
-	actor := Principal{Kind: PrincipalSession, User: User{ID: uuid.NewV7()}}
+	actor := Principal{Kind: PrincipalJWT, User: User{ID: uuid.NewV7()}}
 	items, total, err := jobs.ListTenant(t.Context(), actor, "acme", JobFilter{}, 1, 20)
 	if err != nil {
 		t.Fatalf("ListTenant session error = %v", err)
@@ -140,15 +140,16 @@ func TestJobsTenantAuthorizationAndPATScopeExpansion(t *testing.T) {
 
 func TestJobsRetryBindsPrincipalAndSemanticRequest(t *testing.T) {
 	t.Parallel()
-	tenantID, sourceJobID, sessionID, key := uuid.NewV7(), uuid.NewV7(), uuid.NewV7(), uuid.NewV7()
+	tenantID, sourceJobID, key := uuid.NewV7(), uuid.NewV7(), uuid.NewV7()
+	userID := uuid.NewV7()
 	store := &jobStoreStub{}
 	jobs := NewJobs(store, jobIdentityStub{membership: Membership{TenantID: tenantID, TenantSlug: "acme", Role: "maintainer"}})
 	jobs.now = func() time.Time { return time.Date(2026, 9, 5, 8, 0, 0, 0, time.UTC) }
-	actor := Principal{Kind: PrincipalSession, SessionID: sessionID, User: User{ID: uuid.NewV7()}}
+	actor := Principal{Kind: PrincipalJWT, User: User{ID: userID}}
 	if _, err := jobs.RetryTenant(t.Context(), actor, "acme", sourceJobID, key); err != nil {
 		t.Fatalf("RetryTenant error = %v", err)
 	}
-	if store.retry.TenantID != tenantID || store.retry.SourceJobID != sourceJobID || store.retry.PrincipalType != "session" || store.retry.PrincipalID != sessionID || store.retry.IdempotencyKey != key || len(store.retry.RequestHash) != 32 {
+	if store.retry.TenantID != tenantID || store.retry.SourceJobID != sourceJobID || store.retry.PrincipalType != "jwt" || store.retry.PrincipalID != userID || store.retry.IdempotencyKey != key || len(store.retry.RequestHash) != 32 {
 		t.Fatalf("retry request = %#v", store.retry)
 	}
 }

@@ -22,6 +22,11 @@ func (UnimplementedStrictServer) GetSharedView(ctx context.Context, request GetS
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
+// PreviewAssetView returns ErrStrictOperationNotImplemented until its milestone is implemented.
+func (UnimplementedStrictServer) PreviewAssetView(ctx context.Context, request PreviewAssetViewRequestObject) (PreviewAssetViewResponseObject, error) {
+	return nil, rootapi.ErrStrictOperationNotImplemented
+}
+
 // ListShareLinks returns ErrStrictOperationNotImplemented until its milestone is implemented.
 func (UnimplementedStrictServer) ListShareLinks(ctx context.Context, request ListShareLinksRequestObject) (ListShareLinksResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented

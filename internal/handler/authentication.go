@@ -13,16 +13,17 @@ import (
 )
 
 const (
-	sessionCookieName = "meridian_session"
-	csrfHeaderName    = "X-CSRF-Token"
+	refreshCookieName = "meridian_refresh"
 )
 
 type principalContextKey struct{}
 
+type refreshTokenContextKey struct{}
+
 type operationAuthPolicy struct {
-	required    bool
-	allowCookie bool
-	allowPAT    bool
+	required          bool
+	allowBearer       bool
+	allowRefreshCookie bool
 }
 
 var authPolicies = sync.OnceValue(loadOperationAuthPolicies)
@@ -38,41 +39,50 @@ func (s *Server) authenticateOperation(next strictHandlerFunc, operationID strin
 		if !declared {
 			return nil, errors.New("OpenAPI authentication policy is missing for operation " + operationID)
 		}
-		if !policy.allowCookie && !policy.allowPAT {
-			return next(ctx, w, r, request)
-		}
-		principal, found, err := s.authenticateRequest(ctx, r)
-		if err != nil {
-			return nil, err
-		}
-		if found {
-			if (principal.Kind == service.PrincipalSession && !policy.allowCookie) || (principal.Kind == service.PrincipalPAT && !policy.allowPAT) {
+		if policy.allowRefreshCookie && !policy.allowBearer {
+			// Refresh and logout read the refresh cookie directly.
+			cookie, err := r.Cookie(refreshCookieName)
+			if err != nil {
 				if policy.required {
 					return nil, service.ErrUnauthenticated
 				}
 				return next(ctx, w, r, request)
 			}
-			ctx = context.WithValue(ctx, principalContextKey{}, principal)
-			if principal.Kind == service.PrincipalSession && policy.allowCookie && !safeMethod(r.Method) {
-				if err := s.identity.VerifyCSRF(principal, r.Header.Get(csrfHeaderName)); err != nil {
-					return nil, err
-				}
-			}
-		} else if policy.required {
-			return nil, service.ErrUnauthenticated
+			ctx = context.WithValue(ctx, refreshTokenContextKey{}, cookie.Value)
+			return next(ctx, w, r, request)
 		}
+		if !policy.allowBearer {
+			// Public operations carry no principal.
+			return next(ctx, w, r, request)
+		}
+		principal, found, err := s.authenticateBearer(ctx, r)
+		if err != nil {
+			return nil, err
+		}
+		if !found {
+			if policy.required {
+				return nil, service.ErrUnauthenticated
+			}
+			return next(ctx, w, r, request)
+		}
+		ctx = context.WithValue(ctx, principalContextKey{}, principal)
 		return next(ctx, w, r, request)
 	}
 }
 
-func (s *Server) authenticateRequest(ctx context.Context, r *http.Request) (service.Principal, bool, error) {
-	authorization := r.Header.Get("Authorization")
-	if authorization != "" {
-		bearer, ok := strings.CutPrefix(authorization, "Bearer ")
-		if !ok || strings.ContainsAny(bearer, " \t\r\n") {
-			return service.Principal{}, false, nil
-		}
-		principal, err := s.identity.AuthenticatePAT(ctx, bearer)
+func (s *Server) authenticateBearer(ctx context.Context, r *http.Request) (service.Principal, bool, error) {
+	bearer := r.Header.Get("Authorization")
+	if bearer == "" {
+		// EventSource cannot set an Authorization header; the SSE log stream carries
+		// the access token in the query string instead.
+		bearer = r.URL.Query().Get("token")
+	}
+	token, ok := strings.CutPrefix(bearer, "Bearer ")
+	if !ok || strings.ContainsAny(token, " \t\r\n") {
+		return service.Principal{}, false, nil
+	}
+	if strings.HasPrefix(token, "pat_") {
+		principal, err := s.identity.AuthenticatePAT(ctx, token)
 		if err != nil {
 			if errors.Is(err, service.ErrUnauthenticated) {
 				return service.Principal{}, false, nil
@@ -81,14 +91,7 @@ func (s *Server) authenticateRequest(ctx context.Context, r *http.Request) (serv
 		}
 		return principal, true, nil
 	}
-	cookie, err := r.Cookie(sessionCookieName)
-	if err != nil {
-		if errors.Is(err, http.ErrNoCookie) {
-			return service.Principal{}, false, nil
-		}
-		return service.Principal{}, false, err
-	}
-	principal, err := s.identity.AuthenticateSession(ctx, cookie.Value)
+	principal, err := s.identity.AuthenticateJWT(ctx, token)
 	if err != nil {
 		if errors.Is(err, service.ErrUnauthenticated) {
 			return service.Principal{}, false, nil
@@ -106,8 +109,12 @@ func principalFromContext(ctx context.Context) (service.Principal, error) {
 	return principal, nil
 }
 
-func safeMethod(method string) bool {
-	return method == http.MethodGet || method == http.MethodHead || method == http.MethodOptions || method == http.MethodTrace
+func refreshTokenFromContext(ctx context.Context) (string, error) {
+	token, ok := ctx.Value(refreshTokenContextKey{}).(string)
+	if !ok || token == "" {
+		return "", service.ErrUnauthenticated
+	}
+	return token, nil
 }
 
 func loadOperationAuthPolicies() map[string]operationAuthPolicy {
@@ -122,8 +129,7 @@ func loadOperationAuthPolicies() map[string]operationAuthPolicy {
 			if operation.Security != nil {
 				security = *operation.Security
 			}
-			policy := authPolicy(security)
-			policies[upperFirst(operation.OperationID)] = policy
+			policies[upperFirst(operation.OperationID)] = authPolicy(security)
 		}
 	}
 	return policies
@@ -135,11 +141,11 @@ func authPolicy(requirements openapi3.SecurityRequirements) operationAuthPolicy 
 		if len(requirement) == 0 {
 			policy.required = false
 		}
-		if _, ok := requirement["cookieSession"]; ok {
-			policy.allowCookie = true
+		if _, ok := requirement["bearerAuth"]; ok {
+			policy.allowBearer = true
 		}
-		if _, ok := requirement["patBearer"]; ok {
-			policy.allowPAT = true
+		if _, ok := requirement["refreshCookie"]; ok {
+			policy.allowRefreshCookie = true
 		}
 	}
 	return policy

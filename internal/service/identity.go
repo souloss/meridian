@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	sessionTokenPrefix = "ses_"
+	refreshTokenPrefix = "rfs_"
 	patTokenPrefix     = "pat_"
-	sessionTTL         = 72 * time.Hour
+	refreshTokenTTL    = 168 * time.Hour
 	minimumPasswordLen = 12
 	maximumPasswordLen = 1024
 )
@@ -28,15 +28,17 @@ type Identity struct {
 	store    IdentityStore
 	password PasswordHasher
 	tokens   TokenDigester
+	jwt      *JWTIssuer
 	now      func() time.Time
 }
 
 // NewIdentity constructs identity use cases with caller-owned persistence and key material.
-func NewIdentity(store IdentityStore, tokens TokenDigester) *Identity {
+func NewIdentity(store IdentityStore, tokens TokenDigester, jwtIssuer *JWTIssuer) *Identity {
 	return &Identity{
 		store:    store,
 		password: PasswordHasher{},
 		tokens:   tokens,
+		jwt:      jwtIssuer,
 		now:      time.Now,
 	}
 }
@@ -109,7 +111,7 @@ func (identity *Identity) createUser(ctx context.Context, input CreateUserInput,
 	})
 }
 
-// Login authenticates a local password and creates one browser session.
+// Login authenticates a local password and mints a browser access token and refresh token.
 func (identity *Identity) Login(ctx context.Context, username, password string) (LoginResult, error) {
 	user, passwordHash, err := identity.store.UserByUsername(ctx, username)
 	if err != nil {
@@ -123,62 +125,56 @@ func (identity *Identity) Login(ctx context.Context, username, password string) 
 		return LoginResult{}, ErrUnauthenticated
 	}
 
-	sessionToken, sessionHash, err := identity.tokens.NewOpaqueToken(sessionTokenPrefix)
+	accessToken, accessTTL, err := identity.jwt.IssueAccessToken(user.ID)
 	if err != nil {
 		return LoginResult{}, err
 	}
-	csrfToken, csrfHash, err := identity.tokens.NewOpaqueToken("")
+	refreshToken, refreshHash, err := identity.tokens.NewOpaqueToken(refreshTokenPrefix)
 	if err != nil {
 		return LoginResult{}, err
 	}
 	now := identity.now().UTC()
-	expiresAt := now.Add(sessionTTL)
-	sessionID := uuid.NewV7()
-	if err := identity.store.CreateSession(ctx, NewSession{
-		ID:        sessionID,
+	refreshExpiresAt := now.Add(refreshTokenTTL)
+	if err := identity.store.CreateRefreshToken(ctx, NewRefreshToken{
+		ID:        uuid.NewV7(),
 		UserID:    user.ID,
-		TokenHash: sessionHash,
-		CSRFHash:  csrfHash,
-		ExpiresAt: expiresAt,
+		TokenHash: refreshHash,
+		FamilyID:  uuid.NewV7(),
+		ExpiresAt: refreshExpiresAt,
 	}); err != nil {
 		return LoginResult{}, err
 	}
 	memberships, err := identity.store.ActiveMemberships(ctx, user.ID)
 	if err != nil {
-		cleanupErr := identity.store.RevokeSession(context.WithoutCancel(ctx), sessionID, now)
-		return LoginResult{}, errors.Join(err, cleanupErr)
+		return LoginResult{}, err
 	}
 	return LoginResult{
-		SessionToken: sessionToken,
-		CSRFToken:    csrfToken,
-		ExpiresAt:    expiresAt,
-		Principal: Principal{
-			Kind:      PrincipalSession,
-			User:      user,
-			SessionID: sessionID,
-			CSRFHash:  csrfHash,
-		},
-		Memberships: memberships,
+		AccessToken:      accessToken,
+		ExpiresInSeconds: int(accessTTL / time.Second),
+		RefreshToken:     refreshToken,
+		RefreshExpiresAt: refreshExpiresAt,
+		Principal:        Principal{Kind: PrincipalJWT, User: user},
+		Memberships:      memberships,
 	}, nil
 }
 
-// AuthenticateSession resolves and touches one opaque browser session token.
-func (identity *Identity) AuthenticateSession(ctx context.Context, plaintext string) (Principal, error) {
-	if !validOpaqueToken(plaintext, sessionTokenPrefix) {
-		return Principal{}, ErrUnauthenticated
+// AuthenticateJWT resolves a short-lived access token to a live user principal.
+func (identity *Identity) AuthenticateJWT(ctx context.Context, plaintext string) (Principal, error) {
+	userID, err := identity.jwt.VerifyAccessToken(plaintext)
+	if err != nil {
+		return Principal{}, err
 	}
-	now := identity.now().UTC()
-	principal, err := identity.store.SessionPrincipalByDigest(ctx, identity.tokens.Digest(plaintext), now)
+	user, err := identity.store.UserByID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return Principal{}, ErrUnauthenticated
 		}
 		return Principal{}, err
 	}
-	if err := identity.store.TouchSession(ctx, principal.SessionID, now); err != nil {
-		return Principal{}, err
+	if user.Status != "active" {
+		return Principal{}, ErrUnauthenticated
 	}
-	return principal, nil
+	return Principal{Kind: PrincipalJWT, User: user}, nil
 }
 
 // AuthenticatePAT resolves and touches one tenant-bound opaque personal access token.
@@ -200,49 +196,84 @@ func (identity *Identity) AuthenticatePAT(ctx context.Context, plaintext string)
 	return principal, nil
 }
 
-// VerifyCSRF validates a browser mutation token against its session digest.
-func (identity *Identity) VerifyCSRF(principal Principal, submitted string) error {
-	if principal.Kind != PrincipalSession || !identity.tokens.Matches(submitted, principal.CSRFHash) {
-		return ErrCSRFInvalid
+// Refresh rotates a refresh token and returns a fresh access token plus the next refresh token.
+//
+// A revoked refresh token indicates replay; the whole family is revoked so a leaked
+// token cannot outlive its legitimate successor.
+func (identity *Identity) Refresh(ctx context.Context, plaintext string) (LoginResult, error) {
+	if !validOpaqueToken(plaintext, refreshTokenPrefix) {
+		return LoginResult{}, ErrUnauthenticated
 	}
-	return nil
-}
-
-// RotateCSRF returns a new plaintext CSRF token after replacing the stored digest.
-func (identity *Identity) RotateCSRF(ctx context.Context, principal Principal) (string, error) {
-	if principal.Kind != PrincipalSession {
-		return "", ErrUnauthenticated
-	}
-	plaintext, digest, err := identity.tokens.NewOpaqueToken("")
+	now := identity.now().UTC()
+	principal, err := identity.store.RefreshTokenPrincipalByDigest(ctx, identity.tokens.Digest(plaintext), now)
 	if err != nil {
-		return "", err
-	}
-	if err := identity.store.RotateSessionCSRF(ctx, principal.SessionID, digest, identity.now().UTC()); err != nil {
 		if errors.Is(err, ErrNotFound) {
-			return "", ErrUnauthenticated
+			return LoginResult{}, ErrUnauthenticated
 		}
-		return "", err
+		return LoginResult{}, err
 	}
-	return plaintext, nil
+	if principal.Revoked {
+		if err := identity.store.RevokeRefreshTokenFamily(ctx, principal.FamilyID, now); err != nil {
+			return LoginResult{}, err
+		}
+		return LoginResult{}, ErrUnauthenticated
+	}
+
+	accessToken, accessTTL, err := identity.jwt.IssueAccessToken(principal.Principal.User.ID)
+	if err != nil {
+		return LoginResult{}, err
+	}
+	nextRefresh, nextHash, err := identity.tokens.NewOpaqueToken(refreshTokenPrefix)
+	if err != nil {
+		return LoginResult{}, err
+	}
+	nextID := uuid.NewV7()
+	refreshExpiresAt := now.Add(refreshTokenTTL)
+	if err := identity.store.CreateRefreshToken(ctx, NewRefreshToken{
+		ID:        nextID,
+		UserID:    principal.Principal.User.ID,
+		TokenHash: nextHash,
+		FamilyID:  principal.FamilyID,
+		ExpiresAt: refreshExpiresAt,
+	}); err != nil {
+		return LoginResult{}, err
+	}
+	if err := identity.store.RotateRefreshToken(ctx, principal.Principal.TokenID, nextID, now); err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return LoginResult{}, ErrUnauthenticated
+		}
+		return LoginResult{}, err
+	}
+	return LoginResult{
+		AccessToken:      accessToken,
+		ExpiresInSeconds: int(accessTTL / time.Second),
+		RefreshToken:     nextRefresh,
+		RefreshExpiresAt: refreshExpiresAt,
+		Principal:        principal.Principal,
+	}, nil
 }
 
-// Logout revokes the current browser session.
-func (identity *Identity) Logout(ctx context.Context, principal Principal) error {
-	if principal.Kind != PrincipalSession {
+// Logout revokes a refresh token family; the browser discards the in-memory access token.
+func (identity *Identity) Logout(ctx context.Context, plaintext string) error {
+	if !validOpaqueToken(plaintext, refreshTokenPrefix) {
 		return ErrUnauthenticated
 	}
-	if err := identity.store.RevokeSession(ctx, principal.SessionID, identity.now().UTC()); err != nil {
+	principal, err := identity.store.RefreshTokenPrincipalByDigest(ctx, identity.tokens.Digest(plaintext), identity.now().UTC())
+	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return ErrUnauthenticated
 		}
 		return err
 	}
+	if err := identity.store.RevokeRefreshTokenFamily(ctx, principal.FamilyID, identity.now().UTC()); err != nil {
+		return err
+	}
 	return nil
 }
 
-// Me returns current user data and active tenant memberships for browser sessions.
+// Me returns current user data and active tenant memberships for browser principals.
 func (identity *Identity) Me(ctx context.Context, principal Principal) (User, []Membership, error) {
-	if principal.Kind != PrincipalSession {
+	if principal.Kind != PrincipalJWT {
 		return User{}, nil, ErrUnauthenticated
 	}
 	memberships, err := identity.store.ActiveMemberships(ctx, principal.User.ID)
@@ -380,7 +411,7 @@ func (identity *Identity) RevokeToken(ctx context.Context, actor Principal, tena
 }
 
 func (identity *Identity) browserMembership(ctx context.Context, actor Principal, tenantSlug string) (Membership, error) {
-	if actor.Kind != PrincipalSession {
+	if actor.Kind != PrincipalJWT {
 		return Membership{}, ErrNotFound
 	}
 	membership, err := identity.store.ActiveMembership(ctx, actor.User.ID, tenantSlug)
@@ -394,7 +425,7 @@ func (identity *Identity) browserMembership(ctx context.Context, actor Principal
 }
 
 func isPlatformAdministrator(principal Principal) bool {
-	return principal.Kind == PrincipalSession && principal.User.IsPlatformAdmin
+	return principal.Kind == PrincipalJWT && principal.User.IsPlatformAdmin
 }
 
 func validateUserInput(input CreateUserInput) error {

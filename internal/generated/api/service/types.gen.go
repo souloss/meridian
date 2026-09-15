@@ -8,9 +8,6 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// IdempotencyKey defines model for IdempotencyKey.
-type IdempotencyKey = openapi_types.UUID
-
 // IfMatch Opaque HTTP entity tag including quotes
 type IfMatch = externalRef0.ETag
 
@@ -86,12 +83,6 @@ type UpdateServiceParams struct {
 	IfMatch IfMatch `json:"if-match"`
 }
 
-// ResolveServiceDriftParams defines parameters for ResolveServiceDrift.
-type ResolveServiceDriftParams struct {
-	// IdempotencyKey Retained for 24 hours; a replay returns the original status and body.
-	IdempotencyKey IdempotencyKey `json:"idempotency-key"`
-}
-
 // ListRecentServicesParams defines parameters for ListRecentServices.
 type ListRecentServicesParams struct {
 	// Page selects a one-based result page.
@@ -106,9 +97,3 @@ type CreateServiceInRepositoryJSONRequestBody = externalRef0.ServiceCreateReques
 
 // UpdateServiceJSONRequestBody defines body for UpdateService for application/json ContentType.
 type UpdateServiceJSONRequestBody = externalRef0.ServicePatchRequest
-
-// PutServiceAccessJSONRequestBody defines body for PutServiceAccess for application/json ContentType.
-type PutServiceAccessJSONRequestBody = externalRef0.ServiceAccessPutRequest
-
-// ResolveServiceDriftJSONRequestBody defines body for ResolveServiceDrift for application/json ContentType.
-type ResolveServiceDriftJSONRequestBody = externalRef0.DriftResolutionRequest

@@ -31,7 +31,7 @@ var expectedM0Tables = []string{
 	"notify_outbox",
 	"platform_settings",
 	"repositories",
-	"sessions",
+	"refresh_tokens",
 	"team_members",
 	"teams",
 	"tenant_blob_refs",

@@ -54,7 +54,11 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("construct token digester: %v", err)
 	}
-	identity := service.NewIdentity(store, digester)
+	jwtIssuer, err := service.NewJWTIssuer(integrationTokenPepper)
+	if err != nil {
+		t.Fatalf("construct JWT issuer: %v", err)
+	}
+	identity := service.NewIdentity(store, digester, jwtIssuer)
 	keyring, err := service.NewCredentialKeyring(
 		base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{0x11}, 32)),
 		1,
@@ -85,29 +89,11 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		"username": "padmin", "password": "correct horse battery staple",
 	}, nil)
 	assertStatus(t, adminLogin, http.StatusOK)
-	adminCookie := responseCookie(t, adminLogin, sessionCookieName)
-	adminCSRF := responseString(t, adminLogin, "csrfToken")
-
-	missingCSRF := requestJSON(t, httpHandler, http.MethodPost, "/api/v1/admin/users", map[string]any{
-		"username": "alice", "displayName": "Alice", "password": "alice secure password",
-	}, []*http.Cookie{adminCookie})
-	assertError(t, missingCSRF, http.StatusForbidden, "csrf_invalid")
-
-	rotated := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/auth/csrf", nil, []*http.Cookie{adminCookie})
-	assertStatus(t, rotated, http.StatusOK)
-	rotatedCSRF := responseString(t, rotated, "csrfToken")
-	if rotatedCSRF == adminCSRF {
-		t.Fatal("rotated CSRF token equals the login token")
-	}
-
-	staleCSRF := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/users", map[string]any{
-		"username": "alice", "displayName": "Alice", "password": "alice secure password",
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: adminCSRF})
-	assertError(t, staleCSRF, http.StatusForbidden, "csrf_invalid")
+	adminToken := responseString(t, adminLogin, "accessToken")
 
 	createdUser := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/users", map[string]any{
 		"username": "alice", "displayName": "Alice", "password": "alice secure password",
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, createdUser, http.StatusCreated)
 	userID, err := uuid.Parse(responseString(t, createdUser, "id"))
 	if err != nil {
@@ -116,14 +102,14 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 
 	createdTenant := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/tenants", map[string]any{
 		"slug": "acme", "displayName": "Acme",
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, createdTenant, http.StatusCreated)
 	tenantETag := responseString(t, createdTenant, "etag")
 	updatedTenant := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/admin/tenants/acme", map[string]any{
 		"displayName": "Acme Operations", "quota": map[string]any{
 			"maxRepositories": 50, "maxServices": 200, "maxStorageBytes": 10737418240, "maxCollectConcurrency": 4,
 		},
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF, "If-Match": tenantETag})
+	}, nil, map[string]string{"Authorization": "Bearer " + adminToken, "If-Match": tenantETag})
 	assertStatus(t, updatedTenant, http.StatusOK)
 	if responseString(t, updatedTenant, "displayName") != "Acme Operations" || responseString(t, updatedTenant, "status") != "active" {
 		t.Fatalf("tenant patch response = %s", updatedTenant.Body.String())
@@ -134,44 +120,43 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}
 	staleTenantUpdate := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/admin/tenants/acme", map[string]any{
 		"displayName": "Stale Update",
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF, "If-Match": tenantETag})
+	}, nil, map[string]string{"Authorization": "Bearer " + adminToken, "If-Match": tenantETag})
 	assertError(t, staleTenantUpdate, http.StatusPreconditionFailed, "precondition_failed")
-	listedUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users?q=alice", nil, []*http.Cookie{adminCookie})
+	listedUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users?q=alice", nil, nil)
 	assertStatus(t, listedUsers, http.StatusOK)
 	if !strings.Contains(listedUsers.Body.String(), `"username":"alice"`) || strings.Contains(listedUsers.Body.String(), "password_hash") {
 		t.Fatalf("platform user directory = %s", listedUsers.Body.String())
 	}
-	listedTenants := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/tenants", nil, []*http.Cookie{adminCookie})
+	listedTenants := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/tenants", nil, nil)
 	assertStatus(t, listedTenants, http.StatusOK)
 	if !strings.Contains(listedTenants.Body.String(), `"slug":"acme"`) || strings.Contains(listedTenants.Body.String(), `"settings"`) {
 		t.Fatalf("platform tenant directory leaked settings or omitted tenant: %s", listedTenants.Body.String())
 	}
 	duplicateTenant := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/tenants", map[string]any{
 		"slug": "acme", "displayName": "Duplicate Acme",
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertError(t, duplicateTenant, http.StatusConflict, "duplicate")
 
 	membershipPath := "/api/v1/admin/tenants/acme/members/" + userID.String()
 	member := requestJSONWithHeaders(t, httpHandler, http.MethodPut, membershipPath, map[string]any{
 		"role": "tenant_admin",
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, member, http.StatusOK)
 
 	aliceLogin := requestJSON(t, httpHandler, http.MethodPost, "/api/v1/auth/login", map[string]any{
 		"username": "alice", "password": "alice secure password",
 	}, nil)
 	assertStatus(t, aliceLogin, http.StatusOK)
-	aliceCookie := responseCookie(t, aliceLogin, sessionCookieName)
-	aliceCSRF := responseString(t, aliceLogin, "csrfToken")
+	aliceToken := responseString(t, aliceLogin, "accessToken")
 	assertTenantMembership(t, aliceLogin, "acme", "tenant_admin")
-	forbiddenPlatformUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users", nil, []*http.Cookie{aliceCookie})
+	forbiddenPlatformUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users", nil, nil)
 	assertError(t, forbiddenPlatformUsers, http.StatusNotFound, "not_found")
 	forbiddenTenantUpdate := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/admin/tenants/acme", map[string]any{
 		"displayName": "Unauthorized Update",
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF, "If-Match": updatedTenantETag})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken, "If-Match": updatedTenantETag})
 	assertError(t, forbiddenTenantUpdate, http.StatusNotFound, "not_found")
 
-	me := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, []*http.Cookie{aliceCookie})
+	me := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, nil)
 	assertStatus(t, me, http.StatusOK)
 	assertTenantMembership(t, me, "acme", "tenant_admin")
 
@@ -187,23 +172,23 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	`, uuid.NewV7(), tenantID, userID, uuid.NewV7(), uuid.NewV7(), uuid.NewV7()); err != nil {
 		t.Fatalf("create audit fixtures: %v", err)
 	}
-	tenantAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/audit-logs", nil, []*http.Cookie{aliceCookie})
+	tenantAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/audit-logs", nil, nil)
 	assertStatus(t, tenantAudits, http.StatusOK)
 	assertAuditPage(t, tenantAudits, 1, "acme", "repository.created")
-	platformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs?filter%5BtenantSlug%5D=acme", nil, []*http.Cookie{adminCookie})
+	platformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs?filter%5BtenantSlug%5D=acme", nil, nil)
 	assertStatus(t, platformAudits, http.StatusOK)
 	assertAuditPage(t, platformAudits, 1, "acme", "repository.created")
-	forbiddenPlatformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs", nil, []*http.Cookie{aliceCookie})
+	forbiddenPlatformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs", nil, nil)
 	assertError(t, forbiddenPlatformAudits, http.StatusNotFound, "not_found")
 
-	invalidBearer := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, []*http.Cookie{aliceCookie}, map[string]string{
+	invalidBearer := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, nil, map[string]string{
 		"Authorization": "Bearer invalid",
 	})
 	assertError(t, invalidBearer, http.StatusUnauthorized, "unauthenticated")
 
 	createdToken := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/tokens", map[string]any{
 		"name": "release automation", "scopes": []string{"asset:read", "asset:push"},
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, createdToken, http.StatusCreated)
 	plaintextPAT := responseString(t, createdToken, "token")
 	if !strings.HasPrefix(plaintextPAT, "pat_") {
@@ -214,7 +199,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		t.Fatalf("authenticate new PAT: %v", err)
 	}
 
-	listedTokens := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/tokens", nil, []*http.Cookie{aliceCookie})
+	listedTokens := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/tokens", nil, nil)
 	assertStatus(t, listedTokens, http.StatusOK)
 	if strings.Contains(listedTokens.Body.String(), plaintextPAT) || strings.Contains(listedTokens.Body.String(), `"token"`) {
 		t.Fatal("token list disclosed PAT bearer material or a token field")
@@ -222,7 +207,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 
 	revokePath := "/api/v1/t/acme/tokens/" + tokenID
 	for attempt := range 2 {
-		revoked := requestJSONWithHeaders(t, httpHandler, http.MethodDelete, revokePath, nil, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+		revoked := requestJSONWithHeaders(t, httpHandler, http.MethodDelete, revokePath, nil, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 		assertStatus(t, revoked, http.StatusNoContent)
 		if attempt == 0 && !errors.Is(authenticatePAT(identity, t, plaintextPAT), service.ErrUnauthenticated) {
 			t.Fatal("revoked PAT remained authenticated")
@@ -235,7 +220,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 
 	createdCredential := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials", map[string]any{
 		"name": "integration credential", "kind": "http_token", "httpToken": map[string]any{"username": "bot", "token": "first-secret-token"},
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, createdCredential, http.StatusCreated)
 	if strings.Contains(createdCredential.Body.String(), "first-secret-token") || strings.Contains(createdCredential.Body.String(), "\"token\"") {
 		t.Fatal("credential create response disclosed secret material")
@@ -247,7 +232,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	credentialETag := responseString(t, createdCredential, "etag")
 	testedCredential := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials/"+credentialID.String()+":test", map[string]any{
 		"repositoryUrl": "https://127.0.0.1:1/repository.git",
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, testedCredential, http.StatusOK)
 	var connectionResult struct {
 		OK          bool   `json:"ok"`
@@ -265,33 +250,33 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		t.Fatal("credential connection response disclosed secret material")
 	}
 	rotationHeaders := map[string]string{
-		csrfHeaderName:    aliceCSRF,
+		"Authorization":   "Bearer " + aliceToken,
 		"If-Match":        credentialETag,
 		"Idempotency-Key": uuid.NewV7().String(),
 	}
 	rotatedCredential := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials/"+credentialID.String()+":rotate", map[string]any{
 		"secret": map[string]any{"username": "bot", "token": "second-secret-token"}, "resyncRepositories": true,
-	}, []*http.Cookie{aliceCookie}, rotationHeaders)
+	}, nil, rotationHeaders)
 	assertStatus(t, rotatedCredential, http.StatusOK)
 	if strings.Contains(rotatedCredential.Body.String(), "second-secret-token") || strings.Contains(rotatedCredential.Body.String(), "first-secret-token") {
 		t.Fatal("credential rotation response disclosed secret material")
 	}
 	replay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials/"+credentialID.String()+":rotate", map[string]any{
 		"secret": map[string]any{"username": "bot", "token": "second-secret-token"}, "resyncRepositories": true,
-	}, []*http.Cookie{aliceCookie}, rotationHeaders)
+	}, nil, rotationHeaders)
 	assertStatus(t, replay, http.StatusOK)
 	if replay.Body.String() != rotatedCredential.Body.String() {
 		t.Fatalf("idempotent rotation body differs\nfirst: %s\nreplay: %s", rotatedCredential.Body.String(), replay.Body.String())
 	}
-	conflictHeaders := map[string]string{csrfHeaderName: aliceCSRF, "If-Match": credentialETag, "Idempotency-Key": rotationHeaders["Idempotency-Key"]}
+	conflictHeaders := map[string]string{"Authorization": "Bearer " + aliceToken, "If-Match": credentialETag, "Idempotency-Key": rotationHeaders["Idempotency-Key"]}
 	conflict := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/credentials/"+credentialID.String()+":rotate", map[string]any{
 		"secret": map[string]any{"username": "bot", "token": "third-secret-token"}, "resyncRepositories": true,
-	}, []*http.Cookie{aliceCookie}, conflictHeaders)
+	}, nil, conflictHeaders)
 	assertError(t, conflict, http.StatusConflict, "idempotency_conflict")
 
 	createdGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials", map[string]any{
 		"name": "integration global credential", "kind": "http_token", "httpToken": map[string]any{"username": "global-bot", "token": "global-first-token"},
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, createdGlobal, http.StatusCreated)
 	if strings.Contains(createdGlobal.Body.String(), "global-first-token") || strings.Contains(createdGlobal.Body.String(), "\"token\"") {
 		t.Fatal("global credential create response disclosed secret material")
@@ -303,14 +288,14 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	globalETag := responseString(t, createdGlobal, "etag")
 	testedGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials/"+globalID.String()+":test", map[string]any{
 		"repositoryUrl": "https://127.0.0.1:1/repository.git",
-	}, []*http.Cookie{adminCookie}, map[string]string{csrfHeaderName: rotatedCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, testedGlobal, http.StatusOK)
 	if strings.Contains(testedGlobal.Body.String(), "global-first-token") {
 		t.Fatal("global credential connection response disclosed secret material")
 	}
 	checkedRepository := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/repositories:check-connection", map[string]any{
 		"url": "https://127.0.0.1:1/repository.git", "credentialId": nil,
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, checkedRepository, http.StatusOK)
 	if strings.Contains(checkedRepository.Body.String(), "first-secret-token") {
 		t.Fatal("repository connection response disclosed secret material")
@@ -320,7 +305,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}
 	createdRepository := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/repositories", map[string]any{
 		"url": "https://git.example.com:443/Team/Repo.git/", "credentialId": credentialID.String(), "defaultBranch": "main",
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, createdRepository, http.StatusCreated)
 	repositoryID, err := uuid.Parse(responseString(t, createdRepository, "id"))
 	if err != nil {
@@ -330,7 +315,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if !strings.Contains(createdRepository.Body.String(), "https://git.example.com:443/Team/Repo.git/") || !strings.Contains(createdRepository.Body.String(), "main") {
 		t.Fatalf("repository response lost display/default values: %s", createdRepository.Body.String())
 	}
-	listedRepositories := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, []*http.Cookie{aliceCookie})
+	listedRepositories := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, nil)
 	assertStatus(t, listedRepositories, http.StatusOK)
 	var repositoryPage struct {
 		Total int `json:"total"`
@@ -346,7 +331,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}
 	updatedRepository := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/t/acme/repositories/"+repositoryID.String(), map[string]any{
 		"defaultBranch": "develop", "note": "managed by integration",
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF, "If-Match": repositoryETag})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken, "If-Match": repositoryETag})
 	assertStatus(t, updatedRepository, http.StatusOK)
 	repositoryETag = responseString(t, updatedRepository, "etag")
 	if !strings.Contains(updatedRepository.Body.String(), "develop") || !strings.Contains(updatedRepository.Body.String(), "managed by integration") {
@@ -354,11 +339,11 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}
 	staleRepositoryUpdate := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/t/acme/repositories/"+repositoryID.String(), map[string]any{
 		"note": nil,
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF, "If-Match": `"repository:` + repositoryID.String() + `:1"`})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken, "If-Match": `"repository:` + repositoryID.String() + `:1"`})
 	assertError(t, staleRepositoryUpdate, http.StatusPreconditionFailed, "precondition_failed")
 	quotaRejected := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/repositories", map[string]any{
 		"url": "https://git.example.com/another.git", "defaultBranch": "main",
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertError(t, quotaRejected, http.StatusConflict, "quota_exceeded")
 	var quotaPayload struct {
 		Details struct {
@@ -373,32 +358,32 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if quotaPayload.Details.Quota != "repositories" || quotaPayload.Details.Current != 1 || quotaPayload.Details.Limit != 1 {
 		t.Fatalf("quota details = %#v", quotaPayload.Details)
 	}
-	listedAfterQuota := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, []*http.Cookie{aliceCookie})
+	listedAfterQuota := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, nil)
 	assertStatus(t, listedAfterQuota, http.StatusOK)
 	if !strings.Contains(listedAfterQuota.Body.String(), `"total":1`) {
 		t.Fatalf("repository count changed after rejected create: %s", listedAfterQuota.Body.String())
 	}
 	boundGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/t/acme/repositories/"+repositoryID.String(), map[string]any{
 		"credentialId": globalID.String(),
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF, "If-Match": repositoryETag})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken, "If-Match": repositoryETag})
 	assertStatus(t, boundGlobal, http.StatusOK)
 	repositoryETag = responseString(t, boundGlobal, "etag")
 	if !strings.Contains(boundGlobal.Body.String(), globalID.String()) {
 		t.Fatalf("global credential binding missing from repository: %s", boundGlobal.Body.String())
 	}
-	tenantCredentials := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/credentials", nil, []*http.Cookie{aliceCookie})
+	tenantCredentials := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/credentials", nil, nil)
 	assertStatus(t, tenantCredentials, http.StatusOK)
 	if !strings.Contains(tenantCredentials.Body.String(), "integration global credential") || !strings.Contains(tenantCredentials.Body.String(), `"isGlobal":true`) {
 		t.Fatalf("tenant credential list did not expose selectable global credential: %s", tenantCredentials.Body.String())
 	}
 	globalRotationHeaders := map[string]string{
-		csrfHeaderName:    rotatedCSRF,
+		"Authorization":   "Bearer " + adminToken,
 		"If-Match":        globalETag,
 		"Idempotency-Key": uuid.NewV7().String(),
 	}
 	rotatedGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials/"+globalID.String()+":rotate", map[string]any{
 		"secret": map[string]any{"username": "global-bot", "token": "global-second-token"}, "resyncRepositories": true,
-	}, []*http.Cookie{adminCookie}, globalRotationHeaders)
+	}, nil, globalRotationHeaders)
 	assertStatus(t, rotatedGlobal, http.StatusOK)
 	if strings.Contains(rotatedGlobal.Body.String(), "global-second-token") || strings.Contains(rotatedGlobal.Body.String(), "global-first-token") {
 		t.Fatal("global credential rotation response disclosed secret material")
@@ -414,33 +399,33 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if len(globalRotationBody.SyncJobs) != 1 || globalRotationBody.SyncJobs[0].JobID == uuid.Nil() {
 		t.Fatalf("global rotation jobs = %#v", globalRotationBody.SyncJobs)
 	}
-	platformJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs", nil, []*http.Cookie{adminCookie})
+	platformJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs", nil, nil)
 	assertStatus(t, platformJobs, http.StatusOK)
 	if !strings.Contains(platformJobs.Body.String(), globalRotationBody.SyncJobs[0].JobID.String()) || strings.Contains(platformJobs.Body.String(), "global-second-token") || strings.Contains(platformJobs.Body.String(), "credentialId") {
 		t.Fatalf("platform job projection leaked or omitted data: %s", platformJobs.Body.String())
 	}
-	platformJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{adminCookie})
+	platformJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil)
 	assertStatus(t, platformJob, http.StatusOK)
 	if strings.Contains(platformJob.Body.String(), "input") || strings.Contains(platformJob.Body.String(), "result") || strings.Contains(platformJob.Body.String(), "error") {
 		t.Fatalf("platform job detail contains redacted fields: %s", platformJob.Body.String())
 	}
-	platformJobAsTenant := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{aliceCookie})
+	platformJobAsTenant := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil)
 	assertError(t, platformJobAsTenant, http.StatusNotFound, "not_found")
-	tenantJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs", nil, []*http.Cookie{aliceCookie})
+	tenantJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs", nil, nil)
 	assertStatus(t, tenantJobs, http.StatusOK)
 	if !strings.Contains(tenantJobs.Body.String(), globalRotationBody.SyncJobs[0].JobID.String()) || strings.Contains(tenantJobs.Body.String(), `"input"`) || strings.Contains(tenantJobs.Body.String(), `"riverJobId"`) {
 		t.Fatalf("tenant job page omitted job or leaked internals: %s", tenantJobs.Body.String())
 	}
-	tenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{aliceCookie})
+	tenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil)
 	assertStatus(t, tenantJob, http.StatusOK)
 	if !strings.Contains(tenantJob.Body.String(), `"status":"pending"`) || !strings.Contains(tenantJob.Body.String(), `"capabilities":["job:read","job:run"]`) || strings.Contains(tenantJob.Body.String(), `"input"`) {
 		t.Fatalf("tenant job detail has invalid projection: %s", tenantJob.Body.String())
 	}
-	crossTenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/other/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, []*http.Cookie{aliceCookie})
+	crossTenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/other/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil)
 	assertError(t, crossTenantJob, http.StatusNotFound, "not_found")
 	jobPAT := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/tokens", map[string]any{
 		"name": "job automation", "scopes": []string{"job:run"},
-	}, []*http.Cookie{aliceCookie}, map[string]string{csrfHeaderName: aliceCSRF})
+	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, jobPAT, http.StatusCreated)
 	jobPATValue := responseString(t, jobPAT, "token")
 	jobViaPAT := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil, map[string]string{
@@ -448,18 +433,18 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	})
 	assertStatus(t, jobViaPAT, http.StatusOK)
 
-	cancelledJob := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":cancel", nil, []*http.Cookie{aliceCookie}, map[string]string{
-		csrfHeaderName: aliceCSRF,
+	cancelledJob := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":cancel", nil, nil, map[string]string{
+		"Authorization": "Bearer " + aliceToken,
 	})
 	assertStatus(t, cancelledJob, http.StatusAccepted)
 	if responseString(t, cancelledJob, "jobId") != globalRotationBody.SyncJobs[0].JobID.String() {
 		t.Fatalf("cancelled job response = %s", cancelledJob.Body.String())
 	}
-	cancelledAgain := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":cancel", nil, []*http.Cookie{aliceCookie}, map[string]string{
-		csrfHeaderName: aliceCSRF,
+	cancelledAgain := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":cancel", nil, nil, map[string]string{
+		"Authorization": "Bearer " + aliceToken,
 	})
 	assertError(t, cancelledAgain, http.StatusConflict, "job_not_cancellable")
-	terminalStream := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+"/logs", nil, []*http.Cookie{aliceCookie}, map[string]string{
+	terminalStream := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+"/logs", nil, nil, map[string]string{
 		"Last-Event-ID": "0",
 	})
 	assertStatus(t, terminalStream, http.StatusOK)
@@ -468,50 +453,50 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	}
 
 	retryKey := uuid.NewV7().String()
-	retryHeaders := map[string]string{csrfHeaderName: aliceCSRF, "Idempotency-Key": retryKey}
-	retriedJob := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":retry", nil, []*http.Cookie{aliceCookie}, retryHeaders)
+	retryHeaders := map[string]string{"Authorization": "Bearer " + aliceToken, "Idempotency-Key": retryKey}
+	retriedJob := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":retry", nil, nil, retryHeaders)
 	assertStatus(t, retriedJob, http.StatusAccepted)
 	retriedJobID := responseString(t, retriedJob, "jobId")
 	if retriedJobID == globalRotationBody.SyncJobs[0].JobID.String() {
 		t.Fatal("manual retry reused the terminal source job")
 	}
-	retryReplay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":retry", nil, []*http.Cookie{aliceCookie}, retryHeaders)
+	retryReplay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+":retry", nil, nil, retryHeaders)
 	assertStatus(t, retryReplay, http.StatusAccepted)
 	if retryReplay.Body.String() != retriedJob.Body.String() {
 		t.Fatalf("retry replay differs\nfirst: %s\nreplay: %s", retriedJob.Body.String(), retryReplay.Body.String())
 	}
-	retriedDetail := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+retriedJobID, nil, []*http.Cookie{aliceCookie})
+	retriedDetail := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+retriedJobID, nil, nil)
 	assertStatus(t, retriedDetail, http.StatusOK)
 	if !strings.Contains(retriedDetail.Body.String(), `"trigger":"retry"`) || !strings.Contains(retriedDetail.Body.String(), `"retryOfJobId":"`+globalRotationBody.SyncJobs[0].JobID.String()+`"`) || !strings.Contains(retriedDetail.Body.String(), `"attempts":[]`) {
 		t.Fatalf("retried job detail = %s", retriedDetail.Body.String())
 	}
-	retryPending := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+retriedJobID+":retry", nil, []*http.Cookie{aliceCookie}, map[string]string{
-		csrfHeaderName: aliceCSRF, "Idempotency-Key": uuid.NewV7().String(),
+	retryPending := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/jobs/"+retriedJobID+":retry", nil, nil, map[string]string{
+		"Authorization": "Bearer " + aliceToken, "Idempotency-Key": uuid.NewV7().String(),
 	})
 	assertError(t, retryPending, http.StatusConflict, "invalid_state")
 	globalReplay := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/admin/global-credentials/"+globalID.String()+":rotate", map[string]any{
 		"secret": map[string]any{"username": "global-bot", "token": "global-second-token"}, "resyncRepositories": true,
-	}, []*http.Cookie{adminCookie}, globalRotationHeaders)
+	}, nil, globalRotationHeaders)
 	assertStatus(t, globalReplay, http.StatusOK)
 	if globalReplay.Body.String() != rotatedGlobal.Body.String() {
 		t.Fatalf("global idempotent rotation body differs\nfirst: %s\nreplay: %s", rotatedGlobal.Body.String(), globalReplay.Body.String())
 	}
 	globalETag = responseString(t, rotatedGlobal, "etag")
-	deletedGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodDelete, "/api/v1/admin/global-credentials/"+globalID.String()+"?force=true", nil, []*http.Cookie{adminCookie}, map[string]string{
-		csrfHeaderName: rotatedCSRF, "If-Match": globalETag,
+	deletedGlobal := requestJSONWithHeaders(t, httpHandler, http.MethodDelete, "/api/v1/admin/global-credentials/"+globalID.String()+"?force=true", nil, nil, map[string]string{
+		"Authorization": "Bearer " + adminToken, "If-Match": globalETag,
 	})
 	assertStatus(t, deletedGlobal, http.StatusNoContent)
-	unboundGlobal := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, []*http.Cookie{aliceCookie})
+	unboundGlobal := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, nil)
 	assertStatus(t, unboundGlobal, http.StatusOK)
 	if !strings.Contains(unboundGlobal.Body.String(), `"credentialId":null`) || !strings.Contains(unboundGlobal.Body.String(), `"class":"auth"`) {
 		t.Fatalf("forced global deletion did not expose unbound health state: %s", unboundGlobal.Body.String())
 	}
 	repositoryETag = responseString(t, unboundGlobal, "etag")
-	deletedRepository := requestJSONWithHeaders(t, httpHandler, http.MethodDelete, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, []*http.Cookie{aliceCookie}, map[string]string{
-		csrfHeaderName: aliceCSRF, "If-Match": repositoryETag,
+	deletedRepository := requestJSONWithHeaders(t, httpHandler, http.MethodDelete, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, nil, map[string]string{
+		"Authorization": "Bearer " + aliceToken, "If-Match": repositoryETag,
 	})
 	assertStatus(t, deletedRepository, http.StatusNoContent)
-	missingRepository := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, []*http.Cookie{aliceCookie})
+	missingRepository := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, nil)
 	assertError(t, missingRepository, http.StatusNotFound, "not_found")
 
 	if _, err := db.Pool.Exec(t.Context(), `UPDATE tenants SET status = 'disabled' WHERE slug = 'acme'`); err != nil {
@@ -591,17 +576,6 @@ func assertError(t *testing.T, response *httptest.ResponseRecorder, status int, 
 	if got := responseString(t, response, "code"); got != code {
 		t.Fatalf("error code = %q, want %q", got, code)
 	}
-}
-
-func responseCookie(t *testing.T, response *httptest.ResponseRecorder, name string) *http.Cookie {
-	t.Helper()
-	for _, cookie := range response.Result().Cookies() {
-		if cookie.Name == name {
-			return cookie
-		}
-	}
-	t.Fatalf("response has no %s cookie", name)
-	return nil
 }
 
 func responseString(t *testing.T, response *httptest.ResponseRecorder, field string) string {

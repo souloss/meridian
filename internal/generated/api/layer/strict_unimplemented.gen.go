@@ -12,6 +12,11 @@ import (
 // Embed it by value and override only the operations owned by the current milestone.
 type UnimplementedStrictServer struct{}
 
+// ListAssetLayerContents returns ErrStrictOperationNotImplemented until its milestone is implemented.
+func (UnimplementedStrictServer) ListAssetLayerContents(ctx context.Context, request ListAssetLayerContentsRequestObject) (ListAssetLayerContentsResponseObject, error) {
+	return nil, rootapi.ErrStrictOperationNotImplemented
+}
+
 // ReorderAssetLayers returns ErrStrictOperationNotImplemented until its milestone is implemented.
 func (UnimplementedStrictServer) ReorderAssetLayers(ctx context.Context, request ReorderAssetLayersRequestObject) (ReorderAssetLayersResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented

@@ -115,6 +115,9 @@ type Querier interface {
 	// CreateNotifyOutbox exposes the corresponding strongly typed database operation.
 	// 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 	CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error)
+	// CreateRefreshToken exposes the corresponding strongly typed database operation.
+	// 保存刷新令牌摘要，不保存明文；family_id 用于轮换家族与重放检测。
+	CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error)
 	// CreateRepository exposes the corresponding strongly typed database operation.
 	// 持久化仓库配置，并初始化空的健康状态摘要。
 	// 仓库 URL 字段不含凭据，凭据只通过 UUID 外键引用。
@@ -126,9 +129,6 @@ type Querier interface {
 	// CreateRetryJobIdempotency exposes the corresponding strongly typed database operation.
 	// 保存可重放 24 小时的准确、非敏感 202 响应。
 	CreateRetryJobIdempotency(ctx context.Context, arg CreateRetryJobIdempotencyParams) error
-	// CreateSession exposes the corresponding strongly typed database operation.
-	// 保存会话令牌和 CSRF 摘要，不保存任一令牌的明文。
-	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	// CreateTenant exposes the corresponding strongly typed database operation.
 	// 使用明确的配额和设置快照创建租户，快照来自平台默认配置。
 	CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error)
@@ -186,15 +186,15 @@ type Querier interface {
 	// GetPlatformSettingsForTenantCreate exposes the corresponding strongly typed database operation.
 	// 返回创建租户时原子复制到新租户的单例 JSON 默认配置。
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
+	// GetRefreshTokenPrincipalByTokenHash exposes the corresponding strongly typed database operation.
+	// 在调用方指定的时间点，根据令牌摘要认证一个有效刷新令牌和有效用户。
+	GetRefreshTokenPrincipalByTokenHash(ctx context.Context, arg GetRefreshTokenPrincipalByTokenHashParams) (GetRefreshTokenPrincipalByTokenHashRow, error)
 	// GetRepository exposes the corresponding strongly typed database operation.
 	// 返回一条有效仓库；软删除记录按设计视为不存在。
 	GetRepository(ctx context.Context, arg GetRepositoryParams) (Repository, error)
 	// GetRetryJobIdempotency exposes the corresponding strongly typed database operation.
 	// 返回 retryJob 请求保留的准确响应。
 	GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error)
-	// GetSessionPrincipalByTokenHash exposes the corresponding strongly typed database operation.
-	// 在调用方指定的时间点，根据令牌摘要认证一个有效浏览器会话和有效用户。
-	GetSessionPrincipalByTokenHash(ctx context.Context, arg GetSessionPrincipalByTokenHashParams) (GetSessionPrincipalByTokenHashRow, error)
 	// GetTenantBlobReference exposes the corresponding strongly typed database operation.
 	// 调用方锁定租户配额行后，返回当前对象引用数。
 	GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error)
@@ -338,18 +338,18 @@ type Querier interface {
 	// 幂等撤销一个租户内用户拥有的 PAT，并返回其标识。
 	// 返回已经撤销的匹配记录以保持幂等；不存在或属于其他主体的记录仍视为未找到。
 	RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error)
-	// RevokeSession exposes the corresponding strongly typed database operation.
-	// 原子撤销一个有效浏览器会话，并返回是否有记录发生变化。
-	RevokeSession(ctx context.Context, arg RevokeSessionParams) (int64, error)
+	// RevokeRefreshTokenFamily exposes the corresponding strongly typed database operation.
+	// 撤销一个刷新令牌家族的全部有效令牌，用于登出或重放检测。
+	RevokeRefreshTokenFamily(ctx context.Context, arg RevokeRefreshTokenFamilyParams) (int64, error)
 	// RotateCredentialSecret exposes the corresponding strongly typed database operation.
 	// 有条件地替换加密秘密材料并递增凭据版本号。
 	RotateCredentialSecret(ctx context.Context, arg RotateCredentialSecretParams) (Credential, error)
 	// RotateGlobalCredentialSecret exposes the corresponding strongly typed database operation.
 	// 有条件地替换平台加密秘密材料并递增版本号。
 	RotateGlobalCredentialSecret(ctx context.Context, arg RotateGlobalCredentialSecretParams) (GlobalCredential, error)
-	// RotateSessionCSRFHash exposes the corresponding strongly typed database operation.
-	// 替换一个有效浏览器会话的 CSRF 摘要。
-	RotateSessionCSRFHash(ctx context.Context, arg RotateSessionCSRFHashParams) (int64, error)
+	// RotateRefreshToken exposes the corresponding strongly typed database operation.
+	// 原子轮换一个刷新令牌：撤销旧令牌并记录替换的新令牌，返回是否有记录发生变化。
+	RotateRefreshToken(ctx context.Context, arg RotateRefreshTokenParams) (int64, error)
 	// SetJobExecutionStage exposes the corresponding strongly typed database operation.
 	// 记录当前流水线阶段，不改变持久化生命周期状态。
 	// 阶段取值受应用 DDL 约束。
@@ -361,9 +361,6 @@ type Querier interface {
 	// TouchAPIToken exposes the corresponding strongly typed database operation.
 	// 记录未撤销租户 PAT 最近一次成功使用的时间。
 	TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error
-	// TouchSession exposes the corresponding strongly typed database operation.
-	// 记录未撤销浏览器会话最近一次被接受请求的时间。
-	TouchSession(ctx context.Context, arg TouchSessionParams) error
 	// UnbindCredentialRepositories exposes the corresponding strongly typed database operation.
 	// 通过有效引用策略检查后，清除所有仓库引用。
 	// 归档仓库保留健康状态和历史，但不能继续持有已删除凭据的外键。

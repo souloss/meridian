@@ -246,7 +246,7 @@ func (jobs *Jobs) tenantMembership(ctx context.Context, actor Principal, tenantS
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
 	}
-	if actor.Kind != PrincipalSession || jobs.identities == nil {
+	if actor.Kind != PrincipalJWT || jobs.identities == nil {
 		return Membership{}, ErrNotFound
 	}
 	membership, err := jobs.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)

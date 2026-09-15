@@ -41,7 +41,7 @@ func TestAuditsEnforceTenantAndPlatformBoundaries(t *testing.T) {
 	tenantID := uuid.NewV7()
 	store := &auditStoreStub{}
 	audits := NewAudits(store, auditIdentityStub{membership: Membership{TenantID: tenantID, TenantSlug: "acme", Role: "tenant_admin"}})
-	tenantActor := Principal{Kind: PrincipalSession, User: User{ID: uuid.NewV7()}}
+	tenantActor := Principal{Kind: PrincipalJWT, User: User{ID: uuid.NewV7()}}
 	if _, _, err := audits.ListTenant(t.Context(), tenantActor, "acme", AuditFilter{}, 1, 20); err != nil {
 		t.Fatalf("tenant audit list: %v", err)
 	}
@@ -49,7 +49,7 @@ func TestAuditsEnforceTenantAndPlatformBoundaries(t *testing.T) {
 		t.Fatalf("tenant query calls/id = %d/%s, want 1/%s", store.tenantCalls, store.tenantID, tenantID)
 	}
 
-	platformActor := Principal{Kind: PrincipalSession, User: User{IsPlatformAdmin: true}}
+	platformActor := Principal{Kind: PrincipalJWT, User: User{IsPlatformAdmin: true}}
 	if _, _, err := audits.ListPlatform(t.Context(), platformActor, AuditFilter{TenantSlug: "acme"}, 1, 20); err != nil {
 		t.Fatalf("platform audit list: %v", err)
 	}
@@ -59,7 +59,7 @@ func TestAuditsEnforceTenantAndPlatformBoundaries(t *testing.T) {
 
 	for _, actor := range []Principal{
 		{Kind: PrincipalPAT, TenantSlug: "acme", TenantID: tenantID, Role: "tenant_admin", Scopes: []string{"asset:read"}},
-		{Kind: PrincipalSession, User: User{IsPlatformAdmin: false}},
+		{Kind: PrincipalJWT, User: User{IsPlatformAdmin: false}},
 	} {
 		if _, _, err := audits.ListPlatform(t.Context(), actor, AuditFilter{}, 1, 20); err != ErrNotFound {
 			t.Errorf("unauthorized platform actor error = %v, want ErrNotFound", err)
@@ -71,7 +71,7 @@ func TestAuditsValidateFiltersBeforePersistence(t *testing.T) {
 	t.Parallel()
 	store := &auditStoreStub{}
 	audits := NewAudits(store, nil)
-	actor := Principal{Kind: PrincipalSession, User: User{IsPlatformAdmin: true}}
+	actor := Principal{Kind: PrincipalJWT, User: User{IsPlatformAdmin: true}}
 	now := time.Now().UTC()
 	earlier := now.Add(-time.Hour)
 	valid := AuditFilter{Actions: []string{"job.failed"}, ResourceType: "job", From: &earlier, To: &now, TenantSlug: "acme"}

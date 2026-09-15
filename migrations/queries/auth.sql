@@ -69,71 +69,60 @@ SET
 WHERE id = sqlc.arg(id)
 RETURNING *;
 
--- 保存会话令牌和 CSRF 摘要，不保存任一令牌的明文。
--- name: CreateSession :one
-INSERT INTO sessions (
+-- 保存刷新令牌摘要，不保存明文；family_id 用于轮换家族与重放检测。
+-- name: CreateRefreshToken :one
+INSERT INTO refresh_tokens (
   id,
   user_id,
   token_hash,
-  csrf_hash,
+  family_id,
   expires_at
 ) VALUES (
   sqlc.arg(id),
   sqlc.arg(user_id),
   sqlc.arg(token_hash),
-  sqlc.arg(csrf_hash),
+  sqlc.arg(family_id),
   sqlc.arg(expires_at)
 )
 RETURNING *;
 
--- 在调用方指定的时间点，根据令牌摘要认证一个有效浏览器会话和有效用户。
--- name: GetSessionPrincipalByTokenHash :one
+-- 在调用方指定的时间点，根据令牌摘要认证一个有效刷新令牌和有效用户。
+-- name: GetRefreshTokenPrincipalByTokenHash :one
 SELECT
-  sessions.id AS session_id,
-  sessions.user_id,
-  sessions.csrf_hash,
-  sessions.expires_at,
+  refresh_tokens.id AS token_id,
+  refresh_tokens.user_id,
+  refresh_tokens.family_id,
+  refresh_tokens.revoked_at,
+  refresh_tokens.expires_at,
   users.username,
   users.display_name,
   users.email,
-	users.status AS user_status,
-	users.is_platform_admin,
-	users.revision AS user_revision,
-	users.created_at AS user_created_at,
-	users.updated_at AS user_updated_at
-FROM sessions
-JOIN users ON users.id = sessions.user_id
-WHERE sessions.token_hash = sqlc.arg(token_hash)
-  AND sessions.revoked_at IS NULL
-  AND sessions.expires_at > sqlc.arg(authenticated_at)
+  users.status AS user_status,
+  users.is_platform_admin,
+  users.revision AS user_revision,
+  users.created_at AS user_created_at,
+  users.updated_at AS user_updated_at
+FROM refresh_tokens
+JOIN users ON users.id = refresh_tokens.user_id
+WHERE refresh_tokens.token_hash = sqlc.arg(token_hash)
+  AND refresh_tokens.expires_at > sqlc.arg(authenticated_at)
   AND users.status = 'active';
 
--- 记录未撤销浏览器会话最近一次被接受请求的时间。
--- name: TouchSession :exec
-UPDATE sessions
+-- 原子轮换一个刷新令牌：撤销旧令牌并记录替换的新令牌，返回是否有记录发生变化。
+-- name: RotateRefreshToken :execrows
+UPDATE refresh_tokens
 SET
-  last_seen_at = sqlc.arg(seen_at),
-  updated_at = sqlc.arg(seen_at)
+  revoked_at = sqlc.arg(revoked_at),
+  replaced_by = sqlc.arg(replaced_by)
 WHERE id = sqlc.arg(id)
   AND revoked_at IS NULL;
 
--- 替换一个有效浏览器会话的 CSRF 摘要。
--- name: RotateSessionCSRFHash :execrows
-UPDATE sessions
+-- 撤销一个刷新令牌家族的全部有效令牌，用于登出或重放检测。
+-- name: RevokeRefreshTokenFamily :execrows
+UPDATE refresh_tokens
 SET
-  csrf_hash = sqlc.arg(csrf_hash),
-  updated_at = sqlc.arg(updated_at)
-WHERE id = sqlc.arg(id)
-  AND revoked_at IS NULL
-  AND expires_at > sqlc.arg(updated_at);
-
--- 原子撤销一个有效浏览器会话，并返回是否有记录发生变化。
--- name: RevokeSession :execrows
-UPDATE sessions
-SET
-  revoked_at = sqlc.arg(revoked_at),
-  updated_at = sqlc.arg(revoked_at)
-WHERE id = sqlc.arg(id)
+  revoked_at = sqlc.arg(revoked_at)
+WHERE family_id = sqlc.arg(family_id)
   AND revoked_at IS NULL;
 
 -- 保存租户范围内的 PAT 元数据和令牌摘要，不保存令牌明文。

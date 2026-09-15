@@ -49,7 +49,7 @@ func (audits *Audits) tenantMembership(ctx context.Context, actor Principal, ten
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
 	}
-	if actor.Kind != PrincipalSession || audits.identities == nil {
+	if actor.Kind != PrincipalJWT || audits.identities == nil {
 		return Membership{}, ErrNotFound
 	}
 	membership, err := audits.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)

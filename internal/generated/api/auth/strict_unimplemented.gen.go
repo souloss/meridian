@@ -12,11 +12,6 @@ import (
 // Embed it by value and override only the operations owned by the current milestone.
 type UnimplementedStrictServer struct{}
 
-// GetCsrfToken returns ErrStrictOperationNotImplemented until its milestone is implemented.
-func (UnimplementedStrictServer) GetCsrfToken(ctx context.Context, request GetCsrfTokenRequestObject) (GetCsrfTokenResponseObject, error) {
-	return nil, rootapi.ErrStrictOperationNotImplemented
-}
-
 // Login returns ErrStrictOperationNotImplemented until its milestone is implemented.
 func (UnimplementedStrictServer) Login(ctx context.Context, request LoginRequestObject) (LoginResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
@@ -39,5 +34,10 @@ func (UnimplementedStrictServer) GetMyPreferences(ctx context.Context, request G
 
 // UpdateMyPreferences returns ErrStrictOperationNotImplemented until its milestone is implemented.
 func (UnimplementedStrictServer) UpdateMyPreferences(ctx context.Context, request UpdateMyPreferencesRequestObject) (UpdateMyPreferencesResponseObject, error) {
+	return nil, rootapi.ErrStrictOperationNotImplemented
+}
+
+// Refresh returns ErrStrictOperationNotImplemented until its milestone is implemented.
+func (UnimplementedStrictServer) Refresh(ctx context.Context, request RefreshRequestObject) (RefreshResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

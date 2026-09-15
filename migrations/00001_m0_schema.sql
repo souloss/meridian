@@ -96,31 +96,30 @@ COMMENT ON COLUMN users.revision IS '用于生成 HTTP ETag 的单调递增并�
 COMMENT ON COLUMN users.created_at IS '创建用户记录时的 UTC 事务时间。';
 COMMENT ON COLUMN users.updated_at IS '最近一次更新用户元数据时的 UTC 事务时间。';
 
-CREATE TABLE sessions (
+CREATE TABLE refresh_tokens (
   id uuid PRIMARY KEY,
   user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   token_hash bytea NOT NULL UNIQUE,
-  csrf_hash bytea NOT NULL,
+  family_id uuid NOT NULL,
   expires_at timestamptz NOT NULL,
   revoked_at timestamptz,
-  last_seen_at timestamptz,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
+  replaced_by uuid,
+  created_at timestamptz NOT NULL DEFAULT now()
 );
 
-COMMENT ON TABLE sessions IS '浏览器认证会话，只保存令牌和 CSRF 摘要。';
-COMMENT ON COLUMN sessions.id IS '应用生成的 UUID v7 会话标识。';
-COMMENT ON COLUMN sessions.user_id IS '通过该会话认证的全局用户。';
-COMMENT ON COLUMN sessions.token_hash IS '不透明会话令牌的 HMAC-SHA-256 摘要。';
-COMMENT ON COLUMN sessions.csrf_hash IS '与会话绑定的 CSRF 令牌 HMAC-SHA-256 摘要。';
-COMMENT ON COLUMN sessions.expires_at IS '会话失效的 UTC 时间点。';
-COMMENT ON COLUMN sessions.revoked_at IS '主动撤销会话的 UTC 时间点，未撤销时为空。';
-COMMENT ON COLUMN sessions.last_seen_at IS '最近一次接受请求的 UTC 时间，首次使用前为空。';
-COMMENT ON COLUMN sessions.created_at IS '创建会话记录时的 UTC 事务时间。';
-COMMENT ON COLUMN sessions.updated_at IS '最近一次更新会话元数据时的 UTC 事务时间。';
+COMMENT ON TABLE refresh_tokens IS '浏览器刷新令牌，只保存 HMAC 摘要并支持轮换家族。';
+COMMENT ON COLUMN refresh_tokens.id IS '应用生成的 UUID v7 刷新令牌标识。';
+COMMENT ON COLUMN refresh_tokens.user_id IS '通过该刷新令牌续期的全局用户。';
+COMMENT ON COLUMN refresh_tokens.token_hash IS '刷新令牌明文的 HMAC-SHA-256 摘要。';
+COMMENT ON COLUMN refresh_tokens.family_id IS '轮换家族标识，同一登录会话的多次轮换共享，用于检测重放。';
+COMMENT ON COLUMN refresh_tokens.expires_at IS '刷新令牌失效的 UTC 时间点。';
+COMMENT ON COLUMN refresh_tokens.revoked_at IS '主动撤销或检测到重放时置为当前时间，未撤销时为空。';
+COMMENT ON COLUMN refresh_tokens.replaced_by IS '轮换后新令牌的 id，仅被替换的旧令牌非空。';
+COMMENT ON COLUMN refresh_tokens.created_at IS '创建刷新令牌记录时的 UTC 事务时间。';
 
-CREATE INDEX sessions_user_expiry_idx ON sessions (user_id, expires_at);
-CREATE INDEX sessions_expiry_idx ON sessions (expires_at);
+CREATE INDEX refresh_tokens_user_expiry_idx ON refresh_tokens (user_id, expires_at);
+CREATE INDEX refresh_tokens_expiry_idx ON refresh_tokens (expires_at);
+CREATE INDEX refresh_tokens_family_idx ON refresh_tokens (family_id);
 
 CREATE TABLE tenant_members (
   tenant_id uuid NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -661,7 +660,7 @@ DROP TABLE IF EXISTS api_tokens;
 DROP TABLE IF EXISTS team_members;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS tenant_members;
-DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS refresh_tokens;
 DROP TABLE IF EXISTS tenant_blob_refs;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS tenants;
