@@ -255,14 +255,17 @@ model BreakingTodo {
   /** contains the uuid associated with this breaking todo. */
   assetVersionId: Uuid;
 
-  /** contains the uuid associated with this breaking todo. */
-  assigneeId: Uuid;
+  /** identifies the service associated with this resource. */
+  serviceId: Uuid;
 
   /** is the current lifecycle or processing state. */
   status: TodoStatus;
 
   /** contains the diff counts associated with this breaking todo. */
   summary: DiffCounts;
+
+  /** contains the user id that acknowledged this breaking todo. */
+  @oneOf ackedBy: Uuid | null;
 
   /** specifies the comment associated with this breaking todo. */
   comment: string | null;

@@ -21,8 +21,8 @@ BUILD_ROOT = REPOSITORY_ROOT / "build" / "contracts" / "api"
 CANONICAL = REPOSITORY_ROOT / "contracts" / "openapi.yaml"
 OPENAPI_OUTPUT = Path("@typespec") / "openapi3" / "openapi.yaml"
 DOMAINS_ROOT = API_ROOT / "domains"
-DEFAULT_SECURITY = [{"cookieSession": []}, {"patBearer": []}]
-SECURITY_NAMES = {"ApiKeyAuth": "cookieSession", "BearerAuth": "patBearer"}
+DEFAULT_SECURITY = [{"bearerAuth": []}]
+SECURITY_NAMES = {"BearerAuth": "bearerAuth", "ApiKeyAuth": "refreshCookie"}
 METHODS = {"get", "put", "post", "delete", "options", "head", "patch", "trace"}
 
 
@@ -356,16 +356,16 @@ def parameter_name(key: str) -> str:
 
 def security_schemes() -> dict[str, dict[str, str]]:
     return {
-        "cookieSession": {
-            "type": "apiKey",
-            "in": "cookie",
-            "name": "meridian_session",
-            "description": "Unsafe browser requests additionally require X-CSRF-Token.",
-        },
-        "patBearer": {
+        "bearerAuth": {
             "type": "http",
             "scheme": "bearer",
-            "bearerFormat": "pat_",
+            "description": "Short-lived JWT access token in the Authorization header.",
+        },
+        "refreshCookie": {
+            "type": "apiKey",
+            "in": "cookie",
+            "name": "meridian_refresh",
+            "description": "HttpOnly refresh cookie used only by /auth/refresh and /auth/logout.",
         },
     }
 

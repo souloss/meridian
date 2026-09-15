@@ -38,9 +38,9 @@
 | 租户级 | `viewer` | 只读：浏览、检索、调试、订阅 |
 | — | CI Bot | 通过租户绑定的 PAT 操作，仅限 token 作用域内 |
 
-- 服务级授权（`service_grants`）：可把某个服务的 owner/maintainer/viewer 授予具体用户或团队
+- 服务负责人（`services.owners` / `services.maintainers`）：owner 有 layer:edit / layer:approve / asset:publish，maintainer 有 layer:edit / asset:publish；负责人记录在 service 上而非独立的 service_grants 表
 - 层级权限点：`layer:edit`（编辑人工层）、`layer:approve`（审批 AI / 第三方层修订）；默认 maintainer 有 edit，服务 owner 有 approve
-- 权限模型：`租户隔离（强制）+ 租户内 RBAC + 服务级 ReBAC-lite`，预留 ABAC 扩展位
+- 权限模型：`租户隔离（强制）+ 租户内 RBAC + 服务负责人字段`，预留 ABAC 扩展位
 
 ---
 
@@ -78,7 +78,7 @@ SystemGroup 系统分组（跨仓库把多个 Service 组织成"系统"，全局
 | **AssetRefTrack** | Asset 在 branch/tag 上独立的 latest/current、健康和版本序列 | release 同步不得覆盖 main；缺省解析仓库默认分支 |
 | **AssetVersion** | 某 Track 上一次完整合并和索引的不可变快照 | 只与该 Track latest fingerprint 相同才 no-op；返回历史输入仍创建新版本 |
 | **AssetItem** | 从合并结果解析出的扁平条目（openapi→operation；dbschema→table/column；dependency→edge），供检索/统计/diff/全局视图 | 由 kind 的 extractor 产出，随 AssetVersion 重建；每条携带 provenance（来自哪个层） |
-| **SystemGroup** | 租户内逻辑分组：若干 Service（可跨仓库）归入一个"系统"，支持一级嵌套（域 → 系统） | 范围聚合视图与订阅的作用域单位 |
+| **SystemGroup** | 租户内逻辑分组：若干 Service（可跨仓库）归入一个"系统"，单层结构、服务可属多个分组 | 范围聚合视图与订阅的作用域单位 |
 | **ViewDef** | 视图注册表条目，含 ViewInputSpec（F6） | 插件化注册，不改核心代码 |
 | **CollectionJob** | 一次采集任务（拉代码 → 发现服务 → 各源产层 → 合并 → 归一 → 索引 → 通知） | 手动 / 定时 / Webhook 触发 |
 
@@ -113,13 +113,13 @@ SystemGroup 系统分组（跨仓库把多个 Service 组织成"系统"，全局
 
 ### F1 身份、租户与权限（P0）
 
-- F1.1 本地账号密码登录（argon2id 哈希）+ 服务端 session（浏览器只持有 HttpOnly `meridian_session` Cookie）
+- F1.1 本地账号密码登录（argon2id 哈希）+ JWT 认证：浏览器持有短时 access token（内存，`Authorization: Bearer` 发送）+ HttpOnly `meridian_refresh` Cookie 静默续期；因凭据不再随 cookie 自动携带，不再需要 CSRF
 - F1.2 预留 OIDC / LDAP 接入点（接口层抽象，v1 只实现 local provider）
 - F1.3 租户：`platform_admin` 可创建/停用租户；租户含 slug、展示名、配额、默认配置
 - F1.4 租户成员：`tenant_members`（user × tenant × role）；一个用户可属多个租户
 - F1.5 租户切换：顶栏切换器，切换后所有数据视图与 URL 前缀随之变化（`/t/{tenantSlug}/...`）
 - F1.6 **强制隔离**：所有查询必须带 `tenant_id`，取不到即报错，绝不降级为"查全部"
-- F1.7 服务级授权：`service_grants`，支持在单个服务上向用户或团队授予 owner / maintainer / viewer
+- F1.7 服务负责人：`services.owners` / `services.maintainers` 直接记录服务负责人与维护者（用户或团队引用）；owner/maintainer 享有服务级 layer:edit / layer:approve / asset:publish 等权限
 - F1.8 可见性：服务可设 `private`（仅授权可见）/ `internal`（租户内登录可见）/ `public`（匿名可见）
 - F1.9 API Key / PAT：v1 仅绑定租户；平台级 bot token 不在 v1。支持作用域（`asset:push`、`asset:read`、`job:run`）、过期时间、最后使用时间、可撤销
 - F1.10 租户配额（不做计费）：`max_repositories`、`max_services`、`max_storage_bytes`、采集并发上限；超限明确提示而非静默失败
@@ -173,12 +173,11 @@ SystemGroup 系统分组（跨仓库把多个 Service 组织成"系统"，全局
   - 约束：一个资产至多一个启用的 base 层；无有效 base 时仅可用空骨架做 AI 输入/合并预览，不得创建 AssetVersion
   - glob 展开为多个资产：配置 `assetNameTemplate={parent_dir}` 后，`api/*/openapi.yaml` 命中 3 个文件时自动展开成 3 个 Asset（名字取目录名），每个各得一个独立 base 层；若沿用默认 `{file_stem}` 导致重名，则以 422 `validation_error` 拒绝本次 scope 的整批物化
   - 路径未命中时的错误处理（体验关键）：返回错误码 `asset_path_not_found` + 实际扫描到的候选文件列表（"找到了 `api/v1/swagger.json`，要改成它吗？"），前端一键修正
-- F4.7 **配置来源与同步策略**（权威来源 = 平台 DB）：
+- F4.7 **配置来源与导入策略**（权威来源 = 平台 DB）：
   - 所有服务与资产源配置持久化在平台数据库，是唯一权威来源
-  - 服务级 `config_sync_policy`：`ignore`（默认，忽略仓库配置文件）/ `import_once`（仅首次录入或手动导入时读取）/ `sync`（每次同步以仓库文件覆盖 DB，GitOps 模式）
-  - 字段级来源标记 `config_source ∈ {db_manual, repo_file, repo_bootstrap}`：只有非 `db_manual` 字段允许被 `sync` 覆盖，避免冲掉人工改动
-  - 漂移检测：仓库文件与 DB 配置不一致时，服务页显示「配置漂移」+ 差异对比 + 一键采纳/忽略
-- F4.8 **SystemGroup（P1）**：租户内创建系统分组，把服务（可跨仓库）归入；支持一级嵌套（域 → 系统 → 服务）；分组是范围聚合视图（F6）与订阅（F9）的作用域单位
+  - 服务级 `config_sync_policy`：`ignore`（默认，忽略仓库配置文件）/ `import_once`（仅首次录入或手动导入时读取）
+  - 导入采用 preview/apply 两阶段：preview 生成 `previewId + commit + configDigest`，apply 校验三者一致后才落库；导入只创建或更新预览中明确的资源，不做字段级来源标记与漂移检测
+- F4.8 **SystemGroup（P1）**：租户内创建系统分组，把服务（可跨仓库）归入；单层结构、服务可属多个分组；分组是范围聚合视图（F6）与订阅（F9）的作用域单位
 
 ### F5 资产采集、层与版本（P0 核心）
 
@@ -186,7 +185,7 @@ SystemGroup 系统分组（跨仓库把多个 Service 组织成"系统"，全局
 
 ```
 resolve（拉代码/读缓存）
-  → discover（服务发现 + 配置漂移检测）
+  → discover（服务发现）
   → extract（各 SourceBinding 产出各自的 LayerRevision）
   → merge（base + overlays 确定性合并）
   → normalize（kind 校验器：格式归一 / $ref bundle / lint / 质量分）
@@ -237,6 +236,7 @@ resolve（拉代码/读缓存）
 - F6.1 **ViewDef**：唯一注册表为 [contracts/views.yaml](../contracts/views.yaml)，声明 id、输入限制、mount、options schema、columns 和里程碑；租户只保存启停/排序/默认参数覆盖。
 - F6.2 **ViewInputSpec —— 视图输入契约（四模式）**：`single`、`versions`、`collection`、`scope` 的 discriminator 与 DTO 由 [contracts/openapi.yaml](../contracts/openapi.yaml) 定义，内建视图的接受范围由 `views.yaml` 定义。
   - 后端提供统一**输入解析器**：前端路由/分享链接携带 input descriptor（如 `{mode:'versions', assetId, versionIds:[v3,v7]}` 或 `{mode:'scope', systemGroupId, kinds:['dependency']}`），后端校验其满足目标视图的 ViewInputSpec 后，解析为 `DocRef[]`（含签名内容 URL）或 AssetItem 查询结果喂给视图
+  - **前端编排 + 后端算（临时预览）**：后端只负责交付各层数据（批量 `layer-contents`）；前端选择要预览的层（开关/排序/未落库草稿），提交轻量 `/views:preview`，后端用与落库版本相同的 merge 引擎算合并结果 + provenance 内联返回、**不落库**；临时状态纯会话内存、刷新即丢；匿名/分享页只读落库版本、不提供预览
   - 分支/版本表达：`versions` 模式的 branch/tag selector 先解析为 Track 的固定 versionId；快照与分享只保存固定结果，不随 latest 漂移
   - 视图运行时统一入参：`{ docs: DocRef[] | ItemQueryResult, scope?, options, theme }`
 - F6.3 **内置视图**：
@@ -246,7 +246,7 @@ resolve（拉代码/读缓存）
   | `swagger-ui` | single | openapi | 交互式调试（Try it out） | P0 |
   | `redoc` | single | openapi | 三栏阅读型 | P0 |
   | `source` | single | * | 合并后源码 + 语法高亮 + **层标注开关**（hover 显示每段来自哪个层，基于 provenance） | P0 |
-  | `layers` | single | * | 层管理视图：层列表/启停/排序、各层修订历史、逐层预览合并前后差异、回滚 | P0 |
+  | `layers` | single | * | 层管理视图：层列表/启停/排序、各层修订历史、逐层预览合并前后差异、回滚；支持临时开关层/未落库草稿预览 | P0 |
   | `operations` | single | openapi | 端点表格，筛选排序 | P0 |
   | `items-table` | single | * | 通用条目表格（任何 kind 的免费默认视图） | P0 |
   | `diff` | versions(2..2) | * | 结构化 DIFF（F7） | P0 |
@@ -254,7 +254,7 @@ resolve（拉代码/读缓存）
   | `collection-table` | collection | * | 跨服务同类资产汇总/对齐度 | P1 |
   | `dep-graph` | scope | dependency | 跨系统全局依赖图（按 SystemGroup / 租户聚合） | P1 |
   | `catalog-dashboard` | scope | * | 资产大盘：数量/质量分/覆盖率（多少服务还没有 openapi 资产） | P1 |
-  | `erd` | single | dbschema | 数据模型 ER 图 | P2 |
+  | `erd` | single | dbschema | 数据模型 ER 图 | P1 |
   | `rapidoc` / `markdown` / `mock` / `embed` | single | openapi | 轻量渲染 / Wiki 导出 / Mock / 嵌入片段 | P2 |
 - F6.4 三种挂载方式：`component`（Nuxt 内置组件，用于 diff / layers / items-table 等深度定制视图）/ `iframe`（第三方 bundle 如 Swagger UI、Redoc，由后端托管 dist，强隔离、升级只换资源包）/ `external`（外链）
 - F6.5 视图偏好记忆：用户级 + 服务级默认视图；视图开关支持平台级默认 + 租户级覆盖（启停/排序/默认参数）
@@ -287,7 +287,7 @@ resolve（拉代码/读缓存）
 - F9.1 订阅粒度：服务级 / 单资产级 / SystemGroup 级 / AssetKind 级（"本系统任何 dbschema 变更都通知我"）
 - F9.2 事件类型：新版本发布、破坏性变更、采集失败、服务废弃、`ai_layer.generated`（AI 层产出待审）、`layer.approved` / `layer.rejected`
 - F9.3 通知渠道：站内消息（先做）+ Webhook（企微/飞书/钉钉/自定义）+ 邮件（可插拔 provider）；平台级默认 + 租户级覆盖
-- F9.4 **Breaking Change 确认机制**：产生破坏性变更时给负责人生成待办，确认「已知悉/已通知调用方」后才能关闭
+- F9.4 **Breaking Change 确认机制**：产生破坏性变更时给服务生成一条服务级待办（唯一键 `assetVersionId + serviceId`），任何有权限的服务成员确认「已知悉/已通知调用方」后即关闭，不做逐用户展开
 - F9.5 服务页轻量评论/备注（不做完整讨论区）
 
 ### F10 任务调度与可观测（P0）
@@ -362,7 +362,7 @@ AI 产出质量必须通过固定 fixture 验收：生成文档必须通过 kind
 | 并发 | 单实例应用 + PostgreSQL；采集并发默认 4，按租户配额限流；单仓库工作区串行 |
 | 确定性 | merge 可重放：给定 AssetVersion 的层修订清单与引擎版本，任何时候重放得到相同哈希 |
 | 隔离 | 租户间数据完全不可见；越权访问返回 404（避免资源存在性泄漏）；检索、任务、审计全部带租户维度 |
-| 安全 | 凭证静态加密；密钥不进日志/响应；CSRF；PAT 仅展示一次；分享链接签名 + 过期；producer 隔离执行且默认断网；依赖漏洞扫描进 CI |
+| 安全 | 凭证静态加密；密钥不进日志/响应；Bearer access token 天然免疫 CSRF；PAT 仅展示一次；分享链接签名 + 过期；producer 隔离执行且默认断网；依赖漏洞扫描进 CI |
 | 可用性 | 应用无状态（状态在 PG 与 blob 存储）；任务中断可恢复 |
 | 可维护 | 分层清晰（handler / service / repo）；核心逻辑单测覆盖 ≥ 70%；必测项：租户越权用例（每个资源）、overlay 合并确定性用例、provenance 正确性用例；DB 迁移版本化可回滚 |
 | 易用 | 首次启动 5 分钟内看到第一个服务的文档（内置示例租户 + 示例仓库一键体验） |
@@ -394,7 +394,7 @@ AI 产出质量必须通过固定 fixture 验收：生成文档必须通过 kind
 |---|---|---|
 | D1 | 资产主路径 = 仓库文件 base 层 + overlay 叠加；AI / 人工 / 第三方全部收敛进层模型，无特例代码路径 | 采集、审批、diff、provenance 共用一套管道 |
 | D2 | 存储 = PostgreSQL 16（层/版本/provenance 用 JSONB，全局视图用递归 CTE，队列用 River） | docker-compose 为标准部署；M5 单容器体验镜像只是附带并拉起同版本 PostgreSQL 进程 |
-| D3 | 服务/资产配置的权威来源 = 平台 DB；`.asset-platform.yaml` 为导入来源（`ignore` / `import_once` / `sync` 三策略 + 字段级来源标记 + 漂移检测） | 人工修改不被 GitOps 覆盖 |
+| D3 | 服务/资产配置的权威来源 = 平台 DB；`.asset-platform.yaml` 仅作为导入来源（`ignore` / `import_once` 两策略，preview/apply 两阶段，无字段级来源标记与漂移检测） | 数据库保持权威，导入不覆盖人工改动 |
 | D4 | 多租户强制隔离：所有业务表带 `tenant_id`，唯一约束限定租户内，检索索引带租户列，工作区按租户分目录，配额与审计按租户 | 隔离不可事后补 |
 | D5 | Overlay 双方言：openapi 兼容官方 OpenAPI Overlay Spec 1.0，其余 kind 用平台通用 Overlay；两方言编译到同一内部 action 模型，合并引擎唯一 | 生态兼容 + 全 kind 一致 |
 | D6 | 视图输入契约四模式（single / versions / collection / scope），分享链接、权限校验、缓存基于同一 input descriptor | 视图能力可被机器校验，新视图零侵入 |
@@ -409,11 +409,11 @@ AI 产出质量必须通过固定 fixture 验收：生成文档必须通过 kind
 |---|---|---|---|
 | **M0 地基** | 2-3 周 | 契约生成、租户/权限/PAT、凭证、仓库连接骨架、River、审计/outbox、核心迁移 | 越权与 PAT 用例全绿；契约生成无漂移；凭证连通性可测 |
 | **M1 资产主链路** | 3-4 周 | 仓库发现/同步、SourceSpec/Binding、默认分支 Track、openapi file-glob → merge → normalize/index → Viewer/public read、任务恢复 | 5 分钟内从录入仓库看到第一份文档；相同 latest fingerprint no-op |
-| **M2 层与 Overlay** | 3 周 | LayerHead/Revision、通用 Overlay、OpenAPI Overlay 1.0、manual 编辑/预览、GitOps 字段来源、provenance | 三层合并确定性、历史回退和漂移用例通过 |
+| **M2 层与 Overlay** | 3 周 | LayerHead/Revision、通用 Overlay、OpenAPI Overlay 1.0、manual 编辑/预览、临时开关层/草稿预览、provenance | 三层合并确定性、历史回退和预览用例通过 |
 | **M3 AI 闭环 + Diff** | 3 周 | AI 冷启动/审批、分支 Track、openapi diff/breaking、snapshot/share、todo、最小通知、`meridian push/diff` | 无文档 → AI → 审批 → 发布 → release diff → 分享/待办/CI 门禁完整演示 |
 | **M4 多 kind + 全局视图** | 3-4 周 | dbschema、dependency 两个 kind（含通用 diff）、SystemGroup、dep-graph、catalog-dashboard、检索 | 新 kind 接入实测 ≤ 1 人周；全局依赖图可用 |
 | **M5 协作与开放** | 3 周 | 通用订阅、站内信、通知渠道、出向 webhook、asyncapi、运维合规加固 | 事件至少一次投递、签名重试与订阅取消用例通过 |
-| M6+ | — | config / deployment kind、erd / mock 视图、gRPC kind 插件、SDK 生成、层感知 diff | — |
+| M6+ | — | config / deployment kind、mock 视图、gRPC kind 插件、SDK 生成、层感知 diff | — |
 
 ---
 
@@ -444,7 +444,7 @@ actions:
 
 ### A.3 仓库配置文件 `.asset-platform.yaml`
 
-探测位置（优先级）：`<service_root>/.asset-platform.yaml` → `<repo_root>/.asset-platform.yaml`。是否采纳由服务级 `config_sync_policy` 决定（F4.7）。
+探测位置（优先级）：`<service_root>/.asset-platform.yaml` → `<repo_root>/.asset-platform.yaml`。是否采纳由服务级 `config_sync_policy` 决定（F4.7，`ignore`/`import_once`）。
 
 以下仅为阅读示例；唯一可验证结构是 [contracts/repository-config.schema.yaml](../contracts/repository-config.schema.yaml)。`command` 模式通过全局唯一名称 `producerProfile` 引用平台受控 profile，导入时解析为内部 UUID，不接受原始 shell。
 

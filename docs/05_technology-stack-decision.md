@@ -66,9 +66,9 @@ TanStack Query 是唯一 API server-state owner；Pinia 不保存 tenant、membe
 
 ### 5.2 OpenAPI 客户端
 
-不采用 `openapi-fetch`。其维护者已在 2026 路线图宣布转入维护模式，并明确指出复杂认证、序列化和 runtime 行为会迫使项目堆叠 wrapper。Meridian 恰好包含 CSRF、ETag、Idempotency-Key、multipart、统一错误、任务和多种 response，因此改用仍活跃的 Orval 8：生成 Fetch request、Vue Query hooks/query keys 与 MSW mock，减少人工胶水。
+不采用 `openapi-fetch`。其维护者已在 2026 路线图宣布转入维护模式，并明确指出复杂认证、序列化和 runtime 行为会迫使项目堆叠 wrapper。Meridian 恰好包含 Bearer token 静默续期、ETag、Idempotency-Key、multipart、统一错误、任务和多种 response，因此改用仍活跃的 Orval 8：生成 Fetch request、Vue Query hooks/query keys 与 MSW mock，减少人工胶水。
 
-custom fetcher 只能处理同源 base URL、cookie/CSRF、ErrorResponse/requestId 和全局 401；业务 header/body 必须在 OpenAPI operation 上出现。生成代码不能手改，也不能在 composable 中再包一层通用 CRUD SDK。
+custom fetcher 只能处理同源 base URL、Bearer access token + `/auth/refresh` 续期、ErrorResponse/requestId 和全局 401；业务 header/body 必须在 OpenAPI operation 上出现。生成代码不能手改，也不能在 composable 中再包一层通用 CRUD SDK。
 
 ### 5.3 编辑器
 

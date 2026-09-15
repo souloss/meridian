@@ -33,7 +33,7 @@ Go 泛型方法只用于具体 helper 类型的类型保持/变换；不得放�
 | release 首版如何判断 breaking | 默认分支 current，否则 latest，固定写 baselineVersionId | `domain.yaml.versions.comparisonBase` |
 | glob 一个配置如何对应多个资产 | SourceSpec 展开为稳定 SourceBinding | `domain.yaml.sourceExpansion` |
 | 资产源在领域、HTTP、数据库的名称不一致 | 全部统一为 SourceSpec；展开结果统一为 SourceBinding | `openapi.yaml`、`domain.yaml.sourceExpansion`、`storage.yaml` |
-| GitOps 谁覆盖谁 | DB 是权威；按 JSON Pointer 记录字段来源，仅 repo 来源字段可同步覆盖 | `domain.yaml.configAuthority` |
+| 配置导入谁覆盖谁 | DB 是权威；仓库文件仅作导入来源，preview/apply 两阶段，不做字段级来源与漂移 | `domain.yaml.configAuthority` |
 | 无 Asset 时 AI 从哪里启动 | Service 级冷启动 operation，创建 Asset/Layer/candidate | `openapi.yaml`、`domain.yaml.producers` |
 | command 是否能执行请求方 shell | 不能；只能选择平台受控 producer profile | `domain.yaml.producers` |
 | worker 崩溃后外部命令是否重放 | completion manifest 优先；仅 replay-safe 可在新目录重试，否则 outcome_unknown | `domain.yaml.producers` |

@@ -54,7 +54,7 @@ registry:
     itemTypes: [table, column]
     itemKey: '${tableName}${columnName == null ? "" : "." + columnName}'
     overlayDialects: [platform-v1]
-    defaultViews: [source, layers, items-table, diff]
+    defaultViews: [source, layers, items-table, diff, erd]
     capabilities: [validate, extract, generic_diff, breaking_rules, overlay]
     pluginVersion: 1
   - id: dependency

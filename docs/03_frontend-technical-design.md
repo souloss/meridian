@@ -31,7 +31,7 @@
 
 选择 Nuxt 不是为了 SSR。Meridian 的价值页面全部依赖登录态、租户和实时 API 数据，SPA 与单二进制交付更匹配；Nuxt 提供约定式路由、布局、自动导入、代码分割和 Vite HMR，减少 B 端多模块装配成本。CI 必须执行 `nuxt generate`，确认所有深链经 Go fallback 可刷新，并拒绝运行时服务端依赖。
 
-Orval custom fetcher 的职责仅限同源 base URL、`credentials: same-origin`、cookie 会话的 CSRF header、统一 ErrorResponse/requestId 和 401 处理。`If-Match`、`Idempotency-Key`、上传 body 和 operation 参数必须由生成签名显式传入，不能在 wrapper 中猜测。生成目录禁止手改，代码生成后必须 typecheck 且 git diff 为空。
+Orval custom fetcher 的职责仅限同源 base URL、`Authorization: Bearer`（内存中的 access token）、401 时静默调用 `/auth/refresh` 续期并重放一次、统一 ErrorResponse/requestId。不写 CSRF header（Bearer 免疫 CSRF）；`If-Match`、`Idempotency-Key`、上传 body 和 operation 参数必须由生成签名显式传入，不能在 wrapper 中猜测。生成目录禁止手改，代码生成后必须 typecheck 且 git diff 为空。
 
 建议目录：
 
@@ -41,7 +41,7 @@ web/app/layouts             admin/tenant/public/share 布局
 web/app/middleware          auth/tenant 路由守卫
 web/app/api/generated        Orval 生成 models/client/query/MSW，禁止手改
 web/app/api/fetcher.ts       唯一手写 transport adapter
-web/app/composables         API client/query/csrf/capability
+web/app/composables         API client/query/auth-refresh/capability
 web/app/stores              仅导航、drawer、未提交草稿等 UI 状态
 web/app/features/admin      平台控制面
 web/app/features/catalog    repository/service/source/group
@@ -140,7 +140,7 @@ Viewer 路由固定 assetId/versionId；只在用户明确选择“跟随分支�
 
 Viewer 顶部包含 ref/version picker、lifecycle、分享和下载；View tabs 来自 views contract。切换时构造 InputDescriptor，调用 resolve，成功后才写 URL 和偏好。422 时保留旧视图并展示 descriptor 错误。
 
-`source`、`operations`、`items-table`、`layers`、`diff` 是内建 Vue 组件；Swagger/Redoc 等第三方 renderer 在不含 `allow-same-origin` 的 opaque-origin iframe 中运行。父页先取签名 artifact，再以 document text 通过一次性 nonce 建立的 transferred MessagePort 传入；之后忽略 window message，frame 自身 `connect-src 'none'`。Try-it-out 默认关闭；启用时 iframe 通过该 port 请求父页面执行 tenant allowlist 内、`credentials: omit` 的浏览器 fetch，不经过平台后端代理，也不向 iframe 传 session。表格 columns 使用 ViewDef 独立字段，不能塞进 optionsSchema。
+`source`、`operations`、`items-table`、`layers`、`diff` 是内建 Vue 组件；Swagger/Redoc 等第三方 renderer 在不含 `allow-same-origin` 的 opaque-origin iframe 中运行。父页先取签名 artifact，再以 document text 通过一次性 nonce 建立的 transferred MessagePort 传入；之后忽略 window message，frame 自身 `connect-src 'none'`。Try-it-out 默认关闭；启用时 iframe 通过该 port 请求父页面执行 tenant allowlist 内、`credentials: omit` 的浏览器 fetch，不经过平台后端代理，也不向 iframe 传 access token。表格 columns 使用 ViewDef 独立字段，不能塞进 optionsSchema。
 
 ### 5.5 层与人工 Overlay
 
@@ -153,7 +153,7 @@ Layers view 左侧展示 Layer，右侧展示 scoped timeline 和 head：latest�
 - 创建 manual SourceSpec（响应返回 `initialLayerId`）并提交 manual revision；
 - 查看 revision 原文、元数据、review context 和 provenance；
 - rollback 到允许的历史修订；
-- merge preview。
+- **临时开关层/草稿预览（贯穿全部视图）**：前端选择要预览的层（开关/排序/未落库草稿），提交 `/views:preview`，后端用与落库相同的 merge 引擎算合并结果 + provenance 内联返回、不落库；临时状态纯会话内存、刷新即丢；层内容通过批量 `layer-contents` 端点一次取全。
 
 编辑器左侧编辑，右侧 800ms 防抖 preview；保存携带 `expectedEffectiveRevisionId` 和 Idempotency-Key。422 的 1-based line/column 映射 CodeMirror。关闭、重开或 rollback 后出现新版本是正常行为；内容 hash 可以复用，versionId 不得被前端当成 hash。
 
@@ -181,15 +181,9 @@ Diff 输入选择器支持固定版本、branch/tag 和临时 upload。提交后
 
 非默认分支首版的自动 diff 基线由后端解析为默认分支 current/latest。前端只展示 `baselineVersionId`，不自行猜测。breaking todo 在版本 index 后出现，用户只可 ack 自己的 todo。
 
-### 5.8 GitOps 漂移
+### 5.8 配置导入
 
-Repository 配置导入采用 preview/apply 两阶段。Preview 页面按字段展示 DB value、file value、source 和差异；apply 使用 previewId/configDigest。漂移解决的动作固定为 take_file、keep_db、ignore：
-
-- take_file 显式接受 file 值；
-- keep_db 令字段变为 db_manual；
-- ignore 只忽略当前 file digest，下一次仓库变化重新提示。
-
-不得在 Service 或 Source 顶层用单一 `configSource` badge 代替字段级来源。
+Repository 配置导入采用 preview/apply 两阶段。Preview 页面展示导入将创建/更新的服务与资产源清单；apply 使用 previewId/configDigest。数据库始终是权威来源，导入不做字段级来源标记与漂移检测，也不静默覆盖人工改动。
 
 ### 5.9 搜索、分组、订阅与通知
 
@@ -232,11 +226,11 @@ Nuxt UI Table 不允许把“点击整行”作为唯一操作入口；查看、
 
 | 里程碑 | 前端交付 |
 | --- | --- |
-| M0 | generated client、登录/CSRF、租户壳、控制面、错误与 capability 基础设施 |
+| M0 | generated client、登录/JWT refresh、租户壳、控制面、错误与 capability 基础设施 |
 | M1 | 仓库向导、服务页、source、job drawer、OpenAPI Viewer/public read |
-| M2 | Layers、编辑/preview、revision timeline、rollback、字段级 GitOps |
+| M2 | Layers、编辑/preview、revision timeline、rollback、临时开关层/草稿预览 |
 | M3 | AI 冷启动/审批、Track/version picker、lifecycle、diff/snapshot/share、todo、最小 inbox |
-| M4 | GitOps 完整漂移、search/group/dashboard、dbschema/dependency views |
+| M4 | search/group/dashboard、dbschema/dependency views |
 | M5 | 通用订阅、通知渠道、asyncapi view、运维合规界面 |
 
 完成定义不是页面存在，而是对应 `acceptance.yaml` 的用户故事、错误路径和权限反例通过，且生成代码无漂移。

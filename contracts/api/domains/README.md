@@ -10,14 +10,14 @@ that are genuinely private to that domain; shared wire models stay under
 | File | Boundary |
 | --- | --- |
 | `asset/routes.tsp` | Asset kinds, sources, bindings, assets, versions and publishing |
-| `auth/routes.tsp` | CSRF, login, logout, identity and preferences |
+| `auth/routes.tsp` | Login, refresh, logout, identity and preferences |
 | `collaboration/routes.tsp` | Notifications, comments, subscriptions, audits and todos |
 | `diff/routes.tsp` | Diff uploads, runs, snapshots, exports, links, rules and search |
 | `job/routes.tsp` | Jobs, logs, cancellation and retry |
 | `layer/routes.tsp` | Layers, revisions, ordering, reviews and approval |
 | `platform/routes.tsp` | Platform users, tenants, settings, credentials and jobs |
 | `repository/routes.tsp` | Repository CRUD, checks, discovery, sync and imports |
-| `service/routes.tsp` | Services, access, sources, views, tags and teams |
+| `service/routes.tsp` | Services, sources, views, tags and teams |
 | `system/routes.tsp` | Health, readiness, metrics and system groups |
 | `tenant/routes.tsp` | Tenant settings, members, credentials, tokens and hosts |
 | `view/routes.tsp` | View definitions, overrides, resolution and public access |

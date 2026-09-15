@@ -18,7 +18,6 @@ releaseScope:
     - config-asset-kind
     - deployment-asset-kind
     - markdown-doc-asset-kind
-    - erd-view
     - rapidoc-view
     - mock-view
     - embed-snippet-view
@@ -85,7 +84,6 @@ wire:
       - previewRepositoryConfigImport
       - applyRepositoryConfigImport
       - rotateNotificationChannelSecret
-      - resolveServiceDrift
       - produceSource
       - generateMissingAssetWithAi
       - publishAssetVersion
@@ -117,7 +115,7 @@ wire:
         query: percent-decoded-list-of-name-value-pairs-sorted-by-name-then-value-with-duplicates-preserved
         semanticHeaders: lower-case-map-containing-if-match-when-present
         body: parsed-json-value-or-null-when-no-body
-      excludedHeaders: [authorization, cookie, x-csrf-token, x-request-id, idempotency-key, content-length]
+      excludedHeaders: [authorization, cookie, x-request-id, idempotency-key, content-length]
       storageEncoding: 32-raw-bytes-in-request_hash-bytea
       diagnosticEncoding: lowercase-hex
     concurrentFirstRequest:
@@ -203,22 +201,31 @@ authentication:
     secretEncoding: unpadded-base64url-of-exactly-32-random-bytes
     comparison: constant-time
     submittedTokenLogging: forbidden
-  browser:
-    cookieName: meridian_session
-    tokenFormat: ses_-plus-base64url-32-random-bytes
-    storage: hmac-digest-only
-    httpOnly: true
-    secureOutsideLocalDevelopment: true
-    sameSite: Lax
-    sessionTtlHours: 72
-    csrf:
-      header: X-CSRF-Token
-      tokenFormat: base64url-32-random-bytes
-      storage: hmac-digest-only
-      deliveredBy:
-        - login-response-field: csrfToken
-        - endpoint: GET /api/v1/auth/csrf
-      requiredFor: browser-non-safe-methods
+  jwt:
+    accessToken:
+      transport: authorization-bearer-header
+      scheme: Bearer
+      lifetimeMinutes: 15
+      algorithm: HS256
+      signingKeyConfiguration: MERIDIAN_JWT_SIGNING_KEY
+      signingKeyEncoding: base64url-of-exactly-32-random-bytes
+      claims: [sub, exp, iat, jti]
+      clientStorage: in-memory-only-never-persisted
+      csrf: not-applicable-bearer-header-is-csrf-immune
+    refreshToken:
+      transport: http-only-cookie
+      cookieName: meridian_refresh
+      httpOnly: true
+      secureOutsideLocalDevelopment: true
+      sameSite: Lax
+      path: /api/v1/auth
+      lifetimeHours: 168
+      rotation: rotate-on-every-refresh
+      reuseDetection: reject-and-revoke-token-family-on-reuse
+      storage: hmac-digest-only-in-refresh-tokens-table
+      revocation: server-side-revocable
+    refreshEndpoint: POST /api/v1/auth/refresh
+    logoutBehavior: revoke-refresh-token-and-clear-cookie-access-token-discarded-client-side
   pat:
     header: Authorization
     scheme: Bearer
@@ -229,11 +236,11 @@ authentication:
     tokenFormat: pat_-plus-base64url-32-random-bytes
     randomSource: cryptographic-random
     storage: hmac-digest-only
-    csrfRequired: false
     invalidOrExpiredHttpStatus: 401
   credentialPrecedence:
-    rule: authorization-bearer-when-present-otherwise-browser-cookie
-    invalidBearerFallbackToCookie: forbidden
+    rule: authorization-bearer-when-present-otherwise-unauthenticated
+    bearerInterpretation: server-inspects-token-to-distinguish-jwt-from-pat_-prefixed-pat
+    invalidBearerFallbackToRefreshCookie: forbidden
   platformAdminTenantAccess: >-
     Platform administrator status grants platform metadata administration only.
     Tenant business data is available only when the same user is also an active
@@ -382,6 +389,8 @@ sse:
   jobLogs:
     endpoint: GET-/api/v1/t/{tenantSlug}/jobs/{jobId}/logs
     contentType: text/event-stream
+    authentication: short-lived-one-time-signed-token-in-query-string-because-event-source-cannot-set-authorization-header
+    tokenReuse: single-use-and-expires
     events: [log, state]
     replayCursor: persisted-job-stage-log-sequence-from-Last-Event-ID
     initialState: send-current-job-state-before-new-log-events
@@ -418,7 +427,6 @@ authorization:
       - repository:sync
       - repository:write
       - service:create
-      - service:manage_members
       - service:read
       - service:write
       - subscription:manage_self
@@ -438,8 +446,7 @@ authorization:
   resolution:
     - platform-scope-is-independent-from-tenant-scope
     - tenant-admin-grants-all-tenant-permissions
-    - tenant-role-grants-are-unioned-with-service-grants
-    - explicit-service-grants-may-add-permissions
+    - tenant-role-grants-are-unioned-with-service-ownership-permissions
     - no-grant-may-cross-a-tenant-boundary
   tenantRoles:
     tenant_admin:
@@ -471,30 +478,24 @@ authorization:
         - subscription:manage_self
         - todo:read_self
         - token:manage
-  serviceRoles:
-    owner:
-      permissions:
-        - service:read
-        - service:write
-        - service:manage_members
-        - asset:read
-        - asset:publish
-        - layer:read
-        - layer:edit
-        - layer:approve
-    maintainer:
-      permissions:
-        - service:read
-        - service:write
-        - asset:read
-        - asset:publish
-        - layer:read
-        - layer:edit
-    viewer:
-      permissions: [service:read, asset:read, layer:read]
-  explicitServicePermissions:
-    allowed: [layer:edit, layer:approve, asset:publish]
-    storage: service_grants.permissions
+  serviceOwnership:
+    storageFields: [services.owners, services.maintainers]
+    referenceUsersAndTeams: true
+    ownerPermissions:
+      - service:read
+      - service:write
+      - asset:read
+      - asset:publish
+      - layer:read
+      - layer:edit
+      - layer:approve
+    maintainerPermissions:
+      - service:read
+      - service:write
+      - asset:read
+      - asset:publish
+      - layer:read
+      - layer:edit
   patScopes:
     asset:read: [service:read, asset:read, layer:read]
     asset:push: [asset:push]
@@ -533,7 +534,6 @@ enums:
   layerRole: [base, overlay]
   layerOrigin: [repo, third_party, manual, ai_generated]
   sourceMode: [builtin, command, push, manual, ai]
-  sourceConfigOrigin: [db_manual, repo_file, repo_bootstrap]
   jobStatus: [pending, running, succeeded, succeeded_with_warnings, failed, outcome_unknown, cancelled]
   jobTrigger: [manual, schedule, webhook, api, cli, system, retry]
   pipelineStage: [resolve, discover, extract, merge, normalize, index]
@@ -946,13 +946,11 @@ sourceExpansion:
 
 systemGroups:
   maximumDepth: 1
+  model: single-level-system-group-no-parent-self-reference
   rootParentId: null
-  parentRules:
-    - parent-must-be-in-the-same-tenant
-    - parent-must-be-null-for-root-group
-    - parent-must-be-non-null-for-second-level-group
-    - self-parent-and-any-cycle-rejected-with-nesting_too_deep
-  deleteBehavior: detach-children-to-root-and-remove-memberships-without-deleting-services
+  parentRules: []
+  groupServiceRelation: many-to-many-services-may-belong-to-multiple-groups
+  deleteBehavior: remove-memberships-without-deleting-services
 
 configAuthority:
   authoritativeStore: database
@@ -961,9 +959,6 @@ configAuthority:
   policies:
     ignore: never-read-automatically
     import_once: read-only-on-explicit-import
-    sync: compare-every-repository-sync
-  fieldSourceTable: config_field_sources
-  fieldSourceKey: [tenant_id, resource_type, resource_id, field_path]
   producerProfileReference:
     repositoryField: producerProfile
     repositoryValue: globally-unique-profile-name
@@ -972,14 +967,10 @@ configAuthority:
   serviceRoot:
     repositoryFileRootSentinel: '.'
     databaseAndApiRootRepresentation: empty-string
-    importNormalization: exact-dot-to-empty-string-before-preview-diff-and-uniqueness-check
+    importNormalization: exact-dot-to-empty-string-before-preview-and-uniqueness-check
     otherDotSegments: forbidden
-  manualEditEffect: set-source-db_manual
-  syncOverwriteRule: only-repo_file-or-repo_bootstrap-fields
-  drift:
-    ignore: retain-diff-and-mark-ignored-until-repository-value-changes
-    takeFile: write-value-and-set-source-repo_file
-    keepDb: keep-value-and-set-source-db_manual
+  manualEditEffect: authoritative-database-value-unchanged
+  importOverwriteRule: import-only-creates-or-updates-explicitly-previewed-resources
 
 producers:
   profiles:
@@ -1079,6 +1070,23 @@ viewerRuntime:
     tenantScopeId: must-be-null
     serviceOrSystemGroupScopeId: must-be-non-null
     refSelectors: resolve-once-to-an-immutable-version-before-view-execution
+
+viewerPreview:
+  purpose: frontend-orchestrates-layer-selection-and-backend-runs-the-same-merge-engine-without-persisting
+  endpoint: POST-/api/v1/t/{tenantSlug}/assets/{assetId}/views:preview
+  input:
+    layers:
+      - enabledLayerIds: UUID-list-in-application-order
+      - draftLayers: optional-inline-content-not-yet-persisted
+    contentType: string
+  output:
+    mergedContent: inline-json-or-text-body-not-a-signed-url
+    provenance: json-pointer-to-last-writing-layer
+    engineVersion: merge-engine-version-used
+  persistence: never-written-to-database-no-revision-created
+  scope: authenticated-tenant-members-only-anonymous-and-shared-pages-are-read-only
+  consistency: same-merge-engine-as-version-materialization-so-preview-equals-committed-result
+  layerContentFetch: one-batch-endpoint-returns-effective-contents-for-all-layers-of-an-asset
 
 sharing:
   supportedResources: [view, diff_snapshot]
@@ -1219,10 +1227,11 @@ events:
     channels: at-least-one-enabled-visible-notification-channel
     disabledEffect: keep-row-and-ignore-only-future-events
   breakingTodos:
-    assignees: all-active-user-owners
-    teamOwnerExpansion: active-team-members
-    fallbackAssignees: tenant-admins
-    uniqueness: [asset_version_id, assignee_id]
+    scope: service-level-todo-not-per-user-expansion
+    assignees: [service-owners, service-maintainers, tenant-admins]
+    uniqueness: [asset_version_id, service_id]
+    ackSemantics: any-authorized-service-member-ack-closes-the-service-todo
+    ackRecord: single-acked_by-and-acked_at-columns-on-the-todo-row
 
 storage:
   blobStore:

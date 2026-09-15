@@ -329,9 +329,9 @@ items:
     milestone: M2
     priority: P0
     status: ready
-    title: gitops-preview-apply-and-drift-resolution
+    title: gitops-preview-apply
     dependsOn: [M2-AGENT-001]
-    operationIds: [previewRepositoryConfigImport, applyRepositoryConfigImport, resolveServiceDrift]
+    operationIds: [previewRepositoryConfigImport, applyRepositoryConfigImport]
     stories: [US-07]
     assertions: [SMK-028, SMK-038]
     verify: [smoke-m2-gitops]

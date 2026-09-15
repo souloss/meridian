@@ -110,7 +110,7 @@ toolchain:
       httpClient: fetch
       outputMode: tags-split
       mocks: msw
-      customFetcherScope: base-url-cookie-csrf-error-request-id-only
+      customFetcherScope: base-url-bearer-token-refresh-error-request-id-only
   openapiLint:
     tool: redocly-cli
     version: '>=2.51.1,<3.0.0'

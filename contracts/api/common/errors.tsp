@@ -11,7 +11,6 @@ namespace MeridianApi;
 /** identifies one supported error code value. */
 enum ErrorCode {
   unauthenticated,
-  csrf_invalid,
   not_found,
   validation_error,
   asset_path_not_found,

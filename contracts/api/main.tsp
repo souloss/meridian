@@ -21,7 +21,7 @@ using TypeSpec.OpenAPI;
 @service(#{ title: "Meridian API" })
 @info(#{ version: "1.0.0" })
 @server("/")
-@useAuth(ApiKeyAuth<ApiKeyLocation.cookie, "meridian_session"> | BearerAuth)
+@useAuth(BearerAuth)
 @tagMetadata(#[
   #{ name: "System" },
   #{ name: "Auth" },

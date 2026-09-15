@@ -312,3 +312,18 @@ op listReviews(
       @header("X-Request-Id") XRequestId?: string;
       @body body: ErrorResponse;
     };
+
+/** Returns the effective contents of every layer for an asset in one batch, for preview and rendering. */
+@tag("Layer")
+@extension("x-tenant-scope", "tenant")
+@extension("x-permissions", #["layer:read"])
+@extension("x-milestone", "M2")
+@route("/api/v1/t/{tenantSlug}/assets/{assetId}/layer-contents")
+@get
+op listAssetLayerContents(...Parameters.TenantSlug, ...Parameters.AssetId):
+  | AssetLayerContents
+  | {
+      @statusCode statusCode: 404;
+      @header("X-Request-Id") XRequestId?: string;
+      @body body: ErrorResponse;
+    };

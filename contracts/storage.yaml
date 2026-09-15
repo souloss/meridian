@@ -26,7 +26,7 @@ database:
     or through a database-enforced composite foreign key, except an explicitly
     declared globalUnique key used for token lookup. Repository methods require
     tenant_id as their first argument.
-  globalUniqueExceptions: [api_tokens.token_hash, share_links.token_hash]
+  globalUniqueExceptions: [api_tokens.token_hash, share_links.token_hash, refresh_tokens.token_hash]
 
 ddlConventions:
   fieldCoverage: every-field-must-resolve-exactly-one-sql-type
@@ -53,14 +53,14 @@ ddlConventions:
     source_specs.branch_patterns: 'text[]'
     layers.branch_patterns: 'text[]'
     api_tokens.scopes: 'text[]'
-    service_grants.permissions: 'text[]'
+    services.owners: 'text[]'
+    services.maintainers: 'text[]'
     subscriptions.events: 'text[]'
     subscriptions.target_id: text
     diff_rule_sets.version: integer
   exactColumnTypes:
     id: uuid
     tenant_id: uuid
-    parent_id: uuid
     user_id: uuid
     team_id: uuid
     credential_id: uuid
@@ -93,7 +93,9 @@ ddlConventions:
     created_by: uuid
     author_id: uuid
     requested_by: uuid
-    assignee_id: uuid
+    acked_by: uuid
+    replaced_by: uuid
+    family_id: uuid
     actor_id: uuid
     target_id: uuid
     principal_id: uuid
@@ -122,14 +124,10 @@ ddlConventions:
     key_version: integer
     quality_score: integer
     fingerprint: text
-    config_digest: text
-    repository_value_digest: text
-    ignored_digest: text
     content_hash: text
     merged_hash: text
     input_fingerprint: text
     token_hash: bytea
-    csrf_hash: bytea
     request_hash: bytea
     password_hash: text
     webhook_secret_hash: bytea
@@ -208,7 +206,6 @@ ddlConventions:
     framework: text
     lifecycle: text
     visibility: text
-    config_sync_policy: text
     body: text
     color: text
     commit_sha: text
@@ -283,7 +280,7 @@ ddlConventions:
   nullabilityDefault: not-null
   nullableColumns:
     users: [email]
-    sessions: [revoked_at, last_seen_at]
+    refresh_tokens: [replaced_by]
     api_tokens: [expires_at, last_used_at, revoked_at]
     credentials: [last_used_at]
     global_credentials: [last_used_at]
@@ -292,8 +289,6 @@ ddlConventions:
     services: [description, language, framework, deleted_at]
     service_comments: [deleted_at]
     tag_definitions: [color, description]
-    config_import_previews: [applied_at]
-    config_field_sources: [repository_value_digest, ignored_digest]
     producer_profiles: [unavailable_reason, deleted_at]
     assets: [deleted_at]
     source_specs: [path, producer_profile_id, last_error, deleted_at]
@@ -304,12 +299,12 @@ ddlConventions:
     layer_heads: [latest_revision_id, effective_revision_id, candidate_revision_id]
     asset_ref_tracks: [latest_version_id, current_version_id]
     asset_versions: [revision, source_commit, baseline_version_id, diff_summary]
-    system_groups: [parent_id, description]
+    system_groups: [description]
     share_links: [resource_id, view_id, revoked_at]
     jobs: [river_job_id, retry_of_job_id, scope_id, ref_type, ref_name, next_attempt_at, result, error, started_at, finished_at]
     job_stage_logs: [stage]
     notifications: [read_at]
-    breaking_todos: [acked_at, comment]
+    breaking_todos: [acked_by, acked_at, comment]
     audit_logs: [tenant_id, actor_id]
     tenant_exports: [artifact_ref, expires_at, error]
   defaults:
@@ -342,7 +337,8 @@ ddlConventions:
       author_id: users.id
       created_by: users.id
       requested_by: users.id
-      assignee_id: users.id
+      acked_by: users.id
+      replaced_by: refresh_tokens.id
       team_id: teams.id
       credential_id: credentials.id
       global_credential_id: global_credentials.id
@@ -363,7 +359,6 @@ ddlConventions:
       baseline_version_id: asset_versions.id
       rule_set_id: diff_rule_sets.id
       group_id: system_groups.id
-      parent_id: system_groups.id
       channel_id: notification_channels.id
       subscription_id: subscriptions.id
       blob_digest: blobs.blob_digest
@@ -409,11 +404,14 @@ tables:
     primaryKey: [id]
     unique: [[username], [email]]
     fields: [id, username, password_hash, display_name, email, status, is_platform_admin, revision, created_at, updated_at]
-  sessions:
+  refresh_tokens:
     tenantScoped: false
     primaryKey: [id]
-    fields: [id, user_id, token_hash, csrf_hash, expires_at, revoked_at, last_seen_at, created_at, updated_at]
-    indexes: [[user_id, expires_at], [expires_at]]
+    unique: [[token_hash]]
+    globalUnique: [[token_hash]]
+    fields: [id, user_id, token_hash, family_id, expires_at, revoked_at, replaced_by, created_at]
+    indexes: [[user_id, expires_at], [expires_at], [family_id]]
+    mutation: token-hash-is-written-once-and-row-is-revoked-on-rotation
   tenant_members:
     tenantScoped: true
     primaryKey: [tenant_id, user_id]
@@ -479,11 +477,7 @@ tables:
     tenantScoped: true
     primaryKey: [tenant_id, id]
     unique: [[tenant_id, slug], [tenant_id, repository_id, root_dir]]
-    fields: [tenant_id, id, repository_id, slug, display_name, description, root_dir, language, framework, owners, lifecycle, visibility, config_sync_policy, revision, deleted_at, created_at, updated_at]
-  service_grants:
-    tenantScoped: true
-    primaryKey: [tenant_id, service_id, principal_type, principal_id]
-    fields: [tenant_id, service_id, principal_type, principal_id, role, permissions, created_at, updated_at]
+    fields: [tenant_id, id, repository_id, slug, display_name, description, root_dir, language, framework, owners, maintainers, lifecycle, visibility, revision, deleted_at, created_at, updated_at]
   service_stars:
     tenantScoped: true
     primaryKey: [tenant_id, service_id, user_id]
@@ -510,15 +504,6 @@ tables:
     primaryKey: [tenant_id, id]
     unique: [[tenant_id, repository_id, commit_sha, root_dir]]
     fields: [tenant_id, id, repository_id, commit_sha, root_dir, detected, status, created_at, updated_at]
-  config_import_previews:
-    tenantScoped: true
-    primaryKey: [tenant_id, id]
-    fields: [tenant_id, id, repository_id, commit_sha, config_digest, preview, expires_at, applied_at, created_by, created_at]
-  config_field_sources:
-    tenantScoped: true
-    primaryKey: [tenant_id, resource_type, resource_id, field_path]
-    fields: [tenant_id, resource_type, resource_id, field_path, source, repository_value_digest, ignored_digest, updated_at]
-
   asset_kinds:
     tenantScoped: false
     primaryKey: [id]
@@ -601,7 +586,7 @@ tables:
     tenantScoped: true
     primaryKey: [tenant_id, id]
     unique: [[tenant_id, slug]]
-    fields: [tenant_id, id, parent_id, slug, display_name, description, revision, created_at, updated_at]
+    fields: [tenant_id, id, slug, display_name, description, revision, created_at, updated_at]
   system_group_members:
     tenantScoped: true
     primaryKey: [tenant_id, group_id, service_id]
@@ -671,8 +656,8 @@ tables:
   breaking_todos:
     tenantScoped: true
     primaryKey: [tenant_id, id]
-    unique: [[tenant_id, asset_version_id, assignee_id]]
-    fields: [tenant_id, id, asset_version_id, assignee_id, status, acked_at, comment, created_at, updated_at]
+    unique: [[tenant_id, asset_version_id, service_id]]
+    fields: [tenant_id, id, asset_version_id, service_id, status, acked_by, acked_at, comment, created_at, updated_at]
   audit_logs:
     tenantScoped: conditional
     primaryKey: [id]

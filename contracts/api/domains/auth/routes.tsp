@@ -8,22 +8,6 @@ using TypeSpec.OpenAPI;
 @service
 namespace MeridianApi;
 
-/** Returns a CSRF token bound to the current authenticated browser session. */
-@tag("Auth")
-@extension("x-tenant-scope", "identity")
-@extension("x-permissions", #[])
-@extension("x-milestone", "M0")
-@route("/api/v1/auth/csrf")
-@get
-@useAuth(ApiKeyAuth<ApiKeyLocation.cookie, "meridian_session">)
-op getCsrfToken():
-  | CsrfToken
-  | {
-      @statusCode statusCode: 401;
-      @header("X-Request-Id") XRequestId?: string;
-      @body body: ErrorResponse;
-    };
-
 /** Authenticates local credentials and creates a browser session. */
 @tag("Auth")
 @extension("x-tenant-scope", "identity")
@@ -50,7 +34,27 @@ op login(@body body: LoginRequest):
       @body body: ErrorResponse;
     };
 
-/** Revokes the current browser session and clears its session cookie. */
+/** Exchanges the HttpOnly refresh cookie for a fresh access token, rotating the refresh token. */
+@tag("Auth")
+@extension("x-tenant-scope", "identity")
+@extension("x-permissions", #[])
+@extension("x-idempotency", #{ mode: "none" })
+@extension("x-milestone", "M0")
+@route("/api/v1/auth/refresh")
+@post
+@useAuth(ApiKeyAuth<ApiKeyLocation.cookie, "meridian_refresh">)
+op refresh():
+  | {
+      @header("Set-Cookie") SetCookie?: string;
+      @body body: RefreshResult;
+    }
+  | {
+      @statusCode statusCode: 401;
+      @header("X-Request-Id") XRequestId?: string;
+      @body body: ErrorResponse;
+    };
+
+/** Revokes the refresh token and clears its cookie; the client discards the access token in memory. */
 @tag("Auth")
 @extension("x-tenant-scope", "identity")
 @extension("x-permissions", #[])
@@ -58,7 +62,7 @@ op login(@body body: LoginRequest):
 @extension("x-milestone", "M0")
 @route("/api/v1/auth/logout")
 @post
-@useAuth(ApiKeyAuth<ApiKeyLocation.cookie, "meridian_session">)
+@useAuth(ApiKeyAuth<ApiKeyLocation.cookie, "meridian_refresh">)
 op logout():
   | (NoContentResponse & {
       @header("Set-Cookie") SetCookie?: string;
@@ -81,7 +85,6 @@ op logout():
 @extension("x-milestone", "M0")
 @route("/api/v1/auth/me")
 @get
-@useAuth(ApiKeyAuth<ApiKeyLocation.cookie, "meridian_session">)
 op getMe():
   | Me
   | {

@@ -181,6 +181,15 @@ views:
         focusServiceId: {type: [string, 'null'], format: uuid}
         focusDepth: {type: integer, minimum: 1, maximum: 3, default: 1}
 
+  - id: erd
+    nameKey: view.erd
+    milestone: M4
+    mount: component
+    component: ErdView
+    input: {mode: single, kinds: [dbschema]}
+    defaultOptions: {}
+    optionsSchema: {type: object, additionalProperties: false}
+
   - id: catalog-dashboard
     nameKey: view.catalogDashboard
     milestone: M4

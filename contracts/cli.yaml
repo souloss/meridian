@@ -72,6 +72,7 @@ commands:
       localDevelopmentOptOutFlag: --insecure-cookies
       optOutAddressRequirement: explicit-loopback-host
       optOutProductionUse: forbidden
+      cookiePurpose: refresh-token-cookie-only-access-token-travels-in-authorization-header
   admin:
     milestone: M0
     audience: operator

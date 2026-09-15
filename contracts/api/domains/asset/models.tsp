@@ -24,22 +24,6 @@ enum SourceMode {
   ai,
 }
 
-/** identifies one supported config source value. */
-enum ConfigSource {
-  db_manual,
-  repo_file,
-  repo_bootstrap,
-}
-
-/** represents field source data exchanged through the Meridian API. */
-model FieldSource {
-  /** specifies the pointer associated with this field source. */
-  pointer: string;
-
-  /** contains the config source associated with this field source. */
-  source: ConfigSource;
-}
-
 /** represents asset kind data exchanged through the Meridian API. */
 model AssetKind {
   /** uniquely identifies this resource. */
@@ -149,12 +133,6 @@ model SourceSpec {
 
   /** indicates whether enabled applies to this source spec. */
   enabled: boolean;
-
-  /** contains the config source associated with this source spec. */
-  configOrigin: ConfigSource;
-
-  /** contains the ordered config field sources associated with this source spec. */
-  configFieldSources: FieldSource[];
 
   /** specifies the last error associated with this source spec. */
   lastError: string | null;
@@ -836,5 +814,3 @@ model PublicAsset {
   /** is the RFC 3339 UTC instant when this resource was last updated. */
   updatedAt: Timestamp;
 }
-
-/** carries the anti-forgery token bound to the current cookie session. */

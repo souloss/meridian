@@ -1149,36 +1149,6 @@ paths:
       x-idempotency:
         mode: optional
         ttlHours: 24
-  /api/v1/auth/csrf:
-    get:
-      operationId: getCsrfToken
-      description: Returns a CSRF token bound to the current authenticated browser session.
-      parameters: []
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CsrfToken'
-        '401':
-          description: Access is unauthorized.
-          headers:
-            X-Request-Id:
-              required: false
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-      - Auth
-      security:
-      - cookieSession: []
-      x-milestone: M0
-      x-permissions: []
-      x-tenant-scope: identity
   /api/v1/auth/login:
     post:
       operationId: login
@@ -1240,7 +1210,7 @@ paths:
   /api/v1/auth/logout:
     post:
       operationId: logout
-      description: Revokes the current browser session and clears its session cookie.
+      description: Revokes the refresh token and clears its cookie; the client discards the access token in memory.
       parameters: []
       responses:
         '204':
@@ -1275,7 +1245,7 @@ paths:
       tags:
       - Auth
       security:
-      - cookieSession: []
+      - refreshCookie: []
       x-milestone: M0
       x-idempotency:
         mode: optional
@@ -1307,8 +1277,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       tags:
       - Auth
-      security:
-      - cookieSession: []
       x-milestone: M0
       x-permissions: []
       x-tenant-scope: identity
@@ -1387,6 +1355,43 @@ paths:
       x-idempotency:
         mode: optional
         ttlHours: 24
+      x-permissions: []
+      x-tenant-scope: identity
+  /api/v1/auth/refresh:
+    post:
+      operationId: refresh
+      description: Exchanges the HttpOnly refresh cookie for a fresh access token, rotating the refresh token.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Set-Cookie:
+              required: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResult'
+        '401':
+          description: Access is unauthorized.
+          headers:
+            X-Request-Id:
+              required: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - Auth
+      security:
+      - refreshCookie: []
+      x-milestone: M0
+      x-idempotency:
+        mode: none
       x-permissions: []
       x-tenant-scope: identity
   /api/v1/content/{token}:
@@ -2010,6 +2015,37 @@ paths:
       x-permissions:
       - asset:read
       x-tenant-scope: tenant
+  /api/v1/t/{tenantSlug}/assets/{assetId}/layer-contents:
+    get:
+      operationId: listAssetLayerContents
+      description: Returns the effective contents of every layer for an asset in one batch, for preview and rendering.
+      parameters:
+      - $ref: '#/components/parameters/TenantSlug'
+      - $ref: '#/components/parameters/AssetId'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetLayerContents'
+        '404':
+          description: The server cannot find the requested resource.
+          headers:
+            X-Request-Id:
+              required: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - Layer
+      x-milestone: M2
+      x-permissions:
+      - layer:read
+      x-tenant-scope: tenant
   /api/v1/t/{tenantSlug}/assets/{assetId}/layers/order:
     put:
       operationId: reorderAssetLayers
@@ -2124,6 +2160,56 @@ paths:
       x-milestone: M1
       x-permissions:
       - asset:read
+      x-tenant-scope: tenant
+  /api/v1/t/{tenantSlug}/assets/{assetId}/views:preview:
+    post:
+      operationId: previewAssetView
+      description: Previews a layer selection and optional draft layers using the real merge engine without persisting anything.
+      parameters:
+      - $ref: '#/components/parameters/TenantSlug'
+      - $ref: '#/components/parameters/AssetId'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ViewPreviewResult'
+        '404':
+          description: The server cannot find the requested resource.
+          headers:
+            X-Request-Id:
+              required: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Client error
+          headers:
+            X-Request-Id:
+              required: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - View
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ViewPreviewRequest'
+      x-milestone: M2
+      x-idempotency:
+        mode: none
+      x-permissions:
+      - layer:read
       x-tenant-scope: tenant
   /api/v1/t/{tenantSlug}/assets/{assetId}:ai-generate:
     post:
@@ -5518,87 +5604,6 @@ paths:
       x-idempotency:
         mode: optional
         ttlHours: 24
-  /api/v1/t/{tenantSlug}/services/{serviceSlug}/access:
-    get:
-      operationId: getServiceAccess
-      description: Returns the selected service access within the authorized request scope.
-      parameters:
-      - $ref: '#/components/parameters/TenantSlug'
-      - $ref: '#/components/parameters/ServiceSlug'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceAccess'
-        '404':
-          description: The server cannot find the requested resource.
-          headers:
-            X-Request-Id:
-              required: false
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-      - Service
-      x-milestone: M0
-      x-permissions:
-      - service:manage_members
-      x-tenant-scope: tenant
-    put:
-      operationId: putServiceAccess
-      description: Creates or replaces the selected service access within the authorized request scope.
-      parameters:
-      - $ref: '#/components/parameters/TenantSlug'
-      - $ref: '#/components/parameters/ServiceSlug'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceAccess'
-        '404':
-          description: The server cannot find the requested resource.
-          headers:
-            X-Request-Id:
-              required: false
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: The request conflicts with the current state of the server.
-          headers:
-            X-Request-Id:
-              required: false
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-      - Service
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ServiceAccessPutRequest'
-      x-milestone: M0
-      x-permissions:
-      - service:manage_members
-      x-tenant-scope: tenant
-      x-idempotency:
-        mode: optional
-        ttlHours: 24
   /api/v1/t/{tenantSlug}/services/{serviceSlug}/assets:ai-generate:
     post:
       operationId: generateMissingAssetWithAi
@@ -5831,64 +5836,6 @@ paths:
         ttlHours: 24
       x-permissions:
       - layer:edit
-      x-tenant-scope: tenant
-  /api/v1/t/{tenantSlug}/services/{serviceSlug}:resolve-drift:
-    post:
-      operationId: resolveServiceDrift
-      description: Resolves service drift within the authorized request scope.
-      parameters:
-      - $ref: '#/components/parameters/TenantSlug'
-      - $ref: '#/components/parameters/ServiceSlug'
-      - $ref: '#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          description: The request has succeeded.
-          headers:
-            etag:
-              required: false
-              description: Opaque resource revision token. Clients must echo it unchanged in If-Match.
-              schema:
-                $ref: '#/components/schemas/ETag'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Service'
-        '404':
-          description: The server cannot find the requested resource.
-          headers:
-            X-Request-Id:
-              required: false
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: The request conflicts with the current state of the server.
-          headers:
-            X-Request-Id:
-              required: false
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-      - Service
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DriftResolutionRequest'
-      x-milestone: M2
-      x-idempotency:
-        mode: required
-        ttlHours: 24
-      x-permissions:
-      - service:write
       x-tenant-scope: tenant
   /api/v1/t/{tenantSlug}/services/{serviceSlug}:star:
     post:
@@ -7806,8 +7753,7 @@ paths:
       x-permissions: []
       x-tenant-scope: public
 security:
-- cookieSession: []
-- patBearer: []
+- bearerAuth: []
 components:
   parameters:
     AssetId:
@@ -8522,6 +8468,21 @@ components:
           type: boolean
           description: indicates whether enabled applies to this asset kind patch request.
       description: defines validated input for the corresponding Meridian API operation.
+    AssetLayerContents:
+      type: object
+      required:
+      - assetId
+      - layers
+      properties:
+        assetId:
+          $ref: '#/components/schemas/Uuid'
+          description: uniquely identifies this resource.
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/LayerContent'
+          description: contains the ordered layers associated with this asset layer contents.
+      description: contains one batch of layer contents for all layers of an asset.
     AssetName:
       type: string
       pattern: ^[a-z0-9][a-z0-9-]{0,63}$
@@ -8937,9 +8898,10 @@ components:
       required:
       - id
       - assetVersionId
-      - assigneeId
+      - serviceId
       - status
       - summary
+      - ackedBy
       - comment
       - createdAt
       - acknowledgedAt
@@ -8950,15 +8912,20 @@ components:
         assetVersionId:
           $ref: '#/components/schemas/Uuid'
           description: contains the uuid associated with this breaking todo.
-        assigneeId:
+        serviceId:
           $ref: '#/components/schemas/Uuid'
-          description: contains the uuid associated with this breaking todo.
+          description: identifies the service associated with this resource.
         status:
           $ref: '#/components/schemas/TodoStatus'
           description: is the current lifecycle or processing state.
         summary:
           $ref: '#/components/schemas/DiffCounts'
           description: contains the diff counts associated with this breaking todo.
+        ackedBy:
+          oneOf:
+          - $ref: '#/components/schemas/Uuid'
+          - type: 'null'
+          description: contains the user id that acknowledged this breaking todo.
         comment:
           anyOf:
           - type: string
@@ -9152,51 +9119,17 @@ components:
             $ref: '#/components/schemas/Comment'
           description: contains the ordered items associated with this comment page.
       description: contains one paginated page of comment records.
-    ConfigFieldDiff:
-      type: object
-      required:
-      - pointer
-      - databaseValue
-      - fileValue
-      - source
-      properties:
-        pointer:
-          type: string
-          description: specifies the pointer associated with this config field diff.
-        databaseValue:
-          description: specifies the database value associated with this config field diff.
-        fileValue:
-          description: specifies the file value associated with this config field diff.
-        source:
-          $ref: '#/components/schemas/ConfigSource'
-          description: contains the config source associated with this config field diff.
-      description: represents config field diff data exchanged through the Meridian API.
     ConfigImportApplyRequest:
       type: object
       required:
       - configDigest
-      - defaultResolution
       properties:
         configDigest:
           type: string
           description: is the lowercase SHA-256 digest of the normalized configuration.
-        defaultResolution:
-          type: string
-          enum:
-          - keep_db
-          - take_file
-          description: specifies the default resolution associated with this config import apply request.
         replaceAiBases:
           type: boolean
           description: Explicitly applies the domain baseReplacement transaction for matching repository bases.
-        fieldResolutions:
-          type: object
-          unevaluatedProperties:
-            type: string
-            enum:
-            - keep_db
-            - take_file
-          description: specifies the field resolutions associated with this config import apply request.
       description: defines validated input for the corresponding Meridian API operation.
     ConfigImportPreview:
       type: object
@@ -9207,7 +9140,6 @@ components:
       - configDigest
       - services
       - sources
-      - drift
       - expiresAt
       properties:
         previewId:
@@ -9232,11 +9164,6 @@ components:
           items:
             $ref: '#/components/schemas/SourceSpec'
           description: contains the ordered sources associated with this config import preview.
-        drift:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConfigFieldDiff'
-          description: contains the ordered drift associated with this config import preview.
         expiresAt:
           $ref: '#/components/schemas/Timestamp'
           description: is the RFC 3339 UTC instant after which this value is invalid.
@@ -9286,13 +9213,6 @@ components:
             $ref: '#/components/schemas/Uuid'
           description: contains the ordered source spec ids associated with this config import result.
       description: reports the result of the corresponding Meridian operation.
-    ConfigSource:
-      type: string
-      enum:
-      - db_manual
-      - repo_file
-      - repo_bootstrap
-      description: identifies one supported config source value.
     ConnectionTest:
       type: object
       required:
@@ -9584,16 +9504,6 @@ components:
           type: boolean
           description: indicates whether deduplicated applies to this credential sync job.
       description: represents credential sync job data exchanged through the Meridian API.
-    CsrfToken:
-      type: object
-      required:
-      - csrfToken
-      properties:
-        csrfToken:
-          type: string
-          minLength: 32
-          description: binds a state-changing browser request to the current session.
-      description: carries the anti-forgery token bound to the current cookie session.
     DashboardViewResolution:
       type: object
       required:
@@ -10027,53 +9937,38 @@ components:
       - layer.approved
       - layer.rejected
       description: identifies one supported domain event type value.
-    DriftInfo:
+    DraftLayerInput:
       type: object
       required:
-      - hasDrift
-      - fields
-      - fileCommit
+      - role
+      - origin
+      - ord
+      - content
+      - contentType
       properties:
-        hasDrift:
-          type: boolean
-          description: indicates whether drift applies to this drift info.
-        fields:
-          type: array
-          items:
-            $ref: '#/components/schemas/FieldSource'
-          description: contains the ordered fields associated with this drift info.
-        fileCommit:
+        role:
+          $ref: '#/components/schemas/LayerRole'
+          description: specifies the layer role associated with this draft layer input.
+        origin:
+          $ref: '#/components/schemas/LayerOrigin'
+          description: specifies the layer origin associated with this draft layer input.
+        dialect:
           anyOf:
           - type: string
           - type: 'null'
-          description: specifies the file commit associated with this drift info.
-      description: represents drift info data exchanged through the Meridian API.
-    DriftResolutionRequest:
-      type: object
-      required:
-      - configDigest
-      - resolution
-      properties:
-        configDigest:
+          description: specifies the dialect associated with this draft layer input.
+        ord:
+          type: integer
+          minimum: 0
+          description: specifies the ord associated with this draft layer input.
+        content:
           type: string
-          description: is the lowercase SHA-256 digest of the normalized configuration.
-        resolution:
-          type: string
-          enum:
-          - keep_db
-          - take_file
-          - ignore
-          description: specifies the resolution associated with this drift resolution request.
-        fields:
-          type: object
-          unevaluatedProperties:
-            type: string
-            enum:
-            - keep_db
-            - take_file
-            - ignore
-          description: specifies the fields associated with this drift resolution request.
-      description: defines validated input for the corresponding Meridian API operation.
+          maxLength: 1048576
+          description: contains the content associated with this draft layer input.
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+          description: contains the content type associated with this draft layer input.
+      description: represents an inline draft layer that participates in preview without being persisted.
     ETag:
       type: string
       minLength: 3
@@ -10084,7 +9979,6 @@ components:
       type: string
       enum:
       - unauthenticated
-      - csrf_invalid
       - not_found
       - validation_error
       - asset_path_not_found
@@ -10208,19 +10102,6 @@ components:
           description: specifies the known host policy associated with this fetch config.
           default: strict
       description: represents fetch config data exchanged through the Meridian API.
-    FieldSource:
-      type: object
-      required:
-      - pointer
-      - source
-      properties:
-        pointer:
-          type: string
-          description: specifies the pointer associated with this field source.
-        source:
-          $ref: '#/components/schemas/ConfigSource'
-          description: contains the config source associated with this field source.
-      description: represents field source data exchanged through the Meridian API.
     GitPushWebhook:
       type: object
       required:
@@ -11066,6 +10947,46 @@ components:
           $ref: '#/components/schemas/Timestamp'
           description: is the RFC 3339 UTC instant when this resource was last updated.
       description: represents layer data exchanged through the Meridian API.
+    LayerContent:
+      type: object
+      required:
+      - layerId
+      - assetId
+      - role
+      - origin
+      - ord
+      - effectiveRevision
+      - content
+      - contentType
+      properties:
+        layerId:
+          $ref: '#/components/schemas/Uuid'
+          description: uniquely identifies this resource.
+        assetId:
+          $ref: '#/components/schemas/Uuid'
+          description: identifies the asset associated with this resource.
+        role:
+          $ref: '#/components/schemas/LayerRole'
+          description: contains the layer role associated with this layer content.
+        origin:
+          $ref: '#/components/schemas/LayerOrigin'
+          description: contains the layer origin associated with this layer content.
+        ord:
+          type: integer
+          minimum: 0
+          description: specifies the ord associated with this layer content.
+        effectiveRevision:
+          oneOf:
+          - $ref: '#/components/schemas/LayerRevision'
+          - type: 'null'
+          description: contains the effective revision associated with this layer content.
+        content:
+          type: string
+          description: contains the content associated with this layer content.
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+          description: contains the content type associated with this layer content.
+      description: returns one layer's effective content and metadata for preview and rendering.
     LayerHead:
       type: object
       required:
@@ -11464,16 +11385,22 @@ components:
       type: object
       required:
       - me
-      - csrfToken
+      - accessToken
+      - expiresInSeconds
       properties:
         me:
           $ref: '#/components/schemas/Me'
           description: contains the authenticated user, memberships, and platform role.
-        csrfToken:
+        accessToken:
           type: string
-          minLength: 32
-          description: binds a state-changing browser request to the current session.
-      description: returns the authenticated principal and the initial session-bound CSRF token.
+          minLength: 16
+          description: is the short-lived access token the client sends in the Authorization header.
+        expiresInSeconds:
+          type: integer
+          minimum: 60
+          description: is the access token lifetime in seconds; the client refreshes before this elapses.
+      description: returns the authenticated principal and a short-lived access token. The refresh token is delivered as an
+        HttpOnly cookie.
     Me:
       type: object
       required:
@@ -12603,6 +12530,21 @@ components:
       - branch
       - tag
       description: identifies one supported ref type value.
+    RefreshResult:
+      type: object
+      required:
+      - accessToken
+      - expiresInSeconds
+      properties:
+        accessToken:
+          type: string
+          minLength: 16
+          description: is the newly issued short-lived access token.
+        expiresInSeconds:
+          type: integer
+          minimum: 60
+          description: is the access token lifetime in seconds.
+      description: returns a fresh access token after silent refresh.
     Repository:
       type: object
       required:
@@ -13362,10 +13304,10 @@ components:
       - lifecycle
       - repository
       - owners
+      - maintainers
       - tags
       - assets
       - missingKinds
-      - drift
       - capabilities
       - starred
       - createdAt
@@ -13417,6 +13359,9 @@ components:
         owners:
           $ref: '#/components/schemas/OwnerRefs'
           description: contains the owner refs associated with this service.
+        maintainers:
+          $ref: '#/components/schemas/OwnerRefs'
+          description: contains the maintainer refs associated with this service.
         tags:
           type: array
           items:
@@ -13432,9 +13377,6 @@ components:
           items:
             $ref: '#/components/schemas/MissingKind'
           description: contains the ordered missing kinds associated with this service.
-        drift:
-          $ref: '#/components/schemas/DriftInfo'
-          description: contains the drift info associated with this service.
         capabilities:
           $ref: '#/components/schemas/CapabilityListItem'
           description: lists actions the authenticated principal may perform on this resource.
@@ -13448,32 +13390,6 @@ components:
           $ref: '#/components/schemas/Timestamp'
           description: is the RFC 3339 UTC instant when this resource was last updated.
       description: represents service data exchanged through the Meridian API.
-    ServiceAccess:
-      type: object
-      required:
-      - grants
-      - updatedAt
-      properties:
-        grants:
-          type: array
-          items:
-            $ref: '#/components/schemas/ServiceGrant'
-          description: contains the ordered grants associated with this service access.
-        updatedAt:
-          $ref: '#/components/schemas/Timestamp'
-          description: is the RFC 3339 UTC instant when this resource was last updated.
-      description: represents service access data exchanged through the Meridian API.
-    ServiceAccessPutRequest:
-      type: object
-      required:
-      - grants
-      properties:
-        grants:
-          type: array
-          items:
-            $ref: '#/components/schemas/ServiceGrant'
-          description: contains the ordered grants associated with this service access put request.
-      description: defines validated input for the corresponding Meridian API operation.
     ServiceAiGenerateRequest:
       type: object
       required:
@@ -13528,6 +13444,9 @@ components:
         owners:
           $ref: '#/components/schemas/OwnerRefs'
           description: contains the owner refs associated with this service create request.
+        maintainers:
+          $ref: '#/components/schemas/OwnerRefs'
+          description: contains the maintainer refs associated with this service create request.
         tagIds:
           type: array
           items:
@@ -13541,36 +13460,6 @@ components:
           format: repository-relative-path
           description: Null or omitted means repository root and is stored as an empty rootDir.
       description: defines validated input for the corresponding Meridian API operation.
-    ServiceGrant:
-      type: object
-      required:
-      - principalType
-      - principalId
-      - role
-      - permissions
-      properties:
-        principalType:
-          type: string
-          enum:
-          - user
-          - team
-          description: specifies the principal type associated with this service grant.
-        principalId:
-          $ref: '#/components/schemas/Uuid'
-          description: contains the uuid associated with this service grant.
-        role:
-          $ref: '#/components/schemas/ServiceRole'
-          description: contains the service role associated with this service grant.
-        permissions:
-          type: array
-          items:
-            type: string
-            enum:
-            - layer:edit
-            - layer:approve
-            - asset:publish
-          description: contains the ordered permissions associated with this service grant.
-      description: represents service grant data exchanged through the Meridian API.
     ServiceList:
       type: object
       required:
@@ -13632,6 +13521,9 @@ components:
         owners:
           $ref: '#/components/schemas/OwnerRefs'
           description: contains the owner refs associated with this service patch request.
+        maintainers:
+          $ref: '#/components/schemas/OwnerRefs'
+          description: contains the maintainer refs associated with this service patch request.
         tagIds:
           type: array
           items:
@@ -13655,13 +13547,6 @@ components:
           type: string
           description: specifies the display name associated with this service ref.
       description: represents service ref data exchanged through the Meridian API.
-    ServiceRole:
-      type: string
-      enum:
-      - owner
-      - maintainer
-      - viewer
-      description: identifies one supported service role value.
     ServiceVisibility:
       type: string
       enum:
@@ -13985,8 +13870,6 @@ components:
       - timeoutSec
       - branchPatterns
       - enabled
-      - configOrigin
-      - configFieldSources
       - lastError
       - lastRun
       - bindingsCount
@@ -14049,14 +13932,6 @@ components:
         enabled:
           type: boolean
           description: indicates whether enabled applies to this source spec.
-        configOrigin:
-          $ref: '#/components/schemas/ConfigSource'
-          description: contains the config source associated with this source spec.
-        configFieldSources:
-          type: array
-          items:
-            $ref: '#/components/schemas/FieldSource'
-          description: contains the ordered config field sources associated with this source spec.
         lastError:
           anyOf:
           - type: string
@@ -14412,7 +14287,6 @@ components:
       required:
       - id
       - etag
-      - parentId
       - slug
       - displayName
       - description
@@ -14427,11 +14301,6 @@ components:
         etag:
           $ref: '#/components/schemas/ETag'
           description: is the opaque entity tag required for optimistic concurrency control.
-        parentId:
-          oneOf:
-          - $ref: '#/components/schemas/Uuid'
-          - type: 'null'
-          description: specifies the parent id associated with this system group.
         slug:
           $ref: '#/components/schemas/Slug'
           description: contains the slug associated with this system group.
@@ -14478,11 +14347,6 @@ components:
           - type: 'null'
           maxLength: 2000
           description: specifies the description associated with this system group create request.
-        parentId:
-          oneOf:
-          - $ref: '#/components/schemas/Uuid'
-          - type: 'null'
-          description: specifies the parent id associated with this system group create request.
         serviceIds:
           type: array
           items:
@@ -14525,11 +14389,6 @@ components:
           - type: 'null'
           maxLength: 2000
           description: specifies the description associated with this system group patch request.
-        parentId:
-          oneOf:
-          - $ref: '#/components/schemas/Uuid'
-          - type: 'null'
-          description: specifies the parent id associated with this system group patch request.
       description: defines validated input for the corresponding Meridian API operation.
     Tag:
       type: object
@@ -15608,6 +15467,50 @@ components:
           unevaluatedProperties: {}
           description: specifies the default options associated with this view override value.
       description: represents view override value data exchanged through the Meridian API.
+    ViewPreviewRequest:
+      type: object
+      required:
+      - enabledLayerIds
+      - contentType
+      properties:
+        enabledLayerIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/Uuid'
+          description: contains the ordered enabled layer ids associated with this view preview request.
+        draftLayers:
+          type: array
+          items:
+            $ref: '#/components/schemas/DraftLayerInput'
+          description: contains the ordered draft layers associated with this view preview request.
+          default: []
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+          description: specifies the content type associated with this view preview request.
+      description: Frontend selects which layers to merge and may add inline draft layers; the backend runs the same merge
+        engine and returns the result without persisting anything.
+    ViewPreviewResult:
+      type: object
+      required:
+      - mergedContent
+      - mediaType
+      - provenance
+      - engineVersion
+      properties:
+        mergedContent:
+          type: string
+          description: contains the merged content associated with this view preview result.
+        mediaType:
+          type: string
+          description: specifies the media type associated with this view preview result.
+        provenance:
+          type: object
+          unevaluatedProperties: {}
+          description: contains the provenance associated with this view preview result.
+        engineVersion:
+          type: string
+          description: specifies the engine version associated with this view preview result.
+      description: returns the merged preview result inline; nothing is persisted.
     ViewResolution:
       type: object
       oneOf:
@@ -15649,14 +15552,14 @@ components:
           description: specifies the options associated with this view resolve request.
       description: Input arity and kind constraints are validated from the selected entry in views.yaml.
   securitySchemes:
-    cookieSession:
-      type: apiKey
-      in: cookie
-      name: meridian_session
-      description: Unsafe browser requests additionally require X-CSRF-Token.
-    patBearer:
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: pat_
+      description: Short-lived JWT access token in the Authorization header.
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: meridian_refresh
+      description: HttpOnly refresh cookie used only by /auth/refresh and /auth/logout.
 servers:
 - url: /

@@ -303,9 +303,6 @@ model SystemGroup {
   /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
 
-  /** specifies the parent id associated with this system group. */
-  @oneOf parentId: Uuid | null;
-
   /** contains the slug associated with this system group. */
   slug: Slug;
 
@@ -345,9 +342,6 @@ model SystemGroupCreateRequest {
   /** specifies the description associated with this system group create request. */
   @maxLength(2000) description?: string | null;
 
-  /** specifies the parent id associated with this system group create request. */
-  @oneOf parentId?: Uuid | null;
-
   /** contains the ordered service ids associated with this system group create request. */
   serviceIds?: Uuid[];
 }
@@ -359,9 +353,6 @@ model SystemGroupPatchRequest {
 
   /** specifies the description associated with this system group patch request. */
   @maxLength(2000) description?: string | null;
-
-  /** specifies the parent id associated with this system group patch request. */
-  @oneOf parentId?: Uuid | null;
 }
 
 /** defines validated input for the corresponding Meridian API operation. */
@@ -383,4 +374,52 @@ model PublicViewResolveRequest {
 
   /** specifies the options associated with this public view resolve request. */
   options?: Record<unknown>;
+}
+
+/** represents an inline draft layer that participates in preview without being persisted. */
+model DraftLayerInput {
+  /** specifies the layer role associated with this draft layer input. */
+  role: LayerRole;
+
+  /** specifies the layer origin associated with this draft layer input. */
+  origin: LayerOrigin;
+
+  /** specifies the dialect associated with this draft layer input. */
+  dialect?: string | null;
+
+  /** specifies the ord associated with this draft layer input. */
+  @minValue(0) ord: integer;
+
+  /** contains the content associated with this draft layer input. */
+  @maxLength(1048576) content: string;
+
+  /** contains the content type associated with this draft layer input. */
+  contentType: ContentType;
+}
+
+/** Frontend selects which layers to merge and may add inline draft layers; the backend runs the same merge engine and returns the result without persisting anything. */
+model ViewPreviewRequest {
+  /** contains the ordered enabled layer ids associated with this view preview request. */
+  enabledLayerIds: Uuid[];
+
+  /** contains the ordered draft layers associated with this view preview request. */
+  draftLayers?: DraftLayerInput[] = #[];
+
+  /** specifies the content type associated with this view preview request. */
+  contentType: ContentType;
+}
+
+/** returns the merged preview result inline; nothing is persisted. */
+model ViewPreviewResult {
+  /** contains the merged content associated with this view preview result. */
+  mergedContent: string;
+
+  /** specifies the media type associated with this view preview result. */
+  mediaType: string;
+
+  /** contains the provenance associated with this view preview result. */
+  provenance: Record<unknown>;
+
+  /** specifies the engine version associated with this view preview result. */
+  engineVersion: string;
 }

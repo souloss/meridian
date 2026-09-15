@@ -22,9 +22,7 @@ fixtures:
     carol:
       tenant: acme
       role: viewer
-      serviceGrants:
-        order-service: {role: viewer, permissions: [layer:approve]}
-        pay-service: {role: viewer, permissions: [layer:approve]}
+      serviceOwnerOf: [order-service, pay-service]
     eve: {tenant: rival, role: viewer}
   repositories:
     fixture-repo-a:
@@ -115,16 +113,15 @@ stories:
       - first-release-track-diff-baseline-is-default-current-else-latest
       - release-diff-has-one-breaking-removed-operation
       - snapshot-share-is-frozen-and-read-only
-      - one-todo-per-expanded-owner-user
+      - one-service-todo-per-version
   US-07:
     fixture: standard
     milestone: M2
-    operations: [previewRepositoryConfigImport, applyRepositoryConfigImport, resolveServiceDrift]
+    operations: [previewRepositoryConfigImport, applyRepositoryConfigImport]
     assertions:
       - preview-and-apply-use-the-same-commit-and-config-digest
-      - repository-sync-never-overwrites-db-manual-fields
-      - ignored-file-digest-is-shown-again-only-after-file-content-changes
-      - repository-root-dot-normalizes-to-empty-service-root-without-drift
+      - import-only-creates-or-updates-previewed-resources
+      - repository-root-dot-normalizes-to-empty-service-root
   US-08:
     fixture: standard
     milestone: M4
@@ -211,7 +208,7 @@ smokeSuite:
             httpStatus: 200
             response:
               me: {user: alice, tenantsContains: [{slug: acme, role: tenant_admin}]}
-              csrfToken: present
+              accessToken: present
           - operationId: getMe
             httpStatus: 200
             response: {tenantsContains: [acme], disabledTenantsExcluded: true}
@@ -531,8 +528,8 @@ smokeSuite:
       expected:
         operation: {operationId: listBreakingTodos, httpStatus: 200}
         creation:
-          oneTodoPerExpandedOwnerUser: true
-          uniquenessKey: assetVersionId-plus-assigneeUserId
+          oneServiceTodoPerVersion: true
+          uniquenessKey: assetVersionId-plus-serviceId
           duplicateIndexOrRetryCreatesNoAdditionalTodo: true
         acknowledgement:
           operationId: acknowledgeBreakingTodo
@@ -700,7 +697,7 @@ smokeSuite:
     SMK-028:
       milestone: M2
       story: US-07
-      assertion: field-level-gitops-drift
+      assertion: config-import-preview-apply
       expected:
         preview:
           operationId: previewRepositoryConfigImport
@@ -711,13 +708,8 @@ smokeSuite:
           httpStatus: 200
           sameCommitAndConfigDigestAsPreview: true
         authority:
-          repoFileFieldsUpdated: true
-          dbManualFieldsOverwritten: false
-        drift:
-          changedFileProducesDrift: true
-          ignore: {digestPersisted: true, shownAgainOnlyWhenDigestChanges: true}
-          takeFile: {repoFieldBecomesAuthoritative: true}
-          keepDb: {dbManualFieldPreserved: true}
+          databaseRemainsAuthoritative: true
+          manualEditNotSilentlyOverwritten: true
     SMK-029:
       milestone: M0
       story: US-02
@@ -864,7 +856,7 @@ smokeSuite:
         canonicalization:
           algorithm: SHA-256-over-RFC8785-JCS
           includes: [operationId, pathParameters, sortedQueryPairs, ifMatchWhenPresent, parsedJsonBody]
-          excludes: [authorization, cookie, csrf, requestId, idempotencyKey]
+          excludes: [authorization, cookie, requestId, idempotencyKey]
     SMK-037:
       milestone: M1
       story: US-02
@@ -876,7 +868,7 @@ smokeSuite:
           serviceSourceLayerAssetDeletedAt: set
           sourceBindings: stale-with-last-resolved-path-retained
           tracks: {active: false, desiredGenerationIncremented: true}
-          removedRelations: [serviceGrants, stars, recents, tags, systemGroupMemberships]
+          removedRelations: [stars, recents, tags, systemGroupMemberships]
           comments: soft-deleted
           subscriptions: disabled
         jobs:
@@ -901,7 +893,6 @@ smokeSuite:
           operationId: applyRepositoryConfigImport
           httpStatus: 200
           serviceRootDir: ''
-        nextSyncDriftForRoot: false
     SMK-039:
       milestone: M5
       story: US-11

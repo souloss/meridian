@@ -69,13 +69,15 @@ migrations                 goose SQL 与 sqlc 查询源
 
 ## 3. 身份、租户与授权
 
-- 浏览器使用 `meridian_session` HttpOnly cookie；所有 cookie 写请求校验 CSRF token。
-- CLI/CI 使用 Bearer PAT；只存 token hash，明文只在创建时返回一次。
+- 浏览器登录颁发**短时 JWT access token**（内存持有、`Authorization: Bearer` 发送）与 **HttpOnly `meridian_refresh` Cookie**（仅 `/auth/refresh` 静默续期、每次轮换、可撤销）；access token 不随 cookie 自动携带，因此**不需要 CSRF 防护**。
+- CLI/CI 使用 Bearer PAT（`pat_` 前缀）；服务端按 token 区分 JWT 与 PAT；只存 token hash，明文只在创建时返回一次。
 - 未认证固定返回 401 `unauthenticated`。已认证但无权和资源不存在统一返回 404 `not_found`，避免资源探测。
 - 请求先解析 tenant slug，再校验 active membership，然后查询时强制带 `tenant_id`。不得先查资源再做租户过滤。
 - platform admin 只操作控制面；若没有同租户有效成员身份，不得读取租户业务正文。
 - capability 由服务端计算并随资源返回。前端隐藏按钮只是体验优化，不能代替后端鉴权。
 - 审计中凭证、PAT、webhook secret、仓库内正文、prompt 和生成内容都只记录标识、摘要与 hash。
+- 服务级权限由 `services.owners` / `services.maintainers` 直接表达（用户或团队引用），不再有 `service_grants` 表；owner 享有 `layer:approve`，maintainer 享有 `layer:edit`。
+- 浏览器无法自定义 `Authorization` 的场景（SSE 任务日志、签名下载、iframe 文档投递）使用**短时一次性签名 token**，与 JWT 正交、不引入 cookie。
 
 公开读取使用独立 `/api/v1/public/...` 路径，只允许 public Service 的 current published merged 内容与视图，不暴露 layer、revision、provenance、仓库、搜索和非 current 版本。
 
@@ -161,14 +163,13 @@ repo/command/AI 默认使用精确 ref scope，manual/push 默认 global。合�
 
 自动 diff 基线：同 Track 用 previous latest；非默认分支首版用同步开始时的默认分支 current，否则 default latest；默认分支首版无基线。基线 ID必须写入版本，后续不得随 head 漂移。
 
-## 6. GitOps、命令与 AI
+## 6. 配置导入、命令与 AI
 
-`.asset-platform.yaml` 必须通过 `repository-config.schema.yaml` 校验。数据库是运行时权威源，配置来源按 JSON Pointer 保存：
+`.asset-platform.yaml` 必须通过 `repository-config.schema.yaml` 校验。数据库是运行时唯一权威源，仓库文件只作显式导入来源（`ignore` / `import_once`）：
 
-- `repo_file` / `repo_bootstrap` 字段可被后续 sync 覆盖；
-- 页面人工编辑字段立即变成 `db_manual`，仓库不得静默覆盖；
-- preview 生成 `previewId + commit + configDigest`，apply 必须校验三者未漂移；
-- keep_db 保留数据库并记录人工来源；take_file 写入仓库值；ignore 绑定当前 file digest，仓库变化后漂移重新出现。
+- 导入采用 preview/apply 两阶段：preview 生成 `previewId + commit + configDigest`，apply 校验三者一致后才落库；
+- 导入只创建或更新预览中明确列出的资源，不做字段级来源标记、不做漂移检测；
+- 页面人工编辑直接改数据库，仓库导入不静默覆盖。
 
 command/AI 只允许平台管理员通过 `/api/v1/admin/producer-profiles` 维护的 producer profile，不接受业务请求传任意 shell。租户只能读取 `/api/v1/t/{tenantSlug}/producer-profiles` 返回的 enabled/available 安全元数据并按 ID 选择。AI/API 密钥由部署环境或 secret file 提供，profile 只能按名称选取部署白名单的环境变量；值不进入 API、数据库、审计或日志。worker 使用非 root UID 和镜像内固定路径 `/usr/bin/bwrap` 的 bubblewrap、只读仓库、独立空输出目录、默认断网和资源限额；bwrap 缺失时 profile 标记 unavailable，禁止降级为裸进程。每次执行写 completion manifest；缺 marker 时仅 `replay_safe` profile 可在新目录重试，否则结束为 `outcome_unknown`。
 
@@ -203,9 +204,9 @@ MVP blob 实现固定为 `domain.yaml#/storage/blobStore`：`MERIDIAN_BLOB_ROOT`
 4. CI 重新生成并断言工作区无差异；
 5. 以契约中的 examples 和 `acceptance.yaml` 生成 contract tests。
 
-全局错误体为 `{code,message,details?,requestId}`。列表使用 `page/pageSize`，排序使用 `sort/order`。资源写操作使用 `If-Match` 或显式 expected head；可重试副作用使用 `Idempotency-Key`。内容超限返回 413 `content_too_large`，语义校验返回 422。
+全局错误体为 `{code,message,details?,requestId}`。列表使用 `page/pageSize`，排序使用 `sort/order`。资源写操作使用 `If-Match` 或显式 expected head；可重试副作用使用 `Idempotency-Key`。内容超限返回 413 `content_too_large`，语义校验返回 422。认证为 `Authorization: Bearer`（JWT access token 或 `pat_` PAT），浏览器凭据不再用 cookie 承载，无 CSRF header。
 
-长任务统一返回 202 JobAccepted。数据库状态是事实源；前端同时使用 Job 状态查询和持久化日志 SSE。SSE 必须支持状态快照、持久 sequence、`Last-Event-ID` 断线重放、15 秒 heartbeat 和终态后关闭；断线时先按游标重连，无法恢复时退化为状态轮询。
+长任务统一返回 202 JobAccepted。数据库状态是事实源；前端同时使用 Job 状态查询和持久化日志 SSE。SSE 无法携带 `Authorization` header，改由**短时一次性签名 token**（查询串）认证；仍支持状态快照、持久 sequence、`Last-Event-ID` 断线重放、15 秒 heartbeat 和终态后关闭；断线时先按游标重连，无法恢复时退化为状态轮询。
 
 ## 9. 任务、并发与恢复
 
@@ -221,11 +222,11 @@ MVP blob 实现固定为 `domain.yaml#/storage/blobStore`：`MERIDIAN_BLOB_ROOT`
 
 Kind plugin 的 normalize/item/diff 接口和 built-in kind 规则在 `kinds.yaml`。首发先实现 openapi，M4-M5 再启用 asyncapi/dbschema/dependency；禁用 kind 不删除历史。
 
-View resolve 只接受 `views.yaml` 中的 InputDescriptor。后端校验 view、kind、scope 和版本访问权，返回短时签名内容 URL 或结构化数据。第三方 iframe 资源同源托管但使用严格 CSP 与 sandbox，不开放任意网络代理。
+View resolve 只接受 `views.yaml` 中的 InputDescriptor。后端校验 view、kind、scope 和版本访问权，返回短时签名内容 URL 或结构化数据。第三方 iframe 资源同源托管但使用严格 CSP 与 sandbox，不开放任意网络代理。临时预览走独立 `/views:preview`：前端提交层选择（含未落库草稿），后端用与落库相同的 merge 引擎算合并结果 + provenance 内联返回、不落库；层内容通过批量 `layer-contents` 端点一次取全。
 
 索引行必须带 tenant/service/asset/version/itemKey，查询第一条件是 tenant。高亮返回结构化片段，不返回服务端拼接 HTML。深链固定 assetId/versionId/itemKey，不能依赖 latest。
 
-breaking todo 唯一键为 `(assetVersionId, assigneeUserId)`。多个用户 owner 各一条。`version.published` 与 `version.breaking` 是两个独立事件和通知；webhook 至少一次投递，以 eventId 去重，签名和重试见 `events.yaml`。
+breaking todo 是服务级实体，唯一键 `(assetVersionId, serviceId)`，任何有权限的服务成员 ack 即关闭（行内记录 `ackedBy`/`ackedAt`），不做逐用户展开。`version.published` 与 `version.breaking` 是两个独立事件和通知；webhook 至少一次投递，以 eventId 去重，签名和重试见 `events.yaml`。
 
 ## 11. 实施顺序
 
@@ -233,9 +234,9 @@ breaking todo 唯一键为 `(assetVersionId, assigneeUserId)`。多个用户 own
 | --- | --- |
 | M0 | 契约校验/生成、数据库骨架、auth/tenant/RBAC、blob/job/audit/outbox |
 | M1 | repository/service/source、discover/sync、默认分支 Track、openapi normalize/index、public read |
-| M2 | LayerHead、manual overlay、provenance、rollback、字段级 GitOps |
+| M2 | LayerHead、manual overlay、provenance、rollback、临时开关层/草稿预览 |
 | M3 | AI producer/review、多 branch/tag Track UI、version lifecycle、diff/snapshot/share、breaking todo、CLI push/diff、最小通知 |
-| M4 | GitOps 完整漂移、dbschema/dependency、group/search/global views |
+| M4 | dbschema/dependency、group/search/global views |
 | M5 | 通用订阅/inbox/webhook、asyncapi、合规与运维加固 |
 
 每个里程碑只在 `acceptance.yaml` 映射的 AC、Smoke 和负向 API 用例全部通过后完成。测试 fixture 必须按场景独立建立，不允许依赖上一用户故事的残留状态。

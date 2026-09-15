@@ -351,3 +351,24 @@ op resolvePublicView(...Parameters.TenantSlug, @body body: PublicViewResolveRequ
       @header("X-Request-Id") XRequestId?: string;
       @body body: ErrorResponse;
     };
+
+/** Previews a layer selection and optional draft layers using the real merge engine without persisting anything. */
+@tag("View")
+@extension("x-tenant-scope", "tenant")
+@extension("x-permissions", #["layer:read"])
+@extension("x-idempotency", #{ mode: "none" })
+@extension("x-milestone", "M2")
+@route("/api/v1/t/{tenantSlug}/assets/{assetId}/views:preview")
+@post
+op previewAssetView(...Parameters.TenantSlug, ...Parameters.AssetId, @body body: ViewPreviewRequest):
+  | ViewPreviewResult
+  | {
+      @statusCode statusCode: 404;
+      @header("X-Request-Id") XRequestId?: string;
+      @body body: ErrorResponse;
+    }
+  | {
+      @statusCode statusCode: 422;
+      @header("X-Request-Id") XRequestId?: string;
+      @body body: ErrorResponse;
+    };

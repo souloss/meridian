@@ -1,6 +1,6 @@
 # Meridian 架构设计遗漏与优化建议 (Design Review & Refinements)
 
-> 状态：提案 (Proposed, 2026-09-06)
+> 状态：提案 (Proposed, 2026-09-06)；2026-09-15 对齐后：1.2 与 1.4 已采纳并落地到契约（见各节「决议」），其余条目维持待办。
 > 目的：记录 M0-M5 设计规范中发现的重大边界遗漏、分布式系统缺陷以及关键 UX 优化项。这些问题在实施前需得到明确决策与修正，避免引发后续返工。
 
 ## 1. 重大设计缺陷与遗漏 (Critical Defects & Omissions)
@@ -21,6 +21,8 @@
   - Todo 应作为 Team/Service 级别的业务实体进行分配，而非直接打散平铺至 Individual。
   - 引入**“认领（Claim）”**与**“共享完成”**机制。任何具备权限的成员确认 (Ack) 之后，该版本下的破坏性待办即转为关闭，其他人的看板应同步消隐。
 
+- **决议（2026-09-15，已采纳）**：`breaking_todos` 改为**服务级待办**，唯一键 `(asset_version_id, service_id)`；任何有权限的服务成员 ack 即关闭，行内记录 `acked_by`/`acked_at`。契约见 `domain.yaml.events.breakingTodos` 与 `storage.yaml.tables.breaking_todos`；逐用户展开（`assignee_id`）已移除。
+
 ### 1.3 AI Base 替换时的 Overlay 静默失效与漂移
 - **发现位置**: `00_development-readiness.md` (模糊点解释)
 - **问题描述**: 当无代码的服务使用了 AI 生成的 Base 后，再次接入 Repo 代码源码时，可通过 `replaceAiBase=true` 原子性地用代码替换 AI Base。
@@ -36,6 +38,8 @@
 - **修正要求**:
   - 如果约束 3 层，建议取消自引用的 `parentId`，采用两张独立实体表 `SystemDomain`（域）与 `SystemGroup`（系统），从数据结构上杜绝任意嵌套和深度扩散。
   - 明确规定 `Service` 与 `SystemGroup` 的映射是 M:N（多对多）还是 1:N（一对多），并在 `storage.yaml` 补充唯一约束和业务层 Check。
+
+- **决议（2026-09-15，已采纳）**：采用**单层 SystemGroup**（去 `parent_id` 自引用与递归 CTE），服务 M:N 挂多个组；「域」概念取消。契约见 `domain.yaml.systemGroups` 与 `storage.yaml.tables.system_groups`（已删 `parent_id` 列）。
 
 ## 2. 关键优化项 (Important Optimizations)
 

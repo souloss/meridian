@@ -269,4 +269,40 @@ model ReviewPage {
   items: ReviewContext[];
 }
 
+/** returns one layer's effective content and metadata for preview and rendering. */
+model LayerContent {
+  /** uniquely identifies this resource. */
+  layerId: Uuid;
+
+  /** identifies the asset associated with this resource. */
+  assetId: Uuid;
+
+  /** contains the layer role associated with this layer content. */
+  role: LayerRole;
+
+  /** contains the layer origin associated with this layer content. */
+  origin: LayerOrigin;
+
+  /** specifies the ord associated with this layer content. */
+  @minValue(0) ord: integer;
+
+  /** contains the effective revision associated with this layer content. */
+  @oneOf effectiveRevision: LayerRevision | null;
+
+  /** contains the content associated with this layer content. */
+  content: string;
+
+  /** contains the content type associated with this layer content. */
+  contentType: ContentType;
+}
+
+/** contains one batch of layer contents for all layers of an asset. */
+model AssetLayerContents {
+  /** uniquely identifies this resource. */
+  assetId: Uuid;
+
+  /** contains the ordered layers associated with this asset layer contents. */
+  layers: LayerContent[];
+}
+
 /** contains one paginated page of user records. */

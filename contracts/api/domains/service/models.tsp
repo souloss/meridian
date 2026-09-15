@@ -111,18 +111,6 @@ model MissingKind {
   canGenerateWithAi: boolean;
 }
 
-/** represents drift info data exchanged through the Meridian API. */
-model DriftInfo {
-  /** indicates whether drift applies to this drift info. */
-  hasDrift: boolean;
-
-  /** contains the ordered fields associated with this drift info. */
-  fields: FieldSource[];
-
-  /** specifies the file commit associated with this drift info. */
-  fileCommit: string | null;
-}
-
 /** represents service data exchanged through the Meridian API. */
 model Service {
   /** uniquely identifies this resource. */
@@ -161,6 +149,9 @@ model Service {
   /** contains the owner refs associated with this service. */
   owners: OwnerRefs;
 
+  /** contains the maintainer refs associated with this service. */
+  maintainers: OwnerRefs;
+
   /** contains the ordered tags associated with this service. */
   tags: Tag[];
 
@@ -169,9 +160,6 @@ model Service {
 
   /** contains the ordered missing kinds associated with this service. */
   missingKinds: MissingKind[];
-
-  /** contains the drift info associated with this service. */
-  drift: DriftInfo;
 
   /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityList;
@@ -193,27 +181,77 @@ model ServiceList {
 }
 
 /** defines validated input for the corresponding Meridian API operation. */
+model ServiceCreateRequest {
+  /** contains the slug associated with this service create request. */
+  slug: Slug;
+
+  /** specifies the display name associated with this service create request. */
+  @minLength(1) @maxLength(128) displayName: string;
+
+  /** specifies the description associated with this service create request. */
+  @maxLength(2000) description?: string | null;
+
+  /** specifies the visibility associated with this service create request. */
+  visibility?: ServiceVisibility;
+
+  /** contains the owner refs associated with this service create request. */
+  owners?: OwnerRefs;
+
+  /** contains the maintainer refs associated with this service create request. */
+  maintainers?: OwnerRefs;
+
+  /** contains the ordered tag ids associated with this service create request. */
+  tagIds?: Uuid[];
+
+  /** Null or omitted means repository root and is stored as an empty rootDir. */
+  @maxLength(512) @format("repository-relative-path") path?: string | null;
+}
+
+/** contains one paginated page of service records. */
+model ServicePage {
+  ...PageInfo;
+
+  /** contains the ordered items associated with this service page. */
+  items: Service[];
+}
+
+/** defines validated input for the corresponding Meridian API operation. */
+model ServicePatchRequest {
+  /** specifies the display name associated with this service patch request. */
+  @minLength(1) @maxLength(128) displayName?: string;
+
+  /** specifies the description associated with this service patch request. */
+  @maxLength(2000) description?: string | null;
+
+  /** contains the service visibility associated with this service patch request. */
+  visibility?: ServiceVisibility;
+
+  /** contains the lifecycle associated with this service patch request. */
+  lifecycle?: Lifecycle;
+
+  /** contains the owner refs associated with this service patch request. */
+  owners?: OwnerRefs;
+
+  /** contains the maintainer refs associated with this service patch request. */
+  maintainers?: OwnerRefs;
+
+  /** contains the ordered tag ids associated with this service patch request. */
+  tagIds?: Uuid[];
+}
+
+/** represents star state data exchanged through the Meridian API. */
+model StarState {
+  /** indicates whether starred applies to this star state. */
+  starred: boolean;
+}
+
+/** defines validated input for the corresponding Meridian API operation. */
 model ConfigImportPreviewRequest {
   /** contains the ref type associated with this config import preview request. */
   refType?: RefType;
 
   /** contains the ref name associated with this config import preview request. */
   ref?: RefName;
-}
-
-/** represents config field diff data exchanged through the Meridian API. */
-model ConfigFieldDiff {
-  /** specifies the pointer associated with this config field diff. */
-  pointer: string;
-
-  /** specifies the database value associated with this config field diff. */
-  databaseValue: unknown;
-
-  /** specifies the file value associated with this config field diff. */
-  fileValue: unknown;
-
-  /** contains the config source associated with this config field diff. */
-  source: ConfigSource;
 }
 
 /** represents config import preview data exchanged through the Meridian API. */
@@ -236,9 +274,6 @@ model ConfigImportPreview {
   /** contains the ordered sources associated with this config import preview. */
   sources: SourceSpec[];
 
-  /** contains the ordered drift associated with this config import preview. */
-  drift: ConfigFieldDiff[];
-
   /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp;
 }
@@ -248,14 +283,8 @@ model ConfigImportApplyRequest {
   /** is the lowercase SHA-256 digest of the normalized configuration. */
   configDigest: string;
 
-  /** specifies the default resolution associated with this config import apply request. */
-  defaultResolution: "keep_db" | "take_file";
-
   /** Explicitly applies the domain baseReplacement transaction for matching repository bases. */
   replaceAiBases?: boolean;
-
-  /** specifies the field resolutions associated with this config import apply request. */
-  fieldResolutions?: Record<"keep_db" | "take_file">;
 }
 
 /** reports the result of the corresponding Meridian operation. */
@@ -295,114 +324,6 @@ model GitPushWebhook {
 
   /** indicates whether deleted applies to this git push webhook. */
   deleted: boolean;
-}
-
-/** defines validated input for the corresponding Meridian API operation. */
-model ServiceCreateRequest {
-  /** contains the slug associated with this service create request. */
-  slug: Slug;
-
-  /** specifies the display name associated with this service create request. */
-  @minLength(1) @maxLength(128) displayName: string;
-
-  /** specifies the description associated with this service create request. */
-  @maxLength(2000) description?: string | null;
-
-  /** specifies the visibility associated with this service create request. */
-  visibility?: ServiceVisibility;
-
-  /** contains the owner refs associated with this service create request. */
-  owners?: OwnerRefs;
-
-  /** contains the ordered tag ids associated with this service create request. */
-  tagIds?: Uuid[];
-
-  /** Null or omitted means repository root and is stored as an empty rootDir. */
-  @maxLength(512) @format("repository-relative-path") path?: string | null;
-}
-
-/** contains one paginated page of service records. */
-model ServicePage {
-  ...PageInfo;
-
-  /** contains the ordered items associated with this service page. */
-  items: Service[];
-}
-
-/** defines validated input for the corresponding Meridian API operation. */
-model ServicePatchRequest {
-  /** specifies the display name associated with this service patch request. */
-  @minLength(1) @maxLength(128) displayName?: string;
-
-  /** specifies the description associated with this service patch request. */
-  @maxLength(2000) description?: string | null;
-
-  /** contains the service visibility associated with this service patch request. */
-  visibility?: ServiceVisibility;
-
-  /** contains the lifecycle associated with this service patch request. */
-  lifecycle?: Lifecycle;
-
-  /** contains the owner refs associated with this service patch request. */
-  owners?: OwnerRefs;
-
-  /** contains the ordered tag ids associated with this service patch request. */
-  tagIds?: Uuid[];
-}
-
-/** represents star state data exchanged through the Meridian API. */
-model StarState {
-  /** indicates whether starred applies to this star state. */
-  starred: boolean;
-}
-
-/** identifies one supported service role value. */
-enum ServiceRole {
-  owner,
-  maintainer,
-  viewer,
-}
-
-/** represents service grant data exchanged through the Meridian API. */
-model ServiceGrant {
-  /** specifies the principal type associated with this service grant. */
-  principalType: "user" | "team";
-
-  /** contains the uuid associated with this service grant. */
-  principalId: Uuid;
-
-  /** contains the service role associated with this service grant. */
-  role: ServiceRole;
-
-  /** contains the ordered permissions associated with this service grant. */
-  permissions: ("layer:edit" | "layer:approve" | "asset:publish")[];
-}
-
-/** represents service access data exchanged through the Meridian API. */
-model ServiceAccess {
-  /** contains the ordered grants associated with this service access. */
-  grants: ServiceGrant[];
-
-  /** is the RFC 3339 UTC instant when this resource was last updated. */
-  updatedAt: Timestamp;
-}
-
-/** defines validated input for the corresponding Meridian API operation. */
-model ServiceAccessPutRequest {
-  /** contains the ordered grants associated with this service access put request. */
-  grants: ServiceGrant[];
-}
-
-/** defines validated input for the corresponding Meridian API operation. */
-model DriftResolutionRequest {
-  /** is the lowercase SHA-256 digest of the normalized configuration. */
-  configDigest: string;
-
-  /** specifies the resolution associated with this drift resolution request. */
-  resolution: "keep_db" | "take_file" | "ignore";
-
-  /** specifies the fields associated with this drift resolution request. */
-  fields?: Record<"keep_db" | "take_file" | "ignore">;
 }
 
 /** represents public service data exchanged through the Meridian API. */

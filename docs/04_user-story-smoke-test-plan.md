@@ -104,15 +104,15 @@ SOP：
 5. 匿名读取，同 token 尝试访问其它 version；
 6. owner ack 自己的 todo。
 
-验收：release 首版 `baselineVersionId` 固定为同步开始时 main current，否则 main latest；breaking=1；tree/side-by-side/list 使用同一结果；分享冻结且只能访问 descriptor 白名单；每个展开后的用户 owner 恰好一条 todo。
+验收：release 首版 `baselineVersionId` 固定为同步开始时 main current，否则 main latest；breaking=1；tree/side-by-side/list 使用同一结果；分享冻结且只能访问 descriptor 白名单；每个版本产生一条服务级 todo，任一服务成员 ack 即关闭。
 
-### US-07 GitOps 导入与字段级漂移
+### US-07 配置导入
 
-目标：仓库配置可同步，同时人工改过的字段不被静默覆盖。
+目标：仓库配置可通过 preview/apply 导入，数据库始终是权威来源。
 
-SOP：对 fixture-repo-b 先 preview 再 apply；变更 repo_file 字段并同步；在 UI 手改该字段；仓库再次变更；分别执行 take_file、keep_db、ignore。
+SOP：对 fixture-repo-b 先 preview 再 apply；导入只创建或更新预览中明确的资源，不静默覆盖人工改动。
 
-验收：apply 使用相同 commit/configDigest；repo_file 可更新，db_manual 不覆盖；keep_db 固定人工来源；ignore 绑定当前 file digest，文件内容再次变化后漂移重新出现；配置文件服务根 `.` 在 preview 前规范化为 API/DB 空 `rootDir`，后续同步不产生伪漂移。
+验收：apply 使用相同 commit/configDigest；数据库保持权威，人工编辑不被覆盖；配置文件服务根 `.` 在 preview 前规范化为 API/DB 空 `rootDir`。
 
 ### US-08 搜索与系统级视图
 
@@ -203,7 +203,7 @@ Smoke ID、里程碑、用户故事和 assertion 的完整映射在 `acceptance.
 | --- | --- |
 | M0 | US-01、US-11 的身份/隔离/PAT/配额基础 + 05 文档第 8 节六项 spike |
 | M1 | US-02、US-03、US-12 的仓库主链、互斥与恢复基础 |
-| M2 | US-04、US-07 的 Layer/overlay/字段级 GitOps |
+| M2 | US-04、US-07 的 Layer/overlay/配置导入 |
 | M3 | US-05、US-06、US-09、US-12 的 AI 失败恢复，含 diff share、todo、最小审批通知 |
 | M4 | US-08，多 kind/search/group/global views |
 | M5 | US-10，通用订阅/inbox/webhook 与合规加固 |

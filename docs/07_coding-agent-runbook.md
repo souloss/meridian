@@ -198,7 +198,7 @@ Agent 在以下节点必须核对完整证据并生成里程碑 checkpoint：
 | --- | --- | --- |
 | M0 | US-01、US-11、M0 Smoke、负向隔离矩阵、六项 executable spike | 登录租户切换、凭据非回显、跨租户 404、桌面控制面主路径 |
 | M1 | US-02、US-03、US-12 的 M1 断言及对应 Smoke | Golden Path、同步恢复、互斥和 SSE 重连、OpenAPI Viewer/public read |
-| M2 | US-04、US-07 及对应 Smoke | overlay 审批/回滚、provenance、GitOps 字段来源 |
+| M2 | US-04、US-07 及对应 Smoke | overlay 审批/回滚、provenance、配置导入 |
 | M3 | US-05、US-06、US-09 及对应 Smoke（包含 SMK-033） | AI 审批和失败恢复、repo base 替换 AI base、diff/share/todo、CLI 门禁 |
 | M4 | US-08 及多 kind/search/group Smoke | 搜索 deep link、租户/分组图范围、覆盖率 |
 | M5 | US-10、US-02 的体验镜像断言（SMK-030）及协作/合规 Smoke | 通知投递、Webhook 重试、订阅取消、运维恢复、体验镜像五分钟首文档 |

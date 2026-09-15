@@ -8,12 +8,6 @@ using TypeSpec.OpenAPI;
 
 namespace MeridianApi;
 
-/** carries the anti-forgery token bound to the current cookie session. */
-model CsrfToken {
-  /** binds a state-changing browser request to the current session. */
-  @minLength(32) csrfToken: string;
-}
-
 /** contains local credentials used to create a browser session. */
 model LoginRequest {
   /** specifies the username associated with this login request. */
@@ -87,13 +81,25 @@ model Me {
   isPlatformAdmin: boolean;
 }
 
-/** returns the authenticated principal and the initial session-bound CSRF token. */
+/** returns the authenticated principal and a short-lived access token. The refresh token is delivered as an HttpOnly cookie. */
 model LoginResult {
   /** contains the authenticated user, memberships, and platform role. */
   me: Me;
 
-  /** binds a state-changing browser request to the current session. */
-  @minLength(32) csrfToken: string;
+  /** is the short-lived access token the client sends in the Authorization header. */
+  @minLength(16) accessToken: string;
+
+  /** is the access token lifetime in seconds; the client refreshes before this elapses. */
+  @minValue(60) expiresInSeconds: integer;
+}
+
+/** returns a fresh access token after silent refresh. */
+model RefreshResult {
+  /** is the newly issued short-lived access token. */
+  @minLength(16) accessToken: string;
+
+  /** is the access token lifetime in seconds. */
+  @minValue(60) expiresInSeconds: integer;
 }
 
 /** represents user preferences data exchanged through the Meridian API. */
