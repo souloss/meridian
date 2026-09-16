@@ -1,10 +1,10 @@
 # Meridian 实施进度
 
-> 最后核对：2026-09-08
+> 最后核对：2026-09-16
 > 当前里程碑：M1（asset-mainline）
-> 里程碑状态：M0 自主 checkpoint 已完成；M1 开始继续推进
-> 最新稳定提交：`0869beec21827bfa3984698828b536d3f8aa5398 feat(M0-CONTRACT-002): automate milestone checkpoints`
-> 当前开发切片：M1-AGENT-001 claimed（attempt 2，租约至 2026-09-07T21:40:31Z）
+> 里程碑状态：M0 自主 checkpoint 已完成；M1-CONTRACT-002 五项产品决策已落地并通过
+> 最新稳定提交：`7116c507f9f0b87a9fd8ba8b74cdb69517c67970 AI:feat(repository): 落地 M1 五项产品决策，解除 discovery/producer 契约阻塞`
+> 当前开发切片：M1-CONTRACT-002 passed；下一步领取 M1-AGENT-001 attempt 3
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段完成记录 `milestoneCheckpoints` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和 Agent 证据 checkpoint 为准。
 
@@ -153,6 +153,6 @@ git diff --check
 
 ## 当前阻塞
 
-M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并采用 `sourceExpansion` 子结构。attempt 1 的干净 worktree 生成前置缺口已保留在 `artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json`；attempt 2 补齐 Nuxt prepare 和生成投影后通过，最终证据见 `artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json`。M1-AGENT-001 attempt 2 的只读契约审计确认：Profile 列表缺少 requested kind 输入、候选接受缺少 Service visibility 默认值、候选 commit 身份规则互相冲突、discover 去重键在 resolve 前无法构造、Profile 创建时 dependencyStatus 的判定方式未定义。M1-CONTRACT-002 因这些产品口径进入 `blocked`；证据见 `artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json`。
+M1-CONTRACT-001 已按用户决定拆分 operation/Smoke 归属并采用 `sourceExpansion` 子结构。attempt 1 的干净 worktree 生成前置缺口已保留在 `artifacts/agent/M1-CONTRACT-001/20260907T165358Z/report.json`；attempt 2 补齐 Nuxt prepare 和生成投影后通过，最终证据见 `artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json`。M1-AGENT-001 attempt 2 的只读契约审计确认：Profile 列表缺少 requested kind 输入、候选接受缺少 Service visibility 默认值、候选 commit 身份规则互相冲突、discover 去重键在 resolve 前无法构造、Profile 创建时 dependencyStatus 的判定方式未定义（证据见 `artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json`）。M1-CONTRACT-002 已将上述五项产品决策落地到 domain/storage/TSP 契约并通过门禁：`listAvailableProducerProfiles` 可选 kind 过滤、`service` 创建默认 visibility 为 `private`、候选键 `[repositoryId, rootDir]` 不含 commit、`repo.discover` 去重键 `discover:{repositoryId}:{refType}:{refName}`、producer 依赖检测在创建时校验可执行路径并在启动时全量重扫；最终证据见 `artifacts/agent/M1-CONTRACT-002/20260916T0356Z/report.json`。
 
 后续阶段尚未实现的 target/fixture 同样属于对应工作项交付物，不能因此反复要求用户提供命令。若实际修复后仍达到重试上限，Agent 应给出明确技术失败报告；只有阶段自动门禁全绿时，Agent 才能完成里程碑 checkpoint。

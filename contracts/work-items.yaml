@@ -229,7 +229,7 @@ items:
   - id: M1-CONTRACT-002
     milestone: M1
     priority: P0
-    status: ready
+    status: passed
     title: define-repository-discovery-and-producer-selection-semantics
     dependsOn: [M1-CONTRACT-001]
     operationIds: []
@@ -237,17 +237,17 @@ items:
     assertions: []
     verify: [contracts-validate, contracts-generate-then-git-diff-exit-code]
     owner: coding-agent
-    attempt: 0
+    attempt: 1
     maxAttempts: 3
     leaseUntil: null
-    startedAt: null
+    startedAt: '2026-09-16T03:55:53Z'
     baseCommit: 21400f5bfa30e8df3c1674b992914efeacb40be6
-    contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
+    contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
     failureKind: null
     blockedReason: null
-    reportPath: null
-    lastEvidence: null
-    nextAction: claim-and-apply-the-five-user-decisions
+    reportPath: artifacts/agent/M1-CONTRACT-002/20260916T0356Z/report.json
+    lastEvidence: artifacts/agent/M1-CONTRACT-002/20260916T0356Z/report.json
+    nextAction: claim M1-AGENT-001 attempt 3
     recovery:
       authorizedBy: souloss
       authorizedOn: '2026-09-16'

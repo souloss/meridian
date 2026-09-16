@@ -1,0 +1,49 @@
+{
+  "workItem": "M1-CONTRACT-002",
+  "status": "passed",
+  "commit": "7116c507f9f0b87a9fd8ba8b74cdb69517c67970",
+  "baseCommit": "21400f5bfa30e8df3c1674b992914efeacb40be6",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "sourceDigest": "sha256:bbea9a91ad2272e3294a010b174bf8064b90386f0e91c1459b2fd5a7bce186fa",
+  "startedAt": "2026-09-16T03:55:53Z",
+  "finishedAt": "2026-09-16T03:59:31Z",
+  "reportPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/report.json",
+  "stories": ["US-02"],
+  "assertions": [
+    {"id": "discovery-candidate-key-and-dedupe", "status": "passed", "evidence": "internal/contracttest/domain_semantics_test.go"},
+    {"id": "producer-dependency-detection-and-kind-filter", "status": "passed", "evidence": "internal/contracttest/domain_semantics_test.go"},
+    {"id": "service-visibility-default-private", "status": "passed", "evidence": "internal/contracttest/domain_semantics_test.go"},
+    {"id": "contract-projection-closure", "status": "passed", "evidence": "internal/contracttest/work_items_test.go"}
+  ],
+  "commands": [
+    {"command": "make contracts-validate ITEM=M1-CONTRACT-002", "exitCode": 0, "durationSeconds": 52.15, "stdoutPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log"},
+    {"command": "make contracts-generate-then-git-diff-exit-code ITEM=M1-CONTRACT-002", "exitCode": 0, "durationSeconds": 46.81, "stdoutPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log"},
+    {"command": "go test ./...", "exitCode": 0, "durationSeconds": 0.26, "stdoutPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log"},
+    {"command": "go vet ./...", "exitCode": 0, "durationSeconds": 0.34, "stdoutPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0.01, "stdoutPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log", "stderrPath": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/commands.log"}
+  ],
+  "changedFiles": [
+    "contracts/api/domains/tenant/routes.tsp",
+    "contracts/domain.yaml",
+    "contracts/openapi.yaml",
+    "contracts/storage.yaml",
+    "contracts/work-items.yaml",
+    "internal/generated/api/spec.gen.go",
+    "internal/generated/api/tenant/server.gen.go",
+    "internal/generated/api/tenant/types.gen.go",
+    "internal/contracttest/domain_semantics_test.go"
+  ],
+  "compatibility": {
+    "listAvailableProducerProfiles": "optional kind query parameter filters to enabled, available profiles whose supportedKinds contain the kind",
+    "serviceVisibility": "defaultWhenOmittedOnServiceCreate is private; public anonymous read limited to service/asset metadata and current published version",
+    "candidateKey": "[repositoryId, rootDir] with null-or-omitted path stored as empty root dir",
+    "discoverDedupe": "discover:{repositoryId}:{refType}:{refName} constructed from repository+ref scope before resolve",
+    "dependencyDetection": "profile creation verifies executable path exists and is executable, then stores availability; startup rescans all profiles"
+  },
+  "deferred": [
+    "M1-AGENT-001 production implementation remains gated by its own smoke-m1-repository fixture and SMK-032/SMK-040 assertions"
+  ],
+  "failures": [],
+  "failureKind": null,
+  "nextAction": "claim M1-AGENT-001 attempt 3"
+}
