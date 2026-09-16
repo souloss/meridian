@@ -5,7 +5,6 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
-import type { Uuid } from './uuid.ts';
 
 /**
  * defines validated input for the corresponding Meridian API operation.
@@ -22,6 +21,4 @@ export interface SystemGroupPatchRequest {
      * @maxLength 2000
      */
   description?: string | null;
-  /** specifies the parent id associated with this system group patch request. */
-  parentId?: Uuid | null;
 }

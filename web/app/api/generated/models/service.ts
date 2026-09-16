@@ -7,7 +7,6 @@
  */
 import type { AssetSummary } from './assetSummary.ts';
 import type { CapabilityListItem } from './capabilityListItem.ts';
-import type { DriftInfo } from './driftInfo.ts';
 import type { ETag } from './eTag.ts';
 import type { Lifecycle } from './lifecycle.ts';
 import type { MissingKind } from './missingKind.ts';
@@ -56,14 +55,14 @@ export interface Service {
   repository: RepositoryRef;
   /** contains the owner refs associated with this service. */
   owners: OwnerRefs;
+  /** contains the maintainer refs associated with this service. */
+  maintainers: OwnerRefs;
   /** contains the ordered tags associated with this service. */
   tags: Tag[];
   /** contains the ordered assets associated with this service. */
   assets: AssetSummary[];
   /** contains the ordered missing kinds associated with this service. */
   missingKinds: MissingKind[];
-  /** contains the drift info associated with this service. */
-  drift: DriftInfo;
   /** lists actions the authenticated principal may perform on this resource. */
   capabilities: CapabilityListItem;
   /** indicates whether starred applies to this service. */

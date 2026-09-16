@@ -31,6 +31,8 @@ export interface ServiceCreateRequest {
   visibility?: ServiceVisibility;
   /** contains the owner refs associated with this service create request. */
   owners?: OwnerRefs;
+  /** contains the maintainer refs associated with this service create request. */
+  maintainers?: OwnerRefs;
   /** contains the ordered tag ids associated with this service create request. */
   tagIds?: Uuid[];
   /**

@@ -31,6 +31,7 @@ import type {
 } from 'vue';
 
 import type {
+  AssetLayerContents,
   ErrorResponse,
   GetLayerParams,
   JobAccepted,
@@ -57,6 +58,120 @@ import { serializeQueryParams } from '../../query-params.ts';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
+/** listAssetLayerContentsResponse200 represents a declared HTTP response from the list asset layer contents response200 operation. */
+export type listAssetLayerContentsResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: AssetLayerContents
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** listAssetLayerContentsResponse404 represents a declared HTTP response from the list asset layer contents response404 operation. */
+export type listAssetLayerContentsResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** listAssetLayerContentsResponseSuccess represents a declared HTTP response from the list asset layer contents response success operation. */
+export type listAssetLayerContentsResponseSuccess = (listAssetLayerContentsResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** listAssetLayerContentsResponseError represents a declared HTTP response from the list asset layer contents response error operation. */
+export type listAssetLayerContentsResponseError = (listAssetLayerContentsResponse404) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** listAssetLayerContentsResponse represents a declared HTTP response from the list asset layer contents response operation. */
+export type listAssetLayerContentsResponse = (listAssetLayerContentsResponseSuccess | listAssetLayerContentsResponseError)
+
+/** getListAssetLayerContentsUrl builds the relative URL for its OpenAPI operation. */
+export const getListAssetLayerContentsUrl = (tenantSlug: string,
+    assetId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/assets/${assetId}/layer-contents`
+}
+
+/**
+ * Returns the effective contents of every layer for an asset in one batch, for preview and rendering.
+ */
+export const listAssetLayerContents = async (tenantSlug: string,
+    assetId: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listAssetLayerContentsResponse> => {
+
+  return meridianFetch<listAssetLayerContentsResponse>(getListAssetLayerContentsUrl(tenantSlug,assetId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+/** getListAssetLayerContentsQueryKey is generated from the Meridian OpenAPI contract for get list asset layer contents query key. */
+export const getListAssetLayerContentsQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>,) => {
+    return [
+    'api','v1','t',tenantSlug,'assets',assetId,'layer-contents'
+    ] as const;
+    }
+
+
+/** getListAssetLayerContentsQueryOptions builds TanStack Query options for its OpenAPI operation. */
+export const getListAssetLayerContentsQueryOptions = <TData = Awaited<ReturnType<typeof listAssetLayerContents>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetLayerContents>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  getListAssetLayerContentsQueryKey(tenantSlug,assetId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssetLayerContents>>> = ({ signal }) => listAssetLayerContents(toValue(tenantSlug),toValue(assetId), { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: computed(() => toValue(tenantSlug) !== null && toValue(tenantSlug) !== undefined && toValue(assetId) !== null && toValue(assetId) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssetLayerContents>>, TError, TData>
+}
+
+/** ListAssetLayerContentsQueryResult is the resolved data returned by its generated Vue Query hook. */
+export type ListAssetLayerContentsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssetLayerContents>>>
+/** ListAssetLayerContentsQueryError is the error type returned by its generated Vue Query hook. */
+export type ListAssetLayerContentsQueryError = ErrorResponse
+
+
+
+/** useListAssetLayerContents executes its OpenAPI operation through TanStack Vue Query. */
+export function useListAssetLayerContents<TData = Awaited<ReturnType<typeof listAssetLayerContents>>, TError = ErrorResponse>(
+ tenantSlug: MaybeRefOrGetter<string>,
+    assetId: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssetLayerContents>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient
+ ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssetLayerContentsQueryOptions(tenantSlug,assetId,options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
+
+  return query;
+}
+
+
+
 
 
 

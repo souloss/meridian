@@ -21,18 +21,15 @@ import {
   TenantRole
 } from '../../models';
 import type {
-  CsrfToken,
   LoginResult,
   Me,
+  RefreshResult,
   UserPreferences
 } from '../../models';
 
 
-/** getGetCsrfTokenResponseMock provides generated MSW behavior for contract tests. */
-export const getGetCsrfTokenResponseMock = (overrideResponse: Partial<Extract<CsrfToken, object>> = {}): CsrfToken => ({csrfToken: faker.string.alpha({length: {min: 32, max: 32}}), ...overrideResponse})
-
 /** getLoginResponseMock provides generated MSW behavior for contract tests. */
-export const getLoginResponseMock = (overrideResponse: Partial<Extract<LoginResult, object>> = {}): LoginResult => ({me: {user: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.internet.email(), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, tenants: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.helpers.arrayElement(Object.values(TenantRole))})), isPlatformAdmin: faker.datatype.boolean()}, csrfToken: faker.string.alpha({length: {min: 32, max: 32}}), ...overrideResponse})
+export const getLoginResponseMock = (overrideResponse: Partial<Extract<LoginResult, object>> = {}): LoginResult => ({me: {user: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.internet.email(), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, tenants: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.helpers.arrayElement(Object.values(TenantRole))})), isPlatformAdmin: faker.datatype.boolean()}, accessToken: faker.string.alpha({length: {min: 16, max: 20}}), expiresInSeconds: faker.number.int({min: 60}), ...overrideResponse})
 
 /** getGetMeResponseMock provides generated MSW behavior for contract tests. */
 export const getGetMeResponseMock = (overrideResponse: Partial<Extract<Me, object>> = {}): Me => ({user: {id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), username: faker.string.alpha({length: {min: 1, max: 128}}), displayName: faker.string.alpha({length: {min: 1, max: 128}}), email: faker.internet.email(), status: faker.helpers.arrayElement(['active','disabled'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, tenants: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), slug: faker.helpers.fromRegExp("^[a-z0-9][a-z0-9-]{0,63}$"), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.helpers.arrayElement(Object.values(TenantRole))})), isPlatformAdmin: faker.datatype.boolean(), ...overrideResponse})
@@ -43,19 +40,9 @@ export const getGetMyPreferencesResponseMock = (overrideResponse: Partial<Extrac
 /** getUpdateMyPreferencesResponseMock provides generated MSW behavior for contract tests. */
 export const getUpdateMyPreferencesResponseMock = (overrideResponse: Partial<Extract<UserPreferences, object>> = {}): UserPreferences => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), locale: faker.helpers.arrayElement(['zh-CN','en'] as const), theme: faker.helpers.arrayElement(['light','dark','system'] as const), defaultViews: {}, ...overrideResponse})
 
+/** getRefreshResponseMock provides generated MSW behavior for contract tests. */
+export const getRefreshResponseMock = (overrideResponse: Partial<Extract<RefreshResult, object>> = {}): RefreshResult => ({accessToken: faker.string.alpha({length: {min: 16, max: 20}}), expiresInSeconds: faker.number.int({min: 60}), ...overrideResponse})
 
-/** getGetCsrfTokenMockHandler provides generated MSW behavior for contract tests. */
-export const getGetCsrfTokenMockHandler = (overrideResponse?: CsrfToken | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CsrfToken> | CsrfToken), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/auth/csrf', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetCsrfTokenResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
 
 /** getLoginMockHandler provides generated MSW behavior for contract tests. */
 export const getLoginMockHandler = (overrideResponse?: LoginResult | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<LoginResult> | LoginResult), options?: RequestHandlerOptions) => {
@@ -119,12 +106,25 @@ export const getUpdateMyPreferencesMockHandler = (overrideResponse?: UserPrefere
       })
   }, options)
 }
+
+/** getRefreshMockHandler provides generated MSW behavior for contract tests. */
+export const getRefreshMockHandler = (overrideResponse?: RefreshResult | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<RefreshResult> | RefreshResult), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/auth/refresh', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getRefreshResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 /** getAuthMock provides generated MSW behavior for contract tests. */
 export const getAuthMock = () => [
-  getGetCsrfTokenMockHandler(),
   getLoginMockHandler(),
   getLogoutMockHandler(),
   getGetMeMockHandler(),
   getGetMyPreferencesMockHandler(),
-  getUpdateMyPreferencesMockHandler()
+  getUpdateMyPreferencesMockHandler(),
+  getRefreshMockHandler()
 ]

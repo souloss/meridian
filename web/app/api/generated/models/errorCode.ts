@@ -15,7 +15,6 @@ export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
 /** ErrorCode is generated from the Meridian OpenAPI contract for error code. */
 export const ErrorCode = {
   unauthenticated: 'unauthenticated',
-  csrf_invalid: 'csrf_invalid',
   not_found: 'not_found',
   validation_error: 'validation_error',
   asset_path_not_found: 'asset_path_not_found',

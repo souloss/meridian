@@ -26,11 +26,11 @@ import {
 } from 'vue';
 
 import type {
-  CsrfToken,
   ErrorResponse,
   LoginRequest,
   LoginResult,
   Me,
+  RefreshResult,
   UserPreferences,
   UserPreferencesPatchRequest
 } from '../models';
@@ -40,115 +40,6 @@ import { serializeQueryParams } from '../../query-params.ts';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
-
-/** getCsrfTokenResponse200 represents a declared HTTP response from the get csrf token response200 operation. */
-export type getCsrfTokenResponse200 = {
-  /** Data contains the decoded response payload. */
-  data: CsrfToken
-  /** Status is the HTTP response status code. */
-  status: 200
-}
-
-/** getCsrfTokenResponse401 represents a declared HTTP response from the get csrf token response401 operation. */
-export type getCsrfTokenResponse401 = {
-  /** Data contains the decoded response payload. */
-  data: ErrorResponse
-  /** Status is the HTTP response status code. */
-  status: 401
-}
-
-/** getCsrfTokenResponseSuccess represents a declared HTTP response from the get csrf token response success operation. */
-export type getCsrfTokenResponseSuccess = (getCsrfTokenResponse200) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-/** getCsrfTokenResponseError represents a declared HTTP response from the get csrf token response error operation. */
-export type getCsrfTokenResponseError = (getCsrfTokenResponse401) & {
-  /** Headers contains the HTTP response headers. */
-  headers: Headers;
-};
-
-/** getCsrfTokenResponse represents a declared HTTP response from the get csrf token response operation. */
-export type getCsrfTokenResponse = (getCsrfTokenResponseSuccess | getCsrfTokenResponseError)
-
-/** getGetCsrfTokenUrl builds the relative URL for its OpenAPI operation. */
-export const getGetCsrfTokenUrl = () => {
-
-
-  return `/api/v1/auth/csrf`
-}
-
-/**
- * Returns a CSRF token bound to the current authenticated browser session.
- */
-export const getCsrfToken = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<getCsrfTokenResponse> => {
-
-  return meridianFetch<getCsrfTokenResponse>(getGetCsrfTokenUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-/** getGetCsrfTokenQueryKey is generated from the Meridian OpenAPI contract for get get csrf token query key. */
-export const getGetCsrfTokenQueryKey = () => {
-    return [
-    'api','v1','auth','csrf'
-    ] as const;
-    }
-
-
-/** getGetCsrfTokenQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getGetCsrfTokenQueryOptions = <TData = Awaited<ReturnType<typeof getCsrfToken>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  getGetCsrfTokenQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCsrfToken>>> = ({ signal }) => getCsrfToken({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>
-}
-
-/** GetCsrfTokenQueryResult is the resolved data returned by its generated Vue Query hook. */
-export type GetCsrfTokenQueryResult = NonNullable<Awaited<ReturnType<typeof getCsrfToken>>>
-/** GetCsrfTokenQueryError is the error type returned by its generated Vue Query hook. */
-export type GetCsrfTokenQueryError = ErrorResponse
-
-
-
-/** useGetCsrfToken executes its OpenAPI operation through TanStack Vue Query. */
-export function useGetCsrfToken<TData = Awaited<ReturnType<typeof getCsrfToken>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
- , queryClient?: QueryClient
- ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetCsrfTokenQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
-
-  return query;
-}
-
-
-
 
 
 
@@ -318,7 +209,7 @@ export const getLogoutUrl = () => {
 }
 
 /**
- * Revokes the current browser session and clears its session cookie.
+ * Revokes the refresh token and clears its cookie; the client discards the access token in memory.
  */
 export const logout = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<logoutResponse> => {
 
@@ -709,4 +600,108 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getUpdateMyPreferencesMutationOptions(options), queryClient);
+    }
+    /** refreshResponse200 represents a declared HTTP response from the refresh response200 operation. */
+    export type refreshResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: RefreshResult
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** refreshResponse401 represents a declared HTTP response from the refresh response401 operation. */
+export type refreshResponse401 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 401
+}
+
+/** refreshResponseSuccess represents a declared HTTP response from the refresh response success operation. */
+export type refreshResponseSuccess = (refreshResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** refreshResponseError represents a declared HTTP response from the refresh response error operation. */
+export type refreshResponseError = (refreshResponse401) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** refreshResponse represents a declared HTTP response from the refresh response operation. */
+export type refreshResponse = (refreshResponseSuccess | refreshResponseError)
+
+/** getRefreshUrl builds the relative URL for its OpenAPI operation. */
+export const getRefreshUrl = () => {
+
+
+  return `/api/v1/auth/refresh`
+}
+
+/**
+ * Exchanges the HttpOnly refresh cookie for a fresh access token, rotating the refresh token.
+ */
+export const refresh = async ( options?: Parameters<typeof meridianFetch>[1]): Promise<refreshResponse> => {
+
+  return meridianFetch<refreshResponse>(getRefreshUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+/** getRefreshMutationKey is generated from the Meridian OpenAPI contract for get refresh mutation key. */
+export const getRefreshMutationKey = () => ['refresh'] as const;
+
+/** getRefreshMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getRefreshMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refresh>>, TError,void, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof refresh>>, TError,void, TContext> => {
+
+const mutationKey = getRefreshMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof refresh>>, void> = () => {
+
+
+          return  refresh(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** RefreshMutationResult is generated from the Meridian OpenAPI contract for refresh mutation result. */
+    export type RefreshMutationResult = NonNullable<Awaited<ReturnType<typeof refresh>>>
+
+    /** RefreshMutationError is generated from the Meridian OpenAPI contract for refresh mutation error. */
+    export type RefreshMutationError = ErrorResponse
+
+
+    /** useRefresh executes its OpenAPI operation through TanStack Vue Query. */
+    export const useRefresh = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refresh>>, TError,void, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof refresh>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getRefreshMutationOptions(options), queryClient);
     }

@@ -25,8 +25,6 @@ export interface SystemGroupCreateRequest {
      * @maxLength 2000
      */
   description?: string | null;
-  /** specifies the parent id associated with this system group create request. */
-  parentId?: Uuid | null;
   /** contains the ordered service ids associated with this system group create request. */
   serviceIds?: Uuid[];
 }

@@ -18,12 +18,14 @@ export interface BreakingTodo {
   id: Uuid;
   /** contains the uuid associated with this breaking todo. */
   assetVersionId: Uuid;
-  /** contains the uuid associated with this breaking todo. */
-  assigneeId: Uuid;
+  /** identifies the service associated with this resource. */
+  serviceId: Uuid;
   /** is the current lifecycle or processing state. */
   status: TodoStatus;
   /** contains the diff counts associated with this breaking todo. */
   summary: DiffCounts;
+  /** contains the user id that acknowledged this breaking todo. */
+  ackedBy: Uuid | null;
   /** specifies the comment associated with this breaking todo. */
   comment: string | null;
   /** is the RFC 3339 UTC instant when this resource was created. */

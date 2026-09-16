@@ -45,6 +45,7 @@ import type {
   KnownHost,
   KnownHostCreateRequest,
   KnownHostPage,
+  ListAvailableProducerProfilesParams,
   ListCredentialsParams,
   ListKnownHostsParams,
   ListTeamsParams,
@@ -1670,18 +1671,20 @@ export type listAvailableProducerProfilesResponseError = (listAvailableProducerP
 export type listAvailableProducerProfilesResponse = (listAvailableProducerProfilesResponseSuccess | listAvailableProducerProfilesResponseError)
 
 /** getListAvailableProducerProfilesUrl builds the relative URL for its OpenAPI operation. */
-export const getListAvailableProducerProfilesUrl = (tenantSlug: string,) => {
+export const getListAvailableProducerProfilesUrl = (tenantSlug: string,
+    params?: ListAvailableProducerProfilesParams,) => {
+  const stringifiedParams = serializeQueryParams(params);
 
-
-  return `/api/v1/t/${tenantSlug}/producer-profiles`
+  return stringifiedParams.length > 0 ? `/api/v1/t/${tenantSlug}/producer-profiles?${stringifiedParams}` : `/api/v1/t/${tenantSlug}/producer-profiles`
 }
 
 /**
  * Returns the requested page of available producer profiles within the authorized request scope.
  */
-export const listAvailableProducerProfiles = async (tenantSlug: string, options?: Parameters<typeof meridianFetch>[1]): Promise<listAvailableProducerProfilesResponse> => {
+export const listAvailableProducerProfiles = async (tenantSlug: string,
+    params?: ListAvailableProducerProfilesParams, options?: Parameters<typeof meridianFetch>[1]): Promise<listAvailableProducerProfilesResponse> => {
 
-  return meridianFetch<listAvailableProducerProfilesResponse>(getListAvailableProducerProfilesUrl(tenantSlug),
+  return meridianFetch<listAvailableProducerProfilesResponse>(getListAvailableProducerProfilesUrl(tenantSlug,params),
   {
     ...options,
     method: 'GET'
@@ -1695,24 +1698,26 @@ export const listAvailableProducerProfiles = async (tenantSlug: string, options?
 
 
 /** getListAvailableProducerProfilesQueryKey is generated from the Meridian OpenAPI contract for get list available producer profiles query key. */
-export const getListAvailableProducerProfilesQueryKey = (tenantSlug: MaybeRefOrGetter<string>,) => {
+export const getListAvailableProducerProfilesQueryKey = (tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAvailableProducerProfilesParams>,) => {
     return [
-    'api','v1','t',tenantSlug,'producer-profiles'
+    'api','v1','t',tenantSlug,'producer-profiles', ...(params ? [params] : [])
     ] as const;
     }
 
 
 /** getListAvailableProducerProfilesQueryOptions builds TanStack Query options for its OpenAPI operation. */
-export const getListAvailableProducerProfilesQueryOptions = <TData = Awaited<ReturnType<typeof listAvailableProducerProfiles>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAvailableProducerProfiles>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+export const getListAvailableProducerProfilesQueryOptions = <TData = Awaited<ReturnType<typeof listAvailableProducerProfiles>>, TError = ErrorResponse>(tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAvailableProducerProfilesParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAvailableProducerProfiles>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getListAvailableProducerProfilesQueryKey(tenantSlug);
+  const queryKey =  getListAvailableProducerProfilesQueryKey(tenantSlug,params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAvailableProducerProfiles>>> = ({ signal }) => listAvailableProducerProfiles(toValue(tenantSlug), { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAvailableProducerProfiles>>> = ({ signal }) => listAvailableProducerProfiles(toValue(tenantSlug),toValue(params), { signal, ...requestOptions });
 
 
 
@@ -1730,11 +1735,12 @@ export type ListAvailableProducerProfilesQueryError = ErrorResponse
 
 /** useListAvailableProducerProfiles executes its OpenAPI operation through TanStack Vue Query. */
 export function useListAvailableProducerProfiles<TData = Awaited<ReturnType<typeof listAvailableProducerProfiles>>, TError = ErrorResponse>(
- tenantSlug: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAvailableProducerProfiles>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
+ tenantSlug: MaybeRefOrGetter<string>,
+    params?: MaybeRefOrGetter<ListAvailableProducerProfilesParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAvailableProducerProfiles>>, TError, TData>>, request?: SecondParameter<typeof meridianFetch>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListAvailableProducerProfilesQueryOptions(tenantSlug,options)
+  const queryOptions = getListAvailableProducerProfilesQueryOptions(tenantSlug,params,options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -8,14 +8,19 @@
 import type { Me } from './me.ts';
 
 /**
- * returns the authenticated principal and the initial session-bound CSRF token.
+ * returns the authenticated principal and a short-lived access token. The refresh token is delivered as an HttpOnly cookie.
  */
 export interface LoginResult {
   /** contains the authenticated user, memberships, and platform role. */
   me: Me;
   /**
-     * binds a state-changing browser request to the current session.
-     * @minLength 32
+     * is the short-lived access token the client sends in the Authorization header.
+     * @minLength 16
      */
-  csrfToken: string;
+  accessToken: string;
+  /**
+     * is the access token lifetime in seconds; the client refreshes before this elapses.
+     * @minimum 60
+     */
+  expiresInSeconds: number;
 }

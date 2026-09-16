@@ -48,6 +48,8 @@ import type {
   ViewOverride,
   ViewOverrideList,
   ViewOverridePutRequest,
+  ViewPreviewRequest,
+  ViewPreviewResult,
   ViewResolution,
   ViewResolveRequest
 } from '../models';
@@ -290,8 +292,131 @@ export function useGetSharedView<TData = Awaited<ReturnType<typeof getSharedView
 
 
 
-/** listShareLinksResponse200 represents a declared HTTP response from the list share links response200 operation. */
-export type listShareLinksResponse200 = {
+/** previewAssetViewResponse200 represents a declared HTTP response from the preview asset view response200 operation. */
+export type previewAssetViewResponse200 = {
+  /** Data contains the decoded response payload. */
+  data: ViewPreviewResult
+  /** Status is the HTTP response status code. */
+  status: 200
+}
+
+/** previewAssetViewResponse404 represents a declared HTTP response from the preview asset view response404 operation. */
+export type previewAssetViewResponse404 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 404
+}
+
+/** previewAssetViewResponse422 represents a declared HTTP response from the preview asset view response422 operation. */
+export type previewAssetViewResponse422 = {
+  /** Data contains the decoded response payload. */
+  data: ErrorResponse
+  /** Status is the HTTP response status code. */
+  status: 422
+}
+
+/** previewAssetViewResponseSuccess represents a declared HTTP response from the preview asset view response success operation. */
+export type previewAssetViewResponseSuccess = (previewAssetViewResponse200) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+/** previewAssetViewResponseError represents a declared HTTP response from the preview asset view response error operation. */
+export type previewAssetViewResponseError = (previewAssetViewResponse404 | previewAssetViewResponse422) & {
+  /** Headers contains the HTTP response headers. */
+  headers: Headers;
+};
+
+/** previewAssetViewResponse represents a declared HTTP response from the preview asset view response operation. */
+export type previewAssetViewResponse = (previewAssetViewResponseSuccess | previewAssetViewResponseError)
+
+/** getPreviewAssetViewUrl builds the relative URL for its OpenAPI operation. */
+export const getPreviewAssetViewUrl = (tenantSlug: string,
+    assetId: string,) => {
+
+
+  return `/api/v1/t/${tenantSlug}/assets/${assetId}/views:preview`
+}
+
+/**
+ * Previews a layer selection and optional draft layers using the real merge engine without persisting anything.
+ */
+export const previewAssetView = async (tenantSlug: string,
+    assetId: string,
+    viewPreviewRequest: ViewPreviewRequest, options?: Parameters<typeof meridianFetch>[1]): Promise<previewAssetViewResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return meridianFetch<previewAssetViewResponse>(getPreviewAssetViewUrl(tenantSlug,assetId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(viewPreviewRequest)
+  }
+);}
+
+
+
+
+
+/** getPreviewAssetViewMutationKey is generated from the Meridian OpenAPI contract for get preview asset view mutation key. */
+export const getPreviewAssetViewMutationKey = () => ['previewAssetView'] as const;
+
+/** getPreviewAssetViewMutationOptions builds TanStack Mutation options for its OpenAPI operation. */
+export const getPreviewAssetViewMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewAssetView>>, TError,PreviewAssetViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof previewAssetView>>, TError,PreviewAssetViewMutationVariables, TContext> => {
+
+const mutationKey = getPreviewAssetViewMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof previewAssetView>>, PreviewAssetViewMutationVariables> = (props) => {
+          const {tenantSlug,assetId,data} = props ?? {};
+
+          return  previewAssetView(tenantSlug,assetId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    /** PreviewAssetViewMutationResult is generated from the Meridian OpenAPI contract for preview asset view mutation result. */
+    export type PreviewAssetViewMutationResult = NonNullable<Awaited<ReturnType<typeof previewAssetView>>>
+    /** PreviewAssetViewMutationBody is the request body type for its generated OpenAPI operation. */
+    export type PreviewAssetViewMutationBody = ViewPreviewRequest
+    /** PreviewAssetViewMutationError is generated from the Meridian OpenAPI contract for preview asset view mutation error. */
+    export type PreviewAssetViewMutationError = ErrorResponse
+    /** PreviewAssetViewMutationVariables is generated from the Meridian OpenAPI contract for preview asset view mutation variables. */
+    export type PreviewAssetViewMutationVariables = {/** TenantSlug carries the tenant slug value for PreviewAssetViewMutationVariables. */ tenantSlug: string;/** AssetId carries the asset id value for PreviewAssetViewMutationVariables. */ assetId: string;/** Data contains the decoded response payload. */ data: ViewPreviewRequest}
+
+    /** usePreviewAssetView executes its OpenAPI operation through TanStack Vue Query. */
+    export const usePreviewAssetView = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewAssetView>>, TError,PreviewAssetViewMutationVariables, TContext>, request?: SecondParameter<typeof meridianFetch>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof previewAssetView>>,
+        TError,
+        PreviewAssetViewMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPreviewAssetViewMutationOptions(options), queryClient);
+    }
+    /** listShareLinksResponse200 represents a declared HTTP response from the list share links response200 operation. */
+    export type listShareLinksResponse200 = {
   /** Data contains the decoded response payload. */
   data: ShareLinkPage
   /** Status is the HTTP response status code. */

@@ -6,9 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { AssetNameTemplate } from './assetNameTemplate.ts';
-import type { ConfigSource } from './configSource.ts';
 import type { ETag } from './eTag.ts';
-import type { FieldSource } from './fieldSource.ts';
 import type { KindId } from './kindId.ts';
 import type { LayerOrigin } from './layerOrigin.ts';
 import type { LayerRole } from './layerRole.ts';
@@ -63,10 +61,6 @@ export interface SourceSpec {
   branchPatterns: RefGlob[];
   /** indicates whether enabled applies to this source spec. */
   enabled: boolean;
-  /** contains the config source associated with this source spec. */
-  configOrigin: ConfigSource;
-  /** contains the ordered config field sources associated with this source spec. */
-  configFieldSources: FieldSource[];
   /** specifies the last error associated with this source spec. */
   lastError: string | null;
   /** specifies the last run associated with this source spec. */

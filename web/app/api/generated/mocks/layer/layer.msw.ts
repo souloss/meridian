@@ -26,6 +26,7 @@ import {
   RevisionStatus
 } from '../../models';
 import type {
+  AssetLayerContents,
   JobAccepted,
   Layer,
   LayerList,
@@ -38,6 +39,12 @@ import type {
   User
 } from '../../models';
 
+
+/** getListAssetLayerContentsResponseLayerRevisionMock provides generated MSW behavior for contract tests. */
+export const getListAssetLayerContentsResponseLayerRevisionMock = (overrideResponse: Partial<LayerRevision> = {}): LayerRevision => ({...{id: faker.string.uuid(), layerId: faker.string.uuid(), scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), contentType: faker.helpers.arrayElement(Object.values(ContentType)), contentUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), dialect: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), sourceBranch: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), gitCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdBy: faker.helpers.arrayElement([faker.string.uuid(),null,]), aiMeta: faker.helpers.arrayElement([null,]), reviewStatus: faker.helpers.arrayElement(Object.values(RevisionStatus)), reviewComment: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, ...overrideResponse});
+
+/** getListAssetLayerContentsResponseMock provides generated MSW behavior for contract tests. */
+export const getListAssetLayerContentsResponseMock = (overrideResponse: Partial<Extract<AssetLayerContents, object>> = {}): AssetLayerContents => ({assetId: faker.string.uuid(), layers: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({layerId: faker.string.uuid(), assetId: faker.string.uuid(), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), ord: faker.number.int({min: 0}), effectiveRevision: faker.helpers.arrayElement([{...getListAssetLayerContentsResponseLayerRevisionMock()},null,]), content: faker.string.alpha({length: {min: 10, max: 20}}), contentType: faker.helpers.arrayElement(Object.values(ContentType))})), ...overrideResponse})
 
 /** getReorderAssetLayersResponseMock provides generated MSW behavior for contract tests. */
 export const getReorderAssetLayersResponseMock = (overrideResponse: Partial<Extract<LayerList, object>> = {}): LayerList => ({etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), etag: faker.helpers.fromRegExp("^(W/)?\"[^\"]+\"$"), assetId: faker.string.uuid(), sourceSpecId: faker.helpers.arrayElement([faker.string.uuid(),null,]), role: faker.helpers.arrayElement(Object.values(LayerRole)), origin: faker.helpers.arrayElement(Object.values(LayerOrigin)), ord: faker.number.int({min: 0}), dialect: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), enabled: faker.datatype.boolean(), heads: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), latestRevisionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), effectiveRevisionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), candidateRevisionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), generation: faker.number.int({min: 0})})), capabilities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
@@ -84,6 +91,19 @@ export const getListReviewsResponseUserMock = (overrideResponse: Partial<User> =
 /** getListReviewsResponseMock provides generated MSW behavior for contract tests. */
 export const getListReviewsResponseMock = (overrideResponse: Partial<Extract<ReviewPage, object>> = {}): ReviewPage => ({total: faker.number.int({min: 0}), page: faker.number.int({min: 1}), pageSize: faker.number.int({min: 1, max: 100}), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({revision: {id: faker.string.uuid(), layerId: faker.string.uuid(), scopeType: faker.helpers.arrayElement(['ref','global'] as const), scopeKey: faker.string.alpha({length: {min: 1, max: 260}}), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), contentType: faker.helpers.arrayElement(Object.values(ContentType)), contentUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), dialect: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), sourceBranch: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), gitCommit: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdBy: faker.helpers.arrayElement([faker.string.uuid(),null,]), aiMeta: faker.helpers.arrayElement([null,]), reviewStatus: faker.helpers.arrayElement(Object.values(RevisionStatus)), reviewComment: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, currentEffectiveRevision: faker.helpers.arrayElement([{...getListReviewsResponseLayerRevisionMock()},null,]), diff: {kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), left: {sourceType: faker.helpers.arrayElement(['version','upload'] as const), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.helpers.arrayElement([faker.string.uuid(),null,]), versionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), uploadId: faker.helpers.arrayElement([faker.string.uuid(),null,]), requestedRefType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), requestedRef: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,])}, right: {sourceType: faker.helpers.arrayElement(['version','upload'] as const), kind: faker.helpers.fromRegExp("^[a-z][a-z0-9_]{0,63}$"), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.helpers.arrayElement([faker.string.uuid(),null,]), versionId: faker.helpers.arrayElement([faker.string.uuid(),null,]), uploadId: faker.helpers.arrayElement([faker.string.uuid(),null,]), requestedRefType: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(RefType)),null,]), requestedRef: faker.helpers.arrayElement([faker.helpers.fromRegExp("^[A-Za-z0-9._/-]+$"),null,])}, snapshotId: faker.helpers.arrayElement([faker.string.uuid(),null,]), summary: {added: faker.number.int({min: 0}), removed: faker.number.int({min: 0}), modified: faker.number.int({min: 0}), breaking: faker.number.int({min: 0}), risky: faker.number.int({min: 0}), nonBreaking: faker.number.int({min: 0}), informational: faker.number.int({min: 0})}, changes: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), level: faker.helpers.arrayElement(Object.values(DiffLevel)), code: faker.string.alpha({length: {min: 10, max: 20}}), path: faker.string.alpha({length: {min: 10, max: 20}}), summary: faker.string.alpha({length: {min: 10, max: 20}}), before: {}, after: {}})), generatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, author: faker.helpers.arrayElement([{...getListReviewsResponseUserMock()},null,])})), ...overrideResponse})
 
+
+/** getListAssetLayerContentsMockHandler provides generated MSW behavior for contract tests. */
+export const getListAssetLayerContentsMockHandler = (overrideResponse?: AssetLayerContents | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<AssetLayerContents> | AssetLayerContents), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/t/:tenantSlug/assets/:assetId/layer-contents', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListAssetLayerContentsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 
 /** getReorderAssetLayersMockHandler provides generated MSW behavior for contract tests. */
 export const getReorderAssetLayersMockHandler = (overrideResponse?: LayerList | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<LayerList> | LayerList), options?: RequestHandlerOptions) => {
@@ -229,6 +249,7 @@ export const getListReviewsMockHandler = (overrideResponse?: ReviewPage | ((info
 }
 /** getLayerMock provides generated MSW behavior for contract tests. */
 export const getLayerMock = () => [
+  getListAssetLayerContentsMockHandler(),
   getReorderAssetLayersMockHandler(),
   getGetLayerRevisionMockHandler(),
   getGetReviewContextMockHandler(),

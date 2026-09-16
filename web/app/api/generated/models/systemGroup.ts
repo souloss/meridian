@@ -19,8 +19,6 @@ export interface SystemGroup {
   id: Uuid;
   /** is the opaque entity tag required for optimistic concurrency control. */
   etag: ETag;
-  /** specifies the parent id associated with this system group. */
-  parentId: Uuid | null;
   /** contains the slug associated with this system group. */
   slug: Slug;
   /** specifies the display name associated with this system group. */

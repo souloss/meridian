@@ -7,6 +7,6 @@
  */
 
 /**
- * specifies the fields associated with this drift resolution request.
+ * contains the provenance associated with this view preview result.
  */
-export type DriftResolutionRequestFields = {[key: string]: 'keep_db' | 'take_file' | 'ignore'};
+export type ViewPreviewResultProvenance = {[key: string]: unknown};

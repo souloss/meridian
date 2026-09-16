@@ -7,12 +7,17 @@
  */
 
 /**
- * carries the anti-forgery token bound to the current cookie session.
+ * returns a fresh access token after silent refresh.
  */
-export interface CsrfToken {
+export interface RefreshResult {
   /**
-     * binds a state-changing browser request to the current session.
-     * @minLength 32
+     * is the newly issued short-lived access token.
+     * @minLength 16
      */
-  csrfToken: string;
+  accessToken: string;
+  /**
+     * is the access token lifetime in seconds.
+     * @minimum 60
+     */
+  expiresInSeconds: number;
 }

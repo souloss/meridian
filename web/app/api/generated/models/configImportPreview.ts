@@ -5,7 +5,6 @@
  * Authoritative HTTP and DTO contract. Markdown documents are explanatory only. All tenant resource operations return 404 for both absence and authorization denial.
  * OpenAPI spec version: 1.0.0
  */
-import type { ConfigFieldDiff } from './configFieldDiff.ts';
 import type { Service } from './service.ts';
 import type { SourceSpec } from './sourceSpec.ts';
 import type { Timestamp } from './timestamp.ts';
@@ -27,8 +26,6 @@ export interface ConfigImportPreview {
   services: Service[];
   /** contains the ordered sources associated with this config import preview. */
   sources: SourceSpec[];
-  /** contains the ordered drift associated with this config import preview. */
-  drift: ConfigFieldDiff[];
   /** is the RFC 3339 UTC instant after which this value is invalid. */
   expiresAt: Timestamp;
 }
