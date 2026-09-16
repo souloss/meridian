@@ -1,0 +1,64 @@
+{
+  "milestone": "M0",
+  "status": "completed",
+  "commit": "56fd5b1f34abfbd68430d79c296a527d5fbf4308",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "reportPath": "artifacts/agent/milestones/M0/20260916T0255Z/report.json",
+  "completedBy": "coding-agent",
+  "completedAt": "2026-09-16T02:55:00Z",
+  "previousAcceptance": {
+    "acceptedBy": "souloss",
+    "acceptedAt": "2026-09-07T23:40:01+08:00",
+    "reportPath": "artifacts/agent/milestones/M0/20260906T182703Z/report.json"
+  },
+  "desktopEntry": {
+    "bootstrap": "MERIDIAN_DATABASE_URL=postgres://meridian:meridian@127.0.0.1:54329/meridian?sslmode=disable vfox exec golang@1.27.1 -- go run ./cmd/meridian admin create --username padmin",
+    "start": "make backend-run",
+    "url": "http://127.0.0.1:8080/login"
+  },
+  "demoPath": [
+    "bootstrap and sign in as the platform administrator",
+    "create users and tenants, assign tenant membership, and verify tenant-business 404 boundaries",
+    "exercise repository, credential, job, audit, tenant switching, and disabled-tenant control-plane paths"
+  ],
+  "workItems": [
+    {"id": "M0-AGENT-001", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-001/20260905T183222Z/report.json"},
+    {"id": "M0-AGENT-002", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-002/20260906T170406Z/report.json"},
+    {"id": "M0-AGENT-003", "status": "passed", "evidence": "artifacts/agent/M0-AGENT-003/20260906T182703Z/report.json"},
+    {"id": "M0-CONTRACT-001", "status": "passed", "evidence": "artifacts/agent/M0-CONTRACT-001/20260906T174209Z/report.json"},
+    {"id": "M0-CONTRACT-002", "status": "passed", "evidence": "artifacts/agent/M0-CONTRACT-002/20260907T205730Z/report.json"}
+  ],
+  "stories": [
+    {"id": "US-01", "status": "passed", "evidence": ["SMK-001", "SMK-002", "SMK-003", "SMK-004"]},
+    {"id": "US-11", "status": "passed", "evidence": ["SMK-005", "SMK-029", "SMK-031", "SMK-035"]}
+  ],
+  "assertions": [
+    {"id": "SMK-001", "status": "passed", "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-001.json"},
+    {"id": "SMK-002", "status": "passed", "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-002.json"},
+    {"id": "SMK-003", "status": "passed", "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-003.json"},
+    {"id": "SMK-004", "status": "passed", "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-004.json"},
+    {"id": "SMK-005", "status": "passed", "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-005.json"},
+    {"id": "SMK-029", "status": "passed", "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-029.json"},
+    {"id": "SMK-031", "status": "passed", "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-031.json"},
+    {"id": "SMK-035", "status": "passed", "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-035.json"},
+    {"id": "perf-table-cytoscape", "status": "passed", "evidence": "artifacts/spikes/perf-table-cytoscape.json"},
+    {"id": "perf-editor", "status": "passed", "evidence": "artifacts/spikes/perf-editor.json"},
+    {"id": "a11y-m0", "status": "passed", "evidence": "artifacts/spikes/a11y-m0.json"}
+  ],
+  "commands": [
+    {"command": "make smoke-all MILESTONE=M0", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/smoke/2026-09-16T02-55-04-413ZpaEIS6/SMK-001.log"}
+  ],
+  "measurements": {
+    "graphFirstPaintMs": 851.6,
+    "virtualTableRenderedRows": 23,
+    "editorRepeatedLongTasksOver50Ms": 0,
+    "desktopAxeViolations": 0,
+    "mobileAxeViolations": 0
+  },
+  "deferred": [],
+  "failures": [],
+  "risks": [
+    "TypeSpec and Redocly emit existing non-blocking warnings while returning successful validation results"
+  ],
+  "nextAction": "claim M1-CONTRACT-002"
+}

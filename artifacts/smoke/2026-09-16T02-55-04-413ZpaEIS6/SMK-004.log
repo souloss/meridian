@@ -1,0 +1,29 @@
+$ 'sh' 'scripts/test-integration.sh' '-json' '-run' '^TestM0Smoke$/^SMK-004$' 'github.com/meridian-labs/meridian/internal/handler'
+{"Time":"2026-09-16T10:55:22.590935452+08:00","Action":"start","Package":"github.com/meridian-labs/meridian/internal/handler"}
+{"Time":"2026-09-16T10:55:22.60204809+08:00","Action":"run","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke"}
+{"Time":"2026-09-16T10:55:22.602120148+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke","Output":"=== RUN   TestM0Smoke\n","OutputType":"frame"}
+{"Time":"2026-09-16T10:55:22.602159877+08:00","Action":"run","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004"}
+{"Time":"2026-09-16T10:55:22.602175383+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Output":"=== RUN   TestM0Smoke/SMK-004\n","OutputType":"frame"}
+{"Time":"2026-09-16T10:55:23.287306577+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Output":"2026/09/16 10:55:23 INFO http_request trace_id=00000000000000000000000000000000 span_id=0000000000000000 request_id=SZ452/Oo0coe8DzR-000001 method=POST path=/api/v1/auth/login status=200 latency_ms=213.500589 request_bytes=58 response_bytes=619 remote_addr=192.0.2.1:1234 user_agent=\"\"\n"}
+{"Time":"2026-09-16T10:55:23.548987002+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Output":"2026/09/16 10:55:23 INFO http_request trace_id=00000000000000000000000000000000 span_id=0000000000000000 request_id=SZ452/Oo0coe8DzR-000002 method=POST path=/api/v1/auth/login status=200 latency_ms=152.210747 request_bytes=53 response_bytes=712 remote_addr=192.0.2.1:1234 user_agent=\"\"\n"}
+{"Time":"2026-09-16T10:55:23.551151251+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Output":"2026/09/16 10:55:23 INFO http_request trace_id=00000000000000000000000000000000 span_id=0000000000000000 request_id=SZ452/Oo0coe8DzR-000003 method=POST path=/api/v1/t/{tenantSlug}/tokens status=201 latency_ms=2.102904 request_bytes=51 response_bytes=253 remote_addr=192.0.2.1:1234 user_agent=\"\"\n"}
+{"Time":"2026-09-16T10:55:23.553694181+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Output":"2026/09/16 10:55:23 INFO http_request trace_id=00000000000000000000000000000000 span_id=0000000000000000 request_id=SZ452/Oo0coe8DzR-000004 method=GET path=/api/v1/t/{tenantSlug}/tokens status=200 latency_ms=2.497957 request_bytes=0 response_bytes=240 remote_addr=192.0.2.1:1234 user_agent=\"\"\n"}
+{"Time":"2026-09-16T10:55:23.55477201+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Output":"2026/09/16 10:55:23 INFO http_request trace_id=00000000000000000000000000000000 span_id=0000000000000000 request_id=SZ452/Oo0coe8DzR-000005 method=DELETE path=/api/v1/t/{tenantSlug}/tokens/{tokenId} status=204 latency_ms=1.030229 request_bytes=0 response_bytes=0 remote_addr=192.0.2.1:1234 user_agent=\"\"\n"}
+{"Time":"2026-09-16T10:55:23.556029529+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Output":"2026/09/16 10:55:23 INFO http_request trace_id=00000000000000000000000000000000 span_id=0000000000000000 request_id=SZ452/Oo0coe8DzR-000006 method=GET path=/api/v1/t/{tenantSlug}/repositories status=401 latency_ms=1.23862 request_bytes=0 response_bytes=100 remote_addr=192.0.2.1:1234 user_agent=\"\"\n"}
+{"Time":"2026-09-16T10:55:23.556280163+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Output":"--- PASS: TestM0Smoke/SMK-004 (0.95s)\n","OutputType":"frame"}
+{"Time":"2026-09-16T10:55:23.556333019+08:00","Action":"pass","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke/SMK-004","Elapsed":0.95}
+{"Time":"2026-09-16T10:55:23.556403156+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke","Output":"--- PASS: TestM0Smoke (0.95s)\n","OutputType":"frame"}
+{"Time":"2026-09-16T10:55:23.556428624+08:00","Action":"pass","Package":"github.com/meridian-labs/meridian/internal/handler","Test":"TestM0Smoke","Elapsed":0.95}
+{"Time":"2026-09-16T10:55:23.556433374+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-09-16T10:55:23.564509768+08:00","Action":"output","Package":"github.com/meridian-labs/meridian/internal/handler","Output":"ok  \tgithub.com/meridian-labs/meridian/internal/handler\t0.973s\n"}
+{"Time":"2026-09-16T10:55:23.564544331+08:00","Action":"pass","Package":"github.com/meridian-labs/meridian/internal/handler","Elapsed":0.974}
+
+ Network meridian-it-tmp-bqqakawwky_default  Creating
+ Network meridian-it-tmp-bqqakawwky_default  Created
+ Container meridian-it-tmp-bqqakawwky-postgres-test-1  Creating
+ Container meridian-it-tmp-bqqakawwky-postgres-test-1  Created
+ Container meridian-it-tmp-bqqakawwky-postgres-test-1  Starting
+ Container meridian-it-tmp-bqqakawwky-postgres-test-1  Started
+ Container meridian-it-tmp-bqqakawwky-postgres-test-1  Waiting
+ Container meridian-it-tmp-bqqakawwky-postgres-test-1  Healthy
+

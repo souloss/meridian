@@ -62,7 +62,7 @@ milestoneCheckpointPolicy:
   staleSourceOrContractReturnsTo: pending
 
 milestoneCheckpoints:
-  M0: {status: completed, reportPath: artifacts/agent/milestones/M0/20260907T205730Z/report.json, completedBy: coding-agent, completedAt: '2026-09-07T20:57:30Z', completedCommit: 0869beec21827bfa3984698828b536d3f8aa5398, contractDigest: 'sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb'}
+  M0: {status: completed, reportPath: artifacts/agent/milestones/M0/20260916T0255Z/report.json, completedBy: coding-agent, completedAt: '2026-09-16T02:55:00Z', completedCommit: 56fd5b1f34abfbd68430d79c296a527d5fbf4308, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
   M1: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
   M2: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
   M3: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
