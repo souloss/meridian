@@ -122,12 +122,12 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		"displayName": "Stale Update",
 	}, nil, map[string]string{"Authorization": "Bearer " + adminToken, "If-Match": tenantETag})
 	assertError(t, staleTenantUpdate, http.StatusPreconditionFailed, "precondition_failed")
-	listedUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users?q=alice", nil, nil)
+	listedUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users?q=alice", nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, listedUsers, http.StatusOK)
 	if !strings.Contains(listedUsers.Body.String(), `"username":"alice"`) || strings.Contains(listedUsers.Body.String(), "password_hash") {
 		t.Fatalf("platform user directory = %s", listedUsers.Body.String())
 	}
-	listedTenants := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/tenants", nil, nil)
+	listedTenants := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/tenants", nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, listedTenants, http.StatusOK)
 	if !strings.Contains(listedTenants.Body.String(), `"slug":"acme"`) || strings.Contains(listedTenants.Body.String(), `"settings"`) {
 		t.Fatalf("platform tenant directory leaked settings or omitted tenant: %s", listedTenants.Body.String())
@@ -149,14 +149,14 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	assertStatus(t, aliceLogin, http.StatusOK)
 	aliceToken := responseString(t, aliceLogin, "accessToken")
 	assertTenantMembership(t, aliceLogin, "acme", "tenant_admin")
-	forbiddenPlatformUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users", nil, nil)
+	forbiddenPlatformUsers := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/users", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertError(t, forbiddenPlatformUsers, http.StatusNotFound, "not_found")
 	forbiddenTenantUpdate := requestJSONWithHeaders(t, httpHandler, http.MethodPatch, "/api/v1/admin/tenants/acme", map[string]any{
 		"displayName": "Unauthorized Update",
 	}, nil, map[string]string{"Authorization": "Bearer " + aliceToken, "If-Match": updatedTenantETag})
 	assertError(t, forbiddenTenantUpdate, http.StatusNotFound, "not_found")
 
-	me := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, nil)
+	me := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, me, http.StatusOK)
 	assertTenantMembership(t, me, "acme", "tenant_admin")
 
@@ -172,13 +172,13 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	`, uuid.NewV7(), tenantID, userID, uuid.NewV7(), uuid.NewV7(), uuid.NewV7()); err != nil {
 		t.Fatalf("create audit fixtures: %v", err)
 	}
-	tenantAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/audit-logs", nil, nil)
+	tenantAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/audit-logs", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, tenantAudits, http.StatusOK)
 	assertAuditPage(t, tenantAudits, 1, "acme", "repository.created")
-	platformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs?filter%5BtenantSlug%5D=acme", nil, nil)
+	platformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs?filter%5BtenantSlug%5D=acme", nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, platformAudits, http.StatusOK)
 	assertAuditPage(t, platformAudits, 1, "acme", "repository.created")
-	forbiddenPlatformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs", nil, nil)
+	forbiddenPlatformAudits := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/audit-logs", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertError(t, forbiddenPlatformAudits, http.StatusNotFound, "not_found")
 
 	invalidBearer := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/auth/me", nil, nil, map[string]string{
@@ -199,7 +199,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		t.Fatalf("authenticate new PAT: %v", err)
 	}
 
-	listedTokens := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/tokens", nil, nil)
+	listedTokens := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/tokens", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, listedTokens, http.StatusOK)
 	if strings.Contains(listedTokens.Body.String(), plaintextPAT) || strings.Contains(listedTokens.Body.String(), `"token"`) {
 		t.Fatal("token list disclosed PAT bearer material or a token field")
@@ -315,7 +315,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if !strings.Contains(createdRepository.Body.String(), "https://git.example.com:443/Team/Repo.git/") || !strings.Contains(createdRepository.Body.String(), "main") {
 		t.Fatalf("repository response lost display/default values: %s", createdRepository.Body.String())
 	}
-	listedRepositories := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, nil)
+	listedRepositories := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, listedRepositories, http.StatusOK)
 	var repositoryPage struct {
 		Total int `json:"total"`
@@ -358,7 +358,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if quotaPayload.Details.Quota != "repositories" || quotaPayload.Details.Current != 1 || quotaPayload.Details.Limit != 1 {
 		t.Fatalf("quota details = %#v", quotaPayload.Details)
 	}
-	listedAfterQuota := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, nil)
+	listedAfterQuota := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, listedAfterQuota, http.StatusOK)
 	if !strings.Contains(listedAfterQuota.Body.String(), `"total":1`) {
 		t.Fatalf("repository count changed after rejected create: %s", listedAfterQuota.Body.String())
@@ -371,7 +371,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if !strings.Contains(boundGlobal.Body.String(), globalID.String()) {
 		t.Fatalf("global credential binding missing from repository: %s", boundGlobal.Body.String())
 	}
-	tenantCredentials := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/credentials", nil, nil)
+	tenantCredentials := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/credentials", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, tenantCredentials, http.StatusOK)
 	if !strings.Contains(tenantCredentials.Body.String(), "integration global credential") || !strings.Contains(tenantCredentials.Body.String(), `"isGlobal":true`) {
 		t.Fatalf("tenant credential list did not expose selectable global credential: %s", tenantCredentials.Body.String())
@@ -399,29 +399,29 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if len(globalRotationBody.SyncJobs) != 1 || globalRotationBody.SyncJobs[0].JobID == uuid.Nil() {
 		t.Fatalf("global rotation jobs = %#v", globalRotationBody.SyncJobs)
 	}
-	platformJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs", nil, nil)
+	platformJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs", nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, platformJobs, http.StatusOK)
 	if !strings.Contains(platformJobs.Body.String(), globalRotationBody.SyncJobs[0].JobID.String()) || strings.Contains(platformJobs.Body.String(), "global-second-token") || strings.Contains(platformJobs.Body.String(), "credentialId") {
 		t.Fatalf("platform job projection leaked or omitted data: %s", platformJobs.Body.String())
 	}
-	platformJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil)
+	platformJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, map[string]string{"Authorization": "Bearer " + adminToken})
 	assertStatus(t, platformJob, http.StatusOK)
 	if strings.Contains(platformJob.Body.String(), "input") || strings.Contains(platformJob.Body.String(), "result") || strings.Contains(platformJob.Body.String(), "error") {
 		t.Fatalf("platform job detail contains redacted fields: %s", platformJob.Body.String())
 	}
-	platformJobAsTenant := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil)
+	platformJobAsTenant := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/admin/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertError(t, platformJobAsTenant, http.StatusNotFound, "not_found")
-	tenantJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs", nil, nil)
+	tenantJobs := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs", nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, tenantJobs, http.StatusOK)
 	if !strings.Contains(tenantJobs.Body.String(), globalRotationBody.SyncJobs[0].JobID.String()) || strings.Contains(tenantJobs.Body.String(), `"input"`) || strings.Contains(tenantJobs.Body.String(), `"riverJobId"`) {
 		t.Fatalf("tenant job page omitted job or leaked internals: %s", tenantJobs.Body.String())
 	}
-	tenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil)
+	tenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, tenantJob, http.StatusOK)
 	if !strings.Contains(tenantJob.Body.String(), `"status":"pending"`) || !strings.Contains(tenantJob.Body.String(), `"capabilities":["job:read","job:run"]`) || strings.Contains(tenantJob.Body.String(), `"input"`) {
 		t.Fatalf("tenant job detail has invalid projection: %s", tenantJob.Body.String())
 	}
-	crossTenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/other/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, nil)
+	crossTenantJob := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/other/jobs/"+globalRotationBody.SyncJobs[0].JobID.String(), nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertError(t, crossTenantJob, http.StatusNotFound, "not_found")
 	jobPAT := requestJSONWithHeaders(t, httpHandler, http.MethodPost, "/api/v1/t/acme/tokens", map[string]any{
 		"name": "job automation", "scopes": []string{"job:run"},
@@ -445,6 +445,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	})
 	assertError(t, cancelledAgain, http.StatusConflict, "job_not_cancellable")
 	terminalStream := requestJSONWithHeaders(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+globalRotationBody.SyncJobs[0].JobID.String()+"/logs", nil, nil, map[string]string{
+		"Authorization": "Bearer " + aliceToken,
 		"Last-Event-ID": "0",
 	})
 	assertStatus(t, terminalStream, http.StatusOK)
@@ -465,7 +466,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 	if retryReplay.Body.String() != retriedJob.Body.String() {
 		t.Fatalf("retry replay differs\nfirst: %s\nreplay: %s", retriedJob.Body.String(), retryReplay.Body.String())
 	}
-	retriedDetail := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+retriedJobID, nil, nil)
+	retriedDetail := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/jobs/"+retriedJobID, nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, retriedDetail, http.StatusOK)
 	if !strings.Contains(retriedDetail.Body.String(), `"trigger":"retry"`) || !strings.Contains(retriedDetail.Body.String(), `"retryOfJobId":"`+globalRotationBody.SyncJobs[0].JobID.String()+`"`) || !strings.Contains(retriedDetail.Body.String(), `"attempts":[]`) {
 		t.Fatalf("retried job detail = %s", retriedDetail.Body.String())
@@ -486,7 +487,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		"Authorization": "Bearer " + adminToken, "If-Match": globalETag,
 	})
 	assertStatus(t, deletedGlobal, http.StatusNoContent)
-	unboundGlobal := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, nil)
+	unboundGlobal := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertStatus(t, unboundGlobal, http.StatusOK)
 	if !strings.Contains(unboundGlobal.Body.String(), `"credentialId":null`) || !strings.Contains(unboundGlobal.Body.String(), `"class":"auth"`) {
 		t.Fatalf("forced global deletion did not expose unbound health state: %s", unboundGlobal.Body.String())
@@ -496,7 +497,7 @@ func TestIdentityHTTPWorkflow(t *testing.T) {
 		"Authorization": "Bearer " + aliceToken, "If-Match": repositoryETag,
 	})
 	assertStatus(t, deletedRepository, http.StatusNoContent)
-	missingRepository := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, nil)
+	missingRepository := requestJSON(t, httpHandler, http.MethodGet, "/api/v1/t/acme/repositories/"+repositoryID.String(), nil, map[string]string{"Authorization": "Bearer " + aliceToken})
 	assertError(t, missingRepository, http.StatusNotFound, "not_found")
 
 	if _, err := db.Pool.Exec(t.Context(), `UPDATE tenants SET status = 'disabled' WHERE slug = 'acme'`); err != nil {
@@ -533,9 +534,9 @@ func authenticatePAT(identity *service.Identity, t *testing.T, token string) err
 	return err
 }
 
-func requestJSON(t *testing.T, handler http.Handler, method, path string, body any, cookies []*http.Cookie) *httptest.ResponseRecorder {
+func requestJSON(t *testing.T, handler http.Handler, method, path string, body any, headers map[string]string) *httptest.ResponseRecorder {
 	t.Helper()
-	return requestJSONWithHeaders(t, handler, method, path, body, cookies, nil)
+	return requestJSONWithHeaders(t, handler, method, path, body, nil, headers)
 }
 
 func requestJSONWithHeaders(t *testing.T, handler http.Handler, method, path string, body any, cookies []*http.Cookie, headers map[string]string) *httptest.ResponseRecorder {
