@@ -59,7 +59,7 @@ type ServerInterface interface {
 	PutTenantMember(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, userId UserId)
 
 	// (GET /api/v1/t/{tenantSlug}/producer-profiles)
-	ListAvailableProducerProfiles(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
+	ListAvailableProducerProfiles(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListAvailableProducerProfilesParams)
 
 	// (GET /api/v1/t/{tenantSlug}/settings)
 	GetTenantSettings(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug)
@@ -177,7 +177,7 @@ func (_ Unimplemented) PutTenantMember(w http.ResponseWriter, r *http.Request, t
 }
 
 // (GET /api/v1/t/{tenantSlug}/producer-profiles)
-func (_ Unimplemented) ListAvailableProducerProfiles(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
+func (_ Unimplemented) ListAvailableProducerProfiles(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListAvailableProducerProfilesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -949,8 +949,24 @@ func (siw *ServerInterfaceWrapper) ListAvailableProducerProfiles(w http.Response
 		return
 	}
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListAvailableProducerProfilesParams
+
+	// ------------- Optional query parameter "kind" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "kind", r.URL.Query(), &params.Kind, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "kind"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "kind", Err: err})
+		}
+		return
+	}
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListAvailableProducerProfiles(w, r, tenantSlug)
+		siw.Handler.ListAvailableProducerProfiles(w, r, tenantSlug, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2769,6 +2785,7 @@ func (response PutTenantMember409JSONResponse) VisitPutTenantMemberResponse(w ht
 
 type ListAvailableProducerProfilesRequestObject struct {
 	TenantSlug TenantSlug `json:"tenantSlug"`
+	Params     ListAvailableProducerProfilesParams
 }
 
 type ListAvailableProducerProfilesResponseObject interface {
@@ -4448,10 +4465,11 @@ func (sh *strictHandler) PutTenantMember(w http.ResponseWriter, r *http.Request,
 }
 
 // ListAvailableProducerProfiles operation middleware
-func (sh *strictHandler) ListAvailableProducerProfiles(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug) {
+func (sh *strictHandler) ListAvailableProducerProfiles(w http.ResponseWriter, r *http.Request, tenantSlug TenantSlug, params ListAvailableProducerProfilesParams) {
 	var request ListAvailableProducerProfilesRequestObject
 
 	request.TenantSlug = tenantSlug
+	request.Params = params
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
 		return sh.ssi.ListAvailableProducerProfiles(ctx, request.(ListAvailableProducerProfilesRequestObject))

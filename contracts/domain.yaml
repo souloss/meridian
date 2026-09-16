@@ -178,11 +178,12 @@ repository:
   discovery:
     markerFiles: [go.mod, pom.xml, build.gradle, build.gradle.kts, package.json, pyproject.toml, Cargo.toml]
     markerDirectories: [proto]
-    candidateKey: [repositoryId, commit, rootDir]
+    candidateKey: [repositoryId, rootDir]
     rootNormalization: repository-relative-path-with-empty-root-allowed
     serviceCreatePathMapping: null-or-omitted-request-path-is-stored-as-empty-root-dir
     ordering: rootDir-ascending-bytewise
     repeatedCandidateBehavior: update-existing-candidate-and-reset-status-to-pending-only-if-commit-changed
+    commitTracking: candidate-stores-commit-as-a-column-and-updates-it-in-place
   recentServices:
     table: recent_services
     readOperation: listRecentServices
@@ -505,6 +506,7 @@ authorization:
     unauthenticated: {httpStatus: 401, errorCode: unauthenticated}
 
 visibility:
+  defaultWhenOmittedOnServiceCreate: private
   private:
     anonymous: deny
     tenantMember: require-service-read-grant
@@ -981,6 +983,10 @@ producers:
     timeoutSecondsByKind: {command: 300, ai: 600}
     timeoutMinimumSeconds: 10
     aiSelection: request-producerProfileId-then-tenant-defaultAiProducerProfileId-else-validation-error
+    listAvailableFiltering: optional-kind-query-parameter-filters-to-enabled-available-and-supportedKinds-containing-kind
+    dependencyDetection:
+      creationOrUpdate: verify-executable-absolute-path-exists-and-is-executable-then-store-availability
+      startup: rescan-all-profiles-and-refresh-availability
   runner:
     implementation: bubblewrap
     missingDependencyBehavior: profile-unavailable
@@ -1143,7 +1149,7 @@ jobs:
   types:
     tenant.delete: {scopeType: tenant, uniqueKey: 'tenant-delete:{tenantId}'}
     repo.sync: {scopeType: repository, refRequired: true, uniqueKey: 'repo:{repositoryId}:{refType}:{refName}'}
-    repo.discover: {scopeType: repository, uniqueKey: 'discover:{repositoryId}:{commit}'}
+    repo.discover: {scopeType: repository, refRequired: true, uniqueKey: 'discover:{repositoryId}:{refType}:{refName}'}
     asset.produce: {scopeType: source, refRequired: true, uniqueKey: 'produce:{sourceId}:{refType}:{refName}:{commit}'}
     asset.merge: {scopeType: track, uniqueKey: 'merge:{trackId}'}
     asset.index: {scopeType: version, uniqueKey: 'index:{assetVersionId}'}

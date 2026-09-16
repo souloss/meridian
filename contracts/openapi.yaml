@@ -4636,6 +4636,7 @@ paths:
       description: Returns the requested page of available producer profiles within the authorized request scope.
       parameters:
       - $ref: '#/components/parameters/TenantSlug'
+      - $ref: '#/components/parameters/KindFilter'
       responses:
         '200':
           description: The request has succeeded.

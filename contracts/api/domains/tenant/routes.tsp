@@ -65,7 +65,7 @@ op updateTenantSettings(
 @extension("x-milestone", "M1")
 @route("/api/v1/t/{tenantSlug}/producer-profiles")
 @get
-op listAvailableProducerProfiles(...Parameters.TenantSlug):
+op listAvailableProducerProfiles(...Parameters.TenantSlug, ...Parameters.KindFilter):
   | ProducerProfileOptionList
   | {
       @statusCode statusCode: 404;

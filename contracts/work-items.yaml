@@ -229,7 +229,7 @@ items:
   - id: M1-CONTRACT-002
     milestone: M1
     priority: P0
-    status: blocked
+    status: ready
     title: define-repository-discovery-and-producer-selection-semantics
     dependsOn: [M1-CONTRACT-001]
     operationIds: []
@@ -243,11 +243,20 @@ items:
     startedAt: null
     baseCommit: 21400f5bfa30e8df3c1674b992914efeacb40be6
     contractDigest: sha256:56d71ba4f34fcb335b187d31a8aa327c299c829516e658c5cc7adbd173975fcb
-    failureKind: product_decision
-    blockedReason: The frozen contracts do not define five behaviors required by SMK-032 and SMK-040; explicit product decisions are required before contract repair.
+    failureKind: null
+    blockedReason: null
     reportPath: null
     lastEvidence: null
-    nextAction: obtain explicit decisions for profile filtering, service visibility default, candidate identity, discover deduplication, and executable dependency detection
+    nextAction: claim-and-apply-the-five-user-decisions
+    recovery:
+      authorizedBy: souloss
+      authorizedOn: '2026-09-16'
+      decisions:
+        - listAvailableProducerProfiles-optional-kind-filter
+        - service-visibility-default-private
+        - candidate-key-without-commit
+        - discover-dedupe-key-by-ref
+        - producer-dependency-detection-at-create-plus-startup-rescan
 
   - id: M1-CONTRACT-001
     milestone: M1

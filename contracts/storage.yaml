@@ -502,7 +502,7 @@ tables:
   discovery_candidates:
     tenantScoped: true
     primaryKey: [tenant_id, id]
-    unique: [[tenant_id, repository_id, commit_sha, root_dir]]
+    unique: [[tenant_id, repository_id, root_dir]]
     fields: [tenant_id, id, repository_id, commit_sha, root_dir, detected, status, created_at, updated_at]
   asset_kinds:
     tenantScoped: false

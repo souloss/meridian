@@ -20,6 +20,9 @@ type IdempotencyKey = openapi_types.UUID
 // IfMatch Opaque HTTP entity tag including quotes
 type IfMatch = externalRef0.ETag
 
+// KindFilter identifies an asset kind registered in contracts/kinds.yaml.
+type KindFilter = externalRef0.KindId
+
 // Page defines model for Page.
 type Page = int
 
@@ -111,6 +114,12 @@ type ListTenantMembersParams struct {
 
 	// PageSize limits the number of records returned on one page.
 	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+}
+
+// ListAvailableProducerProfilesParams defines parameters for ListAvailableProducerProfiles.
+type ListAvailableProducerProfilesParams struct {
+	// Kind identifies or filters the kind value in the query.
+	Kind *KindFilter `form:"kind,omitempty" json:"kind,omitempty"`
 }
 
 // UpdateTenantSettingsParams defines parameters for UpdateTenantSettings.
