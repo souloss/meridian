@@ -183,11 +183,15 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 	if service.Lifecycle == "retired" {
 		return SourceSpecRecord{}, ErrInvalidState
 	}
+	if validated.Mode == "manual" && input.TargetAssetID == nil {
+		return SourceSpecRecord{}, ErrValidation
+	}
 	record, err := discovery.store.CreateSourceSpec(ctx, NewSourceSpec{
 		TenantID: membership.TenantID, ID: uuid.NewV7(), ServiceID: service.ID, Kind: validated.Kind,
 		AssetNameTemplate: validated.AssetNameTemplate, Role: validated.Role, Origin: validated.Origin, Mode: validated.Mode,
 		Path: validated.Path, ProducerProfileID: validated.ProducerProfileID, Ord: validated.Ord, TimeoutSec: validated.TimeoutSec,
 		BranchPatterns: validated.BranchPatterns, Enabled: validated.Enabled, ConfigOrigin: validated.ConfigOrigin,
+		TargetAssetID: input.TargetAssetID,
 	})
 	if err != nil {
 		return SourceSpecRecord{}, err
@@ -444,10 +448,10 @@ func (err *ProducerUnavailableError) Error() string {
 
 // CandidateOverride adjusts one candidate during acceptance.
 type CandidateOverride struct {
-	CandidateID  uuid.UUID
-	Slug         *string
-	DisplayName  *string
-	Visibility   *string
+	CandidateID uuid.UUID
+	Slug        *string
+	DisplayName *string
+	Visibility  *string
 }
 
 func (candidate DiscoveryCandidateRecord) DisplayName() string {

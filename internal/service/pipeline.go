@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"uuid"
@@ -377,8 +378,8 @@ func (runner *PipelineRunner) materializeVersion(ctx context.Context, tenantID u
 
 func (runner *PipelineRunner) buildFingerprint(manifest []LayerManifestEntry) string {
 	payload, _ := json.Marshal(struct {
-		Manifest          []LayerManifestEntry `json:"manifest"`
-		MergeEngineVersion string              `json:"mergeEngineVersion"`
+		Manifest           []LayerManifestEntry `json:"manifest"`
+		MergeEngineVersion string               `json:"mergeEngineVersion"`
 	}{Manifest: manifest, MergeEngineVersion: mergeEngineVersion})
 	hash := sha256.Sum256(payload)
 	return hex.EncodeToString(hash[:])
@@ -388,7 +389,29 @@ func nextVersionLabel(latest AssetVersionRecord, sequence int64) string {
 	if latest.Version == "" {
 		return initialVersionLabel
 	}
-	return latest.Version
+	// Increment the patch segment; breaking/major decisions are a later milestone.
+	return incrementVersionLabel(latest.Version)
+}
+
+// incrementVersionLabel bumps the patch segment of a semver label. This is the
+// M2 automatic-increment default for "all other input changes".
+func incrementVersionLabel(version string) string {
+	major, minor, patch := "0", "0", "0"
+	parts := strings.SplitN(version, ".", 3)
+	if len(parts) > 0 {
+		major = parts[0]
+	}
+	if len(parts) > 1 {
+		minor = parts[1]
+	}
+	if len(parts) > 2 {
+		patch = parts[2]
+	}
+	nextPatch, err := strconv.Atoi(patch)
+	if err != nil {
+		return version
+	}
+	return major + "." + minor + "." + strconv.Itoa(nextPatch+1)
 }
 
 func (runner *PipelineRunner) recordSourceError(ctx context.Context, tenantID uuid.UUID, spec SourceSpecRecord, code, scopeKey, commit string) error {

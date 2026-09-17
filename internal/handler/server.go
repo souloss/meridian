@@ -22,19 +22,20 @@ import (
 )
 
 type Server struct {
-	ready         atomic.Bool
-	assets        fs.FS
-	identity      *service.Identity
-	credentials   *service.Credentials
-	repositories  *service.Repositories
-	jobs          *service.Jobs
-	audits        *service.Audits
-	producers     *service.Producers
-	discovery     *service.Discovery
-	assetService  *service.Assets
-	views         *service.Views
+	ready            atomic.Bool
+	assets           fs.FS
+	identity         *service.Identity
+	credentials      *service.Credentials
+	repositories     *service.Repositories
+	jobs             *service.Jobs
+	audits           *service.Audits
+	producers        *service.Producers
+	discovery        *service.Discovery
+	assetService     *service.Assets
+	views            *service.Views
 	serviceLifecycle *service.ServiceLifecycle
-	secureCookies bool
+	layerEdit        *service.LayerEdit
+	secureCookies    bool
 }
 
 // Dependencies groups the independently testable use cases exposed by the HTTP server.
@@ -59,6 +60,8 @@ type Dependencies struct {
 	Views *service.Views
 	// ServiceLifecycle provides service metadata updates, public reads, and delete.
 	ServiceLifecycle *service.ServiceLifecycle
+	// LayerEdit provides overlay revisions, ordering, rollback, merge preview, and provenance.
+	LayerEdit *service.LayerEdit
 }
 
 func New() *Server {
@@ -96,6 +99,7 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.assetService = dependencies.Assets
 	s.views = dependencies.Views
 	s.serviceLifecycle = dependencies.ServiceLifecycle
+	s.layerEdit = dependencies.LayerEdit
 	s.secureCookies = secureCookies
 	return s
 }
@@ -118,6 +122,7 @@ func requestErrorHandler(w http.ResponseWriter, r *http.Request, _ error) {
 }
 
 func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
+	var overlayErr *service.OverlayInvalidError
 	if quotaErr, ok := errors.AsType[*service.QuotaExceededError](err); ok {
 		writeErrorDetails(w, r, http.StatusConflict, "quota_exceeded", "tenant resource quota would be exceeded", map[string]any{
 			"quota": quotaErr.Resource, "current": quotaErr.Current, "limit": quotaErr.Limit,
@@ -133,6 +138,9 @@ func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 		return
 	case errors.Is(err, service.ErrDuplicate):
 		writeError(w, r, http.StatusConflict, "duplicate", "resource already exists")
+		return
+	case errors.As(err, &overlayErr):
+		writeErrorDetails(w, r, http.StatusUnprocessableEntity, "overlay_invalid", "overlay document is invalid", overlayErrorDetails(overlayErr))
 		return
 	case errors.Is(err, service.ErrValidation):
 		writeError(w, r, http.StatusUnprocessableEntity, "validation_error", "request violates a domain rule")

@@ -56,17 +56,19 @@ type AssetItemRecord struct {
 
 // LayerRecord is one asset layer.
 type LayerRecord struct {
-	ID           uuid.UUID
-	AssetID      uuid.UUID
-	SourceSpecID *uuid.UUID
-	Role         string
-	Origin       string
-	Ord          int
-	Dialect      *string
-	Enabled      bool
+	ID             uuid.UUID
+	AssetID        uuid.UUID
+	SourceSpecID   *uuid.UUID
+	Role           string
+	Origin         string
+	Ord            int
+	Dialect        *string
+	Enabled        bool
 	BranchPatterns []string
-	DisplayName  string
-	Revision     int64
+	DisplayName    string
+	Revision       int64
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 // LayerRevisionRecord is one immutable layer content revision.
@@ -78,6 +80,7 @@ type LayerRevisionRecord struct {
 	ContentHash  string
 	ContentRef   string
 	ContentType  string
+	Dialect      *string
 	ReviewStatus string
 	GitCommit    *string
 	SourceBranch *string
@@ -116,64 +119,64 @@ type NewLayerHead struct {
 
 // NewAssetVersion carries values for one version insert.
 type NewAssetVersion struct {
-	TenantID             uuid.UUID
-	ID                   uuid.UUID
-	AssetID              uuid.UUID
-	TrackID              uuid.UUID
-	SequenceNo           int64
-	Version              string
-	Lifecycle            string
-	Revision             int64
-	QualityScore         *int32
-	MergeRequestID       *uuid.UUID
-	InputFingerprint     string
-	MergeEngineVersion   string
+	TenantID               uuid.UUID
+	ID                     uuid.UUID
+	AssetID                uuid.UUID
+	TrackID                uuid.UUID
+	SequenceNo             int64
+	Version                string
+	Lifecycle              string
+	Revision               int64
+	QualityScore           *int32
+	MergeRequestID         *uuid.UUID
+	InputFingerprint       string
+	MergeEngineVersion     string
 	OverlayCompilerVersion *string
 	OverlayMode            *string
 	NormalizerVersion      *string
 	KindPluginVersion      *string
-	LayerManifest        []byte
-	MergedHash           *string
-	MergedRef            *string
-	NormalizedRef        *string
-	BundledRef           *string
-	ProvenanceRef        *string
-	SourceCommit         *string
-	BaselineVersionID    *uuid.UUID
-	DiffSummary          []byte
-	Labels               []byte
-	IndexComplete        bool
+	LayerManifest          []byte
+	MergedHash             *string
+	MergedRef              *string
+	NormalizedRef          *string
+	BundledRef             *string
+	ProvenanceRef          *string
+	SourceCommit           *string
+	BaselineVersionID      *uuid.UUID
+	DiffSummary            []byte
+	Labels                 []byte
+	IndexComplete          bool
 }
 
 // NewAssetItem carries values for one item insert.
 type NewAssetItem struct {
-	TenantID      uuid.UUID
-	ID            uuid.UUID
+	TenantID       uuid.UUID
+	ID             uuid.UUID
 	AssetVersionID uuid.UUID
-	AssetID       uuid.UUID
-	ServiceID     uuid.UUID
-	Kind          string
-	ItemType      string
-	Key           string
-	Display       []byte
-	SearchText    string
-	SearchRaw     []byte
-	Provenance    []byte
+	AssetID        uuid.UUID
+	ServiceID      uuid.UUID
+	Kind           string
+	ItemType       string
+	Key            string
+	Display        []byte
+	SearchText     string
+	SearchRaw      []byte
+	Provenance     []byte
 }
 
 // NewSourceBinding carries values for one binding upsert.
 type NewSourceBinding struct {
-	TenantID      uuid.UUID
-	ID            uuid.UUID
-	SourceSpecID  uuid.UUID
-	ScopeType     string
-	ScopeKey      string
-	ExpansionKey  string
-	ResolvedPath  *string
-	SourceSystem  *string
-	AssetID       uuid.UUID
-	LayerID       uuid.UUID
-	State         string
+	TenantID       uuid.UUID
+	ID             uuid.UUID
+	SourceSpecID   uuid.UUID
+	ScopeType      string
+	ScopeKey       string
+	ExpansionKey   string
+	ResolvedPath   *string
+	SourceSystem   *string
+	AssetID        uuid.UUID
+	LayerID        uuid.UUID
+	State          string
 	LastSeenCommit *string
 }
 
@@ -263,13 +266,13 @@ type AssetKindRecord struct {
 
 // AssetRefTrackRecord is one asset ref track.
 type AssetRefTrackRecord struct {
-	ID            uuid.UUID
-	AssetID       uuid.UUID
-	RefType       string
-	RefName       string
-	LatestVersionID *uuid.UUID
+	ID               uuid.UUID
+	AssetID          uuid.UUID
+	RefType          string
+	RefName          string
+	LatestVersionID  *uuid.UUID
 	CurrentVersionID *uuid.UUID
-	Health        string
+	Health           string
 }
 
 // LayerHeadRecord is one layer head pointer.
@@ -321,17 +324,17 @@ type SourceSpecPatch struct {
 
 // NewLayer carries values for one layer create.
 type NewLayer struct {
-	TenantID      uuid.UUID
-	ID            uuid.UUID
-	AssetID       uuid.UUID
-	SourceSpecID  *uuid.UUID
-	Role          string
-	Origin        string
-	Ord           int
-	Dialect       *string
-	Enabled       bool
+	TenantID       uuid.UUID
+	ID             uuid.UUID
+	AssetID        uuid.UUID
+	SourceSpecID   *uuid.UUID
+	Role           string
+	Origin         string
+	Ord            int
+	Dialect        *string
+	Enabled        bool
 	BranchPatterns []string
-	DisplayName   string
+	DisplayName    string
 }
 
 // VersionRefRecord is a version reference embedded in an asset summary.
@@ -356,7 +359,7 @@ type AssetSummaryRecord struct {
 
 // MissingKindRecord reports a registered kind the service has no asset for.
 type MissingKindRecord struct {
-	Kind            string
-	CanConfigure    bool
+	Kind              string
+	CanConfigure      bool
 	CanGenerateWithAI bool
 }

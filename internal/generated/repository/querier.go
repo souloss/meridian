@@ -163,6 +163,9 @@ type Querier interface {
 	// CreateLayerRevision exposes the corresponding strongly typed database operation.
 	// 创建一条层修订。
 	CreateLayerRevision(ctx context.Context, arg CreateLayerRevisionParams) (LayerRevision, error)
+	// CreateMergeJob exposes the corresponding strongly typed database operation.
+	// 记录一条持久化的资产合并请求。
+	CreateMergeJob(ctx context.Context, arg CreateMergeJobParams) (Job, error)
 	// CreateNotifyOutbox exposes the corresponding strongly typed database operation.
 	// 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 	CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error)
@@ -260,6 +263,9 @@ type Querier interface {
 	// GetAssetByName exposes the corresponding strongly typed database operation.
 	// 按服务、kind、名称返回一个活跃资产。
 	GetAssetByName(ctx context.Context, arg GetAssetByNameParams) (Asset, error)
+	// GetAssetForSourceSpec exposes the corresponding strongly typed database operation.
+	// 校验 manual 源配置的目标资产：必须属于该服务且 kind 匹配。
+	GetAssetForSourceSpec(ctx context.Context, arg GetAssetForSourceSpecParams) (Asset, error)
 	// GetAssetKind exposes the corresponding strongly typed database operation.
 	// M1 资产流水线的持久化查询：资产、层、修订、版本、条目、轨迹、kind 与最近访问。
 	// 全部查询保留 tenant_id 谓词；asset_kinds 为平台级 global 表。
@@ -268,12 +274,18 @@ type Querier interface {
 	// GetAssetRefTrack exposes the corresponding strongly typed database operation.
 	// 返回一条资产引用轨迹。
 	GetAssetRefTrack(ctx context.Context, arg GetAssetRefTrackParams) (AssetRefTrack, error)
+	// GetAssetRefTrackByID exposes the corresponding strongly typed database operation.
+	// 按轨迹 id 返回一条资产引用轨迹，供 asset.merge 任务按轨迹定位资产。
+	GetAssetRefTrackByID(ctx context.Context, arg GetAssetRefTrackByIDParams) (AssetRefTrack, error)
 	// GetAssetRepositoryDefaultBranch exposes the corresponding strongly typed database operation.
 	// 返回一个资产所属服务的仓库默认分支。
 	GetAssetRepositoryDefaultBranch(ctx context.Context, arg GetAssetRepositoryDefaultBranchParams) (string, error)
 	// GetAssetVersion exposes the corresponding strongly typed database operation.
 	// 返回一条资产版本。
 	GetAssetVersion(ctx context.Context, arg GetAssetVersionParams) (AssetVersion, error)
+	// GetAssetVersionForProvenance exposes the corresponding strongly typed database operation.
+	// 按 id 返回一个资产版本，供溯源读取层清单与基准。
+	GetAssetVersionForProvenance(ctx context.Context, arg GetAssetVersionForProvenanceParams) (AssetVersion, error)
 	// GetBaseLayerForAsset exposes the corresponding strongly typed database operation.
 	// 返回一个资产的 base 层。
 	GetBaseLayerForAsset(ctx context.Context, arg GetBaseLayerForAssetParams) (Layer, error)
@@ -301,9 +313,20 @@ type Querier interface {
 	// GetLatestVersionInTrack exposes the corresponding strongly typed database operation.
 	// 返回轨迹内最新创建的版本。
 	GetLatestVersionInTrack(ctx context.Context, arg GetLatestVersionInTrackParams) (AssetVersion, error)
+	// GetLayer exposes the corresponding strongly typed database operation.
+	// M2 层编辑、overlay 修订、回滚与排序的持久化查询。
+	// 全部查询保留 tenant_id 谓词。
+	// 返回一条活跃层。
+	GetLayer(ctx context.Context, arg GetLayerParams) (Layer, error)
+	// GetLayerForUpdate exposes the corresponding strongly typed database operation.
+	// 锁定一条活跃层，供排序与回滚前校验 revision。
+	GetLayerForUpdate(ctx context.Context, arg GetLayerForUpdateParams) (Layer, error)
 	// GetLayerHead exposes the corresponding strongly typed database operation.
 	// 返回一个层头。
 	GetLayerHead(ctx context.Context, arg GetLayerHeadParams) (LayerHead, error)
+	// GetLayerRevision exposes the corresponding strongly typed database operation.
+	// 返回一条层修订，供回滚与溯源读取。
+	GetLayerRevision(ctx context.Context, arg GetLayerRevisionParams) (LayerRevision, error)
 	// GetPlatformJob exposes the corresponding strongly typed database operation.
 	// 返回一条脱敏平台任务，不包含租户拥有的负载或执行详情。
 	// 保留租户和仓库范围的作用域标识，与公开 PlatformJob 契约一致。
@@ -416,6 +439,15 @@ type Querier interface {
 	// ListKnownHosts exposes the corresponding strongly typed database operation.
 	// 返回租户认可的 SSH 主机身份稳定分页结果。
 	ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error)
+	// ListLayerHeadsForAsset exposes the corresponding strongly typed database operation.
+	// 返回一个资产下全部层的头指针（用于合并选择有效修订）。
+	ListLayerHeadsForAsset(ctx context.Context, arg ListLayerHeadsForAssetParams) ([]LayerHead, error)
+	// ListLayerRevisions exposes the corresponding strongly typed database operation.
+	// 列出某层某作用域内的全部修订，按创建时间倒序。
+	ListLayerRevisions(ctx context.Context, arg ListLayerRevisionsParams) ([]LayerRevision, error)
+	// ListLayersForAsset exposes the corresponding strongly typed database operation.
+	// 返回一个资产下全部活跃层，按 ord 后 id 排序。
+	ListLayersForAsset(ctx context.Context, arg ListLayersForAssetParams) ([]Layer, error)
 	// ListPlatformAuditLogs exposes the corresponding strongly typed database operation.
 	// 为平台控制面返回一页按最新时间优先排列的跨租户审计元数据。
 	// 平台级记录的可空租户归属会保留在结果中。
@@ -609,6 +641,13 @@ type Querier interface {
 	// UpdateGlobalCredentialMetadata exposes the corresponding strongly typed database operation.
 	// 有条件地更新平台凭据名称并递增版本号。
 	UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error)
+	// UpdateLayerHeadPointers exposes the corresponding strongly typed database operation.
+	// 更新或创建（upsert）一个层头的最新/生效/候选修订指针并递增代次。
+	// 首次提交插入 generation=1；后续提交在既有行上递增 generation。
+	UpdateLayerHeadPointers(ctx context.Context, arg UpdateLayerHeadPointersParams) (LayerHead, error)
+	// UpdateLayerOrd exposes the corresponding strongly typed database operation.
+	// 更新一条层的排序号并递增 revision。
+	UpdateLayerOrd(ctx context.Context, arg UpdateLayerOrdParams) (Layer, error)
 	// UpdateProducerProfileDependencyStatus exposes the corresponding strongly typed database operation.
 	// 启动时全量重扫并刷新依赖状态。
 	UpdateProducerProfileDependencyStatus(ctx context.Context, arg UpdateProducerProfileDependencyStatusParams) (int64, error)

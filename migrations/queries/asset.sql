@@ -62,6 +62,13 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND ref_type = sqlc.arg(ref_type)
   AND ref_name = sqlc.arg(ref_name);
 
+-- 按轨迹 id 返回一条资产引用轨迹，供 asset.merge 任务按轨迹定位资产。
+-- name: GetAssetRefTrackByID :one
+SELECT *
+FROM asset_ref_tracks
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id);
+
 -- 创建一条层。
 -- name: CreateLayer :one
 INSERT INTO layers (tenant_id, id, asset_id, source_spec_id, role, origin, ord, dialect, enabled, branch_patterns, display_name)
@@ -392,6 +399,19 @@ INSERT INTO jobs (
 ) VALUES (
   sqlc.arg(tenant_id), sqlc.arg(id), 'repo.sync', 'repository', sqlc.arg(repository_id),
   sqlc.arg(ref_type), sqlc.narg(ref_name), 'manual', sqlc.arg(job_input)::jsonb,
+  'pending', 3, sqlc.arg(dedupe_key), sqlc.arg(active_generation), true
+)
+ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
+RETURNING *;
+
+-- 记录一条持久化的资产合并请求。
+-- name: CreateMergeJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  sqlc.arg(tenant_id), sqlc.arg(id), 'asset.merge', 'track', sqlc.arg(track_id),
+  NULL, NULL, 'manual', sqlc.arg(job_input)::jsonb,
   'pending', 3, sqlc.arg(dedupe_key), sqlc.arg(active_generation), true
 )
 ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING

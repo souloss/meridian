@@ -481,6 +481,52 @@ func (q *Queries) CreateSourceSpec(ctx context.Context, arg CreateSourceSpecPara
 	return i, err
 }
 
+const getAssetForSourceSpec = `-- name: GetAssetForSourceSpec :one
+SELECT tenant_id, id, service_id, kind, name, revision, deleted_at, created_at, updated_at
+FROM assets
+WHERE tenant_id = $1
+  AND id = $2
+  AND service_id = $3
+  AND kind = $4
+  AND deleted_at IS NULL
+`
+
+// GetAssetForSourceSpecParams contains the strongly typed arguments for the GetAssetForSourceSpec query.
+type GetAssetForSourceSpecParams struct {
+	// TenantID is the tenant id value supplied to the GetAssetForSourceSpec query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// AssetID is the asset id value supplied to the GetAssetForSourceSpec query.
+	AssetID uuid.UUID `json:"asset_id"`
+	// ServiceID is the service id value supplied to the GetAssetForSourceSpec query.
+	ServiceID uuid.UUID `json:"service_id"`
+	// Kind is the kind value supplied to the GetAssetForSourceSpec query.
+	Kind string `json:"kind"`
+}
+
+// GetAssetForSourceSpec executes the generated GetAssetForSourceSpec database query.
+// 校验 manual 源配置的目标资产：必须属于该服务且 kind 匹配。
+func (q *Queries) GetAssetForSourceSpec(ctx context.Context, arg GetAssetForSourceSpecParams) (Asset, error) {
+	row := q.db.QueryRow(ctx, getAssetForSourceSpec,
+		arg.TenantID,
+		arg.AssetID,
+		arg.ServiceID,
+		arg.Kind,
+	)
+	var i Asset
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.ServiceID,
+		&i.Kind,
+		&i.Name,
+		&i.Revision,
+		&i.DeletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getDiscoveryCandidate = `-- name: GetDiscoveryCandidate :one
 SELECT tenant_id, id, repository_id, commit_sha, root_dir, detected, status, created_at, updated_at
 FROM discovery_candidates

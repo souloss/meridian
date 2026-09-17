@@ -537,6 +537,78 @@ func (q *Queries) CreateLayerRevision(ctx context.Context, arg CreateLayerRevisi
 	return i, err
 }
 
+const createMergeJob = `-- name: CreateMergeJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  $1, $2, 'asset.merge', 'track', $3,
+  NULL, NULL, 'manual', $4::jsonb,
+  'pending', 3, $5, $6, true
+)
+ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
+RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+`
+
+// CreateMergeJobParams contains the strongly typed arguments for the CreateMergeJob query.
+type CreateMergeJobParams struct {
+	// TenantID is the tenant id value supplied to the CreateMergeJob query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the id value supplied to the CreateMergeJob query.
+	ID uuid.UUID `json:"id"`
+	// TrackID is the track id value supplied to the CreateMergeJob query.
+	TrackID *uuid.UUID `json:"track_id"`
+	// JobInput is the job input value supplied to the CreateMergeJob query.
+	JobInput []byte `json:"job_input"`
+	// DedupeKey is the dedupe key value supplied to the CreateMergeJob query.
+	DedupeKey string `json:"dedupe_key"`
+	// ActiveGeneration is the active generation value supplied to the CreateMergeJob query.
+	ActiveGeneration int64 `json:"active_generation"`
+}
+
+// CreateMergeJob executes the generated CreateMergeJob database query.
+// 记录一条持久化的资产合并请求。
+func (q *Queries) CreateMergeJob(ctx context.Context, arg CreateMergeJobParams) (Job, error) {
+	row := q.db.QueryRow(ctx, createMergeJob,
+		arg.TenantID,
+		arg.ID,
+		arg.TrackID,
+		arg.JobInput,
+		arg.DedupeKey,
+		arg.ActiveGeneration,
+	)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const createSyncJob = `-- name: CreateSyncJob :one
 INSERT INTO jobs (
   tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
@@ -751,6 +823,44 @@ func (q *Queries) GetAssetRefTrack(ctx context.Context, arg GetAssetRefTrackPara
 		arg.RefType,
 		arg.RefName,
 	)
+	var i AssetRefTrack
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.AssetID,
+		&i.RefType,
+		&i.RefName,
+		&i.LatestVersionID,
+		&i.CurrentVersionID,
+		&i.Health,
+		&i.DesiredGeneration,
+		&i.ProcessedGeneration,
+		&i.Active,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getAssetRefTrackByID = `-- name: GetAssetRefTrackByID :one
+SELECT tenant_id, id, asset_id, ref_type, ref_name, latest_version_id, current_version_id, health, desired_generation, processed_generation, active, created_at, updated_at
+FROM asset_ref_tracks
+WHERE tenant_id = $1
+  AND id = $2
+`
+
+// GetAssetRefTrackByIDParams contains the strongly typed arguments for the GetAssetRefTrackByID query.
+type GetAssetRefTrackByIDParams struct {
+	// TenantID is the tenant id value supplied to the GetAssetRefTrackByID query.
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the id value supplied to the GetAssetRefTrackByID query.
+	ID uuid.UUID `json:"id"`
+}
+
+// GetAssetRefTrackByID executes the generated GetAssetRefTrackByID database query.
+// 按轨迹 id 返回一条资产引用轨迹，供 asset.merge 任务按轨迹定位资产。
+func (q *Queries) GetAssetRefTrackByID(ctx context.Context, arg GetAssetRefTrackByIDParams) (AssetRefTrack, error) {
+	row := q.db.QueryRow(ctx, getAssetRefTrackByID, arg.TenantID, arg.ID)
 	var i AssetRefTrack
 	err := row.Scan(
 		&i.TenantID,

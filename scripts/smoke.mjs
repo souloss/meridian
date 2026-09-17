@@ -13,6 +13,7 @@ const ids = mode === '--credentials' ? ['SMK-005', 'SMK-031', 'SMK-035']
   : mode === '--m1-golden-path' ? ['SMK-006', 'SMK-007', 'SMK-008', 'SMK-009', 'SMK-010']
   : mode === '--m1-service-lifecycle' ? ['SMK-034', 'SMK-037']
   : mode === '--m1-concurrency' ? ['SMK-027', 'SMK-036']
+  : mode === '--m2-overlay' ? ['SMK-011', 'SMK-012', 'SMK-013', 'SMK-014']
   : mode === '--all' ? Object.keys(catalog).filter(id => catalog[id].milestone <= milestone)
   : catalog[mode] ? [mode] : []
 if (ids.length === 0) {

@@ -247,9 +247,33 @@ func (store *DiscoveryStore) GetProducerProfile(ctx context.Context, id uuid.UUI
 	return producerProfileFromRow(row), nil
 }
 
-// CreateSourceSpec inserts one validated source configuration.
+// CreateSourceSpec inserts one validated source configuration. Manual mode
+// additionally creates its one global source binding and layer in the same
+// transaction and returns the layer id as the source's initial layer.
 func (store *DiscoveryStore) CreateSourceSpec(ctx context.Context, input service.NewSourceSpec) (service.SourceSpecRecord, error) {
-	row, err := store.queries.CreateSourceSpec(ctx, generated.CreateSourceSpecParams{
+	if input.Mode != "manual" || input.TargetAssetID == nil {
+		row, err := store.queries.CreateSourceSpec(ctx, generated.CreateSourceSpecParams{
+			TenantID: input.TenantID, ID: input.ID, ServiceID: input.ServiceID, Kind: input.Kind, AssetNameTemplate: input.AssetNameTemplate,
+			Role: input.Role, Origin: input.Origin, Mode: input.Mode, Path: input.Path,
+			ProducerProfileID: input.ProducerProfileID, Ord: int32(input.Ord), TimeoutSec: int32(input.TimeoutSec),
+			BranchPatterns: input.BranchPatterns, Enabled: input.Enabled, ConfigOrigin: input.ConfigOrigin,
+		})
+		if err != nil {
+			return service.SourceSpecRecord{}, normalizeError(err)
+		}
+		return sourceSpecFromRow(row, 0), nil
+	}
+
+	// Manual mode: create the source spec, its one global binding, and its one
+	// layer atomically, and return the layer id.
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return service.SourceSpecRecord{}, fmt.Errorf("begin manual source spec transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	queries := generated.New(tx)
+
+	spec, err := queries.CreateSourceSpec(ctx, generated.CreateSourceSpecParams{
 		TenantID: input.TenantID, ID: input.ID, ServiceID: input.ServiceID, Kind: input.Kind, AssetNameTemplate: input.AssetNameTemplate,
 		Role: input.Role, Origin: input.Origin, Mode: input.Mode, Path: input.Path,
 		ProducerProfileID: input.ProducerProfileID, Ord: int32(input.Ord), TimeoutSec: int32(input.TimeoutSec),
@@ -258,7 +282,32 @@ func (store *DiscoveryStore) CreateSourceSpec(ctx context.Context, input service
 	if err != nil {
 		return service.SourceSpecRecord{}, normalizeError(err)
 	}
-	return sourceSpecFromRow(row, 0), nil
+	layerID := uuid.NewV7()
+	if _, err := queries.GetAssetForSourceSpec(ctx, generated.GetAssetForSourceSpecParams{
+		TenantID: input.TenantID, AssetID: *input.TargetAssetID, ServiceID: input.ServiceID, Kind: input.Kind,
+	}); err != nil {
+		return service.SourceSpecRecord{}, normalizeError(err)
+	}
+	if _, err := queries.CreateLayer(ctx, generated.CreateLayerParams{
+		TenantID: input.TenantID, ID: layerID, AssetID: *input.TargetAssetID, SourceSpecID: new(input.ID),
+		Role: input.Role, Origin: input.Origin, Ord: int32(input.Ord), Dialect: nil, Enabled: input.Enabled,
+		BranchPatterns: input.BranchPatterns, DisplayName: input.AssetNameTemplate,
+	}); err != nil {
+		return service.SourceSpecRecord{}, normalizeError(err)
+	}
+	if _, err := queries.UpsertSourceBinding(ctx, generated.UpsertSourceBindingParams{
+		TenantID: input.TenantID, ID: uuid.NewV7(), SourceSpecID: input.ID,
+		ScopeType: "global", ScopeKey: "*", ExpansionKey: input.AssetNameTemplate,
+		ResolvedPath: nil, SourceSystem: nil, AssetID: *input.TargetAssetID, LayerID: layerID, State: "active", LastSeenCommit: nil,
+	}); err != nil {
+		return service.SourceSpecRecord{}, normalizeError(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return service.SourceSpecRecord{}, normalizeError(err)
+	}
+	record := sourceSpecFromRow(spec, 1)
+	record.InitialLayerID = new(layerID)
+	return record, nil
 }
 
 // GetSourceSpec returns one active source configuration.

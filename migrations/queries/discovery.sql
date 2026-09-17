@@ -41,6 +41,16 @@ INSERT INTO services (
 )
 RETURNING *;
 
+-- 校验 manual 源配置的目标资产：必须属于该服务且 kind 匹配。
+-- name: GetAssetForSourceSpec :one
+SELECT *
+FROM assets
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(asset_id)
+  AND service_id = sqlc.arg(service_id)
+  AND kind = sqlc.arg(kind)
+  AND deleted_at IS NULL;
+
 -- 列出活跃服务的确定顺序分页。
 -- name: ListServices :many
 SELECT *

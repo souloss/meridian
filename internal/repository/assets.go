@@ -185,7 +185,7 @@ func (store *AssetStore) CreateLayerRevision(ctx context.Context, input service.
 	}
 	return service.LayerRevisionRecord{
 		ID: row.ID, LayerID: row.LayerID, ScopeType: row.ScopeType, ScopeKey: row.ScopeKey,
-		ContentHash: row.ContentHash, ContentRef: row.ContentRef, ContentType: row.ContentType, ReviewStatus: row.ReviewStatus,
+		ContentHash: row.ContentHash, ContentRef: row.ContentRef, ContentType: row.ContentType, Dialect: row.Dialect, ReviewStatus: row.ReviewStatus,
 		GitCommit: row.GitCommit, SourceBranch: row.SourceBranch, CreatedAt: row.CreatedAt.Time,
 	}, nil
 }
@@ -198,7 +198,7 @@ func (store *AssetStore) GetLatestLayerRevision(ctx context.Context, tenantID, l
 	}
 	return service.LayerRevisionRecord{
 		ID: row.ID, LayerID: row.LayerID, ScopeType: row.ScopeType, ScopeKey: row.ScopeKey,
-		ContentHash: row.ContentHash, ContentRef: row.ContentRef, ContentType: row.ContentType, ReviewStatus: row.ReviewStatus,
+		ContentHash: row.ContentHash, ContentRef: row.ContentRef, ContentType: row.ContentType, Dialect: row.Dialect, ReviewStatus: row.ReviewStatus,
 		GitCommit: row.GitCommit, SourceBranch: row.SourceBranch, CreatedAt: row.CreatedAt.Time,
 	}, nil
 }
@@ -474,6 +474,7 @@ func layerFromRow(row generated.Layer) service.LayerRecord {
 		ID: row.ID, AssetID: row.AssetID, SourceSpecID: row.SourceSpecID, Role: row.Role, Origin: row.Origin,
 		Ord: int(row.Ord), Dialect: row.Dialect, Enabled: row.Enabled, BranchPatterns: append([]string(nil), row.BranchPatterns...),
 		DisplayName: row.DisplayName, Revision: row.Revision,
+		CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
 	}
 }
 

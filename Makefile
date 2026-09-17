@@ -6,7 +6,7 @@ MERIDIAN_DEV_MASTER_KEY_VERSION ?= 1
 MERIDIAN_DEV_CREDENTIAL_FINGERPRINT_KEY ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 MILESTONE ?= $(if $(ITEM),$(firstword $(subst -, ,$(ITEM))),M5)
 
-.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-m1-golden-path smoke-m1-service-lifecycle smoke-m1-concurrency smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 perf-openapi-pipeline e2e-viewer job-recovery-tests quality-gate
+.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-m1-golden-path smoke-m1-service-lifecycle smoke-m1-concurrency smoke-m2-overlay overlay-property-tests smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 perf-openapi-pipeline e2e-viewer job-recovery-tests quality-gate
 
 all: build
 
@@ -102,6 +102,14 @@ smoke-m1-service-lifecycle:
 # M1 concurrency: sync idempotency digest and repository mutex.
 smoke-m1-concurrency:
 	sh ./scripts/smoke.sh --m1-concurrency
+
+# M2 overlay: platform-v1 overlay determinism, provenance, editor e2e, rollback.
+smoke-m2-overlay:
+	sh ./scripts/smoke.sh --m2-overlay
+
+# M2 overlay property tests: determinism, provenance, target-miss, invalid rejection.
+overlay-property-tests:
+	vfox exec golang@1.27.1 -- go test -count=1 ./internal/service -run '^TestOverlay'
 
 # M1 job recovery: worker crash recovery mutex and SSE reconnect.
 job-recovery-tests:

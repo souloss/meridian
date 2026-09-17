@@ -307,6 +307,9 @@ func sourceSpecResponse(record service.SourceSpecRecord) api.SourceSpec {
 	lastError := nullable.NewNullNullable[string]()
 	lastRun := nullable.NewNullNullable[api.SourceRunSummary]()
 	initialLayer := nullable.NewNullNullable[api.Uuid]()
+	if record.InitialLayerID != nil {
+		initialLayer = nullable.NewNullableWithValue(api.Uuid(*record.InitialLayerID))
+	}
 	return api.SourceSpec{
 		Id: api.Uuid(record.ID), Etag: revisionETag("source-spec", record.ID.String(), record.Revision),
 		ServiceId: api.Uuid(record.ServiceID), Kind: api.KindId(record.Kind), AssetNameTemplate: api.AssetNameTemplate(record.AssetNameTemplate),
@@ -410,6 +413,10 @@ func sourceSpecInput(body api.SourceSpecCreateRequest) service.NewSourceSpec {
 	if body.ProducerProfileId.IsSpecified() && !body.ProducerProfileId.IsNull() {
 		profileID = new(serviceUUID(body.ProducerProfileId.MustGet()))
 	}
+	var targetAssetID *uuid.UUID
+	if body.TargetAssetId.IsSpecified() && !body.TargetAssetId.IsNull() {
+		targetAssetID = new(serviceUUID(body.TargetAssetId.MustGet()))
+	}
 	ord := 0
 	if body.Ord != nil {
 		ord = *body.Ord
@@ -429,7 +436,7 @@ func sourceSpecInput(body api.SourceSpecCreateRequest) service.NewSourceSpec {
 	return service.NewSourceSpec{
 		Kind: string(body.Kind), AssetNameTemplate: assetNameTemplate, Role: role, Origin: origin, Mode: mode,
 		Path: path, ProducerProfileID: profileID, Ord: ord, TimeoutSec: timeoutSec,
-		BranchPatterns: branchPatterns, Enabled: enabled, ConfigOrigin: "api",
+		BranchPatterns: branchPatterns, Enabled: enabled, ConfigOrigin: "api", TargetAssetID: targetAssetID,
 	}
 }
 

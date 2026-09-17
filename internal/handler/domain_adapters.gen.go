@@ -37,6 +37,10 @@ func (adapter assetServer) GetAssetVersion(ctx context.Context, request asset.Ge
 	return adapter.server.GetAssetVersion(ctx, request)
 }
 
+func (adapter assetServer) GetAssetVersionProvenance(ctx context.Context, request asset.GetAssetVersionProvenanceRequestObject) (asset.GetAssetVersionProvenanceResponseObject, error) {
+	return adapter.server.GetAssetVersionProvenance(ctx, request)
+}
+
 func (adapter assetServer) ListAssetVersionItems(ctx context.Context, request asset.ListAssetVersionItemsRequestObject) (asset.ListAssetVersionItemsResponseObject, error) {
 	return adapter.server.ListAssetVersionItems(ctx, request)
 }
@@ -47,6 +51,10 @@ func (adapter assetServer) ListSourceBindings(ctx context.Context, request asset
 
 func (adapter assetServer) ListSourceSpecs(ctx context.Context, request asset.ListSourceSpecsRequestObject) (asset.ListSourceSpecsResponseObject, error) {
 	return adapter.server.ListSourceSpecs(ctx, request)
+}
+
+func (adapter assetServer) PreviewMerge(ctx context.Context, request asset.PreviewMergeRequestObject) (asset.PreviewMergeResponseObject, error) {
+	return adapter.server.PreviewMerge(ctx, request)
 }
 
 func (adapter assetServer) UpdateSourceSpec(ctx context.Context, request asset.UpdateSourceSpecRequestObject) (asset.UpdateSourceSpecResponseObject, error) {
@@ -116,6 +124,18 @@ func (adapter jobServer) StreamJobLogs(ctx context.Context, request job.StreamJo
 type layerServer struct {
 	layer.UnimplementedStrictServer
 	server *Server
+}
+
+func (adapter layerServer) CreateLayerRevision(ctx context.Context, request layer.CreateLayerRevisionRequestObject) (layer.CreateLayerRevisionResponseObject, error) {
+	return adapter.server.CreateLayerRevision(ctx, request)
+}
+
+func (adapter layerServer) ReorderAssetLayers(ctx context.Context, request layer.ReorderAssetLayersRequestObject) (layer.ReorderAssetLayersResponseObject, error) {
+	return adapter.server.ReorderAssetLayers(ctx, request)
+}
+
+func (adapter layerServer) RollbackLayer(ctx context.Context, request layer.RollbackLayerRequestObject) (layer.RollbackLayerResponseObject, error) {
+	return adapter.server.RollbackLayer(ctx, request)
 }
 
 type platformServer struct {

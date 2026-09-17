@@ -101,9 +101,12 @@ type SourceSpecRecord struct {
 	Enabled           bool
 	ConfigOrigin      string
 	BindingsCount     int
-	Revision          int64
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
+	// InitialLayerID is non-null only for a manual source spec: createSourceSpec
+	// atomically creates its one global binding and layer and returns that layer id.
+	InitialLayerID *uuid.UUID
+	Revision       int64
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 // NewSourceSpec carries validated values ready for an atomic insert.
@@ -123,6 +126,9 @@ type NewSourceSpec struct {
 	BranchPatterns    []string
 	Enabled           bool
 	ConfigOrigin      string
+	// TargetAssetID is required only for manual mode; the asset must belong to
+	// the path service and match kind.
+	TargetAssetID *uuid.UUID
 }
 
 // SourceBindingRecord is one materialized source binding projection.

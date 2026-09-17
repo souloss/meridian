@@ -89,11 +89,14 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		return fmt.Errorf("configure content blob store: %w", err)
 	}
 	assetStore := repository.NewAssetStore(db.Pool)
+	layerStore := repository.NewLayerStore(db.Pool)
 	syncRunner := service.NewPipelineRunner(assetStore, blobStore, workspaceRoot)
+	layerEdit := service.NewLayerEdit(layerStore, blobStore, identityStore)
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
 		Executions:     repositoryStore,
 		SyncRunner:     syncRunner,
 		DiscoverRunner: service.NewDiscoveryRunner(discoveryStore, workspaceRoot),
+		MergeRunner:    layerEdit,
 		Outbox:         repositoryStore,
 	}, logger)
 	if err != nil {
@@ -101,6 +104,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	}
 	discoveryStore.BindRiver(runtime.Client())
 	serviceLifecycleStore.BindRiver(runtime.Client())
+	layerStore.BindRiver(runtime.Client())
 	credentials := service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), identityStore, keyring)
 	repositories := service.NewRepositories(repositoryStore, identityStore)
 	jobs := service.NewJobs(repository.NewJobControlStore(db.Pool, runtime.Client()), identityStore)
@@ -116,6 +120,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		Handler: handler.NewWithRuntimeServices(handler.Dependencies{
 			Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
 			Producers: producers, Discovery: discovery, Assets: assets, Views: views, ServiceLifecycle: serviceLifecycle,
+			LayerEdit: layerEdit,
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
