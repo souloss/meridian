@@ -481,7 +481,7 @@ func roleAllows(role, permission string) bool {
 		return role == "maintainer" || role == "viewer"
 	case "repository:read", "service:read", "asset:read", "layer:read":
 		return role == "maintainer" || role == "viewer"
-	case "repository:write", "repository:sync", "service:write", "service:create", "layer:edit":
+	case "repository:write", "repository:sync", "service:write", "service:create", "layer:edit", "layer:approve", "asset:publish":
 		return role == "maintainer"
 	case "job:read", "job:run":
 		return role == "maintainer"

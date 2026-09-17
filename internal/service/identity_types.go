@@ -27,6 +27,9 @@ var (
 	ErrQuotaExceeded = errors.New("tenant quota would be exceeded")
 	// ErrInvalidState means the resource lifecycle forbids the requested transition.
 	ErrInvalidState = errors.New("resource lifecycle forbids the requested transition")
+	// ErrBaseLayerExists means a repo base would replace an AI-generated base
+	// without the explicit replaceAiBase flag.
+	ErrBaseLayerExists = errors.New("an AI-generated base layer already exists")
 )
 
 // QuotaExceededError preserves the safe resource counters needed by a quota response.

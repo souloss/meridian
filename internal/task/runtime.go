@@ -24,6 +24,8 @@ type RuntimeDependencies struct {
 	DiscoverRunner DiscoverRunner
 	// MergeRunner executes the M2 asset merge pipeline.
 	MergeRunner MergeRunner
+	// AiGenerateRunner executes the M3 asset AI generation pipeline.
+	AiGenerateRunner AiGenerateRunner
 	// Outbox persists delivery leases, retries, and completions.
 	Outbox OutboxStore
 	// OutboxDeliverer sends events through configured channel adapters.
@@ -45,6 +47,9 @@ func NewRuntime(pool *pgxpool.Pool, dependencies RuntimeDependencies, logger *sl
 	river.AddWorker(workers, NewCredentialSyncWorker(dependencies.Executions, dependencies.SyncRunner))
 	river.AddWorker(workers, NewDiscoverWorker(dependencies.Executions, dependencies.DiscoverRunner))
 	river.AddWorker(workers, NewMergeWorker(dependencies.Executions, dependencies.MergeRunner))
+	if dependencies.AiGenerateRunner != nil {
+		river.AddWorker(workers, NewAiGenerateWorker(dependencies.Executions, dependencies.AiGenerateRunner))
+	}
 	river.AddWorker(workers, NewOutboxDispatchWorker(dependencies.Outbox, dependencies.OutboxDeliverer))
 	client, err := river.NewClient(riverpgxv5.New(pool), &river.Config{
 		Logger: logger,

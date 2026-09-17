@@ -310,6 +310,72 @@ func (store *DiscoveryStore) CreateSourceSpec(ctx context.Context, input service
 	return record, nil
 }
 
+// GetAiBaseForService returns an AI-generated base source spec for a service/kind.
+func (store *DiscoveryStore) GetAiBaseForService(ctx context.Context, tenantID, serviceID uuid.UUID, kind string) (service.SourceSpecRecord, error) {
+	row, err := store.queries.GetAiBaseForService(ctx, generated.GetAiBaseForServiceParams{TenantID: tenantID, ServiceID: serviceID, Kind: kind})
+	if err != nil {
+		return service.SourceSpecRecord{}, normalizeError(err)
+	}
+	return sourceSpecFromRow(row, 0), nil
+}
+
+// ReplaceAiBaseForService archives the AI base source and layer, then creates a
+// replacement repository base source and layer bound to the same asset, leaving
+// history retained (SMK-033: no dual base, track generation increment).
+func (store *DiscoveryStore) ReplaceAiBaseForService(ctx context.Context, tenantID, serviceID uuid.UUID, kind string) error {
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return fmt.Errorf("begin AI base replacement transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	queries := generated.New(tx)
+
+	// Locate the AI base layers to reuse their asset before archiving.
+	aiLayers, err := queries.ListAiBaseLayersForService(ctx, generated.ListAiBaseLayersForServiceParams{TenantID: tenantID, ServiceID: serviceID, Kind: kind})
+	if err != nil {
+		return normalizeError(err)
+	}
+	if len(aiLayers) == 0 {
+		return service.ErrNotFound
+	}
+	assetID := aiLayers[0].AssetID
+	archiveCandidates := make([]uuid.UUID, 0, len(aiLayers))
+	for _, layer := range aiLayers {
+		archiveCandidates = append(archiveCandidates, layer.ID)
+	}
+
+	if _, err := queries.ArchiveAiBaseLayersForService(ctx, generated.ArchiveAiBaseLayersForServiceParams{TenantID: tenantID, ServiceID: serviceID, Kind: kind}); err != nil {
+		return normalizeError(err)
+	}
+	if _, err := queries.ArchiveAiBaseForService(ctx, generated.ArchiveAiBaseForServiceParams{TenantID: tenantID, ServiceID: serviceID, Kind: kind}); err != nil {
+		return normalizeError(err)
+	}
+
+	// Create a repository base layer on the same asset to avoid dual base.
+	repoSourceID := uuid.NewV7()
+	repoLayerID := uuid.NewV7()
+	if _, err := queries.CreateSourceSpec(ctx, generated.CreateSourceSpecParams{
+		TenantID: tenantID, ID: repoSourceID, ServiceID: serviceID, Kind: kind,
+		AssetNameTemplate: "{file_stem}", Role: "base", Origin: "repo", Mode: "builtin",
+		Path: new("openapi.yaml"), ProducerProfileID: nil, Ord: 0, TimeoutSec: 120,
+		BranchPatterns: []string{"**"}, Enabled: true, ConfigOrigin: "api",
+	}); err != nil {
+		return normalizeError(err)
+	}
+	if _, err := queries.CreateLayer(ctx, generated.CreateLayerParams{
+		TenantID: tenantID, ID: repoLayerID, AssetID: assetID, SourceSpecID: new(repoSourceID),
+		Role: "base", Origin: "repo", Ord: 0, Dialect: nil, Enabled: true,
+		BranchPatterns: []string{"**"}, DisplayName: "",
+	}); err != nil {
+		return normalizeError(err)
+	}
+	_ = archiveCandidates
+	if err := tx.Commit(ctx); err != nil {
+		return normalizeError(err)
+	}
+	return nil
+}
+
 // GetSourceSpec returns one active source configuration.
 func (store *DiscoveryStore) GetSourceSpec(ctx context.Context, tenantID, id uuid.UUID) (service.SourceSpecRecord, error) {
 	row, err := store.queries.GetSourceSpec(ctx, generated.GetSourceSpecParams{TenantID: tenantID, ID: id})

@@ -180,7 +180,7 @@ func layerRevisionFromRow(row generated.LayerRevision) service.LayerRevisionReco
 		ID: row.ID, LayerID: row.LayerID, ScopeType: row.ScopeType, ScopeKey: row.ScopeKey,
 		ContentHash: row.ContentHash, ContentRef: row.ContentRef, ContentType: row.ContentType, Dialect: row.Dialect,
 		ReviewStatus: row.ReviewStatus, GitCommit: row.GitCommit, SourceBranch: row.SourceBranch,
-		CreatedAt: row.CreatedAt.Time,
+		CreatedBy: row.CreatedBy, CreatedAt: row.CreatedAt.Time,
 	}
 }
 

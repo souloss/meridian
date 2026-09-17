@@ -29,6 +29,10 @@ func (adapter assetServer) CreateSourceSpec(ctx context.Context, request asset.C
 	return adapter.server.CreateSourceSpec(ctx, request)
 }
 
+func (adapter assetServer) GenerateMissingAssetWithAi(ctx context.Context, request asset.GenerateMissingAssetWithAiRequestObject) (asset.GenerateMissingAssetWithAiResponseObject, error) {
+	return adapter.server.GenerateMissingAssetWithAi(ctx, request)
+}
+
 func (adapter assetServer) GetAsset(ctx context.Context, request asset.GetAssetRequestObject) (asset.GetAssetResponseObject, error) {
 	return adapter.server.GetAsset(ctx, request)
 }
@@ -55,6 +59,10 @@ func (adapter assetServer) ListSourceSpecs(ctx context.Context, request asset.Li
 
 func (adapter assetServer) PreviewMerge(ctx context.Context, request asset.PreviewMergeRequestObject) (asset.PreviewMergeResponseObject, error) {
 	return adapter.server.PreviewMerge(ctx, request)
+}
+
+func (adapter assetServer) PublishAssetVersion(ctx context.Context, request asset.PublishAssetVersionRequestObject) (asset.PublishAssetVersionResponseObject, error) {
+	return adapter.server.PublishAssetVersion(ctx, request)
 }
 
 func (adapter assetServer) UpdateSourceSpec(ctx context.Context, request asset.UpdateSourceSpecRequestObject) (asset.UpdateSourceSpecResponseObject, error) {
@@ -126,8 +134,20 @@ type layerServer struct {
 	server *Server
 }
 
+func (adapter layerServer) ApproveLayerRevision(ctx context.Context, request layer.ApproveLayerRevisionRequestObject) (layer.ApproveLayerRevisionResponseObject, error) {
+	return adapter.server.ApproveLayerRevision(ctx, request)
+}
+
 func (adapter layerServer) CreateLayerRevision(ctx context.Context, request layer.CreateLayerRevisionRequestObject) (layer.CreateLayerRevisionResponseObject, error) {
 	return adapter.server.CreateLayerRevision(ctx, request)
+}
+
+func (adapter layerServer) GetReviewContext(ctx context.Context, request layer.GetReviewContextRequestObject) (layer.GetReviewContextResponseObject, error) {
+	return adapter.server.GetReviewContext(ctx, request)
+}
+
+func (adapter layerServer) RejectLayerRevision(ctx context.Context, request layer.RejectLayerRevisionRequestObject) (layer.RejectLayerRevisionResponseObject, error) {
+	return adapter.server.RejectLayerRevision(ctx, request)
 }
 
 func (adapter layerServer) ReorderAssetLayers(ctx context.Context, request layer.ReorderAssetLayersRequestObject) (layer.ReorderAssetLayersResponseObject, error) {

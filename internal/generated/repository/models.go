@@ -11,6 +11,47 @@ import (
 	"uuid"
 )
 
+// AiGenerationResult is the generated PostgreSQL representation of the corresponding Meridian table row.
+// AI 资产生成成功或失败的一次可重放结果快照。
+type AiGenerationResult struct {
+	// TenantID is the generated tenant id database value for AiGenerationResult.
+	// 拥有该生成结果的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for AiGenerationResult.
+	// 应用生成的 UUID v7 结果标识。
+	ID uuid.UUID `json:"id"`
+	// JobID is the generated job id database value for AiGenerationResult.
+	// 产生该结果的资产 AI 生成任务。
+	JobID uuid.UUID `json:"job_id"`
+	// Stage is the generated stage database value for AiGenerationResult.
+	// 终止所在流水线阶段：resolve、discover、extract、merge、normalize 或 index。
+	Stage string `json:"stage"`
+	// Status is the generated status database value for AiGenerationResult.
+	// 终态：succeeded、failed 或 cancelled。
+	Status string `json:"status"`
+	// ErrorCode is the generated error code database value for AiGenerationResult.
+	// 稳定且不含敏感信息的失败分类；成功时为空。
+	ErrorCode string `json:"error_code"`
+	// ContentRef is the generated content ref database value for AiGenerationResult.
+	// 生成内容在 blob 存储中的内容引用，成功时非空。
+	ContentRef *string `json:"content_ref"`
+	// ContentHash is the generated content hash database value for AiGenerationResult.
+	// 生成内容的 SHA-256 摘要，成功时非空。
+	ContentHash *string `json:"content_hash"`
+	// ContentType is the generated content type database value for AiGenerationResult.
+	// 生成内容的 IANA 媒体类型，成功时非空。
+	ContentType *string `json:"content_type"`
+	// Manifest is the generated manifest database value for AiGenerationResult.
+	// 生产者完成清单的规范化投影；超时/无效时可观察到的部分清单。
+	Manifest []byte `json:"manifest"`
+	// RevisionID is the generated revision id database value for AiGenerationResult.
+	// 依据成功内容创建的层修订标识；失败时为空。
+	RevisionID *uuid.UUID `json:"revision_id"`
+	// CreatedAt is the generated created at database value for AiGenerationResult.
+	// 记录该结果时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
 // ApiToken is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 租户内个人访问令牌，仅保存加密摘要。
 type ApiToken struct {

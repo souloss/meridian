@@ -437,6 +437,7 @@ func sourceSpecInput(body api.SourceSpecCreateRequest) service.NewSourceSpec {
 		Kind: string(body.Kind), AssetNameTemplate: assetNameTemplate, Role: role, Origin: origin, Mode: mode,
 		Path: path, ProducerProfileID: profileID, Ord: ord, TimeoutSec: timeoutSec,
 		BranchPatterns: branchPatterns, Enabled: enabled, ConfigOrigin: "api", TargetAssetID: targetAssetID,
+		ReplaceAiBase: body.ReplaceAiBase != nil && *body.ReplaceAiBase,
 	}
 }
 

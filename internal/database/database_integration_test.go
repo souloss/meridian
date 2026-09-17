@@ -16,6 +16,7 @@ import (
 )
 
 var expectedM0Tables = []string{
+	"ai_generation_results",
 	"api_tokens",
 	"asset_items",
 	"asset_kinds",
@@ -57,7 +58,7 @@ var expectedM0Tables = []string{
 	"users",
 }
 
-const expectedApplicationMigrationVersion = 7
+const expectedApplicationMigrationVersion = 8
 
 func TestMigrationLifecycle(t *testing.T) {
 	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")

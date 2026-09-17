@@ -36,6 +36,7 @@ type Server struct {
 	serviceLifecycle *service.ServiceLifecycle
 	layerEdit        *service.LayerEdit
 	configImport     *service.ConfigImport
+	aiWorkflow       *service.AiWorkflow
 	secureCookies    bool
 }
 
@@ -65,6 +66,8 @@ type Dependencies struct {
 	LayerEdit *service.LayerEdit
 	// ConfigImport provides gitops repository configuration preview and apply.
 	ConfigImport *service.ConfigImport
+	// AiWorkflow provides AI generation, revision review, and version publish.
+	AiWorkflow *service.AiWorkflow
 }
 
 func New() *Server {
@@ -104,6 +107,7 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.serviceLifecycle = dependencies.ServiceLifecycle
 	s.layerEdit = dependencies.LayerEdit
 	s.configImport = dependencies.ConfigImport
+	s.aiWorkflow = dependencies.AiWorkflow
 	s.secureCookies = secureCookies
 	return s
 }
@@ -172,6 +176,14 @@ func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 		return
 	case errors.Is(err, service.ErrInvalidState):
 		writeError(w, r, http.StatusConflict, "invalid_state", "resource lifecycle forbids the requested transition")
+		return
+	case errors.Is(err, service.ErrBaseLayerExists):
+		writeError(w, r, http.StatusConflict, "base_layer_exists", "an AI-generated base layer already exists")
+		return
+	case func() bool { _, ok := errors.AsType[*service.VersionNotPublishableError](err); return ok }():
+		writeErrorDetails(w, r, http.StatusConflict, "version_not_publishable", "version is not publishable", map[string]any{
+			"blockingRevisions": []any{}, "layerId": nil, "revisionId": nil, "reviewStatus": nil,
+		})
 		return
 	case errors.Is(err, api.ErrStrictOperationNotImplemented):
 		writeError(w, r, http.StatusNotImplemented, "internal_error", "operation is not implemented")

@@ -84,6 +84,7 @@ type LayerRevisionRecord struct {
 	ReviewStatus string
 	GitCommit    *string
 	SourceBranch *string
+	CreatedBy    *uuid.UUID
 	CreatedAt    time.Time
 }
 

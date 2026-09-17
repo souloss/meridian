@@ -129,6 +129,9 @@ type NewSourceSpec struct {
 	// TargetAssetID is required only for manual mode; the asset must belong to
 	// the path service and match kind.
 	TargetAssetID *uuid.UUID
+	// ReplaceAiBase explicitly archives an existing AI-generated base before
+	// creating a repository base (SMK-033).
+	ReplaceAiBase bool
 }
 
 // SourceBindingRecord is one materialized source binding projection.
@@ -224,6 +227,10 @@ type DiscoveryStore interface {
 	CountServices(context.Context, uuid.UUID) (int64, int64, error)
 	CreateSourceSpec(context.Context, NewSourceSpec) (SourceSpecRecord, error)
 	GetSourceSpec(context.Context, uuid.UUID, uuid.UUID) (SourceSpecRecord, error)
+	// GetAiBaseForService returns an AI-generated base for a service/kind when one exists.
+	GetAiBaseForService(context.Context, uuid.UUID, uuid.UUID, string) (SourceSpecRecord, error)
+	// ReplaceAiBaseForService archives the AI base and creates the repository base in one transaction.
+	ReplaceAiBaseForService(context.Context, uuid.UUID, uuid.UUID, string) error
 	UpdateSourceSpec(context.Context, SourceSpecPatch) (SourceSpecRecord, error)
 	ListSourceSpecsForService(context.Context, uuid.UUID, uuid.UUID) ([]SourceSpecRecord, error)
 	ListSourceBindings(context.Context, uuid.UUID, uuid.UUID) ([]SourceBindingRecord, error)

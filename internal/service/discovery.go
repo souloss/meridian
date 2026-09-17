@@ -186,6 +186,11 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 	if validated.Mode == "manual" && input.TargetAssetID == nil {
 		return SourceSpecRecord{}, ErrValidation
 	}
+	if validated.Role == "base" && validated.Origin == "repo" {
+		if err := discovery.enforceRepoBaseReplacement(ctx, membership.TenantID, service.ID, input.Kind, input.ReplaceAiBase); err != nil {
+			return SourceSpecRecord{}, err
+		}
+	}
 	record, err := discovery.store.CreateSourceSpec(ctx, NewSourceSpec{
 		TenantID: membership.TenantID, ID: uuid.NewV7(), ServiceID: service.ID, Kind: validated.Kind,
 		AssetNameTemplate: validated.AssetNameTemplate, Role: validated.Role, Origin: validated.Origin, Mode: validated.Mode,
@@ -197,6 +202,20 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 		return SourceSpecRecord{}, err
 	}
 	return record, nil
+}
+
+// enforceRepoBaseReplacement rejects an implicit repo base that would replace an
+// AI-generated base, and archives the AI base when replaceAiBase is requested.
+func (discovery *Discovery) enforceRepoBaseReplacement(ctx context.Context, tenantID, serviceID uuid.UUID, kind string, replace bool) error {
+	if !replace {
+		if _, err := discovery.store.GetAiBaseForService(ctx, tenantID, serviceID, kind); err == nil {
+			return ErrBaseLayerExists
+		} else if !isNotFound(err) {
+			return err
+		}
+		return nil
+	}
+	return discovery.store.ReplaceAiBaseForService(ctx, tenantID, serviceID, kind)
 }
 
 // ListSourceBindings returns the current materialized bindings for one source spec.
