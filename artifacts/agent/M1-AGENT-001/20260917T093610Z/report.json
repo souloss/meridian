@@ -1,0 +1,129 @@
+{
+  "workItem": "M1-AGENT-001",
+  "status": "passed",
+  "commit": "9dbcf29d0fefc5baef0f25af439783e86b497d60",
+  "baseCommit": "5ad7dd67734f1adcbe9adbbb4f0037d1821de1f8",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "sourceDigest": "sha256:f67c951b100df1fe7b949762e0b6d3137ccbf7c7776d7cf7eb1ebe9ecc049bbf",
+  "startedAt": "2026-09-16T04:51:24Z",
+  "finishedAt": "2026-09-17T09:36:10Z",
+  "reportPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/report.json",
+  "stories": [
+    "US-02"
+  ],
+  "assertions": [
+    {
+      "id": "SMK-032",
+      "status": "passed",
+      "evidence": "artifacts/smoke/2026-09-17T09-39-41-929ZmFTDHB/SMK-032.json"
+    },
+    {
+      "id": "SMK-040",
+      "status": "passed",
+      "evidence": "artifacts/smoke/2026-09-17T09-39-41-929ZmFTDHB/SMK-040.json"
+    }
+  ],
+  "commands": [
+    {
+      "command": "make smoke-m1-repository ITEM=M1-AGENT-001",
+      "exitCode": 0,
+      "durationSeconds": 24.0,
+      "stdoutPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log"
+    },
+    {
+      "command": "make contracts-validate ITEM=M1-AGENT-001",
+      "exitCode": 0,
+      "durationSeconds": 52.0,
+      "stdoutPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log"
+    },
+    {
+      "command": "make contracts-generate-then-git-diff-exit-code ITEM=M1-AGENT-001",
+      "exitCode": 0,
+      "durationSeconds": 47.0,
+      "stdoutPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log"
+    },
+    {
+      "command": "go build ./...",
+      "exitCode": 0,
+      "durationSeconds": 8.0,
+      "stdoutPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log"
+    },
+    {
+      "command": "go vet ./...",
+      "exitCode": 0,
+      "durationSeconds": 3.0,
+      "stdoutPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log"
+    },
+    {
+      "command": "go test ./...",
+      "exitCode": 0,
+      "durationSeconds": 6.0,
+      "stdoutPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "durationSeconds": 0.0,
+      "stdoutPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log",
+      "stderrPath": "artifacts/agent/M1-AGENT-001/20260917T093610Z/commands.log"
+    }
+  ],
+  "changedFiles": [
+    "Makefile",
+    "contracts/work-items.yaml",
+    "internal/command/serve.go",
+    "internal/database/database_integration_test.go",
+    "internal/generated/repository/discovery.sql.go",
+    "internal/generated/repository/models.go",
+    "internal/generated/repository/querier.go",
+    "internal/handler/discovery.go",
+    "internal/handler/domain_adapters.gen.go",
+    "internal/handler/repository_discovery_smoke_integration_test.go",
+    "internal/handler/server.go",
+    "internal/repository/discovery.go",
+    "internal/service/discovery.go",
+    "internal/service/discovery_runner.go",
+    "internal/service/discovery_types.go",
+    "internal/service/identity.go",
+    "internal/service/producers.go",
+    "internal/task/discover.go",
+    "internal/task/runtime.go",
+    "migrations/00005_m1_repository_discovery.sql",
+    "migrations/queries/discovery.sql",
+    "scripts/smoke-cases.json",
+    "scripts/smoke.mjs"
+  ],
+  "compatibility": {
+    "migration": "new migration 00005 adds services/discovery_candidates/producer_profiles/source_specs/source_bindings; recent_services deferred to M1-AGENT-002",
+    "producerSelection": "listAvailableProducerProfiles filters enabled+available profiles by optional kind; createSourceSpec rejects disabled/unavailable profiles with 422 producer_profile_unavailable",
+    "discovery": "repo.discover job enqueued with dedupe discover:{repositoryId}:{refType}:{refName}; runner clones and upserts candidates keyed by (repositoryId, rootDir) with commit-tracking reset",
+    "visibility": "candidate acceptance creates services with default visibility private",
+    "roles": "roleAllows extended with service:read/service:write/service:create/layer:edit/asset:read mappings"
+  },
+  "deferred": [
+    "syncRepository and the git producer checkout pipeline remain M0 UnsupportedSyncRunner",
+    "recent_services read/write path, service lifecycle, and OpenAPI viewer belong to M1-AGENT-002/004",
+    "producer startup dependency rescan is implemented at the store query level but not yet scheduled at boot"
+  ],
+  "diagnostics": [
+    {
+      "command": "make contracts-generate-then-git-diff-exit-code ITEM=M1-AGENT-001",
+      "exitCode": 2,
+      "resolution": "first run before go generate; resolved by running go generate ./... then re-running the gate, which now exits 0"
+    },
+    {
+      "command": "./scripts/test-integration.sh",
+      "exitCode": 1,
+      "resolution": "TestM0Smoke/SMK-001 migration-down failure is pre-existing and reproduces identically at parent commit 5ad7dd6 (verified via worktree); unrelated to this work item"
+    }
+  ],
+  "failures": [],
+  "failureKind": null,
+  "nextAction": "claim M1-AGENT-002"
+}

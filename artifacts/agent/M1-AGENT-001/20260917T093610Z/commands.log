@@ -1,0 +1,18 @@
+=== make smoke-m1-repository ITEM=M1-AGENT-001 ===
+sh ./scripts/smoke.sh --m1-repository
+SMK-032: pass; artifacts/smoke/2026-09-17T09-39-41-929ZmFTDHB/SMK-032.json
+SMK-040: pass; artifacts/smoke/2026-09-17T09-39-41-929ZmFTDHB/SMK-040.json
+EXIT=0
+
+=== make contracts-validate ITEM=M1-AGENT-001 ===
+EXIT=0
+=== make contracts-generate-then-git-diff-exit-code ITEM=M1-AGENT-001 ===
+EXIT=0
+=== go build ./... ===
+EXIT=0
+=== go vet ./... ===
+EXIT=0
+=== go test ./... ===
+EXIT=0
+=== git diff --check ===
+EXIT=0

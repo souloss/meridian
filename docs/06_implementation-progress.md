@@ -1,10 +1,10 @@
 # Meridian 实施进度
 
-> 最后核对：2026-09-16
+> 最后核对：2026-09-17
 > 当前里程碑：M1（asset-mainline）
-> 里程碑状态：M0 自主 checkpoint 已完成；M1-CONTRACT-002 五项产品决策已落地并通过
-> 最新稳定提交：`7116c507f9f0b87a9fd8ba8b74cdb69517c67970 AI:feat(repository): 落地 M1 五项产品决策，解除 discovery/producer 契约阻塞`
-> 当前开发切片：M1-CONTRACT-002 passed；下一步领取 M1-AGENT-001 attempt 3
+> 里程碑状态：M0 自主 checkpoint 已完成；M1-CONTRACT-002 通过；M1-AGENT-001 通过
+> 最新稳定提交：`9dbcf29d0fefc5baef0f25af439783e86b497d60 AI:feat(m1): 仓库发现、源绑定与受控生产者选择落地`
+> 当前开发切片：M1-AGENT-001 passed；下一步领取 M1-AGENT-002
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段完成记录 `milestoneCheckpoints` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和 Agent 证据 checkpoint 为准。
 
@@ -122,7 +122,7 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 下一步顺序
 
-M0 自动门禁和 Agent checkpoint 已完成。M1-AGENT-001 attempt 2 在实现前契约审计中发现 SMK-032/SMK-040 所需的五项行为没有确定定义，已保留为 `contract_failure` 并登记 M1-CONTRACT-002；M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
+M0 自动门禁和 Agent checkpoint 已完成。M1-AGENT-001 attempt 3 已实现并通过：新增 migration `00005_m1_repository_discovery.sql`（services/discovery_candidates/producer_profiles/source_specs/source_bindings 五表）、`discovery.sql` 查询与 sqlc 生成、`service.Discovery`/`service.Producers`/`service.DiscoveryRunner`（git clone + marker 探测 + candidate upsert）、`task.DiscoverArgs/DiscoverWorker/DiscoverRunner` 及 River 注册、handler 层 `discoverRepository`/`listDiscoveryCandidates`/`acceptDiscoveryCandidates`/`createSourceSpec`/`listSourceBindings`/`listAvailableProducerProfiles`/`createProducerProfile`，并补齐 `smoke-m1-repository` 门禁与 SMK-032/SMK-040 fixture（git-http-backend 本地仓），最终证据见 `artifacts/agent/M1-AGENT-001/20260917T093610Z/report.json`。M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
 
 ## 更新流程
 

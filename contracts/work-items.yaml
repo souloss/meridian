@@ -201,7 +201,7 @@ items:
   - id: M1-AGENT-001
     milestone: M1
     priority: P0
-    status: verifying
+    status: passed
     title: repository-discovery-and-source-bindings
     dependsOn: [M0-AGENT-003, M1-CONTRACT-001, M1-CONTRACT-002]
     operationIds: [createProducerProfile, listAvailableProducerProfiles, checkRepositoryConnection, createRepository, discoverRepository, listDiscoveryCandidates, acceptDiscoveryCandidates, createSourceSpec, listSourceBindings]
@@ -211,20 +211,20 @@ items:
     owner: coding-agent
     attempt: 3
     maxAttempts: 3
-    leaseUntil: '2026-09-16T05:21:24Z'
+    leaseUntil: null
     startedAt: '2026-09-16T04:51:24Z'
-    baseCommit: 6f2f98422a3899dd9b9fb803dad6be02b06464f8
+    baseCommit: 5ad7dd67734f1adcbe9adbbb4f0037d1821de1f8
     contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
     failureKind: null
     blockedReason: null
-    reportPath: artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json
-    lastEvidence: artifacts/agent/M1-AGENT-001/20260907T212421Z/report.json
+    reportPath: artifacts/agent/M1-AGENT-001/20260917T093610Z/report.json
+    lastEvidence: artifacts/agent/M1-AGENT-001/20260917T093610Z/report.json
     retry:
       previousAttempt: 2
       previousStatus: needs_retry
       changedSinceFailure: M1-CONTRACT-002 landed the five user decisions (kind filter, private default, candidate key, ref dedupe key, dependency detection) and passed its gates
       toolingGap: smoke-m1-repository target and SMK-032/SMK-040 fixtures are owned by this attempt
-    nextAction: implement repository discovery, source bindings, producer profiles, and the smoke-m1-repository gate
+    nextAction: claim M1-AGENT-002
 
   - id: M1-CONTRACT-002
     milestone: M1
