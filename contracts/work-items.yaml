@@ -378,14 +378,22 @@ items:
   - id: M2-AGENT-002
     milestone: M2
     priority: P0
-    status: ready
+    status: passed
     title: gitops-preview-apply
     dependsOn: [M2-AGENT-001]
     operationIds: [previewRepositoryConfigImport, applyRepositoryConfigImport]
     stories: [US-07]
     assertions: [SMK-028, SMK-038]
     verify: [smoke-m2-gitops]
-    reportPath: null
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    startedAt: '2026-09-18T04:40:00Z'
+    baseCommit: b4563c0bf32730028d75501e81355d86967f61b3
+    contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
+    reportPath: artifacts/agent/M2-AGENT-002/20260918T050000Z/report.json
+    lastEvidence: artifacts/agent/M2-AGENT-002/20260918T050000Z/report.json
+    nextAction: complete the M2 milestone checkpoint
 
   - id: M3-AGENT-001
     milestone: M3
