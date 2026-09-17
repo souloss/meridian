@@ -1,0 +1,57 @@
+{
+  "id": "e2e-viewer",
+  "status": "passed",
+  "commit": "5460bff341a48d11a2a923f650493ead0a44a7e6",
+  "sourceDigest": "sha256:a7afc2e44db45c7c0741cce4ceaa5086e596de4f3406dc92ce94689021cf0967",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "browser": "chromium",
+  "browserVersion": "151.0.7922.34",
+  "project": "desktop",
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "fixture": "web/tests/spikes/harness",
+  "thresholds": {
+    "minRenderedBytes": 1
+  },
+  "measurements": {
+    "ready": true,
+    "bytes": 115,
+    "hasIframe": false,
+    "rendered": true,
+    "renderedBytes": 115
+  },
+  "assertions": [
+    {
+      "id": "viewer-ready",
+      "status": "passed",
+      "actual": true,
+      "threshold": true
+    },
+    {
+      "id": "document-rendered",
+      "status": "passed",
+      "actual": true,
+      "threshold": true
+    },
+    {
+      "id": "document-non-empty",
+      "status": "passed",
+      "actual": 115,
+      "threshold": ">0"
+    },
+    {
+      "id": "document-is-openapi",
+      "status": "passed",
+      "actual": "contains openapi header",
+      "threshold": "openapi: 3.1.0"
+    }
+  ],
+  "tests": {
+    "run": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  }
+}

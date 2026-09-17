@@ -1,0 +1,22 @@
+assertions:
+    - actual: 10000
+      id: operations-extracted-exactly
+      status: passed
+      threshold: 10000
+    - actual: 365
+      id: parse-under-budget
+      status: passed
+      threshold: <10000ms
+    - actual: b915969e09ca8ebd4c6faac8141a8d60cd704e7293cbd4a07f997109f65b9b97
+      id: deterministic-keys
+      status: passed
+elapsedMs: 365
+expectedOperations: 10000
+firstKey: GET /v1/resources/r000000/items/{id}
+heapAllocMiB: 26.175758361816406
+id: perf-openapi-pipeline
+keysDigest: b915969e09ca8ebd4c6faac8141a8d60cd704e7293cbd4a07f997109f65b9b97
+lastKey: GET /v1/resources/r009999/items/{id}
+operations: 10000
+parseBudgetMs: 10000
+status: passed

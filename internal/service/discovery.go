@@ -28,12 +28,19 @@ const (
 type Discovery struct {
 	store      DiscoveryStore
 	identities IdentityStore
+	assets     *Assets
 	now        func() time.Time
 }
 
 // NewDiscovery constructs discovery use cases with caller-owned persistence.
 func NewDiscovery(store DiscoveryStore, identities IdentityStore) *Discovery {
 	return &Discovery{store: store, identities: identities, now: time.Now}
+}
+
+// WithAssets binds the asset read use cases used to enrich service responses.
+func (discovery *Discovery) WithAssets(assets *Assets) *Discovery {
+	discovery.assets = assets
+	return discovery
 }
 
 // Discover enqueues one idempotent repository discovery job and returns its identity.
@@ -195,6 +202,225 @@ func (discovery *Discovery) ListSourceBindings(ctx context.Context, actor Princi
 		return nil, err
 	}
 	return discovery.store.ListSourceBindings(ctx, membership.TenantID, sourceID)
+}
+
+// ListSourceSpecs returns the active source specs for one service.
+func (discovery *Discovery) ListSourceSpecs(ctx context.Context, actor Principal, tenantSlug, serviceSlug string) ([]SourceSpecRecord, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "asset:read")
+	if err != nil {
+		return nil, err
+	}
+	service, err := discovery.store.GetServiceBySlug(ctx, membership.TenantID, serviceSlug)
+	if err != nil {
+		return nil, err
+	}
+	specs, err := discovery.store.ListSourceSpecsForService(ctx, membership.TenantID, service.ID)
+	if err != nil {
+		return nil, err
+	}
+	for index := range specs {
+		count, err := discovery.store.CountActiveBindings(ctx, membership.TenantID, specs[index].ID)
+		if err == nil {
+			specs[index].BindingsCount = int(count)
+		}
+	}
+	return specs, nil
+}
+
+// Sync enqueues one idempotent repository synchronization job.
+func (discovery *Discovery) Sync(ctx context.Context, actor Principal, tenantSlug string, repositoryID, idempotencyKey uuid.UUID, input RepositorySyncInput) (JobAccepted, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "repository:sync")
+	if err != nil {
+		return JobAccepted{}, err
+	}
+	if idempotencyKey == uuid.Nil() {
+		return JobAccepted{}, ErrValidation
+	}
+	refType := input.RefType
+	if refType == "" {
+		refType = "branch"
+	}
+	if refType != "branch" && refType != "tag" {
+		return JobAccepted{}, ErrValidation
+	}
+	refName := input.RefName
+	if refName == "" {
+		record, err := discovery.store.GetRepository(ctx, membership.TenantID, repositoryID)
+		if err != nil {
+			return JobAccepted{}, err
+		}
+		refName = record.DefaultBranch
+	}
+	if !validGitRefName(refName) {
+		return JobAccepted{}, ErrValidation
+	}
+	if _, err := discovery.store.GetRepository(ctx, membership.TenantID, repositoryID); err != nil {
+		return JobAccepted{}, err
+	}
+	return discovery.store.EnqueueSyncJob(ctx, SyncJobInput{
+		TenantID: membership.TenantID, RepositoryID: repositoryID, RefType: refType, RefName: refName,
+		IdempotencyKey: idempotencyKey, Force: input.Force,
+	})
+}
+
+// UpdateSourceSpec applies a validated patch to one source spec.
+func (discovery *Discovery) UpdateSourceSpec(ctx context.Context, actor Principal, tenantSlug string, sourceID uuid.UUID, etag string, input SourceSpecPatchInput) (SourceSpecRecord, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "layer:edit")
+	if err != nil {
+		return SourceSpecRecord{}, err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "source-spec", sourceID)
+	if err != nil {
+		return SourceSpecRecord{}, ErrPrecondition
+	}
+	current, err := discovery.store.GetSourceSpec(ctx, membership.TenantID, sourceID)
+	if err != nil {
+		return SourceSpecRecord{}, err
+	}
+	merged := mergeSourceSpecPatch(current, input)
+	if err := validateMergedSourceSpec(merged); err != nil {
+		return SourceSpecRecord{}, err
+	}
+	patch := SourceSpecPatch{TenantID: membership.TenantID, ID: sourceID, ExpectedRevision: expectedRevision}
+	if input.AssetNameTemplate != nil {
+		patch.AssetNameTemplate = input.AssetNameTemplate
+	}
+	if input.Role != nil {
+		patch.Role = input.Role
+	}
+	if input.Origin != nil {
+		patch.Origin = input.Origin
+	}
+	if input.Mode != nil {
+		patch.Mode = input.Mode
+	}
+	if input.Path != nil {
+		patch.Path = input.Path
+	}
+	if input.ProducerProfileID != nil {
+		patch.ProducerProfileID = input.ProducerProfileID
+	}
+	if input.Ord != nil {
+		patch.Ord = input.Ord
+	}
+	if input.TimeoutSec != nil {
+		patch.TimeoutSec = input.TimeoutSec
+	}
+	if len(input.BranchPatterns) > 0 {
+		patch.BranchPatterns = input.BranchPatterns
+	}
+	if input.Enabled != nil {
+		patch.Enabled = input.Enabled
+	}
+	return discovery.store.UpdateSourceSpec(ctx, patch)
+}
+
+// GetService returns one service detail and records a successful read.
+func (discovery *Discovery) GetService(ctx context.Context, actor Principal, tenantSlug, serviceSlug string) (ServiceRecord, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "service:read")
+	if err != nil {
+		return ServiceRecord{}, err
+	}
+	record, err := discovery.store.GetServiceBySlug(ctx, membership.TenantID, serviceSlug)
+	if err != nil {
+		return ServiceRecord{}, err
+	}
+	if err := discovery.store.UpsertRecentService(ctx, membership.TenantID, membership.UserID, record.ID, discovery.now().UTC()); err != nil {
+		return ServiceRecord{}, err
+	}
+	return record, nil
+}
+
+// ServiceDetail carries one service together with its asset summaries and missing kinds.
+type ServiceDetail struct {
+	Service        ServiceRecord
+	AssetSummaries []AssetSummaryRecord
+	MissingKinds   []MissingKindRecord
+}
+
+// GetServiceDetail returns one service detail enriched with its asset summaries
+// and missing kinds, and records a successful read.
+func (discovery *Discovery) GetServiceDetail(ctx context.Context, actor Principal, tenantSlug, serviceSlug string) (ServiceDetail, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "service:read")
+	if err != nil {
+		return ServiceDetail{}, err
+	}
+	record, err := discovery.store.GetServiceBySlug(ctx, membership.TenantID, serviceSlug)
+	if err != nil {
+		return ServiceDetail{}, err
+	}
+	if err := discovery.store.UpsertRecentService(ctx, membership.TenantID, membership.UserID, record.ID, discovery.now().UTC()); err != nil {
+		return ServiceDetail{}, err
+	}
+	detail := ServiceDetail{Service: record, AssetSummaries: []AssetSummaryRecord{}, MissingKinds: []MissingKindRecord{}}
+	if discovery.assets == nil {
+		return detail, nil
+	}
+	summaries, missing, err := discovery.assets.AssetSummaries(ctx, membership.TenantID, record.ID)
+	if err != nil {
+		return ServiceDetail{}, err
+	}
+	detail.AssetSummaries = summaries
+	detail.MissingKinds = missing
+	return detail, nil
+}
+
+// ListRecentServices returns the caller's recently viewed services.
+func (discovery *Discovery) ListRecentServices(ctx context.Context, actor Principal, tenantSlug string, page, pageSize int) ([]ServiceRecord, int64, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "service:read")
+	if err != nil {
+		return nil, 0, err
+	}
+	if err := validatePagination(page, pageSize); err != nil {
+		return nil, 0, err
+	}
+	return discovery.store.ListRecentServices(ctx, membership.TenantID, membership.UserID, int32(pageSize), int32((page-1)*pageSize))
+}
+
+func mergeSourceSpecPatch(current SourceSpecRecord, input SourceSpecPatchInput) SourceSpecRecord {
+	if input.AssetNameTemplate != nil {
+		current.AssetNameTemplate = *input.AssetNameTemplate
+	}
+	if input.Role != nil {
+		current.Role = *input.Role
+	}
+	if input.Origin != nil {
+		current.Origin = *input.Origin
+	}
+	if input.Mode != nil {
+		current.Mode = *input.Mode
+	}
+	if input.Path != nil {
+		current.Path = input.Path
+	}
+	if input.ProducerProfileID != nil {
+		current.ProducerProfileID = input.ProducerProfileID
+	}
+	if input.Ord != nil {
+		current.Ord = *input.Ord
+	}
+	if input.TimeoutSec != nil {
+		current.TimeoutSec = *input.TimeoutSec
+	}
+	if len(input.BranchPatterns) > 0 {
+		current.BranchPatterns = input.BranchPatterns
+	}
+	if input.Enabled != nil {
+		current.Enabled = *input.Enabled
+	}
+	return current
+}
+
+func validateMergedSourceSpec(spec SourceSpecRecord) error {
+	probe := NewSourceSpec{
+		Kind: spec.Kind, AssetNameTemplate: spec.AssetNameTemplate, Role: spec.Role, Origin: spec.Origin, Mode: spec.Mode,
+		Path: spec.Path, ProducerProfileID: spec.ProducerProfileID, Ord: spec.Ord, TimeoutSec: spec.TimeoutSec,
+		BranchPatterns: spec.BranchPatterns, Enabled: spec.Enabled,
+	}
+	if _, err := validateNewSourceSpec(probe); err != nil {
+		return err
+	}
+	return nil
 }
 
 // ProducerUnavailableError reports that the selected producer profile is not usable.

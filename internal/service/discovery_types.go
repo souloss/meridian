@@ -160,6 +160,27 @@ type DiscoverJobInput struct {
 	IdempotencyKey uuid.UUID
 }
 
+// RepositorySyncInput describes one repository synchronization request.
+type RepositorySyncInput struct {
+	RefType string
+	RefName string
+	Force   *bool
+}
+
+// SourceSpecPatchInput carries explicit PATCH fields for one source spec update.
+type SourceSpecPatchInput struct {
+	AssetNameTemplate *string
+	Role              *string
+	Origin            *string
+	Mode              *string
+	Path              *string
+	ProducerProfileID *uuid.UUID
+	Ord               *int
+	TimeoutSec        *int
+	BranchPatterns    []string
+	Enabled           *bool
+}
+
 // NewService carries validated values ready for an atomic service insert.
 type NewService struct {
 	TenantID     uuid.UUID
@@ -180,12 +201,13 @@ type ProducerStore interface {
 }
 
 // DiscoveryStore is the persistence boundary for repository discovery, service
-// acceptance, and source configuration. It also enqueues discovery jobs
-// transactionally. Every method retains the tenant predicate.
+// acceptance, and source configuration. It also enqueues discovery and sync
+// jobs transactionally. Every method retains the tenant predicate.
 type DiscoveryStore interface {
 	ProducerStore
 	GetRepository(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
 	EnqueueDiscoveryJob(context.Context, DiscoverJobInput) (JobAccepted, error)
+	EnqueueSyncJob(context.Context, SyncJobInput) (JobAccepted, error)
 	UpsertDiscoveryCandidate(context.Context, NewDiscoveryCandidate) (DiscoveryCandidateRecord, error)
 	ListDiscoveryCandidates(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]DiscoveryCandidateRecord, int64, error)
 	GetDiscoveryCandidate(context.Context, uuid.UUID, uuid.UUID) (DiscoveryCandidateRecord, error)
@@ -195,8 +217,13 @@ type DiscoveryStore interface {
 	CountServices(context.Context, uuid.UUID) (int64, int64, error)
 	CreateSourceSpec(context.Context, NewSourceSpec) (SourceSpecRecord, error)
 	GetSourceSpec(context.Context, uuid.UUID, uuid.UUID) (SourceSpecRecord, error)
+	UpdateSourceSpec(context.Context, SourceSpecPatch) (SourceSpecRecord, error)
+	ListSourceSpecsForService(context.Context, uuid.UUID, uuid.UUID) ([]SourceSpecRecord, error)
 	ListSourceBindings(context.Context, uuid.UUID, uuid.UUID) ([]SourceBindingRecord, error)
 	CountSourceBindings(context.Context, uuid.UUID, uuid.UUID) (int64, error)
+	CountActiveBindings(context.Context, uuid.UUID, uuid.UUID) (int64, error)
+	UpsertRecentService(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, time.Time) error
+	ListRecentServices(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]ServiceRecord, int64, error)
 }
 
 // NewDiscoveryCandidate carries one discovered service root for an upsert.

@@ -6,7 +6,7 @@ MERIDIAN_DEV_MASTER_KEY_VERSION ?= 1
 MERIDIAN_DEV_CREDENTIAL_FINGERPRINT_KEY ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 MILESTONE ?= $(if $(ITEM),$(firstword $(subst -, ,$(ITEM))),M5)
 
-.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 quality-gate
+.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-m1-golden-path smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 perf-openapi-pipeline e2e-viewer quality-gate
 
 all: build
 
@@ -91,6 +91,10 @@ smoke-m0-credentials:
 smoke-m1-repository:
 	sh ./scripts/smoke.sh --m1-repository
 
+# M1 golden path: sync pipeline, asset materialization, and viewer resolution.
+smoke-m1-golden-path:
+	sh ./scripts/smoke.sh --m1-golden-path
+
 smoke-runner-test:
 	vfox exec nodejs@24.20.0 -- node --test scripts/smoke-runner.test.mjs
 
@@ -111,6 +115,15 @@ perf-editor: spike-harness
 
 a11y-m0: spike-harness
 	vfox exec nodejs@24.20.0 -- pnpm --dir web exec node scripts/run-spike.mjs a11y-m0 a11y-m0.spec.ts all
+
+# M1 OpenAPI pipeline: parse + extract 10,000 operations under the perf budget.
+perf-openapi-pipeline:
+	mkdir -p artifacts/spikes
+	SPIKE_REPORT_PATH=artifacts/spikes/perf-openapi-pipeline.json vfox exec golang@1.27.1 -- go run ./cmd/perf-openapi-pipeline
+
+# M1 viewer: resolveView single-document rendering in the spike harness.
+e2e-viewer: spike-harness
+	vfox exec nodejs@24.20.0 -- pnpm --dir web exec node scripts/run-spike.mjs e2e-viewer e2e-viewer.spec.ts desktop
 
 quality-gate:
 	@case "$(ITEM)" in \

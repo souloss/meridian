@@ -441,16 +441,36 @@ func seedDiscoveryRepository(t *testing.T) (bare string, working string) {
 	root := t.TempDir()
 	repo := filepath.Join(root, "seed")
 	bare = filepath.Join(root, "repository.git")
-	for _, dir := range []string{repo, filepath.Join(repo, "order-service"), filepath.Join(repo, "pay-service")} {
+	for _, dir := range []string{repo, filepath.Join(repo, "order-service"), filepath.Join(repo, "pay-service"), filepath.Join(repo, "order-service", "apis", "billing"), filepath.Join(repo, "order-service", "apis", "inventory"), filepath.Join(repo, "order-service", "apis", "shipping")} {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
 			t.Fatalf("mkdir seed repo: %v", err)
 		}
 	}
+	const openapiDocument = `openapi: 3.1.0
+info:
+  title: Order Service
+  version: 1.0.0
+paths:
+  /orders:
+    get:
+      summary: List orders
+      responses: {}
+    post:
+      summary: Create order
+      responses: {}
+  /orders/{id}:
+    get:
+      summary: Get order
+      responses: {}
+`
 	files := map[string]string{
-		"package.json":               "{\"name\":\"root\"}\n",
-		"order-service/pom.xml":      "<project/>\n",
-		"order-service/openapi.yaml": "openapi: 3.1.0\n",
-		"pay-service/go.mod":         "module example/pay\n\ngo 1.21\n",
+		"package.json":                              "{\"name\":\"root\"}\n",
+		"order-service/pom.xml":                     "<project/>\n",
+		"order-service/openapi.yaml":                openapiDocument,
+		"order-service/apis/billing/openapi.yaml":   openapiDocument,
+		"order-service/apis/inventory/openapi.yaml": openapiDocument,
+		"order-service/apis/shipping/openapi.yaml":  openapiDocument,
+		"pay-service/go.mod":                        "module example/pay\n\ngo 1.21\n",
 	}
 	for path, contents := range files {
 		if err := os.WriteFile(filepath.Join(repo, path), []byte(contents), 0o644); err != nil {

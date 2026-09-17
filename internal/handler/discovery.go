@@ -182,11 +182,28 @@ func (s *Server) CreateSourceSpec(ctx context.Context, request asset.CreateSourc
 	}, nil
 }
 
-// ListSourceBindings returns the current bindings for one source spec.
-func (s *Server) ListSourceBindings(ctx context.Context, request asset.ListSourceBindingsRequestObject) (asset.ListSourceBindingsResponseObject, error) {
+// ListSourceSpecs returns the active source specs for one service.
+func (s *Server) ListSourceSpecs(ctx context.Context, request asset.ListSourceSpecsRequestObject) (asset.ListSourceSpecsResponseObject, error) {
 	if s.discovery == nil {
 		return nil, api.ErrStrictOperationNotImplemented
 	}
+	principal, err := principalFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	items, err := s.discovery.ListSourceSpecs(ctx, principal, string(request.TenantSlug), string(request.ServiceSlug))
+	if err != nil {
+		return nil, err
+	}
+	responses := make([]api.SourceSpec, 0, len(items))
+	for _, item := range items {
+		responses = append(responses, sourceSpecResponse(item))
+	}
+	return asset.ListSourceSpecs200JSONResponse(api.SourceSpecList{Items: responses}), nil
+}
+
+// ListSourceBindings returns the current bindings for one source spec.
+func (s *Server) ListSourceBindings(ctx context.Context, request asset.ListSourceBindingsRequestObject) (asset.ListSourceBindingsResponseObject, error) {
 	principal, err := principalFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -342,6 +359,33 @@ func serviceResponse(record service.ServiceRecord) api.Service {
 		Tags: []api.Tag{}, Assets: []api.AssetSummary{}, MissingKinds: []api.MissingKind{},
 		Capabilities: api.CapabilityList{}, Starred: false, CreatedAt: record.CreatedAt, UpdatedAt: record.UpdatedAt,
 	}
+}
+
+// serviceResponseWithAssets renders a service response enriched with its asset
+// summaries and missing kinds resolved through the asset read use cases.
+func serviceResponseWithAssets(record service.ServiceRecord, summaries []service.AssetSummaryRecord, missing []service.MissingKindRecord) api.Service {
+	response := serviceResponse(record)
+	response.Assets = make([]api.AssetSummary, 0, len(summaries))
+	for _, summary := range summaries {
+		current := nullable.NewNullNullable[api.VersionRef]()
+		if summary.CurrentVersion != nil {
+			current = nullable.NewNullableWithValue(api.VersionRef{Id: api.Uuid(summary.CurrentVersion.ID), Version: summary.CurrentVersion.Version, Lifecycle: api.Lifecycle(summary.CurrentVersion.Lifecycle)})
+		}
+		latest := nullable.NewNullNullable[api.VersionRef]()
+		if summary.LatestVersion != nil {
+			latest = nullable.NewNullableWithValue(api.VersionRef{Id: api.Uuid(summary.LatestVersion.ID), Version: summary.LatestVersion.Version, Lifecycle: api.Lifecycle(summary.LatestVersion.Lifecycle)})
+		}
+		response.Assets = append(response.Assets, api.AssetSummary{
+			Id: api.Uuid(summary.ID), Kind: api.KindId(summary.Kind), Name: api.AssetName(summary.Name),
+			Lifecycle: api.Lifecycle(summary.Lifecycle), Health: api.AssetSummaryHealth(summary.Health),
+			CurrentVersion: current, LatestVersion: latest, RefType: api.RefType(summary.RefType), Ref: api.RefName(summary.RefName),
+		})
+	}
+	response.MissingKinds = make([]api.MissingKind, 0, len(missing))
+	for _, kind := range missing {
+		response.MissingKinds = append(response.MissingKinds, api.MissingKind{Kind: api.KindId(kind.Kind), CanConfigure: kind.CanConfigure, CanGenerateWithAi: kind.CanGenerateWithAI})
+	}
+	return response
 }
 
 func sourceSpecInput(body api.SourceSpecCreateRequest) service.NewSourceSpec {

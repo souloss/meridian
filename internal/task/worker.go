@@ -17,8 +17,8 @@ var ErrRepositorySyncUnavailable = errors.New("repository synchronization produc
 type UnsupportedSyncRunner struct{}
 
 // Run returns a stable, non-secret error until the M1 repository producer exists.
-func (UnsupportedSyncRunner) Run(context.Context, CredentialSyncArgs) error {
-	return ErrRepositorySyncUnavailable
+func (UnsupportedSyncRunner) Run(context.Context, CredentialSyncArgs) (SyncResult, error) {
+	return SyncResult{}, ErrRepositorySyncUnavailable
 }
 
 // CredentialSyncWorker advances durable Meridian state around one River attempt.
@@ -56,7 +56,8 @@ func (worker *CredentialSyncWorker) Work(ctx context.Context, job *river.Job[Cre
 		return nil
 	}
 
-	if err := worker.runner.Run(ctx, job.Args); err != nil {
+	syncResult, err := worker.runner.Run(ctx, job.Args)
+	if err != nil {
 		return worker.finishFailure(ctx, job.Args, job.Attempt, err)
 	}
 	for _, stage := range [...]Stage{StageDiscover, StageExtract, StageMerge, StageNormalize, StageIndex} {
@@ -69,9 +70,10 @@ func (worker *CredentialSyncWorker) Work(ctx context.Context, job *river.Job[Cre
 		}
 	}
 	result, err := json.Marshal(struct {
-		RepositoryID string `json:"repositoryId"`
-		RefName      string `json:"refName"`
-	}{RepositoryID: job.Args.RepositoryID.String(), RefName: job.Args.RefName})
+		RepositoryID   string `json:"repositoryId"`
+		RefName        string `json:"refName"`
+		ResolvedCommit string `json:"resolvedCommit"`
+	}{RepositoryID: job.Args.RepositoryID.String(), RefName: job.Args.RefName, ResolvedCommit: syncResult.ResolvedCommit})
 	if err != nil {
 		return err
 	}

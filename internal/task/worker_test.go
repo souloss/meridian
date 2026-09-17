@@ -35,7 +35,9 @@ type recordingSyncRunner struct {
 	err error
 }
 
-func (runner recordingSyncRunner) Run(context.Context, CredentialSyncArgs) error { return runner.err }
+func (runner recordingSyncRunner) Run(context.Context, CredentialSyncArgs) (SyncResult, error) {
+	return SyncResult{}, runner.err
+}
 
 func TestCredentialSyncWorkerRecordsAllPipelineStages(t *testing.T) {
 	store := &recordingExecutionStore{}

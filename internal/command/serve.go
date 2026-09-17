@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"github.com/meridian-labs/meridian/internal/handler"
 	"github.com/meridian-labs/meridian/internal/repository"
 	"github.com/meridian-labs/meridian/internal/service"
+	"github.com/meridian-labs/meridian/internal/storage"
 	"github.com/meridian-labs/meridian/internal/task"
 	"github.com/spf13/cobra"
 )
@@ -74,10 +76,24 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
 	discoveryStore := repository.NewDiscoveryStoreWithRiver(db.Pool, nil)
 	workspaceRoot := os.Getenv("MERIDIAN_WORKSPACE_ROOT")
+	if workspaceRoot == "" {
+		workspaceRoot = filepath.Join(os.TempDir(), "meridian-workspace")
+	}
+	blobRoot := os.Getenv("MERIDIAN_BLOB_ROOT")
+	if blobRoot == "" {
+		blobRoot = filepath.Join(os.TempDir(), "meridian-blobs")
+	}
+	blobStore, err := storage.NewLocalStore(blobRoot)
+	if err != nil {
+		return fmt.Errorf("configure content blob store: %w", err)
+	}
+	assetStore := repository.NewAssetStore(db.Pool)
+	syncRunner := service.NewPipelineRunner(assetStore, blobStore, workspaceRoot)
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
-		Executions: repositoryStore,
+		Executions:     repositoryStore,
+		SyncRunner:     syncRunner,
 		DiscoverRunner: service.NewDiscoveryRunner(discoveryStore, workspaceRoot),
-		Outbox: repositoryStore,
+		Outbox:         repositoryStore,
 	}, logger)
 	if err != nil {
 		return fmt.Errorf("configure River runtime: %w", err)
@@ -89,11 +105,14 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	audits := service.NewAudits(repositoryStore, identityStore)
 	producers := service.NewProducers(discoveryStore, identityStore)
 	discovery := service.NewDiscovery(discoveryStore, identityStore)
+	assets := service.NewAssets(assetStore, identityStore)
+	views := service.NewViews(assetStore, identityStore)
+	discovery.WithAssets(assets)
 	server := &http.Server{
 		Addr: addr,
 		Handler: handler.NewWithRuntimeServices(handler.Dependencies{
 			Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
-			Producers: producers, Discovery: discovery,
+			Producers: producers, Discovery: discovery, Assets: assets, Views: views,
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,

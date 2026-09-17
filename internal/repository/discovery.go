@@ -296,6 +296,30 @@ func (store *DiscoveryStore) CountSourceBindings(ctx context.Context, tenantID, 
 	return store.queries.CountSourceBindings(ctx, generated.CountSourceBindingsParams{TenantID: tenantID, SourceSpecID: sourceSpecID})
 }
 
+// ListSourceSpecsForService returns active source specs for one service.
+func (store *DiscoveryStore) ListSourceSpecsForService(ctx context.Context, tenantID, serviceID uuid.UUID) ([]service.SourceSpecRecord, error) {
+	rows, err := store.queries.ListSourceSpecsForService(ctx, generated.ListSourceSpecsForServiceParams{TenantID: tenantID, ServiceID: serviceID})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	items := make([]service.SourceSpecRecord, 0, len(rows))
+	for _, row := range rows {
+		items = append(items, service.SourceSpecRecord{
+			ID: row.ID, ServiceID: row.ServiceID, Kind: row.Kind, AssetNameTemplate: row.AssetNameTemplate,
+			Role: row.Role, Origin: row.Origin, Mode: row.Mode, Path: row.Path, ProducerProfileID: row.ProducerProfileID,
+			Ord: int(row.Ord), TimeoutSec: int(row.TimeoutSec), BranchPatterns: append([]string(nil), row.BranchPatterns...),
+			Enabled: row.Enabled, ConfigOrigin: row.ConfigOrigin, Revision: row.Revision,
+			CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
+		})
+	}
+	return items, nil
+}
+
+// CountActiveBindings returns the active binding count for one source spec.
+func (store *DiscoveryStore) CountActiveBindings(ctx context.Context, tenantID, sourceSpecID uuid.UUID) (int64, error) {
+	return store.queries.CountActiveBindings(ctx, generated.CountActiveBindingsParams{TenantID: tenantID, SourceSpecID: sourceSpecID})
+}
+
 func discoveryDedupeKey(repositoryID uuid.UUID, refType, refName string) string {
 	return "discover:" + repositoryID.String() + ":" + refType + ":" + refName
 }
@@ -346,6 +370,57 @@ func sourceSpecFromRow(row generated.SourceSpec, bindingsCount int) service.Sour
 		Enabled: row.Enabled, ConfigOrigin: row.ConfigOrigin, BindingsCount: bindingsCount, Revision: row.Revision,
 		CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
 	}
+}
+
+// ListRecentServices returns one page of recently viewed services.
+func (store *DiscoveryStore) ListRecentServices(ctx context.Context, tenantID, userID uuid.UUID, limit, offset int32) ([]service.ServiceRecord, int64, error) {
+	total, err := store.queries.CountRecentServices(ctx, generated.CountRecentServicesParams{TenantID: tenantID, UserID: userID})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	rows, err := store.queries.ListRecentServices(ctx, generated.ListRecentServicesParams{TenantID: tenantID, UserID: userID, PageLimit: limit, PageOffset: offset})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	items := make([]service.ServiceRecord, 0, len(rows))
+	for _, row := range rows {
+		items = append(items, service.ServiceRecord{
+			ID: row.ID, RepositoryID: row.RepositoryID, Slug: row.Slug, DisplayName: row.DisplayName,
+			Description: row.Description, RootDir: row.RootDir, Language: row.Language, Framework: row.Framework,
+			Visibility: row.Visibility, Lifecycle: row.Lifecycle, Revision: row.Revision,
+			CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
+		})
+	}
+	return items, total, nil
+}
+
+// UpsertRecentService records one successful service detail read.
+func (store *DiscoveryStore) UpsertRecentService(ctx context.Context, tenantID, userID, serviceID uuid.UUID, viewedAt time.Time) error {
+	if _, err := store.queries.UpsertRecentService(ctx, generated.UpsertRecentServiceParams{TenantID: tenantID, UserID: userID, ServiceID: serviceID, ViewedAt: timestamp(viewedAt)}); err != nil {
+		return normalizeError(err)
+	}
+	return nil
+}
+
+// UpdateSourceSpec applies a validated source spec patch under its revision.
+func (store *DiscoveryStore) UpdateSourceSpec(ctx context.Context, input service.SourceSpecPatch) (service.SourceSpecRecord, error) {
+	row, err := store.queries.UpdateSourceSpec(ctx, generated.UpdateSourceSpecParams{
+		TenantID: input.TenantID, ID: input.ID, ExpectedRevision: input.ExpectedRevision,
+		AssetNameTemplate: input.AssetNameTemplate, Role: input.Role, Origin: input.Origin, Mode: input.Mode,
+		Path: input.Path, ProducerProfileID: input.ProducerProfileID,
+		Ord: int32Pointer(input.Ord), TimeoutSec: int32Pointer(input.TimeoutSec),
+		BranchPatterns: input.BranchPatterns, Enabled: input.Enabled,
+	})
+	if err != nil {
+		return service.SourceSpecRecord{}, normalizeError(err)
+	}
+	return service.SourceSpecRecord{
+		ID: row.ID, ServiceID: row.ServiceID, Kind: row.Kind, AssetNameTemplate: row.AssetNameTemplate,
+		Role: row.Role, Origin: row.Origin, Mode: row.Mode, Path: row.Path, ProducerProfileID: row.ProducerProfileID,
+		Ord: int(row.Ord), TimeoutSec: int(row.TimeoutSec), BranchPatterns: append([]string(nil), row.BranchPatterns...),
+		Enabled: row.Enabled, ConfigOrigin: row.ConfigOrigin, Revision: row.Revision,
+		CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
+	}, nil
 }
 
 var _ service.DiscoveryStore = (*DiscoveryStore)(nil)

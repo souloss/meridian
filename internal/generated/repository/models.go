@@ -49,6 +49,244 @@ type ApiToken struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+// Asset is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 服务内的资产，由 kind 与 name 唯一标识。
+type Asset struct {
+	// TenantID is the generated tenant id database value for Asset.
+	// 拥有该资产的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for Asset.
+	// 应用生成的 UUID v7 资产标识。
+	ID uuid.UUID `json:"id"`
+	// ServiceID is the generated service id database value for Asset.
+	// 该资产所属的服务。
+	ServiceID uuid.UUID `json:"service_id"`
+	// Kind is the generated kind database value for Asset.
+	// 资产 kind 标识。
+	Kind string `json:"kind"`
+	// Name is the generated name database value for Asset.
+	// 资产名称，经资产名模板渲染并规范化。
+	Name string `json:"name"`
+	// Revision is the generated revision database value for Asset.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
+	Revision int64 `json:"revision"`
+	// DeletedAt is the generated deleted at database value for Asset.
+	// 软删除时间；资产活跃时为空。
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	// CreatedAt is the generated created at database value for Asset.
+	// 创建资产时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for Asset.
+	// 最近一次更新资产时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// AssetItem is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 资产版本的索引条目，如 openapi 的单个 operation。
+type AssetItem struct {
+	// TenantID is the generated tenant id database value for AssetItem.
+	// 拥有该条目的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for AssetItem.
+	// 应用生成的 UUID v7 条目标识。
+	ID uuid.UUID `json:"id"`
+	// AssetVersionID is the generated asset version id database value for AssetItem.
+	// 该条目所属的资产版本。
+	AssetVersionID uuid.UUID `json:"asset_version_id"`
+	// AssetID is the generated asset id database value for AssetItem.
+	// 该条目所属的资产。
+	AssetID uuid.UUID `json:"asset_id"`
+	// ServiceID is the generated service id database value for AssetItem.
+	// 该条目所属的服务。
+	ServiceID uuid.UUID `json:"service_id"`
+	// Kind is the generated kind database value for AssetItem.
+	// 资产 kind 标识。
+	Kind string `json:"kind"`
+	// ItemType is the generated item type database value for AssetItem.
+	// 条目类型，如 operation。
+	ItemType string `json:"item_type"`
+	// Key is the generated key database value for AssetItem.
+	// 条目在版本内的稳定键，如 UPPER(method) normalizedPath。
+	Key string `json:"key"`
+	// Display is the generated display database value for AssetItem.
+	// 条目展示字段 JSON。
+	Display []byte `json:"display"`
+	// SearchText is the generated search text database value for AssetItem.
+	// 用于三元组搜索的文本。
+	SearchText string `json:"search_text"`
+	// SearchVector is the generated search vector database value for AssetItem.
+	// 用于全文检索的 tsvector。
+	SearchVector any `json:"search_vector"`
+	// SearchRaw is the generated search raw database value for AssetItem.
+	// 原始可搜索 JSON。
+	SearchRaw []byte `json:"search_raw"`
+	// Provenance is the generated provenance database value for AssetItem.
+	// 条目溯源 JSON。
+	Provenance []byte `json:"provenance"`
+	// CreatedAt is the generated created at database value for AssetItem.
+	// 创建条目时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+// AssetKind is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 平台级资产 kind 注册表，声明每种 kind 的契约与插件版本。
+type AssetKind struct {
+	// ID is the generated id database value for AssetKind.
+	// 资产 kind 标识，如 openapi。
+	ID string `json:"id"`
+	// ContractVersion is the generated contract version database value for AssetKind.
+	// 该 kind 遵循的契约版本。
+	ContractVersion string `json:"contract_version"`
+	// Enabled is the generated enabled database value for AssetKind.
+	// 该 kind 是否启用。
+	Enabled bool `json:"enabled"`
+	// PluginVersion is the generated plugin version database value for AssetKind.
+	// 处理该 kind 的插件版本。
+	PluginVersion string `json:"plugin_version"`
+	// CreatedAt is the generated created at database value for AssetKind.
+	// 注册 kind 时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for AssetKind.
+	// 最近一次更新 kind 注册时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// AssetRefTrack is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 资产在某一 Git 分支或标签上的版本轨迹。
+type AssetRefTrack struct {
+	// TenantID is the generated tenant id database value for AssetRefTrack.
+	// 拥有该轨迹的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for AssetRefTrack.
+	// 应用生成的 UUID v7 轨迹标识。
+	ID uuid.UUID `json:"id"`
+	// AssetID is the generated asset id database value for AssetRefTrack.
+	// 该轨迹所属的资产。
+	AssetID uuid.UUID `json:"asset_id"`
+	// RefType is the generated ref type database value for AssetRefTrack.
+	// Git 引用类别：branch 或 tag。
+	RefType string `json:"ref_type"`
+	// RefName is the generated ref name database value for AssetRefTrack.
+	// Git 引用名。
+	RefName string `json:"ref_name"`
+	// LatestVersionID is the generated latest version id database value for AssetRefTrack.
+	// 最新创建的版本，可为空。
+	LatestVersionID *uuid.UUID `json:"latest_version_id"`
+	// CurrentVersionID is the generated current version id database value for AssetRefTrack.
+	// 当前选中的已发布版本，可为空。
+	CurrentVersionID *uuid.UUID `json:"current_version_id"`
+	// Health is the generated health database value for AssetRefTrack.
+	// 轨迹健康状态：ok、stale 或 invalid。
+	Health string `json:"health"`
+	// DesiredGeneration is the generated desired generation database value for AssetRefTrack.
+	// 期望处理代次。
+	DesiredGeneration int64 `json:"desired_generation"`
+	// ProcessedGeneration is the generated processed generation database value for AssetRefTrack.
+	// 已处理代次。
+	ProcessedGeneration int64 `json:"processed_generation"`
+	// Active is the generated active database value for AssetRefTrack.
+	// 轨迹是否活跃。
+	Active bool `json:"active"`
+	// CreatedAt is the generated created at database value for AssetRefTrack.
+	// 创建轨迹时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for AssetRefTrack.
+	// 最近一次更新轨迹时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// AssetVersion is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 资产版本，记录一次合并物化的完整快照。
+type AssetVersion struct {
+	// TenantID is the generated tenant id database value for AssetVersion.
+	// 拥有该版本的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for AssetVersion.
+	// 应用生成的 UUID v7 版本标识。
+	ID uuid.UUID `json:"id"`
+	// AssetID is the generated asset id database value for AssetVersion.
+	// 该版本所属的资产。
+	AssetID uuid.UUID `json:"asset_id"`
+	// TrackID is the generated track id database value for AssetVersion.
+	// 该版本所属的引用轨迹。
+	TrackID uuid.UUID `json:"track_id"`
+	// SequenceNo is the generated sequence no database value for AssetVersion.
+	// 轨迹内单调递增的序号。
+	SequenceNo int64 `json:"sequence_no"`
+	// Version is the generated version database value for AssetVersion.
+	// 语义化版本标签，如 1.0.0。
+	Version string `json:"version"`
+	// Lifecycle is the generated lifecycle database value for AssetVersion.
+	// 版本生命周期：draft、published、deprecated 或 retired。
+	Lifecycle string `json:"lifecycle"`
+	// Revision is the generated revision database value for AssetVersion.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
+	Revision int64 `json:"revision"`
+	// QualityScore is the generated quality score database value for AssetVersion.
+	// 可选的质量评分。
+	QualityScore *int32 `json:"quality_score"`
+	// MergeRequestID is the generated merge request id database value for AssetVersion.
+	// 产生该版本的合并请求，可为空。
+	MergeRequestID *uuid.UUID `json:"merge_request_id"`
+	// InputFingerprint is the generated input fingerprint database value for AssetVersion.
+	// 构建输入指纹，用于 no-op 判定。
+	InputFingerprint string `json:"input_fingerprint"`
+	// MergeEngineVersion is the generated merge engine version database value for AssetVersion.
+	// 合并引擎版本。
+	MergeEngineVersion string `json:"merge_engine_version"`
+	// OverlayCompilerVersion is the generated overlay compiler version database value for AssetVersion.
+	// overlay 编译器版本，可为空。
+	OverlayCompilerVersion *string `json:"overlay_compiler_version"`
+	// OverlayMode is the generated overlay mode database value for AssetVersion.
+	// overlay 模式，可为空。
+	OverlayMode *string `json:"overlay_mode"`
+	// NormalizerVersion is the generated normalizer version database value for AssetVersion.
+	// 规范化器版本，可为空。
+	NormalizerVersion *string `json:"normalizer_version"`
+	// KindPluginVersion is the generated kind plugin version database value for AssetVersion.
+	// kind 插件版本，可为空。
+	KindPluginVersion *string `json:"kind_plugin_version"`
+	// LayerManifest is the generated layer manifest database value for AssetVersion.
+	// 产生该版本的层修订清单 JSON。
+	LayerManifest []byte `json:"layer_manifest"`
+	// MergedHash is the generated merged hash database value for AssetVersion.
+	// 合并内容摘要，可为空。
+	MergedHash *string `json:"merged_hash"`
+	// MergedRef is the generated merged ref database value for AssetVersion.
+	// 合并内容引用，可为空。
+	MergedRef *string `json:"merged_ref"`
+	// NormalizedRef is the generated normalized ref database value for AssetVersion.
+	// 规范化内容引用，可为空。
+	NormalizedRef *string `json:"normalized_ref"`
+	// BundledRef is the generated bundled ref database value for AssetVersion.
+	// 打包内容引用，可为空。
+	BundledRef *string `json:"bundled_ref"`
+	// ProvenanceRef is the generated provenance ref database value for AssetVersion.
+	// 溯源引用，可为空。
+	ProvenanceRef *string `json:"provenance_ref"`
+	// SourceCommit is the generated source commit database value for AssetVersion.
+	// 来源提交 SHA，可为空。
+	SourceCommit *string `json:"source_commit"`
+	// BaselineVersionID is the generated baseline version id database value for AssetVersion.
+	// 比较基线版本，可为空。
+	BaselineVersionID *uuid.UUID `json:"baseline_version_id"`
+	// DiffSummary is the generated diff summary database value for AssetVersion.
+	// 与基线的 diff 摘要，可为空。
+	DiffSummary []byte `json:"diff_summary"`
+	// Labels is the generated labels database value for AssetVersion.
+	// 版本标签 JSON。
+	Labels []byte `json:"labels"`
+	// IndexComplete is the generated index complete database value for AssetVersion.
+	// 是否已完成 item 索引。
+	IndexComplete bool `json:"index_complete"`
+	// CreatedAt is the generated created at database value for AssetVersion.
+	// 创建版本时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for AssetVersion.
+	// 最近一次更新版本时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
 // AuditLog is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 不包含秘密和业务内容的追加式安全及业务审计元数据。
 type AuditLog struct {
@@ -464,6 +702,147 @@ type KnownHost struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+// Layer is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 资产的内容层，base 唯一，overlay 按 ord 排序。
+type Layer struct {
+	// TenantID is the generated tenant id database value for Layer.
+	// 拥有该层的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for Layer.
+	// 应用生成的 UUID v7 层标识。
+	ID uuid.UUID `json:"id"`
+	// AssetID is the generated asset id database value for Layer.
+	// 该层所属的资产。
+	AssetID uuid.UUID `json:"asset_id"`
+	// SourceSpecID is the generated source spec id database value for Layer.
+	// 产生该层的源配置，可为空。
+	SourceSpecID *uuid.UUID `json:"source_spec_id"`
+	// Role is the generated role database value for Layer.
+	// 层角色：base 或 overlay。
+	Role string `json:"role"`
+	// Origin is the generated origin database value for Layer.
+	// 层来源：repo、third_party、manual 或 ai_generated。
+	Origin string `json:"origin"`
+	// Ord is the generated ord database value for Layer.
+	// overlay 层在资产内的排序号。
+	Ord int32 `json:"ord"`
+	// Dialect is the generated dialect database value for Layer.
+	// 层内容方言，可为空。
+	Dialect *string `json:"dialect"`
+	// Enabled is the generated enabled database value for Layer.
+	// 该层是否参与合并。
+	Enabled bool `json:"enabled"`
+	// BranchPatterns is the generated branch patterns database value for Layer.
+	// 该层适用的分支/标签 glob 列表。
+	BranchPatterns []string `json:"branch_patterns"`
+	// DisplayName is the generated display name database value for Layer.
+	// 界面展示的层名称。
+	DisplayName string `json:"display_name"`
+	// Revision is the generated revision database value for Layer.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
+	Revision int64 `json:"revision"`
+	// DeletedAt is the generated deleted at database value for Layer.
+	// 软删除时间；层活跃时为空。
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	// CreatedAt is the generated created at database value for Layer.
+	// 创建层时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for Layer.
+	// 最近一次更新层时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// LayerHead is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 层在指定作用域内的最新/生效/候选修订指针。
+type LayerHead struct {
+	// TenantID is the generated tenant id database value for LayerHead.
+	// 拥有该层头的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// LayerID is the generated layer id database value for LayerHead.
+	// 该层头所属的层。
+	LayerID uuid.UUID `json:"layer_id"`
+	// ScopeType is the generated scope type database value for LayerHead.
+	// 作用域类型：ref 或 global。
+	ScopeType string `json:"scope_type"`
+	// ScopeKey is the generated scope key database value for LayerHead.
+	// global 时为 *，否则为 branch:<name> 或 tag:<name>。
+	ScopeKey string `json:"scope_key"`
+	// LatestRevisionID is the generated latest revision id database value for LayerHead.
+	// 最新提交的修订。
+	LatestRevisionID *uuid.UUID `json:"latest_revision_id"`
+	// EffectiveRevisionID is the generated effective revision id database value for LayerHead.
+	// 最新无需或已批准的有效修订。
+	EffectiveRevisionID *uuid.UUID `json:"effective_revision_id"`
+	// CandidateRevisionID is the generated candidate revision id database value for LayerHead.
+	// 待审核的候选修订，可为空。
+	CandidateRevisionID *uuid.UUID `json:"candidate_revision_id"`
+	// Generation is the generated generation database value for LayerHead.
+	// 单调递增的变更计数器。
+	Generation int64 `json:"generation"`
+	// UpdatedAt is the generated updated at database value for LayerHead.
+	// 最近一次更新层头时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// LayerRevision is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 层内容的一次不可变修订。
+type LayerRevision struct {
+	// TenantID is the generated tenant id database value for LayerRevision.
+	// 拥有该修订的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for LayerRevision.
+	// 应用生成的 UUID v7 修订标识。
+	ID uuid.UUID `json:"id"`
+	// LayerID is the generated layer id database value for LayerRevision.
+	// 该修订所属的层。
+	LayerID uuid.UUID `json:"layer_id"`
+	// ScopeType is the generated scope type database value for LayerRevision.
+	// 作用域类型：ref 或 global。
+	ScopeType string `json:"scope_type"`
+	// ScopeKey is the generated scope key database value for LayerRevision.
+	// global 时为 *，否则为 branch:<name> 或 tag:<name>。
+	ScopeKey string `json:"scope_key"`
+	// ContentHash is the generated content hash database value for LayerRevision.
+	// 层内容的 SHA-256 摘要。
+	ContentHash string `json:"content_hash"`
+	// ContentRef is the generated content ref database value for LayerRevision.
+	// 指向 blob 存储的内容引用。
+	ContentRef string `json:"content_ref"`
+	// ContentType is the generated content type database value for LayerRevision.
+	// 层内容的 IANA 媒体类型。
+	ContentType string `json:"content_type"`
+	// Dialect is the generated dialect database value for LayerRevision.
+	// 层内容方言，可为空。
+	Dialect *string `json:"dialect"`
+	// SourceBranch is the generated source branch database value for LayerRevision.
+	// 来源分支，可为空。
+	SourceBranch *string `json:"source_branch"`
+	// ReviewStatus is the generated review status database value for LayerRevision.
+	// 修订审核状态。
+	ReviewStatus string `json:"review_status"`
+	// ReviewComment is the generated review comment database value for LayerRevision.
+	// 审核备注，可为空。
+	ReviewComment *string `json:"review_comment"`
+	// GitCommit is the generated git commit database value for LayerRevision.
+	// 产生该修订的提交 SHA，可为空。
+	GitCommit *string `json:"git_commit"`
+	// CreatedBy is the generated created by database value for LayerRevision.
+	// 提交该修订的用户，可为空。
+	CreatedBy *uuid.UUID `json:"created_by"`
+	// ProducerRunID is the generated producer run id database value for LayerRevision.
+	// 生产者运行标识，可为空。
+	ProducerRunID *uuid.UUID `json:"producer_run_id"`
+	// AiMeta is the generated ai meta database value for LayerRevision.
+	// AI 生成相关的结构化元数据，可为空。
+	AiMeta []byte `json:"ai_meta"`
+	// Review is the generated review database value for LayerRevision.
+	// 审核结构化信息，可为空。
+	Review []byte `json:"review"`
+	// CreatedAt is the generated created at database value for LayerRevision.
+	// 创建修订时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
 // NotificationChannel is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 租户拥有的通知投递通道配置，webhook 秘密使用加密值。
 type NotificationChannel struct {
@@ -626,6 +1005,23 @@ type ProducerProfile struct {
 	// UpdatedAt is the generated updated at database value for ProducerProfile.
 	// 最近一次更新配置文件时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// RecentService is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 用户最近访问的服务记录，一人一服务一行。
+type RecentService struct {
+	// TenantID is the generated tenant id database value for RecentService.
+	// 拥有该记录的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// UserID is the generated user id database value for RecentService.
+	// 访问该服务的用户。
+	UserID uuid.UUID `json:"user_id"`
+	// ServiceID is the generated service id database value for RecentService.
+	// 被访问的服务。
+	ServiceID uuid.UUID `json:"service_id"`
+	// ViewedAt is the generated viewed at database value for RecentService.
+	// 最近成功访问该服务详情的时间。
+	ViewedAt pgtype.Timestamptz `json:"viewed_at"`
 }
 
 // RefreshToken is the generated PostgreSQL representation of the corresponding Meridian table row.
@@ -974,6 +1370,29 @@ type TenantBlobRef struct {
 	// LastReferencedAt is the generated last referenced at database value for TenantBlobRef.
 	// 租户最近新增或刷新引用时的 UTC 时间。
 	LastReferencedAt pgtype.Timestamptz `json:"last_referenced_at"`
+}
+
+// TenantKindOverride is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 租户级别的资产 kind 开关覆盖。
+type TenantKindOverride struct {
+	// TenantID is the generated tenant id database value for TenantKindOverride.
+	// 拥有该覆盖的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// KindID is the generated kind id database value for TenantKindOverride.
+	// 被覆盖的资产 kind 标识。
+	KindID string `json:"kind_id"`
+	// Enabled is the generated enabled database value for TenantKindOverride.
+	// 该租户是否启用该 kind。
+	Enabled bool `json:"enabled"`
+	// Revision is the generated revision database value for TenantKindOverride.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
+	Revision int64 `json:"revision"`
+	// CreatedAt is the generated created at database value for TenantKindOverride.
+	// 创建覆盖时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for TenantKindOverride.
+	// 最近一次更新覆盖时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // TenantMember is the generated PostgreSQL representation of the corresponding Meridian table row.

@@ -10,10 +10,11 @@ const milestone = process.env.MILESTONE || 'M5'
 if (!/^M[0-5]$/.test(milestone)) throw new Error('MILESTONE must be M0 through M5')
 const ids = mode === '--credentials' ? ['SMK-005', 'SMK-031', 'SMK-035']
   : mode === '--m1-repository' ? ['SMK-032', 'SMK-040']
+  : mode === '--m1-golden-path' ? ['SMK-006', 'SMK-007', 'SMK-008', 'SMK-009', 'SMK-010']
   : mode === '--all' ? Object.keys(catalog).filter(id => catalog[id].milestone <= milestone)
   : catalog[mode] ? [mode] : []
 if (ids.length === 0) {
-  console.error('usage: make smoke SMK=SMK-005 | make smoke-all MILESTONE=M0 | make smoke-m0-credentials | make smoke-m1-repository')
+  console.error('usage: make smoke SMK=SMK-005 | make smoke-all MILESTONE=M0 | make smoke-m0-credentials | make smoke-m1-repository | make smoke-m1-golden-path')
   process.exit(2)
 }
 

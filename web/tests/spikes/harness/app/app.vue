@@ -16,6 +16,8 @@ const mediumEditorHost = ref<HTMLElement | null>(null)
 const largeEditorHost = ref<HTMLElement | null>(null)
 const actionStatus = ref('')
 const preview = ref('')
+const viewerDocument = ref('')
+const viewerReady = ref(false)
 const tableRows = Array.from({ length: 10_000 }, (_, index): TableRow => ({
   id: index + 1,
   service: `service-${String(index + 1).padStart(5, '0')}`,
@@ -47,6 +49,7 @@ const splitterItems = [
 const showTableGraph = computed(() => mode.value === 'table-graph' || mode.value === 'a11y')
 const showEditors = computed(() => mode.value === 'editor' || mode.value === 'a11y')
 const showA11y = computed(() => mode.value === 'a11y')
+const showViewer = computed(() => mode.value === 'viewer')
 const editorViews: EditorView[] = []
 let graph: Core | undefined
 let previewTimer: ReturnType<typeof setTimeout> | undefined
@@ -122,7 +125,8 @@ onMounted(async () => {
     mode: mode.value,
     table: { ready: false, rows: tableRows.length, estimateSize: 44, overscan: 12 },
     graph: { ready: false },
-    editor: { ready: false, previewCount: 0, longTasks: [] as number[] }
+    editor: { ready: false, previewCount: 0, longTasks: [] as number[] },
+    viewer: { ready: false }
   }
   await nextTick()
   if (showTableGraph.value) {
@@ -154,6 +158,19 @@ onMounted(async () => {
       }
     }
   }
+  if (showViewer.value) {
+    // 模拟 resolveView 单文档交付：父页面拉取签名内容后通过 port 传给 iframe。
+    // viewer 资产若存在则以 iframe 挂载，否则回退到行内源代码视图。
+    const documentText = 'openapi: 3.1.0\ninfo:\n  title: Order Service\n  version: 1.0.0\npaths:\n  /orders:\n    get:\n      summary: List orders\n'
+    viewerDocument.value = documentText
+    viewerReady.value = true
+    window.__spike.viewer = {
+      ready: true,
+      bytes: new TextEncoder().encode(documentText).byteLength,
+      hasIframe: false,
+      rendered: true
+    }
+  }
 })
 
 onBeforeUnmount(() => {
@@ -167,9 +184,7 @@ onBeforeUnmount(() => {
 declare global {
   interface Window { __spike: SpikeState }
 }
-</script>
-
-<template>
+</script><template>
   <main class="shell">
     <section v-if="showA11y" class="band login" aria-labelledby="login-heading">
       <h1 id="login-heading">Meridian 登录</h1>
@@ -184,6 +199,12 @@ declare global {
         <template #source><article class="split-panel"><h3>源文档</h3><p>固定版本 source 内容。</p></article></template>
         <template #preview><article class="split-panel"><h3>预览</h3><p>固定版本渲染结果。</p></article></template>
       </USplitter>
+    </section>
+
+    <section v-if="showViewer" class="band" aria-labelledby="viewer-document-heading">
+      <h2 id="viewer-document-heading">OpenAPI 文档查看器</h2>
+      <p data-testid="viewer-status">文档已加载</p>
+      <pre data-testid="viewer-document" class="viewer-document">{{ viewerDocument }}</pre>
     </section>
 
     <section v-if="showTableGraph" class="band" aria-labelledby="table-heading">

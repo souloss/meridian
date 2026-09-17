@@ -29,8 +29,28 @@ func (adapter assetServer) CreateSourceSpec(ctx context.Context, request asset.C
 	return adapter.server.CreateSourceSpec(ctx, request)
 }
 
+func (adapter assetServer) GetAsset(ctx context.Context, request asset.GetAssetRequestObject) (asset.GetAssetResponseObject, error) {
+	return adapter.server.GetAsset(ctx, request)
+}
+
+func (adapter assetServer) GetAssetVersion(ctx context.Context, request asset.GetAssetVersionRequestObject) (asset.GetAssetVersionResponseObject, error) {
+	return adapter.server.GetAssetVersion(ctx, request)
+}
+
+func (adapter assetServer) ListAssetVersionItems(ctx context.Context, request asset.ListAssetVersionItemsRequestObject) (asset.ListAssetVersionItemsResponseObject, error) {
+	return adapter.server.ListAssetVersionItems(ctx, request)
+}
+
 func (adapter assetServer) ListSourceBindings(ctx context.Context, request asset.ListSourceBindingsRequestObject) (asset.ListSourceBindingsResponseObject, error) {
 	return adapter.server.ListSourceBindings(ctx, request)
+}
+
+func (adapter assetServer) ListSourceSpecs(ctx context.Context, request asset.ListSourceSpecsRequestObject) (asset.ListSourceSpecsResponseObject, error) {
+	return adapter.server.ListSourceSpecs(ctx, request)
+}
+
+func (adapter assetServer) UpdateSourceSpec(ctx context.Context, request asset.UpdateSourceSpecRequestObject) (asset.UpdateSourceSpecResponseObject, error) {
+	return adapter.server.UpdateSourceSpec(ctx, request)
 }
 
 type authServer struct {
@@ -204,6 +224,10 @@ func (adapter repositoryServer) ListRepositories(ctx context.Context, request re
 	return adapter.server.ListRepositories(ctx, request)
 }
 
+func (adapter repositoryServer) SyncRepository(ctx context.Context, request repository.SyncRepositoryRequestObject) (repository.SyncRepositoryResponseObject, error) {
+	return adapter.server.SyncRepository(ctx, request)
+}
+
 func (adapter repositoryServer) UpdateRepository(ctx context.Context, request repository.UpdateRepositoryRequestObject) (repository.UpdateRepositoryResponseObject, error) {
 	return adapter.server.UpdateRepository(ctx, request)
 }
@@ -211,6 +235,14 @@ func (adapter repositoryServer) UpdateRepository(ctx context.Context, request re
 type serviceServer struct {
 	serviceapi.UnimplementedStrictServer
 	server *Server
+}
+
+func (adapter serviceServer) GetService(ctx context.Context, request serviceapi.GetServiceRequestObject) (serviceapi.GetServiceResponseObject, error) {
+	return adapter.server.GetService(ctx, request)
+}
+
+func (adapter serviceServer) ListRecentServices(ctx context.Context, request serviceapi.ListRecentServicesRequestObject) (serviceapi.ListRecentServicesResponseObject, error) {
+	return adapter.server.ListRecentServices(ctx, request)
 }
 
 type systemServer struct {
@@ -294,6 +326,10 @@ func (adapter tenantServer) UpdateCredential(ctx context.Context, request tenant
 type viewServer struct {
 	view.UnimplementedStrictServer
 	server *Server
+}
+
+func (adapter viewServer) ResolveView(ctx context.Context, request view.ResolveViewRequestObject) (view.ResolveViewResponseObject, error) {
+	return adapter.server.ResolveView(ctx, request)
 }
 
 func registerDomainHandlers(server *Server, router chi.Router) {

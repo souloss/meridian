@@ -122,5 +122,11 @@ type ClaimResult struct {
 // SyncRunner performs repository synchronization after the durable job is claimed.
 // M0 supplies an explicit unsupported runner; M1 replaces it with the Git producer.
 type SyncRunner interface {
-	Run(context.Context, CredentialSyncArgs) error
+	Run(context.Context, CredentialSyncArgs) (SyncResult, error)
+}
+
+// SyncResult carries the resolved commit recorded for a completed synchronization.
+type SyncResult struct {
+	// ResolvedCommit is the Git commit the pipeline materialized.
+	ResolvedCommit string
 }
