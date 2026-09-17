@@ -63,7 +63,7 @@ milestoneCheckpointPolicy:
 
 milestoneCheckpoints:
   M0: {status: completed, reportPath: artifacts/agent/milestones/M0/20260916T0255Z/report.json, completedBy: coding-agent, completedAt: '2026-09-16T02:55:00Z', completedCommit: 56fd5b1f34abfbd68430d79c296a527d5fbf4308, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
-  M1: {status: completed, reportPath: artifacts/agent/milestones/M1/20260917T181336Z/report.json, completedBy: coding-agent, completedAt: '2026-09-17T18:13:36Z', completedCommit: 0a9e580c87fe35203093954a2ab79f7355e613b2, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
+  M1: {status: completed, reportPath: artifacts/agent/milestones/M1/20260917T181336Z/report.json, completedBy: coding-agent, completedAt: '2026-09-17T18:13:36Z', completedCommit: 62d7c8579fc7880cd2637359e027bc7f3cea5e85, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
   M2: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
   M3: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
   M4: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
