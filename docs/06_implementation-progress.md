@@ -2,9 +2,9 @@
 
 > 最后核对：2026-09-17
 > 当前里程碑：M1（asset-mainline）
-> 里程碑状态：M0 自主 checkpoint 已完成；M1-CONTRACT-002 通过；M1-AGENT-001 通过
-> 最新稳定提交：`9dbcf29d0fefc5baef0f25af439783e86b497d60 AI:feat(m1): 仓库发现、源绑定与受控生产者选择落地`
-> 当前开发切片：M1-AGENT-001 passed；下一步领取 M1-AGENT-002
+> 里程碑状态：M0 自主 checkpoint 已完成；M1-CONTRACT-002 通过；M1-AGENT-001 通过；M1-AGENT-002 通过
+> 最新稳定提交：`cb0b60b3441f2d18368478d17bef319d4a870c70 AI:feat(m1): OpenAPI 流水线、资产物化与查看器解析落地`
+> 当前开发切片：M1-AGENT-002 passed；下一步领取 M1-AGENT-004
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段完成记录 `milestoneCheckpoints` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和 Agent 证据 checkpoint 为准。
 
@@ -30,7 +30,7 @@
 | 里程碑 | 交付范围 | 当前状态 |
 | --- | --- | --- |
 | M0 地基 | 契约与生成、迁移、身份/租户/RBAC/PAT、凭据、仓库骨架、Blob、Job、Audit、Outbox、控制面基础 | 已完成（Agent checkpoint） |
-| M1 资产主链路 | Repository/Service/Source、发现与同步、默认分支 Track、OpenAPI normalize/index、Viewer/public read | 未开始业务实现；只有契约和生成接口，M0 仓库骨架除外 |
+| M1 资产主链路 | Repository/Service/Source、发现与同步、默认分支 Track、OpenAPI normalize/index、Viewer/public read | 开发中：发现/源绑定/受控生产者（001）、同步流水线与资产物化、查看器解析（002）已通过；公开读取与 lifecycle、Job 恢复与 SSE 待续 |
 | M2 Layer 与 Overlay | LayerHead/Revision、Overlay、人工编辑、Provenance、Rollback、配置导入、临时开关层预览 | 未开始业务实现 |
 | M3 AI、Diff 与门禁 | AI producer/review、生命周期、分支版本、Diff、分享、Todo、CLI push/diff、最小通知 | 未开始业务实现 |
 | M4 多 kind 与全局视图 | dbschema/dependency、SystemGroup、依赖图、搜索和全局视图 | 未开始业务实现 |
@@ -122,7 +122,9 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 ## 下一步顺序
 
-M0 自动门禁和 Agent checkpoint 已完成。M1-AGENT-001 attempt 3 已实现并通过：新增 migration `00005_m1_repository_discovery.sql`（services/discovery_candidates/producer_profiles/source_specs/source_bindings 五表）、`discovery.sql` 查询与 sqlc 生成、`service.Discovery`/`service.Producers`/`service.DiscoveryRunner`（git clone + marker 探测 + candidate upsert）、`task.DiscoverArgs/DiscoverWorker/DiscoverRunner` 及 River 注册、handler 层 `discoverRepository`/`listDiscoveryCandidates`/`acceptDiscoveryCandidates`/`createSourceSpec`/`listSourceBindings`/`listAvailableProducerProfiles`/`createProducerProfile`，并补齐 `smoke-m1-repository` 门禁与 SMK-032/SMK-040 fixture（git-http-backend 本地仓），最终证据见 `artifacts/agent/M1-AGENT-001/20260917T093610Z/report.json`。M5 SMK-039 继续承担全部租户资源 ID operation 的完整隔离矩阵。
+M0 自动门禁和 Agent checkpoint 已完成。M1-AGENT-001 attempt 3 已实现并通过：新增 migration `00005_m1_repository_discovery.sql`（services/discovery_candidates/producer_profiles/source_specs/source_bindings 五表）、`discovery.sql` 查询与 sqlc 生成、`service.Discovery`/`service.Producers`/`service.DiscoveryRunner`（git clone + marker 探测 + candidate upsert）、`task.DiscoverArgs/DiscoverWorker/DiscoverRunner` 及 River 注册、handler 层 `discoverRepository`/`listDiscoveryCandidates`/`acceptDiscoveryCandidates`/`createSourceSpec`/`listSourceBindings`/`listAvailableProducerProfiles`/`createProducerProfile`，并补齐 `smoke-m1-repository` 门禁与 SMK-032/SMK-040 fixture（git-http-backend 本地仓），最终证据见 `artifacts/agent/M1-AGENT-001/20260917T093610Z/report.json`。
+
+M1-AGENT-002 attempt 1 已实现并通过：新增 migration `00006_m1_asset_pipeline.sql`（asset_kinds/tenant_kind_overrides/assets/layers/layer_revisions/layer_heads/asset_ref_tracks/asset_versions/asset_items/recent_services 十表，全部 up/down 带列注释）与 `asset.sql` 查询；`service.PipelineRunner` 实现 `task.SyncRunner`（resolve→discover→extract→merge→normalize→index 六阶段，builtin openapi 源物化资产/层/修订/头/版本/条目/绑定，按 content-hash 与 input-fingerprint 幂等，并记录 last_error/健康状态）；`service.Assets`/`service.Views` 读取链路与 8 个 handler（`syncRepository`/`updateSourceSpec`/`getService`/`listRecentServices`/`getAsset`/`getAssetVersion`/`listAssetVersionItems`/`resolveView`，getService 富化 assets 与 missingKinds）；补齐 `smoke-m1-golden-path`（SMK-006..010）、`perf-openapi-pipeline`、`e2e-viewer` 三个门禁，最终证据见 `artifacts/agent/M1-AGENT-002/20260917T145546Z/report.json`。`getPublicService` 匿名公开读取与 service lifecycle 归属 M1-AGENT-004，Job 恢复互斥与 SSE 重连归属 M1-AGENT-003。
 
 ## 更新流程
 

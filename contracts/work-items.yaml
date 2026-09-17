@@ -289,14 +289,25 @@ items:
   - id: M1-AGENT-002
     milestone: M1
     priority: P0
-    status: ready
+    status: passed
     title: openapi-pipeline-viewer-and-public-read
     dependsOn: [M1-AGENT-001]
     operationIds: [syncRepository, updateSourceSpec, getService, listRecentServices, getAsset, getAssetVersion, listAssetVersionItems, resolveView]
     stories: [US-02, US-03]
     assertions: [SMK-006, SMK-007, SMK-008, SMK-009, SMK-010]
     verify: [smoke-m1-golden-path, perf-openapi-pipeline, e2e-viewer]
-    reportPath: null
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: '2026-09-17T10:00:25Z'
+    baseCommit: 5460bff341a48d11a2a923f650493ead0a44a7e6
+    contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
+    failureKind: null
+    blockedReason: null
+    reportPath: artifacts/agent/M1-AGENT-002/20260917T145546Z/report.json
+    lastEvidence: artifacts/agent/M1-AGENT-002/20260917T145546Z/report.json
+    nextAction: claim M1-AGENT-004
 
   - id: M1-AGENT-003
     milestone: M1

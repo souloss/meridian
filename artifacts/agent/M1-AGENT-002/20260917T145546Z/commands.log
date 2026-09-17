@@ -1,0 +1,51 @@
+# M1-AGENT-002 命令执行日志
+
+workItem: M1-AGENT-002
+startedAt: 2026-09-17T10:00:25Z
+contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
+
+$ go tool sqlc generate
+exitCode=0 durationSeconds≈1.5
+
+$ go run ./internal/codegen/godoc -dir internal/generated/repository
+exitCode=0 durationSeconds≈0.5
+
+$ go generate ./...
+exitCode=0 durationSeconds≈45
+
+$ go build ./...
+exitCode=0 durationSeconds≈8
+
+$ go vet ./...
+exitCode=0 durationSeconds≈3
+
+$ go test ./...
+exitCode=0 durationSeconds≈6
+
+$ make contracts-validate ITEM=M1-AGENT-002
+exitCode=0 durationSeconds≈52
+
+$ make contracts-generate-then-git-diff-exit-code ITEM=M1-AGENT-002
+exitCode=0 durationSeconds≈47（先 go generate 后再跑；第一次运行在 go generate 前会失败）
+
+$ make smoke-m1-golden-path ITEM=M1-AGENT-002
+exitCode=0 durationSeconds≈24
+SMK-006: pass; artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-006.json
+SMK-007: pass; artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-007.json
+SMK-008: pass; artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-008.json
+SMK-009: pass; artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-009.json
+SMK-010: pass; artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-010.json
+
+$ make perf-openapi-pipeline ITEM=M1-AGENT-002
+exitCode=0 durationSeconds≈1
+report: artifacts/spikes/perf-openapi-pipeline.json (operations=10000, elapsedMs=365, status=passed)
+
+$ make e2e-viewer ITEM=M1-AGENT-002
+exitCode=0 durationSeconds≈40
+report: artifacts/spikes/e2e-viewer.json (status=passed)
+
+$ git diff --check
+exitCode=0 durationSeconds≈0
+
+$ ITEM=M1-AGENT-002 go test ./internal/contracttest -run '^TestAgentGateAvailability$'
+exitCode=0 —— 三个 verify target 均 resolves
