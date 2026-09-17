@@ -1,0 +1,26 @@
+$ go test ./...
+ok  github.com/meridian-labs/meridian/internal/command
+ok  github.com/meridian-labs/meridian/internal/contracttest
+ok  github.com/meridian-labs/meridian/internal/handler
+ok  github.com/meridian-labs/meridian/internal/service
+ok  github.com/meridian-labs/meridian/internal/storage
+ok  github.com/meridian-labs/meridian/internal/task
+
+$ go vet ./...
+(no output)
+
+$ go tool sqlc vet
+(no output)
+
+$ make smoke-m3-ai ITEM=M3-AGENT-001
+SMK-015: pass
+SMK-016: pass
+SMK-017: pass
+SMK-033: pass
+
+$ make ai-quality-gate ITEM=M3-AGENT-001
+ok  github.com/meridian-labs/meridian/internal/service
+ok  github.com/meridian-labs/meridian/internal/task
+
+$ go test ./internal/contracttest -run 'TestAgentQueueReferencesAndMilestoneCheckpoints|TestSmokeCatalogMatchesAcceptance|TestAgentGateAvailability' -count=1
+ok  github.com/meridian-labs/meridian/internal/contracttest

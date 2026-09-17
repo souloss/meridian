@@ -398,7 +398,7 @@ items:
   - id: M3-AGENT-001
     milestone: M3
     priority: P0
-    status: claimed
+    status: passed
     title: ai-review-publish-and-minimal-notification
     dependsOn: [M2-AGENT-002]
     operationIds: [generateMissingAssetWithAi, getReviewContext, approveLayerRevision, rejectLayerRevision, publishAssetVersion, createSourceSpec]
@@ -406,10 +406,14 @@ items:
     assertions: [SMK-015, SMK-016, SMK-017, SMK-033]
     verify: [smoke-m3-ai, ai-quality-gate]
     owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
     startedAt: '2026-09-17T22:20:00Z'
     baseCommit: a91d27538bd647798dfdddf4be1e24cb93e14ace
     contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
-    reportPath: null
+    reportPath: artifacts/agent/M3-AGENT-001/20260917T232800Z/report.json
+    lastEvidence: artifacts/agent/M3-AGENT-001/20260917T232800Z/report.json
+    nextAction: claim M3-AGENT-002
 
   - id: M3-AGENT-002
     milestone: M3
