@@ -358,14 +358,22 @@ items:
   - id: M2-AGENT-001
     milestone: M2
     priority: P0
-    status: ready
+    status: passed
     title: layers-overlay-provenance-and-rollback
     dependsOn: [M1-AGENT-003]
     operationIds: [previewMerge, createLayerRevision, getAssetVersionProvenance, reorderAssetLayers, rollbackLayer]
     stories: [US-04]
     assertions: [SMK-011, SMK-012, SMK-013, SMK-014]
     verify: [smoke-m2-overlay, overlay-property-tests]
-    reportPath: null
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    startedAt: '2026-09-18T03:30:00Z'
+    baseCommit: 3e6e746b8c12f3fb1b7865fbf489ec5a768d7ccd
+    contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
+    reportPath: artifacts/agent/M2-AGENT-001/20260918T043500Z/report.json
+    lastEvidence: artifacts/agent/M2-AGENT-001/20260918T043500Z/report.json
+    nextAction: claim M2-AGENT-002
 
   - id: M2-AGENT-002
     milestone: M2
