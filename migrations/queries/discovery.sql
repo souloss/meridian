@@ -171,6 +171,13 @@ FROM producer_profiles
 WHERE id = sqlc.arg(id)
   AND deleted_at IS NULL;
 
+-- 按全局唯一名称返回一个未删除的生产者配置文件，供配置导入解析名称引用。
+-- name: GetProducerProfileByName :one
+SELECT *
+FROM producer_profiles
+WHERE name = sqlc.arg(name)
+  AND deleted_at IS NULL;
+
 -- 列出可被租户选择的可用生产者配置；可选按 kind 过滤。
 -- name: ListAvailableProducerProfiles :many
 SELECT *

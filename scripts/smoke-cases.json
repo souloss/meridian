@@ -26,7 +26,7 @@
   "SMK-025": {"milestone": "M5"},
   "SMK-026": {"milestone": "M3"},
   "SMK-027": {"milestone": "M1", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM1ConcurrencySmoke/SMK-027", "fixture": "internal/handler/m1_concurrency_smoke_integration_test.go"},
-  "SMK-028": {"milestone": "M2"},
+  "SMK-028": {"milestone": "M2", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM2GitopsSmoke/SMK-028", "fixture": "internal/handler/m2_gitops_smoke_integration_test.go"},
   "SMK-029": {"milestone": "M0", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM0Smoke/SMK-029", "fixture": "internal/handler/m0_smoke_integration_test.go"},
   "SMK-030": {"milestone": "M5"},
   "SMK-031": {"milestone": "M0", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM0CredentialSmoke/SMK-031", "fixture": "internal/handler/credential_smoke_integration_test.go"},
@@ -36,7 +36,7 @@
   "SMK-035": {"milestone": "M0", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM0CredentialSmoke/SMK-035", "fixture": "internal/handler/credential_smoke_integration_test.go"},
   "SMK-036": {"milestone": "M1", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM1ConcurrencySmoke/SMK-036", "fixture": "internal/handler/m1_concurrency_smoke_integration_test.go"},
   "SMK-037": {"milestone": "M1", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM1ServiceLifecycleSmoke/SMK-037", "fixture": "internal/handler/m1_service_lifecycle_smoke_integration_test.go"},
-  "SMK-038": {"milestone": "M2"},
+  "SMK-038": {"milestone": "M2", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM2GitopsSmoke/SMK-038", "fixture": "internal/handler/m2_gitops_smoke_integration_test.go"},
   "SMK-039": {"milestone": "M5"},
   "SMK-040": {"milestone": "M1", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM1RepositorySmoke/SMK-040", "fixture": "internal/handler/repository_discovery_smoke_integration_test.go"}
 }

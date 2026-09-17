@@ -115,12 +115,13 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	views := service.NewViews(assetStore, identityStore)
 	discovery.WithAssets(assets)
 	serviceLifecycle := service.NewServiceLifecycle(serviceLifecycleStore, assets, identityStore)
+	configImport := service.NewConfigImport(discoveryStore, identityStore, workspaceRoot)
 	server := &http.Server{
 		Addr: addr,
 		Handler: handler.NewWithRuntimeServices(handler.Dependencies{
 			Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
 			Producers: producers, Discovery: discovery, Assets: assets, Views: views, ServiceLifecycle: serviceLifecycle,
-			LayerEdit: layerEdit,
+			LayerEdit: layerEdit, ConfigImport: configImport,
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,

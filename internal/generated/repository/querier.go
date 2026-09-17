@@ -129,6 +129,11 @@ type Querier interface {
 	// CreateBlobMetadata exposes the corresponding strongly typed database operation.
 	// 写入不可变的内容寻址元数据；其他租户或请求已登记相同摘要时不返回记录。
 	CreateBlobMetadata(ctx context.Context, arg CreateBlobMetadataParams) (Blob, error)
+	// CreateConfigImportPreview exposes the corresponding strongly typed database operation.
+	// M2 gitops 配置导入的持久化查询。
+	// 全部查询保留 tenant_id 谓词。
+	// 插入一次可应用的配置导入预览。
+	CreateConfigImportPreview(ctx context.Context, arg CreateConfigImportPreviewParams) (ConfigImportPreview, error)
 	// CreateCredential exposes the corresponding strongly typed database operation.
 	// 写入一条租户拥有的加密凭据，并返回元数据和密文。
 	// 查询不会接收秘密明文，服务层只提供加密后的投影。
@@ -292,6 +297,12 @@ type Querier interface {
 	// GetBlobMetadata exposes the corresponding strongly typed database operation.
 	// 返回不可变对象元数据，用于校验重复使用的摘要。
 	GetBlobMetadata(ctx context.Context, blobDigest string) (Blob, error)
+	// GetConfigImportPreview exposes the corresponding strongly typed database operation.
+	// 返回一次未过期的配置导入预览，锁定供 apply 串行化。
+	GetConfigImportPreview(ctx context.Context, arg GetConfigImportPreviewParams) (ConfigImportPreview, error)
+	// GetConfigImportPreviewByID exposes the corresponding strongly typed database operation.
+	// 按预览 id 返回一次配置导入预览（跨仓库校验失败时保持只读）。
+	GetConfigImportPreviewByID(ctx context.Context, arg GetConfigImportPreviewByIDParams) (ConfigImportPreview, error)
 	// GetCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
 	// 返回保留的租户凭据轮换重放记录及其过期时间。
 	GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error)
@@ -337,6 +348,9 @@ type Querier interface {
 	// GetProducerProfile exposes the corresponding strongly typed database operation.
 	// 返回一个未删除的生产者配置文件。
 	GetProducerProfile(ctx context.Context, id uuid.UUID) (ProducerProfile, error)
+	// GetProducerProfileByName exposes the corresponding strongly typed database operation.
+	// 按全局唯一名称返回一个未删除的生产者配置文件，供配置导入解析名称引用。
+	GetProducerProfileByName(ctx context.Context, name string) (ProducerProfile, error)
 	// GetPublicServiceBySlug exposes the corresponding strongly typed database operation.
 	// 按 tenant_slug + service_slug 返回一条活跃服务，供匿名公开读取解析。
 	GetPublicServiceBySlug(ctx context.Context, arg GetPublicServiceBySlugParams) (Service, error)

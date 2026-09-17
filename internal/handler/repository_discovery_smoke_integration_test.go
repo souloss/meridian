@@ -465,6 +465,7 @@ paths:
 `
 	files := map[string]string{
 		"package.json":                              "{\"name\":\"root\"}\n",
+		".asset-platform.yaml":                      "version: 1\nservices:\n  - name: order-service\n    root: order-service\n    assets:\n      - kind: openapi\n        base: {mode: builtin, path: openapi.yaml}\n  - name: pay-service\n    root: pay-service\n    assets:\n      - kind: openapi\n        base: {mode: builtin, path: openapi.yaml}\n",
 		"order-service/pom.xml":                     "<project/>\n",
 		"order-service/openapi.yaml":                openapiDocument,
 		"order-service/apis/billing/openapi.yaml":   openapiDocument,

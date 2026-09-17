@@ -345,6 +345,41 @@ type Blob struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
+// ConfigImportPreview is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 仓库配置导入的一次可应用预览快照。
+type ConfigImportPreview struct {
+	// TenantID is the generated tenant id database value for ConfigImportPreview.
+	// 拥有该预览的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for ConfigImportPreview.
+	// 应用生成的 UUID v7 预览标识。
+	ID uuid.UUID `json:"id"`
+	// RepositoryID is the generated repository id database value for ConfigImportPreview.
+	// 该预览针对的仓库。
+	RepositoryID uuid.UUID `json:"repository_id"`
+	// RefType is the generated ref type database value for ConfigImportPreview.
+	// 解析配置所用 Git 引用类别：branch 或 tag。
+	RefType string `json:"ref_type"`
+	// RefName is the generated ref name database value for ConfigImportPreview.
+	// 解析配置所用 Git 引用名。
+	RefName string `json:"ref_name"`
+	// Commit is the generated commit database value for ConfigImportPreview.
+	// 解析配置时冻结的提交 SHA。
+	Commit string `json:"commit"`
+	// ConfigDigest is the generated config digest database value for ConfigImportPreview.
+	// 规范化配置的 SHA-256 摘要，apply 必须与之匹配。
+	ConfigDigest string `json:"config_digest"`
+	// Preview is the generated preview database value for ConfigImportPreview.
+	// 规范化后的服务与源配置投影 JSON。
+	Preview []byte `json:"preview"`
+	// CreatedAt is the generated created at database value for ConfigImportPreview.
+	// 创建预览时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// ExpiresAt is the generated expires at database value for ConfigImportPreview.
+	// 预览失效后的 UTC 时间。
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+}
+
 // Credential is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 租户拥有的加密 SSH 或 HTTP 凭据，绝不持久化秘密明文。
 type Credential struct {

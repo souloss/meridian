@@ -598,6 +598,43 @@ func (q *Queries) GetProducerProfile(ctx context.Context, id uuid.UUID) (Produce
 	return i, err
 }
 
+const getProducerProfileByName = `-- name: GetProducerProfileByName :one
+SELECT id, name, kind, executable, args, env_allowlist, supported_kinds, replay_safe, network, timeout_sec, memory_mib, cpu_seconds, pids, enabled, dependency_status, unavailable_reason, revision, deleted_at, created_at, updated_at
+FROM producer_profiles
+WHERE name = $1
+  AND deleted_at IS NULL
+`
+
+// GetProducerProfileByName executes the generated GetProducerProfileByName database query.
+// 按全局唯一名称返回一个未删除的生产者配置文件，供配置导入解析名称引用。
+func (q *Queries) GetProducerProfileByName(ctx context.Context, name string) (ProducerProfile, error) {
+	row := q.db.QueryRow(ctx, getProducerProfileByName, name)
+	var i ProducerProfile
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Kind,
+		&i.Executable,
+		&i.Args,
+		&i.EnvAllowlist,
+		&i.SupportedKinds,
+		&i.ReplaySafe,
+		&i.Network,
+		&i.TimeoutSec,
+		&i.MemoryMib,
+		&i.CpuSeconds,
+		&i.Pids,
+		&i.Enabled,
+		&i.DependencyStatus,
+		&i.UnavailableReason,
+		&i.Revision,
+		&i.DeletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getServiceByID = `-- name: GetServiceByID :one
 SELECT tenant_id, id, repository_id, slug, display_name, description, root_dir, language, framework, owners, maintainers, lifecycle, visibility, revision, deleted_at, created_at, updated_at
 FROM services

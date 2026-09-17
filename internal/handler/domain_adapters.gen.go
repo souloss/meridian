@@ -216,6 +216,10 @@ func (adapter repositoryServer) AcceptDiscoveryCandidates(ctx context.Context, r
 	return adapter.server.AcceptDiscoveryCandidates(ctx, request)
 }
 
+func (adapter repositoryServer) ApplyRepositoryConfigImport(ctx context.Context, request repository.ApplyRepositoryConfigImportRequestObject) (repository.ApplyRepositoryConfigImportResponseObject, error) {
+	return adapter.server.ApplyRepositoryConfigImport(ctx, request)
+}
+
 func (adapter repositoryServer) CheckRepositoryConnection(ctx context.Context, request repository.CheckRepositoryConnectionRequestObject) (repository.CheckRepositoryConnectionResponseObject, error) {
 	return adapter.server.CheckRepositoryConnection(ctx, request)
 }
@@ -242,6 +246,10 @@ func (adapter repositoryServer) ListDiscoveryCandidates(ctx context.Context, req
 
 func (adapter repositoryServer) ListRepositories(ctx context.Context, request repository.ListRepositoriesRequestObject) (repository.ListRepositoriesResponseObject, error) {
 	return adapter.server.ListRepositories(ctx, request)
+}
+
+func (adapter repositoryServer) PreviewRepositoryConfigImport(ctx context.Context, request repository.PreviewRepositoryConfigImportRequestObject) (repository.PreviewRepositoryConfigImportResponseObject, error) {
+	return adapter.server.PreviewRepositoryConfigImport(ctx, request)
 }
 
 func (adapter repositoryServer) SyncRepository(ctx context.Context, request repository.SyncRepositoryRequestObject) (repository.SyncRepositoryResponseObject, error) {

@@ -35,6 +35,7 @@ type Server struct {
 	views            *service.Views
 	serviceLifecycle *service.ServiceLifecycle
 	layerEdit        *service.LayerEdit
+	configImport     *service.ConfigImport
 	secureCookies    bool
 }
 
@@ -62,6 +63,8 @@ type Dependencies struct {
 	ServiceLifecycle *service.ServiceLifecycle
 	// LayerEdit provides overlay revisions, ordering, rollback, merge preview, and provenance.
 	LayerEdit *service.LayerEdit
+	// ConfigImport provides gitops repository configuration preview and apply.
+	ConfigImport *service.ConfigImport
 }
 
 func New() *Server {
@@ -100,6 +103,7 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.views = dependencies.Views
 	s.serviceLifecycle = dependencies.ServiceLifecycle
 	s.layerEdit = dependencies.LayerEdit
+	s.configImport = dependencies.ConfigImport
 	s.secureCookies = secureCookies
 	return s
 }
