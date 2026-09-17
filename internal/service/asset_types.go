@@ -185,12 +185,31 @@ type SyncJobInput struct {
 	RefName        string
 	IdempotencyKey uuid.UUID
 	Force          *bool
+	// PrincipalType and PrincipalID bound the replay identity to the caller.
+	PrincipalType string
+	PrincipalID   uuid.UUID
+	// RequestHash is the 32-byte RFC 8785 request digest for replay comparison.
+	RequestHash []byte
 }
 
 // SyncStore is the persistence boundary for repository synchronization enqueueing.
 type SyncStore interface {
 	GetRepository(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
 	EnqueueSyncJob(context.Context, SyncJobInput) (JobAccepted, error)
+	MarkSyncJobDirty(context.Context, uuid.UUID, string, int64) error
+	GetSyncJobForSuccessor(context.Context, uuid.UUID, uuid.UUID) (SyncJobSuccessorState, error)
+	ClearSyncJobDirty(context.Context, uuid.UUID, uuid.UUID) error
+}
+
+// SyncJobSuccessorState captures whether a completed sync must spawn a successor.
+type SyncJobSuccessorState struct {
+	JobID            uuid.UUID
+	Status           string
+	Dirty            bool
+	ScopeID          *uuid.UUID
+	RefType          *string
+	RefName          *string
+	ActiveGeneration int64
 }
 
 // AssetStore is the persistence boundary for the M1 asset pipeline.

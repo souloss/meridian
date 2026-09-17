@@ -260,9 +260,16 @@ func (discovery *Discovery) Sync(ctx context.Context, actor Principal, tenantSlu
 	if _, err := discovery.store.GetRepository(ctx, membership.TenantID, repositoryID); err != nil {
 		return JobAccepted{}, err
 	}
+	principalType, principalID := rotationPrincipal(actor)
+	requestHash, err := RequestDigest("syncRepository", map[string]any{
+		"tenantSlug": tenantSlug, "repositoryId": repositoryID.String(),
+	}, map[string]any{}, map[string]any{"refType": refType, "ref": refName})
+	if err != nil {
+		return JobAccepted{}, ErrValidation
+	}
 	return discovery.store.EnqueueSyncJob(ctx, SyncJobInput{
 		TenantID: membership.TenantID, RepositoryID: repositoryID, RefType: refType, RefName: refName,
-		IdempotencyKey: idempotencyKey, Force: input.Force,
+		IdempotencyKey: idempotencyKey, Force: input.Force, PrincipalType: principalType, PrincipalID: principalID, RequestHash: requestHash,
 	})
 }
 

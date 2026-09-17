@@ -43,6 +43,9 @@ type Querier interface {
 	// ClearSourceLastError exposes the corresponding strongly typed database operation.
 	// 源物化成功后清空失败说明并归零连续失败次数。
 	ClearSourceLastError(ctx context.Context, arg ClearSourceLastErrorParams) (int64, error)
+	// ClearSyncJobDirty exposes the corresponding strongly typed database operation.
+	// 清空一条已成功任务的 dirty 标记，保证后续任只入队一次。
+	ClearSyncJobDirty(ctx context.Context, arg ClearSyncJobDirtyParams) (int64, error)
 	// CountAPITokensByUser exposes the corresponding strongly typed database operation.
 	// 返回一个用户在一个租户内拥有的 PAT 元数据总数。
 	CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error)
@@ -186,6 +189,9 @@ type Querier interface {
 	// CreateSourceSpec exposes the corresponding strongly typed database operation.
 	// 持久化源配置。
 	CreateSourceSpec(ctx context.Context, arg CreateSourceSpecParams) (SourceSpec, error)
+	// CreateSyncIdempotency exposes the corresponding strongly typed database operation.
+	// 保存可重放 24 小时的准确、非敏感 202 响应。
+	CreateSyncIdempotency(ctx context.Context, arg CreateSyncIdempotencyParams) error
 	// CreateSyncJob exposes the corresponding strongly typed database operation.
 	// 记录一条持久化的仓库同步请求。
 	CreateSyncJob(ctx context.Context, arg CreateSyncJobParams) (Job, error)
@@ -232,6 +238,9 @@ type Querier interface {
 	// DeleteServiceSourceSpecs exposes the corresponding strongly typed database operation.
 	// 软删除一个服务下全部活跃源配置。
 	DeleteServiceSourceSpecs(ctx context.Context, arg DeleteServiceSourceSpecsParams) (int64, error)
+	// DeleteSyncIdempotency exposes the corresponding strongly typed database operation.
+	// 在重新使用幂等键前删除已过期的 syncRepository 重放记录。
+	DeleteSyncIdempotency(ctx context.Context, arg DeleteSyncIdempotencyParams) error
 	// FinishJobExecution exposes the corresponding strongly typed database operation.
 	// 记录终态结果或可重试失败。
 	// 可重试失败保持 pending，等待 River 下一次尝试；终态失败会写入完成时间和 failed 状态。
@@ -333,6 +342,12 @@ type Querier interface {
 	// GetSourceSpec exposes the corresponding strongly typed database operation.
 	// 返回一个活跃源配置。
 	GetSourceSpec(ctx context.Context, arg GetSourceSpecParams) (SourceSpec, error)
+	// GetSyncIdempotency exposes the corresponding strongly typed database operation.
+	// 返回 syncRepository 请求保留的准确响应。
+	GetSyncIdempotency(ctx context.Context, arg GetSyncIdempotencyParams) (GetSyncIdempotencyRow, error)
+	// GetSyncJobForSuccessor exposes the corresponding strongly typed database operation.
+	// 返回一条 repo.sync 任务，供完成后判断是否需要后续任。
+	GetSyncJobForSuccessor(ctx context.Context, arg GetSyncJobForSuccessorParams) (GetSyncJobForSuccessorRow, error)
 	// GetTenantBlobReference exposes the corresponding strongly typed database operation.
 	// 调用方锁定租户配额行后，返回当前对象引用数。
 	GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error)
@@ -493,6 +508,11 @@ type Querier interface {
 	// LockRetryJobIdempotency exposes the corresponding strongly typed database operation.
 	// 为已认证的租户主体串行化一个重试幂等键。
 	LockRetryJobIdempotency(ctx context.Context, lockKey string) error
+	// LockSyncIdempotency exposes the corresponding strongly typed database operation.
+	// syncRepository 的幂等重放持久化查询。
+	// 重放身份为 [tenantId, principalType, principalId, operationId, idempotencyKey]。
+	// 在调用方事务内串行化一个 syncRepository 重放身份。
+	LockSyncIdempotency(ctx context.Context, lockKey string) error
 	// LockTenantJobForControl exposes the corresponding strongly typed database operation.
 	// 串行化一个租户任务的取消和手动重试决策。
 	LockTenantJobForControl(ctx context.Context, arg LockTenantJobForControlParams) (Job, error)
@@ -511,6 +531,12 @@ type Querier interface {
 	// MarkOutboxFailed exposes the corresponding strongly typed database operation.
 	// 记录一次脱敏失败尝试及下一次可执行时间，并隔离已过期租约的更新。
 	MarkOutboxFailed(ctx context.Context, arg MarkOutboxFailedParams) (int64, error)
+	// MarkSyncJobDirty exposes the corresponding strongly typed database operation.
+	// syncRepository 的 dirty 标记与完成后续任物化查询。
+	// dirty 语义对齐 contracts/domain.yaml 的 coalescing：运行中收到重复请求置 dirty，
+	// 完成后若 dirty 置位则入队一个使用最新输入的后续任。
+	// 运行中的 repo.sync 收到重复请求时置 dirty。
+	MarkSyncJobDirty(ctx context.Context, arg MarkSyncJobDirtyParams) (int64, error)
 	// MarkTracksHealthyForSourceSpec exposes the corresponding strongly typed database operation.
 	// 将某源配置关联资产的引用轨迹恢复为 ok。
 	MarkTracksHealthyForSourceSpec(ctx context.Context, arg MarkTracksHealthyForSourceSpecParams) (int64, error)
