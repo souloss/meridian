@@ -1,0 +1,46 @@
+{
+  "milestone": "M1",
+  "status": "completed",
+  "commit": "0a9e580c87fe35203093954a2ab79f7355e613b2",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "reportPath": "artifacts/agent/milestones/M1/20260917T181336Z/report.json",
+  "completedBy": "coding-agent",
+  "completedAt": "2026-09-17T18:13:36Z",
+  "workItems": [
+    {"id": "M1-CONTRACT-001", "status": "passed", "evidence": "artifacts/agent/M1-CONTRACT-001/20260907T170329Z/report.json"},
+    {"id": "M1-CONTRACT-002", "status": "passed", "evidence": "artifacts/agent/M1-CONTRACT-002/20260916T0356Z/report.json"},
+    {"id": "M1-AGENT-001", "status": "passed", "evidence": "artifacts/agent/M1-AGENT-001/20260917T093610Z/report.json"},
+    {"id": "M1-AGENT-002", "status": "passed", "evidence": "artifacts/agent/M1-AGENT-002/20260917T145546Z/report.json"},
+    {"id": "M1-AGENT-003", "status": "passed", "evidence": "artifacts/agent/M1-AGENT-003/20260917T180332Z/report.json"},
+    {"id": "M1-AGENT-004", "status": "passed", "evidence": "artifacts/agent/M1-AGENT-004/20260917T171913Z/report.json"}
+  ],
+  "stories": [
+    {"id": "US-02", "status": "passed", "evidence": ["SMK-006", "SMK-007", "SMK-008", "SMK-009", "SMK-010", "SMK-032", "SMK-034", "SMK-037", "SMK-040"]},
+    {"id": "US-03", "status": "passed", "evidence": ["SMK-006", "SMK-008"]},
+    {"id": "US-12", "status": "passed", "evidence": ["SMK-027", "SMK-036"]}
+  ],
+  "assertions": [
+    {"id": "SMK-006", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-006.json"},
+    {"id": "SMK-007", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-007.json"},
+    {"id": "SMK-008", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-008.json"},
+    {"id": "SMK-009", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-009.json"},
+    {"id": "SMK-010", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T14-48-34-342Zouuqhq/SMK-010.json"},
+    {"id": "SMK-027", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T18-03-32-259ZSK3ccP/SMK-027.json"},
+    {"id": "SMK-032", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T09-39-41-929ZmFTDHB/SMK-032.json"},
+    {"id": "SMK-034", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T17-09-38-817Z9aHQpT/SMK-034.json"},
+    {"id": "SMK-036", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T18-03-32-259ZSK3ccP/SMK-036.json"},
+    {"id": "SMK-037", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T17-09-38-817Z9aHQpT/SMK-037.json"},
+    {"id": "SMK-040", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T09-39-41-929ZmFTDHB/SMK-040.json"},
+    {"id": "perf-openapi-pipeline", "status": "passed", "evidence": "artifacts/spikes/perf-openapi-pipeline.json"},
+    {"id": "e2e-viewer", "status": "passed", "evidence": "artifacts/spikes/e2e-viewer.json"}
+  ],
+  "deferred": [
+    {"id": "SMK-039", "milestone": "M5", "reason": "complete generated tenant resource-ID isolation matrix after all M5 operations"},
+    {"id": "getPublicService content-bearing single-document views", "reason": "anonymous view content delivery is completed by M3 share-link/public-view work items"}
+  ],
+  "risks": [
+    "The smoke-m1-golden-path fixture exercises builtin openapi sources only; command/ai producer sandbox execution remains a M3+ capability",
+    "SSE reconnect behavior is contract-satisfied (resumable cursor, Last-Event-ID) but not covered by an automated browser e2e fixture in this milestone"
+  ],
+  "nextAction": "claim M2-AGENT-001"
+}

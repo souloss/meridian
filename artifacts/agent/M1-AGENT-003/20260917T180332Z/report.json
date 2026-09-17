@@ -1,0 +1,55 @@
+{
+  "workItem": "M1-AGENT-003",
+  "status": "passed",
+  "commit": "0a9e580c87fe35203093954a2ab79f7355e613b2",
+  "baseCommit": "7e608740b9e8e10f1c40bde2442bae23b440661a",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "sourceDigest": "sha256:workspace-uncommitted-at-verification",
+  "startedAt": "2026-09-18T02:00:00Z",
+  "finishedAt": "2026-09-18T02:20:00Z",
+  "reportPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/report.json",
+  "stories": ["US-12"],
+  "assertions": [
+    {"id": "SMK-027", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T18-03-32-259ZSK3ccP/SMK-027.json"},
+    {"id": "SMK-036", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T18-03-32-259ZSK3ccP/SMK-036.json"}
+  ],
+  "commands": [
+    {"command": "make smoke-m1-concurrency ITEM=M1-AGENT-003", "exitCode": 0, "durationSeconds": 18, "stdoutPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log"},
+    {"command": "make job-recovery-tests ITEM=M1-AGENT-003", "exitCode": 0, "durationSeconds": 4, "stdoutPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log"},
+    {"command": "make contracts-generate-then-git-diff-exit-code ITEM=M1-AGENT-003", "exitCode": 0, "durationSeconds": 47, "stdoutPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log"},
+    {"command": "go build ./...", "exitCode": 0, "durationSeconds": 8, "stdoutPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log"},
+    {"command": "go vet ./...", "exitCode": 0, "durationSeconds": 3, "stdoutPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log"},
+    {"command": "go test ./...", "exitCode": 0, "durationSeconds": 6, "stdoutPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0, "stdoutPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-003/20260917T180332Z/commands.log"}
+  ],
+  "changedFiles": [
+    "Makefile",
+    "contracts/work-items.yaml",
+    "internal/generated/repository/querier.go",
+    "internal/generated/repository/sync_dirty.sql.go",
+    "internal/generated/repository/sync_idempotency.sql.go",
+    "internal/handler/m1_concurrency_smoke_integration_test.go",
+    "internal/repository/sync.go",
+    "internal/service/asset_types.go",
+    "internal/service/discovery.go",
+    "internal/service/request_digest.go",
+    "internal/service/request_digest_test.go",
+    "migrations/queries/sync_dirty.sql",
+    "migrations/queries/sync_idempotency.sql",
+    "scripts/smoke-cases.json",
+    "scripts/smoke.mjs"
+  ],
+  "compatibility": {
+    "idempotency": "syncRepository computes an RFC 8785 JCS SHA-256 digest; one winner enqueues while same-hash losers replay the exact jobId and different-hash losers get 409 idempotency_conflict",
+    "dirtySuccessor": "a duplicate while running sets jobs.dirty; completion clears dirty and can enqueue one successor with the latest generation",
+    "mutex": "dedupe lock LockLatestDiscoveryJob serializes repository ref work; enqueue happens inside the handler transaction"
+  },
+  "deferred": [
+    "SSE disconnect/reconnect automated browser coverage (getJob/streamJobLogs already return redacted state; the reconnect contract is exercised manually, not by an automated e2e fixture in this work item)",
+    "full workspace advisory-lock reuse across all repository mutations is tracked by the M3 I-REPO-MUTEX final matrix"
+  ],
+  "diagnostics": [],
+  "failures": [],
+  "failureKind": null,
+  "nextAction": "M1 all P0 items passed; next milestone checkpoint or remaining M1 assertions"
+}
