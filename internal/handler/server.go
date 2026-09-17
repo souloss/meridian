@@ -33,6 +33,7 @@ type Server struct {
 	discovery     *service.Discovery
 	assetService  *service.Assets
 	views         *service.Views
+	serviceLifecycle *service.ServiceLifecycle
 	secureCookies bool
 }
 
@@ -56,6 +57,8 @@ type Dependencies struct {
 	Assets *service.Assets
 	// Views provides built-in view resolution.
 	Views *service.Views
+	// ServiceLifecycle provides service metadata updates, public reads, and delete.
+	ServiceLifecycle *service.ServiceLifecycle
 }
 
 func New() *Server {
@@ -92,6 +95,7 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.discovery = dependencies.Discovery
 	s.assetService = dependencies.Assets
 	s.views = dependencies.Views
+	s.serviceLifecycle = dependencies.ServiceLifecycle
 	s.secureCookies = secureCookies
 	return s
 }
@@ -153,6 +157,9 @@ func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 		return
 	case errors.Is(err, service.ErrBranchNotIndexed):
 		writeError(w, r, http.StatusUnprocessableEntity, "branch_not_indexed", "the selected branch is not indexed")
+		return
+	case errors.Is(err, service.ErrInvalidState):
+		writeError(w, r, http.StatusConflict, "invalid_state", "resource lifecycle forbids the requested transition")
 		return
 	case errors.Is(err, api.ErrStrictOperationNotImplemented):
 		writeError(w, r, http.StatusNotImplemented, "internal_error", "operation is not implemented")

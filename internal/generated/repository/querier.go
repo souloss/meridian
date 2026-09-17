@@ -30,6 +30,9 @@ type Querier interface {
 	// AttachRiverJobID exposes the corresponding strongly typed database operation.
 	// 在插入两行的同一事务中，将应用 UUID 任务关联到内部 River 序号。
 	AttachRiverJobID(ctx context.Context, arg AttachRiverJobIDParams) (int64, error)
+	// CancelServiceJob exposes the corresponding strongly typed database operation.
+	// 将一条仍待执行的任务转为 cancelled 终态。
+	CancelServiceJob(ctx context.Context, arg CancelServiceJobParams) (int64, error)
 	// CancelTenantJob exposes the corresponding strongly typed database operation.
 	// 仅将 pending 或 running 的租户任务转为持久化的 cancelled 终态。
 	CancelTenantJob(ctx context.Context, arg CancelTenantJobParams) (Job, error)
@@ -192,6 +195,9 @@ type Querier interface {
 	// CreateUser exposes the corresponding strongly typed database operation.
 	// 创建一个全局身份，保存 Argon2id PHC 校验值，不保存密码明文。
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	// DeactivateServiceTracks exposes the corresponding strongly typed database operation.
+	// 停用一个服务下全部引用轨迹并递增期望代次。
+	DeactivateServiceTracks(ctx context.Context, arg DeactivateServiceTracksParams) (int64, error)
 	// DeleteCredential exposes the corresponding strongly typed database operation.
 	// 调用方完成引用和 ETag 检查后，删除一条租户凭据。
 	DeleteCredential(ctx context.Context, arg DeleteCredentialParams) (int64, error)
@@ -204,6 +210,9 @@ type Querier interface {
 	// DeleteGlobalCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
 	// 在重新使用前删除已过期的平台凭据轮换重放记录。
 	DeleteGlobalCredentialRotationIdempotency(ctx context.Context, arg DeleteGlobalCredentialRotationIdempotencyParams) error
+	// DeleteRecentServicesForService exposes the corresponding strongly typed database operation.
+	// 移除一个服务对应的最近访问记录。
+	DeleteRecentServicesForService(ctx context.Context, arg DeleteRecentServicesForServiceParams) (int64, error)
 	// DeleteRepository exposes the corresponding strongly typed database operation.
 	// 软删除仓库；URL 和分支能否复用由策略决定。
 	// 历史任务和审计记录在更新后仍保持租户范围。
@@ -211,6 +220,18 @@ type Querier interface {
 	// DeleteRetryJobIdempotency exposes the corresponding strongly typed database operation.
 	// 在重新使用幂等键前删除已过期的重试重放记录。
 	DeleteRetryJobIdempotency(ctx context.Context, arg DeleteRetryJobIdempotencyParams) error
+	// DeleteService exposes the corresponding strongly typed database operation.
+	// 软删除一条服务并递增 revision。
+	DeleteService(ctx context.Context, arg DeleteServiceParams) (Service, error)
+	// DeleteServiceAssets exposes the corresponding strongly typed database operation.
+	// 软删除一个服务下全部活跃资产。
+	DeleteServiceAssets(ctx context.Context, arg DeleteServiceAssetsParams) (int64, error)
+	// DeleteServiceLayers exposes the corresponding strongly typed database operation.
+	// 软删除一个服务下全部活跃层。
+	DeleteServiceLayers(ctx context.Context, arg DeleteServiceLayersParams) (int64, error)
+	// DeleteServiceSourceSpecs exposes the corresponding strongly typed database operation.
+	// 软删除一个服务下全部活跃源配置。
+	DeleteServiceSourceSpecs(ctx context.Context, arg DeleteServiceSourceSpecsParams) (int64, error)
 	// FinishJobExecution exposes the corresponding strongly typed database operation.
 	// 记录终态结果或可重试失败。
 	// 可重试失败保持 pending，等待 River 下一次尝试；终态失败会写入完成时间和 failed 状态。
@@ -284,6 +305,9 @@ type Querier interface {
 	// GetProducerProfile exposes the corresponding strongly typed database operation.
 	// 返回一个未删除的生产者配置文件。
 	GetProducerProfile(ctx context.Context, id uuid.UUID) (ProducerProfile, error)
+	// GetPublicServiceBySlug exposes the corresponding strongly typed database operation.
+	// 按 tenant_slug + service_slug 返回一条活跃服务，供匿名公开读取解析。
+	GetPublicServiceBySlug(ctx context.Context, arg GetPublicServiceBySlugParams) (Service, error)
 	// GetRefreshTokenPrincipalByTokenHash exposes the corresponding strongly typed database operation.
 	// 在调用方指定的时间点，根据令牌摘要认证一个有效刷新令牌和有效用户。
 	GetRefreshTokenPrincipalByTokenHash(ctx context.Context, arg GetRefreshTokenPrincipalByTokenHashParams) (GetRefreshTokenPrincipalByTokenHashRow, error)
@@ -301,6 +325,11 @@ type Querier interface {
 	// 全部查询保留 tenant_id 谓词；producer_profiles 为平台级 global 表。
 	// 返回一个活跃服务，供源配置、服务详情等路径按 slug 定位。
 	GetServiceBySlug(ctx context.Context, arg GetServiceBySlugParams) (Service, error)
+	// GetServiceForUpdate exposes the corresponding strongly typed database operation.
+	// M1 服务生命周期、公开读取与软删除的持久化查询。
+	// 全部查询保留 tenant_id 谓词；公开读取按 tenant_slug + service_slug 跨表解析。
+	// 锁定一条活跃服务行，供条件更新与删除前校验 revision。
+	GetServiceForUpdate(ctx context.Context, arg GetServiceForUpdateParams) (Service, error)
 	// GetSourceSpec exposes the corresponding strongly typed database operation.
 	// 返回一个活跃源配置。
 	GetSourceSpec(ctx context.Context, arg GetSourceSpecParams) (SourceSpec, error)
@@ -454,6 +483,9 @@ type Querier interface {
 	// LockLatestTenantJobGeneration exposes the corresponding strongly typed database operation.
 	// 持有行锁时返回最新的语义代次。
 	LockLatestTenantJobGeneration(ctx context.Context, arg LockLatestTenantJobGenerationParams) (Job, error)
+	// LockPendingServiceJobs exposes the corresponding strongly typed database operation.
+	// 锁定一个服务及其子资源作用域下仍待执行的任务，供删除事务统一取消。
+	LockPendingServiceJobs(ctx context.Context, arg LockPendingServiceJobsParams) ([]LockPendingServiceJobsRow, error)
 	// LockRepositoryQuota exposes the corresponding strongly typed database operation.
 	// 使用租户配额行锁串行化仓库创建。
 	// 适配器在计数和插入期间持有该锁，避免并发创建超过租户配额。
@@ -521,6 +553,9 @@ type Querier interface {
 	// SetSourceLastError exposes the corresponding strongly typed database operation.
 	// 记录一次源物化的失败说明并递增连续失败次数。
 	SetSourceLastError(ctx context.Context, arg SetSourceLastErrorParams) (int64, error)
+	// StaleServiceBindings exposes the corresponding strongly typed database operation.
+	// 将一个服务下全部活跃源绑定标记为 stale（保留 resolved_path）。
+	StaleServiceBindings(ctx context.Context, arg StaleServiceBindingsParams) (int64, error)
 	// StartJobExecution exposes the corresponding strongly typed database operation.
 	// 为一次 River 尝试领取持久化 Meridian 任务。
 	// 终态领域记录不会再次领取，因此 worker 已提交终态后发生 River 重试也不会产生副作用。
@@ -555,6 +590,10 @@ type Querier interface {
 	// 有条件地更新明确提供的仓库字段并递增版本号。
 	// 字段 set 标志保留字段省略和显式 JSON null 之间的区别。
 	UpdateRepository(ctx context.Context, arg UpdateRepositoryParams) (Repository, error)
+	// UpdateService exposes the corresponding strongly typed database operation.
+	// 有条件地更新服务元数据并递增 revision。
+	// description 使用 set 标志保留「未提供」与「显式置空」的区别。
+	UpdateService(ctx context.Context, arg UpdateServiceParams) (Service, error)
 	// UpdateSourceSpec exposes the corresponding strongly typed database operation.
 	// 更新一条源配置，应用明确提供的 PATCH 字段并递增版本。
 	UpdateSourceSpec(ctx context.Context, arg UpdateSourceSpecParams) (SourceSpec, error)

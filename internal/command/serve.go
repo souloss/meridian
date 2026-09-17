@@ -75,6 +75,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	identity := service.NewIdentity(identityStore, digester, jwtIssuer)
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
 	discoveryStore := repository.NewDiscoveryStoreWithRiver(db.Pool, nil)
+	serviceLifecycleStore := repository.NewServiceLifecycleStoreWithRiver(db.Pool, nil)
 	workspaceRoot := os.Getenv("MERIDIAN_WORKSPACE_ROOT")
 	if workspaceRoot == "" {
 		workspaceRoot = filepath.Join(os.TempDir(), "meridian-workspace")
@@ -99,6 +100,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		return fmt.Errorf("configure River runtime: %w", err)
 	}
 	discoveryStore.BindRiver(runtime.Client())
+	serviceLifecycleStore.BindRiver(runtime.Client())
 	credentials := service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), identityStore, keyring)
 	repositories := service.NewRepositories(repositoryStore, identityStore)
 	jobs := service.NewJobs(repository.NewJobControlStore(db.Pool, runtime.Client()), identityStore)
@@ -108,11 +110,12 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	assets := service.NewAssets(assetStore, identityStore)
 	views := service.NewViews(assetStore, identityStore)
 	discovery.WithAssets(assets)
+	serviceLifecycle := service.NewServiceLifecycle(serviceLifecycleStore, assets, identityStore)
 	server := &http.Server{
 		Addr: addr,
 		Handler: handler.NewWithRuntimeServices(handler.Dependencies{
 			Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
-			Producers: producers, Discovery: discovery, Assets: assets, Views: views,
+			Producers: producers, Discovery: discovery, Assets: assets, Views: views, ServiceLifecycle: serviceLifecycle,
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,

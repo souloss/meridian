@@ -61,7 +61,7 @@ func (store *AssetStore) ListServicesByRepository(ctx context.Context, tenantID,
 	items := make([]service.ServiceRecord, 0, len(rows))
 	for _, row := range rows {
 		items = append(items, service.ServiceRecord{
-			ID: row.ID, RepositoryID: row.RepositoryID, Slug: row.Slug, DisplayName: row.DisplayName,
+			TenantID: row.TenantID, ID: row.ID, RepositoryID: row.RepositoryID, Slug: row.Slug, DisplayName: row.DisplayName,
 			Description: row.Description, RootDir: row.RootDir, Language: row.Language, Framework: row.Framework,
 			Visibility: row.Visibility, Lifecycle: row.Lifecycle, Revision: row.Revision,
 			CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
@@ -460,7 +460,7 @@ func (store *AssetStore) ListRecentServices(ctx context.Context, tenantID, userI
 	items := make([]service.ServiceRecord, 0, len(rows))
 	for _, row := range rows {
 		items = append(items, service.ServiceRecord{
-			ID: row.ID, RepositoryID: row.RepositoryID, Slug: row.Slug, DisplayName: row.DisplayName,
+			TenantID: row.TenantID, ID: row.ID, RepositoryID: row.RepositoryID, Slug: row.Slug, DisplayName: row.DisplayName,
 			Description: row.Description, RootDir: row.RootDir, Language: row.Language, Framework: row.Framework,
 			Visibility: row.Visibility, Lifecycle: row.Lifecycle, Revision: row.Revision,
 			CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,

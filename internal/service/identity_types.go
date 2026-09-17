@@ -25,6 +25,8 @@ var (
 	ErrIdempotencyConflict = errors.New("idempotency key was reused for a different request")
 	// ErrQuotaExceeded means a tenant resource ceiling would be exceeded by the operation.
 	ErrQuotaExceeded = errors.New("tenant quota would be exceeded")
+	// ErrInvalidState means the resource lifecycle forbids the requested transition.
+	ErrInvalidState = errors.New("resource lifecycle forbids the requested transition")
 )
 
 // QuotaExceededError preserves the safe resource counters needed by a quota response.

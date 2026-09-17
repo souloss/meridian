@@ -68,6 +68,7 @@ type NewProducerProfile struct {
 
 // ServiceRecord is the tenant-visible service projection used by discovery acceptance.
 type ServiceRecord struct {
+	TenantID     uuid.UUID
 	ID           uuid.UUID
 	RepositoryID uuid.UUID
 	Slug         string

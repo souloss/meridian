@@ -180,6 +180,9 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 	if err != nil {
 		return SourceSpecRecord{}, err
 	}
+	if service.Lifecycle == "retired" {
+		return SourceSpecRecord{}, ErrInvalidState
+	}
 	record, err := discovery.store.CreateSourceSpec(ctx, NewSourceSpec{
 		TenantID: membership.TenantID, ID: uuid.NewV7(), ServiceID: service.ID, Kind: validated.Kind,
 		AssetNameTemplate: validated.AssetNameTemplate, Role: validated.Role, Origin: validated.Origin, Mode: validated.Mode,

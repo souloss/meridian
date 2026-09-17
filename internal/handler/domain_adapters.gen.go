@@ -237,12 +237,24 @@ type serviceServer struct {
 	server *Server
 }
 
+func (adapter serviceServer) DeleteService(ctx context.Context, request serviceapi.DeleteServiceRequestObject) (serviceapi.DeleteServiceResponseObject, error) {
+	return adapter.server.DeleteService(ctx, request)
+}
+
+func (adapter serviceServer) GetPublicService(ctx context.Context, request serviceapi.GetPublicServiceRequestObject) (serviceapi.GetPublicServiceResponseObject, error) {
+	return adapter.server.GetPublicService(ctx, request)
+}
+
 func (adapter serviceServer) GetService(ctx context.Context, request serviceapi.GetServiceRequestObject) (serviceapi.GetServiceResponseObject, error) {
 	return adapter.server.GetService(ctx, request)
 }
 
 func (adapter serviceServer) ListRecentServices(ctx context.Context, request serviceapi.ListRecentServicesRequestObject) (serviceapi.ListRecentServicesResponseObject, error) {
 	return adapter.server.ListRecentServices(ctx, request)
+}
+
+func (adapter serviceServer) UpdateService(ctx context.Context, request serviceapi.UpdateServiceRequestObject) (serviceapi.UpdateServiceResponseObject, error) {
+	return adapter.server.UpdateService(ctx, request)
 }
 
 type systemServer struct {

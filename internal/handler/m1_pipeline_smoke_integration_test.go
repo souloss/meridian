@@ -102,6 +102,7 @@ func newM1PipelineFixture(t *testing.T) *m1PipelineFixture {
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
 	discoveryStore := repository.NewDiscoveryStoreWithRiver(db.Pool, nil)
 	assetStore := repository.NewAssetStore(db.Pool)
+	serviceLifecycleStore := repository.NewServiceLifecycleStoreWithRiver(db.Pool, nil)
 	workspace := t.TempDir()
 	blobs, err := storage.NewLocalStore(filepath.Join(t.TempDir(), "blobs"))
 	if err != nil {
@@ -116,10 +117,12 @@ func newM1PipelineFixture(t *testing.T) *m1PipelineFixture {
 		t.Fatalf("create M1 pipeline queue runtime: %v", err)
 	}
 	discoveryStore.BindRiver(runtime.Client())
+	serviceLifecycleStore.BindRiver(runtime.Client())
 
 	assets := service.NewAssets(assetStore, store)
 	views := service.NewViews(assetStore, store)
 	discovery := service.NewDiscovery(discoveryStore, store).WithAssets(assets)
+	serviceLifecycle := service.NewServiceLifecycle(serviceLifecycleStore, assets, store)
 
 	handler := NewWithRuntimeServices(Dependencies{
 		Identity:     identity,
@@ -130,6 +133,7 @@ func newM1PipelineFixture(t *testing.T) *m1PipelineFixture {
 		Discovery:    discovery,
 		Assets:       assets,
 		Views:        views,
+		ServiceLifecycle: serviceLifecycle,
 	}, false).Handler()
 
 	runtime.Start(t.Context())
