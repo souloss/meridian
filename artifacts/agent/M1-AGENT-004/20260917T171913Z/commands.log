@@ -1,0 +1,40 @@
+# M1-AGENT-004 命令执行日志
+
+workItem: M1-AGENT-004
+startedAt: 2026-09-18T01:00:00Z
+contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
+
+$ go tool sqlc generate
+exitCode=0 durationSeconds≈1.5
+
+$ go run ./internal/codegen/godoc -dir internal/generated/repository
+exitCode=0 durationSeconds≈0.5
+
+$ go generate ./...
+exitCode=0 durationSeconds≈45
+
+$ go build ./...
+exitCode=0 durationSeconds≈8
+
+$ go vet ./...
+exitCode=0 durationSeconds≈3
+
+$ go test ./...
+exitCode=0 durationSeconds≈6
+
+$ make contracts-validate ITEM=M1-AGENT-004
+exitCode=0 durationSeconds≈52
+
+$ make contracts-generate-then-git-diff-exit-code ITEM=M1-AGENT-004
+exitCode=0 durationSeconds≈47（先 go generate 后再跑；第一次运行在 go generate 前会失败）
+
+$ make smoke-m1-service-lifecycle ITEM=M1-AGENT-004
+exitCode=0 durationSeconds≈20
+SMK-034: pass; artifacts/smoke/2026-09-17T17-09-38-817Z9aHQpT/SMK-034.json
+SMK-037: pass; artifacts/smoke/2026-09-17T17-09-38-817Z9aHQpT/SMK-037.json
+
+$ go test ./internal/contracttest -run 'TestSmokeCatalogMatchesAcceptance'
+exitCode=0 —— 目录完整
+
+$ git diff --check
+exitCode=0 durationSeconds≈0

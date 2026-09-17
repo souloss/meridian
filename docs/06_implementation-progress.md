@@ -1,10 +1,10 @@
 # Meridian 实施进度
 
-> 最后核对：2026-09-17
+> 最后核对：2026-09-18
 > 当前里程碑：M1（asset-mainline）
-> 里程碑状态：M0 自主 checkpoint 已完成；M1-CONTRACT-002 通过；M1-AGENT-001 通过；M1-AGENT-002 通过
-> 最新稳定提交：`cb0b60b3441f2d18368478d17bef319d4a870c70 AI:feat(m1): OpenAPI 流水线、资产物化与查看器解析落地`
-> 当前开发切片：M1-AGENT-002 passed；下一步领取 M1-AGENT-004
+> 里程碑状态：M0 自主 checkpoint 已完成；M1-CONTRACT-002 通过；M1-AGENT-001/002/004 通过
+> 最新稳定提交：`bb5eb01c707cf9fe11a12b7f0e11daeb1ef6309d AI:feat(m1): 服务生命周期、公开读取与软删除落地`
+> 当前开发切片：M1-AGENT-004 passed；下一步领取 M1-AGENT-003
 
 本文只记录实施状态和验证证据，不定义产品行为，也不替代契约。可领取的原子工作项、依赖和阶段完成记录 `milestoneCheckpoints` 以 [`contracts/work-items.yaml`](../contracts/work-items.yaml) 为准。范围、接口、领域规则、存储和验收发生冲突时，依次回到 [`contracts/manifest.yaml`](../contracts/manifest.yaml) 引用的对应契约；里程碑是否完成以 [`contracts/acceptance.yaml`](../contracts/acceptance.yaml)、工作项门禁和 Agent 证据 checkpoint 为准。
 
@@ -30,7 +30,7 @@
 | 里程碑 | 交付范围 | 当前状态 |
 | --- | --- | --- |
 | M0 地基 | 契约与生成、迁移、身份/租户/RBAC/PAT、凭据、仓库骨架、Blob、Job、Audit、Outbox、控制面基础 | 已完成（Agent checkpoint） |
-| M1 资产主链路 | Repository/Service/Source、发现与同步、默认分支 Track、OpenAPI normalize/index、Viewer/public read | 开发中：发现/源绑定/受控生产者（001）、同步流水线与资产物化、查看器解析（002）已通过；公开读取与 lifecycle、Job 恢复与 SSE 待续 |
+| M1 资产主链路 | Repository/Service/Source、发现与同步、默认分支 Track、OpenAPI normalize/index、Viewer/public read | 开发中：发现/源绑定/受控生产者（001）、同步流水线与资产物化/查看器（002）、服务生命周期与公开读取/软删除（004）已通过；Job 恢复与 SSE 待续 |
 | M2 Layer 与 Overlay | LayerHead/Revision、Overlay、人工编辑、Provenance、Rollback、配置导入、临时开关层预览 | 未开始业务实现 |
 | M3 AI、Diff 与门禁 | AI producer/review、生命周期、分支版本、Diff、分享、Todo、CLI push/diff、最小通知 | 未开始业务实现 |
 | M4 多 kind 与全局视图 | dbschema/dependency、SystemGroup、依赖图、搜索和全局视图 | 未开始业务实现 |
@@ -124,7 +124,9 @@ M0-M3 采用 desktop-first：先实现完整桌面功能，移动视觉、动画
 
 M0 自动门禁和 Agent checkpoint 已完成。M1-AGENT-001 attempt 3 已实现并通过：新增 migration `00005_m1_repository_discovery.sql`（services/discovery_candidates/producer_profiles/source_specs/source_bindings 五表）、`discovery.sql` 查询与 sqlc 生成、`service.Discovery`/`service.Producers`/`service.DiscoveryRunner`（git clone + marker 探测 + candidate upsert）、`task.DiscoverArgs/DiscoverWorker/DiscoverRunner` 及 River 注册、handler 层 `discoverRepository`/`listDiscoveryCandidates`/`acceptDiscoveryCandidates`/`createSourceSpec`/`listSourceBindings`/`listAvailableProducerProfiles`/`createProducerProfile`，并补齐 `smoke-m1-repository` 门禁与 SMK-032/SMK-040 fixture（git-http-backend 本地仓），最终证据见 `artifacts/agent/M1-AGENT-001/20260917T093610Z/report.json`。
 
-M1-AGENT-002 attempt 1 已实现并通过：新增 migration `00006_m1_asset_pipeline.sql`（asset_kinds/tenant_kind_overrides/assets/layers/layer_revisions/layer_heads/asset_ref_tracks/asset_versions/asset_items/recent_services 十表，全部 up/down 带列注释）与 `asset.sql` 查询；`service.PipelineRunner` 实现 `task.SyncRunner`（resolve→discover→extract→merge→normalize→index 六阶段，builtin openapi 源物化资产/层/修订/头/版本/条目/绑定，按 content-hash 与 input-fingerprint 幂等，并记录 last_error/健康状态）；`service.Assets`/`service.Views` 读取链路与 8 个 handler（`syncRepository`/`updateSourceSpec`/`getService`/`listRecentServices`/`getAsset`/`getAssetVersion`/`listAssetVersionItems`/`resolveView`，getService 富化 assets 与 missingKinds）；补齐 `smoke-m1-golden-path`（SMK-006..010）、`perf-openapi-pipeline`、`e2e-viewer` 三个门禁，最终证据见 `artifacts/agent/M1-AGENT-002/20260917T145546Z/report.json`。`getPublicService` 匿名公开读取与 service lifecycle 归属 M1-AGENT-004，Job 恢复互斥与 SSE 重连归属 M1-AGENT-003。
+M1-AGENT-002 attempt 1 已实现并通过：新增 migration `00006_m1_asset_pipeline.sql`（asset_kinds/tenant_kind_overrides/assets/layers/layer_revisions/layer_heads/asset_ref_tracks/asset_versions/asset_items/recent_services 十表，全部 up/down 带列注释）与 `asset.sql` 查询；`service.PipelineRunner` 实现 `task.SyncRunner`（resolve→discover→extract→merge→normalize→index 六阶段，builtin openapi 源物化资产/层/修订/头/版本/条目/绑定，按 content-hash 与 input-fingerprint 幂等，并记录 last_error/健康状态）；`service.Assets`/`service.Views` 读取链路与 8 个 handler（`syncRepository`/`updateSourceSpec`/`getService`/`listRecentServices`/`getAsset`/`getAssetVersion`/`listAssetVersionItems`/`resolveView`，getService 富化 assets 与 missingKinds）；补齐 `smoke-m1-golden-path`（SMK-006..010）、`perf-openapi-pipeline`、`e2e-viewer` 三个门禁，最终证据见 `artifacts/agent/M1-AGENT-002/20260917T145546Z/report.json`。
+
+M1-AGENT-004 attempt 1 已实现并通过：新增 `service_lifecycle.sql` 查询与 sqlc 生成，`service.ServiceLifecycle`（draft→published→deprecated→retired 前进状态机，非法迁移 409 invalid_state；public 读取按 visibility=public 且 lifecycle∈{published,deprecated} 门控；退役拒绝源创建）；handler `updateService`/`deleteService`/`getPublicService` 与 serve.go 装配 `ServiceLifecycleStore`+River；补齐 `smoke-m1-service-lifecycle` 门禁与 SMK-034/SMK-037 fixture，最终证据见 `artifacts/agent/M1-AGENT-004/20260917T171913Z/report.json`。Job 恢复互斥与 SSE 重连归属 M1-AGENT-003。
 
 ## 更新流程
 

@@ -324,14 +324,25 @@ items:
   - id: M1-AGENT-004
     milestone: M1
     priority: P0
-    status: ready
+    status: passed
     title: service-lifecycle-public-read-and-delete
     dependsOn: [M1-AGENT-002]
     operationIds: [updateService, deleteService, getPublicService]
     stories: [US-02]
     assertions: [SMK-034, SMK-037]
     verify: [smoke-m1-service-lifecycle]
-    reportPath: null
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: '2026-09-18T01:00:00Z'
+    baseCommit: a6edeac0e587152e2130d8400333956aeb03b107
+    contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
+    failureKind: null
+    blockedReason: null
+    reportPath: artifacts/agent/M1-AGENT-004/20260917T171913Z/report.json
+    lastEvidence: artifacts/agent/M1-AGENT-004/20260917T171913Z/report.json
+    nextAction: claim M1-AGENT-003
 
   - id: M2-AGENT-001
     milestone: M2

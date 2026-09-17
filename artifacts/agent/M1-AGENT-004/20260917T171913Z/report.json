@@ -1,0 +1,64 @@
+{
+  "workItem": "M1-AGENT-004",
+  "status": "passed",
+  "commit": "bb5eb01c707cf9fe11a12b7f0e11daeb1ef6309d",
+  "baseCommit": "a6edeac0e587152e2130d8400333956aeb03b107",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "sourceDigest": "sha256:workspace-uncommitted-at-verification",
+  "startedAt": "2026-09-18T01:00:00Z",
+  "finishedAt": "2026-09-18T01:19:00Z",
+  "reportPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/report.json",
+  "stories": ["US-02"],
+  "assertions": [
+    {"id": "SMK-034", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T17-09-38-817Z9aHQpT/SMK-034.json"},
+    {"id": "SMK-037", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T17-09-38-817Z9aHQpT/SMK-037.json"}
+  ],
+  "commands": [
+    {"command": "make smoke-m1-service-lifecycle ITEM=M1-AGENT-004", "exitCode": 0, "durationSeconds": 20, "stdoutPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log"},
+    {"command": "make contracts-validate ITEM=M1-AGENT-004", "exitCode": 0, "durationSeconds": 52, "stdoutPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log"},
+    {"command": "make contracts-generate-then-git-diff-exit-code ITEM=M1-AGENT-004", "exitCode": 0, "durationSeconds": 47, "stdoutPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log"},
+    {"command": "go build ./...", "exitCode": 0, "durationSeconds": 8, "stdoutPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log"},
+    {"command": "go vet ./...", "exitCode": 0, "durationSeconds": 3, "stdoutPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log"},
+    {"command": "go test ./...", "exitCode": 0, "durationSeconds": 6, "stdoutPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0, "stdoutPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log", "stderrPath": "artifacts/agent/M1-AGENT-004/20260917T171913Z/commands.log"}
+  ],
+  "changedFiles": [
+    "Makefile",
+    "contracts/work-items.yaml",
+    "internal/command/serve.go",
+    "internal/generated/repository/querier.go",
+    "internal/generated/repository/service_lifecycle.sql.go",
+    "internal/handler/domain_adapters.gen.go",
+    "internal/handler/m1_pipeline_smoke_integration_test.go",
+    "internal/handler/m1_service_lifecycle_smoke_integration_test.go",
+    "internal/handler/server.go",
+    "internal/handler/service_lifecycle.go",
+    "internal/repository/assets.go",
+    "internal/repository/discovery.go",
+    "internal/repository/service_lifecycle.go",
+    "internal/service/discovery.go",
+    "internal/service/discovery_types.go",
+    "internal/service/identity_types.go",
+    "internal/service/service_lifecycle.go",
+    "internal/service/service_lifecycle_types.go",
+    "migrations/queries/service_lifecycle.sql",
+    "scripts/smoke-cases.json",
+    "scripts/smoke.mjs"
+  ],
+  "compatibility": {
+    "lifecycle": "draft→published→deprecated→retired forward-only; illegal transition returns 409 invalid_state; retired rejects source create with invalid_state",
+    "publicRead": "getPublicService gated by visibility=public AND lifecycle∈{published,deprecated}, otherwise 404 not_found",
+    "softDelete": "deleteService 204 under If-Match; soft-deletes service/source/assets/layers, stales bindings, deactivates tracks, removes recents, and cancels pending service-scoped jobs in one transaction",
+    "serviceDeprecatedEvent": "event delivery seam left as a no-op pending outbox wiring (M1-AGENT-003/M3)"
+  },
+  "deferred": [
+    "service.deprecated outbox event append (seam no-op; wired with event delivery in M1-AGENT-003/M3)",
+    "stars/tags/owner/maintainer PATCH fields (schema columns not yet migrated)"
+  ],
+  "diagnostics": [
+    {"command": "make contracts-generate-then-git-diff-exit-code ITEM=M1-AGENT-004", "exitCode": 2, "resolution": "first run before go generate; resolved by running go generate ./... then re-running the gate, which now exits 0"}
+  ],
+  "failures": [],
+  "failureKind": null,
+  "nextAction": "claim M1-AGENT-003 (job recovery mutex + SSE reconnect)"
+}
