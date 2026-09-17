@@ -1,0 +1,12 @@
+$ make smoke-m2-overlay ITEM=M2-AGENT-001
+SMK-011: pass; artifacts/smoke/2026-09-17T21-42-12-936ZzurdDF/SMK-011.json
+SMK-012: pass; artifacts/smoke/2026-09-17T21-42-12-936ZzurdDF/SMK-012.json
+SMK-013: pass; artifacts/smoke/2026-09-17T21-42-12-936ZzurdDF/SMK-013.json
+SMK-014: pass; artifacts/smoke/2026-09-17T21-42-12-936ZzurdDF/SMK-014.json
+$ make overlay-property-tests ITEM=M2-AGENT-001
+ok  	github.com/meridian-labs/meridian/internal/service	0.003s
+$ make smoke-m2-gitops ITEM=M2-AGENT-002
+SMK-028: pass; artifacts/smoke/2026-09-17T21-42-37-394ZMbBH9I/SMK-028.json
+SMK-038: pass; artifacts/smoke/2026-09-17T21-42-37-394ZMbBH9I/SMK-038.json
+$ go test ./internal/contracttest
+ok  	github.com/meridian-labs/meridian/internal/contracttest	0.077s

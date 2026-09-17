@@ -1,0 +1,53 @@
+{
+  "milestone": "M2",
+  "status": "completed",
+  "commit": "001bb4b00cb840a859d74f40b86abfba38783752",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "reportPath": "artifacts/agent/milestones/M2/20260918T054500Z/report.json",
+  "completedBy": "coding-agent",
+  "completedAt": "2026-09-18T05:45:00Z",
+  "workItems": [
+    {
+      "id": "M2-AGENT-001",
+      "status": "passed",
+      "evidence": "artifacts/agent/M2-AGENT-001/20260918T043500Z/report.json"
+    },
+    {
+      "id": "M2-AGENT-002",
+      "status": "passed",
+      "evidence": "artifacts/agent/M2-AGENT-002/20260918T050000Z/report.json"
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-04",
+      "status": "passed",
+      "evidence": ["SMK-011", "SMK-012", "SMK-013", "SMK-014"]
+    },
+    {
+      "id": "US-07",
+      "status": "passed",
+      "evidence": ["SMK-028", "SMK-038"]
+    }
+  ],
+  "assertions": [
+    {"id": "SMK-011", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T21-42-12-936ZzurdDF/SMK-011.json"},
+    {"id": "SMK-012", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T21-42-12-936ZzurdDF/SMK-012.json"},
+    {"id": "SMK-013", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T21-42-12-936ZzurdDF/SMK-013.json"},
+    {"id": "SMK-014", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T21-42-12-936ZzurdDF/SMK-014.json"},
+    {"id": "SMK-028", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T21-42-37-394ZMbBH9I/SMK-028.json"},
+    {"id": "SMK-038", "status": "passed", "evidence": "artifacts/smoke/2026-09-17T21-42-37-394ZMbBH9I/SMK-038.json"}
+  ],
+  "deferred": [],
+  "risks": [
+    "Config import apply creates sources for manual-mode assets without an initial revision; the manual layer becomes the base skeleton for a later createLayerRevision, matching the M2 overlay editor flow"
+  ],
+  "nextAction": "claim M3-AGENT-001",
+  "commands": [
+    {"command": "make smoke-m2-overlay ITEM=M2-AGENT-001", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M2/20260918T054500Z/commands.log"},
+    {"command": "make overlay-property-tests ITEM=M2-AGENT-001", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M2/20260918T054500Z/commands.log"},
+    {"command": "make smoke-m2-gitops ITEM=M2-AGENT-002", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M2/20260918T054500Z/commands.log"},
+    {"command": "go test ./internal/contracttest", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M2/20260918T054500Z/commands.log"}
+  ],
+  "failures": []
+}
