@@ -479,9 +479,9 @@ func roleAllows(role, permission string) bool {
 	switch permission {
 	case "token:manage":
 		return role == "maintainer" || role == "viewer"
-	case "repository:read":
+	case "repository:read", "service:read", "asset:read":
 		return role == "maintainer" || role == "viewer"
-	case "repository:write", "repository:sync":
+	case "repository:write", "repository:sync", "service:write", "service:create", "layer:edit":
 		return role == "maintainer"
 	case "job:read", "job:run":
 		return role == "maintainer"

@@ -20,6 +20,8 @@ type RuntimeDependencies struct {
 	Executions ExecutionStore
 	// SyncRunner executes the M1 repository synchronization pipeline.
 	SyncRunner SyncRunner
+	// DiscoverRunner executes the M1 repository discovery pipeline.
+	DiscoverRunner DiscoverRunner
 	// Outbox persists delivery leases, retries, and completions.
 	Outbox OutboxStore
 	// OutboxDeliverer sends events through configured channel adapters.
@@ -39,6 +41,7 @@ func NewRuntime(pool *pgxpool.Pool, dependencies RuntimeDependencies, logger *sl
 	}
 	workers := river.NewWorkers()
 	river.AddWorker(workers, NewCredentialSyncWorker(dependencies.Executions, dependencies.SyncRunner))
+	river.AddWorker(workers, NewDiscoverWorker(dependencies.Executions, dependencies.DiscoverRunner))
 	river.AddWorker(workers, NewOutboxDispatchWorker(dependencies.Outbox, dependencies.OutboxDeliverer))
 	client, err := river.NewClient(riverpgxv5.New(pool), &river.Config{
 		Logger: logger,

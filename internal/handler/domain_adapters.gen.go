@@ -25,6 +25,14 @@ type assetServer struct {
 	server *Server
 }
 
+func (adapter assetServer) CreateSourceSpec(ctx context.Context, request asset.CreateSourceSpecRequestObject) (asset.CreateSourceSpecResponseObject, error) {
+	return adapter.server.CreateSourceSpec(ctx, request)
+}
+
+func (adapter assetServer) ListSourceBindings(ctx context.Context, request asset.ListSourceBindingsRequestObject) (asset.ListSourceBindingsResponseObject, error) {
+	return adapter.server.ListSourceBindings(ctx, request)
+}
+
 type authServer struct {
 	auth.UnimplementedStrictServer
 	server *Server
@@ -99,6 +107,10 @@ func (adapter platformServer) CreateGlobalCredential(ctx context.Context, reques
 	return adapter.server.CreateGlobalCredential(ctx, request)
 }
 
+func (adapter platformServer) CreateProducerProfile(ctx context.Context, request platform.CreateProducerProfileRequestObject) (platform.CreateProducerProfileResponseObject, error) {
+	return adapter.server.CreateProducerProfile(ctx, request)
+}
+
 func (adapter platformServer) CreateTenant(ctx context.Context, request platform.CreateTenantRequestObject) (platform.CreateTenantResponseObject, error) {
 	return adapter.server.CreateTenant(ctx, request)
 }
@@ -160,6 +172,10 @@ type repositoryServer struct {
 	server *Server
 }
 
+func (adapter repositoryServer) AcceptDiscoveryCandidates(ctx context.Context, request repository.AcceptDiscoveryCandidatesRequestObject) (repository.AcceptDiscoveryCandidatesResponseObject, error) {
+	return adapter.server.AcceptDiscoveryCandidates(ctx, request)
+}
+
 func (adapter repositoryServer) CheckRepositoryConnection(ctx context.Context, request repository.CheckRepositoryConnectionRequestObject) (repository.CheckRepositoryConnectionResponseObject, error) {
 	return adapter.server.CheckRepositoryConnection(ctx, request)
 }
@@ -172,8 +188,16 @@ func (adapter repositoryServer) DeleteRepository(ctx context.Context, request re
 	return adapter.server.DeleteRepository(ctx, request)
 }
 
+func (adapter repositoryServer) DiscoverRepository(ctx context.Context, request repository.DiscoverRepositoryRequestObject) (repository.DiscoverRepositoryResponseObject, error) {
+	return adapter.server.DiscoverRepository(ctx, request)
+}
+
 func (adapter repositoryServer) GetRepository(ctx context.Context, request repository.GetRepositoryRequestObject) (repository.GetRepositoryResponseObject, error) {
 	return adapter.server.GetRepository(ctx, request)
+}
+
+func (adapter repositoryServer) ListDiscoveryCandidates(ctx context.Context, request repository.ListDiscoveryCandidatesRequestObject) (repository.ListDiscoveryCandidatesResponseObject, error) {
+	return adapter.server.ListDiscoveryCandidates(ctx, request)
 }
 
 func (adapter repositoryServer) ListRepositories(ctx context.Context, request repository.ListRepositoriesRequestObject) (repository.ListRepositoriesResponseObject, error) {
@@ -233,6 +257,10 @@ func (adapter tenantServer) CreateToken(ctx context.Context, request tenant.Crea
 
 func (adapter tenantServer) DeleteCredential(ctx context.Context, request tenant.DeleteCredentialRequestObject) (tenant.DeleteCredentialResponseObject, error) {
 	return adapter.server.DeleteCredential(ctx, request)
+}
+
+func (adapter tenantServer) ListAvailableProducerProfiles(ctx context.Context, request tenant.ListAvailableProducerProfilesRequestObject) (tenant.ListAvailableProducerProfilesResponseObject, error) {
+	return adapter.server.ListAvailableProducerProfiles(ctx, request)
 }
 
 func (adapter tenantServer) ListCredentials(ctx context.Context, request tenant.ListCredentialsRequestObject) (tenant.ListCredentialsResponseObject, error) {

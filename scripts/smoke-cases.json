@@ -30,7 +30,7 @@
   "SMK-029": {"milestone": "M0", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM0Smoke/SMK-029", "fixture": "internal/handler/m0_smoke_integration_test.go"},
   "SMK-030": {"milestone": "M5"},
   "SMK-031": {"milestone": "M0", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM0CredentialSmoke/SMK-031", "fixture": "internal/handler/credential_smoke_integration_test.go"},
-  "SMK-032": {"milestone": "M1"},
+  "SMK-032": {"milestone": "M1", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM1RepositorySmoke/SMK-032", "fixture": "internal/handler/repository_discovery_smoke_integration_test.go"},
   "SMK-033": {"milestone": "M3"},
   "SMK-034": {"milestone": "M1"},
   "SMK-035": {"milestone": "M0", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM0CredentialSmoke/SMK-035", "fixture": "internal/handler/credential_smoke_integration_test.go"},
@@ -38,5 +38,5 @@
   "SMK-037": {"milestone": "M1"},
   "SMK-038": {"milestone": "M2"},
   "SMK-039": {"milestone": "M5"},
-  "SMK-040": {"milestone": "M1"}
+  "SMK-040": {"milestone": "M1", "package": "github.com/meridian-labs/meridian/internal/handler", "test": "TestM1RepositorySmoke/SMK-040", "fixture": "internal/handler/repository_discovery_smoke_integration_test.go"}
 }

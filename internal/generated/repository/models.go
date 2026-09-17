@@ -171,6 +171,38 @@ type CredentialTeamShare struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
+// DiscoveryCandidate is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 仓库发现流水线产生的候选服务根目录。
+type DiscoveryCandidate struct {
+	// TenantID is the generated tenant id database value for DiscoveryCandidate.
+	// 拥有该候选记录的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for DiscoveryCandidate.
+	// 应用生成的 UUID v7 候选标识。
+	ID uuid.UUID `json:"id"`
+	// RepositoryID is the generated repository id database value for DiscoveryCandidate.
+	// 产生候选的仓库。
+	RepositoryID uuid.UUID `json:"repository_id"`
+	// CommitSha is the generated commit sha database value for DiscoveryCandidate.
+	// 发现该候选时解析到的提交 SHA。
+	CommitSha string `json:"commit_sha"`
+	// RootDir is the generated root dir database value for DiscoveryCandidate.
+	// 仓库相对根目录，空字符串表示仓库根。
+	RootDir string `json:"root_dir"`
+	// Detected is the generated detected database value for DiscoveryCandidate.
+	// 探测到的 marker 文件与 kind 结构 JSON。
+	Detected []byte `json:"detected"`
+	// Status is the generated status database value for DiscoveryCandidate.
+	// 候选状态：pending、accepted 或 dismissed。
+	Status string `json:"status"`
+	// CreatedAt is the generated created at database value for DiscoveryCandidate.
+	// 首次发现候选时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for DiscoveryCandidate.
+	// 最近一次更新候选时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
 // GlobalCredential is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 由平台管理、租户可选择但仅平台管理员可修改的加密凭据。
 type GlobalCredential struct {
@@ -531,6 +563,71 @@ type PlatformSetting struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+// ProducerProfile is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 平台管理员维护的全局生产者配置文件，供租户源配置选择。
+type ProducerProfile struct {
+	// ID is the generated id database value for ProducerProfile.
+	// 应用生成的 UUID v7 生产者配置文件标识。
+	ID uuid.UUID `json:"id"`
+	// Name is the generated name database value for ProducerProfile.
+	// 平台内唯一的配置文件名称。
+	Name string `json:"name"`
+	// Kind is the generated kind database value for ProducerProfile.
+	// 生产者类别：command 或 ai。
+	Kind string `json:"kind"`
+	// Executable is the generated executable database value for ProducerProfile.
+	// 必须为可执行文件的绝对路径。
+	Executable string `json:"executable"`
+	// Args is the generated args database value for ProducerProfile.
+	// 以显式数组传递的命令参数，不做 shell 展开。
+	Args []byte `json:"args"`
+	// EnvAllowlist is the generated env allowlist database value for ProducerProfile.
+	// 允许透传的环境变量名列表，绝不保存值。
+	EnvAllowlist []string `json:"env_allowlist"`
+	// SupportedKinds is the generated supported kinds database value for ProducerProfile.
+	// 该生产者可产出的资产 kind 标识列表。
+	SupportedKinds []string `json:"supported_kinds"`
+	// ReplaySafe is the generated replay safe database value for ProducerProfile.
+	// 中断后重新执行是否安全。
+	ReplaySafe bool `json:"replay_safe"`
+	// Network is the generated network database value for ProducerProfile.
+	// 网络模式：none 隔离或 inherit 继承。
+	Network string `json:"network"`
+	// TimeoutSec is the generated timeout sec database value for ProducerProfile.
+	// 生产者默认超时，与源配置超时取较小值生效。
+	TimeoutSec int32 `json:"timeout_sec"`
+	// MemoryMib is the generated memory mib database value for ProducerProfile.
+	// 执行内存上限，单位 MiB。
+	MemoryMib int32 `json:"memory_mib"`
+	// CpuSeconds is the generated cpu seconds database value for ProducerProfile.
+	// 执行 CPU 时间上限，单位秒。
+	CpuSeconds int32 `json:"cpu_seconds"`
+	// Pids is the generated pids database value for ProducerProfile.
+	// 执行进程数上限。
+	Pids int32 `json:"pids"`
+	// Enabled is the generated enabled database value for ProducerProfile.
+	// 平台是否允许租户选择该配置文件。
+	Enabled bool `json:"enabled"`
+	// DependencyStatus is the generated dependency status database value for ProducerProfile.
+	// 可执行依赖探测结果：available 或 unavailable。
+	DependencyStatus string `json:"dependency_status"`
+	// UnavailableReason is the generated unavailable reason database value for ProducerProfile.
+	// 依赖不可用时的简短脱敏说明，可用时为空。
+	UnavailableReason *string `json:"unavailable_reason"`
+	// Revision is the generated revision database value for ProducerProfile.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
+	Revision int64 `json:"revision"`
+	// DeletedAt is the generated deleted at database value for ProducerProfile.
+	// 软删除时间；配置文件活跃时为空。
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	// CreatedAt is the generated created at database value for ProducerProfile.
+	// 创建配置文件时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for ProducerProfile.
+	// 最近一次更新配置文件时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
 // RefreshToken is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 浏览器刷新令牌，只保存 HMAC 摘要并支持轮换家族。
 type RefreshToken struct {
@@ -613,6 +710,177 @@ type Repository struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt is the generated updated at database value for Repository.
 	// 最近一次更新仓库时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// Service is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 仓库发现产生的租户服务聚合与元数据。
+type Service struct {
+	// TenantID is the generated tenant id database value for Service.
+	// 拥有该服务的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for Service.
+	// 应用生成的 UUID v7 服务标识。
+	ID uuid.UUID `json:"id"`
+	// RepositoryID is the generated repository id database value for Service.
+	// 该服务所属的仓库。
+	RepositoryID uuid.UUID `json:"repository_id"`
+	// Slug is the generated slug database value for Service.
+	// 租户内唯一的服务 URL 标识。
+	Slug string `json:"slug"`
+	// DisplayName is the generated display name database value for Service.
+	// 界面展示的服务名称。
+	DisplayName string `json:"display_name"`
+	// Description is the generated description database value for Service.
+	// 可选的服务说明。
+	Description *string `json:"description"`
+	// RootDir is the generated root dir database value for Service.
+	// 仓库内相对根目录；空字符串表示仓库根。
+	RootDir string `json:"root_dir"`
+	// Language is the generated language database value for Service.
+	// 探测到的主要语言，可为空。
+	Language *string `json:"language"`
+	// Framework is the generated framework database value for Service.
+	// 探测到的主要框架，可为空。
+	Framework *string `json:"framework"`
+	// Owners is the generated owners database value for Service.
+	// 服务负责人的用户 UUID 列表。
+	Owners []string `json:"owners"`
+	// Maintainers is the generated maintainers database value for Service.
+	// 服务维护者的用户 UUID 列表。
+	Maintainers []string `json:"maintainers"`
+	// Lifecycle is the generated lifecycle database value for Service.
+	// 服务生命周期：draft、published、deprecated 或 retired。
+	Lifecycle string `json:"lifecycle"`
+	// Visibility is the generated visibility database value for Service.
+	// 服务可见性：private、internal 或 public，默认 private。
+	Visibility string `json:"visibility"`
+	// Revision is the generated revision database value for Service.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
+	Revision int64 `json:"revision"`
+	// DeletedAt is the generated deleted at database value for Service.
+	// 软删除时间；服务活跃时为空。
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	// CreatedAt is the generated created at database value for Service.
+	// 创建服务记录时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for Service.
+	// 最近一次更新服务时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// SourceBinding is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 源配置物化出的绑定，指向具体资产与层。
+type SourceBinding struct {
+	// TenantID is the generated tenant id database value for SourceBinding.
+	// 拥有该绑定的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for SourceBinding.
+	// 应用生成的 UUID v7 绑定标识。
+	ID uuid.UUID `json:"id"`
+	// SourceSpecID is the generated source spec id database value for SourceBinding.
+	// 产生该绑定的源配置。
+	SourceSpecID uuid.UUID `json:"source_spec_id"`
+	// ScopeType is the generated scope type database value for SourceBinding.
+	// 作用域类型：ref 或 global。
+	ScopeType string `json:"scope_type"`
+	// ScopeKey is the generated scope key database value for SourceBinding.
+	// global 时为 *，否则为 branch:<name> 或 tag:<name>。
+	ScopeKey string `json:"scope_key"`
+	// ExpansionKey is the generated expansion key database value for SourceBinding.
+	// 展开维度键，缺省为空。
+	ExpansionKey string `json:"expansion_key"`
+	// ResolvedPath is the generated resolved path database value for SourceBinding.
+	// 解析到的仓库路径，文件消失后保留并标记 stale。
+	ResolvedPath *string `json:"resolved_path"`
+	// SourceSystem is the generated source system database value for SourceBinding.
+	// push/manual 源的来源系统标识，可为空。
+	SourceSystem *string `json:"source_system"`
+	// AssetID is the generated asset id database value for SourceBinding.
+	// 该绑定关联的资产，M1 阶段尚无资产表故无外键。
+	AssetID uuid.UUID `json:"asset_id"`
+	// LayerID is the generated layer id database value for SourceBinding.
+	// 该绑定关联的层，M1 阶段尚无层表故无外键。
+	LayerID uuid.UUID `json:"layer_id"`
+	// State is the generated state database value for SourceBinding.
+	// 绑定状态：active、stale 或 error。
+	State string `json:"state"`
+	// LastSeenCommit is the generated last seen commit database value for SourceBinding.
+	// global 非 Git 物化时为空，否则为最近提交 SHA。
+	LastSeenCommit *string `json:"last_seen_commit"`
+	// CreatedAt is the generated created at database value for SourceBinding.
+	// 创建绑定时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for SourceBinding.
+	// 最近一次更新绑定时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// SourceSpec is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 服务的源配置，定义如何从仓库或生产者产出资产内容。
+type SourceSpec struct {
+	// TenantID is the generated tenant id database value for SourceSpec.
+	// 拥有该源配置的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for SourceSpec.
+	// 应用生成的 UUID v7 源配置标识。
+	ID uuid.UUID `json:"id"`
+	// ServiceID is the generated service id database value for SourceSpec.
+	// 该源配置所属的服务。
+	ServiceID uuid.UUID `json:"service_id"`
+	// Kind is the generated kind database value for SourceSpec.
+	// 源配置产出的资产 kind 标识。
+	Kind string `json:"kind"`
+	// AssetNameTemplate is the generated asset name template database value for SourceSpec.
+	// 资产命名模板，缺省为 {file_stem}。
+	AssetNameTemplate string `json:"asset_name_template"`
+	// Role is the generated role database value for SourceSpec.
+	// 层角色：base 或 overlay。
+	Role string `json:"role"`
+	// Origin is the generated origin database value for SourceSpec.
+	// 层来源：repo、third_party、manual 或 ai_generated。
+	Origin string `json:"origin"`
+	// Mode is the generated mode database value for SourceSpec.
+	// 源模式：builtin、command、push、manual 或 ai。
+	Mode string `json:"mode"`
+	// Path is the generated path database value for SourceSpec.
+	// 仓库相对 glob 路径，manual/push 模式为空。
+	Path *string `json:"path"`
+	// ProducerProfileID is the generated producer profile id database value for SourceSpec.
+	// command/ai 模式选中的生产者配置文件，可为空。
+	ProducerProfileID *uuid.UUID `json:"producer_profile_id"`
+	// Ord is the generated ord database value for SourceSpec.
+	// 同资产内的层排序号，从 0 开始。
+	Ord int32 `json:"ord"`
+	// TimeoutSec is the generated timeout sec database value for SourceSpec.
+	// 有效超时为该值与生产者配置超时的较小值。
+	TimeoutSec int32 `json:"timeout_sec"`
+	// BranchPatterns is the generated branch patterns database value for SourceSpec.
+	// 有序的分支/标签包含 glob 列表。
+	BranchPatterns []string `json:"branch_patterns"`
+	// Enabled is the generated enabled database value for SourceSpec.
+	// 该源配置是否参与物化。
+	Enabled bool `json:"enabled"`
+	// ConfigOrigin is the generated config origin database value for SourceSpec.
+	// 配置来源：api、repository-config 或 discovery。
+	ConfigOrigin string `json:"config_origin"`
+	// LastError is the generated last error database value for SourceSpec.
+	// 最近一次失败的可选脱敏说明。
+	LastError *string `json:"last_error"`
+	// FailureStreak is the generated failure streak database value for SourceSpec.
+	// 连续失败次数。
+	FailureStreak int32 `json:"failure_streak"`
+	// Revision is the generated revision database value for SourceSpec.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
+	Revision int64 `json:"revision"`
+	// DeletedAt is the generated deleted at database value for SourceSpec.
+	// 软删除时间；源配置活跃时为空。
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	// CreatedAt is the generated created at database value for SourceSpec.
+	// 创建源配置时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for SourceSpec.
+	// 最近一次更新源配置时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 

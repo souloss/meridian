@@ -12,6 +12,9 @@ import (
 
 // Querier exposes every generated Meridian database query for dependency injection and tests.
 type Querier interface {
+	// AcceptDiscoveryCandidate exposes the corresponding strongly typed database operation.
+	// 将候选标记为已接受；仅在 pending 状态时生效。
+	AcceptDiscoveryCandidate(ctx context.Context, arg AcceptDiscoveryCandidateParams) (int64, error)
 	// AddCredentialTeamShare exposes the corresponding strongly typed database operation.
 	// 授予一条同租户团队可见性关系。
 	AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error
@@ -40,6 +43,9 @@ type Querier interface {
 	// CountCredentialRepositories exposes the corresponding strongly typed database operation.
 	// 统计引用某条租户凭据的有效仓库数量。
 	CountCredentialRepositories(ctx context.Context, arg CountCredentialRepositoriesParams) (int64, error)
+	// CountDiscoveryCandidates exposes the corresponding strongly typed database operation.
+	// 返回匹配一次仓库的候选总数。
+	CountDiscoveryCandidates(ctx context.Context, arg CountDiscoveryCandidatesParams) (int64, error)
 	// CountGlobalCredentialRepositories exposes the corresponding strongly typed database operation.
 	// 统计引用某条平台凭据的有效仓库数量。
 	CountGlobalCredentialRepositories(ctx context.Context, credentialID *uuid.UUID) (int64, error)
@@ -52,6 +58,9 @@ type Querier interface {
 	// CountListedRepositories exposes the corresponding strongly typed database operation.
 	// 返回匹配一次租户搜索的有效仓库数量。
 	CountListedRepositories(ctx context.Context, arg CountListedRepositoriesParams) (int64, error)
+	// CountListedServices exposes the corresponding strongly typed database operation.
+	// 返回匹配一次租户搜索的有效服务数量。
+	CountListedServices(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountPlatformAuditLogs exposes the corresponding strongly typed database operation.
 	// 按照 ListPlatformAuditLogs 的跨租户条件和全部可选过滤条件返回准确总数。
 	CountPlatformAuditLogs(ctx context.Context, arg CountPlatformAuditLogsParams) (int64, error)
@@ -63,6 +72,12 @@ type Querier interface {
 	// 返回有效仓库数量和租户固定的仓库配额。
 	// 配额读取租户快照，不读取可变的平台默认值。
 	CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error)
+	// CountServices exposes the corresponding strongly typed database operation.
+	// 返回有效服务数量与租户固定的服务配额。
+	CountServices(ctx context.Context, tenantID uuid.UUID) (CountServicesRow, error)
+	// CountSourceBindings exposes the corresponding strongly typed database operation.
+	// 统计一个源配置当前的绑定数量。
+	CountSourceBindings(ctx context.Context, arg CountSourceBindingsParams) (int64, error)
 	// CountTenantAuditLogs exposes the corresponding strongly typed database operation.
 	// 按照 ListTenantAuditLogs 的租户条件和全部可选过滤条件返回准确总数。
 	CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error)
@@ -102,6 +117,9 @@ type Querier interface {
 	// CreateDefaultUserPreferences exposes the corresponding strongly typed database operation.
 	// 为新身份创建语言、主题和默认视图偏好。
 	CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
+	// CreateDiscoveryJob exposes the corresponding strongly typed database operation.
+	// 记录一条持久化的仓库发现请求。
+	CreateDiscoveryJob(ctx context.Context, arg CreateDiscoveryJobParams) (Job, error)
 	// CreateGlobalCredential exposes the corresponding strongly typed database operation.
 	// 写入一条平台拥有的加密凭据。
 	CreateGlobalCredential(ctx context.Context, arg CreateGlobalCredentialParams) (GlobalCredential, error)
@@ -115,6 +133,9 @@ type Querier interface {
 	// CreateNotifyOutbox exposes the corresponding strongly typed database operation.
 	// 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 	CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error)
+	// CreateProducerProfile exposes the corresponding strongly typed database operation.
+	// 平台侧持久化生产者配置文件。
+	CreateProducerProfile(ctx context.Context, arg CreateProducerProfileParams) (ProducerProfile, error)
 	// CreateRefreshToken exposes the corresponding strongly typed database operation.
 	// 保存刷新令牌摘要，不保存明文；family_id 用于轮换家族与重放检测。
 	CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error)
@@ -129,6 +150,12 @@ type Querier interface {
 	// CreateRetryJobIdempotency exposes the corresponding strongly typed database operation.
 	// 保存可重放 24 小时的准确、非敏感 202 响应。
 	CreateRetryJobIdempotency(ctx context.Context, arg CreateRetryJobIdempotencyParams) error
+	// CreateService exposes the corresponding strongly typed database operation.
+	// 持久化一个候选接受后新建的服务，冲突时静默跳过。
+	CreateService(ctx context.Context, arg CreateServiceParams) (Service, error)
+	// CreateSourceSpec exposes the corresponding strongly typed database operation.
+	// 持久化源配置。
+	CreateSourceSpec(ctx context.Context, arg CreateSourceSpecParams) (SourceSpec, error)
 	// CreateTenant exposes the corresponding strongly typed database operation.
 	// 使用明确的配额和设置快照创建租户，快照来自平台默认配置。
 	CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error)
@@ -173,6 +200,9 @@ type Querier interface {
 	// GetCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
 	// 返回保留的租户凭据轮换重放记录及其过期时间。
 	GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error)
+	// GetDiscoveryCandidate exposes the corresponding strongly typed database operation.
+	// 返回一个候选，供接受前校验。
+	GetDiscoveryCandidate(ctx context.Context, arg GetDiscoveryCandidateParams) (DiscoveryCandidate, error)
 	// GetGlobalCredential exposes the corresponding strongly typed database operation.
 	// 返回一条平台凭据。
 	GetGlobalCredential(ctx context.Context, id uuid.UUID) (GlobalCredential, error)
@@ -186,6 +216,9 @@ type Querier interface {
 	// GetPlatformSettingsForTenantCreate exposes the corresponding strongly typed database operation.
 	// 返回创建租户时原子复制到新租户的单例 JSON 默认配置。
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
+	// GetProducerProfile exposes the corresponding strongly typed database operation.
+	// 返回一个未删除的生产者配置文件。
+	GetProducerProfile(ctx context.Context, id uuid.UUID) (ProducerProfile, error)
 	// GetRefreshTokenPrincipalByTokenHash exposes the corresponding strongly typed database operation.
 	// 在调用方指定的时间点，根据令牌摘要认证一个有效刷新令牌和有效用户。
 	GetRefreshTokenPrincipalByTokenHash(ctx context.Context, arg GetRefreshTokenPrincipalByTokenHashParams) (GetRefreshTokenPrincipalByTokenHashRow, error)
@@ -195,6 +228,17 @@ type Querier interface {
 	// GetRetryJobIdempotency exposes the corresponding strongly typed database operation.
 	// 返回 retryJob 请求保留的准确响应。
 	GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error)
+	// GetServiceByID exposes the corresponding strongly typed database operation.
+	// 返回一个活跃服务，供按 id 定位。
+	GetServiceByID(ctx context.Context, arg GetServiceByIDParams) (Service, error)
+	// GetServiceBySlug exposes the corresponding strongly typed database operation.
+	// M1 仓库发现、候选、服务、生产者配置与源配置/绑定的持久化查询。
+	// 全部查询保留 tenant_id 谓词；producer_profiles 为平台级 global 表。
+	// 返回一个活跃服务，供源配置、服务详情等路径按 slug 定位。
+	GetServiceBySlug(ctx context.Context, arg GetServiceBySlugParams) (Service, error)
+	// GetSourceSpec exposes the corresponding strongly typed database operation.
+	// 返回一个活跃源配置。
+	GetSourceSpec(ctx context.Context, arg GetSourceSpecParams) (SourceSpec, error)
 	// GetTenantBlobReference exposes the corresponding strongly typed database operation.
 	// 调用方锁定租户配额行后，返回当前对象引用数。
 	GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error)
@@ -230,9 +274,15 @@ type Querier interface {
 	// ListActiveTenantMemberships exposes the corresponding strongly typed database operation.
 	// 按稳定 slug 和 UUID 顺序返回用户的有效租户成员关系。
 	ListActiveTenantMemberships(ctx context.Context, userID uuid.UUID) ([]ListActiveTenantMembershipsRow, error)
+	// ListAvailableProducerProfiles exposes the corresponding strongly typed database operation.
+	// 列出可被租户选择的可用生产者配置；可选按 kind 过滤。
+	ListAvailableProducerProfiles(ctx context.Context, kindFilter string) ([]ProducerProfile, error)
 	// ListCredentialTeamShares exposes the corresponding strongly typed database operation.
 	// 返回一条租户凭据完整且有序的团队共享集合。
 	ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error)
+	// ListDiscoveryCandidates exposes the corresponding strongly typed database operation.
+	// 列出候选，按 rootDir 逐字节升序并分页。
+	ListDiscoveryCandidates(ctx context.Context, arg ListDiscoveryCandidatesParams) ([]DiscoveryCandidate, error)
 	// ListEnabledNotificationChannelIDs exposes the corresponding strongly typed database operation.
 	// 为 M0 运维事件返回确定性的通道目标；M5 订阅路由会提供更精确的目标集合。
 	ListEnabledNotificationChannelIDs(ctx context.Context, tenantID uuid.UUID) ([]uuid.UUID, error)
@@ -251,6 +301,9 @@ type Querier interface {
 	// 结果刻意排除输入、结果、错误、尝试次数、引用、River 标识和日志。
 	// 空过滤数组和空字符串表示不限制；只有租户和仓库范围任务暴露作用域标识。
 	ListPlatformJobs(ctx context.Context, arg ListPlatformJobsParams) ([]ListPlatformJobsRow, error)
+	// ListProducerProfiles exposes the corresponding strongly typed database operation.
+	// 返回平台生产者配置文件分页。
+	ListProducerProfiles(ctx context.Context, arg ListProducerProfilesParams) ([]ProducerProfile, error)
 	// ListRepositories exposes the corresponding strongly typed database operation.
 	// 按规范化 URL 和 UUID 的确定顺序返回有效仓库。
 	// 即使搜索字符串为空，查询及全部谓词仍保留租户边界。
@@ -261,6 +314,12 @@ type Querier interface {
 	// ListRepositoriesForGlobalCredential exposes the corresponding strongly typed database operation.
 	// 返回引用某条平台凭据的未删除仓库。
 	ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error)
+	// ListServices exposes the corresponding strongly typed database operation.
+	// 列出活跃服务的确定顺序分页。
+	ListServices(ctx context.Context, arg ListServicesParams) ([]Service, error)
+	// ListSourceBindings exposes the corresponding strongly typed database operation.
+	// 列出源配置物化出的绑定，按创建顺序。
+	ListSourceBindings(ctx context.Context, arg ListSourceBindingsParams) ([]SourceBinding, error)
 	// ListTenantAuditLogs exposes the corresponding strongly typed database operation.
 	// 返回租户范围内按最新时间优先排列的一页追加式审计元数据。
 	// 查询始终受 tenant_id 限制，结果不包含业务内容或携带秘密的字段。
@@ -299,6 +358,10 @@ type Querier interface {
 	// 串行化一个仓库分支的凭据轮换去重。
 	// 状态为 pending 或 running 的记录会复用；终态记录会递增 active_generation 以接受新工作。
 	LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error)
+	// LockLatestDiscoveryJob exposes the corresponding strongly typed database operation.
+	// 串行化一个仓库发现请求的去重键。
+	// 终态记录会递增 active_generation 以接受新工作。
+	LockLatestDiscoveryJob(ctx context.Context, arg LockLatestDiscoveryJobParams) (LockLatestDiscoveryJobRow, error)
 	// LockLatestTenantJobGeneration exposes the corresponding strongly typed database operation.
 	// 持有行锁时返回最新的语义代次。
 	LockLatestTenantJobGeneration(ctx context.Context, arg LockLatestTenantJobGenerationParams) (Job, error)
@@ -375,6 +438,9 @@ type Querier interface {
 	// UpdateGlobalCredentialMetadata exposes the corresponding strongly typed database operation.
 	// 有条件地更新平台凭据名称并递增版本号。
 	UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error)
+	// UpdateProducerProfileDependencyStatus exposes the corresponding strongly typed database operation.
+	// 启动时全量重扫并刷新依赖状态。
+	UpdateProducerProfileDependencyStatus(ctx context.Context, arg UpdateProducerProfileDependencyStatusParams) (int64, error)
 	// UpdateRepository exposes the corresponding strongly typed database operation.
 	// 有条件地更新明确提供的仓库字段并递增版本号。
 	// 字段 set 标志保留字段省略和显式 JSON null 之间的区别。
@@ -383,6 +449,9 @@ type Querier interface {
 	// 有条件地更新平台控制的租户字段并递增版本号。
 	// 字段 set 标志保留 PATCH 字段省略状态，同时允许完整替换配额。
 	UpdateTenant(ctx context.Context, arg UpdateTenantParams) (Tenant, error)
+	// UpsertDiscoveryCandidate exposes the corresponding strongly typed database operation.
+	// 按仓库引用身份解析候选键：repositoryId + rootDir，不含 commit。
+	UpsertDiscoveryCandidate(ctx context.Context, arg UpsertDiscoveryCandidateParams) (DiscoveryCandidate, error)
 	// UpsertTenantMember exposes the corresponding strongly typed database operation.
 	// 创建或替换租户角色关系，并记录调用方提供的更新时间。
 	UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error)

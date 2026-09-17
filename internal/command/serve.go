@@ -72,20 +72,28 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	identityStore := repository.NewIdentityStore(db.Pool)
 	identity := service.NewIdentity(identityStore, digester, jwtIssuer)
 	repositoryStore := repository.NewRepositoryStore(db.Pool)
+	discoveryStore := repository.NewDiscoveryStoreWithRiver(db.Pool, nil)
+	workspaceRoot := os.Getenv("MERIDIAN_WORKSPACE_ROOT")
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
-		Executions: repositoryStore, Outbox: repositoryStore,
+		Executions: repositoryStore,
+		DiscoverRunner: service.NewDiscoveryRunner(discoveryStore, workspaceRoot),
+		Outbox: repositoryStore,
 	}, logger)
 	if err != nil {
 		return fmt.Errorf("configure River runtime: %w", err)
 	}
+	discoveryStore.BindRiver(runtime.Client())
 	credentials := service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), identityStore, keyring)
 	repositories := service.NewRepositories(repositoryStore, identityStore)
 	jobs := service.NewJobs(repository.NewJobControlStore(db.Pool, runtime.Client()), identityStore)
 	audits := service.NewAudits(repositoryStore, identityStore)
+	producers := service.NewProducers(discoveryStore, identityStore)
+	discovery := service.NewDiscovery(discoveryStore, identityStore)
 	server := &http.Server{
 		Addr: addr,
 		Handler: handler.NewWithRuntimeServices(handler.Dependencies{
 			Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
+			Producers: producers, Discovery: discovery,
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,

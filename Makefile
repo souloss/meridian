@@ -6,7 +6,7 @@ MERIDIAN_DEV_MASTER_KEY_VERSION ?= 1
 MERIDIAN_DEV_CREDENTIAL_FINGERPRINT_KEY ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 MILESTONE ?= $(if $(ITEM),$(firstword $(subst -, ,$(ITEM))),M5)
 
-.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 quality-gate
+.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 quality-gate
 
 all: build
 
@@ -86,6 +86,10 @@ smoke-all:
 # A pass requires each named Smoke test to execute without skips.
 smoke-m0-credentials:
 	sh ./scripts/smoke.sh --credentials
+
+# M1 repository discovery and controlled producer profile selection.
+smoke-m1-repository:
+	sh ./scripts/smoke.sh --m1-repository
 
 smoke-runner-test:
 	vfox exec nodejs@24.20.0 -- node --test scripts/smoke-runner.test.mjs

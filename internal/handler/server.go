@@ -29,6 +29,8 @@ type Server struct {
 	repositories  *service.Repositories
 	jobs          *service.Jobs
 	audits        *service.Audits
+	producers     *service.Producers
+	discovery     *service.Discovery
 	secureCookies bool
 }
 
@@ -44,6 +46,10 @@ type Dependencies struct {
 	Jobs *service.Jobs
 	// Audits provides tenant and platform audit query use cases.
 	Audits *service.Audits
+	// Producers provides platform producer configuration and tenant selection.
+	Producers *service.Producers
+	// Discovery provides repository discovery, candidate acceptance, and source configuration.
+	Discovery *service.Discovery
 }
 
 func New() *Server {
@@ -76,6 +82,8 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.repositories = dependencies.Repositories
 	s.jobs = dependencies.Jobs
 	s.audits = dependencies.Audits
+	s.producers = dependencies.Producers
+	s.discovery = dependencies.Discovery
 	s.secureCookies = secureCookies
 	return s
 }
@@ -136,7 +144,12 @@ func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 		writeError(w, r, http.StatusNotImplemented, "internal_error", "operation is not implemented")
 		return
 	}
+	if _, ok := errors.AsType[*service.ProducerUnavailableError](err); ok {
+		writeError(w, r, http.StatusUnprocessableEntity, "producer_profile_unavailable", "the selected producer profile is not available")
+		return
+	}
 	writeError(w, r, http.StatusInternalServerError, "internal_error", "request failed")
+	slog.Error("unhandled response error", "error", err)
 }
 
 func openAPIRequestValidator() func(http.Handler) http.Handler {
