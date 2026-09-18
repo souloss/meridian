@@ -10,792 +10,829 @@ import (
 	"uuid"
 )
 
-// Querier exposes every generated Meridian database query for dependency injection and tests.
+// Querier 暴露每一个生成的 Meridian 数据库查询，供依赖注入与测试使用。
 type Querier interface {
-	// AcceptDiscoveryCandidate exposes the corresponding strongly typed database operation.
+	// AcceptDiscoveryCandidate 暴露相应的强类型数据库操作。
 	// 将候选标记为已接受；仅在 pending 状态时生效。
 	AcceptDiscoveryCandidate(ctx context.Context, arg AcceptDiscoveryCandidateParams) (int64, error)
-	// AckBreakingTodo exposes the corresponding strongly typed database operation.
+	// AckBreakingTodo 暴露相应的强类型数据库操作。
 	// 确认一条待办（任意授权服务成员确认即关闭）。
 	AckBreakingTodo(ctx context.Context, arg AckBreakingTodoParams) (BreakingTodo, error)
-	// AddCredentialTeamShare exposes the corresponding strongly typed database operation.
+	// AddCredentialTeamShare 暴露相应的强类型数据库操作。
 	// 授予一条同租户团队可见性关系。
 	AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error
-	// AddTenantBlobReference exposes the corresponding strongly typed database operation.
+	// AddTenantBlobReference 暴露相应的强类型数据库操作。
 	// 调用方完成串行化并校验唯一字节配额后，创建或递增一条租户对象引用。
 	AddTenantBlobReference(ctx context.Context, arg AddTenantBlobReferenceParams) (TenantBlobRef, error)
-	// AppendJobFailureAudit exposes the corresponding strongly typed database operation.
+	// AppendJobFailureAudit 暴露相应的强类型数据库操作。
 	// 与任务终态和出站事件行在同一事务中记录一条追加式、脱敏的系统事实。
 	AppendJobFailureAudit(ctx context.Context, arg AppendJobFailureAuditParams) (AuditLog, error)
-	// AppendJobStageLog exposes the corresponding strongly typed database operation.
+	// AppendJobStageLog 暴露相应的强类型数据库操作。
 	// 使用调用方提供的游标持久化一条脱敏阶段事件。
 	AppendJobStageLog(ctx context.Context, arg AppendJobStageLogParams) (JobStageLog, error)
-	// ArchiveAiBaseForService exposes the corresponding strongly typed database operation.
+	// ArchiveAiBaseForService 暴露相应的强类型数据库操作。
 	// 将某服务某 kind 的 AI 生成 base 源配置及其层软删除（历史保留）。
 	ArchiveAiBaseForService(ctx context.Context, arg ArchiveAiBaseForServiceParams) (int64, error)
-	// ArchiveAiBaseLayersForService exposes the corresponding strongly typed database operation.
+	// ArchiveAiBaseLayersForService 暴露相应的强类型数据库操作。
 	// 将某服务某 kind 的 AI 生成 base 层软删除（历史保留）。
 	ArchiveAiBaseLayersForService(ctx context.Context, arg ArchiveAiBaseLayersForServiceParams) (int64, error)
-	// AttachRiverJobID exposes the corresponding strongly typed database operation.
+	// AttachRiverJobID 暴露相应的强类型数据库操作。
 	// 在插入两行的同一事务中，将应用 UUID 任务关联到内部 River 序号。
 	AttachRiverJobID(ctx context.Context, arg AttachRiverJobIDParams) (int64, error)
-	// BumpAssetRefTrackGeneration exposes the corresponding strongly typed database operation.
+	// BumpAssetRefTrackGeneration 暴露相应的强类型数据库操作。
 	// 更新轨迹的 desired_generation，表示一次发布（或历史回退）影响了该轨迹。
 	BumpAssetRefTrackGeneration(ctx context.Context, arg BumpAssetRefTrackGenerationParams) (int64, error)
-	// CancelServiceJob exposes the corresponding strongly typed database operation.
+	// BumpSystemGroupRevision 暴露相应的强类型数据库操作。
+	// 递增系统分组版本号。
+	BumpSystemGroupRevision(ctx context.Context, arg BumpSystemGroupRevisionParams) (int64, error)
+	// CancelServiceJob 暴露相应的强类型数据库操作。
 	// 将一条仍待执行的任务转为 cancelled 终态。
 	CancelServiceJob(ctx context.Context, arg CancelServiceJobParams) (int64, error)
-	// CancelTenantJob exposes the corresponding strongly typed database operation.
+	// CancelTenantJob 暴露相应的强类型数据库操作。
 	// 仅将 pending 或 running 的租户任务转为持久化的 cancelled 终态。
 	CancelTenantJob(ctx context.Context, arg CancelTenantJobParams) (Job, error)
-	// ClaimNextOutboxDelivery exposes the corresponding strongly typed database operation.
+	// ClaimNextOutboxDelivery 暴露相应的强类型数据库操作。
 	// 使用 SKIP LOCKED 原子租约领取一条到期投递。
 	// 状态为 delivering 的记录在租约过期后重新变为可领取，以便从崩溃中恢复。
 	ClaimNextOutboxDelivery(ctx context.Context, arg ClaimNextOutboxDeliveryParams) (ClaimNextOutboxDeliveryRow, error)
-	// ClearSourceLastError exposes the corresponding strongly typed database operation.
+	// ClearSourceLastError 暴露相应的强类型数据库操作。
 	// 源物化成功后清空失败说明并归零连续失败次数。
 	ClearSourceLastError(ctx context.Context, arg ClearSourceLastErrorParams) (int64, error)
-	// ClearSyncJobDirty exposes the corresponding strongly typed database operation.
-	// 清空一条已成功任务的 dirty 标记，保证后续任只入队一次。
+	// ClearSyncJobDirty 暴露相应的强类型数据库操作。
+	// 清空一条已成功任务的 dirty 标记，保证后续任务只入队一次。
 	ClearSyncJobDirty(ctx context.Context, arg ClearSyncJobDirtyParams) (int64, error)
-	// CountAPITokensByUser exposes the corresponding strongly typed database operation.
+	// CountAPITokensByUser 暴露相应的强类型数据库操作。
 	// 返回一个用户在一个租户内拥有的 PAT 元数据总数。
 	CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error)
-	// CountActiveBindings exposes the corresponding strongly typed database operation.
+	// CountActiveBindings 暴露相应的强类型数据库操作。
 	// 统计一个源配置当前活跃的绑定数量。
 	CountActiveBindings(ctx context.Context, arg CountActiveBindingsParams) (int64, error)
-	// CountAssetVersionItems exposes the corresponding strongly typed database operation.
+	// CountAssetVersionItems 暴露相应的强类型数据库操作。
 	// 统计资产版本条目总数。
 	CountAssetVersionItems(ctx context.Context, arg CountAssetVersionItemsParams) (int64, error)
-	// CountBreakingTodos exposes the corresponding strongly typed database operation.
+	// CountBreakingTodos 暴露相应的强类型数据库操作。
 	// 统计破坏性变更待办总数。
 	CountBreakingTodos(ctx context.Context, arg CountBreakingTodosParams) (int64, error)
-	// CountCredentialRepositories exposes the corresponding strongly typed database operation.
+	// CountCredentialRepositories 暴露相应的强类型数据库操作。
 	// 统计引用某条租户凭据的有效仓库数量。
 	CountCredentialRepositories(ctx context.Context, arg CountCredentialRepositoriesParams) (int64, error)
-	// CountDiscoveryCandidates exposes the corresponding strongly typed database operation.
+	// CountDiscoveryCandidates 暴露相应的强类型数据库操作。
 	// 返回匹配一次仓库的候选总数。
 	CountDiscoveryCandidates(ctx context.Context, arg CountDiscoveryCandidatesParams) (int64, error)
-	// CountGlobalCredentialRepositories exposes the corresponding strongly typed database operation.
+	// CountGlobalCredentialRepositories 暴露相应的强类型数据库操作。
 	// 统计引用某条平台凭据的有效仓库数量。
 	CountGlobalCredentialRepositories(ctx context.Context, credentialID *uuid.UUID) (int64, error)
-	// CountGlobalCredentials exposes the corresponding strongly typed database operation.
+	// CountGlobalCredentials 暴露相应的强类型数据库操作。
 	// 统计全部平台凭据数量。
 	CountGlobalCredentials(ctx context.Context) (int64, error)
-	// CountKnownHosts exposes the corresponding strongly typed database operation.
+	// CountKnownHosts 暴露相应的强类型数据库操作。
 	// 统计一个租户认可的主机身份数量。
 	CountKnownHosts(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// CountListedRepositories exposes the corresponding strongly typed database operation.
+	// CountListedRepositories 暴露相应的强类型数据库操作。
 	// 返回匹配一次租户搜索的有效仓库数量。
 	CountListedRepositories(ctx context.Context, arg CountListedRepositoriesParams) (int64, error)
-	// CountListedServices exposes the corresponding strongly typed database operation.
+	// CountListedServices 暴露相应的强类型数据库操作。
 	// 返回匹配一次租户搜索的有效服务数量。
 	CountListedServices(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// CountPlatformAuditLogs exposes the corresponding strongly typed database operation.
+	// CountPlatformAuditLogs 暴露相应的强类型数据库操作。
 	// 按照 ListPlatformAuditLogs 的跨租户条件和全部可选过滤条件返回准确总数。
 	CountPlatformAuditLogs(ctx context.Context, arg CountPlatformAuditLogsParams) (int64, error)
-	// CountPlatformJobs exposes the corresponding strongly typed database operation.
+	// CountPlatformJobs 暴露相应的强类型数据库操作。
 	// 返回匹配给定条件的脱敏平台任务总数。
 	// 复用 ListPlatformJobs 的完整谓词，避免分页总数与结果集不一致。
 	CountPlatformJobs(ctx context.Context, arg CountPlatformJobsParams) (int64, error)
-	// CountRecentServices exposes the corresponding strongly typed database operation.
+	// CountRecentServices 暴露相应的强类型数据库操作。
 	// 统计用户最近访问的服务总数。
 	CountRecentServices(ctx context.Context, arg CountRecentServicesParams) (int64, error)
-	// CountRepositories exposes the corresponding strongly typed database operation.
+	// CountRepositories 暴露相应的强类型数据库操作。
 	// 返回有效仓库数量和租户固定的仓库配额。
 	// 配额读取租户快照，不读取可变的平台默认值。
 	CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error)
-	// CountServices exposes the corresponding strongly typed database operation.
+	// CountSearchableAssetItems 暴露相应的强类型数据库操作。
+	// 统计租户内全部活跃资产条目数量，供跨 kind 搜索分页。
+	CountSearchableAssetItems(ctx context.Context, arg CountSearchableAssetItemsParams) (int64, error)
+	// CountServices 暴露相应的强类型数据库操作。
 	// 返回有效服务数量与租户固定的服务配额。
 	CountServices(ctx context.Context, tenantID uuid.UUID) (CountServicesRow, error)
-	// CountSourceBindings exposes the corresponding strongly typed database operation.
+	// CountSourceBindings 暴露相应的强类型数据库操作。
 	// 统计一个源配置当前的绑定数量。
 	CountSourceBindings(ctx context.Context, arg CountSourceBindingsParams) (int64, error)
-	// CountTenantAuditLogs exposes the corresponding strongly typed database operation.
+	// CountTenantAuditLogs 暴露相应的强类型数据库操作。
 	// 按照 ListTenantAuditLogs 的租户条件和全部可选过滤条件返回准确总数。
 	CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error)
-	// CountTenantCredentials exposes the corresponding strongly typed database operation.
+	// CountTenantCredentials 暴露相应的强类型数据库操作。
 	// 统计一个租户成员可见的租户凭据和平台凭据数量。
 	CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error)
-	// CountTenantJobs exposes the corresponding strongly typed database operation.
+	// CountTenantJobs 暴露相应的强类型数据库操作。
 	// 返回 ListTenantJobs 所用谓词对应的准确总数。
 	CountTenantJobs(ctx context.Context, arg CountTenantJobsParams) (int64, error)
-	// CountTenantUniqueBlobBytes exposes the corresponding strongly typed database operation.
+	// CountTenantUniqueBlobBytes 暴露相应的强类型数据库操作。
 	// 每个有正引用的全局对象只计入一次，避免相同内容的重复版本重复消耗配额。
 	CountTenantUniqueBlobBytes(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// CountTenants exposes the corresponding strongly typed database operation.
+	// CountTenants 暴露相应的强类型数据库操作。
 	// 返回平台管理可见的租户生命周期记录数量。
 	CountTenants(ctx context.Context) (int64, error)
-	// CountUsers exposes the corresponding strongly typed database operation.
+	// CountUsers 暴露相应的强类型数据库操作。
 	// 返回匹配一次平台搜索的身份数量。
 	CountUsers(ctx context.Context, searchQuery string) (int64, error)
-	// CreateAPIToken exposes the corresponding strongly typed database operation.
+	// CreateAPIToken 暴露相应的强类型数据库操作。
 	// 保存租户范围内的 PAT 元数据和令牌摘要，不保存令牌明文。
 	CreateAPIToken(ctx context.Context, arg CreateAPITokenParams) (ApiToken, error)
-	// CreateAiGenerationIdempotency exposes the corresponding strongly typed database operation.
+	// CreateAiGenerationIdempotency 暴露相应的强类型数据库操作。
 	// 保存可重放 24 小时的准确、非敏感 202 响应。
 	CreateAiGenerationIdempotency(ctx context.Context, arg CreateAiGenerationIdempotencyParams) error
-	// CreateAiGenerationJob exposes the corresponding strongly typed database operation.
+	// CreateAiGenerationJob 暴露相应的强类型数据库操作。
 	// 记录一条资产 AI 生成任务。
 	CreateAiGenerationJob(ctx context.Context, arg CreateAiGenerationJobParams) (Job, error)
-	// CreateAssetItem exposes the corresponding strongly typed database operation.
+	// CreateAssetItem 暴露相应的强类型数据库操作。
 	// 创建一条资产版本条目。
 	CreateAssetItem(ctx context.Context, arg CreateAssetItemParams) (AssetItem, error)
-	// CreateAssetRefTrack exposes the corresponding strongly typed database operation.
+	// CreateAssetRefTrack 暴露相应的强类型数据库操作。
 	// 创建一条资产引用轨迹。
 	CreateAssetRefTrack(ctx context.Context, arg CreateAssetRefTrackParams) (AssetRefTrack, error)
-	// CreateAssetVersion exposes the corresponding strongly typed database operation.
+	// CreateAssetVersion 暴露相应的强类型数据库操作。
 	// 创建一条资产版本。
 	CreateAssetVersion(ctx context.Context, arg CreateAssetVersionParams) (AssetVersion, error)
-	// CreateBlobMetadata exposes the corresponding strongly typed database operation.
+	// CreateBlobMetadata 暴露相应的强类型数据库操作。
 	// 写入不可变的内容寻址元数据；其他租户或请求已登记相同摘要时不返回记录。
 	CreateBlobMetadata(ctx context.Context, arg CreateBlobMetadataParams) (Blob, error)
-	// CreateBreakingTodoIfAbsent exposes the corresponding strongly typed database operation.
+	// CreateBreakingTodoIfAbsent 暴露相应的强类型数据库操作。
 	// 幂等创建一条破坏性变更待办（唯一键 asset_version_id + service_id）。
 	CreateBreakingTodoIfAbsent(ctx context.Context, arg CreateBreakingTodoIfAbsentParams) (BreakingTodo, error)
-	// CreateConfigImportPreview exposes the corresponding strongly typed database operation.
+	// CreateConfigImportPreview 暴露相应的强类型数据库操作。
 	// M2 gitops 配置导入的持久化查询。
 	// 全部查询保留 tenant_id 谓词。
 	// 插入一次可应用的配置导入预览。
 	CreateConfigImportPreview(ctx context.Context, arg CreateConfigImportPreviewParams) (ConfigImportPreview, error)
-	// CreateCredential exposes the corresponding strongly typed database operation.
+	// CreateCredential 暴露相应的强类型数据库操作。
 	// 写入一条租户拥有的加密凭据，并返回元数据和密文。
 	// 查询不会接收秘密明文，服务层只提供加密后的投影。
 	CreateCredential(ctx context.Context, arg CreateCredentialParams) (Credential, error)
-	// CreateCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// CreateCredentialRotationIdempotency 暴露相应的强类型数据库操作。
 	// 保存可安全精确重放 24 小时的租户凭据轮换响应。
 	// 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 	CreateCredentialRotationIdempotency(ctx context.Context, arg CreateCredentialRotationIdempotencyParams) error
-	// CreateCredentialSyncJob exposes the corresponding strongly typed database operation.
+	// CreateCredentialSyncJob 暴露相应的强类型数据库操作。
 	// 记录一条持久化的默认分支仓库同步请求。
 	// 输入只包含非敏感凭据标识和轮换原因。
 	CreateCredentialSyncJob(ctx context.Context, arg CreateCredentialSyncJobParams) (Job, error)
-	// CreateDefaultUserPreferences exposes the corresponding strongly typed database operation.
+	// CreateDefaultUserPreferences 暴露相应的强类型数据库操作。
 	// 为新身份创建语言、主题和默认视图偏好。
 	CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
-	// CreateDiffSnapshot exposes the corresponding strongly typed database operation.
+	// CreateDiffSnapshot 暴露相应的强类型数据库操作。
 	// 创建一条差异快照，冻结解析后的选择器与产物。
 	CreateDiffSnapshot(ctx context.Context, arg CreateDiffSnapshotParams) (DiffSnapshot, error)
-	// CreateDiscoveryJob exposes the corresponding strongly typed database operation.
+	// CreateDiscoveryJob 暴露相应的强类型数据库操作。
 	// 记录一条持久化的仓库发现请求。
 	CreateDiscoveryJob(ctx context.Context, arg CreateDiscoveryJobParams) (Job, error)
-	// CreateGlobalCredential exposes the corresponding strongly typed database operation.
+	// CreateGlobalCredential 暴露相应的强类型数据库操作。
 	// 写入一条平台拥有的加密凭据。
 	CreateGlobalCredential(ctx context.Context, arg CreateGlobalCredentialParams) (GlobalCredential, error)
-	// CreateGlobalCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// CreateGlobalCredentialRotationIdempotency 暴露相应的强类型数据库操作。
 	// 保存可安全精确重放 24 小时的平台凭据轮换响应。
 	// 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 	CreateGlobalCredentialRotationIdempotency(ctx context.Context, arg CreateGlobalCredentialRotationIdempotencyParams) error
-	// CreateKnownHost exposes the corresponding strongly typed database operation.
+	// CreateKnownHost 暴露相应的强类型数据库操作。
 	// 写入一条由服务端派生的已认可 SSH 主机身份。
 	CreateKnownHost(ctx context.Context, arg CreateKnownHostParams) (KnownHost, error)
-	// CreateLayer exposes the corresponding strongly typed database operation.
+	// CreateLayer 暴露相应的强类型数据库操作。
 	// 创建一条层。
 	CreateLayer(ctx context.Context, arg CreateLayerParams) (Layer, error)
-	// CreateLayerRevision exposes the corresponding strongly typed database operation.
+	// CreateLayerRevision 暴露相应的强类型数据库操作。
 	// 创建一条层修订。
 	CreateLayerRevision(ctx context.Context, arg CreateLayerRevisionParams) (LayerRevision, error)
-	// CreateMergeJob exposes the corresponding strongly typed database operation.
+	// CreateMergeJob 暴露相应的强类型数据库操作。
 	// 记录一条持久化的资产合并请求。
 	CreateMergeJob(ctx context.Context, arg CreateMergeJobParams) (Job, error)
-	// CreateNotifyOutbox exposes the corresponding strongly typed database operation.
+	// CreateNotifyOutbox 暴露相应的强类型数据库操作。
 	// 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 	CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error)
-	// CreateProducerProfile exposes the corresponding strongly typed database operation.
+	// CreateProducerProfile 暴露相应的强类型数据库操作。
 	// 平台侧持久化生产者配置文件。
 	CreateProducerProfile(ctx context.Context, arg CreateProducerProfileParams) (ProducerProfile, error)
-	// CreateRefreshToken exposes the corresponding strongly typed database operation.
+	// CreateRefreshToken 暴露相应的强类型数据库操作。
 	// 保存刷新令牌摘要，不保存明文；family_id 用于轮换家族与重放检测。
 	CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error)
-	// CreateRepository exposes the corresponding strongly typed database operation.
+	// CreateRepository 暴露相应的强类型数据库操作。
 	// 持久化仓库配置，并初始化空的健康状态摘要。
 	// 仓库 URL 字段不含凭据，凭据只通过 UUID 外键引用。
 	CreateRepository(ctx context.Context, arg CreateRepositoryParams) (Repository, error)
-	// CreateRetriedTenantJob exposes the corresponding strongly typed database operation.
+	// CreateRetriedTenantJob 暴露相应的强类型数据库操作。
 	// 根据不可变的源执行输入创建一个新的 pending 代次。
 	// 结果、错误、阶段、尝试次数和时间戳会重置，形成独立重试。
 	CreateRetriedTenantJob(ctx context.Context, arg CreateRetriedTenantJobParams) (Job, error)
-	// CreateRetryJobIdempotency exposes the corresponding strongly typed database operation.
+	// CreateRetryJobIdempotency 暴露相应的强类型数据库操作。
 	// 保存可重放 24 小时的准确、非敏感 202 响应。
 	CreateRetryJobIdempotency(ctx context.Context, arg CreateRetryJobIdempotencyParams) error
-	// CreateService exposes the corresponding strongly typed database operation.
+	// CreateService 暴露相应的强类型数据库操作。
 	// 持久化一个候选接受后新建的服务，冲突时静默跳过。
 	CreateService(ctx context.Context, arg CreateServiceParams) (Service, error)
-	// CreateShareLink exposes the corresponding strongly typed database operation.
+	// CreateShareLink 暴露相应的强类型数据库操作。
 	// 创建一条分享链接，令牌哈希全局唯一。
 	CreateShareLink(ctx context.Context, arg CreateShareLinkParams) (ShareLink, error)
-	// CreateSourceSpec exposes the corresponding strongly typed database operation.
+	// CreateSourceSpec 暴露相应的强类型数据库操作。
 	// 持久化源配置。
 	CreateSourceSpec(ctx context.Context, arg CreateSourceSpecParams) (SourceSpec, error)
-	// CreateSyncIdempotency exposes the corresponding strongly typed database operation.
+	// CreateSyncIdempotency 暴露相应的强类型数据库操作。
 	// 保存可重放 24 小时的准确、非敏感 202 响应。
 	CreateSyncIdempotency(ctx context.Context, arg CreateSyncIdempotencyParams) error
-	// CreateSyncJob exposes the corresponding strongly typed database operation.
+	// CreateSyncJob 暴露相应的强类型数据库操作。
 	// 记录一条持久化的仓库同步请求。
 	CreateSyncJob(ctx context.Context, arg CreateSyncJobParams) (Job, error)
-	// CreateTenant exposes the corresponding strongly typed database operation.
+	// CreateSystemGroup 暴露相应的强类型数据库操作。
+	// M4 系统分组、依赖图与跨 kind 搜索的持久化查询。
+	// 全部查询保留 tenant_id 谓词。
+	// 幂等创建一条系统分组（唯一键 tenant_id + slug）。
+	CreateSystemGroup(ctx context.Context, arg CreateSystemGroupParams) (SystemGroup, error)
+	// CreateTenant 暴露相应的强类型数据库操作。
 	// 使用明确的配额和设置快照创建租户，快照来自平台默认配置。
 	CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error)
-	// CreateUpload exposes the corresponding strongly typed database operation.
+	// CreateUpload 暴露相应的强类型数据库操作。
 	// 创建一条上传。
 	CreateUpload(ctx context.Context, arg CreateUploadParams) (Upload, error)
-	// CreateUser exposes the corresponding strongly typed database operation.
+	// CreateUser 暴露相应的强类型数据库操作。
 	// 创建一个全局身份，保存 Argon2id PHC 校验值，不保存密码明文。
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	// DeactivateServiceTracks exposes the corresponding strongly typed database operation.
+	// DeactivateServiceTracks 暴露相应的强类型数据库操作。
 	// 停用一个服务下全部引用轨迹并递增期望代次。
 	DeactivateServiceTracks(ctx context.Context, arg DeactivateServiceTracksParams) (int64, error)
-	// DeleteAiGenerationIdempotency exposes the corresponding strongly typed database operation.
+	// DeleteAiGenerationIdempotency 暴露相应的强类型数据库操作。
 	// 在重新使用幂等键前删除已过期的 generateMissingAssetWithAi 重放记录。
 	DeleteAiGenerationIdempotency(ctx context.Context, arg DeleteAiGenerationIdempotencyParams) error
-	// DeleteCredential exposes the corresponding strongly typed database operation.
+	// DeleteCredential 暴露相应的强类型数据库操作。
 	// 调用方完成引用和 ETag 检查后，删除一条租户凭据。
 	DeleteCredential(ctx context.Context, arg DeleteCredentialParams) (int64, error)
-	// DeleteCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// DeleteCredentialRotationIdempotency 暴露相应的强类型数据库操作。
 	// 在重新使用前删除已过期的租户凭据轮换重放记录。
 	DeleteCredentialRotationIdempotency(ctx context.Context, arg DeleteCredentialRotationIdempotencyParams) error
-	// DeleteGlobalCredential exposes the corresponding strongly typed database operation.
+	// DeleteGlobalCredential 暴露相应的强类型数据库操作。
 	// 完成引用和 ETag 检查后，删除一条平台凭据。
 	DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCredentialParams) (int64, error)
-	// DeleteGlobalCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// DeleteGlobalCredentialRotationIdempotency 暴露相应的强类型数据库操作。
 	// 在重新使用前删除已过期的平台凭据轮换重放记录。
 	DeleteGlobalCredentialRotationIdempotency(ctx context.Context, arg DeleteGlobalCredentialRotationIdempotencyParams) error
-	// DeleteRecentServicesForService exposes the corresponding strongly typed database operation.
+	// DeleteRecentServicesForService 暴露相应的强类型数据库操作。
 	// 移除一个服务对应的最近访问记录。
 	DeleteRecentServicesForService(ctx context.Context, arg DeleteRecentServicesForServiceParams) (int64, error)
-	// DeleteRepository exposes the corresponding strongly typed database operation.
+	// DeleteRepository 暴露相应的强类型数据库操作。
 	// 软删除仓库；URL 和分支能否复用由策略决定。
 	// 历史任务和审计记录在更新后仍保持租户范围。
 	DeleteRepository(ctx context.Context, arg DeleteRepositoryParams) (int64, error)
-	// DeleteRetryJobIdempotency exposes the corresponding strongly typed database operation.
+	// DeleteRetryJobIdempotency 暴露相应的强类型数据库操作。
 	// 在重新使用幂等键前删除已过期的重试重放记录。
 	DeleteRetryJobIdempotency(ctx context.Context, arg DeleteRetryJobIdempotencyParams) error
-	// DeleteService exposes the corresponding strongly typed database operation.
+	// DeleteService 暴露相应的强类型数据库操作。
 	// 软删除一条服务并递增 revision。
 	DeleteService(ctx context.Context, arg DeleteServiceParams) (Service, error)
-	// DeleteServiceAssets exposes the corresponding strongly typed database operation.
+	// DeleteServiceAssets 暴露相应的强类型数据库操作。
 	// 软删除一个服务下全部活跃资产。
 	DeleteServiceAssets(ctx context.Context, arg DeleteServiceAssetsParams) (int64, error)
-	// DeleteServiceLayers exposes the corresponding strongly typed database operation.
+	// DeleteServiceLayers 暴露相应的强类型数据库操作。
 	// 软删除一个服务下全部活跃层。
 	DeleteServiceLayers(ctx context.Context, arg DeleteServiceLayersParams) (int64, error)
-	// DeleteServiceSourceSpecs exposes the corresponding strongly typed database operation.
+	// DeleteServiceSourceSpecs 暴露相应的强类型数据库操作。
 	// 软删除一个服务下全部活跃源配置。
 	DeleteServiceSourceSpecs(ctx context.Context, arg DeleteServiceSourceSpecsParams) (int64, error)
-	// DeleteSyncIdempotency exposes the corresponding strongly typed database operation.
+	// DeleteSyncIdempotency 暴露相应的强类型数据库操作。
 	// 在重新使用幂等键前删除已过期的 syncRepository 重放记录。
 	DeleteSyncIdempotency(ctx context.Context, arg DeleteSyncIdempotencyParams) error
-	// FinishJobExecution exposes the corresponding strongly typed database operation.
+	// FinishJobExecution 暴露相应的强类型数据库操作。
 	// 记录终态结果或可重试失败。
 	// 可重试失败保持 pending，等待 River 下一次尝试；终态失败会写入完成时间和 failed 状态。
 	FinishJobExecution(ctx context.Context, arg FinishJobExecutionParams) (Job, error)
-	// GetAPITokenPrincipalByTokenHash exposes the corresponding strongly typed database operation.
+	// GetAPITokenPrincipalByTokenHash 暴露相应的强类型数据库操作。
 	// 根据令牌摘要认证一个用户、成员关系和租户均有效的 PAT。
 	GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAPITokenPrincipalByTokenHashParams) (GetAPITokenPrincipalByTokenHashRow, error)
-	// GetActiveTenantBySlug exposes the corresponding strongly typed database operation.
+	// GetActiveTenantBySlug 暴露相应的强类型数据库操作。
 	// 仅按 slug 返回有效租户，供租户范围业务访问使用。
 	GetActiveTenantBySlug(ctx context.Context, slug string) (Tenant, error)
-	// GetActiveTenantMembership exposes the corresponding strongly typed database operation.
+	// GetActiveTenantMembership 暴露相应的强类型数据库操作。
 	// 返回一条有效租户成员关系，不泄露已停用租户记录。
 	GetActiveTenantMembership(ctx context.Context, arg GetActiveTenantMembershipParams) (GetActiveTenantMembershipRow, error)
-	// GetAiBaseForService exposes the corresponding strongly typed database operation.
+	// GetAiBaseForService 暴露相应的强类型数据库操作。
 	// 返回某服务某 kind 下启用且未删除的 AI 生成 base 源配置。
 	GetAiBaseForService(ctx context.Context, arg GetAiBaseForServiceParams) (SourceSpec, error)
-	// GetAiGenerationIdempotency exposes the corresponding strongly typed database operation.
+	// GetAiGenerationIdempotency 暴露相应的强类型数据库操作。
 	// 返回 generateMissingAssetWithAi 请求保留的准确响应。
 	GetAiGenerationIdempotency(ctx context.Context, arg GetAiGenerationIdempotencyParams) (GetAiGenerationIdempotencyRow, error)
-	// GetAiGenerationResult exposes the corresponding strongly typed database operation.
+	// GetAiGenerationResult 暴露相应的强类型数据库操作。
 	// 返回一次 AI 资产生成结果快照，供终态读取与重放。
 	GetAiGenerationResult(ctx context.Context, arg GetAiGenerationResultParams) (AiGenerationResult, error)
-	// GetAsset exposes the corresponding strongly typed database operation.
+	// GetAsset 暴露相应的强类型数据库操作。
 	// 返回一个活跃资产。
 	GetAsset(ctx context.Context, arg GetAssetParams) (Asset, error)
-	// GetAssetByName exposes the corresponding strongly typed database operation.
+	// GetAssetByName 暴露相应的强类型数据库操作。
 	// 按服务、kind、名称返回一个活跃资产。
 	GetAssetByName(ctx context.Context, arg GetAssetByNameParams) (Asset, error)
-	// GetAssetForSourceSpec exposes the corresponding strongly typed database operation.
+	// GetAssetForSourceSpec 暴露相应的强类型数据库操作。
 	// 校验 manual 源配置的目标资产：必须属于该服务且 kind 匹配。
 	GetAssetForSourceSpec(ctx context.Context, arg GetAssetForSourceSpecParams) (Asset, error)
-	// GetAssetKind exposes the corresponding strongly typed database operation.
+	// GetAssetKind 暴露相应的强类型数据库操作。
 	// M1 资产流水线的持久化查询：资产、层、修订、版本、条目、轨迹、kind 与最近访问。
 	// 全部查询保留 tenant_id 谓词；asset_kinds 为平台级 global 表。
 	// 返回一个未删除的资产 kind 注册。
 	GetAssetKind(ctx context.Context, id string) (AssetKind, error)
-	// GetAssetRefTrack exposes the corresponding strongly typed database operation.
+	// GetAssetRefTrack 暴露相应的强类型数据库操作。
 	// 返回一条资产引用轨迹。
 	GetAssetRefTrack(ctx context.Context, arg GetAssetRefTrackParams) (AssetRefTrack, error)
-	// GetAssetRefTrackByID exposes the corresponding strongly typed database operation.
+	// GetAssetRefTrackByID 暴露相应的强类型数据库操作。
 	// 按轨迹 id 返回一条资产引用轨迹，供 asset.merge 任务按轨迹定位资产。
 	GetAssetRefTrackByID(ctx context.Context, arg GetAssetRefTrackByIDParams) (AssetRefTrack, error)
-	// GetAssetRepositoryDefaultBranch exposes the corresponding strongly typed database operation.
+	// GetAssetRepositoryDefaultBranch 暴露相应的强类型数据库操作。
 	// 返回一个资产所属服务的仓库默认分支。
 	GetAssetRepositoryDefaultBranch(ctx context.Context, arg GetAssetRepositoryDefaultBranchParams) (string, error)
-	// GetAssetVersion exposes the corresponding strongly typed database operation.
+	// GetAssetVersion 暴露相应的强类型数据库操作。
 	// 返回一条资产版本。
 	GetAssetVersion(ctx context.Context, arg GetAssetVersionParams) (AssetVersion, error)
-	// GetAssetVersionForProvenance exposes the corresponding strongly typed database operation.
+	// GetAssetVersionForProvenance 暴露相应的强类型数据库操作。
 	// 按 id 返回一个资产版本，供溯源读取层清单与基准。
 	GetAssetVersionForProvenance(ctx context.Context, arg GetAssetVersionForProvenanceParams) (AssetVersion, error)
-	// GetBaseLayerForAsset exposes the corresponding strongly typed database operation.
+	// GetBaseLayerForAsset 暴露相应的强类型数据库操作。
 	// 返回一个资产的 base 层。
 	GetBaseLayerForAsset(ctx context.Context, arg GetBaseLayerForAssetParams) (Layer, error)
-	// GetBlobMetadata exposes the corresponding strongly typed database operation.
+	// GetBlobMetadata 暴露相应的强类型数据库操作。
 	// 返回不可变对象元数据，用于校验重复使用的摘要。
 	GetBlobMetadata(ctx context.Context, blobDigest string) (Blob, error)
-	// GetConfigImportPreview exposes the corresponding strongly typed database operation.
+	// GetConfigImportPreview 暴露相应的强类型数据库操作。
 	// 返回一次未过期的配置导入预览，锁定供 apply 串行化。
 	GetConfigImportPreview(ctx context.Context, arg GetConfigImportPreviewParams) (ConfigImportPreview, error)
-	// GetConfigImportPreviewByID exposes the corresponding strongly typed database operation.
+	// GetConfigImportPreviewByID 暴露相应的强类型数据库操作。
 	// 按预览 id 返回一次配置导入预览（跨仓库校验失败时保持只读）。
 	GetConfigImportPreviewByID(ctx context.Context, arg GetConfigImportPreviewByIDParams) (ConfigImportPreview, error)
-	// GetCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// GetCredentialRotationIdempotency 暴露相应的强类型数据库操作。
 	// 返回保留的租户凭据轮换重放记录及其过期时间。
 	GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error)
-	// GetCurrentVersionInTrack exposes the corresponding strongly typed database operation.
+	// GetCurrentVersionInTrack 暴露相应的强类型数据库操作。
 	// 返回轨迹内当前已发布的版本。
 	GetCurrentVersionInTrack(ctx context.Context, arg GetCurrentVersionInTrackParams) (AssetVersion, error)
-	// GetDiffSnapshot exposes the corresponding strongly typed database operation.
+	// GetDiffSnapshot 暴露相应的强类型数据库操作。
 	// 返回一条差异快照，供分享描述符冻结。
 	GetDiffSnapshot(ctx context.Context, arg GetDiffSnapshotParams) (DiffSnapshot, error)
-	// GetDiscoveryCandidate exposes the corresponding strongly typed database operation.
+	// GetDiscoveryCandidate 暴露相应的强类型数据库操作。
 	// 返回一个候选，供接受前校验。
 	GetDiscoveryCandidate(ctx context.Context, arg GetDiscoveryCandidateParams) (DiscoveryCandidate, error)
-	// GetGlobalCredential exposes the corresponding strongly typed database operation.
+	// GetGlobalCredential 暴露相应的强类型数据库操作。
 	// 返回一条平台凭据。
 	GetGlobalCredential(ctx context.Context, id uuid.UUID) (GlobalCredential, error)
-	// GetGlobalCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// GetGlobalCredentialRotationIdempotency 暴露相应的强类型数据库操作。
 	// 返回保留的平台凭据轮换重放记录。
 	GetGlobalCredentialRotationIdempotency(ctx context.Context, arg GetGlobalCredentialRotationIdempotencyParams) (GetGlobalCredentialRotationIdempotencyRow, error)
-	// GetJobInput exposes the corresponding strongly typed database operation.
+	// GetJobInput 暴露相应的强类型数据库操作。
 	// 返回一条任务不可变、非敏感的输入 JSON，供 worker 恢复执行上下文。
 	GetJobInput(ctx context.Context, arg GetJobInputParams) ([]byte, error)
-	// GetLatestLayerRevision exposes the corresponding strongly typed database operation.
+	// GetLatestLayerRevision 暴露相应的强类型数据库操作。
 	// 返回某层在某作用域内最新创建的一条修订。
 	GetLatestLayerRevision(ctx context.Context, arg GetLatestLayerRevisionParams) (LayerRevision, error)
-	// GetLatestVersionInTrack exposes the corresponding strongly typed database operation.
+	// GetLatestVersionInTrack 暴露相应的强类型数据库操作。
 	// 返回轨迹内最新创建的版本。
 	GetLatestVersionInTrack(ctx context.Context, arg GetLatestVersionInTrackParams) (AssetVersion, error)
-	// GetLayer exposes the corresponding strongly typed database operation.
+	// GetLayer 暴露相应的强类型数据库操作。
 	// M2 层编辑、overlay 修订、回滚与排序的持久化查询。
 	// 全部查询保留 tenant_id 谓词。
 	// 返回一条活跃层。
 	GetLayer(ctx context.Context, arg GetLayerParams) (Layer, error)
-	// GetLayerForUpdate exposes the corresponding strongly typed database operation.
+	// GetLayerForUpdate 暴露相应的强类型数据库操作。
 	// 锁定一条活跃层，供排序与回滚前校验 revision。
 	GetLayerForUpdate(ctx context.Context, arg GetLayerForUpdateParams) (Layer, error)
-	// GetLayerHead exposes the corresponding strongly typed database operation.
+	// GetLayerHead 暴露相应的强类型数据库操作。
 	// 返回一个层头。
 	GetLayerHead(ctx context.Context, arg GetLayerHeadParams) (LayerHead, error)
-	// GetLayerRevision exposes the corresponding strongly typed database operation.
+	// GetLayerRevision 暴露相应的强类型数据库操作。
 	// 返回一条层修订，供回滚与溯源读取。
 	GetLayerRevision(ctx context.Context, arg GetLayerRevisionParams) (LayerRevision, error)
-	// GetLayerRevisionForReview exposes the corresponding strongly typed database operation.
+	// GetLayerRevisionForReview 暴露相应的强类型数据库操作。
 	// 返回待审核修订及其层的行，供评审事务使用。
 	GetLayerRevisionForReview(ctx context.Context, arg GetLayerRevisionForReviewParams) (GetLayerRevisionForReviewRow, error)
-	// GetPlatformJob exposes the corresponding strongly typed database operation.
+	// GetPlatformJob 暴露相应的强类型数据库操作。
 	// 返回一条脱敏平台任务，不包含租户拥有的负载或执行详情。
 	// 保留租户和仓库范围的作用域标识，与公开 PlatformJob 契约一致。
 	GetPlatformJob(ctx context.Context, id uuid.UUID) (GetPlatformJobRow, error)
-	// GetPlatformSettingsForTenantCreate exposes the corresponding strongly typed database operation.
+	// GetPlatformSettingsForTenantCreate 暴露相应的强类型数据库操作。
 	// 返回创建租户时原子复制到新租户的单例 JSON 默认配置。
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
-	// GetProducerProfile exposes the corresponding strongly typed database operation.
+	// GetProducerProfile 暴露相应的强类型数据库操作。
 	// 返回一个未删除的生产者配置文件。
 	GetProducerProfile(ctx context.Context, id uuid.UUID) (ProducerProfile, error)
-	// GetProducerProfileByName exposes the corresponding strongly typed database operation.
+	// GetProducerProfileByName 暴露相应的强类型数据库操作。
 	// 按全局唯一名称返回一个未删除的生产者配置文件，供配置导入解析名称引用。
 	GetProducerProfileByName(ctx context.Context, name string) (ProducerProfile, error)
-	// GetPublicServiceBySlug exposes the corresponding strongly typed database operation.
+	// GetPublicServiceBySlug 暴露相应的强类型数据库操作。
 	// 按 tenant_slug + service_slug 返回一条活跃服务，供匿名公开读取解析。
 	GetPublicServiceBySlug(ctx context.Context, arg GetPublicServiceBySlugParams) (Service, error)
-	// GetRefreshTokenPrincipalByTokenHash exposes the corresponding strongly typed database operation.
+	// GetRefreshTokenPrincipalByTokenHash 暴露相应的强类型数据库操作。
 	// 在调用方指定的时间点，根据令牌摘要认证一个有效刷新令牌和有效用户。
 	GetRefreshTokenPrincipalByTokenHash(ctx context.Context, arg GetRefreshTokenPrincipalByTokenHashParams) (GetRefreshTokenPrincipalByTokenHashRow, error)
-	// GetRepository exposes the corresponding strongly typed database operation.
+	// GetRepository 暴露相应的强类型数据库操作。
 	// 返回一条有效仓库；软删除记录按设计视为不存在。
 	GetRepository(ctx context.Context, arg GetRepositoryParams) (Repository, error)
-	// GetRetryJobIdempotency exposes the corresponding strongly typed database operation.
+	// GetRepositoryByService 暴露相应的强类型数据库操作。
+	// 返回服务所属的仓库，供搜索命中投影 owning repository。
+	GetRepositoryByService(ctx context.Context, arg GetRepositoryByServiceParams) (Repository, error)
+	// GetRetryJobIdempotency 暴露相应的强类型数据库操作。
 	// 返回 retryJob 请求保留的准确响应。
 	GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error)
-	// GetServiceByID exposes the corresponding strongly typed database operation.
+	// GetServiceByID 暴露相应的强类型数据库操作。
 	// 返回一个活跃服务，供按 id 定位。
 	GetServiceByID(ctx context.Context, arg GetServiceByIDParams) (Service, error)
-	// GetServiceBySlug exposes the corresponding strongly typed database operation.
+	// GetServiceBySlug 暴露相应的强类型数据库操作。
 	// M1 仓库发现、候选、服务、生产者配置与源配置/绑定的持久化查询。
 	// 全部查询保留 tenant_id 谓词；producer_profiles 为平台级 global 表。
 	// 返回一个活跃服务，供源配置、服务详情等路径按 slug 定位。
 	GetServiceBySlug(ctx context.Context, arg GetServiceBySlugParams) (Service, error)
-	// GetServiceForUpdate exposes the corresponding strongly typed database operation.
+	// GetServiceForUpdate 暴露相应的强类型数据库操作。
 	// M1 服务生命周期、公开读取与软删除的持久化查询。
 	// 全部查询保留 tenant_id 谓词；公开读取按 tenant_slug + service_slug 跨表解析。
 	// 锁定一条活跃服务行，供条件更新与删除前校验 revision。
 	GetServiceForUpdate(ctx context.Context, arg GetServiceForUpdateParams) (Service, error)
-	// GetShareLinkByTokenHash exposes the corresponding strongly typed database operation.
+	// GetShareLinkByTokenHash 暴露相应的强类型数据库操作。
 	// 按令牌哈希返回一条未撤销且未过期的分享链接。
 	GetShareLinkByTokenHash(ctx context.Context, tokenHash []byte) (ShareLink, error)
-	// GetSourceLayerByPushKey exposes the corresponding strongly typed database operation.
+	// GetSourceLayerByPushKey 暴露相应的强类型数据库操作。
 	// 返回资产下按推送身份（kind + 资产名模板）匹配的推送层，供重复推送复用同一 overlay 层。
 	GetSourceLayerByPushKey(ctx context.Context, arg GetSourceLayerByPushKeyParams) (Layer, error)
-	// GetSourceSpec exposes the corresponding strongly typed database operation.
+	// GetSourceSpec 暴露相应的强类型数据库操作。
 	// 返回一个活跃源配置。
 	GetSourceSpec(ctx context.Context, arg GetSourceSpecParams) (SourceSpec, error)
-	// GetSyncIdempotency exposes the corresponding strongly typed database operation.
+	// GetSyncIdempotency 暴露相应的强类型数据库操作。
 	// 返回 syncRepository 请求保留的准确响应。
 	GetSyncIdempotency(ctx context.Context, arg GetSyncIdempotencyParams) (GetSyncIdempotencyRow, error)
-	// GetSyncJobForSuccessor exposes the corresponding strongly typed database operation.
+	// GetSyncJobForSuccessor 暴露相应的强类型数据库操作。
 	// 返回一条 repo.sync 任务，供完成后判断是否需要后续任。
 	GetSyncJobForSuccessor(ctx context.Context, arg GetSyncJobForSuccessorParams) (GetSyncJobForSuccessorRow, error)
-	// GetTenantBlobReference exposes the corresponding strongly typed database operation.
+	// GetSystemGroup 暴露相应的强类型数据库操作。
+	// 返回一条系统分组。
+	GetSystemGroup(ctx context.Context, arg GetSystemGroupParams) (SystemGroup, error)
+	// GetSystemGroupBySlug 暴露相应的强类型数据库操作。
+	// 按 slug 返回一条系统分组。
+	GetSystemGroupBySlug(ctx context.Context, arg GetSystemGroupBySlugParams) (SystemGroup, error)
+	// GetTenantBlobReference 暴露相应的强类型数据库操作。
 	// 调用方锁定租户配额行后，返回当前对象引用数。
 	GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error)
-	// GetTenantBySlug exposes the corresponding strongly typed database operation.
+	// GetTenantBySlug 暴露相应的强类型数据库操作。
 	// 按 slug 返回任意生命周期状态的租户，供平台管理使用。
 	GetTenantBySlug(ctx context.Context, slug string) (Tenant, error)
-	// GetTenantCredential exposes the corresponding strongly typed database operation.
+	// GetTenantCredential 暴露相应的强类型数据库操作。
 	// 返回一条可见的租户凭据及其团队共享标识。
 	GetTenantCredential(ctx context.Context, arg GetTenantCredentialParams) (GetTenantCredentialRow, error)
-	// GetTenantCredentialForMutation exposes the corresponding strongly typed database operation.
+	// GetTenantCredentialForMutation 暴露相应的强类型数据库操作。
 	// 返回一条不经过可见性过滤的租户凭据。
 	// 服务层已完成租户操作授权，本查询保留 404 与 412 的区别。
 	GetTenantCredentialForMutation(ctx context.Context, arg GetTenantCredentialForMutationParams) (Credential, error)
-	// GetTenantJob exposes the corresponding strongly typed database operation.
+	// GetTenantJob 暴露相应的强类型数据库操作。
 	// 保留租户条件，返回一条租户可见的完整任务记录。
 	GetTenantJob(ctx context.Context, arg GetTenantJobParams) (Job, error)
-	// GetTenantJobStreamState exposes the corresponding strongly typed database operation.
+	// GetTenantJobStreamState 暴露相应的强类型数据库操作。
 	// 在一条 PostgreSQL 语句中返回任务状态和已持久化日志的最大游标，
 	// 确保 SSE 不会发送领先于日志记录的状态。
 	GetTenantJobStreamState(ctx context.Context, arg GetTenantJobStreamStateParams) (GetTenantJobStreamStateRow, error)
-	// GetTenantKindOverride exposes the corresponding strongly typed database operation.
+	// GetTenantKindOverride 暴露相应的强类型数据库操作。
 	// 返回一个租户级 kind 覆盖，未显式配置时回退默认启用。
 	GetTenantKindOverride(ctx context.Context, arg GetTenantKindOverrideParams) (TenantKindOverride, error)
-	// GetTenantSettings exposes the corresponding strongly typed database operation.
+	// GetTenantSettings 暴露相应的强类型数据库操作。
 	// 返回租户的设置 JSON 快照，供 trust 模式与自动发布判定。
 	GetTenantSettings(ctx context.Context, id uuid.UUID) ([]byte, error)
-	// GetTenantSlugForEvent exposes the corresponding strongly typed database operation.
+	// GetTenantSlugForEvent 暴露相应的强类型数据库操作。
 	// 解析领域事件信封中使用的稳定租户标识。
 	GetTenantSlugForEvent(ctx context.Context, tenantID uuid.UUID) (string, error)
-	// GetUpload exposes the corresponding strongly typed database operation.
+	// GetUpload 暴露相应的强类型数据库操作。
 	// M3 差异、分享与待办的持久化查询。
 	// 全部查询保留 tenant_id 谓词。
 	// 返回一条上传，供文件选择器解析。
 	GetUpload(ctx context.Context, arg GetUploadParams) (Upload, error)
-	// GetUserByID exposes the corresponding strongly typed database operation.
+	// GetUserByID 暴露相应的强类型数据库操作。
 	// 按传入 UUID 返回对应的全局身份。
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
-	// GetUserByUsername exposes the corresponding strongly typed database operation.
+	// GetUserByUsername 暴露相应的强类型数据库操作。
 	// 按准确且唯一的登录名返回全局身份。
 	GetUserByUsername(ctx context.Context, username string) (User, error)
-	// ListAPITokensByUser exposes the corresponding strongly typed database operation.
+	// InsertSystemGroupMember 暴露相应的强类型数据库操作。
+	InsertSystemGroupMember(ctx context.Context, arg InsertSystemGroupMemberParams) (int64, error)
+	// ListAPITokensByUser 暴露相应的强类型数据库操作。
 	// 在明确的租户边界内，返回一个用户的稳定分页 PAT 元数据。
 	ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUserParams) ([]ApiToken, error)
-	// ListActiveBindingsForScope exposes the corresponding strongly typed database operation.
+	// ListActiveBindingsForScope 暴露相应的强类型数据库操作。
 	// 列出服务某作用域内当前活跃的源绑定。
 	ListActiveBindingsForScope(ctx context.Context, arg ListActiveBindingsForScopeParams) ([]SourceBinding, error)
-	// ListActiveTenantMemberships exposes the corresponding strongly typed database operation.
+	// ListActiveTenantMemberships 暴露相应的强类型数据库操作。
 	// 按稳定 slug 和 UUID 顺序返回用户的有效租户成员关系。
 	ListActiveTenantMemberships(ctx context.Context, userID uuid.UUID) ([]ListActiveTenantMembershipsRow, error)
-	// ListAiBaseLayersForService exposes the corresponding strongly typed database operation.
+	// ListAiBaseLayersForService 暴露相应的强类型数据库操作。
 	// 返回某服务某 kind 的 AI 生成 base 层（含资产标识），供替换事务复用资产。
 	ListAiBaseLayersForService(ctx context.Context, arg ListAiBaseLayersForServiceParams) ([]Layer, error)
-	// ListAssetKinds exposes the corresponding strongly typed database operation.
+	// ListAssetKinds 暴露相应的强类型数据库操作。
 	// 返回全部启用的资产 kind 注册。
 	ListAssetKinds(ctx context.Context) ([]AssetKind, error)
-	// ListAssetVersionItems exposes the corresponding strongly typed database operation.
+	// ListAssetVersionItems 暴露相应的强类型数据库操作。
 	// 列出资产版本条目分页。
 	ListAssetVersionItems(ctx context.Context, arg ListAssetVersionItemsParams) ([]AssetItem, error)
-	// ListAssetsForService exposes the corresponding strongly typed database operation.
+	// ListAssetsForService 暴露相应的强类型数据库操作。
 	// 返回一个服务下全部活跃资产。
 	ListAssetsForService(ctx context.Context, arg ListAssetsForServiceParams) ([]Asset, error)
-	// ListAvailableProducerProfiles exposes the corresponding strongly typed database operation.
+	// ListAvailableProducerProfiles 暴露相应的强类型数据库操作。
 	// 列出可被租户选择的可用生产者配置；可选按 kind 过滤。
 	ListAvailableProducerProfiles(ctx context.Context, kindFilter string) ([]ProducerProfile, error)
-	// ListBreakingTodos exposes the corresponding strongly typed database operation.
+	// ListBreakingTodos 暴露相应的强类型数据库操作。
 	// 列出破坏性变更待办，按状态过滤并分页。
 	ListBreakingTodos(ctx context.Context, arg ListBreakingTodosParams) ([]BreakingTodo, error)
-	// ListCredentialTeamShares exposes the corresponding strongly typed database operation.
+	// ListCredentialTeamShares 暴露相应的强类型数据库操作。
 	// 返回一条租户凭据完整且有序的团队共享集合。
 	ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error)
-	// ListDiscoveryCandidates exposes the corresponding strongly typed database operation.
+	// ListDiscoveryCandidates 暴露相应的强类型数据库操作。
 	// 列出候选，按 rootDir 逐字节升序并分页。
 	ListDiscoveryCandidates(ctx context.Context, arg ListDiscoveryCandidatesParams) ([]DiscoveryCandidate, error)
-	// ListEnabledLayerHeadsForAssetScope exposes the corresponding strongly typed database operation.
+	// ListEnabledLayerHeadsForAssetScope 暴露相应的强类型数据库操作。
 	// 列出某资产某作用域内启用层的头指针，供评审前置校验（无候选）。
 	ListEnabledLayerHeadsForAssetScope(ctx context.Context, arg ListEnabledLayerHeadsForAssetScopeParams) ([]LayerHead, error)
-	// ListEnabledNotificationChannelIDs exposes the corresponding strongly typed database operation.
+	// ListEnabledNotificationChannelIDs 暴露相应的强类型数据库操作。
 	// 为 M0 运维事件返回确定性的通道目标；M5 订阅路由会提供更精确的目标集合。
 	ListEnabledNotificationChannelIDs(ctx context.Context, tenantID uuid.UUID) ([]uuid.UUID, error)
-	// ListGlobalCredentials exposes the corresponding strongly typed database operation.
+	// ListGlobalCredentials 暴露相应的强类型数据库操作。
 	// 返回平台凭据的稳定分页结果。
 	ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error)
-	// ListKnownHosts exposes the corresponding strongly typed database operation.
+	// ListKnownHosts 暴露相应的强类型数据库操作。
 	// 返回租户认可的 SSH 主机身份稳定分页结果。
 	ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error)
-	// ListLayerHeadsForAsset exposes the corresponding strongly typed database operation.
+	// ListLayerHeadsForAsset 暴露相应的强类型数据库操作。
 	// 返回一个资产下全部层的头指针（用于合并选择有效修订）。
 	ListLayerHeadsForAsset(ctx context.Context, arg ListLayerHeadsForAssetParams) ([]LayerHead, error)
-	// ListLayerRevisions exposes the corresponding strongly typed database operation.
+	// ListLayerRevisions 暴露相应的强类型数据库操作。
 	// 列出某层某作用域内的全部修订，按创建时间倒序。
 	ListLayerRevisions(ctx context.Context, arg ListLayerRevisionsParams) ([]LayerRevision, error)
-	// ListLayersForAsset exposes the corresponding strongly typed database operation.
+	// ListLayersForAsset 暴露相应的强类型数据库操作。
 	// 返回一个资产下全部活跃层，按 ord 后 id 排序。
 	ListLayersForAsset(ctx context.Context, arg ListLayersForAssetParams) ([]Layer, error)
-	// ListPlatformAuditLogs exposes the corresponding strongly typed database operation.
+	// ListPlatformAuditLogs 暴露相应的强类型数据库操作。
 	// 为平台控制面返回一页按最新时间优先排列的跨租户审计元数据。
 	// 平台级记录的可空租户归属会保留在结果中。
 	ListPlatformAuditLogs(ctx context.Context, arg ListPlatformAuditLogsParams) ([]ListPlatformAuditLogsRow, error)
-	// ListPlatformJobs exposes the corresponding strongly typed database operation.
+	// ListPlatformJobs 暴露相应的强类型数据库操作。
 	// 按最新时间优先返回脱敏的跨租户任务元数据。
 	// 结果刻意排除输入、结果、错误、尝试次数、引用、River 标识和日志。
 	// 空过滤数组和空字符串表示不限制；只有租户和仓库范围任务暴露作用域标识。
 	ListPlatformJobs(ctx context.Context, arg ListPlatformJobsParams) ([]ListPlatformJobsRow, error)
-	// ListProducerProfiles exposes the corresponding strongly typed database operation.
+	// ListProducerProfiles 暴露相应的强类型数据库操作。
 	// 返回平台生产者配置文件分页。
 	ListProducerProfiles(ctx context.Context, arg ListProducerProfilesParams) ([]ProducerProfile, error)
-	// ListRecentServices exposes the corresponding strongly typed database operation.
+	// ListRecentServices 暴露相应的强类型数据库操作。
 	// 列出用户最近访问的服务。
 	ListRecentServices(ctx context.Context, arg ListRecentServicesParams) ([]Service, error)
-	// ListRepositories exposes the corresponding strongly typed database operation.
+	// ListRepositories 暴露相应的强类型数据库操作。
 	// 按规范化 URL 和 UUID 的确定顺序返回有效仓库。
 	// 即使搜索字符串为空，查询及全部谓词仍保留租户边界。
 	ListRepositories(ctx context.Context, arg ListRepositoriesParams) ([]Repository, error)
-	// ListRepositoriesForCredential exposes the corresponding strongly typed database operation.
+	// ListRepositoriesForCredential 暴露相应的强类型数据库操作。
 	// 按契约响应顺序返回未删除仓库对该凭据的引用。
 	ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error)
-	// ListRepositoriesForGlobalCredential exposes the corresponding strongly typed database operation.
+	// ListRepositoriesForGlobalCredential 暴露相应的强类型数据库操作。
 	// 返回引用某条平台凭据的未删除仓库。
 	ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error)
-	// ListServices exposes the corresponding strongly typed database operation.
+	// ListSearchableAssetItems 暴露相应的强类型数据库操作。
+	// 返回租户内全部活跃资产条目，供跨 kind 搜索（不绑定特定版本）。
+	ListSearchableAssetItems(ctx context.Context, arg ListSearchableAssetItemsParams) ([]AssetItem, error)
+	// ListServices 暴露相应的强类型数据库操作。
 	// 列出活跃服务的确定顺序分页。
 	ListServices(ctx context.Context, arg ListServicesParams) ([]Service, error)
-	// ListServicesByRepository exposes the corresponding strongly typed database operation.
+	// ListServicesByRepository 暴露相应的强类型数据库操作。
 	// 返回一个仓库下全部活跃服务。
 	ListServicesByRepository(ctx context.Context, arg ListServicesByRepositoryParams) ([]Service, error)
-	// ListSourceBindings exposes the corresponding strongly typed database operation.
+	// ListSourceBindings 暴露相应的强类型数据库操作。
 	// 列出源配置物化出的绑定，按创建顺序。
 	ListSourceBindings(ctx context.Context, arg ListSourceBindingsParams) ([]SourceBinding, error)
-	// ListSourceSpecsForService exposes the corresponding strongly typed database operation.
+	// ListSourceSpecsForService 暴露相应的强类型数据库操作。
 	// 返回一个服务下全部活跃源配置。
 	ListSourceSpecsForService(ctx context.Context, arg ListSourceSpecsForServiceParams) ([]SourceSpec, error)
-	// ListTenantAuditLogs exposes the corresponding strongly typed database operation.
+	// ListSystemGroupMembers 暴露相应的强类型数据库操作。
+	// 返回一条系统分组的成员服务。
+	ListSystemGroupMembers(ctx context.Context, arg ListSystemGroupMembersParams) ([]SystemGroupMember, error)
+	// ListSystemGroups 暴露相应的强类型数据库操作。
+	// 列出租户内全部系统分组。
+	ListSystemGroups(ctx context.Context, tenantID uuid.UUID) ([]SystemGroup, error)
+	// ListTenantAuditLogs 暴露相应的强类型数据库操作。
 	// 返回租户范围内按最新时间优先排列的一页追加式审计元数据。
 	// 查询始终受 tenant_id 限制，结果不包含业务内容或携带秘密的字段。
 	ListTenantAuditLogs(ctx context.Context, arg ListTenantAuditLogsParams) ([]ListTenantAuditLogsRow, error)
-	// ListTenantCredentials exposes the corresponding strongly typed database operation.
+	// ListTenantCredentials 暴露相应的强类型数据库操作。
 	// 返回一个用户在一个有效租户内可见的凭据。
 	// 团队可见性通过同租户团队成员条件判断；平台凭据以 is_global=true 和租户共享投影追加返回。
 	ListTenantCredentials(ctx context.Context, arg ListTenantCredentialsParams) ([]ListTenantCredentialsRow, error)
-	// ListTenantJobAttemptLogs exposes the corresponding strongly typed database operation.
+	// ListTenantJobAttemptLogs 暴露相应的强类型数据库操作。
 	// 批量加载一页任务的持久化事件，避免 N+1 查询。
 	// 调用方按任务、一基尝试次数和阶段分组，构造 API 尝试投影。
 	ListTenantJobAttemptLogs(ctx context.Context, arg ListTenantJobAttemptLogsParams) ([]JobStageLog, error)
-	// ListTenantJobLogsAfter exposes the corresponding strongly typed database operation.
+	// ListTenantJobLogsAfter 暴露相应的强类型数据库操作。
 	// 返回持久化序号游标之后、数量受限的 SSE 回放记录。
 	ListTenantJobLogsAfter(ctx context.Context, arg ListTenantJobLogsAfterParams) ([]JobStageLog, error)
-	// ListTenantJobs exposes the corresponding strongly typed database operation.
+	// ListTenantJobs 暴露相应的强类型数据库操作。
 	// 在一个租户标识边界内按最新时间优先返回任务分页。
 	// 空过滤数组和空字符串表示不限制；执行输入和 River 标识仍为内部字段。
 	ListTenantJobs(ctx context.Context, arg ListTenantJobsParams) ([]Job, error)
-	// ListTenants exposes the corresponding strongly typed database operation.
+	// ListTenants 暴露相应的强类型数据库操作。
 	// 按稳定 slug 和 UUID 顺序返回全部租户生命周期记录，供平台管理使用。
 	ListTenants(ctx context.Context, arg ListTenantsParams) ([]ListTenantsRow, error)
-	// ListUsers exposes the corresponding strongly typed database operation.
+	// ListUsers 暴露相应的强类型数据库操作。
 	// 为平台管理员返回稳定分页的身份元数据，不包含密码或会话秘密。
 	// 可选搜索值只匹配 username 和 display_name。
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
-	// LockAiGenerationIdempotency exposes the corresponding strongly typed database operation.
+	// ListVersionAiLayerRevisions 暴露相应的强类型数据库操作。
+	// 返回资产版本清单中的 AI 生成层修订标识，供 hasAiLayer 过滤判定。
+	ListVersionAiLayerRevisions(ctx context.Context, tenantID uuid.UUID) ([]ListVersionAiLayerRevisionsRow, error)
+	// LockAiGenerationIdempotency 暴露相应的强类型数据库操作。
 	// 为已认证的租户主体串行化一个 generateMissingAssetWithAi 幂等键。
 	LockAiGenerationIdempotency(ctx context.Context, lockKey string) error
-	// LockAssetRefTrack exposes the corresponding strongly typed database operation.
+	// LockAssetRefTrack 暴露相应的强类型数据库操作。
 	// 锁定轨迹行，供发布事务串行化与递增 desired_generation。
 	LockAssetRefTrack(ctx context.Context, arg LockAssetRefTrackParams) (AssetRefTrack, error)
-	// LockCredentialRotationIdempotency exposes the corresponding strongly typed database operation.
+	// LockCredentialRotationIdempotency 暴露相应的强类型数据库操作。
 	// 在并发 HTTP 请求之间串行化一个轮换幂等键。
 	// 锁键由认证主体和操作派生，绝不来自秘密明文。
 	LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error
-	// LockJobStageSequence exposes the corresponding strongly typed database operation.
+	// LockJobStageSequence 暴露相应的强类型数据库操作。
 	// 在调用方事务内串行化单个任务的日志游标。
 	// 锁键由租户和任务 UUID 派生，不包含用户内容。
 	LockJobStageSequence(ctx context.Context, lockKey string) error
-	// LockLatestCredentialSyncJob exposes the corresponding strongly typed database operation.
+	// LockLatestCredentialSyncJob 暴露相应的强类型数据库操作。
 	// 串行化一个仓库分支的凭据轮换去重。
 	// 状态为 pending 或 running 的记录会复用；终态记录会递增 active_generation 以接受新工作。
 	LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error)
-	// LockLatestDiscoveryJob exposes the corresponding strongly typed database operation.
+	// LockLatestDiscoveryJob 暴露相应的强类型数据库操作。
 	// 串行化一个仓库发现请求的去重键。
 	// 终态记录会递增 active_generation 以接受新工作。
 	LockLatestDiscoveryJob(ctx context.Context, arg LockLatestDiscoveryJobParams) (LockLatestDiscoveryJobRow, error)
-	// LockLatestTenantJobGeneration exposes the corresponding strongly typed database operation.
+	// LockLatestTenantJobGeneration 暴露相应的强类型数据库操作。
 	// 持有行锁时返回最新的语义代次。
 	LockLatestTenantJobGeneration(ctx context.Context, arg LockLatestTenantJobGenerationParams) (Job, error)
-	// LockPendingServiceJobs exposes the corresponding strongly typed database operation.
+	// LockPendingServiceJobs 暴露相应的强类型数据库操作。
 	// 锁定一个服务及其子资源作用域下仍待执行的任务，供删除事务统一取消。
 	LockPendingServiceJobs(ctx context.Context, arg LockPendingServiceJobsParams) ([]LockPendingServiceJobsRow, error)
-	// LockRepositoryQuota exposes the corresponding strongly typed database operation.
+	// LockRepositoryQuota 暴露相应的强类型数据库操作。
 	// 使用租户配额行锁串行化仓库创建。
 	// 适配器在计数和插入期间持有该锁，避免并发创建超过租户配额。
 	LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// LockRetryJobIdempotency exposes the corresponding strongly typed database operation.
+	// LockRetryJobIdempotency 暴露相应的强类型数据库操作。
 	// 为已认证的租户主体串行化一个重试幂等键。
 	LockRetryJobIdempotency(ctx context.Context, lockKey string) error
-	// LockSyncIdempotency exposes the corresponding strongly typed database operation.
+	// LockSyncIdempotency 暴露相应的强类型数据库操作。
 	// syncRepository 的幂等重放持久化查询。
 	// 重放身份为 [tenantId, principalType, principalId, operationId, idempotencyKey]。
 	// 在调用方事务内串行化一个 syncRepository 重放身份。
 	LockSyncIdempotency(ctx context.Context, lockKey string) error
-	// LockTenantJobForControl exposes the corresponding strongly typed database operation.
+	// LockTenantJobForControl 暴露相应的强类型数据库操作。
 	// 串行化一个租户任务的取消和手动重试决策。
 	LockTenantJobForControl(ctx context.Context, arg LockTenantJobForControlParams) (Job, error)
-	// LockTenantStorageQuota exposes the corresponding strongly typed database operation.
+	// LockTenantStorageQuota 暴露相应的强类型数据库操作。
 	// 串行化租户对象引用的全部配额核算，并返回复制到租户快照中的固定字节配额。
 	LockTenantStorageQuota(ctx context.Context, tenantID uuid.UUID) (int64, error)
-	// MarkAssetVersionIndexed exposes the corresponding strongly typed database operation.
+	// MarkAssetVersionIndexed 暴露相应的强类型数据库操作。
 	// 将一条资产版本标记为已完成 item 索引。
 	MarkAssetVersionIndexed(ctx context.Context, arg MarkAssetVersionIndexedParams) (int64, error)
-	// MarkBindingsStaleInScope exposes the corresponding strongly typed database operation.
+	// MarkBindingsStaleInScope 暴露相应的强类型数据库操作。
 	// 将某作用域内本次未出现的绑定标记为 stale。
 	MarkBindingsStaleInScope(ctx context.Context, arg MarkBindingsStaleInScopeParams) (int64, error)
-	// MarkOutboxDelivered exposes the corresponding strongly typed database operation.
+	// MarkOutboxDelivered 暴露相应的强类型数据库操作。
 	// 只完成准确的当前租约，防止旧 worker 覆盖新调度器重新领取的投递。
 	MarkOutboxDelivered(ctx context.Context, arg MarkOutboxDeliveredParams) (int64, error)
-	// MarkOutboxFailed exposes the corresponding strongly typed database operation.
+	// MarkOutboxFailed 暴露相应的强类型数据库操作。
 	// 记录一次脱敏失败尝试及下一次可执行时间，并隔离已过期租约的更新。
 	MarkOutboxFailed(ctx context.Context, arg MarkOutboxFailedParams) (int64, error)
-	// MarkSyncJobDirty exposes the corresponding strongly typed database operation.
+	// MarkSyncJobDirty 暴露相应的强类型数据库操作。
 	// syncRepository 的 dirty 标记与完成后续任物化查询。
 	// dirty 语义对齐 contracts/domain.yaml 的 coalescing：运行中收到重复请求置 dirty，
 	// 完成后若 dirty 置位则入队一个使用最新输入的后续任。
 	// 运行中的 repo.sync 收到重复请求时置 dirty。
 	MarkSyncJobDirty(ctx context.Context, arg MarkSyncJobDirtyParams) (int64, error)
-	// MarkTracksHealthyForSourceSpec exposes the corresponding strongly typed database operation.
+	// MarkTracksHealthyForSourceSpec 暴露相应的强类型数据库操作。
 	// 将某源配置关联资产的引用轨迹恢复为 ok。
 	MarkTracksHealthyForSourceSpec(ctx context.Context, arg MarkTracksHealthyForSourceSpecParams) (int64, error)
-	// MarkTracksStaleForSourceSpec exposes the corresponding strongly typed database operation.
+	// MarkTracksStaleForSourceSpec 暴露相应的强类型数据库操作。
 	// 将某源配置关联资产的引用轨迹标记为 stale。
 	MarkTracksStaleForSourceSpec(ctx context.Context, arg MarkTracksStaleForSourceSpecParams) (int64, error)
-	// NextJobStageSequence exposes the corresponding strongly typed database operation.
+	// NextJobStageSequence 暴露相应的强类型数据库操作。
 	// 调用方取得任务专属事务 advisory lock 后，返回下一个回放游标。
 	NextJobStageSequence(ctx context.Context, arg NextJobStageSequenceParams) (int64, error)
-	// PromoteUserToPlatformAdmin exposes the corresponding strongly typed database operation.
+	// PromoteUserToPlatformAdmin 暴露相应的强类型数据库操作。
 	// 授予平台控制面权限，并递增用户版本号。
 	PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error)
-	// ReplaceCredentialTeamShares exposes the corresponding strongly typed database operation.
+	// ReplaceCredentialTeamShares 暴露相应的强类型数据库操作。
 	// 在一个事务内删除并重建完整的凭据团队共享投影。
 	ReplaceCredentialTeamShares(ctx context.Context, arg ReplaceCredentialTeamSharesParams) error
-	// ResolveRepositoryCredential exposes the corresponding strongly typed database operation.
+	// ReplaceSystemGroupMembers 暴露相应的强类型数据库操作。
+	// 替换一条系统分组的成员：先删除再按序重建。
+	ReplaceSystemGroupMembers(ctx context.Context, arg ReplaceSystemGroupMembersParams) (int64, error)
+	// ResolveRepositoryCredential 暴露相应的强类型数据库操作。
 	// 将一个租户可见的凭据 UUID 解析到唯一的所属表。
 	// 租户凭据使用与凭据列表相同的可见性条件；平台凭据可被有效成员选择，但仍由平台管理员管理。
 	ResolveRepositoryCredential(ctx context.Context, arg ResolveRepositoryCredentialParams) (ResolveRepositoryCredentialRow, error)
-	// RevokeAPIToken exposes the corresponding strongly typed database operation.
+	// RevokeAPIToken 暴露相应的强类型数据库操作。
 	// 幂等撤销一个租户内用户拥有的 PAT，并返回其标识。
 	// 返回已经撤销的匹配记录以保持幂等；不存在或属于其他主体的记录仍视为未找到。
 	RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error)
-	// RevokeRefreshTokenFamily exposes the corresponding strongly typed database operation.
+	// RevokeRefreshTokenFamily 暴露相应的强类型数据库操作。
 	// 撤销一个刷新令牌家族的全部有效令牌，用于登出或重放检测。
 	RevokeRefreshTokenFamily(ctx context.Context, arg RevokeRefreshTokenFamilyParams) (int64, error)
-	// RotateCredentialSecret exposes the corresponding strongly typed database operation.
+	// RotateCredentialSecret 暴露相应的强类型数据库操作。
 	// 有条件地替换加密秘密材料并递增凭据版本号。
 	RotateCredentialSecret(ctx context.Context, arg RotateCredentialSecretParams) (Credential, error)
-	// RotateGlobalCredentialSecret exposes the corresponding strongly typed database operation.
+	// RotateGlobalCredentialSecret 暴露相应的强类型数据库操作。
 	// 有条件地替换平台加密秘密材料并递增版本号。
 	RotateGlobalCredentialSecret(ctx context.Context, arg RotateGlobalCredentialSecretParams) (GlobalCredential, error)
-	// RotateRefreshToken exposes the corresponding strongly typed database operation.
+	// RotateRefreshToken 暴露相应的强类型数据库操作。
 	// 原子轮换一个刷新令牌：撤销旧令牌并记录替换的新令牌，返回是否有记录发生变化。
 	RotateRefreshToken(ctx context.Context, arg RotateRefreshTokenParams) (int64, error)
-	// SetJobExecutionStage exposes the corresponding strongly typed database operation.
+	// SetJobExecutionStage 暴露相应的强类型数据库操作。
 	// 记录当前流水线阶段，不改变持久化生命周期状态。
 	// 阶段取值受应用 DDL 约束。
 	SetJobExecutionStage(ctx context.Context, arg SetJobExecutionStageParams) (int64, error)
-	// SetSourceLastError exposes the corresponding strongly typed database operation.
+	// SetSourceLastError 暴露相应的强类型数据库操作。
 	// 记录一次源物化的失败说明并递增连续失败次数。
 	SetSourceLastError(ctx context.Context, arg SetSourceLastErrorParams) (int64, error)
-	// StaleServiceBindings exposes the corresponding strongly typed database operation.
+	// StaleServiceBindings 暴露相应的强类型数据库操作。
 	// 将一个服务下全部活跃源绑定标记为 stale（保留 resolved_path）。
 	StaleServiceBindings(ctx context.Context, arg StaleServiceBindingsParams) (int64, error)
-	// StartJobExecution exposes the corresponding strongly typed database operation.
+	// StartJobExecution 暴露相应的强类型数据库操作。
 	// 为一次 River 尝试领取持久化 Meridian 任务。
 	// 终态领域记录不会再次领取，因此 worker 已提交终态后发生 River 重试也不会产生副作用。
 	StartJobExecution(ctx context.Context, arg StartJobExecutionParams) (Job, error)
-	// SupersedeLayerRevision exposes the corresponding strongly typed database operation.
+	// SupersedeLayerRevision 暴露相应的强类型数据库操作。
 	// 将一条修订标记为 superseded（新候选替换旧候选）。
 	SupersedeLayerRevision(ctx context.Context, arg SupersedeLayerRevisionParams) (int64, error)
-	// TouchAPIToken exposes the corresponding strongly typed database operation.
+	// TouchAPIToken 暴露相应的强类型数据库操作。
 	// 记录未撤销租户 PAT 最近一次成功使用的时间。
 	TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error
-	// UnbindCredentialRepositories exposes the corresponding strongly typed database operation.
+	// UnbindCredentialRepositories 暴露相应的强类型数据库操作。
 	// 通过有效引用策略检查后，清除所有仓库引用。
 	// 归档仓库保留健康状态和历史，但不能继续持有已删除凭据的外键。
 	UnbindCredentialRepositories(ctx context.Context, arg UnbindCredentialRepositoriesParams) error
-	// UnbindGlobalCredentialRepositories exposes the corresponding strongly typed database operation.
+	// UnbindGlobalCredentialRepositories 暴露相应的强类型数据库操作。
 	// 在删除平台凭据前清除有效和归档仓库的引用。
 	// 只有有效仓库会记录需要重新认证的健康错误。
 	UnbindGlobalCredentialRepositories(ctx context.Context, arg UnbindGlobalCredentialRepositoriesParams) error
-	// UnpublishAssetVersion exposes the corresponding strongly typed database operation.
+	// UnpublishAssetVersion 暴露相应的强类型数据库操作。
 	// 将一条已发布版本置为 draft，供历史输入回退时解除既有 published 状态。
 	UnpublishAssetVersion(ctx context.Context, arg UnpublishAssetVersionParams) (int64, error)
-	// UpdateAssetItemSearchVector exposes the corresponding strongly typed database operation.
+	// UpdateAssetItemSearchVector 暴露相应的强类型数据库操作。
 	// 更新一条资产版本条目的 tsvector 全文检索向量。
 	UpdateAssetItemSearchVector(ctx context.Context, arg UpdateAssetItemSearchVectorParams) (int64, error)
-	// UpdateAssetRefTrackHead exposes the corresponding strongly typed database operation.
+	// UpdateAssetRefTrackHead 暴露相应的强类型数据库操作。
 	// 更新一条轨迹的版本头。
 	UpdateAssetRefTrackHead(ctx context.Context, arg UpdateAssetRefTrackHeadParams) (int64, error)
-	// UpdateAssetVersionPublish exposes the corresponding strongly typed database operation.
+	// UpdateAssetVersionPublish 暴露相应的强类型数据库操作。
 	// 更新一条资产版本的生命周期与版本标签并递增 revision。
 	UpdateAssetVersionPublish(ctx context.Context, arg UpdateAssetVersionPublishParams) (AssetVersion, error)
-	// UpdateCredentialMetadata exposes the corresponding strongly typed database operation.
+	// UpdateCredentialMetadata 暴露相应的强类型数据库操作。
 	// 有条件地更新租户凭据元数据并递增版本号。
 	UpdateCredentialMetadata(ctx context.Context, arg UpdateCredentialMetadataParams) (Credential, error)
-	// UpdateGlobalCredentialMetadata exposes the corresponding strongly typed database operation.
+	// UpdateGlobalCredentialMetadata 暴露相应的强类型数据库操作。
 	// 有条件地更新平台凭据名称并递增版本号。
 	UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error)
-	// UpdateLayerHeadPointers exposes the corresponding strongly typed database operation.
+	// UpdateLayerHeadPointers 暴露相应的强类型数据库操作。
 	// 更新或创建（upsert）一个层头的最新/生效/候选修订指针并递增代次。
 	// 首次提交插入 generation=1；后续提交在既有行上递增 generation。
 	UpdateLayerHeadPointers(ctx context.Context, arg UpdateLayerHeadPointersParams) (LayerHead, error)
-	// UpdateLayerOrd exposes the corresponding strongly typed database operation.
+	// UpdateLayerOrd 暴露相应的强类型数据库操作。
 	// 更新一条层的排序号并递增 revision。
 	UpdateLayerOrd(ctx context.Context, arg UpdateLayerOrdParams) (Layer, error)
-	// UpdateLayerRevisionReview exposes the corresponding strongly typed database operation.
+	// UpdateLayerRevisionReview 暴露相应的强类型数据库操作。
 	// 将一条待审核修订置为 approved 或 rejected 并写入审核备注。
 	UpdateLayerRevisionReview(ctx context.Context, arg UpdateLayerRevisionReviewParams) (LayerRevision, error)
-	// UpdateProducerProfileDependencyStatus exposes the corresponding strongly typed database operation.
+	// UpdateProducerProfileDependencyStatus 暴露相应的强类型数据库操作。
 	// 启动时全量重扫并刷新依赖状态。
 	UpdateProducerProfileDependencyStatus(ctx context.Context, arg UpdateProducerProfileDependencyStatusParams) (int64, error)
-	// UpdateRepository exposes the corresponding strongly typed database operation.
+	// UpdateRepository 暴露相应的强类型数据库操作。
 	// 有条件地更新明确提供的仓库字段并递增版本号。
 	// 字段 set 标志保留字段省略和显式 JSON null 之间的区别。
 	UpdateRepository(ctx context.Context, arg UpdateRepositoryParams) (Repository, error)
-	// UpdateService exposes the corresponding strongly typed database operation.
+	// UpdateService 暴露相应的强类型数据库操作。
 	// 有条件地更新服务元数据并递增 revision。
 	// description 使用 set 标志保留「未提供」与「显式置空」的区别。
 	UpdateService(ctx context.Context, arg UpdateServiceParams) (Service, error)
-	// UpdateSourceSpec exposes the corresponding strongly typed database operation.
+	// UpdateSourceSpec 暴露相应的强类型数据库操作。
 	// 更新一条源配置，应用明确提供的 PATCH 字段并递增版本。
 	UpdateSourceSpec(ctx context.Context, arg UpdateSourceSpecParams) (SourceSpec, error)
-	// UpdateTenant exposes the corresponding strongly typed database operation.
+	// UpdateTenant 暴露相应的强类型数据库操作。
 	// 有条件地更新平台控制的租户字段并递增版本号。
 	// 字段 set 标志保留 PATCH 字段省略状态，同时允许完整替换配额。
 	UpdateTenant(ctx context.Context, arg UpdateTenantParams) (Tenant, error)
-	// UpsertAiGenerationResult exposes the corresponding strongly typed database operation.
+	// UpsertAiGenerationResult 暴露相应的强类型数据库操作。
 	// M3 AI 评审与发布的持久化查询。
 	// 全部查询保留 tenant_id 谓词；涉及层头（评审事务）的查询带 FOR UPDATE 锁。
 	// 幂等保存一次 AI 资产生成结果快照。
 	UpsertAiGenerationResult(ctx context.Context, arg UpsertAiGenerationResultParams) (AiGenerationResult, error)
-	// UpsertAsset exposes the corresponding strongly typed database operation.
+	// UpsertAsset 暴露相应的强类型数据库操作。
 	// 幂等创建资产；唯一键冲突时返回已存在行。
 	UpsertAsset(ctx context.Context, arg UpsertAssetParams) (Asset, error)
-	// UpsertDiscoveryCandidate exposes the corresponding strongly typed database operation.
+	// UpsertDiscoveryCandidate 暴露相应的强类型数据库操作。
 	// 按仓库引用身份解析候选键：repositoryId + rootDir，不含 commit。
 	UpsertDiscoveryCandidate(ctx context.Context, arg UpsertDiscoveryCandidateParams) (DiscoveryCandidate, error)
-	// UpsertLayerHead exposes the corresponding strongly typed database operation.
+	// UpsertLayerHead 暴露相应的强类型数据库操作。
 	// 幂等创建层头。
 	UpsertLayerHead(ctx context.Context, arg UpsertLayerHeadParams) (LayerHead, error)
-	// UpsertRecentService exposes the corresponding strongly typed database operation.
+	// UpsertRecentService 暴露相应的强类型数据库操作。
 	// 幂等记录一次用户对服务的成功访问。
 	UpsertRecentService(ctx context.Context, arg UpsertRecentServiceParams) (int64, error)
-	// UpsertSourceBinding exposes the corresponding strongly typed database operation.
+	// UpsertSourceBinding 暴露相应的强类型数据库操作。
 	// 幂等创建源绑定。
 	UpsertSourceBinding(ctx context.Context, arg UpsertSourceBindingParams) (SourceBinding, error)
-	// UpsertTenantMember exposes the corresponding strongly typed database operation.
+	// UpsertTenantMember 暴露相应的强类型数据库操作。
 	// 创建或替换租户角色关系，并记录调用方提供的更新时间。
 	UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error)
 }

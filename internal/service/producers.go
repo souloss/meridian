@@ -15,24 +15,41 @@ const (
 	maxProducerProfileArgs        = 64
 	producerTimeoutCommandDefault = 300
 	producerTimeoutAIDefault      = 600
+	// producerMemoryMiBDefault 是生产者内存上限的默认值（MiB），来源 domain.yaml limits.memoryMiB。
+	producerMemoryMiBDefault = 1024
+	// producerMemoryMiBMin 是生产者内存上限的最小值（MiB）。
+	producerMemoryMiBMin = 64
+	// producerMemoryMiBMax 是生产者内存上限的最大值（MiB）。
+	producerMemoryMiBMax = 16384
+	// producerCPUSecondsDefault 是生产者 CPU 时间配额的默认值（秒），来源 domain.yaml limits.cpuSeconds。
+	producerCPUSecondsDefault = 600
+	// producerCPUSecondsMin 是生产者 CPU 时间配额的最小值（秒）。
+	producerCPUSecondsMin = 1
+	// producerCPUSecondsMax 是生产者 CPU 时间配额的最大值（秒）。
+	producerCPUSecondsMax = 3600
+	// producerPidsDefault 是生产者进程数上限的默认值，来源 domain.yaml limits.pids。
+	producerPidsDefault = 128
+	// producerPidsMin 是生产者进程数上限的最小值。
+	producerPidsMin = 1
+	// producerPidsMax 是生产者进程数上限的最大值。
+	producerPidsMax = 1024
 )
 
-// Producers coordinates platform producer configuration and tenant selection rules.
+// Producers 协调平台生产者配置与租户选择规则。
 type Producers struct {
 	store      ProducerStore
 	identities IdentityStore
 }
 
-// NewProducers constructs producer profile use cases with caller-owned persistence.
+// NewProducers 构造由调用方持有持久化的生产者配置用例。
 func NewProducers(store ProducerStore, identities IdentityStore) *Producers {
 	return &Producers{store: store, identities: identities}
 }
 
-// ListAvailable returns enabled, dependency-available producer profiles visible
-// to a tenant member, optionally filtered to profiles whose supportedKinds
-// contain the requested kind.
+// ListAvailable 返回租户成员可见的、启用且依赖可用的生产者配置，可按 supportedKinds
+// 包含所请求类别进行过滤。
 func (producers *Producers) ListAvailable(ctx context.Context, actor Principal, tenantSlug, kind string) ([]ProducerProfileOption, error) {
-	if _, err := producers.tenantMembership(ctx, actor, tenantSlug, "service:write"); err != nil {
+	if _, err := producers.tenantMembership(ctx, actor, tenantSlug, scopeServiceWrite); err != nil {
 		return nil, err
 	}
 	if kind != "" && !validKindID(kind) {
@@ -54,7 +71,7 @@ func (producers *Producers) ListAvailable(ctx context.Context, actor Principal, 
 	return options, nil
 }
 
-// Create validates, probes the executable, and inserts one platform producer profile.
+// Create 校验、探测可执行文件并插入一个平台生产者配置。
 func (producers *Producers) Create(ctx context.Context, actor Principal, input NewProducerProfile) (ProducerProfile, error) {
 	if !isPlatformAdministrator(actor) {
 		return ProducerProfile{}, ErrNotFound
@@ -70,7 +87,7 @@ func (producers *Producers) Create(ctx context.Context, actor Principal, input N
 
 func (producers *Producers) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
@@ -106,7 +123,7 @@ func validateNewProducerProfile(input NewProducerProfile) (NewProducerProfile, e
 			return NewProducerProfile{}, ErrValidation
 		}
 	}
-	if input.Network != "none" && input.Network != "inherit" {
+	if input.Network != producerNetworkNone && input.Network != producerNetworkInherit {
 		return NewProducerProfile{}, ErrValidation
 	}
 	if input.TimeoutSec == 0 {
@@ -116,25 +133,25 @@ func validateNewProducerProfile(input NewProducerProfile) (NewProducerProfile, e
 			input.TimeoutSec = producerTimeoutCommandDefault
 		}
 	}
-	if input.TimeoutSec < 10 || input.TimeoutSec > 3600 {
+	if input.TimeoutSec < sourceTimeoutMinSec || input.TimeoutSec > sourceTimeoutMaxSec {
 		return NewProducerProfile{}, ErrValidation
 	}
 	if input.MemoryMiB == 0 {
-		input.MemoryMiB = 1024
+		input.MemoryMiB = producerMemoryMiBDefault
 	}
-	if input.MemoryMiB < 64 || input.MemoryMiB > 16384 {
+	if input.MemoryMiB < producerMemoryMiBMin || input.MemoryMiB > producerMemoryMiBMax {
 		return NewProducerProfile{}, ErrValidation
 	}
 	if input.CPUSeconds == 0 {
-		input.CPUSeconds = 600
+		input.CPUSeconds = producerCPUSecondsDefault
 	}
-	if input.CPUSeconds < 1 || input.CPUSeconds > 3600 {
+	if input.CPUSeconds < producerCPUSecondsMin || input.CPUSeconds > producerCPUSecondsMax {
 		return NewProducerProfile{}, ErrValidation
 	}
 	if input.Pids == 0 {
-		input.Pids = 128
+		input.Pids = producerPidsDefault
 	}
-	if input.Pids < 1 || input.Pids > 1024 {
+	if input.Pids < producerPidsMin || input.Pids > producerPidsMax {
 		return NewProducerProfile{}, ErrValidation
 	}
 	input.Args = slices.Clone(input.Args)
@@ -147,16 +164,16 @@ func probeExecutable(executable string) (string, *string) {
 	info, err := os.Stat(executable)
 	if err != nil || info.IsDir() {
 		reason := "executable path does not exist"
-		return "unavailable", &reason
+		return dependencyStatusUnavailable, &reason
 	}
 	if info.Mode().Perm()&0o111 == 0 {
 		reason := "executable path is not executable"
-		return "unavailable", &reason
+		return dependencyStatusUnavailable, &reason
 	}
-	return "available", nil
+	return dependencyStatusAvailable, nil
 }
 
-// validKindID accepts the finite asset kind identifiers registered in the contract.
+// validKindID 接受契约中注册的有限资产类别标识。
 func validKindID(kind string) bool {
 	if kind == "" || utf8.RuneCountInString(kind) > 64 || kind != strings.TrimSpace(kind) {
 		return false

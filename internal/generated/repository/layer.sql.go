@@ -18,15 +18,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetAssetVersionForProvenanceParams contains the strongly typed arguments for the GetAssetVersionForProvenance query.
+// GetAssetVersionForProvenanceParams 包含 GetAssetVersionForProvenance 查询的强类型参数。
 type GetAssetVersionForProvenanceParams struct {
-	// TenantID is the tenant id value supplied to the GetAssetVersionForProvenance query.
+	// TenantID 是提供给 GetAssetVersionForProvenance 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetAssetVersionForProvenance query.
+	// ID 是提供给 GetAssetVersionForProvenance 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetAssetVersionForProvenance executes the generated GetAssetVersionForProvenance database query.
+// GetAssetVersionForProvenance 执行生成的 GetAssetVersionForProvenance 数据库查询。
 // 按 id 返回一个资产版本，供溯源读取层清单与基准。
 func (q *Queries) GetAssetVersionForProvenance(ctx context.Context, arg GetAssetVersionForProvenanceParams) (AssetVersion, error) {
 	row := q.db.QueryRow(ctx, getAssetVersionForProvenance, arg.TenantID, arg.ID)
@@ -74,15 +74,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetLayerParams contains the strongly typed arguments for the GetLayer query.
+// GetLayerParams 包含 GetLayer 查询的强类型参数。
 type GetLayerParams struct {
-	// TenantID is the tenant id value supplied to the GetLayer query.
+	// TenantID 是提供给 GetLayer 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetLayer query.
+	// ID 是提供给 GetLayer 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetLayer executes the generated GetLayer database query.
+// GetLayer 执行生成的 GetLayer 数据库查询。
 // M2 层编辑、overlay 修订、回滚与排序的持久化查询。
 // 全部查询保留 tenant_id 谓词。
 // 返回一条活跃层。
@@ -118,15 +118,15 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// GetLayerForUpdateParams contains the strongly typed arguments for the GetLayerForUpdate query.
+// GetLayerForUpdateParams 包含 GetLayerForUpdate 查询的强类型参数。
 type GetLayerForUpdateParams struct {
-	// TenantID is the tenant id value supplied to the GetLayerForUpdate query.
+	// TenantID 是提供给 GetLayerForUpdate 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetLayerForUpdate query.
+	// ID 是提供给 GetLayerForUpdate 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetLayerForUpdate executes the generated GetLayerForUpdate database query.
+// GetLayerForUpdate 执行生成的 GetLayerForUpdate 数据库查询。
 // 锁定一条活跃层，供排序与回滚前校验 revision。
 func (q *Queries) GetLayerForUpdate(ctx context.Context, arg GetLayerForUpdateParams) (Layer, error) {
 	row := q.db.QueryRow(ctx, getLayerForUpdate, arg.TenantID, arg.ID)
@@ -158,15 +158,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetLayerRevisionParams contains the strongly typed arguments for the GetLayerRevision query.
+// GetLayerRevisionParams 包含 GetLayerRevision 查询的强类型参数。
 type GetLayerRevisionParams struct {
-	// TenantID is the tenant id value supplied to the GetLayerRevision query.
+	// TenantID 是提供给 GetLayerRevision 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetLayerRevision query.
+	// ID 是提供给 GetLayerRevision 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetLayerRevision executes the generated GetLayerRevision database query.
+// GetLayerRevision 执行生成的 GetLayerRevision 数据库查询。
 // 返回一条层修订，供回滚与溯源读取。
 func (q *Queries) GetLayerRevision(ctx context.Context, arg GetLayerRevisionParams) (LayerRevision, error) {
 	row := q.db.QueryRow(ctx, getLayerRevision, arg.TenantID, arg.ID)
@@ -203,15 +203,15 @@ WHERE layer_heads.tenant_id = $1
   AND layer.deleted_at IS NULL
 `
 
-// ListLayerHeadsForAssetParams contains the strongly typed arguments for the ListLayerHeadsForAsset query.
+// ListLayerHeadsForAssetParams 包含 ListLayerHeadsForAsset 查询的强类型参数。
 type ListLayerHeadsForAssetParams struct {
-	// TenantID is the tenant id value supplied to the ListLayerHeadsForAsset query.
+	// TenantID 是提供给 ListLayerHeadsForAsset 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetID is the asset id value supplied to the ListLayerHeadsForAsset query.
+	// AssetID 是提供给 ListLayerHeadsForAsset 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
 }
 
-// ListLayerHeadsForAsset executes the generated ListLayerHeadsForAsset database query.
+// ListLayerHeadsForAsset 执行生成的 ListLayerHeadsForAsset 数据库查询。
 // 返回一个资产下全部层的头指针（用于合并选择有效修订）。
 func (q *Queries) ListLayerHeadsForAsset(ctx context.Context, arg ListLayerHeadsForAssetParams) ([]LayerHead, error) {
 	rows, err := q.db.Query(ctx, listLayerHeadsForAsset, arg.TenantID, arg.AssetID)
@@ -255,23 +255,23 @@ LIMIT $6
 OFFSET $5
 `
 
-// ListLayerRevisionsParams contains the strongly typed arguments for the ListLayerRevisions query.
+// ListLayerRevisionsParams 包含 ListLayerRevisions 查询的强类型参数。
 type ListLayerRevisionsParams struct {
-	// TenantID is the tenant id value supplied to the ListLayerRevisions query.
+	// TenantID 是提供给 ListLayerRevisions 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// LayerID is the layer id value supplied to the ListLayerRevisions query.
+	// LayerID 是提供给 ListLayerRevisions 查询的 LayerID 值。
 	LayerID uuid.UUID `json:"layer_id"`
-	// ScopeType is the scope type value supplied to the ListLayerRevisions query.
+	// ScopeType 是提供给 ListLayerRevisions 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the ListLayerRevisions query.
+	// ScopeKey 是提供给 ListLayerRevisions 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
-	// PageOffset is the page offset value supplied to the ListLayerRevisions query.
+	// PageOffset 是提供给 ListLayerRevisions 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListLayerRevisions query.
+	// PageLimit 是提供给 ListLayerRevisions 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListLayerRevisions executes the generated ListLayerRevisions database query.
+// ListLayerRevisions 执行生成的 ListLayerRevisions 数据库查询。
 // 列出某层某作用域内的全部修订，按创建时间倒序。
 func (q *Queries) ListLayerRevisions(ctx context.Context, arg ListLayerRevisionsParams) ([]LayerRevision, error) {
 	rows, err := q.db.Query(ctx, listLayerRevisions,
@@ -328,15 +328,15 @@ WHERE tenant_id = $1
 ORDER BY ord, id
 `
 
-// ListLayersForAssetParams contains the strongly typed arguments for the ListLayersForAsset query.
+// ListLayersForAssetParams 包含 ListLayersForAsset 查询的强类型参数。
 type ListLayersForAssetParams struct {
-	// TenantID is the tenant id value supplied to the ListLayersForAsset query.
+	// TenantID 是提供给 ListLayersForAsset 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetID is the asset id value supplied to the ListLayersForAsset query.
+	// AssetID 是提供给 ListLayersForAsset 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
 }
 
-// ListLayersForAsset executes the generated ListLayersForAsset database query.
+// ListLayersForAsset 执行生成的 ListLayersForAsset 数据库查询。
 // 返回一个资产下全部活跃层，按 ord 后 id 排序。
 func (q *Queries) ListLayersForAsset(ctx context.Context, arg ListLayersForAssetParams) ([]Layer, error) {
 	rows, err := q.db.Query(ctx, listLayersForAsset, arg.TenantID, arg.AssetID)
@@ -386,25 +386,25 @@ ON CONFLICT (tenant_id, layer_id, scope_type, scope_key) DO UPDATE SET
 RETURNING tenant_id, layer_id, scope_type, scope_key, latest_revision_id, effective_revision_id, candidate_revision_id, generation, updated_at
 `
 
-// UpdateLayerHeadPointersParams contains the strongly typed arguments for the UpdateLayerHeadPointers query.
+// UpdateLayerHeadPointersParams 包含 UpdateLayerHeadPointers 查询的强类型参数。
 type UpdateLayerHeadPointersParams struct {
-	// TenantID is the tenant id value supplied to the UpdateLayerHeadPointers query.
+	// TenantID 是提供给 UpdateLayerHeadPointers 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// LayerID is the layer id value supplied to the UpdateLayerHeadPointers query.
+	// LayerID 是提供给 UpdateLayerHeadPointers 查询的 LayerID 值。
 	LayerID uuid.UUID `json:"layer_id"`
-	// ScopeType is the scope type value supplied to the UpdateLayerHeadPointers query.
+	// ScopeType 是提供给 UpdateLayerHeadPointers 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the UpdateLayerHeadPointers query.
+	// ScopeKey 是提供给 UpdateLayerHeadPointers 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
-	// LatestRevisionID is the latest revision id value supplied to the UpdateLayerHeadPointers query.
+	// LatestRevisionID 是提供给 UpdateLayerHeadPointers 查询的 LatestRevisionID 值。
 	LatestRevisionID *uuid.UUID `json:"latest_revision_id"`
-	// EffectiveRevisionID is the effective revision id value supplied to the UpdateLayerHeadPointers query.
+	// EffectiveRevisionID 是提供给 UpdateLayerHeadPointers 查询的 EffectiveRevisionID 值。
 	EffectiveRevisionID *uuid.UUID `json:"effective_revision_id"`
-	// CandidateRevisionID is the candidate revision id value supplied to the UpdateLayerHeadPointers query.
+	// CandidateRevisionID 是提供给 UpdateLayerHeadPointers 查询的 CandidateRevisionID 值。
 	CandidateRevisionID *uuid.UUID `json:"candidate_revision_id"`
 }
 
-// UpdateLayerHeadPointers executes the generated UpdateLayerHeadPointers database query.
+// UpdateLayerHeadPointers 执行生成的 UpdateLayerHeadPointers 数据库查询。
 // 更新或创建（upsert）一个层头的最新/生效/候选修订指针并递增代次。
 // 首次提交插入 generation=1；后续提交在既有行上递增 generation。
 func (q *Queries) UpdateLayerHeadPointers(ctx context.Context, arg UpdateLayerHeadPointersParams) (LayerHead, error) {
@@ -442,19 +442,19 @@ WHERE tenant_id = $2
 RETURNING tenant_id, id, asset_id, source_spec_id, role, origin, ord, dialect, enabled, branch_patterns, display_name, revision, deleted_at, created_at, updated_at
 `
 
-// UpdateLayerOrdParams contains the strongly typed arguments for the UpdateLayerOrd query.
+// UpdateLayerOrdParams 包含 UpdateLayerOrd 查询的强类型参数。
 type UpdateLayerOrdParams struct {
-	// Ord is the ord value supplied to the UpdateLayerOrd query.
+	// Ord 是提供给 UpdateLayerOrd 查询的 Ord 值。
 	Ord int32 `json:"ord"`
-	// TenantID is the tenant id value supplied to the UpdateLayerOrd query.
+	// TenantID 是提供给 UpdateLayerOrd 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateLayerOrd query.
+	// ID 是提供给 UpdateLayerOrd 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the UpdateLayerOrd query.
+	// ExpectedRevision 是提供给 UpdateLayerOrd 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateLayerOrd executes the generated UpdateLayerOrd database query.
+// UpdateLayerOrd 执行生成的 UpdateLayerOrd 数据库查询。
 // 更新一条层的排序号并递增 revision。
 func (q *Queries) UpdateLayerOrd(ctx context.Context, arg UpdateLayerOrdParams) (Layer, error) {
 	row := q.db.QueryRow(ctx, updateLayerOrd,

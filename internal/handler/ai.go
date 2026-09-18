@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"uuid"
@@ -14,7 +13,16 @@ import (
 	"github.com/oapi-codegen/nullable"
 )
 
-// GenerateMissingAssetWithAi enqueues one AI generation for a missing asset.
+const (
+	// documentKindOpenAPI 是空差异骨架的文档 kind 标识。
+	documentKindOpenAPI = "openapi"
+	// operationGenerateMissingAssetWithAi 是缺失资产生成的幂等摘要操作名。
+	operationGenerateMissingAssetWithAi = "generateMissingAssetWithAi"
+	// operationPublishAssetVersion 是资产版本发布的幂等摘要操作名。
+	operationPublishAssetVersion = "publishAssetVersion"
+)
+
+// GenerateMissingAssetWithAi 为缺失资产入队一次 AI 生成任务。
 func (s *Server) GenerateMissingAssetWithAi(ctx context.Context, request asset.GenerateMissingAssetWithAiRequestObject) (asset.GenerateMissingAssetWithAiResponseObject, error) {
 	if s.aiWorkflow == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -40,7 +48,7 @@ func (s *Server) GenerateMissingAssetWithAi(ctx context.Context, request asset.G
 	if request.Body.ProducerProfileId != nil {
 		input.ProducerProfileID = serviceUUID(*request.Body.ProducerProfileId)
 	}
-	requestHash, err := service.RequestDigest("generateMissingAssetWithAi", map[string]any{
+	requestHash, err := service.RequestDigest(operationGenerateMissingAssetWithAi, map[string]any{
 		"tenantSlug": string(request.TenantSlug), "serviceSlug": string(request.ServiceSlug),
 	}, map[string]any{}, request.Body)
 	if err != nil {
@@ -58,7 +66,7 @@ func (s *Server) GenerateMissingAssetWithAi(ctx context.Context, request asset.G
 	}), nil
 }
 
-// GetReviewContext returns the candidate, current effective revision, and author.
+// GetReviewContext 返回候选修订、当前生效修订与作者信息。
 func (s *Server) GetReviewContext(ctx context.Context, request layer.GetReviewContextRequestObject) (layer.GetReviewContextResponseObject, error) {
 	if s.aiWorkflow == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -80,14 +88,14 @@ func (s *Server) GetReviewContext(ctx context.Context, request layer.GetReviewCo
 		author = nullable.NewNullableWithValue(userResponse(*result.Author))
 	}
 	return layer.GetReviewContext200JSONResponse(api.ReviewContext{
-		Revision:                layerRevisionResponse(result.Revision),
+		Revision:                 layerRevisionResponse(result.Revision),
 		CurrentEffectiveRevision: current,
-		Diff:                    emptyDiffResult(),
-		Author:                  author,
+		Diff:                     emptyDiffResult(),
+		Author:                   author,
 	}), nil
 }
 
-// ApproveLayerRevision approves one pending candidate and enqueues a merge job.
+// ApproveLayerRevision 批准一个待审核候选并入队一次合并任务。
 func (s *Server) ApproveLayerRevision(ctx context.Context, request layer.ApproveLayerRevisionRequestObject) (layer.ApproveLayerRevisionResponseObject, error) {
 	if s.aiWorkflow == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -110,7 +118,7 @@ func (s *Server) ApproveLayerRevision(ctx context.Context, request layer.Approve
 	return layer.ApproveLayerRevision200JSONResponse(reviewResultResponse(decision)), nil
 }
 
-// RejectLayerRevision rejects one pending candidate without advancing the head.
+// RejectLayerRevision 拒绝一个待审核候选且不推进当前生效头。
 func (s *Server) RejectLayerRevision(ctx context.Context, request layer.RejectLayerRevisionRequestObject) (layer.RejectLayerRevisionResponseObject, error) {
 	if s.aiWorkflow == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -129,7 +137,7 @@ func (s *Server) RejectLayerRevision(ctx context.Context, request layer.RejectLa
 	return layer.RejectLayerRevision200JSONResponse(reviewResultResponse(decision)), nil
 }
 
-// PublishAssetVersion publishes one draft version and advances the track head.
+// PublishAssetVersion 发布一个草稿版本并推进对应引用的头部。
 func (s *Server) PublishAssetVersion(ctx context.Context, request asset.PublishAssetVersionRequestObject) (asset.PublishAssetVersionResponseObject, error) {
 	if s.aiWorkflow == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -155,7 +163,7 @@ func (s *Server) PublishAssetVersion(ctx context.Context, request asset.PublishA
 			}
 		}
 	}
-	requestHash, err := service.RequestDigest("publishAssetVersion", map[string]any{
+	requestHash, err := service.RequestDigest(operationPublishAssetVersion, map[string]any{
 		"tenantSlug": string(request.TenantSlug), "versionId": request.VersionId.String(),
 	}, map[string]any{"if-match": request.Params.IfMatch}, request.Body)
 	if err != nil {
@@ -176,7 +184,7 @@ func (s *Server) PublishAssetVersion(ctx context.Context, request asset.PublishA
 	}, nil
 }
 
-// reviewResultResponse projects one approve/reject decision onto the API shape.
+// reviewResultResponse 将一次批准/拒绝决策投影为 API 形状。
 func reviewResultResponse(decision service.ReviewDecision) api.RevisionReviewResult {
 	effective := nullable.NewNullNullable[api.Uuid]()
 	if decision.EffectiveRevisionID != nil {
@@ -199,26 +207,26 @@ func reviewResultResponse(decision service.ReviewDecision) api.RevisionReviewRes
 	}
 }
 
-// emptyDiffResult returns an empty diff for a cold-start review context.
+// emptyDiffResult 为冷启动评审上下文返回一个空差异结果。
 func emptyDiffResult() api.DiffResult {
 	return api.DiffResult{
-		Kind: "openapi", Summary: api.DiffCounts{}, Changes: []api.DiffChange{},
-		Left:  emptyDocumentRef(), Right: emptyDocumentRef(),
+		Kind: documentKindOpenAPI, Summary: api.DiffCounts{}, Changes: []api.DiffChange{},
+		Left: emptyDocumentRef(), Right: emptyDocumentRef(),
 		SnapshotId: nullable.NewNullNullable[api.Uuid](),
 	}
 }
 
-// emptyDocumentRef returns an empty resolved document ref for the skeleton diff.
+// emptyDocumentRef 为骨架差异返回一个空的已解析文档引用。
 func emptyDocumentRef() api.ResolvedDocumentRef {
 	return api.ResolvedDocumentRef{
-		SourceType: api.ResolvedDocumentRefSourceType("version"), Kind: "openapi", ContentHash: "",
+		SourceType: api.ResolvedDocumentRefSourceTypeVersion, Kind: documentKindOpenAPI, ContentHash: "",
 		AssetId: nullable.NewNullNullable[api.Uuid](), VersionId: nullable.NewNullNullable[api.Uuid](),
-		UploadId: nullable.NewNullNullable[api.Uuid](),
+		UploadId:         nullable.NewNullNullable[api.Uuid](),
 		RequestedRefType: nullable.NewNullNullable[api.RefType](), RequestedRef: nullable.NewNullNullable[api.RefName](),
 	}
 }
 
-// rotationPrincipalID returns the stable principal identifier for replay identity.
+// rotationPrincipalID 返回用于重放身份的稳定主体标识。
 func rotationPrincipalID(principal service.Principal) uuid.UUID {
 	if principal.Kind == service.PrincipalPAT {
 		return principal.TokenID
@@ -226,18 +234,16 @@ func rotationPrincipalID(principal service.Principal) uuid.UUID {
 	return principal.User.ID
 }
 
-// parseVersionETag validates the opaque If-Match token for a publish request.
+// parseVersionETag 校验发布请求携带的不透明 If-Match 令牌。
 func parseVersionETag(etag string, versionID uuid.UUID) (int64, error) {
 	prefix := fmt.Sprintf(`"asset-version:%s:`, versionID.String())
 	if !strings.HasPrefix(etag, prefix) || !strings.HasSuffix(etag, `"`) {
-		return 0, errors.New("invalid entity tag")
+		return 0, service.ErrPrecondition
 	}
 	revisionText := strings.TrimSuffix(strings.TrimPrefix(etag, prefix), `"`)
 	var revision int64
 	if _, err := fmt.Sscan(revisionText, &revision); err != nil || revision < 1 {
-		return 0, errors.New("invalid entity tag revision")
+		return 0, service.ErrPrecondition
 	}
 	return revision, nil
 }
-
-var _ = strings.TrimSpace

@@ -10,37 +10,44 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// AiGenerateArgs is the durable, non-secret argument carried by an asset.ai_generate
-// River job. The producer profile and tenant settings are resolved at execution
-// time; no secret data ever enters the queue.
+// 阶段日志消息常量（值 = job_stage_log.message 同口径，供阶段推进与终态落库使用）。
+const (
+	// stageMessageAssetAiGenerateCompleted 表示资产 AI 生成成功完成。
+	stageMessageAssetAiGenerateCompleted = "asset AI generation completed"
+	// stageMessageAssetAiGenerateFailed 表示资产 AI 生成失败。
+	stageMessageAssetAiGenerateFailed = "asset AI generation failed"
+)
+
+// AiGenerateArgs 是 asset.ai_generate River 任务携带的持久化且不含机密信息的参数。
+// 生产者配置与租户设置在执行时解析；队列中永不进入机密数据。
 type AiGenerateArgs struct {
-	// TenantID identifies the tenant boundary for every execution query.
+	// TenantID 标识每次执行查询的租户边界。
 	TenantID uuid.UUID `json:"tenantId"`
-	// JobID identifies the application-owned durable job row.
+	// JobID 标识应用自有的持久化任务行。
 	JobID uuid.UUID `json:"jobId"`
-	// AssetID identifies the missing asset being generated.
+	// AssetID 标识待生成的缺失资产。
 	AssetID uuid.UUID `json:"assetId"`
 }
 
-// Kind returns the stable River kind name persisted in the River schema.
+// Kind 返回持久化在 River schema 中的稳定 River 任务类型名。
 func (AiGenerateArgs) Kind() string { return "meridian_asset_ai_generate" }
 
-// AiGenerateResult is the secret-free outcome of one AI generation run.
+// AiGenerateResult 是一次 AI 生成运行的脱敏结果。
 type AiGenerateResult struct {
-	// Stage identifies the terminal pipeline stage (normalize on success, extract/merge on failure).
+	// Stage 标识终态流水线阶段（成功时为 normalize，失败时为 extract/merge）。
 	Stage string `json:"stage"`
-	// ErrorCode carries a stable failure classification; empty on success.
+	// ErrorCode 携带稳定的失败分类；成功时为空。
 	ErrorCode string `json:"errorCode,omitempty"`
-	// RevisionID identifies the created revision; empty when no revision was created.
+	// RevisionID 标识新建的修订；未创建修订时为空。
 	RevisionID uuid.UUID `json:"revisionId,omitempty"`
 }
 
-// AiGenerateRunner executes one AI generation after the durable job is claimed.
+// AiGenerateRunner 在持久化任务被领取后执行一次 AI 生成。
 type AiGenerateRunner interface {
 	RunAiGeneration(context.Context, AiGenerateArgs) (AiGenerateResult, error)
 }
 
-// AiGenerateWorker advances durable Meridian state around one asset.ai_generate attempt.
+// AiGenerateWorker 围绕一次 asset.ai_generate 尝试推进持久化的 Meridian 状态。
 type AiGenerateWorker struct {
 	river.WorkerDefaults[AiGenerateArgs]
 	store  ExecutionStore
@@ -48,13 +55,12 @@ type AiGenerateWorker struct {
 	now    func() time.Time
 }
 
-// NewAiGenerateWorker constructs the M3 AI generation worker.
+// NewAiGenerateWorker 构造 M3 的 AI 生成工作器。
 func NewAiGenerateWorker(store ExecutionStore, runner AiGenerateRunner) *AiGenerateWorker {
 	return &AiGenerateWorker{store: store, runner: runner, now: time.Now}
 }
 
-// Work claims the durable job, runs the generation, and finishes it with a
-// redacted result or a structured error carrying the failure stage and code.
+// Work 领取持久化任务，执行生成，并以脱敏的结果或携带失败阶段与错误码的结构化错误收尾。
 func (worker *AiGenerateWorker) Work(ctx context.Context, job *river.Job[AiGenerateArgs]) error {
 	if worker.store == nil {
 		return errors.New("AI generation worker has no execution store")
@@ -82,19 +88,18 @@ func (worker *AiGenerateWorker) Work(ctx context.Context, job *river.Job[AiGener
 		return err
 	}
 	return worker.store.FinishJob(ctx, FinishInput{
-		TenantID: job.Args.TenantID, JobID: job.Args.JobID, Status: "succeeded", Result: payload,
-		ExpectedAttempt: job.Attempt, Stage: StageIndex, Level: "info",
-		Message: "asset AI generation completed", Terminal: true, FinishedAt: worker.now().UTC(),
+		TenantID: job.Args.TenantID, JobID: job.Args.JobID, Status: jobStatusSucceeded, Result: payload,
+		ExpectedAttempt: job.Attempt, Stage: StageIndex, Level: logLevelInfo,
+		Message: stageMessageAssetAiGenerateCompleted, Terminal: true, FinishedAt: worker.now().UTC(),
 	})
 }
 
-// finishFailure persists a failed terminal state with the failure stage and a
-// stable error code. A non-terminal error is deliberately re-raised so River
-// retries it; here all outcomes are terminal because the runner persists its own
-// outcome snapshot, so an error from the runner is a hard infrastructure failure.
+// finishFailure 使用失败阶段与稳定错误码持久化终态失败。
+// 非终态错误会被刻意重新抛出以便 River 重试；这里所有结果都是终态，
+// 因为运行器自行持久化结果快照，因此运行器返回的错误是硬性基础设施故障。
 func (worker *AiGenerateWorker) finishFailure(ctx context.Context, args AiGenerateArgs, expectedAttempt int, stage Stage, errorCode string, cause error) error {
 	if errorCode == "" {
-		errorCode = "internal_error"
+		errorCode = errorCodeInternal
 	}
 	errorPayload, err := json.Marshal(struct {
 		Code  string `json:"code"`
@@ -104,9 +109,9 @@ func (worker *AiGenerateWorker) finishFailure(ctx context.Context, args AiGenera
 		return err
 	}
 	finishErr := worker.store.FinishJob(ctx, FinishInput{
-		TenantID: args.TenantID, JobID: args.JobID, Status: "failed", Error: errorPayload, ErrorCode: errorCode,
+		TenantID: args.TenantID, JobID: args.JobID, Status: jobStatusFailed, Error: errorPayload, ErrorCode: errorCode,
 		ExpectedAttempt: expectedAttempt,
-		Stage:           stage, Level: "error", Message: "asset AI generation failed", Terminal: true, FinishedAt: worker.now().UTC(),
+		Stage:           stage, Level: logLevelError, Message: stageMessageAssetAiGenerateFailed, Terminal: true, FinishedAt: worker.now().UTC(),
 	})
 	if finishErr != nil {
 		return errors.Join(cause, finishErr)

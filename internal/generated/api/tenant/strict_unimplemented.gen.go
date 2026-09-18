@@ -8,151 +8,151 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// ListCredentials returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListCredentials 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListCredentials(ctx context.Context, request ListCredentialsRequestObject) (ListCredentialsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateCredential(ctx context.Context, request CreateCredentialRequestObject) (CreateCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteCredential(ctx context.Context, request DeleteCredentialRequestObject) (DeleteCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateCredential(ctx context.Context, request UpdateCredentialRequestObject) (UpdateCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RotateCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RotateCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RotateCredential(ctx context.Context, request RotateCredentialRequestObject) (RotateCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// TestCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// TestCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) TestCredential(ctx context.Context, request TestCredentialRequestObject) (TestCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// SearchTenantUsers returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// SearchTenantUsers 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) SearchTenantUsers(ctx context.Context, request SearchTenantUsersRequestObject) (SearchTenantUsersResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateTenantExport returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateTenantExport 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateTenantExport(ctx context.Context, request CreateTenantExportRequestObject) (CreateTenantExportResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListKnownHosts returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListKnownHosts 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListKnownHosts(ctx context.Context, request ListKnownHostsRequestObject) (ListKnownHostsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateKnownHost returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateKnownHost 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateKnownHost(ctx context.Context, request CreateKnownHostRequestObject) (CreateKnownHostResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListTenantMembers returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListTenantMembers 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListTenantMembers(ctx context.Context, request ListTenantMembersRequestObject) (ListTenantMembersResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteTenantMember returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteTenantMember 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteTenantMember(ctx context.Context, request DeleteTenantMemberRequestObject) (DeleteTenantMemberResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PutTenantMember returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PutTenantMember 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PutTenantMember(ctx context.Context, request PutTenantMemberRequestObject) (PutTenantMemberResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListAvailableProducerProfiles returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListAvailableProducerProfiles 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListAvailableProducerProfiles(ctx context.Context, request ListAvailableProducerProfilesRequestObject) (ListAvailableProducerProfilesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetTenantSettings returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetTenantSettings 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetTenantSettings(ctx context.Context, request GetTenantSettingsRequestObject) (GetTenantSettingsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateTenantSettings returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateTenantSettings 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateTenantSettings(ctx context.Context, request UpdateTenantSettingsRequestObject) (UpdateTenantSettingsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListTags returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListTags 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListTags(ctx context.Context, request ListTagsRequestObject) (ListTagsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateTag returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateTag 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateTag(ctx context.Context, request CreateTagRequestObject) (CreateTagResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteTag returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteTag 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteTag(ctx context.Context, request DeleteTagRequestObject) (DeleteTagResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateTag returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateTag 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateTag(ctx context.Context, request UpdateTagRequestObject) (UpdateTagResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListTeams returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListTeams 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListTeams(ctx context.Context, request ListTeamsRequestObject) (ListTeamsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateTeam returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateTeam 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateTeam(ctx context.Context, request CreateTeamRequestObject) (CreateTeamResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteTeam returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteTeam 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteTeam(ctx context.Context, request DeleteTeamRequestObject) (DeleteTeamResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetTeam returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetTeam 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetTeam(ctx context.Context, request GetTeamRequestObject) (GetTeamResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateTeam returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateTeam 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateTeam(ctx context.Context, request UpdateTeamRequestObject) (UpdateTeamResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ReplaceTeamMembers returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ReplaceTeamMembers 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ReplaceTeamMembers(ctx context.Context, request ReplaceTeamMembersRequestObject) (ReplaceTeamMembersResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListTokens returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListTokens 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListTokens(ctx context.Context, request ListTokensRequestObject) (ListTokensResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateToken returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateToken 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateToken(ctx context.Context, request CreateTokenRequestObject) (CreateTokenResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RevokeToken returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RevokeToken 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RevokeToken(ctx context.Context, request RevokeTokenRequestObject) (RevokeTokenResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

@@ -1,4 +1,4 @@
-// Package service implements Meridian business use cases and authorization.
+// Package service 实现 Meridian 业务用例与授权。
 package service
 
 import (
@@ -31,10 +31,10 @@ var dummyPasswordHash = sync.OnceValue(func() string {
 	return encodePasswordHash("meridian-invalid-credential", salt)
 })
 
-// PasswordHasher creates and verifies the frozen Argon2id PHC representation.
+// PasswordHasher 创建并校验冻结的 Argon2id PHC 表示。
 type PasswordHasher struct{}
 
-// Hash converts a plaintext password to the frozen Argon2id PHC representation.
+// Hash 将明文密码转换为冻结的 Argon2id PHC 表示。
 func (PasswordHasher) Hash(password string) (string, error) {
 	salt := make([]byte, passwordSaltBytes)
 	if _, err := rand.Read(salt); err != nil {
@@ -43,7 +43,7 @@ func (PasswordHasher) Hash(password string) (string, error) {
 	return encodePasswordHash(password, salt), nil
 }
 
-// Verify performs an Argon2id derivation and constant-time comparison against a PHC verifier.
+// Verify 对 PHC 校验符执行 Argon2id 派生与常量时间比较。
 func (PasswordHasher) Verify(password, encoded string) bool {
 	salt, expected, ok := parsePasswordHash(encoded)
 	if !ok {
@@ -53,7 +53,7 @@ func (PasswordHasher) Verify(password, encoded string) bool {
 	return subtle.ConstantTimeCompare(actual, expected) == 1
 }
 
-// VerifyDummy performs the same expensive derivation used for a missing login identity.
+// VerifyDummy 执行与缺失登录身份相同的昂贵派生。
 func (hasher PasswordHasher) VerifyDummy(password string) {
 	_ = hasher.Verify(password, dummyPasswordHash())
 }
@@ -89,12 +89,12 @@ func parsePasswordHash(encoded string) ([]byte, []byte, bool) {
 	return salt, hash, true
 }
 
-// TokenDigester generates opaque bearer values and stores only keyed digests.
+// TokenDigester 生成不透明承载值并仅存储密钥化摘要。
 type TokenDigester struct {
 	pepper [tokenPepperBytes]byte
 }
 
-// NewTokenDigester validates an unpadded base64url-encoded 32-byte deployment pepper.
+// NewTokenDigester 校验未填充 base64url 编码的 32 字节部署 pepper。
 func NewTokenDigester(encodedPepper string) (TokenDigester, error) {
 	decoded, err := base64.RawURLEncoding.DecodeString(encodedPepper)
 	if err != nil {
@@ -108,7 +108,7 @@ func NewTokenDigester(encodedPepper string) (TokenDigester, error) {
 	return digester, nil
 }
 
-// NewOpaqueToken creates a prefix plus 32 random bytes encoded without base64 padding.
+// NewOpaqueToken 创建前缀加 32 随机字节、不带 base64 填充编码的令牌。
 func (digester TokenDigester) NewOpaqueToken(prefix string) (plaintext string, digest []byte, err error) {
 	randomBytes := make([]byte, opaqueTokenBytes)
 	if _, err := rand.Read(randomBytes); err != nil {
@@ -118,14 +118,14 @@ func (digester TokenDigester) NewOpaqueToken(prefix string) (plaintext string, d
 	return plaintext, digester.Digest(plaintext), nil
 }
 
-// Digest returns the fixed-width HMAC-SHA-256 digest used for token lookup.
+// Digest 返回用于令牌查找的定宽 HMAC-SHA-256 摘要。
 func (digester TokenDigester) Digest(plaintext string) []byte {
 	mac := hmac.New(sha256.New, digester.pepper[:])
 	_, _ = mac.Write([]byte(plaintext))
 	return mac.Sum(nil)
 }
 
-// Matches compares a submitted plaintext token with an expected digest in constant time.
+// Matches 以常量时间比较提交的明文令牌与期望摘要。
 func (digester TokenDigester) Matches(plaintext string, expectedDigest []byte) bool {
 	return hmac.Equal(digester.Digest(plaintext), expectedDigest)
 }

@@ -17,18 +17,18 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// JobControlStore combines job queries with transaction-aware River controls.
+// JobControlStore 组合任务查询与事务感知的 River 控制。
 type JobControlStore struct {
 	*RepositoryStore
 	riverClient *river.Client[pgx.Tx]
 }
 
-// NewJobControlStore binds tenant job control to PostgreSQL and the process River client.
+// NewJobControlStore 将租户任务控制绑定到 PostgreSQL 与进程 River 客户端。
 func NewJobControlStore(pool *pgxpool.Pool, riverClient *river.Client[pgx.Tx]) *JobControlStore {
 	return &JobControlStore{RepositoryStore: NewRepositoryStore(pool), riverClient: riverClient}
 }
 
-// ListTenantJobs returns one tenant page and attaches all attempt logs with one batch query.
+// ListTenantJobs 返回一页租户任务，并以一次批量查询挂接全部尝试日志。
 func (store *JobControlStore) ListTenantJobs(ctx context.Context, tenantID uuid.UUID, filter service.JobFilter, limit, offset int32) ([]service.JobRecord, int64, error) {
 	query := generated.CountTenantJobsParams{
 		TenantID: tenantID, TypeFilter: filter.Types, StatusFilter: filter.Statuses,
@@ -65,7 +65,7 @@ func (store *JobControlStore) ListTenantJobs(ctx context.Context, tenantID uuid.
 	return items, total, nil
 }
 
-// GetTenantJob returns one tenant job with its complete persisted attempt history.
+// GetTenantJob 返回一个租户任务及其完整持久化的尝试历史。
 func (store *JobControlStore) GetTenantJob(ctx context.Context, tenantID, id uuid.UUID) (service.JobRecord, error) {
 	row, err := store.queries.GetTenantJob(ctx, generated.GetTenantJobParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -84,7 +84,7 @@ func (store *JobControlStore) GetTenantJob(ctx context.Context, tenantID, id uui
 	return items[0], nil
 }
 
-// GetTenantJobStreamState returns one lightweight state and its transactionally observed log cursor.
+// GetTenantJobStreamState 返回一份轻量状态及其事务内观测到的日志游标。
 func (store *JobControlStore) GetTenantJobStreamState(ctx context.Context, tenantID, id uuid.UUID) (service.JobRecord, int64, error) {
 	row, err := store.queries.GetTenantJobStreamState(ctx, generated.GetTenantJobStreamStateParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -104,7 +104,7 @@ func (store *JobControlStore) GetTenantJobStreamState(ctx context.Context, tenan
 	return item, row.LogCursor, nil
 }
 
-// ListTenantJobLogsAfter returns a bounded sequence-ordered replay batch.
+// ListTenantJobLogsAfter 返回一批按序列号有序的、有界的回放日志。
 func (store *JobControlStore) ListTenantJobLogsAfter(ctx context.Context, tenantID, jobID uuid.UUID, afterSequence int64, limit int32) ([]service.JobLogRecord, error) {
 	rows, err := store.queries.ListTenantJobLogsAfter(ctx, generated.ListTenantJobLogsAfterParams{
 		TenantID: tenantID, JobID: jobID, AfterSequence: afterSequence, EventLimit: limit,
@@ -121,7 +121,7 @@ func (store *JobControlStore) ListTenantJobLogsAfter(ctx context.Context, tenant
 	return items, nil
 }
 
-// CancelTenantJob atomically records the domain terminal state and cancels its River row.
+// CancelTenantJob 原子地记录领域终态并取消其 River 行。
 func (store *JobControlStore) CancelTenantJob(ctx context.Context, tenantID, id uuid.UUID, cancelledAt time.Time) (service.JobAccepted, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -133,7 +133,7 @@ func (store *JobControlStore) CancelTenantJob(ctx context.Context, tenantID, id 
 	if err != nil {
 		return service.JobAccepted{}, normalizeError(err)
 	}
-	if job.Status != "pending" && job.Status != "running" {
+	if job.Status != service.JobStatusPending && job.Status != service.JobStatusRunning {
 		return service.JobAccepted{}, service.ErrJobNotCancellable
 	}
 	if job.RiverJobID != nil {
@@ -155,7 +155,7 @@ func (store *JobControlStore) CancelTenantJob(ctx context.Context, tenantID, id 
 	return service.JobAccepted{JobID: id, Deduplicated: false}, nil
 }
 
-// RetryTenantJob atomically creates and enqueues one independent idempotent retry generation.
+// RetryTenantJob 原子地创建并入队一个独立的幂等重试代次。
 func (store *JobControlStore) RetryTenantJob(ctx context.Context, request service.RetryJobRequest) (service.JobAccepted, error) {
 	if len(request.RequestHash) != sha256DigestBytes || request.PrincipalType == "" || request.PrincipalID == uuid.Nil() || request.IdempotencyKey == uuid.Nil() {
 		return service.JobAccepted{}, service.ErrValidation
@@ -178,14 +178,14 @@ func (store *JobControlStore) RetryTenantJob(ctx context.Context, request servic
 	if err != nil {
 		return service.JobAccepted{}, normalizeError(err)
 	}
-	if (source.Status != "failed" && source.Status != "cancelled") || source.Type != "repo.sync" || source.ScopeID == nil || source.RefName == nil {
+	if (source.Status != service.JobStatusFailed && source.Status != service.JobStatusCancelled) || source.Type != jobTypeRepoSync || source.ScopeID == nil || source.RefName == nil {
 		return service.JobAccepted{}, service.ErrJobNotRetryable
 	}
 	latest, err := queries.LockLatestTenantJobGeneration(ctx, generated.LockLatestTenantJobGenerationParams{TenantID: request.TenantID, DedupeKey: source.DedupeKey})
 	if err != nil {
 		return service.JobAccepted{}, normalizeError(err)
 	}
-	if latest.ID != source.ID && (latest.Status == "pending" || latest.Status == "running") {
+	if latest.ID != source.ID && (latest.Status == service.JobStatusPending || latest.Status == service.JobStatusRunning) {
 		return service.JobAccepted{}, service.ErrJobNotRetryable
 	}
 	jobID := uuid.NewV7()
@@ -211,7 +211,7 @@ func (store *JobControlStore) RetryTenantJob(ctx context.Context, request servic
 	if err != nil {
 		return service.JobAccepted{}, normalizeError(err)
 	}
-	if changed != 1 {
+	if changed != rowsAffectedOne {
 		return service.JobAccepted{}, fmt.Errorf("attach retried River job: %w", service.ErrPrecondition)
 	}
 	accepted := service.JobAccepted{JobID: created.ID, Deduplicated: false}
@@ -224,12 +224,10 @@ func (store *JobControlStore) RetryTenantJob(ctx context.Context, request servic
 	return accepted, nil
 }
 
-const sha256DigestBytes = 32
-
 type retryJobReplay struct {
-	// JobID identifies the exact job returned by the original request.
+	// JobID 标识原请求返回的确切任务。
 	JobID uuid.UUID `json:"jobId"`
-	// Deduplicated preserves the exact original response field.
+	// Deduplicated 保留原响应字段的精确值。
 	Deduplicated bool `json:"deduplicated"`
 }
 
@@ -274,7 +272,7 @@ func saveRetryJobReplay(ctx context.Context, queries *generated.Queries, request
 }
 
 func retryJobLockKey(request service.RetryJobRequest) string {
-	return "retryJob:" + request.TenantID.String() + ":" + request.PrincipalType + ":" + request.PrincipalID.String() + ":" + request.IdempotencyKey.String()
+	return retryJobLockPrefix + request.TenantID.String() + ":" + request.PrincipalType + ":" + request.PrincipalID.String() + ":" + request.IdempotencyKey.String()
 }
 
 func tenantJobFromRow(row generated.Job) (service.JobRecord, error) {
@@ -312,23 +310,23 @@ func decodeJobError(jobID uuid.UUID, payload []byte) (*service.JobError, error) 
 		return nil, nil
 	}
 	var stored struct {
-		// Code is the persisted stable failure category.
+		// Code 是持久化的稳定失败分类。
 		Code string `json:"code"`
-		// Message is an optional pre-redacted explanation.
+		// Message 是可选的预脱敏说明。
 		Message string `json:"message"`
-		// RequestID is an optional originating request correlation identifier.
+		// RequestID 是可选的来源请求关联标识。
 		RequestID string `json:"requestId"`
-		// Details contains optional pre-redacted structured diagnostics.
+		// Details 包含可选的预脱敏结构化诊断信息。
 		Details map[string]any `json:"details"`
 	}
 	if err := json.Unmarshal(payload, &stored); err != nil {
 		return nil, fmt.Errorf("decode job error: %w", err)
 	}
-	if stored.Code == "" || stored.Code == "worker_failed" {
-		stored.Code = "internal_error"
+	if stored.Code == "" || stored.Code == jobErrorCodeWorkerFailed {
+		stored.Code = service.ErrorCodeInternal
 	}
 	if stored.Message == "" {
-		stored.Message = "job execution failed"
+		stored.Message = jobErrorDefaultMessage
 	}
 	if stored.RequestID == "" {
 		stored.RequestID = jobID.String()
@@ -363,14 +361,14 @@ func attachJobAttempts(items []service.JobRecord, logs []generated.JobStageLog) 
 		if len(attempts) == 0 || attempts[len(attempts)-1].attempt.Attempt != int(event.Attempt) || attempts[len(attempts)-1].attempt.Stage != *event.Stage {
 			startedAt := event.OccurredAt.Time
 			attempts = append(attempts, jobAttemptBuilder{attempt: service.JobStageAttempt{
-				Stage: *event.Stage, Attempt: int(event.Attempt), Status: "running", StartedAt: new(startedAt),
+				Stage: *event.Stage, Attempt: int(event.Attempt), Status: service.JobStatusRunning, StartedAt: new(startedAt),
 			}, lastAt: startedAt})
 		}
 		current := &attempts[len(attempts)-1]
 		current.lastAt = event.OccurredAt.Time
-		if event.Level == "error" {
+		if event.Level == jobStageLevelError {
 			current.failed = true
-			current.attempt.Status = "failed"
+			current.attempt.Status = service.JobStatusFailed
 			current.attempt.FinishedAt = new(event.OccurredAt.Time)
 		}
 		builders[event.JobID] = attempts
@@ -387,15 +385,15 @@ func attachJobAttempts(items []service.JobRecord, logs []generated.JobStageLog) 
 			if current.failed {
 				current.attempt.Error = job.Error
 				if current.attempt.Error == nil {
-					current.attempt.Error = &service.JobError{Code: "internal_error", Message: "job stage failed", RequestID: job.ID.String()}
+					current.attempt.Error = &service.JobError{Code: service.ErrorCodeInternal, Message: jobStageFailedMessage, RequestID: job.ID.String()}
 				}
-			} else if isCurrent && job.Status == "running" {
-				current.attempt.Status = "running"
+			} else if isCurrent && job.Status == service.JobStatusRunning {
+				current.attempt.Status = service.JobStatusRunning
 			} else if isCurrent && terminalJobRowStatus(job.Status) {
 				current.attempt.Status = job.Status
 				current.attempt.FinishedAt = job.FinishedAt
 			} else {
-				current.attempt.Status = "succeeded"
+				current.attempt.Status = service.JobStatusSucceeded
 				if attemptIndex+1 < len(attempts) && attempts[attemptIndex+1].attempt.Attempt == current.attempt.Attempt {
 					current.attempt.FinishedAt = attempts[attemptIndex+1].attempt.StartedAt
 				} else {
@@ -408,7 +406,7 @@ func attachJobAttempts(items []service.JobRecord, logs []generated.JobStageLog) 
 }
 
 func terminalJobRowStatus(status string) bool {
-	return status == "succeeded" || status == "succeeded_with_warnings" || status == "failed" || status == "outcome_unknown" || status == "cancelled"
+	return status == service.JobStatusSucceeded || status == service.JobStatusSucceededWithWarnings || status == service.JobStatusFailed || status == service.JobStatusOutcomeUnknown || status == service.JobStatusCancelled
 }
 
 var _ service.JobStore = (*JobControlStore)(nil)

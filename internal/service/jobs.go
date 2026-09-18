@@ -12,24 +12,23 @@ import (
 )
 
 var validJobTypes = [...]string{"tenant.delete", "repo.sync", "repo.discover", "asset.produce", "asset.merge", "asset.index", "asset.ai_generate", "asset.reindex", "diff.run", "outbox.dispatch", "workspace.gc", "blob.gc", "retention.cleanup"}
-var validJobStatuses = [...]string{"pending", "running", "succeeded", "succeeded_with_warnings", "failed", "outcome_unknown", "cancelled"}
 var validJobScopes = [...]string{"tenant", "repository", "service", "source", "track", "version", "asset", "diff", "system"}
 
-// Jobs coordinates platform job visibility and keeps tenant-owned payloads out of the admin API.
+// Jobs 协调平台任务可见性，并使租户持有的载荷远离管理 API。
 type Jobs struct {
 	store      JobStore
 	identities IdentityStore
 	now        func() time.Time
 }
 
-// NewJobs constructs the tenant control and platform query use cases.
+// NewJobs 构造租户控制与平台查询用例。
 func NewJobs(store JobStore, identities IdentityStore) *Jobs {
 	return &Jobs{store: store, identities: identities, now: time.Now}
 }
 
-// ListTenant returns one authorized deterministic page with stage-attempt history.
+// ListTenant 返回带阶段尝试历史的一页已授权确定性结果。
 func (jobs *Jobs) ListTenant(ctx context.Context, actor Principal, tenantSlug string, filter JobFilter, page, pageSize int) ([]JobRecord, int64, error) {
-	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, "job:read")
+	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, scopeJobRead)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -49,9 +48,9 @@ func (jobs *Jobs) ListTenant(ctx context.Context, actor Principal, tenantSlug st
 	return items, total, nil
 }
 
-// GetTenant returns one authorized job with persisted stage-attempt history.
+// GetTenant 返回带持久化阶段尝试历史的一个已授权任务。
 func (jobs *Jobs) GetTenant(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID) (JobRecord, error) {
-	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, "job:read")
+	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, scopeJobRead)
 	if err != nil {
 		return JobRecord{}, err
 	}
@@ -62,18 +61,18 @@ func (jobs *Jobs) GetTenant(ctx context.Context, actor Principal, tenantSlug str
 	return jobs.tenantProjection(record, actor, membership, tenantSlug), nil
 }
 
-// CancelTenant atomically cancels a pending or running domain and River job.
+// CancelTenant 原子取消一个待处理或运行中的领域与 River 任务。
 func (jobs *Jobs) CancelTenant(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID) (JobAccepted, error) {
-	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, "job:run")
+	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, scopeJobRun)
 	if err != nil {
 		return JobAccepted{}, err
 	}
 	return jobs.store.CancelTenantJob(ctx, membership.TenantID, id, jobs.now().UTC())
 }
 
-// RetryTenant creates one independent retry generation under a required idempotency key.
+// RetryTenant 在必需的幂等键下创建一个独立重试代次。
 func (jobs *Jobs) RetryTenant(ctx context.Context, actor Principal, tenantSlug string, id, idempotencyKey uuid.UUID) (JobAccepted, error) {
-	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, "job:run")
+	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, scopeJobRun)
 	if err != nil {
 		return JobAccepted{}, err
 	}
@@ -82,11 +81,11 @@ func (jobs *Jobs) RetryTenant(ctx context.Context, actor Principal, tenantSlug s
 		return JobAccepted{}, ErrValidation
 	}
 	payload, err := json.Marshal(struct {
-		// Operation fixes the hash namespace to the OpenAPI operation identifier.
+		// Operation 将哈希命名空间固定为 OpenAPI 操作标识。
 		Operation string `json:"operation"`
-		// TenantSlug binds the key to the tenant route.
+		// TenantSlug 将键绑定到租户路由。
 		TenantSlug string `json:"tenantSlug"`
-		// JobID binds the key to the exact source job.
+		// JobID 将键绑定到确切的源任务。
 		JobID uuid.UUID `json:"jobId"`
 	}{Operation: "retryJob", TenantSlug: tenantSlug, JobID: id})
 	if err != nil {
@@ -99,12 +98,12 @@ func (jobs *Jobs) RetryTenant(ctx context.Context, actor Principal, tenantSlug s
 	})
 }
 
-// OpenTenantStream authorizes one replay cursor and captures the initial durable state.
+// OpenTenantStream 授权一个重放游标并捕获初始持久化状态。
 func (jobs *Jobs) OpenTenantStream(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID, afterSequence int64) (*JobStream, error) {
 	if afterSequence < 0 {
 		return nil, ErrValidation
 	}
-	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, "job:read")
+	membership, err := jobs.tenantMembership(ctx, actor, tenantSlug, scopeJobRead)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +118,7 @@ func (jobs *Jobs) OpenTenantStream(ctx context.Context, actor Principal, tenantS
 	}, nil
 }
 
-// ListPlatform returns a deterministic redacted page for a platform administrator.
+// ListPlatform 向平台管理员返回确定性的脱敏页。
 func (jobs *Jobs) ListPlatform(ctx context.Context, actor Principal, filter PlatformJobFilter, page, pageSize int) ([]PlatformJobRecord, int64, error) {
 	if !isPlatformAdministrator(actor) {
 		return nil, 0, ErrNotFound
@@ -133,7 +132,7 @@ func (jobs *Jobs) ListPlatform(ctx context.Context, actor Principal, filter Plat
 	return jobs.store.ListPlatformJobs(ctx, filter, int32(pageSize), int32((page-1)*pageSize))
 }
 
-// GetPlatform returns one redacted job for a platform administrator.
+// GetPlatform 向平台管理员返回一个脱敏任务。
 func (jobs *Jobs) GetPlatform(ctx context.Context, actor Principal, id uuid.UUID) (PlatformJobRecord, error) {
 	if !isPlatformAdministrator(actor) {
 		return PlatformJobRecord{}, ErrNotFound
@@ -155,7 +154,7 @@ func validatePlatformJobFilter(filter PlatformJobFilter) error {
 	if filter.ScopeType != "" && !slices.Contains(validJobScopes[:], filter.ScopeType) {
 		return ErrValidation
 	}
-	if strings.ContainsAny(filter.ScopeID, "\x00\r\n") || len(filter.ScopeID) > 128 {
+	if strings.ContainsAny(filter.ScopeID, "\x00\r\n") || len(filter.ScopeID) > maxFilterTextRunes {
 		return ErrValidation
 	}
 	if filter.TenantSlug != "" && !slugPattern.MatchString(filter.TenantSlug) {
@@ -164,9 +163,7 @@ func validatePlatformJobFilter(filter PlatformJobFilter) error {
 	return nil
 }
 
-const streamLogBatch = 100
-
-// JobStream emits resumable persisted logs and durable state until termination or cancellation.
+// JobStream 持续发出可恢复的持久化日志与持久化状态，直至终止或取消。
 type JobStream struct {
 	store             JobStore
 	tenantID          uuid.UUID
@@ -177,7 +174,7 @@ type JobStream struct {
 	heartbeatInterval time.Duration
 }
 
-// Run blocks while emitting the initial snapshot, ordered logs, state changes, and heartbeats.
+// Run 阻塞式发出初始快照、有序日志、状态变化与心跳。
 func (stream *JobStream) Run(ctx context.Context, sink JobEventSink) error {
 	cursor := stream.cursor
 	current := stream.initial
@@ -262,10 +259,10 @@ func (jobs *Jobs) tenantMembership(ctx context.Context, actor Principal, tenantS
 func (jobs *Jobs) tenantProjection(record JobRecord, actor Principal, membership Membership, tenantSlug string) JobRecord {
 	record.TenantSlug = tenantSlug
 	record.Progress = jobProgress(record.Status, record.Stage)
-	record.Capabilities = []string{"job:read"}
-	if roleAllows(membership.Role, "job:run") && (actor.Kind != PrincipalPAT || patAllowsJobPermission(actor.Scopes, "job:run")) {
-		if record.Status == "pending" || record.Status == "running" || record.Status == "failed" || record.Status == "cancelled" {
-			record.Capabilities = append(record.Capabilities, "job:run")
+	record.Capabilities = []string{scopeJobRead}
+	if roleAllows(membership.Role, scopeJobRun) && (actor.Kind != PrincipalPAT || patAllowsJobPermission(actor.Scopes, scopeJobRun)) {
+		if record.Status == JobStatusPending || record.Status == JobStatusRunning || record.Status == JobStatusFailed || record.Status == JobStatusCancelled {
+			record.Capabilities = append(record.Capabilities, scopeJobRun)
 		}
 	}
 	return record
@@ -278,39 +275,58 @@ func validateJobFilter(filter JobFilter) error {
 }
 
 func patAllowsJobPermission(scopes []string, permission string) bool {
-	if slices.Contains(scopes, "*") || slices.Contains(scopes, permission) {
+	if slices.Contains(scopes, scopeWildcard) || slices.Contains(scopes, permission) {
 		return true
 	}
-	return permission == "job:read" && slices.Contains(scopes, "job:run")
+	return permission == scopeJobRead && slices.Contains(scopes, scopeJobRun)
 }
 
+const (
+	// streamLogBatch 是任务流单批拉取的日志条数上限。
+	streamLogBatch = 100
+	// jobProgressComplete 是任务完成的确定性进度百分比。
+	jobProgressComplete = 100
+	// jobProgressResolve 是 resolve 阶段完成时的进度百分比。
+	jobProgressResolve = 5
+	// jobProgressDiscover 是 discover 阶段完成时的进度百分比。
+	jobProgressDiscover = 20
+	// jobProgressExtract 是 extract 阶段完成时的进度百分比。
+	jobProgressExtract = 40
+	// jobProgressMerge 是 merge 阶段完成时的进度百分比。
+	jobProgressMerge = 60
+	// jobProgressNormalize 是 normalize 阶段完成时的进度百分比。
+	jobProgressNormalize = 80
+	// jobProgressIndex 是 index 阶段完成时的进度百分比。
+	jobProgressIndex = 95
+)
+
 func jobProgress(status string, stage *string) int {
-	if status == "succeeded" || status == "succeeded_with_warnings" {
-		return 100
+	if status == JobStatusSucceeded || status == JobStatusSucceededWithWarnings {
+		return jobProgressComplete
 	}
-	if status == "pending" || stage == nil {
+	if status == JobStatusPending || stage == nil {
 		return 0
 	}
 	switch *stage {
-	case "resolve":
-		return 5
-	case "discover":
-		return 20
-	case "extract":
-		return 40
-	case "merge":
-		return 60
-	case "normalize":
-		return 80
-	case "index":
-		return 95
+	case StageResolve:
+		return jobProgressResolve
+	case StageDiscover:
+		return jobProgressDiscover
+	case StageExtract:
+		return jobProgressExtract
+	case StageMerge:
+		return jobProgressMerge
+	case StageNormalize:
+		return jobProgressNormalize
+	case StageIndex:
+		return jobProgressIndex
 	default:
 		return 0
 	}
 }
 
 func terminalJobStatus(status string) bool {
-	return status == "succeeded" || status == "succeeded_with_warnings" || status == "failed" || status == "outcome_unknown" || status == "cancelled"
+	return status == JobStatusSucceeded || status == JobStatusSucceededWithWarnings || status == JobStatusFailed || status == JobStatusOutcomeUnknown || status == JobStatusCancelled
 }
 
 func jobStateEvent(record JobRecord, cursor int64) JobStateEvent {

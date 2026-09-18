@@ -101,7 +101,7 @@ func newM1RepositoryFixture(t *testing.T) *m1RepositoryFixture {
 	discoveryStore := repository.NewDiscoveryStore(db.Pool)
 	workspace := t.TempDir()
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
-		Executions: repository.NewRepositoryStore(db.Pool),
+		Executions:     repository.NewRepositoryStore(db.Pool),
 		DiscoverRunner: service.NewDiscoveryRunner(discoveryStore, workspace),
 	}, logger)
 	if err != nil {
@@ -406,8 +406,8 @@ func smokeM1RepositoryDiscovery(t *testing.T) {
 	}, nil)
 	assertStatus(t, createSource, http.StatusCreated)
 	var sourceBody struct {
-		BindingsCount  int  `json:"bindingsCount"`
-		InitialLayerID any  `json:"initialLayerId"`
+		BindingsCount  int    `json:"bindingsCount"`
+		InitialLayerID any    `json:"initialLayerId"`
 		ID             string `json:"id"`
 	}
 	if err := json.Unmarshal(createSource.Body.Bytes(), &sourceBody); err != nil {

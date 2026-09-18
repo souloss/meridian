@@ -1,4 +1,4 @@
-// Package task contains River job arguments and execution orchestration.
+// Package task 包含 River 任务参数与执行编排。
 package task
 
 import (
@@ -7,126 +7,126 @@ import (
 	"uuid"
 )
 
-// Stage identifies one persisted repository synchronization pipeline stage.
+// Stage 标识一个持久化的仓库同步流水线阶段。
 type Stage string
 
+// 流水线阶段常量（值 = pipelineStage 枚举原样，与 service.Stage* 同口径）。
 const (
-	// StageResolve resolves the repository, commit, ref, and source binding.
+	// StageResolve 解析仓库、提交、引用与来源绑定。
 	StageResolve Stage = "resolve"
-	// StageDiscover discovers candidate assets without changing effective configuration.
+	// StageDiscover 发现候选资产而不改变生效配置。
 	StageDiscover Stage = "discover"
-	// StageExtract extracts producer output into an isolated workspace.
+	// StageExtract 将生产者输出抽取到隔离工作区。
 	StageExtract Stage = "extract"
-	// StageMerge merges effective layer heads into a deterministic input.
+	// StageMerge 将生效层头合并为确定性输入。
 	StageMerge Stage = "merge"
-	// StageNormalize canonicalizes the merged input and derives provenance.
+	// StageNormalize 规范化合并输入并推导来源。
 	StageNormalize Stage = "normalize"
-	// StageIndex writes the version, item index, and dependent outbox events.
+	// StageIndex 写入版本、条目索引与依赖的出箱事件。
 	StageIndex Stage = "index"
 )
 
-// CredentialSyncArgs is the durable, non-secret argument carried by a River job.
-// The credential identifier is deliberately absent: the worker resolves the
-// current repository configuration at execution time and never receives secret data.
+// CredentialSyncArgs 是 River 任务携带的持久化且不含机密信息的参数。
+// 凭据标识被刻意排除：工作器在执行时解析当前仓库配置，永不接收机密数据。
 type CredentialSyncArgs struct {
-	// TenantID identifies the tenant boundary for every execution query.
+	// TenantID 标识每次执行查询的租户边界。
 	TenantID uuid.UUID `json:"tenantId"`
-	// JobID identifies the application-owned durable job row.
+	// JobID 标识应用自有的持久化任务行。
 	JobID uuid.UUID `json:"jobId"`
-	// RepositoryID identifies the repository that requested synchronization.
+	// RepositoryID 标识发起同步的仓库。
 	RepositoryID uuid.UUID `json:"repositoryId"`
-	// RefName identifies the normalized Git branch or tag to synchronize.
+	// RefName 标识待同步的规范化 Git 分支或标签。
 	RefName string `json:"refName"`
 }
 
-// Kind returns the stable River kind name persisted in the River schema.
+// Kind 返回持久化在 River schema 中的稳定 River 任务类型名。
 func (CredentialSyncArgs) Kind() string { return "meridian_repo_sync" }
 
-// StartInput describes the initial durable state transition for one job attempt.
+// StartInput 描述一次任务尝试的初始持久化状态迁移。
 type StartInput struct {
-	// TenantID identifies the tenant that owns the job.
+	// TenantID 标识拥有该任务的租户。
 	TenantID uuid.UUID
-	// JobID identifies the application-owned job row.
+	// JobID 标识应用自有的任务行。
 	JobID uuid.UUID
-	// Stage is the first pipeline stage to expose.
+	// Stage 是第一个对外暴露的流水线阶段。
 	Stage Stage
-	// ExpectedAttempt is the one-based River attempt claiming the domain row.
+	// ExpectedAttempt 是领取该领域行的一次性 River 尝试序号。
 	ExpectedAttempt int
-	// StartedAt is the UTC time used for the first attempt timestamp.
+	// StartedAt 是首个尝试时间戳使用的 UTC 时间。
 	StartedAt time.Time
 }
 
-// StageInput describes an active stage transition and its redacted message.
+// StageInput 描述一次活动阶段迁移及其脱敏消息。
 type StageInput struct {
-	// TenantID identifies the tenant that owns the job.
+	// TenantID 标识拥有该任务的租户。
 	TenantID uuid.UUID
-	// JobID identifies the application-owned job row.
+	// JobID 标识应用自有的任务行。
 	JobID uuid.UUID
-	// Stage is the pipeline stage being entered.
+	// Stage 是正在进入的流水线阶段。
 	Stage Stage
-	// ExpectedAttempt is the one-based River attempt that owns the transition.
+	// ExpectedAttempt 是拥有该迁移的一次性 River 尝试序号。
 	ExpectedAttempt int
-	// Level is the structured log severity.
+	// Level 是结构化日志级别。
 	Level string
-	// Message is a secret-free diagnostic message.
+	// Message 是不含机密信息的诊断消息。
 	Message string
-	// OccurredAt is the UTC time at which the event was recorded.
+	// OccurredAt 是事件被记录的 UTC 时间。
 	OccurredAt time.Time
 }
 
-// FinishInput describes the terminal or retryable durable state transition.
+// FinishInput 描述终态或可重试的持久化状态迁移。
 type FinishInput struct {
-	// TenantID identifies the tenant that owns the job.
+	// TenantID 标识拥有该任务的租户。
 	TenantID uuid.UUID
-	// JobID identifies the application-owned job row.
+	// JobID 标识应用自有的任务行。
 	JobID uuid.UUID
-	// RepositoryID identifies the repository included in a collect.failed event.
+	// RepositoryID 标识包含在 collect.failed 事件中的仓库。
 	RepositoryID uuid.UUID
-	// Status is one of the durable Meridian job states.
+	// Status 是持久化 Meridian 任务状态之一。
 	Status string
-	// ExpectedAttempt is the one-based River attempt that owns the transition.
+	// ExpectedAttempt 是拥有该迁移的一次性 River 尝试序号。
 	ExpectedAttempt int
-	// Result is non-secret JSON result metadata, or nil.
+	// Result 是脱敏的 JSON 结果元数据，或为 nil。
 	Result []byte
-	// Error is non-secret structured error metadata, or nil.
+	// Error 是脱敏的结构化错误元数据，或为 nil。
 	Error []byte
-	// ErrorCode is the stable non-secret failure classification used by audit and events.
+	// ErrorCode 是审计与事件使用的稳定脱敏失败分类。
 	ErrorCode string
-	// Terminal indicates whether finishedAt should be written.
+	// Terminal 指示是否应写入 finishedAt。
 	Terminal bool
-	// Stage is the stage associated with the final log event.
+	// Stage 是与最终日志事件关联的阶段。
 	Stage Stage
-	// Level is the structured log severity for the final event.
+	// Level 是最终事件的结构化日志级别。
 	Level string
-	// Message is a secret-free terminal diagnostic.
+	// Message 是脱敏的终态诊断消息。
 	Message string
-	// FinishedAt is the UTC time at which the transition was recorded.
+	// FinishedAt 是迁移被记录的 UTC 时间。
 	FinishedAt time.Time
 }
 
-// ExecutionStore persists the application-owned side of a River job.
+// ExecutionStore 持久化 River 任务中应用自有的一侧。
 type ExecutionStore interface {
 	StartJob(context.Context, StartInput) (ClaimResult, error)
 	SetJobStage(context.Context, StageInput) error
 	FinishJob(context.Context, FinishInput) error
 }
 
-// ClaimResult describes whether the current River attempt owns the domain job.
+// ClaimResult 描述当前 River 尝试是否拥有该领域任务。
 type ClaimResult struct {
-	// Claimed is true when this attempt may execute and finalize the job.
+	// Claimed 为 true 表示该尝试可以执行并收尾该任务。
 	Claimed bool
-	// Attempt is the durable attempt number after the claim.
+	// Attempt 是领取后的持久化尝试序号。
 	Attempt int
 }
 
-// SyncRunner performs repository synchronization after the durable job is claimed.
-// M0 supplies an explicit unsupported runner; M1 replaces it with the Git producer.
+// SyncRunner 在持久化任务被领取后执行仓库同步。
+// M0 提供显式的不支持运行器；M1 以 Git 生产者替换之。
 type SyncRunner interface {
 	Run(context.Context, CredentialSyncArgs) (SyncResult, error)
 }
 
-// SyncResult carries the resolved commit recorded for a completed synchronization.
+// SyncResult 携带一次已完成同步记录的解析提交。
 type SyncResult struct {
-	// ResolvedCommit is the Git commit the pipeline materialized.
+	// ResolvedCommit 是流水线物化出的 Git 提交。
 	ResolvedCommit string
 }

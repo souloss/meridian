@@ -1,4 +1,4 @@
-// Package repository adapts generated SQL queries to service persistence ports.
+// Package repository 将 sqlc 生成的 SQL 查询适配到 service 包的持久化端口（Store 接口）。
 package repository
 
 import (
@@ -18,18 +18,18 @@ import (
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
-// IdentityStore implements the identity service port with sqlc and pgx.
+// IdentityStore 基于 sqlc 与 pgx 实现 service.IdentityStore 身份持久化端口。
 type IdentityStore struct {
 	pool    *pgxpool.Pool
 	queries *generated.Queries
 }
 
-// NewIdentityStore binds identity persistence to a native pgx pool.
+// NewIdentityStore 将身份持久化绑定到原生 pgx 连接池。
 func NewIdentityStore(pool *pgxpool.Pool) *IdentityStore {
 	return &IdentityStore{pool: pool, queries: generated.New(pool)}
 }
 
-// CreateUser atomically inserts an identity and its required default preferences.
+// CreateUser 原子地插入一个身份及其必需的默认偏好设置。
 func (store *IdentityStore) CreateUser(ctx context.Context, input service.NewUser) (service.User, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -58,7 +58,7 @@ func (store *IdentityStore) CreateUser(ctx context.Context, input service.NewUse
 	return userFromRow(row), nil
 }
 
-// UserByUsername returns an identity and its Argon2id verifier for authentication only.
+// UserByUsername 返回一个身份及其 Argon2id 校验器，仅供认证使用。
 func (store *IdentityStore) UserByUsername(ctx context.Context, username string) (service.User, string, error) {
 	row, err := store.queries.GetUserByUsername(ctx, username)
 	if err != nil {
@@ -67,7 +67,7 @@ func (store *IdentityStore) UserByUsername(ctx context.Context, username string)
 	return userFromRow(row), row.PasswordHash, nil
 }
 
-// UserByID returns one identity without exposing its password verifier.
+// UserByID 返回一个身份，且不暴露其密码校验器。
 func (store *IdentityStore) UserByID(ctx context.Context, id uuid.UUID) (service.User, error) {
 	row, err := store.queries.GetUserByID(ctx, id)
 	if err != nil {
@@ -76,7 +76,7 @@ func (store *IdentityStore) UserByID(ctx context.Context, id uuid.UUID) (service
 	return userFromRow(row), nil
 }
 
-// ListUsers returns platform identity metadata without password or session columns.
+// ListUsers 返回平台身份元数据（不含密码与会话列）。
 func (store *IdentityStore) ListUsers(ctx context.Context, search string, limit, offset int32) ([]service.User, int64, error) {
 	total, err := store.queries.CountUsers(ctx, search)
 	if err != nil {
@@ -93,7 +93,7 @@ func (store *IdentityStore) ListUsers(ctx context.Context, search string, limit,
 	return users, total, nil
 }
 
-// PromotePlatformAdmin grants platform administration to an existing identity.
+// PromotePlatformAdmin 为已有身份授予平台管理权限。
 func (store *IdentityStore) PromotePlatformAdmin(ctx context.Context, id uuid.UUID, updatedAt time.Time) (service.User, error) {
 	row, err := store.queries.PromoteUserToPlatformAdmin(ctx, generated.PromoteUserToPlatformAdminParams{
 		UpdatedAt: timestamp(updatedAt),
@@ -105,7 +105,7 @@ func (store *IdentityStore) PromotePlatformAdmin(ctx context.Context, id uuid.UU
 	return userFromRow(row), nil
 }
 
-// CreateRefreshToken persists a keyed browser refresh token digest.
+// CreateRefreshToken 持久化一个带键的浏览器刷新令牌摘要。
 func (store *IdentityStore) CreateRefreshToken(ctx context.Context, input service.NewRefreshToken) error {
 	_, err := store.queries.CreateRefreshToken(ctx, generated.CreateRefreshTokenParams{
 		ID:        input.ID,
@@ -117,7 +117,7 @@ func (store *IdentityStore) CreateRefreshToken(ctx context.Context, input servic
 	return normalizeError(err)
 }
 
-// RefreshTokenPrincipalByDigest resolves one refresh token to its user and rotation family.
+// RefreshTokenPrincipalByDigest 将一个刷新令牌解析为其用户与轮换家族。
 func (store *IdentityStore) RefreshTokenPrincipalByDigest(ctx context.Context, digest []byte, authenticatedAt time.Time) (service.RefreshTokenPrincipal, error) {
 	row, err := store.queries.GetRefreshTokenPrincipalByTokenHash(ctx, generated.GetRefreshTokenPrincipalByTokenHashParams{
 		TokenHash:       digest,
@@ -147,7 +147,7 @@ func (store *IdentityStore) RefreshTokenPrincipalByDigest(ctx context.Context, d
 	}, nil
 }
 
-// RotateRefreshToken revokes the consumed token and records its replacement in one atomic update.
+// RotateRefreshToken 在一次原子更新中吊销已消费令牌并记录其替代令牌。
 func (store *IdentityStore) RotateRefreshToken(ctx context.Context, id, replacedBy uuid.UUID, revokedAt time.Time) error {
 	changed, err := store.queries.RotateRefreshToken(ctx, generated.RotateRefreshTokenParams{
 		RevokedAt:  timestamp(revokedAt),
@@ -163,7 +163,7 @@ func (store *IdentityStore) RotateRefreshToken(ctx context.Context, id, replaced
 	return nil
 }
 
-// RevokeRefreshTokenFamily revokes every unrevoked token in one rotation family.
+// RevokeRefreshTokenFamily 吊销一个轮换家族中所有尚未吊销的令牌。
 func (store *IdentityStore) RevokeRefreshTokenFamily(ctx context.Context, familyID uuid.UUID, revokedAt time.Time) error {
 	_, err := store.queries.RevokeRefreshTokenFamily(ctx, generated.RevokeRefreshTokenFamilyParams{
 		RevokedAt: timestamp(revokedAt),
@@ -172,7 +172,7 @@ func (store *IdentityStore) RevokeRefreshTokenFamily(ctx context.Context, family
 	return normalizeError(err)
 }
 
-// ActiveMemberships returns stable active tenant contexts for one user.
+// ActiveMemberships 返回某一用户的稳定活跃租户上下文列表。
 func (store *IdentityStore) ActiveMemberships(ctx context.Context, userID uuid.UUID) ([]service.Membership, error) {
 	rows, err := store.queries.ListActiveTenantMemberships(ctx, userID)
 	if err != nil {
@@ -191,7 +191,7 @@ func (store *IdentityStore) ActiveMemberships(ctx context.Context, userID uuid.U
 	return memberships, nil
 }
 
-// ActiveMembership resolves one user role without revealing disabled or absent tenants.
+// ActiveMembership 解析某一用户的角色，且不暴露已禁用或不存在的租户。
 func (store *IdentityStore) ActiveMembership(ctx context.Context, userID uuid.UUID, tenantSlug string) (service.Membership, error) {
 	row, err := store.queries.GetActiveTenantMembership(ctx, generated.GetActiveTenantMembershipParams{
 		UserID:     userID,
@@ -209,7 +209,7 @@ func (store *IdentityStore) ActiveMembership(ctx context.Context, userID uuid.UU
 	}, nil
 }
 
-// CreateTenant atomically snapshots platform defaults and inserts one tenant.
+// CreateTenant 原子地快照平台默认值并插入一个租户。
 func (store *IdentityStore) CreateTenant(ctx context.Context, input service.NewTenant) (service.Tenant, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -253,7 +253,7 @@ func (store *IdentityStore) CreateTenant(ctx context.Context, input service.NewT
 	return tenantFromRow(row)
 }
 
-// TenantBySlug returns tenant metadata in any lifecycle state for platform administration.
+// TenantBySlug 返回任意生命周期状态下的租户元数据，供平台管理使用。
 func (store *IdentityStore) TenantBySlug(ctx context.Context, slug string) (service.Tenant, error) {
 	row, err := store.queries.GetTenantBySlug(ctx, slug)
 	if err != nil {
@@ -262,7 +262,7 @@ func (store *IdentityStore) TenantBySlug(ctx context.Context, slug string) (serv
 	return tenantFromRow(row)
 }
 
-// ListTenants returns tenant lifecycle metadata in deterministic order.
+// ListTenants 以确定性顺序返回租户生命周期元数据。
 func (store *IdentityStore) ListTenants(ctx context.Context, limit, offset int32) ([]service.Tenant, int64, error) {
 	total, err := store.queries.CountTenants(ctx)
 	if err != nil {
@@ -283,7 +283,7 @@ func (store *IdentityStore) ListTenants(ctx context.Context, limit, offset int32
 	return tenants, total, nil
 }
 
-// UpdateTenant conditionally updates platform-controlled tenant metadata and advances its revision.
+// UpdateTenant 条件性地更新平台管控的租户元数据并推进其修订号。
 func (store *IdentityStore) UpdateTenant(ctx context.Context, input service.UpdateTenant) (service.Tenant, error) {
 	quota, err := optionalTenantQuota(input.Quota)
 	if err != nil {
@@ -327,7 +327,7 @@ func optionalTenantQuota(value *service.Quota) ([]byte, error) {
 	return encoded, nil
 }
 
-// PutMembership creates or replaces one tenant role assignment.
+// PutMembership 创建或替换一条租户角色分配。
 func (store *IdentityStore) PutMembership(ctx context.Context, tenantID, userID uuid.UUID, role string, updatedAt time.Time) (service.Membership, error) {
 	row, err := store.queries.UpsertTenantMember(ctx, generated.UpsertTenantMemberParams{
 		TenantID:  tenantID,
@@ -346,7 +346,7 @@ func (store *IdentityStore) PutMembership(ctx context.Context, tenantID, userID 
 	}, nil
 }
 
-// CreateToken persists a keyed PAT digest and returns non-secret metadata.
+// CreateToken 持久化一个带键的 PAT 摘要并返回非敏感元数据。
 func (store *IdentityStore) CreateToken(ctx context.Context, input service.NewToken) (service.Token, error) {
 	row, err := store.queries.CreateAPIToken(ctx, generated.CreateAPITokenParams{
 		TenantID:  input.TenantID,
@@ -363,7 +363,7 @@ func (store *IdentityStore) CreateToken(ctx context.Context, input service.NewTo
 	return tokenFromRow(row), nil
 }
 
-// PATPrincipalByDigest resolves one active token, user, membership, and tenant.
+// PATPrincipalByDigest 解析一个活跃令牌及其用户、成员关系与租户。
 func (store *IdentityStore) PATPrincipalByDigest(ctx context.Context, digest []byte, authenticatedAt time.Time) (service.Principal, error) {
 	row, err := store.queries.GetAPITokenPrincipalByTokenHash(ctx, generated.GetAPITokenPrincipalByTokenHashParams{
 		TokenHash:       digest,
@@ -392,7 +392,7 @@ func (store *IdentityStore) PATPrincipalByDigest(ctx context.Context, digest []b
 	}, nil
 }
 
-// TouchToken records successful PAT activity.
+// TouchToken 记录一次成功的 PAT 活跃。
 func (store *IdentityStore) TouchToken(ctx context.Context, tenantID, tokenID uuid.UUID, usedAt time.Time) error {
 	return normalizeError(store.queries.TouchAPIToken(ctx, generated.TouchAPITokenParams{
 		UsedAt:   timestamp(usedAt),
@@ -401,7 +401,7 @@ func (store *IdentityStore) TouchToken(ctx context.Context, tenantID, tokenID uu
 	}))
 }
 
-// ListTokens returns one metadata page and total count for a user's tenant PATs.
+// ListTokens 返回某用户租户内 PAT 的一页元数据及总数。
 func (store *IdentityStore) ListTokens(ctx context.Context, tenantID, userID uuid.UUID, limit, offset int32) ([]service.Token, int64, error) {
 	total, err := store.queries.CountAPITokensByUser(ctx, generated.CountAPITokensByUserParams{TenantID: tenantID, UserID: userID})
 	if err != nil {
@@ -423,7 +423,7 @@ func (store *IdentityStore) ListTokens(ctx context.Context, tenantID, userID uui
 	return tokens, total, nil
 }
 
-// RevokeToken idempotently revokes one PAT owned by the current user in one tenant.
+// RevokeToken 幂等地吊销当前用户在某一租户内持有的一个 PAT。
 func (store *IdentityStore) RevokeToken(ctx context.Context, tenantID, tokenID, userID uuid.UUID, revokedAt time.Time) error {
 	_, err := store.queries.RevokeAPIToken(ctx, generated.RevokeAPITokenParams{
 		RevokedAt: timestamp(revokedAt),
@@ -523,7 +523,7 @@ func normalizeError(err error) error {
 	if errors.Is(err, pgx.ErrNoRows) {
 		return service.ErrNotFound
 	}
-	if pgError, ok := errors.AsType[*pgconn.PgError](err); ok && pgError.Code == "23505" {
+	if pgError, ok := errors.AsType[*pgconn.PgError](err); ok && pgError.Code == pgUniqueViolationCode {
 		return service.ErrDuplicate
 	}
 	return err

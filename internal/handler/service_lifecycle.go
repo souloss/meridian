@@ -9,7 +9,7 @@ import (
 	"github.com/oapi-codegen/nullable"
 )
 
-// UpdateService applies a validated service patch under its revision.
+// UpdateService 在其修订号下应用经过校验的服务补丁。
 func (s *Server) UpdateService(ctx context.Context, request serviceapi.UpdateServiceRequestObject) (serviceapi.UpdateServiceResponseObject, error) {
 	if s.serviceLifecycle == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -31,7 +31,7 @@ func (s *Server) UpdateService(ctx context.Context, request serviceapi.UpdateSer
 	}, nil
 }
 
-// DeleteService soft-deletes one service under its revision.
+// DeleteService 在其修订号下软删除一个服务。
 func (s *Server) DeleteService(ctx context.Context, request serviceapi.DeleteServiceRequestObject) (serviceapi.DeleteServiceResponseObject, error) {
 	if s.serviceLifecycle == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -46,7 +46,7 @@ func (s *Server) DeleteService(ctx context.Context, request serviceapi.DeleteSer
 	return serviceapi.DeleteService204Response{}, nil
 }
 
-// GetPublicService returns one anonymous public service view gated by visibility.
+// GetPublicService 返回一个按可见性门控的匿名公共服务视图。
 func (s *Server) GetPublicService(ctx context.Context, request serviceapi.GetPublicServiceRequestObject) (serviceapi.GetPublicServiceResponseObject, error) {
 	if s.serviceLifecycle == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -58,6 +58,7 @@ func (s *Server) GetPublicService(ctx context.Context, request serviceapi.GetPub
 	return serviceapi.GetPublicService200JSONResponse(publicServiceResponse(record)), nil
 }
 
+// servicePatchInput 将服务补丁请求投影为服务层输入。
 func servicePatchInput(body *api.ServicePatchRequest) service.ServicePatchInput {
 	input := service.ServicePatchInput{}
 	if body.DisplayName != nil {
@@ -78,6 +79,7 @@ func servicePatchInput(body *api.ServicePatchRequest) service.ServicePatchInput 
 	return input
 }
 
+// publicServiceResponse 将公共服务记录投影为 API 形状。
 func publicServiceResponse(record service.PublicServiceRecord) api.PublicService {
 	description := nullable.NewNullNullable[string]()
 	if record.Description != nil {

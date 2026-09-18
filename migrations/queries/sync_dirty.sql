@@ -19,7 +19,7 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND type = 'repo.sync';
 
--- 清空一条已成功任务的 dirty 标记，保证后续任只入队一次。
+-- 清空一条已成功任务的 dirty 标记，保证后续任务只入队一次。
 -- name: ClearSyncJobDirty :execrows
 UPDATE jobs
 SET dirty = false, updated_at = now()

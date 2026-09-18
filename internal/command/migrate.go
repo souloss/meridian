@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// newMigrateCommand 构造管理 Meridian 数据库 schema 的子命令树。
 func newMigrateCommand() *cobra.Command {
 	var databaseURL string
 
@@ -19,6 +20,7 @@ func newMigrateCommand() *cobra.Command {
 	return command
 }
 
+// newMigrateUpCommand 构造应用全部待执行迁移的子命令。
 func newMigrateUpCommand(databaseURL *string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "up",
@@ -35,6 +37,7 @@ func newMigrateUpCommand(databaseURL *string) *cobra.Command {
 	}
 }
 
+// newMigrateDownCommand 构造回滚显式数量迁移步骤的子命令。
 func newMigrateDownCommand(databaseURL *string) *cobra.Command {
 	var steps int
 
@@ -56,6 +59,7 @@ func newMigrateDownCommand(databaseURL *string) *cobra.Command {
 	return command
 }
 
+// newMigrateStatusCommand 构造打印已应用迁移版本的子命令。
 func newMigrateStatusCommand(databaseURL *string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "status",

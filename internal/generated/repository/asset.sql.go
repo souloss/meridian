@@ -22,15 +22,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// ClearSourceLastErrorParams contains the strongly typed arguments for the ClearSourceLastError query.
+// ClearSourceLastErrorParams 包含 ClearSourceLastError 查询的强类型参数。
 type ClearSourceLastErrorParams struct {
-	// TenantID is the tenant id value supplied to the ClearSourceLastError query.
+	// TenantID 是提供给 ClearSourceLastError 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the ClearSourceLastError query.
+	// ID 是提供给 ClearSourceLastError 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// ClearSourceLastError executes the generated ClearSourceLastError database query.
+// ClearSourceLastError 执行生成的 ClearSourceLastError 数据库查询。
 // 源物化成功后清空失败说明并归零连续失败次数。
 func (q *Queries) ClearSourceLastError(ctx context.Context, arg ClearSourceLastErrorParams) (int64, error) {
 	result, err := q.db.Exec(ctx, clearSourceLastError, arg.TenantID, arg.ID)
@@ -48,15 +48,15 @@ WHERE tenant_id = $1
   AND state = 'active'
 `
 
-// CountActiveBindingsParams contains the strongly typed arguments for the CountActiveBindings query.
+// CountActiveBindingsParams 包含 CountActiveBindings 查询的强类型参数。
 type CountActiveBindingsParams struct {
-	// TenantID is the tenant id value supplied to the CountActiveBindings query.
+	// TenantID 是提供给 CountActiveBindings 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SourceSpecID is the source spec id value supplied to the CountActiveBindings query.
+	// SourceSpecID 是提供给 CountActiveBindings 查询的 SourceSpecID 值。
 	SourceSpecID uuid.UUID `json:"source_spec_id"`
 }
 
-// CountActiveBindings executes the generated CountActiveBindings database query.
+// CountActiveBindings 执行生成的 CountActiveBindings 数据库查询。
 // 统计一个源配置当前活跃的绑定数量。
 func (q *Queries) CountActiveBindings(ctx context.Context, arg CountActiveBindingsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countActiveBindings, arg.TenantID, arg.SourceSpecID)
@@ -72,15 +72,15 @@ WHERE tenant_id = $1
   AND asset_version_id = $2
 `
 
-// CountAssetVersionItemsParams contains the strongly typed arguments for the CountAssetVersionItems query.
+// CountAssetVersionItemsParams 包含 CountAssetVersionItems 查询的强类型参数。
 type CountAssetVersionItemsParams struct {
-	// TenantID is the tenant id value supplied to the CountAssetVersionItems query.
+	// TenantID 是提供给 CountAssetVersionItems 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetVersionID is the asset version id value supplied to the CountAssetVersionItems query.
+	// AssetVersionID 是提供给 CountAssetVersionItems 查询的 AssetVersionID 值。
 	AssetVersionID uuid.UUID `json:"asset_version_id"`
 }
 
-// CountAssetVersionItems executes the generated CountAssetVersionItems database query.
+// CountAssetVersionItems 执行生成的 CountAssetVersionItems 数据库查询。
 // 统计资产版本条目总数。
 func (q *Queries) CountAssetVersionItems(ctx context.Context, arg CountAssetVersionItemsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countAssetVersionItems, arg.TenantID, arg.AssetVersionID)
@@ -98,15 +98,15 @@ WHERE r.tenant_id = $1
   AND s.deleted_at IS NULL
 `
 
-// CountRecentServicesParams contains the strongly typed arguments for the CountRecentServices query.
+// CountRecentServicesParams 包含 CountRecentServices 查询的强类型参数。
 type CountRecentServicesParams struct {
-	// TenantID is the tenant id value supplied to the CountRecentServices query.
+	// TenantID 是提供给 CountRecentServices 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// UserID is the user id value supplied to the CountRecentServices query.
+	// UserID 是提供给 CountRecentServices 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// CountRecentServices executes the generated CountRecentServices database query.
+// CountRecentServices 执行生成的 CountRecentServices 数据库查询。
 // 统计用户最近访问的服务总数。
 func (q *Queries) CountRecentServices(ctx context.Context, arg CountRecentServicesParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countRecentServices, arg.TenantID, arg.UserID)
@@ -121,35 +121,35 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 RETURNING tenant_id, id, asset_version_id, asset_id, service_id, kind, item_type, key, display, search_text, search_vector, search_raw, provenance, created_at
 `
 
-// CreateAssetItemParams contains the strongly typed arguments for the CreateAssetItem query.
+// CreateAssetItemParams 包含 CreateAssetItem 查询的强类型参数。
 type CreateAssetItemParams struct {
-	// TenantID is the tenant id value supplied to the CreateAssetItem query.
+	// TenantID 是提供给 CreateAssetItem 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateAssetItem query.
+	// ID 是提供给 CreateAssetItem 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// AssetVersionID is the asset version id value supplied to the CreateAssetItem query.
+	// AssetVersionID 是提供给 CreateAssetItem 查询的 AssetVersionID 值。
 	AssetVersionID uuid.UUID `json:"asset_version_id"`
-	// AssetID is the asset id value supplied to the CreateAssetItem query.
+	// AssetID 是提供给 CreateAssetItem 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// ServiceID is the service id value supplied to the CreateAssetItem query.
+	// ServiceID 是提供给 CreateAssetItem 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the CreateAssetItem query.
+	// Kind 是提供给 CreateAssetItem 查询的 Kind 值。
 	Kind string `json:"kind"`
-	// ItemType is the item type value supplied to the CreateAssetItem query.
+	// ItemType 是提供给 CreateAssetItem 查询的 ItemType 值。
 	ItemType string `json:"item_type"`
-	// Key is the key value supplied to the CreateAssetItem query.
+	// Key 是提供给 CreateAssetItem 查询的 Key 值。
 	Key string `json:"key"`
-	// Display is the display value supplied to the CreateAssetItem query.
+	// Display 是提供给 CreateAssetItem 查询的 Display 值。
 	Display []byte `json:"display"`
-	// SearchText is the search text value supplied to the CreateAssetItem query.
+	// SearchText 是提供给 CreateAssetItem 查询的 SearchText 值。
 	SearchText string `json:"search_text"`
-	// SearchRaw is the search raw value supplied to the CreateAssetItem query.
+	// SearchRaw 是提供给 CreateAssetItem 查询的 SearchRaw 值。
 	SearchRaw []byte `json:"search_raw"`
-	// Provenance is the provenance value supplied to the CreateAssetItem query.
+	// Provenance 是提供给 CreateAssetItem 查询的 Provenance 值。
 	Provenance []byte `json:"provenance"`
 }
 
-// CreateAssetItem executes the generated CreateAssetItem database query.
+// CreateAssetItem 执行生成的 CreateAssetItem 数据库查询。
 // 创建一条资产版本条目。
 func (q *Queries) CreateAssetItem(ctx context.Context, arg CreateAssetItemParams) (AssetItem, error) {
 	row := q.db.QueryRow(ctx, createAssetItem,
@@ -193,23 +193,23 @@ ON CONFLICT (tenant_id, asset_id, ref_type, ref_name) DO UPDATE SET active = tru
 RETURNING tenant_id, id, asset_id, ref_type, ref_name, latest_version_id, current_version_id, health, desired_generation, processed_generation, active, created_at, updated_at
 `
 
-// CreateAssetRefTrackParams contains the strongly typed arguments for the CreateAssetRefTrack query.
+// CreateAssetRefTrackParams 包含 CreateAssetRefTrack 查询的强类型参数。
 type CreateAssetRefTrackParams struct {
-	// TenantID is the tenant id value supplied to the CreateAssetRefTrack query.
+	// TenantID 是提供给 CreateAssetRefTrack 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateAssetRefTrack query.
+	// ID 是提供给 CreateAssetRefTrack 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// AssetID is the asset id value supplied to the CreateAssetRefTrack query.
+	// AssetID 是提供给 CreateAssetRefTrack 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// RefType is the ref type value supplied to the CreateAssetRefTrack query.
+	// RefType 是提供给 CreateAssetRefTrack 查询的 RefType 值。
 	RefType string `json:"ref_type"`
-	// RefName is the ref name value supplied to the CreateAssetRefTrack query.
+	// RefName 是提供给 CreateAssetRefTrack 查询的 RefName 值。
 	RefName string `json:"ref_name"`
-	// Health is the health value supplied to the CreateAssetRefTrack query.
+	// Health 是提供给 CreateAssetRefTrack 查询的 Health 值。
 	Health string `json:"health"`
 }
 
-// CreateAssetRefTrack executes the generated CreateAssetRefTrack database query.
+// CreateAssetRefTrack 执行生成的 CreateAssetRefTrack 数据库查询。
 // 创建一条资产引用轨迹。
 func (q *Queries) CreateAssetRefTrack(ctx context.Context, arg CreateAssetRefTrackParams) (AssetRefTrack, error) {
 	row := q.db.QueryRow(ctx, createAssetRefTrack,
@@ -256,65 +256,65 @@ INSERT INTO asset_versions (
 RETURNING tenant_id, id, asset_id, track_id, sequence_no, version, lifecycle, revision, quality_score, merge_request_id, input_fingerprint, merge_engine_version, overlay_compiler_version, overlay_mode, normalizer_version, kind_plugin_version, layer_manifest, merged_hash, merged_ref, normalized_ref, bundled_ref, provenance_ref, source_commit, baseline_version_id, diff_summary, labels, index_complete, created_at, updated_at
 `
 
-// CreateAssetVersionParams contains the strongly typed arguments for the CreateAssetVersion query.
+// CreateAssetVersionParams 包含 CreateAssetVersion 查询的强类型参数。
 type CreateAssetVersionParams struct {
-	// TenantID is the tenant id value supplied to the CreateAssetVersion query.
+	// TenantID 是提供给 CreateAssetVersion 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateAssetVersion query.
+	// ID 是提供给 CreateAssetVersion 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// AssetID is the asset id value supplied to the CreateAssetVersion query.
+	// AssetID 是提供给 CreateAssetVersion 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// TrackID is the track id value supplied to the CreateAssetVersion query.
+	// TrackID 是提供给 CreateAssetVersion 查询的 TrackID 值。
 	TrackID uuid.UUID `json:"track_id"`
-	// SequenceNo is the sequence no value supplied to the CreateAssetVersion query.
+	// SequenceNo 是提供给 CreateAssetVersion 查询的 SequenceNo 值。
 	SequenceNo int64 `json:"sequence_no"`
-	// Version is the version value supplied to the CreateAssetVersion query.
+	// Version 是提供给 CreateAssetVersion 查询的 Version 值。
 	Version string `json:"version"`
-	// Lifecycle is the lifecycle value supplied to the CreateAssetVersion query.
+	// Lifecycle 是提供给 CreateAssetVersion 查询的 Lifecycle 值。
 	Lifecycle string `json:"lifecycle"`
-	// Revision is the revision value supplied to the CreateAssetVersion query.
+	// Revision 是提供给 CreateAssetVersion 查询的 Revision 值。
 	Revision int64 `json:"revision"`
-	// QualityScore is the quality score value supplied to the CreateAssetVersion query.
+	// QualityScore 是提供给 CreateAssetVersion 查询的 QualityScore 值。
 	QualityScore *int32 `json:"quality_score"`
-	// MergeRequestID is the merge request id value supplied to the CreateAssetVersion query.
+	// MergeRequestID 是提供给 CreateAssetVersion 查询的 MergeRequestID 值。
 	MergeRequestID *uuid.UUID `json:"merge_request_id"`
-	// InputFingerprint is the input fingerprint value supplied to the CreateAssetVersion query.
+	// InputFingerprint 是提供给 CreateAssetVersion 查询的 InputFingerprint 值。
 	InputFingerprint string `json:"input_fingerprint"`
-	// MergeEngineVersion is the merge engine version value supplied to the CreateAssetVersion query.
+	// MergeEngineVersion 是提供给 CreateAssetVersion 查询的 MergeEngineVersion 值。
 	MergeEngineVersion string `json:"merge_engine_version"`
-	// OverlayCompilerVersion is the overlay compiler version value supplied to the CreateAssetVersion query.
+	// OverlayCompilerVersion 是提供给 CreateAssetVersion 查询的 OverlayCompilerVersion 值。
 	OverlayCompilerVersion *string `json:"overlay_compiler_version"`
-	// OverlayMode is the overlay mode value supplied to the CreateAssetVersion query.
+	// OverlayMode 是提供给 CreateAssetVersion 查询的 OverlayMode 值。
 	OverlayMode *string `json:"overlay_mode"`
-	// NormalizerVersion is the normalizer version value supplied to the CreateAssetVersion query.
+	// NormalizerVersion 是提供给 CreateAssetVersion 查询的 NormalizerVersion 值。
 	NormalizerVersion *string `json:"normalizer_version"`
-	// KindPluginVersion is the kind plugin version value supplied to the CreateAssetVersion query.
+	// KindPluginVersion 是提供给 CreateAssetVersion 查询的 KindPluginVersion 值。
 	KindPluginVersion *string `json:"kind_plugin_version"`
-	// LayerManifest is the layer manifest value supplied to the CreateAssetVersion query.
+	// LayerManifest 是提供给 CreateAssetVersion 查询的 LayerManifest 值。
 	LayerManifest []byte `json:"layer_manifest"`
-	// MergedHash is the merged hash value supplied to the CreateAssetVersion query.
+	// MergedHash 是提供给 CreateAssetVersion 查询的 MergedHash 值。
 	MergedHash *string `json:"merged_hash"`
-	// MergedRef is the merged ref value supplied to the CreateAssetVersion query.
+	// MergedRef 是提供给 CreateAssetVersion 查询的 MergedRef 值。
 	MergedRef *string `json:"merged_ref"`
-	// NormalizedRef is the normalized ref value supplied to the CreateAssetVersion query.
+	// NormalizedRef 是提供给 CreateAssetVersion 查询的 NormalizedRef 值。
 	NormalizedRef *string `json:"normalized_ref"`
-	// BundledRef is the bundled ref value supplied to the CreateAssetVersion query.
+	// BundledRef 是提供给 CreateAssetVersion 查询的 BundledRef 值。
 	BundledRef *string `json:"bundled_ref"`
-	// ProvenanceRef is the provenance ref value supplied to the CreateAssetVersion query.
+	// ProvenanceRef 是提供给 CreateAssetVersion 查询的 ProvenanceRef 值。
 	ProvenanceRef *string `json:"provenance_ref"`
-	// SourceCommit is the source commit value supplied to the CreateAssetVersion query.
+	// SourceCommit 是提供给 CreateAssetVersion 查询的 SourceCommit 值。
 	SourceCommit *string `json:"source_commit"`
-	// BaselineVersionID is the baseline version id value supplied to the CreateAssetVersion query.
+	// BaselineVersionID 是提供给 CreateAssetVersion 查询的 BaselineVersionID 值。
 	BaselineVersionID *uuid.UUID `json:"baseline_version_id"`
-	// DiffSummary is the diff summary value supplied to the CreateAssetVersion query.
+	// DiffSummary 是提供给 CreateAssetVersion 查询的 DiffSummary 值。
 	DiffSummary []byte `json:"diff_summary"`
-	// Labels is the labels value supplied to the CreateAssetVersion query.
+	// Labels 是提供给 CreateAssetVersion 查询的 Labels 值。
 	Labels []byte `json:"labels"`
-	// IndexComplete is the index complete value supplied to the CreateAssetVersion query.
+	// IndexComplete 是提供给 CreateAssetVersion 查询的 IndexComplete 值。
 	IndexComplete bool `json:"index_complete"`
 }
 
-// CreateAssetVersion executes the generated CreateAssetVersion database query.
+// CreateAssetVersion 执行生成的 CreateAssetVersion 数据库查询。
 // 创建一条资产版本。
 func (q *Queries) CreateAssetVersion(ctx context.Context, arg CreateAssetVersionParams) (AssetVersion, error) {
 	row := q.db.QueryRow(ctx, createAssetVersion,
@@ -387,33 +387,33 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 RETURNING tenant_id, id, asset_id, source_spec_id, role, origin, ord, dialect, enabled, branch_patterns, display_name, revision, deleted_at, created_at, updated_at
 `
 
-// CreateLayerParams contains the strongly typed arguments for the CreateLayer query.
+// CreateLayerParams 包含 CreateLayer 查询的强类型参数。
 type CreateLayerParams struct {
-	// TenantID is the tenant id value supplied to the CreateLayer query.
+	// TenantID 是提供给 CreateLayer 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateLayer query.
+	// ID 是提供给 CreateLayer 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// AssetID is the asset id value supplied to the CreateLayer query.
+	// AssetID 是提供给 CreateLayer 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// SourceSpecID is the source spec id value supplied to the CreateLayer query.
+	// SourceSpecID 是提供给 CreateLayer 查询的 SourceSpecID 值。
 	SourceSpecID *uuid.UUID `json:"source_spec_id"`
-	// Role is the role value supplied to the CreateLayer query.
+	// Role 是提供给 CreateLayer 查询的 Role 值。
 	Role string `json:"role"`
-	// Origin is the origin value supplied to the CreateLayer query.
+	// Origin 是提供给 CreateLayer 查询的 Origin 值。
 	Origin string `json:"origin"`
-	// Ord is the ord value supplied to the CreateLayer query.
+	// Ord 是提供给 CreateLayer 查询的 Ord 值。
 	Ord int32 `json:"ord"`
-	// Dialect is the dialect value supplied to the CreateLayer query.
+	// Dialect 是提供给 CreateLayer 查询的 Dialect 值。
 	Dialect *string `json:"dialect"`
-	// Enabled is the enabled value supplied to the CreateLayer query.
+	// Enabled 是提供给 CreateLayer 查询的 Enabled 值。
 	Enabled bool `json:"enabled"`
-	// BranchPatterns is the branch patterns value supplied to the CreateLayer query.
+	// BranchPatterns 是提供给 CreateLayer 查询的 BranchPatterns 值。
 	BranchPatterns []string `json:"branch_patterns"`
-	// DisplayName is the display name value supplied to the CreateLayer query.
+	// DisplayName 是提供给 CreateLayer 查询的 DisplayName 值。
 	DisplayName string `json:"display_name"`
 }
 
-// CreateLayer executes the generated CreateLayer database query.
+// CreateLayer 执行生成的 CreateLayer 数据库查询。
 // 创建一条层。
 func (q *Queries) CreateLayer(ctx context.Context, arg CreateLayerParams) (Layer, error) {
 	row := q.db.QueryRow(ctx, createLayer,
@@ -462,39 +462,39 @@ INSERT INTO layer_revisions (
 RETURNING tenant_id, id, layer_id, scope_type, scope_key, content_hash, content_ref, content_type, dialect, source_branch, review_status, review_comment, git_commit, created_by, producer_run_id, ai_meta, review, created_at
 `
 
-// CreateLayerRevisionParams contains the strongly typed arguments for the CreateLayerRevision query.
+// CreateLayerRevisionParams 包含 CreateLayerRevision 查询的强类型参数。
 type CreateLayerRevisionParams struct {
-	// TenantID is the tenant id value supplied to the CreateLayerRevision query.
+	// TenantID 是提供给 CreateLayerRevision 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateLayerRevision query.
+	// ID 是提供给 CreateLayerRevision 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// LayerID is the layer id value supplied to the CreateLayerRevision query.
+	// LayerID 是提供给 CreateLayerRevision 查询的 LayerID 值。
 	LayerID uuid.UUID `json:"layer_id"`
-	// ScopeType is the scope type value supplied to the CreateLayerRevision query.
+	// ScopeType 是提供给 CreateLayerRevision 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the CreateLayerRevision query.
+	// ScopeKey 是提供给 CreateLayerRevision 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
-	// ContentHash is the content hash value supplied to the CreateLayerRevision query.
+	// ContentHash 是提供给 CreateLayerRevision 查询的 ContentHash 值。
 	ContentHash string `json:"content_hash"`
-	// ContentRef is the content ref value supplied to the CreateLayerRevision query.
+	// ContentRef 是提供给 CreateLayerRevision 查询的 ContentRef 值。
 	ContentRef string `json:"content_ref"`
-	// ContentType is the content type value supplied to the CreateLayerRevision query.
+	// ContentType 是提供给 CreateLayerRevision 查询的 ContentType 值。
 	ContentType string `json:"content_type"`
-	// Dialect is the dialect value supplied to the CreateLayerRevision query.
+	// Dialect 是提供给 CreateLayerRevision 查询的 Dialect 值。
 	Dialect *string `json:"dialect"`
-	// SourceBranch is the source branch value supplied to the CreateLayerRevision query.
+	// SourceBranch 是提供给 CreateLayerRevision 查询的 SourceBranch 值。
 	SourceBranch *string `json:"source_branch"`
-	// ReviewStatus is the review status value supplied to the CreateLayerRevision query.
+	// ReviewStatus 是提供给 CreateLayerRevision 查询的 ReviewStatus 值。
 	ReviewStatus string `json:"review_status"`
-	// GitCommit is the git commit value supplied to the CreateLayerRevision query.
+	// GitCommit 是提供给 CreateLayerRevision 查询的 GitCommit 值。
 	GitCommit *string `json:"git_commit"`
-	// CreatedBy is the created by value supplied to the CreateLayerRevision query.
+	// CreatedBy 是提供给 CreateLayerRevision 查询的 CreatedBy 值。
 	CreatedBy *uuid.UUID `json:"created_by"`
-	// ProducerRunID is the producer run id value supplied to the CreateLayerRevision query.
+	// ProducerRunID 是提供给 CreateLayerRevision 查询的 ProducerRunID 值。
 	ProducerRunID *uuid.UUID `json:"producer_run_id"`
 }
 
-// CreateLayerRevision executes the generated CreateLayerRevision database query.
+// CreateLayerRevision 执行生成的 CreateLayerRevision 数据库查询。
 // 创建一条层修订。
 func (q *Queries) CreateLayerRevision(ctx context.Context, arg CreateLayerRevisionParams) (LayerRevision, error) {
 	row := q.db.QueryRow(ctx, createLayerRevision,
@@ -550,23 +550,23 @@ ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// CreateMergeJobParams contains the strongly typed arguments for the CreateMergeJob query.
+// CreateMergeJobParams 包含 CreateMergeJob 查询的强类型参数。
 type CreateMergeJobParams struct {
-	// TenantID is the tenant id value supplied to the CreateMergeJob query.
+	// TenantID 是提供给 CreateMergeJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateMergeJob query.
+	// ID 是提供给 CreateMergeJob 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TrackID is the track id value supplied to the CreateMergeJob query.
+	// TrackID 是提供给 CreateMergeJob 查询的 TrackID 值。
 	TrackID *uuid.UUID `json:"track_id"`
-	// JobInput is the job input value supplied to the CreateMergeJob query.
+	// JobInput 是提供给 CreateMergeJob 查询的 JobInput 值。
 	JobInput []byte `json:"job_input"`
-	// DedupeKey is the dedupe key value supplied to the CreateMergeJob query.
+	// DedupeKey 是提供给 CreateMergeJob 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
-	// ActiveGeneration is the active generation value supplied to the CreateMergeJob query.
+	// ActiveGeneration 是提供给 CreateMergeJob 查询的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// CreateMergeJob executes the generated CreateMergeJob database query.
+// CreateMergeJob 执行生成的 CreateMergeJob 数据库查询。
 // 记录一条持久化的资产合并请求。
 func (q *Queries) CreateMergeJob(ctx context.Context, arg CreateMergeJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, createMergeJob,
@@ -622,27 +622,27 @@ ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// CreateSyncJobParams contains the strongly typed arguments for the CreateSyncJob query.
+// CreateSyncJobParams 包含 CreateSyncJob 查询的强类型参数。
 type CreateSyncJobParams struct {
-	// TenantID is the tenant id value supplied to the CreateSyncJob query.
+	// TenantID 是提供给 CreateSyncJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateSyncJob query.
+	// ID 是提供给 CreateSyncJob 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RepositoryID is the repository id value supplied to the CreateSyncJob query.
+	// RepositoryID 是提供给 CreateSyncJob 查询的 RepositoryID 值。
 	RepositoryID *uuid.UUID `json:"repository_id"`
-	// RefType is the ref type value supplied to the CreateSyncJob query.
+	// RefType 是提供给 CreateSyncJob 查询的 RefType 值。
 	RefType *string `json:"ref_type"`
-	// RefName is the ref name value supplied to the CreateSyncJob query.
+	// RefName 是提供给 CreateSyncJob 查询的 RefName 值。
 	RefName *string `json:"ref_name"`
-	// JobInput is the job input value supplied to the CreateSyncJob query.
+	// JobInput 是提供给 CreateSyncJob 查询的 JobInput 值。
 	JobInput []byte `json:"job_input"`
-	// DedupeKey is the dedupe key value supplied to the CreateSyncJob query.
+	// DedupeKey 是提供给 CreateSyncJob 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
-	// ActiveGeneration is the active generation value supplied to the CreateSyncJob query.
+	// ActiveGeneration 是提供给 CreateSyncJob 查询的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// CreateSyncJob executes the generated CreateSyncJob database query.
+// CreateSyncJob 执行生成的 CreateSyncJob 数据库查询。
 // 记录一条持久化的仓库同步请求。
 func (q *Queries) CreateSyncJob(ctx context.Context, arg CreateSyncJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, createSyncJob,
@@ -695,15 +695,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetAssetParams contains the strongly typed arguments for the GetAsset query.
+// GetAssetParams 包含 GetAsset 查询的强类型参数。
 type GetAssetParams struct {
-	// TenantID is the tenant id value supplied to the GetAsset query.
+	// TenantID 是提供给 GetAsset 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetAsset query.
+	// ID 是提供给 GetAsset 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetAsset executes the generated GetAsset database query.
+// GetAsset 执行生成的 GetAsset 数据库查询。
 // 返回一个活跃资产。
 func (q *Queries) GetAsset(ctx context.Context, arg GetAssetParams) (Asset, error) {
 	row := q.db.QueryRow(ctx, getAsset, arg.TenantID, arg.ID)
@@ -732,19 +732,19 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetAssetByNameParams contains the strongly typed arguments for the GetAssetByName query.
+// GetAssetByNameParams 包含 GetAssetByName 查询的强类型参数。
 type GetAssetByNameParams struct {
-	// TenantID is the tenant id value supplied to the GetAssetByName query.
+	// TenantID 是提供给 GetAssetByName 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the GetAssetByName query.
+	// ServiceID 是提供给 GetAssetByName 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the GetAssetByName query.
+	// Kind 是提供给 GetAssetByName 查询的 Kind 值。
 	Kind string `json:"kind"`
-	// Name is the name value supplied to the GetAssetByName query.
+	// Name 是提供给 GetAssetByName 查询的 Name 值。
 	Name string `json:"name"`
 }
 
-// GetAssetByName executes the generated GetAssetByName database query.
+// GetAssetByName 执行生成的 GetAssetByName 数据库查询。
 // 按服务、kind、名称返回一个活跃资产。
 func (q *Queries) GetAssetByName(ctx context.Context, arg GetAssetByNameParams) (Asset, error) {
 	row := q.db.QueryRow(ctx, getAssetByName,
@@ -775,7 +775,7 @@ FROM asset_kinds
 WHERE id = $1
 `
 
-// GetAssetKind executes the generated GetAssetKind database query.
+// GetAssetKind 执行生成的 GetAssetKind 数据库查询。
 // M1 资产流水线的持久化查询：资产、层、修订、版本、条目、轨迹、kind 与最近访问。
 // 全部查询保留 tenant_id 谓词；asset_kinds 为平台级 global 表。
 // 返回一个未删除的资产 kind 注册。
@@ -802,19 +802,19 @@ WHERE tenant_id = $1
   AND ref_name = $4
 `
 
-// GetAssetRefTrackParams contains the strongly typed arguments for the GetAssetRefTrack query.
+// GetAssetRefTrackParams 包含 GetAssetRefTrack 查询的强类型参数。
 type GetAssetRefTrackParams struct {
-	// TenantID is the tenant id value supplied to the GetAssetRefTrack query.
+	// TenantID 是提供给 GetAssetRefTrack 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetID is the asset id value supplied to the GetAssetRefTrack query.
+	// AssetID 是提供给 GetAssetRefTrack 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// RefType is the ref type value supplied to the GetAssetRefTrack query.
+	// RefType 是提供给 GetAssetRefTrack 查询的 RefType 值。
 	RefType string `json:"ref_type"`
-	// RefName is the ref name value supplied to the GetAssetRefTrack query.
+	// RefName 是提供给 GetAssetRefTrack 查询的 RefName 值。
 	RefName string `json:"ref_name"`
 }
 
-// GetAssetRefTrack executes the generated GetAssetRefTrack database query.
+// GetAssetRefTrack 执行生成的 GetAssetRefTrack 数据库查询。
 // 返回一条资产引用轨迹。
 func (q *Queries) GetAssetRefTrack(ctx context.Context, arg GetAssetRefTrackParams) (AssetRefTrack, error) {
 	row := q.db.QueryRow(ctx, getAssetRefTrack,
@@ -849,15 +849,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetAssetRefTrackByIDParams contains the strongly typed arguments for the GetAssetRefTrackByID query.
+// GetAssetRefTrackByIDParams 包含 GetAssetRefTrackByID 查询的强类型参数。
 type GetAssetRefTrackByIDParams struct {
-	// TenantID is the tenant id value supplied to the GetAssetRefTrackByID query.
+	// TenantID 是提供给 GetAssetRefTrackByID 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetAssetRefTrackByID query.
+	// ID 是提供给 GetAssetRefTrackByID 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetAssetRefTrackByID executes the generated GetAssetRefTrackByID database query.
+// GetAssetRefTrackByID 执行生成的 GetAssetRefTrackByID 数据库查询。
 // 按轨迹 id 返回一条资产引用轨迹，供 asset.merge 任务按轨迹定位资产。
 func (q *Queries) GetAssetRefTrackByID(ctx context.Context, arg GetAssetRefTrackByIDParams) (AssetRefTrack, error) {
 	row := q.db.QueryRow(ctx, getAssetRefTrackByID, arg.TenantID, arg.ID)
@@ -890,15 +890,15 @@ WHERE a.tenant_id = $1
   AND a.deleted_at IS NULL
 `
 
-// GetAssetRepositoryDefaultBranchParams contains the strongly typed arguments for the GetAssetRepositoryDefaultBranch query.
+// GetAssetRepositoryDefaultBranchParams 包含 GetAssetRepositoryDefaultBranch 查询的强类型参数。
 type GetAssetRepositoryDefaultBranchParams struct {
-	// TenantID is the tenant id value supplied to the GetAssetRepositoryDefaultBranch query.
+	// TenantID 是提供给 GetAssetRepositoryDefaultBranch 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetID is the asset id value supplied to the GetAssetRepositoryDefaultBranch query.
+	// AssetID 是提供给 GetAssetRepositoryDefaultBranch 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
 }
 
-// GetAssetRepositoryDefaultBranch executes the generated GetAssetRepositoryDefaultBranch database query.
+// GetAssetRepositoryDefaultBranch 执行生成的 GetAssetRepositoryDefaultBranch 数据库查询。
 // 返回一个资产所属服务的仓库默认分支。
 func (q *Queries) GetAssetRepositoryDefaultBranch(ctx context.Context, arg GetAssetRepositoryDefaultBranchParams) (string, error) {
 	row := q.db.QueryRow(ctx, getAssetRepositoryDefaultBranch, arg.TenantID, arg.AssetID)
@@ -914,15 +914,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetAssetVersionParams contains the strongly typed arguments for the GetAssetVersion query.
+// GetAssetVersionParams 包含 GetAssetVersion 查询的强类型参数。
 type GetAssetVersionParams struct {
-	// TenantID is the tenant id value supplied to the GetAssetVersion query.
+	// TenantID 是提供给 GetAssetVersion 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetAssetVersion query.
+	// ID 是提供给 GetAssetVersion 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetAssetVersion executes the generated GetAssetVersion database query.
+// GetAssetVersion 执行生成的 GetAssetVersion 数据库查询。
 // 返回一条资产版本。
 func (q *Queries) GetAssetVersion(ctx context.Context, arg GetAssetVersionParams) (AssetVersion, error) {
 	row := q.db.QueryRow(ctx, getAssetVersion, arg.TenantID, arg.ID)
@@ -970,15 +970,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetBaseLayerForAssetParams contains the strongly typed arguments for the GetBaseLayerForAsset query.
+// GetBaseLayerForAssetParams 包含 GetBaseLayerForAsset 查询的强类型参数。
 type GetBaseLayerForAssetParams struct {
-	// TenantID is the tenant id value supplied to the GetBaseLayerForAsset query.
+	// TenantID 是提供给 GetBaseLayerForAsset 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetID is the asset id value supplied to the GetBaseLayerForAsset query.
+	// AssetID 是提供给 GetBaseLayerForAsset 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
 }
 
-// GetBaseLayerForAsset executes the generated GetBaseLayerForAsset database query.
+// GetBaseLayerForAsset 执行生成的 GetBaseLayerForAsset 数据库查询。
 // 返回一个资产的 base 层。
 func (q *Queries) GetBaseLayerForAsset(ctx context.Context, arg GetBaseLayerForAssetParams) (Layer, error) {
 	row := q.db.QueryRow(ctx, getBaseLayerForAsset, arg.TenantID, arg.AssetID)
@@ -1013,15 +1013,15 @@ ORDER BY sequence_no DESC
 LIMIT 1
 `
 
-// GetCurrentVersionInTrackParams contains the strongly typed arguments for the GetCurrentVersionInTrack query.
+// GetCurrentVersionInTrackParams 包含 GetCurrentVersionInTrack 查询的强类型参数。
 type GetCurrentVersionInTrackParams struct {
-	// TenantID is the tenant id value supplied to the GetCurrentVersionInTrack query.
+	// TenantID 是提供给 GetCurrentVersionInTrack 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TrackID is the track id value supplied to the GetCurrentVersionInTrack query.
+	// TrackID 是提供给 GetCurrentVersionInTrack 查询的 TrackID 值。
 	TrackID uuid.UUID `json:"track_id"`
 }
 
-// GetCurrentVersionInTrack executes the generated GetCurrentVersionInTrack database query.
+// GetCurrentVersionInTrack 执行生成的 GetCurrentVersionInTrack 数据库查询。
 // 返回轨迹内当前已发布的版本。
 func (q *Queries) GetCurrentVersionInTrack(ctx context.Context, arg GetCurrentVersionInTrackParams) (AssetVersion, error) {
 	row := q.db.QueryRow(ctx, getCurrentVersionInTrack, arg.TenantID, arg.TrackID)
@@ -1071,19 +1071,19 @@ ORDER BY created_at DESC, id DESC
 LIMIT 1
 `
 
-// GetLatestLayerRevisionParams contains the strongly typed arguments for the GetLatestLayerRevision query.
+// GetLatestLayerRevisionParams 包含 GetLatestLayerRevision 查询的强类型参数。
 type GetLatestLayerRevisionParams struct {
-	// TenantID is the tenant id value supplied to the GetLatestLayerRevision query.
+	// TenantID 是提供给 GetLatestLayerRevision 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// LayerID is the layer id value supplied to the GetLatestLayerRevision query.
+	// LayerID 是提供给 GetLatestLayerRevision 查询的 LayerID 值。
 	LayerID uuid.UUID `json:"layer_id"`
-	// ScopeType is the scope type value supplied to the GetLatestLayerRevision query.
+	// ScopeType 是提供给 GetLatestLayerRevision 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the GetLatestLayerRevision query.
+	// ScopeKey 是提供给 GetLatestLayerRevision 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
 }
 
-// GetLatestLayerRevision executes the generated GetLatestLayerRevision database query.
+// GetLatestLayerRevision 执行生成的 GetLatestLayerRevision 数据库查询。
 // 返回某层在某作用域内最新创建的一条修订。
 func (q *Queries) GetLatestLayerRevision(ctx context.Context, arg GetLatestLayerRevisionParams) (LayerRevision, error) {
 	row := q.db.QueryRow(ctx, getLatestLayerRevision,
@@ -1125,15 +1125,15 @@ ORDER BY sequence_no DESC
 LIMIT 1
 `
 
-// GetLatestVersionInTrackParams contains the strongly typed arguments for the GetLatestVersionInTrack query.
+// GetLatestVersionInTrackParams 包含 GetLatestVersionInTrack 查询的强类型参数。
 type GetLatestVersionInTrackParams struct {
-	// TenantID is the tenant id value supplied to the GetLatestVersionInTrack query.
+	// TenantID 是提供给 GetLatestVersionInTrack 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TrackID is the track id value supplied to the GetLatestVersionInTrack query.
+	// TrackID 是提供给 GetLatestVersionInTrack 查询的 TrackID 值。
 	TrackID uuid.UUID `json:"track_id"`
 }
 
-// GetLatestVersionInTrack executes the generated GetLatestVersionInTrack database query.
+// GetLatestVersionInTrack 执行生成的 GetLatestVersionInTrack 数据库查询。
 // 返回轨迹内最新创建的版本。
 func (q *Queries) GetLatestVersionInTrack(ctx context.Context, arg GetLatestVersionInTrackParams) (AssetVersion, error) {
 	row := q.db.QueryRow(ctx, getLatestVersionInTrack, arg.TenantID, arg.TrackID)
@@ -1181,19 +1181,19 @@ WHERE tenant_id = $1
   AND scope_key = $4
 `
 
-// GetLayerHeadParams contains the strongly typed arguments for the GetLayerHead query.
+// GetLayerHeadParams 包含 GetLayerHead 查询的强类型参数。
 type GetLayerHeadParams struct {
-	// TenantID is the tenant id value supplied to the GetLayerHead query.
+	// TenantID 是提供给 GetLayerHead 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// LayerID is the layer id value supplied to the GetLayerHead query.
+	// LayerID 是提供给 GetLayerHead 查询的 LayerID 值。
 	LayerID uuid.UUID `json:"layer_id"`
-	// ScopeType is the scope type value supplied to the GetLayerHead query.
+	// ScopeType 是提供给 GetLayerHead 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the GetLayerHead query.
+	// ScopeKey 是提供给 GetLayerHead 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
 }
 
-// GetLayerHead executes the generated GetLayerHead database query.
+// GetLayerHead 执行生成的 GetLayerHead 数据库查询。
 // 返回一个层头。
 func (q *Queries) GetLayerHead(ctx context.Context, arg GetLayerHeadParams) (LayerHead, error) {
 	row := q.db.QueryRow(ctx, getLayerHead,
@@ -1224,15 +1224,15 @@ WHERE tenant_id = $1
   AND kind_id = $2
 `
 
-// GetTenantKindOverrideParams contains the strongly typed arguments for the GetTenantKindOverride query.
+// GetTenantKindOverrideParams 包含 GetTenantKindOverride 查询的强类型参数。
 type GetTenantKindOverrideParams struct {
-	// TenantID is the tenant id value supplied to the GetTenantKindOverride query.
+	// TenantID 是提供给 GetTenantKindOverride 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// KindID is the kind id value supplied to the GetTenantKindOverride query.
+	// KindID 是提供给 GetTenantKindOverride 查询的 KindID 值。
 	KindID string `json:"kind_id"`
 }
 
-// GetTenantKindOverride executes the generated GetTenantKindOverride database query.
+// GetTenantKindOverride 执行生成的 GetTenantKindOverride 数据库查询。
 // 返回一个租户级 kind 覆盖，未显式配置时回退默认启用。
 func (q *Queries) GetTenantKindOverride(ctx context.Context, arg GetTenantKindOverrideParams) (TenantKindOverride, error) {
 	row := q.db.QueryRow(ctx, getTenantKindOverride, arg.TenantID, arg.KindID)
@@ -1258,19 +1258,19 @@ WHERE tenant_id = $1
   AND state = 'active'
 `
 
-// ListActiveBindingsForScopeParams contains the strongly typed arguments for the ListActiveBindingsForScope query.
+// ListActiveBindingsForScopeParams 包含 ListActiveBindingsForScope 查询的强类型参数。
 type ListActiveBindingsForScopeParams struct {
-	// TenantID is the tenant id value supplied to the ListActiveBindingsForScope query.
+	// TenantID 是提供给 ListActiveBindingsForScope 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SourceSpecID is the source spec id value supplied to the ListActiveBindingsForScope query.
+	// SourceSpecID 是提供给 ListActiveBindingsForScope 查询的 SourceSpecID 值。
 	SourceSpecID uuid.UUID `json:"source_spec_id"`
-	// ScopeType is the scope type value supplied to the ListActiveBindingsForScope query.
+	// ScopeType 是提供给 ListActiveBindingsForScope 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the ListActiveBindingsForScope query.
+	// ScopeKey 是提供给 ListActiveBindingsForScope 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
 }
 
-// ListActiveBindingsForScope executes the generated ListActiveBindingsForScope database query.
+// ListActiveBindingsForScope 执行生成的 ListActiveBindingsForScope 数据库查询。
 // 列出服务某作用域内当前活跃的源绑定。
 func (q *Queries) ListActiveBindingsForScope(ctx context.Context, arg ListActiveBindingsForScopeParams) ([]SourceBinding, error) {
 	rows, err := q.db.Query(ctx, listActiveBindingsForScope,
@@ -1319,7 +1319,7 @@ WHERE enabled = true
 ORDER BY id
 `
 
-// ListAssetKinds executes the generated ListAssetKinds database query.
+// ListAssetKinds 执行生成的 ListAssetKinds 数据库查询。
 // 返回全部启用的资产 kind 注册。
 func (q *Queries) ListAssetKinds(ctx context.Context) ([]AssetKind, error) {
 	rows, err := q.db.Query(ctx, listAssetKinds)
@@ -1362,21 +1362,21 @@ LIMIT $5
 OFFSET $4
 `
 
-// ListAssetVersionItemsParams contains the strongly typed arguments for the ListAssetVersionItems query.
+// ListAssetVersionItemsParams 包含 ListAssetVersionItems 查询的强类型参数。
 type ListAssetVersionItemsParams struct {
-	// TenantID is the tenant id value supplied to the ListAssetVersionItems query.
+	// TenantID 是提供给 ListAssetVersionItems 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetVersionID is the asset version id value supplied to the ListAssetVersionItems query.
+	// AssetVersionID 是提供给 ListAssetVersionItems 查询的 AssetVersionID 值。
 	AssetVersionID uuid.UUID `json:"asset_version_id"`
-	// SearchQuery is the search query value supplied to the ListAssetVersionItems query.
+	// SearchQuery 是提供给 ListAssetVersionItems 查询的 SearchQuery 值。
 	SearchQuery string `json:"search_query"`
-	// PageOffset is the page offset value supplied to the ListAssetVersionItems query.
+	// PageOffset 是提供给 ListAssetVersionItems 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListAssetVersionItems query.
+	// PageLimit 是提供给 ListAssetVersionItems 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListAssetVersionItems executes the generated ListAssetVersionItems database query.
+// ListAssetVersionItems 执行生成的 ListAssetVersionItems 数据库查询。
 // 列出资产版本条目分页。
 func (q *Queries) ListAssetVersionItems(ctx context.Context, arg ListAssetVersionItemsParams) ([]AssetItem, error) {
 	rows, err := q.db.Query(ctx, listAssetVersionItems,
@@ -1428,15 +1428,15 @@ WHERE tenant_id = $1
 ORDER BY name, id
 `
 
-// ListAssetsForServiceParams contains the strongly typed arguments for the ListAssetsForService query.
+// ListAssetsForServiceParams 包含 ListAssetsForService 查询的强类型参数。
 type ListAssetsForServiceParams struct {
-	// TenantID is the tenant id value supplied to the ListAssetsForService query.
+	// TenantID 是提供给 ListAssetsForService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the ListAssetsForService query.
+	// ServiceID 是提供给 ListAssetsForService 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// ListAssetsForService executes the generated ListAssetsForService database query.
+// ListAssetsForService 执行生成的 ListAssetsForService 数据库查询。
 // 返回一个服务下全部活跃资产。
 func (q *Queries) ListAssetsForService(ctx context.Context, arg ListAssetsForServiceParams) ([]Asset, error) {
 	rows, err := q.db.Query(ctx, listAssetsForService, arg.TenantID, arg.ServiceID)
@@ -1480,19 +1480,19 @@ LIMIT $4
 OFFSET $3
 `
 
-// ListRecentServicesParams contains the strongly typed arguments for the ListRecentServices query.
+// ListRecentServicesParams 包含 ListRecentServices 查询的强类型参数。
 type ListRecentServicesParams struct {
-	// TenantID is the tenant id value supplied to the ListRecentServices query.
+	// TenantID 是提供给 ListRecentServices 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// UserID is the user id value supplied to the ListRecentServices query.
+	// UserID 是提供给 ListRecentServices 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// PageOffset is the page offset value supplied to the ListRecentServices query.
+	// PageOffset 是提供给 ListRecentServices 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListRecentServices query.
+	// PageLimit 是提供给 ListRecentServices 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListRecentServices executes the generated ListRecentServices database query.
+// ListRecentServices 执行生成的 ListRecentServices 数据库查询。
 // 列出用户最近访问的服务。
 func (q *Queries) ListRecentServices(ctx context.Context, arg ListRecentServicesParams) ([]Service, error) {
 	rows, err := q.db.Query(ctx, listRecentServices,
@@ -1546,15 +1546,15 @@ WHERE tenant_id = $1
 ORDER BY root_dir, id
 `
 
-// ListServicesByRepositoryParams contains the strongly typed arguments for the ListServicesByRepository query.
+// ListServicesByRepositoryParams 包含 ListServicesByRepository 查询的强类型参数。
 type ListServicesByRepositoryParams struct {
-	// TenantID is the tenant id value supplied to the ListServicesByRepository query.
+	// TenantID 是提供给 ListServicesByRepository 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// RepositoryID is the repository id value supplied to the ListServicesByRepository query.
+	// RepositoryID 是提供给 ListServicesByRepository 查询的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
 }
 
-// ListServicesByRepository executes the generated ListServicesByRepository database query.
+// ListServicesByRepository 执行生成的 ListServicesByRepository 数据库查询。
 // 返回一个仓库下全部活跃服务。
 func (q *Queries) ListServicesByRepository(ctx context.Context, arg ListServicesByRepositoryParams) ([]Service, error) {
 	rows, err := q.db.Query(ctx, listServicesByRepository, arg.TenantID, arg.RepositoryID)
@@ -1603,15 +1603,15 @@ WHERE tenant_id = $1
 ORDER BY ord, id
 `
 
-// ListSourceSpecsForServiceParams contains the strongly typed arguments for the ListSourceSpecsForService query.
+// ListSourceSpecsForServiceParams 包含 ListSourceSpecsForService 查询的强类型参数。
 type ListSourceSpecsForServiceParams struct {
-	// TenantID is the tenant id value supplied to the ListSourceSpecsForService query.
+	// TenantID 是提供给 ListSourceSpecsForService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the ListSourceSpecsForService query.
+	// ServiceID 是提供给 ListSourceSpecsForService 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// ListSourceSpecsForService executes the generated ListSourceSpecsForService database query.
+// ListSourceSpecsForService 执行生成的 ListSourceSpecsForService 数据库查询。
 // 返回一个服务下全部活跃源配置。
 func (q *Queries) ListSourceSpecsForService(ctx context.Context, arg ListSourceSpecsForServiceParams) ([]SourceSpec, error) {
 	rows, err := q.db.Query(ctx, listSourceSpecsForService, arg.TenantID, arg.ServiceID)
@@ -1662,15 +1662,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// MarkAssetVersionIndexedParams contains the strongly typed arguments for the MarkAssetVersionIndexed query.
+// MarkAssetVersionIndexedParams 包含 MarkAssetVersionIndexed 查询的强类型参数。
 type MarkAssetVersionIndexedParams struct {
-	// TenantID is the tenant id value supplied to the MarkAssetVersionIndexed query.
+	// TenantID 是提供给 MarkAssetVersionIndexed 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the MarkAssetVersionIndexed query.
+	// ID 是提供给 MarkAssetVersionIndexed 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// MarkAssetVersionIndexed executes the generated MarkAssetVersionIndexed database query.
+// MarkAssetVersionIndexed 执行生成的 MarkAssetVersionIndexed 数据库查询。
 // 将一条资产版本标记为已完成 item 索引。
 func (q *Queries) MarkAssetVersionIndexed(ctx context.Context, arg MarkAssetVersionIndexedParams) (int64, error) {
 	result, err := q.db.Exec(ctx, markAssetVersionIndexed, arg.TenantID, arg.ID)
@@ -1691,21 +1691,21 @@ WHERE tenant_id = $1
   AND NOT (id = ANY($5::uuid[]))
 `
 
-// MarkBindingsStaleInScopeParams contains the strongly typed arguments for the MarkBindingsStaleInScope query.
+// MarkBindingsStaleInScopeParams 包含 MarkBindingsStaleInScope 查询的强类型参数。
 type MarkBindingsStaleInScopeParams struct {
-	// TenantID is the tenant id value supplied to the MarkBindingsStaleInScope query.
+	// TenantID 是提供给 MarkBindingsStaleInScope 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SourceSpecID is the source spec id value supplied to the MarkBindingsStaleInScope query.
+	// SourceSpecID 是提供给 MarkBindingsStaleInScope 查询的 SourceSpecID 值。
 	SourceSpecID uuid.UUID `json:"source_spec_id"`
-	// ScopeType is the scope type value supplied to the MarkBindingsStaleInScope query.
+	// ScopeType 是提供给 MarkBindingsStaleInScope 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the MarkBindingsStaleInScope query.
+	// ScopeKey 是提供给 MarkBindingsStaleInScope 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
-	// SeenIds is the seen ids value supplied to the MarkBindingsStaleInScope query.
+	// SeenIds 是提供给 MarkBindingsStaleInScope 查询的 SeenIds 值。
 	SeenIds []uuid.UUID `json:"seen_ids"`
 }
 
-// MarkBindingsStaleInScope executes the generated MarkBindingsStaleInScope database query.
+// MarkBindingsStaleInScope 执行生成的 MarkBindingsStaleInScope 数据库查询。
 // 将某作用域内本次未出现的绑定标记为 stale。
 func (q *Queries) MarkBindingsStaleInScope(ctx context.Context, arg MarkBindingsStaleInScopeParams) (int64, error) {
 	result, err := q.db.Exec(ctx, markBindingsStaleInScope,
@@ -1734,15 +1734,15 @@ WHERE track.tenant_id = $1
   )
 `
 
-// MarkTracksHealthyForSourceSpecParams contains the strongly typed arguments for the MarkTracksHealthyForSourceSpec query.
+// MarkTracksHealthyForSourceSpecParams 包含 MarkTracksHealthyForSourceSpec 查询的强类型参数。
 type MarkTracksHealthyForSourceSpecParams struct {
-	// TenantID is the tenant id value supplied to the MarkTracksHealthyForSourceSpec query.
+	// TenantID 是提供给 MarkTracksHealthyForSourceSpec 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SourceSpecID is the source spec id value supplied to the MarkTracksHealthyForSourceSpec query.
+	// SourceSpecID 是提供给 MarkTracksHealthyForSourceSpec 查询的 SourceSpecID 值。
 	SourceSpecID uuid.UUID `json:"source_spec_id"`
 }
 
-// MarkTracksHealthyForSourceSpec executes the generated MarkTracksHealthyForSourceSpec database query.
+// MarkTracksHealthyForSourceSpec 执行生成的 MarkTracksHealthyForSourceSpec 数据库查询。
 // 将某源配置关联资产的引用轨迹恢复为 ok。
 func (q *Queries) MarkTracksHealthyForSourceSpec(ctx context.Context, arg MarkTracksHealthyForSourceSpecParams) (int64, error) {
 	result, err := q.db.Exec(ctx, markTracksHealthyForSourceSpec, arg.TenantID, arg.SourceSpecID)
@@ -1765,15 +1765,15 @@ WHERE track.tenant_id = $1
   )
 `
 
-// MarkTracksStaleForSourceSpecParams contains the strongly typed arguments for the MarkTracksStaleForSourceSpec query.
+// MarkTracksStaleForSourceSpecParams 包含 MarkTracksStaleForSourceSpec 查询的强类型参数。
 type MarkTracksStaleForSourceSpecParams struct {
-	// TenantID is the tenant id value supplied to the MarkTracksStaleForSourceSpec query.
+	// TenantID 是提供给 MarkTracksStaleForSourceSpec 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SourceSpecID is the source spec id value supplied to the MarkTracksStaleForSourceSpec query.
+	// SourceSpecID 是提供给 MarkTracksStaleForSourceSpec 查询的 SourceSpecID 值。
 	SourceSpecID uuid.UUID `json:"source_spec_id"`
 }
 
-// MarkTracksStaleForSourceSpec executes the generated MarkTracksStaleForSourceSpec database query.
+// MarkTracksStaleForSourceSpec 执行生成的 MarkTracksStaleForSourceSpec 数据库查询。
 // 将某源配置关联资产的引用轨迹标记为 stale。
 func (q *Queries) MarkTracksStaleForSourceSpec(ctx context.Context, arg MarkTracksStaleForSourceSpecParams) (int64, error) {
 	result, err := q.db.Exec(ctx, markTracksStaleForSourceSpec, arg.TenantID, arg.SourceSpecID)
@@ -1793,17 +1793,17 @@ WHERE tenant_id = $2
   AND deleted_at IS NULL
 `
 
-// SetSourceLastErrorParams contains the strongly typed arguments for the SetSourceLastError query.
+// SetSourceLastErrorParams 包含 SetSourceLastError 查询的强类型参数。
 type SetSourceLastErrorParams struct {
-	// LastError is the last error value supplied to the SetSourceLastError query.
+	// LastError 是提供给 SetSourceLastError 查询的 LastError 值。
 	LastError *string `json:"last_error"`
-	// TenantID is the tenant id value supplied to the SetSourceLastError query.
+	// TenantID 是提供给 SetSourceLastError 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the SetSourceLastError query.
+	// ID 是提供给 SetSourceLastError 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// SetSourceLastError executes the generated SetSourceLastError database query.
+// SetSourceLastError 执行生成的 SetSourceLastError 数据库查询。
 // 记录一次源物化的失败说明并递增连续失败次数。
 func (q *Queries) SetSourceLastError(ctx context.Context, arg SetSourceLastErrorParams) (int64, error) {
 	result, err := q.db.Exec(ctx, setSourceLastError, arg.LastError, arg.TenantID, arg.ID)
@@ -1820,17 +1820,17 @@ WHERE tenant_id = $2
   AND id = $3
 `
 
-// UpdateAssetItemSearchVectorParams contains the strongly typed arguments for the UpdateAssetItemSearchVector query.
+// UpdateAssetItemSearchVectorParams 包含 UpdateAssetItemSearchVector 查询的强类型参数。
 type UpdateAssetItemSearchVectorParams struct {
-	// SearchText is the search text value supplied to the UpdateAssetItemSearchVector query.
+	// SearchText 是提供给 UpdateAssetItemSearchVector 查询的 SearchText 值。
 	SearchText []byte `json:"search_text"`
-	// TenantID is the tenant id value supplied to the UpdateAssetItemSearchVector query.
+	// TenantID 是提供给 UpdateAssetItemSearchVector 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateAssetItemSearchVector query.
+	// ID 是提供给 UpdateAssetItemSearchVector 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// UpdateAssetItemSearchVector executes the generated UpdateAssetItemSearchVector database query.
+// UpdateAssetItemSearchVector 执行生成的 UpdateAssetItemSearchVector 数据库查询。
 // 更新一条资产版本条目的 tsvector 全文检索向量。
 func (q *Queries) UpdateAssetItemSearchVector(ctx context.Context, arg UpdateAssetItemSearchVectorParams) (int64, error) {
 	result, err := q.db.Exec(ctx, updateAssetItemSearchVector, arg.SearchText, arg.TenantID, arg.ID)
@@ -1850,21 +1850,21 @@ WHERE tenant_id = $4
   AND id = $5
 `
 
-// UpdateAssetRefTrackHeadParams contains the strongly typed arguments for the UpdateAssetRefTrackHead query.
+// UpdateAssetRefTrackHeadParams 包含 UpdateAssetRefTrackHead 查询的强类型参数。
 type UpdateAssetRefTrackHeadParams struct {
-	// LatestVersionID is the latest version id value supplied to the UpdateAssetRefTrackHead query.
+	// LatestVersionID 是提供给 UpdateAssetRefTrackHead 查询的 LatestVersionID 值。
 	LatestVersionID *uuid.UUID `json:"latest_version_id"`
-	// CurrentVersionID is the current version id value supplied to the UpdateAssetRefTrackHead query.
+	// CurrentVersionID 是提供给 UpdateAssetRefTrackHead 查询的 CurrentVersionID 值。
 	CurrentVersionID *uuid.UUID `json:"current_version_id"`
-	// ProcessedGeneration is the processed generation value supplied to the UpdateAssetRefTrackHead query.
+	// ProcessedGeneration 是提供给 UpdateAssetRefTrackHead 查询的 ProcessedGeneration 值。
 	ProcessedGeneration int64 `json:"processed_generation"`
-	// TenantID is the tenant id value supplied to the UpdateAssetRefTrackHead query.
+	// TenantID 是提供给 UpdateAssetRefTrackHead 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateAssetRefTrackHead query.
+	// ID 是提供给 UpdateAssetRefTrackHead 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// UpdateAssetRefTrackHead executes the generated UpdateAssetRefTrackHead database query.
+// UpdateAssetRefTrackHead 执行生成的 UpdateAssetRefTrackHead 数据库查询。
 // 更新一条轨迹的版本头。
 func (q *Queries) UpdateAssetRefTrackHead(ctx context.Context, arg UpdateAssetRefTrackHeadParams) (int64, error) {
 	result, err := q.db.Exec(ctx, updateAssetRefTrackHead,
@@ -1902,37 +1902,37 @@ WHERE tenant_id = $11
 RETURNING tenant_id, id, service_id, kind, asset_name_template, role, origin, mode, path, producer_profile_id, ord, timeout_sec, branch_patterns, enabled, config_origin, last_error, failure_streak, revision, deleted_at, created_at, updated_at
 `
 
-// UpdateSourceSpecParams contains the strongly typed arguments for the UpdateSourceSpec query.
+// UpdateSourceSpecParams 包含 UpdateSourceSpec 查询的强类型参数。
 type UpdateSourceSpecParams struct {
-	// AssetNameTemplate is the asset name template value supplied to the UpdateSourceSpec query.
+	// AssetNameTemplate 是提供给 UpdateSourceSpec 查询的 AssetNameTemplate 值。
 	AssetNameTemplate *string `json:"asset_name_template"`
-	// Role is the role value supplied to the UpdateSourceSpec query.
+	// Role 是提供给 UpdateSourceSpec 查询的 Role 值。
 	Role *string `json:"role"`
-	// Origin is the origin value supplied to the UpdateSourceSpec query.
+	// Origin 是提供给 UpdateSourceSpec 查询的 Origin 值。
 	Origin *string `json:"origin"`
-	// Mode is the mode value supplied to the UpdateSourceSpec query.
+	// Mode 是提供给 UpdateSourceSpec 查询的 Mode 值。
 	Mode *string `json:"mode"`
-	// Path is the path value supplied to the UpdateSourceSpec query.
+	// Path 是提供给 UpdateSourceSpec 查询的 Path 值。
 	Path *string `json:"path"`
-	// ProducerProfileID is the producer profile id value supplied to the UpdateSourceSpec query.
+	// ProducerProfileID 是提供给 UpdateSourceSpec 查询的 ProducerProfileID 值。
 	ProducerProfileID *uuid.UUID `json:"producer_profile_id"`
-	// Ord is the ord value supplied to the UpdateSourceSpec query.
+	// Ord 是提供给 UpdateSourceSpec 查询的 Ord 值。
 	Ord *int32 `json:"ord"`
-	// TimeoutSec is the timeout sec value supplied to the UpdateSourceSpec query.
+	// TimeoutSec 是提供给 UpdateSourceSpec 查询的 TimeoutSec 值。
 	TimeoutSec *int32 `json:"timeout_sec"`
-	// BranchPatterns is the branch patterns value supplied to the UpdateSourceSpec query.
+	// BranchPatterns 是提供给 UpdateSourceSpec 查询的 BranchPatterns 值。
 	BranchPatterns []string `json:"branch_patterns"`
-	// Enabled is the enabled value supplied to the UpdateSourceSpec query.
+	// Enabled 是提供给 UpdateSourceSpec 查询的 Enabled 值。
 	Enabled *bool `json:"enabled"`
-	// TenantID is the tenant id value supplied to the UpdateSourceSpec query.
+	// TenantID 是提供给 UpdateSourceSpec 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateSourceSpec query.
+	// ID 是提供给 UpdateSourceSpec 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the UpdateSourceSpec query.
+	// ExpectedRevision 是提供给 UpdateSourceSpec 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateSourceSpec executes the generated UpdateSourceSpec database query.
+// UpdateSourceSpec 执行生成的 UpdateSourceSpec 数据库查询。
 // 更新一条源配置，应用明确提供的 PATCH 字段并递增版本。
 func (q *Queries) UpdateSourceSpec(ctx context.Context, arg UpdateSourceSpecParams) (SourceSpec, error) {
 	row := q.db.QueryRow(ctx, updateSourceSpec,
@@ -1984,21 +1984,21 @@ ON CONFLICT (tenant_id, service_id, kind, name) DO UPDATE SET updated_at = now()
 RETURNING tenant_id, id, service_id, kind, name, revision, deleted_at, created_at, updated_at
 `
 
-// UpsertAssetParams contains the strongly typed arguments for the UpsertAsset query.
+// UpsertAssetParams 包含 UpsertAsset 查询的强类型参数。
 type UpsertAssetParams struct {
-	// TenantID is the tenant id value supplied to the UpsertAsset query.
+	// TenantID 是提供给 UpsertAsset 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpsertAsset query.
+	// ID 是提供给 UpsertAsset 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ServiceID is the service id value supplied to the UpsertAsset query.
+	// ServiceID 是提供给 UpsertAsset 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the UpsertAsset query.
+	// Kind 是提供给 UpsertAsset 查询的 Kind 值。
 	Kind string `json:"kind"`
-	// Name is the name value supplied to the UpsertAsset query.
+	// Name 是提供给 UpsertAsset 查询的 Name 值。
 	Name string `json:"name"`
 }
 
-// UpsertAsset executes the generated UpsertAsset database query.
+// UpsertAsset 执行生成的 UpsertAsset 数据库查询。
 // 幂等创建资产；唯一键冲突时返回已存在行。
 func (q *Queries) UpsertAsset(ctx context.Context, arg UpsertAssetParams) (Asset, error) {
 	row := q.db.QueryRow(ctx, upsertAsset,
@@ -2035,27 +2035,27 @@ ON CONFLICT (tenant_id, layer_id, scope_type, scope_key) DO UPDATE SET
 RETURNING tenant_id, layer_id, scope_type, scope_key, latest_revision_id, effective_revision_id, candidate_revision_id, generation, updated_at
 `
 
-// UpsertLayerHeadParams contains the strongly typed arguments for the UpsertLayerHead query.
+// UpsertLayerHeadParams 包含 UpsertLayerHead 查询的强类型参数。
 type UpsertLayerHeadParams struct {
-	// TenantID is the tenant id value supplied to the UpsertLayerHead query.
+	// TenantID 是提供给 UpsertLayerHead 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// LayerID is the layer id value supplied to the UpsertLayerHead query.
+	// LayerID 是提供给 UpsertLayerHead 查询的 LayerID 值。
 	LayerID uuid.UUID `json:"layer_id"`
-	// ScopeType is the scope type value supplied to the UpsertLayerHead query.
+	// ScopeType 是提供给 UpsertLayerHead 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the UpsertLayerHead query.
+	// ScopeKey 是提供给 UpsertLayerHead 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
-	// LatestRevisionID is the latest revision id value supplied to the UpsertLayerHead query.
+	// LatestRevisionID 是提供给 UpsertLayerHead 查询的 LatestRevisionID 值。
 	LatestRevisionID *uuid.UUID `json:"latest_revision_id"`
-	// EffectiveRevisionID is the effective revision id value supplied to the UpsertLayerHead query.
+	// EffectiveRevisionID 是提供给 UpsertLayerHead 查询的 EffectiveRevisionID 值。
 	EffectiveRevisionID *uuid.UUID `json:"effective_revision_id"`
-	// CandidateRevisionID is the candidate revision id value supplied to the UpsertLayerHead query.
+	// CandidateRevisionID 是提供给 UpsertLayerHead 查询的 CandidateRevisionID 值。
 	CandidateRevisionID *uuid.UUID `json:"candidate_revision_id"`
-	// Generation is the generation value supplied to the UpsertLayerHead query.
+	// Generation 是提供给 UpsertLayerHead 查询的 Generation 值。
 	Generation int64 `json:"generation"`
 }
 
-// UpsertLayerHead executes the generated UpsertLayerHead database query.
+// UpsertLayerHead 执行生成的 UpsertLayerHead 数据库查询。
 // 幂等创建层头。
 func (q *Queries) UpsertLayerHead(ctx context.Context, arg UpsertLayerHeadParams) (LayerHead, error) {
 	row := q.db.QueryRow(ctx, upsertLayerHead,
@@ -2089,19 +2089,19 @@ VALUES ($1, $2, $3, $4)
 ON CONFLICT (tenant_id, user_id, service_id) DO UPDATE SET viewed_at = EXCLUDED.viewed_at
 `
 
-// UpsertRecentServiceParams contains the strongly typed arguments for the UpsertRecentService query.
+// UpsertRecentServiceParams 包含 UpsertRecentService 查询的强类型参数。
 type UpsertRecentServiceParams struct {
-	// TenantID is the tenant id value supplied to the UpsertRecentService query.
+	// TenantID 是提供给 UpsertRecentService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// UserID is the user id value supplied to the UpsertRecentService query.
+	// UserID 是提供给 UpsertRecentService 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// ServiceID is the service id value supplied to the UpsertRecentService query.
+	// ServiceID 是提供给 UpsertRecentService 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// ViewedAt is the viewed at value supplied to the UpsertRecentService query.
+	// ViewedAt 是提供给 UpsertRecentService 查询的 ViewedAt 值。
 	ViewedAt pgtype.Timestamptz `json:"viewed_at"`
 }
 
-// UpsertRecentService executes the generated UpsertRecentService database query.
+// UpsertRecentService 执行生成的 UpsertRecentService 数据库查询。
 // 幂等记录一次用户对服务的成功访问。
 func (q *Queries) UpsertRecentService(ctx context.Context, arg UpsertRecentServiceParams) (int64, error) {
 	result, err := q.db.Exec(ctx, upsertRecentService,
@@ -2134,35 +2134,35 @@ ON CONFLICT (tenant_id, source_spec_id, scope_type, scope_key, expansion_key) DO
 RETURNING tenant_id, id, source_spec_id, scope_type, scope_key, expansion_key, resolved_path, source_system, asset_id, layer_id, state, last_seen_commit, created_at, updated_at
 `
 
-// UpsertSourceBindingParams contains the strongly typed arguments for the UpsertSourceBinding query.
+// UpsertSourceBindingParams 包含 UpsertSourceBinding 查询的强类型参数。
 type UpsertSourceBindingParams struct {
-	// TenantID is the tenant id value supplied to the UpsertSourceBinding query.
+	// TenantID 是提供给 UpsertSourceBinding 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpsertSourceBinding query.
+	// ID 是提供给 UpsertSourceBinding 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// SourceSpecID is the source spec id value supplied to the UpsertSourceBinding query.
+	// SourceSpecID 是提供给 UpsertSourceBinding 查询的 SourceSpecID 值。
 	SourceSpecID uuid.UUID `json:"source_spec_id"`
-	// ScopeType is the scope type value supplied to the UpsertSourceBinding query.
+	// ScopeType 是提供给 UpsertSourceBinding 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the UpsertSourceBinding query.
+	// ScopeKey 是提供给 UpsertSourceBinding 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
-	// ExpansionKey is the expansion key value supplied to the UpsertSourceBinding query.
+	// ExpansionKey 是提供给 UpsertSourceBinding 查询的 ExpansionKey 值。
 	ExpansionKey string `json:"expansion_key"`
-	// ResolvedPath is the resolved path value supplied to the UpsertSourceBinding query.
+	// ResolvedPath 是提供给 UpsertSourceBinding 查询的 ResolvedPath 值。
 	ResolvedPath *string `json:"resolved_path"`
-	// SourceSystem is the source system value supplied to the UpsertSourceBinding query.
+	// SourceSystem 是提供给 UpsertSourceBinding 查询的 SourceSystem 值。
 	SourceSystem *string `json:"source_system"`
-	// AssetID is the asset id value supplied to the UpsertSourceBinding query.
+	// AssetID 是提供给 UpsertSourceBinding 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// LayerID is the layer id value supplied to the UpsertSourceBinding query.
+	// LayerID 是提供给 UpsertSourceBinding 查询的 LayerID 值。
 	LayerID uuid.UUID `json:"layer_id"`
-	// State is the state value supplied to the UpsertSourceBinding query.
+	// State 是提供给 UpsertSourceBinding 查询的 State 值。
 	State string `json:"state"`
-	// LastSeenCommit is the last seen commit value supplied to the UpsertSourceBinding query.
+	// LastSeenCommit 是提供给 UpsertSourceBinding 查询的 LastSeenCommit 值。
 	LastSeenCommit *string `json:"last_seen_commit"`
 }
 
-// UpsertSourceBinding executes the generated UpsertSourceBinding database query.
+// UpsertSourceBinding 执行生成的 UpsertSourceBinding 数据库查询。
 // 幂等创建源绑定。
 func (q *Queries) UpsertSourceBinding(ctx context.Context, arg UpsertSourceBindingParams) (SourceBinding, error) {
 	row := q.db.QueryRow(ctx, upsertSourceBinding,

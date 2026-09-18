@@ -21,19 +21,19 @@ VALUES (
 RETURNING id, tenant_id, actor_id, actor_type, action, target_type, target_id, detail, ip, request_id, created_at
 `
 
-// AppendJobFailureAuditParams contains the strongly typed arguments for the AppendJobFailureAudit query.
+// AppendJobFailureAuditParams 包含 AppendJobFailureAudit 查询的强类型参数。
 type AppendJobFailureAuditParams struct {
-	// ID is the id value supplied to the AppendJobFailureAudit query.
+	// ID 是提供给 AppendJobFailureAudit 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TenantID is the tenant id value supplied to the AppendJobFailureAudit query.
+	// TenantID 是提供给 AppendJobFailureAudit 查询的 TenantID 值。
 	TenantID *uuid.UUID `json:"tenant_id"`
-	// JobID is the job id value supplied to the AppendJobFailureAudit query.
+	// JobID 是提供给 AppendJobFailureAudit 查询的 JobID 值。
 	JobID *uuid.UUID `json:"job_id"`
-	// Detail is the detail value supplied to the AppendJobFailureAudit query.
+	// Detail 是提供给 AppendJobFailureAudit 查询的 Detail 值。
 	Detail []byte `json:"detail"`
 }
 
-// AppendJobFailureAudit executes the generated AppendJobFailureAudit database query.
+// AppendJobFailureAudit 执行生成的 AppendJobFailureAudit 数据库查询。
 // 与任务终态和出站事件行在同一事务中记录一条追加式、脱敏的系统事实。
 func (q *Queries) AppendJobFailureAudit(ctx context.Context, arg AppendJobFailureAuditParams) (AuditLog, error) {
 	row := q.db.QueryRow(ctx, appendJobFailureAudit,
@@ -95,45 +95,45 @@ RETURNING
   outbox.updated_at AS claimed_at
 `
 
-// ClaimNextOutboxDeliveryParams contains the strongly typed arguments for the ClaimNextOutboxDelivery query.
+// ClaimNextOutboxDeliveryParams 包含 ClaimNextOutboxDelivery 查询的强类型参数。
 type ClaimNextOutboxDeliveryParams struct {
-	// ClaimedAt is the claimed at value supplied to the ClaimNextOutboxDelivery query.
+	// ClaimedAt 是提供给 ClaimNextOutboxDelivery 查询的 ClaimedAt 值。
 	ClaimedAt pgtype.Timestamptz `json:"claimed_at"`
-	// MaxAttempts is the max attempts value supplied to the ClaimNextOutboxDelivery query.
+	// MaxAttempts 是提供给 ClaimNextOutboxDelivery 查询的 MaxAttempts 值。
 	MaxAttempts int32 `json:"max_attempts"`
-	// LeaseExpiredAt is the lease expired at value supplied to the ClaimNextOutboxDelivery query.
+	// LeaseExpiredAt 是提供给 ClaimNextOutboxDelivery 查询的 LeaseExpiredAt 值。
 	LeaseExpiredAt pgtype.Timestamptz `json:"lease_expired_at"`
 }
 
-// ClaimNextOutboxDeliveryRow contains the columns returned by the ClaimNextOutboxDelivery query.
+// ClaimNextOutboxDeliveryRow 包含 ClaimNextOutboxDelivery 查询返回的列。
 type ClaimNextOutboxDeliveryRow struct {
-	// TenantID is the tenant id value returned by the ClaimNextOutboxDelivery query.
+	// TenantID 是 ClaimNextOutboxDelivery 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value returned by the ClaimNextOutboxDelivery query.
+	// ID 是 ClaimNextOutboxDelivery 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// EventID is the event id value returned by the ClaimNextOutboxDelivery query.
+	// EventID 是 ClaimNextOutboxDelivery 查询返回的 EventID 值。
 	EventID uuid.UUID `json:"event_id"`
-	// EventType is the event type value returned by the ClaimNextOutboxDelivery query.
+	// EventType 是 ClaimNextOutboxDelivery 查询返回的 EventType 值。
 	EventType string `json:"event_type"`
-	// AggregateID is the aggregate id value returned by the ClaimNextOutboxDelivery query.
+	// AggregateID 是 ClaimNextOutboxDelivery 查询返回的 AggregateID 值。
 	AggregateID uuid.UUID `json:"aggregate_id"`
-	// AggregateVersion is the aggregate version value returned by the ClaimNextOutboxDelivery query.
+	// AggregateVersion 是 ClaimNextOutboxDelivery 查询返回的 AggregateVersion 值。
 	AggregateVersion int64 `json:"aggregate_version"`
-	// Payload is the payload value returned by the ClaimNextOutboxDelivery query.
+	// Payload 是 ClaimNextOutboxDelivery 查询返回的 Payload 值。
 	Payload []byte `json:"payload"`
-	// ChannelID is the channel id value returned by the ClaimNextOutboxDelivery query.
+	// ChannelID 是 ClaimNextOutboxDelivery 查询返回的 ChannelID 值。
 	ChannelID uuid.UUID `json:"channel_id"`
-	// ChannelType is the channel type value returned by the ClaimNextOutboxDelivery query.
+	// ChannelType 是 ClaimNextOutboxDelivery 查询返回的 ChannelType 值。
 	ChannelType string `json:"channel_type"`
-	// EncryptedConfig is the encrypted config value returned by the ClaimNextOutboxDelivery query.
+	// EncryptedConfig 是 ClaimNextOutboxDelivery 查询返回的 EncryptedConfig 值。
 	EncryptedConfig []byte `json:"encrypted_config"`
-	// RetryCount is the retry count value returned by the ClaimNextOutboxDelivery query.
+	// RetryCount 是 ClaimNextOutboxDelivery 查询返回的 RetryCount 值。
 	RetryCount int32 `json:"retry_count"`
-	// ClaimedAt is the claimed at value returned by the ClaimNextOutboxDelivery query.
+	// ClaimedAt 是 ClaimNextOutboxDelivery 查询返回的 ClaimedAt 值。
 	ClaimedAt pgtype.Timestamptz `json:"claimed_at"`
 }
 
-// ClaimNextOutboxDelivery executes the generated ClaimNextOutboxDelivery database query.
+// ClaimNextOutboxDelivery 执行生成的 ClaimNextOutboxDelivery 数据库查询。
 // 使用 SKIP LOCKED 原子租约领取一条到期投递。
 // 状态为 delivering 的记录在租约过期后重新变为可领取，以便从崩溃中恢复。
 func (q *Queries) ClaimNextOutboxDelivery(ctx context.Context, arg ClaimNextOutboxDeliveryParams) (ClaimNextOutboxDeliveryRow, error) {
@@ -170,27 +170,27 @@ ON CONFLICT (tenant_id, event_id, channel_id) DO NOTHING
 RETURNING tenant_id, id, event_id, event_type, aggregate_id, aggregate_version, payload, channel_id, status, retry_count, next_attempt_at, last_error, created_at, updated_at
 `
 
-// CreateNotifyOutboxParams contains the strongly typed arguments for the CreateNotifyOutbox query.
+// CreateNotifyOutboxParams 包含 CreateNotifyOutbox 查询的强类型参数。
 type CreateNotifyOutboxParams struct {
-	// TenantID is the tenant id value supplied to the CreateNotifyOutbox query.
+	// TenantID 是提供给 CreateNotifyOutbox 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateNotifyOutbox query.
+	// ID 是提供给 CreateNotifyOutbox 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// EventID is the event id value supplied to the CreateNotifyOutbox query.
+	// EventID 是提供给 CreateNotifyOutbox 查询的 EventID 值。
 	EventID uuid.UUID `json:"event_id"`
-	// EventType is the event type value supplied to the CreateNotifyOutbox query.
+	// EventType 是提供给 CreateNotifyOutbox 查询的 EventType 值。
 	EventType string `json:"event_type"`
-	// AggregateID is the aggregate id value supplied to the CreateNotifyOutbox query.
+	// AggregateID 是提供给 CreateNotifyOutbox 查询的 AggregateID 值。
 	AggregateID uuid.UUID `json:"aggregate_id"`
-	// AggregateVersion is the aggregate version value supplied to the CreateNotifyOutbox query.
+	// AggregateVersion 是提供给 CreateNotifyOutbox 查询的 AggregateVersion 值。
 	AggregateVersion int64 `json:"aggregate_version"`
-	// Payload is the payload value supplied to the CreateNotifyOutbox query.
+	// Payload 是提供给 CreateNotifyOutbox 查询的 Payload 值。
 	Payload []byte `json:"payload"`
-	// ChannelID is the channel id value supplied to the CreateNotifyOutbox query.
+	// ChannelID 是提供给 CreateNotifyOutbox 查询的 ChannelID 值。
 	ChannelID uuid.UUID `json:"channel_id"`
 }
 
-// CreateNotifyOutbox executes the generated CreateNotifyOutbox database query.
+// CreateNotifyOutbox 执行生成的 CreateNotifyOutbox 数据库查询。
 // 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 func (q *Queries) CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error) {
 	row := q.db.QueryRow(ctx, createNotifyOutbox,
@@ -229,7 +229,7 @@ FROM tenants
 WHERE id = $1
 `
 
-// GetTenantSlugForEvent executes the generated GetTenantSlugForEvent database query.
+// GetTenantSlugForEvent 执行生成的 GetTenantSlugForEvent 数据库查询。
 // 解析领域事件信封中使用的稳定租户标识。
 func (q *Queries) GetTenantSlugForEvent(ctx context.Context, tenantID uuid.UUID) (string, error) {
 	row := q.db.QueryRow(ctx, getTenantSlugForEvent, tenantID)
@@ -246,7 +246,7 @@ WHERE tenant_id = $1
 ORDER BY id
 `
 
-// ListEnabledNotificationChannelIDs executes the generated ListEnabledNotificationChannelIDs database query.
+// ListEnabledNotificationChannelIDs 执行生成的 ListEnabledNotificationChannelIDs 数据库查询。
 // 为 M0 运维事件返回确定性的通道目标；M5 订阅路由会提供更精确的目标集合。
 func (q *Queries) ListEnabledNotificationChannelIDs(ctx context.Context, tenantID uuid.UUID) ([]uuid.UUID, error) {
 	rows, err := q.db.Query(ctx, listEnabledNotificationChannelIDs, tenantID)
@@ -279,19 +279,19 @@ WHERE tenant_id = $2
   AND updated_at = $4::timestamptz
 `
 
-// MarkOutboxDeliveredParams contains the strongly typed arguments for the MarkOutboxDelivered query.
+// MarkOutboxDeliveredParams 包含 MarkOutboxDelivered 查询的强类型参数。
 type MarkOutboxDeliveredParams struct {
-	// CompletedAt is the completed at value supplied to the MarkOutboxDelivered query.
+	// CompletedAt 是提供给 MarkOutboxDelivered 查询的 CompletedAt 值。
 	CompletedAt pgtype.Timestamptz `json:"completed_at"`
-	// TenantID is the tenant id value supplied to the MarkOutboxDelivered query.
+	// TenantID 是提供给 MarkOutboxDelivered 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the MarkOutboxDelivered query.
+	// ID 是提供给 MarkOutboxDelivered 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ClaimedAt is the claimed at value supplied to the MarkOutboxDelivered query.
+	// ClaimedAt 是提供给 MarkOutboxDelivered 查询的 ClaimedAt 值。
 	ClaimedAt pgtype.Timestamptz `json:"claimed_at"`
 }
 
-// MarkOutboxDelivered executes the generated MarkOutboxDelivered database query.
+// MarkOutboxDelivered 执行生成的 MarkOutboxDelivered 数据库查询。
 // 只完成准确的当前租约，防止旧 worker 覆盖新调度器重新领取的投递。
 func (q *Queries) MarkOutboxDelivered(ctx context.Context, arg MarkOutboxDeliveredParams) (int64, error) {
 	result, err := q.db.Exec(ctx, markOutboxDelivered,
@@ -319,23 +319,23 @@ WHERE tenant_id = $4
   AND updated_at = $6::timestamptz
 `
 
-// MarkOutboxFailedParams contains the strongly typed arguments for the MarkOutboxFailed query.
+// MarkOutboxFailedParams 包含 MarkOutboxFailed 查询的强类型参数。
 type MarkOutboxFailedParams struct {
-	// NextAttemptAt is the next attempt at value supplied to the MarkOutboxFailed query.
+	// NextAttemptAt 是提供给 MarkOutboxFailed 查询的 NextAttemptAt 值。
 	NextAttemptAt pgtype.Timestamptz `json:"next_attempt_at"`
-	// ErrorCode is the error code value supplied to the MarkOutboxFailed query.
+	// ErrorCode 是提供给 MarkOutboxFailed 查询的 ErrorCode 值。
 	ErrorCode string `json:"error_code"`
-	// FailedAt is the failed at value supplied to the MarkOutboxFailed query.
+	// FailedAt 是提供给 MarkOutboxFailed 查询的 FailedAt 值。
 	FailedAt pgtype.Timestamptz `json:"failed_at"`
-	// TenantID is the tenant id value supplied to the MarkOutboxFailed query.
+	// TenantID 是提供给 MarkOutboxFailed 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the MarkOutboxFailed query.
+	// ID 是提供给 MarkOutboxFailed 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ClaimedAt is the claimed at value supplied to the MarkOutboxFailed query.
+	// ClaimedAt 是提供给 MarkOutboxFailed 查询的 ClaimedAt 值。
 	ClaimedAt pgtype.Timestamptz `json:"claimed_at"`
 }
 
-// MarkOutboxFailed executes the generated MarkOutboxFailed database query.
+// MarkOutboxFailed 执行生成的 MarkOutboxFailed 数据库查询。
 // 记录一次脱敏失败尝试及下一次可执行时间，并隔离已过期租约的更新。
 func (q *Queries) MarkOutboxFailed(ctx context.Context, arg MarkOutboxFailedParams) (int64, error) {
 	result, err := q.db.Exec(ctx, markOutboxFailed,

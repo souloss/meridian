@@ -309,7 +309,7 @@ func smokeM3DiffBreakingAndShare(t *testing.T) {
 		"serviceSlug": "order-service", "kind": "openapi", "name": "openapi", "ref": "main",
 		"sourceSystem": "smoke-ci", "createIfMissing": false, "role": "overlay",
 		"contentType": "yaml",
-		"content": "overlay: platform/v1\ntarget_kind: openapi\nactions:\n  - target: /paths/~1orders~1{id}\n    remove: true\n",
+		"content":     "overlay: platform/v1\ntarget_kind: openapi\nactions:\n  - target: /paths/~1orders~1{id}\n    remove: true\n",
 	}, map[string]string{"Idempotency-Key": uuid.NewV7().String()})
 	assertStatus(t, pushed, http.StatusOK)
 	var pushBody struct {
@@ -345,8 +345,8 @@ func smokeM3DiffBreakingAndShare(t *testing.T) {
 
 	// runDiff reports one breaking removed operation.
 	diffResult := f.request(t, &f.alice, http.MethodPost, "/api/v1/t/acme/diff", map[string]any{
-		"left":  map[string]any{"type": "version", "versionId": leftVersion},
-		"right": map[string]any{"type": "version", "versionId": rightVersion},
+		"left":    map[string]any{"type": "version", "versionId": leftVersion},
+		"right":   map[string]any{"type": "version", "versionId": rightVersion},
 		"persist": true,
 	}, nil)
 	assertStatus(t, diffResult, http.StatusOK)
@@ -403,7 +403,7 @@ func smokeM3BreakingTodo(t *testing.T) {
 		"serviceSlug": "order-service", "kind": "openapi", "name": "openapi", "ref": "main",
 		"sourceSystem": "smoke-ci", "createIfMissing": false, "role": "overlay",
 		"contentType": "yaml",
-		"content": "overlay: platform/v1\ntarget_kind: openapi\nactions:\n  - target: /paths/~1orders~1{id}\n    remove: true\n",
+		"content":     "overlay: platform/v1\ntarget_kind: openapi\nactions:\n  - target: /paths/~1orders~1{id}\n    remove: true\n",
 	}, map[string]string{"Idempotency-Key": uuid.NewV7().String()})
 	assertStatus(t, pushed, http.StatusOK)
 	revisionID := ""
@@ -432,8 +432,8 @@ func smokeM3BreakingTodo(t *testing.T) {
 	// Running the same diff twice must not create a duplicate todo.
 	for i := 0; i < 2; i++ {
 		diffResult := f.request(t, &f.alice, http.MethodPost, "/api/v1/t/acme/diff", map[string]any{
-			"left":  map[string]any{"type": "version", "versionId": leftVersion},
-			"right": map[string]any{"type": "version", "versionId": rightVersion},
+			"left":    map[string]any{"type": "version", "versionId": leftVersion},
+			"right":   map[string]any{"type": "version", "versionId": rightVersion},
 			"persist": true,
 		}, nil)
 		assertStatus(t, diffResult, http.StatusOK)
@@ -465,8 +465,8 @@ func smokeM3BreakingTodo(t *testing.T) {
 	acked := f.request(t, &f.alice, http.MethodPost, "/api/v1/t/acme/breaking-todos/"+todoPage.Items[0].ID+":ack", map[string]any{"comment": "noted"}, nil)
 	assertStatus(t, acked, http.StatusOK)
 	var ackedBody struct {
-		Status          string `json:"status"`
-		AcknowledgedAt  string `json:"acknowledgedAt"`
+		Status         string `json:"status"`
+		AcknowledgedAt string `json:"acknowledgedAt"`
 	}
 	if err := json.Unmarshal(acked.Body.Bytes(), &ackedBody); err != nil {
 		t.Fatalf("decode ack: %v", err)
@@ -486,7 +486,7 @@ func smokeM3PushReview(t *testing.T) {
 		"serviceSlug": "order-service", "kind": "openapi", "name": "openapi", "ref": "main",
 		"sourceSystem": "smoke-ci", "createIfMissing": false, "role": "overlay",
 		"contentType": "yaml",
-		"content": "overlay: platform/v1\ntarget_kind: openapi\nactions:\n  - target: /paths/~1orders~1{id}\n    remove: true\n",
+		"content":     "overlay: platform/v1\ntarget_kind: openapi\nactions:\n  - target: /paths/~1orders~1{id}\n    remove: true\n",
 	}, map[string]string{"Idempotency-Key": uuid.NewV7().String()})
 	assertStatus(t, pushed, http.StatusOK)
 

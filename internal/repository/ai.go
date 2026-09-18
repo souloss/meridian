@@ -16,37 +16,26 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// AIStore implements the M3 AI generation, review, and publish persistence
-// boundary. It embeds LayerStore to reuse the layer/head/version/track read and
-// write path and adds the AI job, generation-result, review, and publish queries.
+// AIStore 实现 M3 的 AI 生成、评审与发布持久化边界。它内嵌 LayerStore 复用
+// layer/head/version/track 的读写路径，并新增 AI 任务、生成结果、评审与发布查询。
 type AIStore struct {
 	*LayerStore
 	queries     *generated.Queries
 	riverClient *river.Client[pgx.Tx]
 }
 
-const (
-	// aiOriginDB 是 AI 生成层在 DB 中的来源列值（layerOrigin: ai_generated）。
-	aiOriginDB = "ai_generated"
-	// aiModeDB 是 AI 生成源配置在 DB 中的模式列值（sourceMode: ai）。
-	aiModeDB = "ai"
-	// aiTimeoutDB 是 AI 源配置缺省超时秒数（domain.yaml timeoutSecondsByKind.ai）。
-	aiTimeoutDB = 600
-)
-
-// NewAIStore binds AI generation persistence to a native pgx pool.
+// NewAIStore 将 AI 生成持久化绑定到原生 pgx 连接池。
 func NewAIStore(pool *pgxpool.Pool) *AIStore {
 	return &AIStore{LayerStore: NewLayerStore(pool), queries: generated.New(pool)}
 }
 
-// BindRiver attaches the process River client so AI generation jobs can be
-// enqueued transactionally with their domain rows.
+// BindRiver 挂接进程 River 客户端，使 AI 生成任务可与领域行在同一事务内入队。
 func (store *AIStore) BindRiver(riverClient *river.Client[pgx.Tx]) {
 	store.riverClient = riverClient
 	store.LayerStore.BindRiver(riverClient)
 }
 
-// GetServiceBySlug returns one active service within the tenant boundary.
+// GetServiceBySlug 返回租户边界内的一个活跃服务。
 func (store *AIStore) GetServiceBySlug(ctx context.Context, tenantID uuid.UUID, slug string) (service.ServiceRecord, error) {
 	row, err := store.queries.GetServiceBySlug(ctx, generated.GetServiceBySlugParams{TenantID: tenantID, Slug: slug})
 	if err != nil {
@@ -55,7 +44,7 @@ func (store *AIStore) GetServiceBySlug(ctx context.Context, tenantID uuid.UUID, 
 	return serviceRecordFromRow(row), nil
 }
 
-// GetProducerProfile returns one platform producer profile by id.
+// GetProducerProfile 按 id 返回一个平台生产者配置。
 func (store *AIStore) GetProducerProfile(ctx context.Context, id uuid.UUID) (service.ProducerProfile, error) {
 	row, err := store.queries.GetProducerProfile(ctx, id)
 	if err != nil {
@@ -64,7 +53,7 @@ func (store *AIStore) GetProducerProfile(ctx context.Context, id uuid.UUID) (ser
 	return producerProfileFromRow(row), nil
 }
 
-// GetTenantSettings returns the tenant settings JSON snapshot.
+// GetTenantSettings 返回租户设置 JSON 快照。
 func (store *AIStore) GetTenantSettings(ctx context.Context, tenantID uuid.UUID) ([]byte, error) {
 	row, err := store.queries.GetTenantSettings(ctx, tenantID)
 	if err != nil {
@@ -73,9 +62,8 @@ func (store *AIStore) GetTenantSettings(ctx context.Context, tenantID uuid.UUID)
 	return row, nil
 }
 
-// EnqueueAiGeneration atomically creates the AI source spec, its layer, and the
-// generation job, then records the River work, replaying an existing idempotency
-// record when the key was seen before.
+// EnqueueAiGeneration 原子地创建 AI 源配置、其层与生成任务，随后记录 River 工作；
+// 当幂等键此前已见过时，回放既有幂等记录。
 func (store *AIStore) EnqueueAiGeneration(ctx context.Context, input service.AiGenerateEnqueue) (service.AiGenerateAccepted, error) {
 	if store.riverClient == nil {
 		return service.AiGenerateAccepted{}, errors.New("AI generation has no River client")
@@ -99,9 +87,8 @@ func (store *AIStore) EnqueueAiGeneration(ctx context.Context, input service.AiG
 		}
 	}
 
-	// Create the asset first, then its AI source spec and layer in this
-	// transaction so the job carries stable source/layer identifiers to its
-	// terminal revision write.
+	// 先创建资产，再在同一事务中创建其 AI 源配置与层，
+	// 使任务在其终态修订写入时携带稳定的源/层标识。
 	if _, err := queries.UpsertAsset(ctx, generated.UpsertAssetParams{
 		TenantID: input.TenantID, ID: input.AssetID, ServiceID: input.ServiceID, Kind: input.Kind, Name: input.Name,
 	}); err != nil {
@@ -109,16 +96,16 @@ func (store *AIStore) EnqueueAiGeneration(ctx context.Context, input service.AiG
 	}
 	if _, err := queries.CreateSourceSpec(ctx, generated.CreateSourceSpecParams{
 		TenantID: input.TenantID, ID: input.SourceID, ServiceID: input.ServiceID, Kind: input.Kind,
-		AssetNameTemplate: input.Name, Role: input.Role, Origin: aiOriginDB, Mode: aiModeDB,
+		AssetNameTemplate: input.Name, Role: input.Role, Origin: sourceOriginAI, Mode: sourceModeAI,
 		Path: nil, ProducerProfileID: new(input.ProducerProfileID), Ord: int32(input.Ord),
-		TimeoutSec: int32(aiTimeoutDB), BranchPatterns: []string{"**"}, Enabled: true, ConfigOrigin: "api",
+		TimeoutSec: int32(aiSourceTimeoutSec), BranchPatterns: []string{branchGlobAll}, Enabled: true, ConfigOrigin: sourceConfigOriginAPI,
 	}); err != nil {
 		return service.AiGenerateAccepted{}, normalizeError(err)
 	}
 	if _, err := queries.CreateLayer(ctx, generated.CreateLayerParams{
 		TenantID: input.TenantID, ID: input.LayerID, AssetID: input.AssetID, SourceSpecID: new(input.SourceID),
-		Role: input.Role, Origin: aiOriginDB, Ord: int32(input.Ord), Dialect: nil, Enabled: true,
-		BranchPatterns: []string{"**"}, DisplayName: input.Name,
+		Role: input.Role, Origin: sourceOriginAI, Ord: int32(input.Ord), Dialect: nil, Enabled: true,
+		BranchPatterns: []string{branchGlobAll}, DisplayName: input.Name,
 	}); err != nil {
 		return service.AiGenerateAccepted{}, normalizeError(err)
 	}
@@ -135,9 +122,9 @@ func (store *AIStore) EnqueueAiGeneration(ctx context.Context, input service.AiG
 	accepted := service.AiGenerateAccepted{AssetID: input.AssetID, SourceID: input.SourceID}
 	for {
 		latest, err := queries.LockLatestDiscoveryJob(ctx, generated.LockLatestDiscoveryJobParams{TenantID: input.TenantID, DedupeKey: dedupeKey})
-		generation := int64(1)
+		generation := jobGenerationInitial
 		if err == nil {
-			if latest.Status == "pending" || latest.Status == "running" {
+			if latest.Status == service.JobStatusPending || latest.Status == service.JobStatusRunning {
 				accepted.JobID = latest.ID
 				accepted.Deduplicated = true
 				return accepted, nil
@@ -166,7 +153,7 @@ func (store *AIStore) EnqueueAiGeneration(ctx context.Context, input service.AiG
 				TenantID: input.TenantID, ID: row.ID, RiverJobID: new(inserted.Job.ID), UpdatedAt: timestamp(time.Now().UTC()),
 			}); err != nil {
 				return service.AiGenerateAccepted{}, normalizeError(err)
-			} else if changed != 1 {
+			} else if changed != rowsAffectedOne {
 				return service.AiGenerateAccepted{}, fmt.Errorf("attach River job %d to domain job %s: %w", inserted.Job.ID, row.ID, service.ErrPrecondition)
 			}
 			accepted.JobID = row.ID
@@ -187,7 +174,7 @@ func (store *AIStore) EnqueueAiGeneration(ctx context.Context, input service.AiG
 	}
 }
 
-// GetAiGenerationJobContext returns the durable job input for the worker.
+// GetAiGenerationJobContext 返回供 worker 使用的持久化任务输入。
 func (store *AIStore) GetAiGenerationJobContext(ctx context.Context, tenantID, jobID uuid.UUID) (service.AiGenerationJobContext, error) {
 	row, err := store.queries.GetJobInput(ctx, generated.GetJobInputParams{TenantID: tenantID, ID: jobID})
 	if err != nil {
@@ -201,11 +188,11 @@ func (store *AIStore) GetAiGenerationJobContext(ctx context.Context, tenantID, j
 }
 
 func aiGenerationDedupeKey(assetID uuid.UUID) string {
-	return "ai:" + assetID.String()
+	return dedupeKeyPrefixAI + assetID.String()
 }
 
 func aiGenerationIdempotencyLockKey(input service.AiGenerateEnqueue) string {
-	return "generateMissingAssetWithAi:" + input.TenantID.String() + ":" + input.PrincipalType + ":" + input.PrincipalID.String() + ":" + input.IdempotencyKey.String()
+	return aiGenerationIdempotencyLockPrefix + input.TenantID.String() + ":" + input.PrincipalType + ":" + input.PrincipalID.String() + ":" + input.IdempotencyKey.String()
 }
 
 func loadAiGenerationReplay(ctx context.Context, queries *generated.Queries, input service.AiGenerateEnqueue) (service.AiGenerateAccepted, bool, error) {
@@ -227,7 +214,7 @@ func loadAiGenerationReplay(ctx context.Context, queries *generated.Queries, inp
 		}
 		return service.AiGenerateAccepted{}, false, nil
 	}
-	if len(input.RequestHash) != 32 || string(row.RequestHash) != string(input.RequestHash) {
+	if len(input.RequestHash) != sha256DigestBytes || string(row.RequestHash) != string(input.RequestHash) {
 		return service.AiGenerateAccepted{}, false, service.ErrIdempotencyConflict
 	}
 	var replay aiGenerationReplay
@@ -238,10 +225,14 @@ func loadAiGenerationReplay(ctx context.Context, queries *generated.Queries, inp
 }
 
 type aiGenerationReplay struct {
-	AssetID      uuid.UUID `json:"assetId"`
-	SourceID     uuid.UUID `json:"sourceId"`
-	JobID        uuid.UUID `json:"jobId"`
-	Deduplicated bool      `json:"deduplicated"`
+	// AssetID 是回放响应中的资产标识。
+	AssetID uuid.UUID `json:"assetId"`
+	// SourceID 是回放响应中的源配置标识。
+	SourceID uuid.UUID `json:"sourceId"`
+	// JobID 是回放响应中的任务标识。
+	JobID uuid.UUID `json:"jobId"`
+	// Deduplicated 标识该响应来自去重回放。
+	Deduplicated bool `json:"deduplicated"`
 }
 
 func saveAiGenerationReplay(ctx context.Context, queries *generated.Queries, input service.AiGenerateEnqueue, accepted service.AiGenerateAccepted) error {
@@ -255,7 +246,7 @@ func saveAiGenerationReplay(ctx context.Context, queries *generated.Queries, inp
 	}))
 }
 
-// GetAiGenerationResult returns one durable AI generation outcome.
+// GetAiGenerationResult 返回一份持久化的 AI 生成结果。
 func (store *AIStore) GetAiGenerationResult(ctx context.Context, tenantID, jobID uuid.UUID) (service.AiGenerationOutcome, error) {
 	row, err := store.queries.GetAiGenerationResult(ctx, generated.GetAiGenerationResultParams{TenantID: tenantID, JobID: jobID})
 	if err != nil {
@@ -264,7 +255,7 @@ func (store *AIStore) GetAiGenerationResult(ctx context.Context, tenantID, jobID
 	return aiGenerationOutcomeFromRow(row), nil
 }
 
-// UpsertAiGenerationResult persists one AI generation outcome.
+// UpsertAiGenerationResult 持久化一份 AI 生成结果。
 func (store *AIStore) UpsertAiGenerationResult(ctx context.Context, tenantID uuid.UUID, outcome service.AiGenerationOutcome) error {
 	manifest, err := json.Marshal(outcome.Manifest)
 	if err != nil {
@@ -278,7 +269,7 @@ func (store *AIStore) UpsertAiGenerationResult(ctx context.Context, tenantID uui
 	return normalizeError(err)
 }
 
-// GetLayerRevisionForReview returns one revision enriched with layer/asset context.
+// GetLayerRevisionForReview 返回一份带有层/资产上下文的修订。
 func (store *AIStore) GetLayerRevisionForReview(ctx context.Context, tenantID, id uuid.UUID) (service.ReviewRevisionRecord, error) {
 	row, err := store.queries.GetLayerRevisionForReview(ctx, generated.GetLayerRevisionForReviewParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -295,7 +286,7 @@ func (store *AIStore) GetLayerRevisionForReview(ctx context.Context, tenantID, i
 	}, nil
 }
 
-// ListEnabledLayerHeadsForAssetScope lists heads with candidate pointers for publish gating.
+// ListEnabledLayerHeadsForAssetScope 列出带有候选指针的层头，用于发布门禁。
 func (store *AIStore) ListEnabledLayerHeadsForAssetScope(ctx context.Context, tenantID, assetID uuid.UUID, scopeType, scopeKey string) ([]service.LayerHeadRecord, error) {
 	rows, err := store.queries.ListEnabledLayerHeadsForAssetScope(ctx, generated.ListEnabledLayerHeadsForAssetScopeParams{
 		TenantID: tenantID, AssetID: assetID, ScopeType: scopeType, ScopeKey: scopeKey,
@@ -310,7 +301,7 @@ func (store *AIStore) ListEnabledLayerHeadsForAssetScope(ctx context.Context, te
 	return heads, nil
 }
 
-// UpdateLayerRevisionReview marks a pending revision approved or rejected.
+// UpdateLayerRevisionReview 将待审核修订标记为已批准或已拒绝。
 func (store *AIStore) UpdateLayerRevisionReview(ctx context.Context, tenantID, id uuid.UUID, status string, comment *string) (service.LayerRevisionRecord, error) {
 	row, err := store.queries.UpdateLayerRevisionReview(ctx, generated.UpdateLayerRevisionReviewParams{
 		TenantID: tenantID, ID: id, ReviewStatus: status, ReviewComment: comment,
@@ -321,7 +312,7 @@ func (store *AIStore) UpdateLayerRevisionReview(ctx context.Context, tenantID, i
 	return layerRevisionFromRow(row), nil
 }
 
-// SupersedeLayerRevision marks a pending revision superseded.
+// SupersedeLayerRevision 将待审核修订标记为被替换。
 func (store *AIStore) SupersedeLayerRevision(ctx context.Context, tenantID, id uuid.UUID) error {
 	if _, err := store.queries.SupersedeLayerRevision(ctx, generated.SupersedeLayerRevisionParams{TenantID: tenantID, ID: id}); err != nil {
 		return normalizeError(err)
@@ -329,7 +320,7 @@ func (store *AIStore) SupersedeLayerRevision(ctx context.Context, tenantID, id u
 	return nil
 }
 
-// UnpublishAssetVersion demotes a published version to draft.
+// UnpublishAssetVersion 将已发布版本降级为草稿。
 func (store *AIStore) UnpublishAssetVersion(ctx context.Context, tenantID, versionID uuid.UUID) error {
 	if _, err := store.queries.UnpublishAssetVersion(ctx, generated.UnpublishAssetVersionParams{TenantID: tenantID, ID: versionID}); err != nil {
 		return normalizeError(err)
@@ -337,7 +328,7 @@ func (store *AIStore) UnpublishAssetVersion(ctx context.Context, tenantID, versi
 	return nil
 }
 
-// LockAssetRefTrack locks a track row for the publish transaction.
+// LockAssetRefTrack 为发布事务锁定一个 track 行。
 func (store *AIStore) LockAssetRefTrack(ctx context.Context, tenantID, trackID uuid.UUID) (service.AssetRefTrackRecord, error) {
 	row, err := store.queries.LockAssetRefTrack(ctx, generated.LockAssetRefTrackParams{TenantID: tenantID, ID: trackID})
 	if err != nil {
@@ -349,7 +340,7 @@ func (store *AIStore) LockAssetRefTrack(ctx context.Context, tenantID, trackID u
 	}, nil
 }
 
-// BumpAssetRefTrackGeneration increments the track desired generation.
+// BumpAssetRefTrackGeneration 递增 track 的目标代次。
 func (store *AIStore) BumpAssetRefTrackGeneration(ctx context.Context, tenantID, trackID uuid.UUID) error {
 	if _, err := store.queries.BumpAssetRefTrackGeneration(ctx, generated.BumpAssetRefTrackGenerationParams{TenantID: tenantID, ID: trackID}); err != nil {
 		return normalizeError(err)
@@ -357,7 +348,7 @@ func (store *AIStore) BumpAssetRefTrackGeneration(ctx context.Context, tenantID,
 	return nil
 }
 
-// UpdateAssetVersionPublish publishes a version under optimistic concurrency.
+// UpdateAssetVersionPublish 在乐观并发下发布一个版本。
 func (store *AIStore) UpdateAssetVersionPublish(ctx context.Context, tenantID, versionID uuid.UUID, version string, expectedRevision int64) (service.AssetVersionRecord, error) {
 	row, err := store.queries.UpdateAssetVersionPublish(ctx, generated.UpdateAssetVersionPublishParams{
 		TenantID: tenantID, ID: versionID, Version: version, ExpectedRevision: expectedRevision,

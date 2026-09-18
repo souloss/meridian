@@ -6,15 +6,12 @@ import (
 	"sort"
 )
 
-// RequestDigest computes the SHA-256 request digest over an RFC 8785 JCS
-// canonical object for one idempotent request. Object keys are emitted in
-// ascending order (encoding/json already serializes maps with sorted keys);
-// numbers use the default compact encoding, which is deterministic for the
-// string, UUID, and boolean values carried by the M1 idempotent operations.
+// RequestDigest 对一次幂等请求的 RFC 8785 JCS 规范对象计算 SHA-256 请求摘要。对象键按升序
+// 输出（encoding/json 已按排序键序列化 map）；数字使用默认紧凑编码，对 M1 幂等操作承载的
+// string、UUID 与 boolean 值是确定性的。
 //
-// The canonical object matches contracts/domain.yaml idempotency.requestDigest:
-// operationId, pathParameters, query, semanticHeaders (if-match when present),
-// and the parsed JSON body (nil when absent).
+// 规范对象匹配 contracts/domain.yaml 的 idempotency.requestDigest：operationId、pathParameters、
+// query、semanticHeaders（存在 if-match 时）与解析后的 JSON body（缺失时为 nil）。
 func RequestDigest(operationID string, pathParameters map[string]any, semanticHeaders map[string]any, body any) ([]byte, error) {
 	canonical := map[string]any{
 		"operationId":     operationID,
@@ -31,8 +28,8 @@ func RequestDigest(operationID string, pathParameters map[string]any, semanticHe
 	return sum[:], nil
 }
 
-// sortedValue returns nil for a nil map and otherwise the map itself; encoding/json
-// serializes map keys in sorted order, which is the required JCS key ordering.
+// sortedValue 对 nil map 返回空 map，否则返回 map 本身；encoding/json 按排序键序列化 map，
+// 这正是所需的 JCS 键排序。
 func sortedValue(value map[string]any) any {
 	if value == nil {
 		return map[string]any{}
@@ -40,10 +37,8 @@ func sortedValue(value map[string]any) any {
 	return value
 }
 
-// SortedQueryPairs canonicalizes a query string's percent-decoded name/value
-// pairs into the deterministic order required by the request digest. The M1
-// idempotent operations carry no query parameters, so this always returns an
-// empty list; it is kept as the contract-defined seam.
+// SortedQueryPairs 将查询串的百分号解码名/值对规范化为请求摘要所需的确定性顺序。M1
+// 幂等操作不携带查询参数，因此它恒返回空列表；保留为契约定义的接缝。
 func SortedQueryPairs() []any {
 	return []any{}
 }

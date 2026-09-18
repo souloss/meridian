@@ -14,7 +14,7 @@ import (
 	"github.com/meridian-labs/meridian/internal/task"
 )
 
-// StartJob claims a pending or running domain job and records its first stage event atomically.
+// StartJob 认领一个待执行或执行中的领域任务，并原子地记录其首个阶段事件。
 func (store *RepositoryStore) StartJob(ctx context.Context, input task.StartInput) (task.ClaimResult, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -33,7 +33,7 @@ func (store *RepositoryStore) StartJob(ctx context.Context, input task.StartInpu
 		}
 		return task.ClaimResult{}, normalizeError(err)
 	}
-	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.ExpectedAttempt, input.Stage, "info", "pipeline stage started", input.StartedAt); err != nil {
+	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.ExpectedAttempt, input.Stage, jobStageLevelInfo, jobStageLogMessageStarted, input.StartedAt); err != nil {
 		return task.ClaimResult{}, err
 	}
 	if err := tx.Commit(ctx); err != nil {
@@ -42,7 +42,7 @@ func (store *RepositoryStore) StartJob(ctx context.Context, input task.StartInpu
 	return task.ClaimResult{Claimed: row.ID == input.JobID, Attempt: int(row.Attempt)}, nil
 }
 
-// SetJobStage updates the active stage and appends one ordered, replayable log event atomically.
+// SetJobStage 更新活跃阶段，并原子地追加一条有序、可回放的日志事件。
 func (store *RepositoryStore) SetJobStage(ctx context.Context, input task.StageInput) error {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -57,7 +57,7 @@ func (store *RepositoryStore) SetJobStage(ctx context.Context, input task.StageI
 	if err != nil {
 		return normalizeError(err)
 	}
-	if changed != 1 {
+	if changed != rowsAffectedOne {
 		return serviceErrNotFound()
 	}
 	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.ExpectedAttempt, input.Stage, input.Level, input.Message, input.OccurredAt); err != nil {
@@ -69,7 +69,7 @@ func (store *RepositoryStore) SetJobStage(ctx context.Context, input task.StageI
 	return nil
 }
 
-// FinishJob persists a terminal or retryable state and its final stage log atomically.
+// FinishJob 原子地持久化终态或可重试状态及其最终阶段日志。
 func (store *RepositoryStore) FinishJob(ctx context.Context, input task.FinishInput) error {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -92,7 +92,7 @@ func (store *RepositoryStore) FinishJob(ctx context.Context, input task.FinishIn
 	if err := appendJobStageLog(ctx, queries, input.TenantID, input.JobID, input.ExpectedAttempt, input.Stage, input.Level, input.Message, input.FinishedAt); err != nil {
 		return err
 	}
-	if input.Terminal && input.Status == "failed" {
+	if input.Terminal && input.Status == service.JobStatusFailed {
 		if err := appendJobFailureFacts(ctx, queries, input); err != nil {
 			return err
 		}
@@ -105,39 +105,39 @@ func (store *RepositoryStore) FinishJob(ctx context.Context, input task.FinishIn
 }
 
 type jobFailureAuditDetail struct {
-	// Stage is the pipeline stage that produced the failure.
+	// Stage 是产生失败的流水线阶段。
 	Stage string `json:"stage"`
-	// ErrorCode is the stable secret-free failure classification.
+	// ErrorCode 是稳定的、不含机密的失败分类。
 	ErrorCode string `json:"errorCode"`
 }
 
 type collectFailedPayload struct {
-	// RepositoryID identifies the repository whose collection failed.
+	// RepositoryID 标识采集失败的仓库。
 	RepositoryID uuid.UUID `json:"repositoryId"`
-	// JobID identifies the durable job that reached a failed terminal state.
+	// JobID 标识进入失败终态的持久化任务。
 	JobID uuid.UUID `json:"jobId"`
-	// Stage identifies the pipeline stage that failed.
+	// Stage 标识失败的流水线阶段。
 	Stage string `json:"stage"`
-	// ErrorCode is the stable secret-free failure classification.
+	// ErrorCode 是稳定的、不含机密的失败分类。
 	ErrorCode string `json:"errorCode"`
 }
 
 type collectFailedEnvelope struct {
-	// EventID is the stable receiver deduplication identifier.
+	// EventID 是接收方稳定的去重标识。
 	EventID uuid.UUID `json:"eventId"`
-	// EventType identifies the AsyncAPI message schema.
+	// EventType 标识 AsyncAPI 消息 schema。
 	EventType string `json:"eventType"`
-	// OccurredAt is the UTC instant when the job failure transaction committed.
+	// OccurredAt 是任务失败事务提交的 UTC 时刻。
 	OccurredAt time.Time `json:"occurredAt"`
-	// TenantSlug identifies the tenant without exposing an internal lookup key.
+	// TenantSlug 标识租户，且不暴露内部查询键。
 	TenantSlug string `json:"tenantSlug"`
-	// AggregateType identifies the event-producing domain aggregate category.
+	// AggregateType 标识产生事件的领域聚合类别。
 	AggregateType string `json:"aggregateType"`
-	// AggregateID identifies the job aggregate that emitted the event.
+	// AggregateID 标识发出事件的任务聚合。
 	AggregateID uuid.UUID `json:"aggregateId"`
-	// AggregateVersion orders failure events for the job aggregate.
+	// AggregateVersion 对任务聚合的失败事件进行排序。
 	AggregateVersion int `json:"aggregateVersion"`
-	// Payload contains collect.failed fields frozen by the AsyncAPI contract.
+	// Payload 承载由 AsyncAPI 契约冻结的 collect.failed 字段。
 	Payload collectFailedPayload `json:"payload"`
 }
 
@@ -165,8 +165,8 @@ func appendJobFailureFacts(ctx context.Context, queries *generated.Queries, inpu
 	}
 	eventID := uuid.NewV7()
 	payload, err := json.Marshal(collectFailedEnvelope{
-		EventID: eventID, EventType: "collect.failed", OccurredAt: input.FinishedAt.UTC(),
-		TenantSlug: tenantSlug, AggregateType: "job", AggregateID: input.JobID,
+		EventID: eventID, EventType: collectFailedEventType, OccurredAt: input.FinishedAt.UTC(),
+		TenantSlug: tenantSlug, AggregateType: collectFailedAggregateType, AggregateID: input.JobID,
 		AggregateVersion: input.ExpectedAttempt,
 		Payload: collectFailedPayload{
 			RepositoryID: input.RepositoryID, JobID: input.JobID, Stage: string(input.Stage), ErrorCode: input.ErrorCode,
@@ -177,7 +177,7 @@ func appendJobFailureFacts(ctx context.Context, queries *generated.Queries, inpu
 	}
 	for _, channelID := range channelIDs {
 		if _, err := queries.CreateNotifyOutbox(ctx, generated.CreateNotifyOutboxParams{
-			TenantID: input.TenantID, ID: uuid.NewV7(), EventID: eventID, EventType: "collect.failed",
+			TenantID: input.TenantID, ID: uuid.NewV7(), EventID: eventID, EventType: collectFailedEventType,
 			AggregateID: input.JobID, AggregateVersion: int64(input.ExpectedAttempt), Payload: payload,
 			ChannelID: channelID,
 		}); err != nil {
@@ -188,7 +188,7 @@ func appendJobFailureFacts(ctx context.Context, queries *generated.Queries, inpu
 }
 
 func appendJobStageLog(ctx context.Context, queries *generated.Queries, tenantID, jobID uuid.UUID, attempt int, stage task.Stage, level, message string, occurredAt time.Time) error {
-	lockKey := "job-stage:" + tenantID.String() + ":" + jobID.String()
+	lockKey := jobStageSequenceLockPrefix + tenantID.String() + ":" + jobID.String()
 	if err := queries.LockJobStageSequence(ctx, lockKey); err != nil {
 		return normalizeError(err)
 	}

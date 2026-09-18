@@ -19,15 +19,15 @@ WHERE tenant_id = $1
   AND status = 'pending'
 `
 
-// AcceptDiscoveryCandidateParams contains the strongly typed arguments for the AcceptDiscoveryCandidate query.
+// AcceptDiscoveryCandidateParams 包含 AcceptDiscoveryCandidate 查询的强类型参数。
 type AcceptDiscoveryCandidateParams struct {
-	// TenantID is the tenant id value supplied to the AcceptDiscoveryCandidate query.
+	// TenantID 是提供给 AcceptDiscoveryCandidate 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the AcceptDiscoveryCandidate query.
+	// ID 是提供给 AcceptDiscoveryCandidate 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// AcceptDiscoveryCandidate executes the generated AcceptDiscoveryCandidate database query.
+// AcceptDiscoveryCandidate 执行生成的 AcceptDiscoveryCandidate 数据库查询。
 // 将候选标记为已接受；仅在 pending 状态时生效。
 func (q *Queries) AcceptDiscoveryCandidate(ctx context.Context, arg AcceptDiscoveryCandidateParams) (int64, error) {
 	result, err := q.db.Exec(ctx, acceptDiscoveryCandidate, arg.TenantID, arg.ID)
@@ -44,15 +44,15 @@ WHERE tenant_id = $1
   AND repository_id = $2
 `
 
-// CountDiscoveryCandidatesParams contains the strongly typed arguments for the CountDiscoveryCandidates query.
+// CountDiscoveryCandidatesParams 包含 CountDiscoveryCandidates 查询的强类型参数。
 type CountDiscoveryCandidatesParams struct {
-	// TenantID is the tenant id value supplied to the CountDiscoveryCandidates query.
+	// TenantID 是提供给 CountDiscoveryCandidates 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// RepositoryID is the repository id value supplied to the CountDiscoveryCandidates query.
+	// RepositoryID 是提供给 CountDiscoveryCandidates 查询的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
 }
 
-// CountDiscoveryCandidates executes the generated CountDiscoveryCandidates database query.
+// CountDiscoveryCandidates 执行生成的 CountDiscoveryCandidates 数据库查询。
 // 返回匹配一次仓库的候选总数。
 func (q *Queries) CountDiscoveryCandidates(ctx context.Context, arg CountDiscoveryCandidatesParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countDiscoveryCandidates, arg.TenantID, arg.RepositoryID)
@@ -68,7 +68,7 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// CountListedServices executes the generated CountListedServices database query.
+// CountListedServices 执行生成的 CountListedServices 数据库查询。
 // 返回匹配一次租户搜索的有效服务数量。
 func (q *Queries) CountListedServices(ctx context.Context, tenantID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countListedServices, tenantID)
@@ -88,15 +88,15 @@ SELECT
             WHERE id = $1), 0)::bigint AS limit_count
 `
 
-// CountServicesRow contains the columns returned by the CountServices query.
+// CountServicesRow 包含 CountServices 查询返回的列。
 type CountServicesRow struct {
-	// CurrentCount is the current count value returned by the CountServices query.
+	// CurrentCount 是 CountServices 查询返回的 CurrentCount 值。
 	CurrentCount int64 `json:"current_count"`
-	// LimitCount is the limit count value returned by the CountServices query.
+	// LimitCount 是 CountServices 查询返回的 LimitCount 值。
 	LimitCount int64 `json:"limit_count"`
 }
 
-// CountServices executes the generated CountServices database query.
+// CountServices 执行生成的 CountServices 数据库查询。
 // 返回有效服务数量与租户固定的服务配额。
 func (q *Queries) CountServices(ctx context.Context, tenantID uuid.UUID) (CountServicesRow, error) {
 	row := q.db.QueryRow(ctx, countServices, tenantID)
@@ -112,15 +112,15 @@ WHERE tenant_id = $1
   AND source_spec_id = $2
 `
 
-// CountSourceBindingsParams contains the strongly typed arguments for the CountSourceBindings query.
+// CountSourceBindingsParams 包含 CountSourceBindings 查询的强类型参数。
 type CountSourceBindingsParams struct {
-	// TenantID is the tenant id value supplied to the CountSourceBindings query.
+	// TenantID 是提供给 CountSourceBindings 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SourceSpecID is the source spec id value supplied to the CountSourceBindings query.
+	// SourceSpecID 是提供给 CountSourceBindings 查询的 SourceSpecID 值。
 	SourceSpecID uuid.UUID `json:"source_spec_id"`
 }
 
-// CountSourceBindings executes the generated CountSourceBindings database query.
+// CountSourceBindings 执行生成的 CountSourceBindings 数据库查询。
 // 统计一个源配置当前的绑定数量。
 func (q *Queries) CountSourceBindings(ctx context.Context, arg CountSourceBindingsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countSourceBindings, arg.TenantID, arg.SourceSpecID)
@@ -142,27 +142,27 @@ ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// CreateDiscoveryJobParams contains the strongly typed arguments for the CreateDiscoveryJob query.
+// CreateDiscoveryJobParams 包含 CreateDiscoveryJob 查询的强类型参数。
 type CreateDiscoveryJobParams struct {
-	// TenantID is the tenant id value supplied to the CreateDiscoveryJob query.
+	// TenantID 是提供给 CreateDiscoveryJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateDiscoveryJob query.
+	// ID 是提供给 CreateDiscoveryJob 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RepositoryID is the repository id value supplied to the CreateDiscoveryJob query.
+	// RepositoryID 是提供给 CreateDiscoveryJob 查询的 RepositoryID 值。
 	RepositoryID *uuid.UUID `json:"repository_id"`
-	// RefType is the ref type value supplied to the CreateDiscoveryJob query.
+	// RefType 是提供给 CreateDiscoveryJob 查询的 RefType 值。
 	RefType *string `json:"ref_type"`
-	// RefName is the ref name value supplied to the CreateDiscoveryJob query.
+	// RefName 是提供给 CreateDiscoveryJob 查询的 RefName 值。
 	RefName *string `json:"ref_name"`
-	// JobInput is the job input value supplied to the CreateDiscoveryJob query.
+	// JobInput 是提供给 CreateDiscoveryJob 查询的 JobInput 值。
 	JobInput []byte `json:"job_input"`
-	// DedupeKey is the dedupe key value supplied to the CreateDiscoveryJob query.
+	// DedupeKey 是提供给 CreateDiscoveryJob 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
-	// ActiveGeneration is the active generation value supplied to the CreateDiscoveryJob query.
+	// ActiveGeneration 是提供给 CreateDiscoveryJob 查询的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// CreateDiscoveryJob executes the generated CreateDiscoveryJob database query.
+// CreateDiscoveryJob 执行生成的 CreateDiscoveryJob 数据库查询。
 // 记录一条持久化的仓库发现请求。
 func (q *Queries) CreateDiscoveryJob(ctx context.Context, arg CreateDiscoveryJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, createDiscoveryJob,
@@ -220,43 +220,43 @@ INSERT INTO producer_profiles (
 RETURNING id, name, kind, executable, args, env_allowlist, supported_kinds, replay_safe, network, timeout_sec, memory_mib, cpu_seconds, pids, enabled, dependency_status, unavailable_reason, revision, deleted_at, created_at, updated_at
 `
 
-// CreateProducerProfileParams contains the strongly typed arguments for the CreateProducerProfile query.
+// CreateProducerProfileParams 包含 CreateProducerProfile 查询的强类型参数。
 type CreateProducerProfileParams struct {
-	// ID is the id value supplied to the CreateProducerProfile query.
+	// ID 是提供给 CreateProducerProfile 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Name is the name value supplied to the CreateProducerProfile query.
+	// Name 是提供给 CreateProducerProfile 查询的 Name 值。
 	Name string `json:"name"`
-	// Kind is the kind value supplied to the CreateProducerProfile query.
+	// Kind 是提供给 CreateProducerProfile 查询的 Kind 值。
 	Kind string `json:"kind"`
-	// Executable is the executable value supplied to the CreateProducerProfile query.
+	// Executable 是提供给 CreateProducerProfile 查询的 Executable 值。
 	Executable string `json:"executable"`
-	// Args is the args value supplied to the CreateProducerProfile query.
+	// Args 是提供给 CreateProducerProfile 查询的 Args 值。
 	Args []byte `json:"args"`
-	// EnvAllowlist is the env allowlist value supplied to the CreateProducerProfile query.
+	// EnvAllowlist 是提供给 CreateProducerProfile 查询的 EnvAllowlist 值。
 	EnvAllowlist []string `json:"env_allowlist"`
-	// SupportedKinds is the supported kinds value supplied to the CreateProducerProfile query.
+	// SupportedKinds 是提供给 CreateProducerProfile 查询的 SupportedKinds 值。
 	SupportedKinds []string `json:"supported_kinds"`
-	// ReplaySafe is the replay safe value supplied to the CreateProducerProfile query.
+	// ReplaySafe 是提供给 CreateProducerProfile 查询的 ReplaySafe 值。
 	ReplaySafe bool `json:"replay_safe"`
-	// Network is the network value supplied to the CreateProducerProfile query.
+	// Network 是提供给 CreateProducerProfile 查询的 Network 值。
 	Network string `json:"network"`
-	// TimeoutSec is the timeout sec value supplied to the CreateProducerProfile query.
+	// TimeoutSec 是提供给 CreateProducerProfile 查询的 TimeoutSec 值。
 	TimeoutSec int32 `json:"timeout_sec"`
-	// MemoryMib is the memory mib value supplied to the CreateProducerProfile query.
+	// MemoryMib 是提供给 CreateProducerProfile 查询的 MemoryMib 值。
 	MemoryMib int32 `json:"memory_mib"`
-	// CpuSeconds is the cpu seconds value supplied to the CreateProducerProfile query.
+	// CpuSeconds 是提供给 CreateProducerProfile 查询的 CpuSeconds 值。
 	CpuSeconds int32 `json:"cpu_seconds"`
-	// Pids is the pids value supplied to the CreateProducerProfile query.
+	// Pids 是提供给 CreateProducerProfile 查询的 Pids 值。
 	Pids int32 `json:"pids"`
-	// Enabled is the enabled value supplied to the CreateProducerProfile query.
+	// Enabled 是提供给 CreateProducerProfile 查询的 Enabled 值。
 	Enabled bool `json:"enabled"`
-	// DependencyStatus is the dependency status value supplied to the CreateProducerProfile query.
+	// DependencyStatus 是提供给 CreateProducerProfile 查询的 DependencyStatus 值。
 	DependencyStatus string `json:"dependency_status"`
-	// UnavailableReason is the unavailable reason value supplied to the CreateProducerProfile query.
+	// UnavailableReason 是提供给 CreateProducerProfile 查询的 UnavailableReason 值。
 	UnavailableReason *string `json:"unavailable_reason"`
 }
 
-// CreateProducerProfile executes the generated CreateProducerProfile database query.
+// CreateProducerProfile 执行生成的 CreateProducerProfile 数据库查询。
 // 平台侧持久化生产者配置文件。
 func (q *Queries) CreateProducerProfile(ctx context.Context, arg CreateProducerProfileParams) (ProducerProfile, error) {
 	row := q.db.QueryRow(ctx, createProducerProfile,
@@ -316,37 +316,37 @@ INSERT INTO services (
 RETURNING tenant_id, id, repository_id, slug, display_name, description, root_dir, language, framework, owners, maintainers, lifecycle, visibility, revision, deleted_at, created_at, updated_at
 `
 
-// CreateServiceParams contains the strongly typed arguments for the CreateService query.
+// CreateServiceParams 包含 CreateService 查询的强类型参数。
 type CreateServiceParams struct {
-	// TenantID is the tenant id value supplied to the CreateService query.
+	// TenantID 是提供给 CreateService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateService query.
+	// ID 是提供给 CreateService 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RepositoryID is the repository id value supplied to the CreateService query.
+	// RepositoryID 是提供给 CreateService 查询的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
-	// Slug is the slug value supplied to the CreateService query.
+	// Slug 是提供给 CreateService 查询的 Slug 值。
 	Slug string `json:"slug"`
-	// DisplayName is the display name value supplied to the CreateService query.
+	// DisplayName 是提供给 CreateService 查询的 DisplayName 值。
 	DisplayName string `json:"display_name"`
-	// Description is the description value supplied to the CreateService query.
+	// Description 是提供给 CreateService 查询的 Description 值。
 	Description *string `json:"description"`
-	// RootDir is the root dir value supplied to the CreateService query.
+	// RootDir 是提供给 CreateService 查询的 RootDir 值。
 	RootDir string `json:"root_dir"`
-	// Language is the language value supplied to the CreateService query.
+	// Language 是提供给 CreateService 查询的 Language 值。
 	Language *string `json:"language"`
-	// Framework is the framework value supplied to the CreateService query.
+	// Framework 是提供给 CreateService 查询的 Framework 值。
 	Framework *string `json:"framework"`
-	// Owners is the owners value supplied to the CreateService query.
+	// Owners 是提供给 CreateService 查询的 Owners 值。
 	Owners []string `json:"owners"`
-	// Maintainers is the maintainers value supplied to the CreateService query.
+	// Maintainers 是提供给 CreateService 查询的 Maintainers 值。
 	Maintainers []string `json:"maintainers"`
-	// Lifecycle is the lifecycle value supplied to the CreateService query.
+	// Lifecycle 是提供给 CreateService 查询的 Lifecycle 值。
 	Lifecycle string `json:"lifecycle"`
-	// Visibility is the visibility value supplied to the CreateService query.
+	// Visibility 是提供给 CreateService 查询的 Visibility 值。
 	Visibility string `json:"visibility"`
 }
 
-// CreateService executes the generated CreateService database query.
+// CreateService 执行生成的 CreateService 数据库查询。
 // 持久化一个候选接受后新建的服务，冲突时静默跳过。
 func (q *Queries) CreateService(ctx context.Context, arg CreateServiceParams) (Service, error) {
 	row := q.db.QueryRow(ctx, createService,
@@ -400,41 +400,41 @@ INSERT INTO source_specs (
 RETURNING tenant_id, id, service_id, kind, asset_name_template, role, origin, mode, path, producer_profile_id, ord, timeout_sec, branch_patterns, enabled, config_origin, last_error, failure_streak, revision, deleted_at, created_at, updated_at
 `
 
-// CreateSourceSpecParams contains the strongly typed arguments for the CreateSourceSpec query.
+// CreateSourceSpecParams 包含 CreateSourceSpec 查询的强类型参数。
 type CreateSourceSpecParams struct {
-	// TenantID is the tenant id value supplied to the CreateSourceSpec query.
+	// TenantID 是提供给 CreateSourceSpec 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateSourceSpec query.
+	// ID 是提供给 CreateSourceSpec 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ServiceID is the service id value supplied to the CreateSourceSpec query.
+	// ServiceID 是提供给 CreateSourceSpec 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the CreateSourceSpec query.
+	// Kind 是提供给 CreateSourceSpec 查询的 Kind 值。
 	Kind string `json:"kind"`
-	// AssetNameTemplate is the asset name template value supplied to the CreateSourceSpec query.
+	// AssetNameTemplate 是提供给 CreateSourceSpec 查询的 AssetNameTemplate 值。
 	AssetNameTemplate string `json:"asset_name_template"`
-	// Role is the role value supplied to the CreateSourceSpec query.
+	// Role 是提供给 CreateSourceSpec 查询的 Role 值。
 	Role string `json:"role"`
-	// Origin is the origin value supplied to the CreateSourceSpec query.
+	// Origin 是提供给 CreateSourceSpec 查询的 Origin 值。
 	Origin string `json:"origin"`
-	// Mode is the mode value supplied to the CreateSourceSpec query.
+	// Mode 是提供给 CreateSourceSpec 查询的 Mode 值。
 	Mode string `json:"mode"`
-	// Path is the path value supplied to the CreateSourceSpec query.
+	// Path 是提供给 CreateSourceSpec 查询的 Path 值。
 	Path *string `json:"path"`
-	// ProducerProfileID is the producer profile id value supplied to the CreateSourceSpec query.
+	// ProducerProfileID 是提供给 CreateSourceSpec 查询的 ProducerProfileID 值。
 	ProducerProfileID *uuid.UUID `json:"producer_profile_id"`
-	// Ord is the ord value supplied to the CreateSourceSpec query.
+	// Ord 是提供给 CreateSourceSpec 查询的 Ord 值。
 	Ord int32 `json:"ord"`
-	// TimeoutSec is the timeout sec value supplied to the CreateSourceSpec query.
+	// TimeoutSec 是提供给 CreateSourceSpec 查询的 TimeoutSec 值。
 	TimeoutSec int32 `json:"timeout_sec"`
-	// BranchPatterns is the branch patterns value supplied to the CreateSourceSpec query.
+	// BranchPatterns 是提供给 CreateSourceSpec 查询的 BranchPatterns 值。
 	BranchPatterns []string `json:"branch_patterns"`
-	// Enabled is the enabled value supplied to the CreateSourceSpec query.
+	// Enabled 是提供给 CreateSourceSpec 查询的 Enabled 值。
 	Enabled bool `json:"enabled"`
-	// ConfigOrigin is the config origin value supplied to the CreateSourceSpec query.
+	// ConfigOrigin 是提供给 CreateSourceSpec 查询的 ConfigOrigin 值。
 	ConfigOrigin string `json:"config_origin"`
 }
 
-// CreateSourceSpec executes the generated CreateSourceSpec database query.
+// CreateSourceSpec 执行生成的 CreateSourceSpec 数据库查询。
 // 持久化源配置。
 func (q *Queries) CreateSourceSpec(ctx context.Context, arg CreateSourceSpecParams) (SourceSpec, error) {
 	row := q.db.QueryRow(ctx, createSourceSpec,
@@ -491,19 +491,19 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetAssetForSourceSpecParams contains the strongly typed arguments for the GetAssetForSourceSpec query.
+// GetAssetForSourceSpecParams 包含 GetAssetForSourceSpec 查询的强类型参数。
 type GetAssetForSourceSpecParams struct {
-	// TenantID is the tenant id value supplied to the GetAssetForSourceSpec query.
+	// TenantID 是提供给 GetAssetForSourceSpec 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetID is the asset id value supplied to the GetAssetForSourceSpec query.
+	// AssetID 是提供给 GetAssetForSourceSpec 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// ServiceID is the service id value supplied to the GetAssetForSourceSpec query.
+	// ServiceID 是提供给 GetAssetForSourceSpec 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the GetAssetForSourceSpec query.
+	// Kind 是提供给 GetAssetForSourceSpec 查询的 Kind 值。
 	Kind string `json:"kind"`
 }
 
-// GetAssetForSourceSpec executes the generated GetAssetForSourceSpec database query.
+// GetAssetForSourceSpec 执行生成的 GetAssetForSourceSpec 数据库查询。
 // 校验 manual 源配置的目标资产：必须属于该服务且 kind 匹配。
 func (q *Queries) GetAssetForSourceSpec(ctx context.Context, arg GetAssetForSourceSpecParams) (Asset, error) {
 	row := q.db.QueryRow(ctx, getAssetForSourceSpec,
@@ -534,15 +534,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetDiscoveryCandidateParams contains the strongly typed arguments for the GetDiscoveryCandidate query.
+// GetDiscoveryCandidateParams 包含 GetDiscoveryCandidate 查询的强类型参数。
 type GetDiscoveryCandidateParams struct {
-	// TenantID is the tenant id value supplied to the GetDiscoveryCandidate query.
+	// TenantID 是提供给 GetDiscoveryCandidate 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetDiscoveryCandidate query.
+	// ID 是提供给 GetDiscoveryCandidate 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetDiscoveryCandidate executes the generated GetDiscoveryCandidate database query.
+// GetDiscoveryCandidate 执行生成的 GetDiscoveryCandidate 数据库查询。
 // 返回一个候选，供接受前校验。
 func (q *Queries) GetDiscoveryCandidate(ctx context.Context, arg GetDiscoveryCandidateParams) (DiscoveryCandidate, error) {
 	row := q.db.QueryRow(ctx, getDiscoveryCandidate, arg.TenantID, arg.ID)
@@ -568,7 +568,7 @@ WHERE id = $1
   AND deleted_at IS NULL
 `
 
-// GetProducerProfile executes the generated GetProducerProfile database query.
+// GetProducerProfile 执行生成的 GetProducerProfile 数据库查询。
 // 返回一个未删除的生产者配置文件。
 func (q *Queries) GetProducerProfile(ctx context.Context, id uuid.UUID) (ProducerProfile, error) {
 	row := q.db.QueryRow(ctx, getProducerProfile, id)
@@ -605,7 +605,7 @@ WHERE name = $1
   AND deleted_at IS NULL
 `
 
-// GetProducerProfileByName executes the generated GetProducerProfileByName database query.
+// GetProducerProfileByName 执行生成的 GetProducerProfileByName 数据库查询。
 // 按全局唯一名称返回一个未删除的生产者配置文件，供配置导入解析名称引用。
 func (q *Queries) GetProducerProfileByName(ctx context.Context, name string) (ProducerProfile, error) {
 	row := q.db.QueryRow(ctx, getProducerProfileByName, name)
@@ -643,15 +643,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetServiceByIDParams contains the strongly typed arguments for the GetServiceByID query.
+// GetServiceByIDParams 包含 GetServiceByID 查询的强类型参数。
 type GetServiceByIDParams struct {
-	// TenantID is the tenant id value supplied to the GetServiceByID query.
+	// TenantID 是提供给 GetServiceByID 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetServiceByID query.
+	// ID 是提供给 GetServiceByID 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetServiceByID executes the generated GetServiceByID database query.
+// GetServiceByID 执行生成的 GetServiceByID 数据库查询。
 // 返回一个活跃服务，供按 id 定位。
 func (q *Queries) GetServiceByID(ctx context.Context, arg GetServiceByIDParams) (Service, error) {
 	row := q.db.QueryRow(ctx, getServiceByID, arg.TenantID, arg.ID)
@@ -687,15 +687,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetServiceBySlugParams contains the strongly typed arguments for the GetServiceBySlug query.
+// GetServiceBySlugParams 包含 GetServiceBySlug 查询的强类型参数。
 type GetServiceBySlugParams struct {
-	// TenantID is the tenant id value supplied to the GetServiceBySlug query.
+	// TenantID 是提供给 GetServiceBySlug 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// Slug is the slug value supplied to the GetServiceBySlug query.
+	// Slug 是提供给 GetServiceBySlug 查询的 Slug 值。
 	Slug string `json:"slug"`
 }
 
-// GetServiceBySlug executes the generated GetServiceBySlug database query.
+// GetServiceBySlug 执行生成的 GetServiceBySlug 数据库查询。
 // M1 仓库发现、候选、服务、生产者配置与源配置/绑定的持久化查询。
 // 全部查询保留 tenant_id 谓词；producer_profiles 为平台级 global 表。
 // 返回一个活跃服务，供源配置、服务详情等路径按 slug 定位。
@@ -732,15 +732,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetSourceSpecParams contains the strongly typed arguments for the GetSourceSpec query.
+// GetSourceSpecParams 包含 GetSourceSpec 查询的强类型参数。
 type GetSourceSpecParams struct {
-	// TenantID is the tenant id value supplied to the GetSourceSpec query.
+	// TenantID 是提供给 GetSourceSpec 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetSourceSpec query.
+	// ID 是提供给 GetSourceSpec 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetSourceSpec executes the generated GetSourceSpec database query.
+// GetSourceSpec 执行生成的 GetSourceSpec 数据库查询。
 // 返回一个活跃源配置。
 func (q *Queries) GetSourceSpec(ctx context.Context, arg GetSourceSpecParams) (SourceSpec, error) {
 	row := q.db.QueryRow(ctx, getSourceSpec, arg.TenantID, arg.ID)
@@ -784,7 +784,7 @@ WHERE deleted_at IS NULL
 ORDER BY name, id
 `
 
-// ListAvailableProducerProfiles executes the generated ListAvailableProducerProfiles database query.
+// ListAvailableProducerProfiles 执行生成的 ListAvailableProducerProfiles 数据库查询。
 // 列出可被租户选择的可用生产者配置；可选按 kind 过滤。
 func (q *Queries) ListAvailableProducerProfiles(ctx context.Context, kindFilter string) ([]ProducerProfile, error) {
 	rows, err := q.db.Query(ctx, listAvailableProducerProfiles, kindFilter)
@@ -837,19 +837,19 @@ LIMIT $4
 OFFSET $3
 `
 
-// ListDiscoveryCandidatesParams contains the strongly typed arguments for the ListDiscoveryCandidates query.
+// ListDiscoveryCandidatesParams 包含 ListDiscoveryCandidates 查询的强类型参数。
 type ListDiscoveryCandidatesParams struct {
-	// TenantID is the tenant id value supplied to the ListDiscoveryCandidates query.
+	// TenantID 是提供给 ListDiscoveryCandidates 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// RepositoryID is the repository id value supplied to the ListDiscoveryCandidates query.
+	// RepositoryID 是提供给 ListDiscoveryCandidates 查询的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
-	// PageOffset is the page offset value supplied to the ListDiscoveryCandidates query.
+	// PageOffset 是提供给 ListDiscoveryCandidates 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListDiscoveryCandidates query.
+	// PageLimit 是提供给 ListDiscoveryCandidates 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListDiscoveryCandidates executes the generated ListDiscoveryCandidates database query.
+// ListDiscoveryCandidates 执行生成的 ListDiscoveryCandidates 数据库查询。
 // 列出候选，按 rootDir 逐字节升序并分页。
 func (q *Queries) ListDiscoveryCandidates(ctx context.Context, arg ListDiscoveryCandidatesParams) ([]DiscoveryCandidate, error) {
 	rows, err := q.db.Query(ctx, listDiscoveryCandidates,
@@ -895,15 +895,15 @@ LIMIT $2
 OFFSET $1
 `
 
-// ListProducerProfilesParams contains the strongly typed arguments for the ListProducerProfiles query.
+// ListProducerProfilesParams 包含 ListProducerProfiles 查询的强类型参数。
 type ListProducerProfilesParams struct {
-	// PageOffset is the page offset value supplied to the ListProducerProfiles query.
+	// PageOffset 是提供给 ListProducerProfiles 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListProducerProfiles query.
+	// PageLimit 是提供给 ListProducerProfiles 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListProducerProfiles executes the generated ListProducerProfiles database query.
+// ListProducerProfiles 执行生成的 ListProducerProfiles 数据库查询。
 // 返回平台生产者配置文件分页。
 func (q *Queries) ListProducerProfiles(ctx context.Context, arg ListProducerProfilesParams) ([]ProducerProfile, error) {
 	rows, err := q.db.Query(ctx, listProducerProfiles, arg.PageOffset, arg.PageLimit)
@@ -956,17 +956,17 @@ LIMIT $3
 OFFSET $2
 `
 
-// ListServicesParams contains the strongly typed arguments for the ListServices query.
+// ListServicesParams 包含 ListServices 查询的强类型参数。
 type ListServicesParams struct {
-	// TenantID is the tenant id value supplied to the ListServices query.
+	// TenantID 是提供给 ListServices 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PageOffset is the page offset value supplied to the ListServices query.
+	// PageOffset 是提供给 ListServices 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListServices query.
+	// PageLimit 是提供给 ListServices 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListServices executes the generated ListServices database query.
+// ListServices 执行生成的 ListServices 数据库查询。
 // 列出活跃服务的确定顺序分页。
 func (q *Queries) ListServices(ctx context.Context, arg ListServicesParams) ([]Service, error) {
 	rows, err := q.db.Query(ctx, listServices, arg.TenantID, arg.PageOffset, arg.PageLimit)
@@ -1014,15 +1014,15 @@ WHERE tenant_id = $1
 ORDER BY created_at, id
 `
 
-// ListSourceBindingsParams contains the strongly typed arguments for the ListSourceBindings query.
+// ListSourceBindingsParams 包含 ListSourceBindings 查询的强类型参数。
 type ListSourceBindingsParams struct {
-	// TenantID is the tenant id value supplied to the ListSourceBindings query.
+	// TenantID 是提供给 ListSourceBindings 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SourceSpecID is the source spec id value supplied to the ListSourceBindings query.
+	// SourceSpecID 是提供给 ListSourceBindings 查询的 SourceSpecID 值。
 	SourceSpecID uuid.UUID `json:"source_spec_id"`
 }
 
-// ListSourceBindings executes the generated ListSourceBindings database query.
+// ListSourceBindings 执行生成的 ListSourceBindings 数据库查询。
 // 列出源配置物化出的绑定，按创建顺序。
 func (q *Queries) ListSourceBindings(ctx context.Context, arg ListSourceBindingsParams) ([]SourceBinding, error) {
 	rows, err := q.db.Query(ctx, listSourceBindings, arg.TenantID, arg.SourceSpecID)
@@ -1069,27 +1069,27 @@ LIMIT 1
 FOR UPDATE
 `
 
-// LockLatestDiscoveryJobParams contains the strongly typed arguments for the LockLatestDiscoveryJob query.
+// LockLatestDiscoveryJobParams 包含 LockLatestDiscoveryJob 查询的强类型参数。
 type LockLatestDiscoveryJobParams struct {
-	// TenantID is the tenant id value supplied to the LockLatestDiscoveryJob query.
+	// TenantID 是提供给 LockLatestDiscoveryJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// DedupeKey is the dedupe key value supplied to the LockLatestDiscoveryJob query.
+	// DedupeKey 是提供给 LockLatestDiscoveryJob 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
 }
 
-// LockLatestDiscoveryJobRow contains the columns returned by the LockLatestDiscoveryJob query.
+// LockLatestDiscoveryJobRow 包含 LockLatestDiscoveryJob 查询返回的列。
 type LockLatestDiscoveryJobRow struct {
-	// ID is the id value returned by the LockLatestDiscoveryJob query.
+	// ID 是 LockLatestDiscoveryJob 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TenantID is the tenant id value returned by the LockLatestDiscoveryJob query.
+	// TenantID 是 LockLatestDiscoveryJob 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// Status is the status value returned by the LockLatestDiscoveryJob query.
+	// Status 是 LockLatestDiscoveryJob 查询返回的 Status 值。
 	Status string `json:"status"`
-	// ActiveGeneration is the active generation value returned by the LockLatestDiscoveryJob query.
+	// ActiveGeneration 是 LockLatestDiscoveryJob 查询返回的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// LockLatestDiscoveryJob executes the generated LockLatestDiscoveryJob database query.
+// LockLatestDiscoveryJob 执行生成的 LockLatestDiscoveryJob 数据库查询。
 // 串行化一个仓库发现请求的去重键。
 // 终态记录会递增 active_generation 以接受新工作。
 func (q *Queries) LockLatestDiscoveryJob(ctx context.Context, arg LockLatestDiscoveryJobParams) (LockLatestDiscoveryJobRow, error) {
@@ -1113,17 +1113,17 @@ WHERE id = $3
   AND deleted_at IS NULL
 `
 
-// UpdateProducerProfileDependencyStatusParams contains the strongly typed arguments for the UpdateProducerProfileDependencyStatus query.
+// UpdateProducerProfileDependencyStatusParams 包含 UpdateProducerProfileDependencyStatus 查询的强类型参数。
 type UpdateProducerProfileDependencyStatusParams struct {
-	// DependencyStatus is the dependency status value supplied to the UpdateProducerProfileDependencyStatus query.
+	// DependencyStatus 是提供给 UpdateProducerProfileDependencyStatus 查询的 DependencyStatus 值。
 	DependencyStatus string `json:"dependency_status"`
-	// UnavailableReason is the unavailable reason value supplied to the UpdateProducerProfileDependencyStatus query.
+	// UnavailableReason 是提供给 UpdateProducerProfileDependencyStatus 查询的 UnavailableReason 值。
 	UnavailableReason *string `json:"unavailable_reason"`
-	// ID is the id value supplied to the UpdateProducerProfileDependencyStatus query.
+	// ID 是提供给 UpdateProducerProfileDependencyStatus 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// UpdateProducerProfileDependencyStatus executes the generated UpdateProducerProfileDependencyStatus database query.
+// UpdateProducerProfileDependencyStatus 执行生成的 UpdateProducerProfileDependencyStatus 数据库查询。
 // 启动时全量重扫并刷新依赖状态。
 func (q *Queries) UpdateProducerProfileDependencyStatus(ctx context.Context, arg UpdateProducerProfileDependencyStatusParams) (int64, error) {
 	result, err := q.db.Exec(ctx, updateProducerProfileDependencyStatus, arg.DependencyStatus, arg.UnavailableReason, arg.ID)
@@ -1151,23 +1151,23 @@ ON CONFLICT (tenant_id, repository_id, root_dir) DO UPDATE SET
 RETURNING tenant_id, id, repository_id, commit_sha, root_dir, detected, status, created_at, updated_at
 `
 
-// UpsertDiscoveryCandidateParams contains the strongly typed arguments for the UpsertDiscoveryCandidate query.
+// UpsertDiscoveryCandidateParams 包含 UpsertDiscoveryCandidate 查询的强类型参数。
 type UpsertDiscoveryCandidateParams struct {
-	// TenantID is the tenant id value supplied to the UpsertDiscoveryCandidate query.
+	// TenantID 是提供给 UpsertDiscoveryCandidate 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpsertDiscoveryCandidate query.
+	// ID 是提供给 UpsertDiscoveryCandidate 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RepositoryID is the repository id value supplied to the UpsertDiscoveryCandidate query.
+	// RepositoryID 是提供给 UpsertDiscoveryCandidate 查询的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
-	// CommitSha is the commit sha value supplied to the UpsertDiscoveryCandidate query.
+	// CommitSha 是提供给 UpsertDiscoveryCandidate 查询的 CommitSha 值。
 	CommitSha string `json:"commit_sha"`
-	// RootDir is the root dir value supplied to the UpsertDiscoveryCandidate query.
+	// RootDir 是提供给 UpsertDiscoveryCandidate 查询的 RootDir 值。
 	RootDir string `json:"root_dir"`
-	// Detected is the detected value supplied to the UpsertDiscoveryCandidate query.
+	// Detected 是提供给 UpsertDiscoveryCandidate 查询的 Detected 值。
 	Detected []byte `json:"detected"`
 }
 
-// UpsertDiscoveryCandidate executes the generated UpsertDiscoveryCandidate database query.
+// UpsertDiscoveryCandidate 执行生成的 UpsertDiscoveryCandidate 数据库查询。
 // 按仓库引用身份解析候选键：repositoryId + rootDir，不含 commit。
 func (q *Queries) UpsertDiscoveryCandidate(ctx context.Context, arg UpsertDiscoveryCandidateParams) (DiscoveryCandidate, error) {
 	row := q.db.QueryRow(ctx, upsertDiscoveryCandidate,

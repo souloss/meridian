@@ -7,13 +7,12 @@ import (
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
 	collaboration "github.com/meridian-labs/meridian/internal/generated/api/collaboration"
+	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
-
-	// ListAuditLogs returns one tenant-isolated page of redacted audit metadata.
-	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
 )
 
+// ListAuditLogs 返回租户隔离的一页脱敏审计元数据。
 func (s *Server) ListAuditLogs(ctx context.Context, request collaboration.ListAuditLogsRequestObject) (collaboration.ListAuditLogsResponseObject, error) {
 	if s.audits == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -30,7 +29,7 @@ func (s *Server) ListAuditLogs(ctx context.Context, request collaboration.ListAu
 	return collaboration.ListAuditLogs200JSONResponse(auditPage(items, total, page, pageSize)), nil
 }
 
-// ListPlatformAuditLogs returns one cross-tenant page of redacted audit metadata.
+// ListPlatformAuditLogs 返回跨租户的一页脱敏审计元数据。
 func (s *Server) ListPlatformAuditLogs(ctx context.Context, request platform.ListPlatformAuditLogsRequestObject) (platform.ListPlatformAuditLogsResponseObject, error) {
 	if s.audits == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -47,6 +46,7 @@ func (s *Server) ListPlatformAuditLogs(ctx context.Context, request platform.Lis
 	return platform.ListPlatformAuditLogs200JSONResponse(auditPage(items, total, page, pageSize)), nil
 }
 
+// tenantAuditFilter 将租户审计过滤请求投影为服务层过滤器。
 func tenantAuditFilter(value *api.AuditFilters) service.AuditFilter {
 	if value == nil {
 		return service.AuditFilter{}
@@ -58,6 +58,7 @@ func tenantAuditFilter(value *api.AuditFilters) service.AuditFilter {
 	}
 }
 
+// platformAuditFilter 将平台审计过滤请求投影为服务层过滤器。
 func platformAuditFilter(value *api.PlatformAuditFilters) service.AuditFilter {
 	if value == nil {
 		return service.AuditFilter{}
@@ -69,6 +70,7 @@ func platformAuditFilter(value *api.PlatformAuditFilters) service.AuditFilter {
 	}
 }
 
+// auditPage 将审计记录列表投影为 API 分页形状。
 func auditPage(items []service.AuditRecord, total int64, page, pageSize int) api.AuditLogPage {
 	responses := make([]api.AuditEntry, 0, len(items))
 	for _, item := range items {
@@ -81,6 +83,7 @@ func auditPage(items []service.AuditRecord, total int64, page, pageSize int) api
 	return api.AuditLogPage{Items: responses, Page: page, PageSize: pageSize, Total: int(total)}
 }
 
+// nullableUUID 将可空 UUID 指针包装为可空 API 值。
 func nullableUUID(value *uuid.UUID) nullable.Nullable[api.Uuid] {
 	if value == nil {
 		return nullable.NewNullNullable[api.Uuid]()
@@ -88,6 +91,7 @@ func nullableUUID(value *uuid.UUID) nullable.Nullable[api.Uuid] {
 	return nullable.NewNullableWithValue(api.Uuid(*value))
 }
 
+// nullableSlug 将可空租户 slug 指针包装为可空 API 值。
 func nullableSlug(value *string) nullable.Nullable[api.Slug] {
 	if value == nil {
 		return nullable.NewNullNullable[api.Slug]()
@@ -95,6 +99,7 @@ func nullableSlug(value *string) nullable.Nullable[api.Slug] {
 	return nullable.NewNullableWithValue(api.Slug(*value))
 }
 
+// serviceUUIDPointer 将可空 API UUID 指针转换为服务层 UUID 指针。
 func serviceUUIDPointer(value *api.Uuid) *uuid.UUID {
 	if value == nil {
 		return nil
@@ -103,6 +108,7 @@ func serviceUUIDPointer(value *api.Uuid) *uuid.UUID {
 	return new(converted)
 }
 
+// sliceValue 将可空字符串切片指针解包为切片（nil 透传）。
 func sliceValue(value *[]string) []string {
 	if value == nil {
 		return nil
@@ -110,6 +116,7 @@ func sliceValue(value *[]string) []string {
 	return *value
 }
 
+// stringValue 将可空字符串指针解包为字符串（nil 视为空串）。
 func stringValue(value *string) string {
 	if value == nil {
 		return ""
@@ -117,6 +124,7 @@ func stringValue(value *string) string {
 	return *value
 }
 
+// timeValue 将可空时间戳指针转换为时间指针（nil 透传）。
 func timeValue(value *api.Timestamp) *time.Time {
 	if value == nil {
 		return nil
@@ -125,6 +133,7 @@ func timeValue(value *api.Timestamp) *time.Time {
 	return new(converted)
 }
 
+// slugValue 将可空 slug 指针解包为字符串（nil 视为空串）。
 func slugValue(value *api.Slug) string {
 	if value == nil {
 		return ""

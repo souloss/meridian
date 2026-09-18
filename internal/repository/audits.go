@@ -11,7 +11,7 @@ import (
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
-// ListTenantAudits returns a redacted page constrained by an explicit tenant identifier.
+// ListTenantAudits 返回受显式租户标识约束的、已脱敏的一页审计记录。
 func (store *RepositoryStore) ListTenantAudits(ctx context.Context, tenantID uuid.UUID, filter service.AuditFilter, limit, offset int32) ([]service.AuditRecord, int64, error) {
 	values := auditFilterValues(filter)
 	total, err := store.queries.CountTenantAuditLogs(ctx, generated.CountTenantAuditLogsParams{
@@ -42,7 +42,7 @@ func (store *RepositoryStore) ListTenantAudits(ctx context.Context, tenantID uui
 	return items, total, nil
 }
 
-// ListPlatformAudits returns a redacted cross-tenant audit page for the control plane.
+// ListPlatformAudits 为控制面返回一页跨租户、已脱敏的审计记录。
 func (store *RepositoryStore) ListPlatformAudits(ctx context.Context, filter service.AuditFilter, limit, offset int32) ([]service.AuditRecord, int64, error) {
 	values := auditFilterValues(filter)
 	total, err := store.queries.CountPlatformAuditLogs(ctx, generated.CountPlatformAuditLogsParams{
@@ -74,12 +74,18 @@ func (store *RepositoryStore) ListPlatformAudits(ctx context.Context, filter ser
 }
 
 type auditValues struct {
+	// actorIDSet 表示过滤器中显式提供了 actor 标识。
 	actorIDSet bool
-	actorID    uuid.UUID
-	fromSet    bool
-	fromTime   time.Time
-	toSet      bool
-	toTime     time.Time
+	// actorID 是过滤条件中的操作者标识。
+	actorID uuid.UUID
+	// fromSet 表示过滤器中显式提供了时间下界。
+	fromSet bool
+	// fromTime 是时间下界。
+	fromTime time.Time
+	// toSet 表示过滤器中显式提供了时间上界。
+	toSet bool
+	// toTime 是时间上界。
+	toTime time.Time
 }
 
 func auditFilterValues(filter service.AuditFilter) auditValues {

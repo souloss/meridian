@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/netip"
 	"slices"
@@ -15,9 +14,13 @@ import (
 const (
 	credentialNameLimit  = 64
 	knownHostDefaultPort = 22
+	// knownHostMaxBytes 是规范化主机名的最大字节长度。
+	knownHostMaxBytes = 255
+	// dnsLabelMaxBytes 是 DNS 主机名单个标签的最大字节长度。
+	dnsLabelMaxBytes = 63
 )
 
-// Credentials coordinates authorization, encryption, and conditional persistence for credentials.
+// Credentials 协调凭据的授权、加密与条件持久化。
 type Credentials struct {
 	store      CredentialStore
 	identities IdentityStore
@@ -26,13 +29,13 @@ type Credentials struct {
 	now        func() time.Time
 }
 
-// NewCredentials constructs credential use cases with caller-owned persistence and key material.
+// NewCredentials 构造由调用方持有持久化与密钥材料的凭据用例。
 func NewCredentials(store CredentialStore, identities IdentityStore, keyring CredentialKeyring) *Credentials {
 	return NewCredentialsWithProbe(store, identities, keyring, NewGitConnectionProbe())
 }
 
-// NewCredentialsWithProbe constructs credential use cases with an explicit connection probe.
-// Tests and controlled deployments can inject a deterministic probe without changing authorization behavior.
+// NewCredentialsWithProbe 构造带显式连接探测的凭据用例。测试与受控部署可注入确定性探测，
+// 而不改变授权行为。
 func NewCredentialsWithProbe(store CredentialStore, identities IdentityStore, keyring CredentialKeyring, probe ConnectionProbe) *Credentials {
 	if probe == nil {
 		probe = NewGitConnectionProbe()
@@ -40,9 +43,9 @@ func NewCredentialsWithProbe(store CredentialStore, identities IdentityStore, ke
 	return &Credentials{store: store, identities: identities, keyring: keyring, probe: probe, now: time.Now}
 }
 
-// ListTenant returns tenant-owned credentials visible to the authenticated tenant member.
+// ListTenant 返回认证租户成员可见的租户持有凭据。
 func (credentials *Credentials) ListTenant(ctx context.Context, actor Principal, tenantSlug string, page, pageSize int) ([]CredentialRecord, int64, error) {
-	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, "credential:read")
+	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialRead)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -52,9 +55,9 @@ func (credentials *Credentials) ListTenant(ctx context.Context, actor Principal,
 	return credentials.store.ListCredentials(ctx, membership.TenantID, actor.User.ID, int32(pageSize), int32((page-1)*pageSize))
 }
 
-// CreateTenant encrypts and persists a tenant-owned credential without exposing its secret.
+// CreateTenant 加密并持久化一个租户持有凭据，且不暴露其秘密。
 func (credentials *Credentials) CreateTenant(ctx context.Context, actor Principal, tenantSlug string, input CredentialInput) (CredentialRecord, error) {
-	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, "credential:manage")
+	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialManage)
 	if err != nil {
 		return CredentialRecord{}, err
 	}
@@ -72,18 +75,18 @@ func (credentials *Credentials) CreateTenant(ctx context.Context, actor Principa
 	})
 }
 
-// GetTenant returns one tenant credential while applying the same visibility boundary as listing.
+// GetTenant 在应用与列表相同的可见性边界下返回一个租户凭据。
 func (credentials *Credentials) GetTenant(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID) (CredentialRecord, error) {
-	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, "credential:read")
+	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialRead)
 	if err != nil {
 		return CredentialRecord{}, err
 	}
 	return credentials.store.GetCredential(ctx, membership.TenantID, id, actor.User.ID)
 }
 
-// UpdateTenant applies a metadata-only conditional update to a tenant credential.
+// UpdateTenant 对租户凭据应用仅元数据的条件更新。
 func (credentials *Credentials) UpdateTenant(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID, etag string, patch CredentialPatch) (CredentialRecord, error) {
-	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, "credential:manage")
+	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialManage)
 	if err != nil {
 		return CredentialRecord{}, err
 	}
@@ -100,9 +103,9 @@ func (credentials *Credentials) UpdateTenant(ctx context.Context, actor Principa
 	})
 }
 
-// DeleteTenant conditionally deletes a tenant credential, optionally unbinding repository references.
+// DeleteTenant 条件删除一个租户凭据，可选地解除仓库引用绑定。
 func (credentials *Credentials) DeleteTenant(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID, etag string, force bool) error {
-	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, "credential:manage")
+	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialManage)
 	if err != nil {
 		return err
 	}
@@ -113,9 +116,9 @@ func (credentials *Credentials) DeleteTenant(ctx context.Context, actor Principa
 	return credentials.store.DeleteCredential(ctx, membership.TenantID, id, expectedRevision, force, credentials.now().UTC())
 }
 
-// RotateTenant replaces a tenant secret under If-Match and returns any enqueued sync metadata.
+// RotateTenant 在 If-Match 下替换租户秘密，并返回任何入队的同步元数据。
 func (credentials *Credentials) RotateTenant(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID, etag string, rotation CredentialRotation) (CredentialRecord, []CredentialSyncJob, error) {
-	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, "credential:manage")
+	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialManage)
 	if err != nil {
 		return CredentialRecord{}, nil, err
 	}
@@ -169,7 +172,7 @@ func (credentials *Credentials) RotateTenant(ctx context.Context, actor Principa
 	return updated, jobs, nil
 }
 
-// ListGlobal returns all platform-owned credential metadata to a platform administrator.
+// ListGlobal 向平台管理员返回全部平台持有凭据元数据。
 func (credentials *Credentials) ListGlobal(ctx context.Context, actor Principal, page, pageSize int) ([]GlobalCredentialRecord, int64, error) {
 	if !isPlatformAdministrator(actor) {
 		return nil, 0, ErrNotFound
@@ -180,7 +183,7 @@ func (credentials *Credentials) ListGlobal(ctx context.Context, actor Principal,
 	return credentials.store.ListGlobalCredentials(ctx, int32(pageSize), int32((page-1)*pageSize))
 }
 
-// CreateGlobal encrypts and persists a platform-owned credential.
+// CreateGlobal 加密并持久化一个平台持有凭据。
 func (credentials *Credentials) CreateGlobal(ctx context.Context, actor Principal, input CredentialInput) (GlobalCredentialRecord, error) {
 	if !isPlatformAdministrator(actor) {
 		return GlobalCredentialRecord{}, ErrNotFound
@@ -189,7 +192,7 @@ func (credentials *Credentials) CreateGlobal(ctx context.Context, actor Principa
 		return GlobalCredentialRecord{}, err
 	}
 	id := uuid.NewV7()
-	encrypted, err := credentials.keyring.Encrypt("global", id, input.Secret)
+	encrypted, err := credentials.keyring.Encrypt(credentialScopeGlobal, id, input.Secret)
 	if err != nil {
 		return GlobalCredentialRecord{}, err
 	}
@@ -198,7 +201,7 @@ func (credentials *Credentials) CreateGlobal(ctx context.Context, actor Principa
 	})
 }
 
-// UpdateGlobal applies a metadata-only conditional update to a platform credential.
+// UpdateGlobal 对平台凭据应用仅元数据的条件更新。
 func (credentials *Credentials) UpdateGlobal(ctx context.Context, actor Principal, id uuid.UUID, etag, name string) (GlobalCredentialRecord, error) {
 	if !isPlatformAdministrator(actor) {
 		return GlobalCredentialRecord{}, ErrNotFound
@@ -213,7 +216,7 @@ func (credentials *Credentials) UpdateGlobal(ctx context.Context, actor Principa
 	return credentials.store.UpdateGlobalCredential(ctx, UpdateGlobalCredential{ID: id, ExpectedRevision: expectedRevision, Name: name, UpdatedAt: credentials.now().UTC()})
 }
 
-// DeleteGlobal conditionally deletes a platform credential and can atomically unbind references.
+// DeleteGlobal 条件删除一个平台凭据，并可原子地解除引用绑定。
 func (credentials *Credentials) DeleteGlobal(ctx context.Context, actor Principal, id uuid.UUID, etag string, force bool) error {
 	if !isPlatformAdministrator(actor) {
 		return ErrNotFound
@@ -225,7 +228,7 @@ func (credentials *Credentials) DeleteGlobal(ctx context.Context, actor Principa
 	return credentials.store.DeleteGlobalCredential(ctx, id, expectedRevision, force, credentials.now().UTC())
 }
 
-// RotateGlobal replaces a platform secret under If-Match and returns only safe sync metadata.
+// RotateGlobal 在 If-Match 下替换平台秘密，并仅返回安全的同步元数据。
 func (credentials *Credentials) RotateGlobal(ctx context.Context, actor Principal, id uuid.UUID, etag string, rotation CredentialRotation) (GlobalCredentialRecord, []CredentialSyncJob, error) {
 	if !isPlatformAdministrator(actor) {
 		return GlobalCredentialRecord{}, nil, ErrNotFound
@@ -264,7 +267,7 @@ func (credentials *Credentials) RotateGlobal(ctx context.Context, actor Principa
 	if fingerprint == current.Encrypted.Fingerprint {
 		return GlobalCredentialRecord{}, nil, ErrValidation
 	}
-	encrypted, err := credentials.keyring.Encrypt("global", id, rotation.Secret)
+	encrypted, err := credentials.keyring.Encrypt(credentialScopeGlobal, id, rotation.Secret)
 	if err != nil {
 		return GlobalCredentialRecord{}, nil, err
 	}
@@ -293,9 +296,9 @@ func validateCredentialRotationReplay(rotation CredentialRotation) error {
 	return nil
 }
 
-// ListKnownHosts returns approved SSH host-key identities for one tenant.
+// ListKnownHosts 返回某租户已批准的 SSH 主机密钥身份。
 func (credentials *Credentials) ListKnownHosts(ctx context.Context, actor Principal, tenantSlug string, page, pageSize int) ([]KnownHostRecord, int64, error) {
-	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, "credential:read")
+	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialRead)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -305,9 +308,9 @@ func (credentials *Credentials) ListKnownHosts(ctx context.Context, actor Princi
 	return credentials.store.ListKnownHosts(ctx, membership.TenantID, int32(pageSize), int32((page-1)*pageSize))
 }
 
-// CreateKnownHost validates and persists a manually approved SSH host key.
+// CreateKnownHost 校验并持久化一个手动批准的 SSH 主机密钥。
 func (credentials *Credentials) CreateKnownHost(ctx context.Context, actor Principal, tenantSlug, host string, port *int, publicKey string) (KnownHostRecord, error) {
-	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, "credential:manage")
+	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialManage)
 	if err != nil {
 		return KnownHostRecord{}, err
 	}
@@ -319,7 +322,7 @@ func (credentials *Credentials) CreateKnownHost(ctx context.Context, actor Princ
 	if port != nil {
 		knownPort = *port
 	}
-	if knownPort < 1 || knownPort > 65535 {
+	if knownPort < knownHostPortMin || knownPort > knownHostPortMax {
 		return KnownHostRecord{}, ErrValidation
 	}
 	identity, err := ParseKnownHostPublicKey(publicKey)
@@ -329,7 +332,7 @@ func (credentials *Credentials) CreateKnownHost(ctx context.Context, actor Princ
 	return credentials.store.CreateKnownHost(ctx, NewKnownHost{
 		TenantID: membership.TenantID, ID: uuid.NewV7(), Host: normalizedHost, Port: int32(knownPort),
 		KeyType: identity.KeyType, PublicKey: identity.PublicKey, Fingerprint: identity.Fingerprint,
-		Source: "manual", CreatedBy: actor.User.ID,
+		Source: knownHostSourceManual, CreatedBy: actor.User.ID,
 	})
 }
 
@@ -338,7 +341,7 @@ func (credentials *Credentials) tenantMembership(ctx context.Context, actor Prin
 		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) {
 			return Membership{}, ErrNotFound
 		}
-		if !slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, "*") {
+		if !slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
@@ -399,11 +402,11 @@ func validateCredentialName(name string) error {
 
 func validateSharing(scope string, teamIDs []uuid.UUID) error {
 	switch scope {
-	case "private", "tenant":
+	case credentialSharedScopePrivate, credentialSharedScopeTenant:
 		if len(teamIDs) != 0 {
 			return ErrValidation
 		}
-	case "team":
+	case credentialSharedScopeTeam:
 		if err := validateTeamIDs(teamIDs); err != nil {
 			return err
 		}
@@ -431,7 +434,7 @@ func validateTeamIDs(teamIDs []uuid.UUID) error {
 }
 
 func validatePagination(page, pageSize int) error {
-	if page < 1 || pageSize < 1 || pageSize > 100 {
+	if page < 1 || pageSize < 1 || pageSize > defaultPageSizeMax {
 		return ErrValidation
 	}
 	return nil
@@ -440,12 +443,12 @@ func validatePagination(page, pageSize int) error {
 func parseRevisionETag(value, kind string, id uuid.UUID) (int64, error) {
 	prefix := fmt.Sprintf(`"%s:%s:`, kind, id)
 	if !strings.HasPrefix(value, prefix) || !strings.HasSuffix(value, `"`) {
-		return 0, errors.New("invalid entity tag")
+		return 0, ErrParseEntityTag
 	}
 	revisionText := strings.TrimSuffix(strings.TrimPrefix(value, prefix), `"`)
 	var revision int64
 	if _, err := fmt.Sscan(revisionText, &revision); err != nil || revision < 1 {
-		return 0, errors.New("invalid entity tag revision")
+		return 0, ErrParseEntityTagRevision
 	}
 	return revision, nil
 }
@@ -471,19 +474,19 @@ func normalizeKnownHost(host string) (string, error) {
 		host = strings.TrimSuffix(strings.TrimPrefix(host, "["), "]")
 	}
 	host = strings.ToLower(host)
-	if host == "" || len(host) > 255 || strings.ContainsAny(host, "/?#\x00 \t\r\n") {
-		return "", errors.New("invalid host")
+	if host == "" || len(host) > knownHostMaxBytes || strings.ContainsAny(host, "/?#\x00 \t\r\n") {
+		return "", ErrInvalidHost
 	}
 	if _, err := netip.ParseAddr(host); err == nil {
 		return host, nil
 	}
 	for label := range strings.SplitSeq(host, ".") {
-		if label == "" || len(label) > 63 || strings.HasPrefix(label, "-") || strings.HasSuffix(label, "-") {
-			return "", errors.New("invalid DNS host")
+		if label == "" || len(label) > dnsLabelMaxBytes || strings.HasPrefix(label, "-") || strings.HasSuffix(label, "-") {
+			return "", ErrInvalidDNSHost
 		}
 		for _, character := range label {
 			if (character < 'a' || character > 'z') && (character < '0' || character > '9') && character != '-' {
-				return "", errors.New("invalid DNS host")
+				return "", ErrInvalidDNSHost
 			}
 		}
 	}

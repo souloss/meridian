@@ -8,86 +8,86 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// ListAuditLogs returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListAuditLogs 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListAuditLogs(ctx context.Context, request ListAuditLogsRequestObject) (ListAuditLogsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListBreakingTodos returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListBreakingTodos 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListBreakingTodos(ctx context.Context, request ListBreakingTodosRequestObject) (ListBreakingTodosResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// AcknowledgeBreakingTodo returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// AcknowledgeBreakingTodo 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) AcknowledgeBreakingTodo(ctx context.Context, request AcknowledgeBreakingTodoRequestObject) (AcknowledgeBreakingTodoResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListNotificationChannels returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListNotificationChannels 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListNotificationChannels(ctx context.Context, request ListNotificationChannelsRequestObject) (ListNotificationChannelsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateNotificationChannel returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateNotificationChannel 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateNotificationChannel(ctx context.Context, request CreateNotificationChannelRequestObject) (CreateNotificationChannelResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteNotificationChannel returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteNotificationChannel 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteNotificationChannel(ctx context.Context, request DeleteNotificationChannelRequestObject) (DeleteNotificationChannelResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateNotificationChannel returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateNotificationChannel 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateNotificationChannel(ctx context.Context, request UpdateNotificationChannelRequestObject) (UpdateNotificationChannelResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RotateNotificationChannelSecret returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RotateNotificationChannelSecret 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RotateNotificationChannelSecret(ctx context.Context, request RotateNotificationChannelSecretRequestObject) (RotateNotificationChannelSecretResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// TestNotificationChannel returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// TestNotificationChannel 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) TestNotificationChannel(ctx context.Context, request TestNotificationChannelRequestObject) (TestNotificationChannelResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListNotifications returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListNotifications 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListNotifications(ctx context.Context, request ListNotificationsRequestObject) (ListNotificationsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// MarkNotificationRead returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// MarkNotificationRead 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) MarkNotificationRead(ctx context.Context, request MarkNotificationReadRequestObject) (MarkNotificationReadResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// MarkAllNotificationsRead returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// MarkAllNotificationsRead 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) MarkAllNotificationsRead(ctx context.Context, request MarkAllNotificationsReadRequestObject) (MarkAllNotificationsReadResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListServiceComments returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListServiceComments 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListServiceComments(ctx context.Context, request ListServiceCommentsRequestObject) (ListServiceCommentsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateServiceComment returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateServiceComment 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateServiceComment(ctx context.Context, request CreateServiceCommentRequestObject) (CreateServiceCommentResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListSubscriptions returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListSubscriptions 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListSubscriptions(ctx context.Context, request ListSubscriptionsRequestObject) (ListSubscriptionsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PutSubscription returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PutSubscription 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PutSubscription(ctx context.Context, request PutSubscriptionRequestObject) (PutSubscriptionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

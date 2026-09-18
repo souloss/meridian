@@ -2,15 +2,14 @@ package handler
 
 import (
 	"context"
-	"strings"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
 	repository "github.com/meridian-labs/meridian/internal/generated/api/repository"
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
-// PreviewRepositoryConfigImport validates and normalizes the repository
-// configuration at a ref and returns a non-authoritative preview snapshot.
+// PreviewRepositoryConfigImport 校验并规范化某个 ref 处的仓库配置，
+// 返回一份非权威的预览快照。
 func (s *Server) PreviewRepositoryConfigImport(ctx context.Context, request repository.PreviewRepositoryConfigImportRequestObject) (repository.PreviewRepositoryConfigImportResponseObject, error) {
 	if s.configImport == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -41,7 +40,7 @@ func (s *Server) PreviewRepositoryConfigImport(ctx context.Context, request repo
 	}), nil
 }
 
-// ApplyRepositoryConfigImport materializes one previewed configuration import.
+// ApplyRepositoryConfigImport 落地一份已预览的配置导入。
 func (s *Server) ApplyRepositoryConfigImport(ctx context.Context, request repository.ApplyRepositoryConfigImportRequestObject) (repository.ApplyRepositoryConfigImportResponseObject, error) {
 	if s.configImport == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -79,6 +78,7 @@ func (s *Server) ApplyRepositoryConfigImport(ctx context.Context, request reposi
 	}), nil
 }
 
+// configPreviewServices 将服务记录列表投影为 API 形状。
 func configPreviewServices(records []service.ServiceRecord) []api.Service {
 	services := make([]api.Service, 0, len(records))
 	for _, record := range records {
@@ -87,6 +87,7 @@ func configPreviewServices(records []service.ServiceRecord) []api.Service {
 	return services
 }
 
+// configPreviewSources 将源配置记录列表投影为 API 形状。
 func configPreviewSources(records []service.SourceSpecRecord) []api.SourceSpec {
 	sources := make([]api.SourceSpec, 0, len(records))
 	for _, record := range records {
@@ -94,5 +95,3 @@ func configPreviewSources(records []service.SourceSpecRecord) []api.SourceSpec {
 	}
 	return sources
 }
-
-var _ = strings.TrimSpace

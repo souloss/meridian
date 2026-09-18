@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	"errors"
 	"net/url"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -22,21 +22,21 @@ const (
 	maxRepositoryNoteRunes  = 500
 )
 
-// Repositories coordinates tenant authorization and repository configuration rules.
+// Repositories 协调租户授权与仓库配置规则。
 type Repositories struct {
 	store      RepositoryStore
 	identities IdentityStore
 	now        func() time.Time
 }
 
-// NewRepositories constructs repository use cases with caller-owned persistence.
+// NewRepositories 构造由调用方持有持久化的仓库用例。
 func NewRepositories(store RepositoryStore, identities IdentityStore) *Repositories {
 	return &Repositories{store: store, identities: identities, now: time.Now}
 }
 
-// List returns active repositories visible inside one tenant.
+// List 返回租户内可见的活跃仓库。
 func (repositories *Repositories) List(ctx context.Context, actor Principal, tenantSlug, query string, page, pageSize int) ([]RepositoryRecord, int64, error) {
-	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, "repository:read")
+	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryRead)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -53,9 +53,9 @@ func (repositories *Repositories) List(ctx context.Context, actor Principal, ten
 	return items, total, nil
 }
 
-// Get returns one active repository after applying the tenant boundary.
+// Get 在应用租户边界后返回一个活跃仓库。
 func (repositories *Repositories) Get(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID) (RepositoryRecord, error) {
-	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, "repository:read")
+	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryRead)
 	if err != nil {
 		return RepositoryRecord{}, err
 	}
@@ -67,9 +67,9 @@ func (repositories *Repositories) Get(ctx context.Context, actor Principal, tena
 	return record, nil
 }
 
-// Create validates, resolves credentials, enforces quota, and inserts one repository.
+// Create 校验、解析凭据、执行配额并插入一个仓库。
 func (repositories *Repositories) Create(ctx context.Context, actor Principal, tenantSlug string, input NewRepositoryInput) (RepositoryRecord, error) {
-	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, "repository:write")
+	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryWrite)
 	if err != nil {
 		return RepositoryRecord{}, err
 	}
@@ -82,7 +82,7 @@ func (repositories *Repositories) Create(ctx context.Context, actor Principal, t
 		return RepositoryRecord{}, err
 	}
 	if current >= limit {
-		return RepositoryRecord{}, &QuotaExceededError{Resource: "repositories", Current: current, Limit: limit}
+		return RepositoryRecord{}, &QuotaExceededError{Resource: quotaResourceRepositories, Current: current, Limit: limit}
 	}
 	refs, err := repositories.resolveCredential(ctx, membership, actor, validated.CredentialID)
 	if err != nil {
@@ -100,9 +100,9 @@ func (repositories *Repositories) Create(ctx context.Context, actor Principal, t
 	return record, nil
 }
 
-// Update applies explicit metadata changes under the repository ETag.
+// Update 在仓库 ETag 下应用显式元数据变更。
 func (repositories *Repositories) Update(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID, etag string, patch RepositoryPatchInput) (RepositoryRecord, error) {
-	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, "repository:write")
+	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryWrite)
 	if err != nil {
 		return RepositoryRecord{}, err
 	}
@@ -137,9 +137,9 @@ func (repositories *Repositories) Update(ctx context.Context, actor Principal, t
 	return record, nil
 }
 
-// Delete soft-deletes one repository under the current ETag.
+// Delete 在当前 ETag 下软删除一个仓库。
 func (repositories *Repositories) Delete(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID, etag string) error {
-	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, "repository:write")
+	membership, err := repositories.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryWrite)
 	if err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func (repositories *Repositories) Delete(ctx context.Context, actor Principal, t
 	return repositories.store.DeleteRepository(ctx, membership.TenantID, id, expectedRevision, repositories.now().UTC())
 }
 
-// NewRepositoryInput is the validated boundary input used by the HTTP handler.
+// NewRepositoryInput 是 HTTP 处理器使用的校验后边界输入。
 type NewRepositoryInput struct {
 	URL           string
 	CredentialID  *uuid.UUID
@@ -161,7 +161,7 @@ type NewRepositoryInput struct {
 	Note          *string
 }
 
-// RepositoryPatchInput preserves explicit null versus omitted fields from JSON.
+// RepositoryPatchInput 保留 JSON 中「显式 null」与「省略字段」的区分。
 type RepositoryPatchInput struct {
 	CredentialID  **uuid.UUID
 	DefaultBranch *string
@@ -232,20 +232,20 @@ func validateRepositoryPatch(input RepositoryPatchInput) (RepositoryPatchInput, 
 
 func canonicalRepositoryURL(remote string) (string, error) {
 	if remote == "" || utf8.RuneCountInString(remote) > maxRepositoryURLRunes || remote != strings.TrimSpace(remote) {
-		return "", errors.New("invalid repository URL")
+		return "", ErrInvalidRepositoryURL
 	}
 	lowerRemote := strings.ToLower(remote)
 	if strings.HasPrefix(lowerRemote, "https://") || strings.HasPrefix(lowerRemote, "ssh://") {
 		if strings.ContainsAny(remote, "?#") {
-			return "", errors.New("invalid repository URL")
+			return "", ErrInvalidRepositoryURL
 		}
 		parsed, err := url.ParseRequestURI(remote)
 		if err != nil || parsed.User != nil || parsed.Host == "" || parsed.Fragment != "" || parsed.RawQuery != "" || parsed.Path == "" {
-			return "", errors.New("invalid repository URL")
+			return "", ErrInvalidRepositoryURL
 		}
 		parsed.Scheme = strings.ToLower(parsed.Scheme)
 		parsed.Host = strings.ToLower(parsed.Host)
-		if (parsed.Scheme == "https" && parsed.Port() == "443") || (parsed.Scheme == "ssh" && parsed.Port() == "22") {
+		if (parsed.Scheme == "https" && parsed.Port() == strconv.Itoa(httpsDefaultPort)) || (parsed.Scheme == "ssh" && parsed.Port() == strconv.Itoa(knownHostDefaultPort)) {
 			hostname := parsed.Hostname()
 			if strings.Contains(hostname, ":") {
 				parsed.Host = "[" + hostname + "]"
@@ -255,24 +255,24 @@ func canonicalRepositoryURL(remote string) (string, error) {
 		}
 		parsed.Path = strings.TrimRight(parsed.Path, "/")
 		if parsed.Path == "" {
-			return "", errors.New("invalid repository URL")
+			return "", ErrInvalidRepositoryURL
 		}
 		return parsed.String(), nil
 	}
 	if strings.ContainsAny(remote, "\x00\r\n\t ") || !strings.Contains(remote, "@") {
-		return "", errors.New("invalid SCP URL")
+		return "", ErrInvalidSCPURL
 	}
 	parts := strings.SplitN(remote, ":", 2)
 	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-		return "", errors.New("invalid SCP URL")
+		return "", ErrInvalidSCPURL
 	}
 	user, host, found := strings.Cut(parts[0], "@")
 	if !found || user == "" || host == "" || strings.ContainsAny(user, "/\\:@") || strings.ContainsAny(host, "/\\:@") {
-		return "", errors.New("invalid SCP URL")
+		return "", ErrInvalidSCPURL
 	}
 	path := strings.TrimRight(parts[1], "/")
 	if path == "" {
-		return "", errors.New("invalid SCP URL")
+		return "", ErrInvalidSCPURL
 	}
 	return user + "@" + strings.ToLower(host) + ":" + path, nil
 }
@@ -283,7 +283,7 @@ func defaultBranchPolicy(defaultBranch string) RepositoryBranchPolicy {
 
 func defaultFetchConfig() RepositoryFetchConfig {
 	depth := defaultRepositoryDepth
-	return RepositoryFetchConfig{Shallow: true, Depth: new(depth), Submodules: false, PathAllow: []string{}, PathIgnore: []string{}, KnownHostPolicy: "strict"}
+	return RepositoryFetchConfig{Shallow: true, Depth: new(depth), Submodules: false, PathAllow: []string{}, PathIgnore: []string{}, KnownHostPolicy: knownHostPolicyStrict}
 }
 
 func validateRepositoryConfig(policy RepositoryBranchPolicy, fetch RepositoryFetchConfig, cron, note *string) error {
@@ -293,7 +293,7 @@ func validateRepositoryConfig(policy RepositoryBranchPolicy, fetch RepositoryFet
 	if cron != nil && strings.TrimSpace(*cron) == "" {
 		return ErrValidation
 	}
-	if cron != nil && (utf8.RuneCountInString(*cron) > 128 || !validCron(*cron)) {
+	if cron != nil && (utf8.RuneCountInString(*cron) > maxFilterTextRunes || !validCron(*cron)) {
 		return ErrValidation
 	}
 	if note != nil && utf8.RuneCountInString(*note) > maxRepositoryNoteRunes {
@@ -303,10 +303,10 @@ func validateRepositoryConfig(policy RepositoryBranchPolicy, fetch RepositoryFet
 }
 
 func validFetchConfig(fetch RepositoryFetchConfig) bool {
-	if fetch.KnownHostPolicy != "strict" && fetch.KnownHostPolicy != "accept_new" {
+	if fetch.KnownHostPolicy != knownHostPolicyStrict && fetch.KnownHostPolicy != knownHostPolicyAcceptNew {
 		return false
 	}
-	if fetch.Depth != nil && (*fetch.Depth < 1 || *fetch.Depth > 10000) {
+	if fetch.Depth != nil && (*fetch.Depth < 1 || *fetch.Depth > maxRepositoryDepth) {
 		return false
 	}
 	if fetch.Proxy != nil && (utf8.RuneCountInString(*fetch.Proxy) > maxRepositoryURLRunes || strings.TrimSpace(*fetch.Proxy) == "") {
@@ -454,7 +454,7 @@ func repositoryCredentialPointers(input **uuid.UUID, reference CredentialReferen
 
 func (repositories *Repositories) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
@@ -473,12 +473,12 @@ func (repositories *Repositories) tenantMembership(ctx context.Context, actor Pr
 }
 
 func repositoryCapabilities(actor Principal, role string) []string {
-	capabilities := []string{"repository:read"}
-	if roleAllows(role, "repository:write") {
-		capabilities = append(capabilities, "repository:write")
+	capabilities := []string{scopeRepositoryRead}
+	if roleAllows(role, scopeRepositoryWrite) {
+		capabilities = append(capabilities, scopeRepositoryWrite)
 	}
-	if actor.Kind == PrincipalPAT && !slices.Contains(actor.Scopes, "repository:write") && !slices.Contains(actor.Scopes, "*") {
-		return []string{"repository:read"}
+	if actor.Kind == PrincipalPAT && !slices.Contains(actor.Scopes, scopeRepositoryWrite) && !slices.Contains(actor.Scopes, scopeWildcard) {
+		return []string{scopeRepositoryRead}
 	}
 	return capabilities
 }

@@ -8,66 +8,66 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// ListAssetLayerContents returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListAssetLayerContents 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListAssetLayerContents(ctx context.Context, request ListAssetLayerContentsRequestObject) (ListAssetLayerContentsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ReorderAssetLayers returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ReorderAssetLayers 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ReorderAssetLayers(ctx context.Context, request ReorderAssetLayersRequestObject) (ReorderAssetLayersResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetLayerRevision returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetLayerRevision 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetLayerRevision(ctx context.Context, request GetLayerRevisionRequestObject) (GetLayerRevisionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetReviewContext returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetReviewContext 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetReviewContext(ctx context.Context, request GetReviewContextRequestObject) (GetReviewContextResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ApproveLayerRevision returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ApproveLayerRevision 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ApproveLayerRevision(ctx context.Context, request ApproveLayerRevisionRequestObject) (ApproveLayerRevisionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RejectLayerRevision returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RejectLayerRevision 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RejectLayerRevision(ctx context.Context, request RejectLayerRevisionRequestObject) (RejectLayerRevisionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetLayer returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetLayer 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetLayer(ctx context.Context, request GetLayerRequestObject) (GetLayerResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateLayer returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateLayer 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateLayer(ctx context.Context, request UpdateLayerRequestObject) (UpdateLayerResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListLayerRevisions returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListLayerRevisions 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListLayerRevisions(ctx context.Context, request ListLayerRevisionsRequestObject) (ListLayerRevisionsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateLayerRevision returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateLayerRevision 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateLayerRevision(ctx context.Context, request CreateLayerRevisionRequestObject) (CreateLayerRevisionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RollbackLayer returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RollbackLayer 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RollbackLayer(ctx context.Context, request RollbackLayerRequestObject) (RollbackLayerResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListReviews returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListReviews 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListReviews(ctx context.Context, request ListReviewsRequestObject) (ListReviewsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

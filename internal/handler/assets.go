@@ -14,7 +14,7 @@ import (
 	"github.com/oapi-codegen/nullable"
 )
 
-// SyncRepository enqueues one repository synchronization job.
+// SyncRepository 入队一个仓库同步任务。
 func (s *Server) SyncRepository(ctx context.Context, request repository.SyncRepositoryRequestObject) (repository.SyncRepositoryResponseObject, error) {
 	if s.discovery == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -33,7 +33,7 @@ func (s *Server) SyncRepository(ctx context.Context, request repository.SyncRepo
 	return repository.SyncRepository202JSONResponse(jobAcceptedResponse(accepted)), nil
 }
 
-// UpdateSourceSpec applies a validated patch to one source spec.
+// UpdateSourceSpec 对一个源配置应用已校验补丁。
 func (s *Server) UpdateSourceSpec(ctx context.Context, request asset.UpdateSourceSpecRequestObject) (asset.UpdateSourceSpecResponseObject, error) {
 	if s.discovery == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -55,7 +55,7 @@ func (s *Server) UpdateSourceSpec(ctx context.Context, request asset.UpdateSourc
 	}, nil
 }
 
-// GetService returns one service detail and records a recent read.
+// GetService 返回一个服务详情并记录一次最近读取。
 func (s *Server) GetService(ctx context.Context, request serviceapi.GetServiceRequestObject) (serviceapi.GetServiceResponseObject, error) {
 	if s.discovery == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -74,7 +74,7 @@ func (s *Server) GetService(ctx context.Context, request serviceapi.GetServiceRe
 	}, nil
 }
 
-// ListRecentServices returns the caller's recently viewed services.
+// ListRecentServices 返回调用方最近浏览的服务。
 func (s *Server) ListRecentServices(ctx context.Context, request serviceapi.ListRecentServicesRequestObject) (serviceapi.ListRecentServicesResponseObject, error) {
 	if s.discovery == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -97,7 +97,7 @@ func (s *Server) ListRecentServices(ctx context.Context, request serviceapi.List
 	}), nil
 }
 
-// GetAsset returns one asset projected onto the selected ref track.
+// GetAsset 返回投影到所选 ref 轨道的一个资产。
 func (s *Server) GetAsset(ctx context.Context, request asset.GetAssetRequestObject) (asset.GetAssetResponseObject, error) {
 	if s.assetService == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -125,7 +125,7 @@ func (s *Server) GetAsset(ctx context.Context, request asset.GetAssetRequestObje
 	}, nil
 }
 
-// GetAssetVersion returns one asset version with its layer manifest.
+// GetAssetVersion 返回一个资产版本及其层清单。
 func (s *Server) GetAssetVersion(ctx context.Context, request asset.GetAssetVersionRequestObject) (asset.GetAssetVersionResponseObject, error) {
 	if s.assetService == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -144,7 +144,7 @@ func (s *Server) GetAssetVersion(ctx context.Context, request asset.GetAssetVers
 	}, nil
 }
 
-// ListAssetVersionItems returns one page of indexed items.
+// ListAssetVersionItems 返回一页已索引条目。
 func (s *Server) ListAssetVersionItems(ctx context.Context, request asset.ListAssetVersionItemsRequestObject) (asset.ListAssetVersionItemsResponseObject, error) {
 	if s.assetService == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -171,7 +171,7 @@ func (s *Server) ListAssetVersionItems(ctx context.Context, request asset.ListAs
 	}), nil
 }
 
-// ResolveView resolves a built-in view descriptor from the registry.
+// ResolveView 从注册表解析一个内置视图描述符。
 func (s *Server) ResolveView(ctx context.Context, request view.ResolveViewRequestObject) (view.ResolveViewResponseObject, error) {
 	if s.views == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -228,17 +228,17 @@ func (s *Server) ResolveView(ctx context.Context, request view.ResolveViewReques
 		}); err != nil {
 			return nil, err
 		}
-	case "graph":
+	case service.ViewKindDepGraph:
 		nodes := make([]api.GraphNode, 0, len(resolution.Nodes))
 		for _, node := range resolution.Nodes {
-			nodes = append(nodes, api.GraphNode{Id: node.ID})
+			nodes = append(nodes, api.GraphNode{Id: node.ID, Label: node.Label, ServiceId: api.Uuid(node.ServiceID)})
 		}
 		edges := make([]api.GraphEdge, 0, len(resolution.Edges))
 		for _, edge := range resolution.Edges {
 			edges = append(edges, api.GraphEdge{Id: edge.Source + "->" + edge.Target, From: edge.Source, To: edge.Target, Details: map[string]any{}})
 		}
 		if err := body.FromGraphViewResolution(api.GraphViewResolution{
-			Nodes: nodes, Edges: edges, Truncated: resolution.Truncated, Kind: api.GraphViewResolutionKind("graph"), View: viewDefinitionResponse(resolution.View),
+			Nodes: nodes, Edges: edges, Truncated: resolution.Truncated, Kind: api.GraphViewResolutionKind(service.ViewKindDepGraph), View: viewDefinitionResponse(resolution.View),
 		}); err != nil {
 			return nil, err
 		}
@@ -374,8 +374,8 @@ func viewDefinitionResponse(definition service.ViewDefinition) api.ViewDefinitio
 		DefaultOptions: definition.DefaultOptions, OptionsSchema: definition.OptionsSchema, ColumnsSource: columnsSource,
 		ItemTypes: stringSlicePointer(definition.ItemTypes), Columns: mapSlicePointer(definition.Columns), FallbackColumns: mapSlicePointer(definition.FallbackColumns),
 		Input: api.ViewInputSpec{
-			Mode: api.ViewInputSpecMode(definition.InputMode),
-			Kinds: kindsUnion(definition.InputKinds),
+			Mode:    api.ViewInputSpecMode(definition.InputMode),
+			Kinds:   kindsUnion(definition.InputKinds),
 			MinDocs: intPointer(definition.InputMinDocs), MaxDocs: intPointer(definition.InputMaxDocs),
 			SameKind: boolPointer(definition.InputSameKind), SameAsset: boolPointer(definition.InputSameAsset),
 			Scopes: scopeStringsPointer(definition.InputScopes),

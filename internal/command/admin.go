@@ -13,14 +13,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const maximumPasswordBytes = 1024
+// 管理员密码域常量。
+const (
+	// maximumPasswordBytes 是平台管理员密码允许的最大字节长度。
+	maximumPasswordBytes = 1024
+	// passwordReadSlack 是读取密码时为探测超长而多读取的字节数。
+	passwordReadSlack = 3
+)
 
+// 管理员命令包内哨兵错误。
+var (
+	// errAdminPasswordInputUnavailable 表示无法从任何来源读取密码。
+	errAdminPasswordInputUnavailable = errors.New("administrator password input is unavailable")
+	// errAdminPasswordTooLong 表示密码超过允许的最大字节长度。
+	errAdminPasswordTooLong = errors.New("administrator password exceeds 1024 bytes")
+	// errAdminPasswordRequired 表示 stdin 或 --password-file 均未提供密码。
+	errAdminPasswordRequired = errors.New("administrator password is required on stdin or --password-file")
+)
+
+// newAdminCommand 构造平台管理子命令树。
 func newAdminCommand() *cobra.Command {
 	command := &cobra.Command{Use: "admin", Short: "Bootstrap Meridian administration"}
 	command.AddCommand(newAdminCreateCommand())
 	return command
 }
 
+// newAdminCreateCommand 构造创建或晋升平台管理员的子命令。
 func newAdminCreateCommand() *cobra.Command {
 	var databaseURL string
 	var username string
@@ -65,12 +83,13 @@ func newAdminCreateCommand() *cobra.Command {
 	return command
 }
 
+// readPassword 从 stdin 或密码文件读取平台管理员密码，并执行长度与存在性校验。
 func readPassword(input io.Reader, filename string) (string, error) {
 	source := input
 	var file *os.File
 	if filename == "" {
 		if source == nil {
-			return "", errors.New("administrator password input is unavailable")
+			return "", errAdminPasswordInputUnavailable
 		}
 	} else {
 		var err error
@@ -81,7 +100,7 @@ func readPassword(input io.Reader, filename string) (string, error) {
 		defer file.Close()
 		source = file
 	}
-	data, err := io.ReadAll(io.LimitReader(source, maximumPasswordBytes+3))
+	data, err := io.ReadAll(io.LimitReader(source, maximumPasswordBytes+passwordReadSlack))
 	if err != nil {
 		return "", fmt.Errorf("read administrator password: %w", err)
 	}
@@ -89,10 +108,10 @@ func readPassword(input io.Reader, filename string) (string, error) {
 	password, _ = strings.CutSuffix(password, "\n")
 	password, _ = strings.CutSuffix(password, "\r")
 	if len(password) > maximumPasswordBytes {
-		return "", errors.New("administrator password exceeds 1024 bytes")
+		return "", errAdminPasswordTooLong
 	}
 	if password == "" {
-		return "", errors.New("administrator password is required on stdin or --password-file")
+		return "", errAdminPasswordRequired
 	}
 	return password, nil
 }

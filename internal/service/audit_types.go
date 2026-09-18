@@ -6,47 +6,47 @@ import (
 	"uuid"
 )
 
-// AuditRecord is the redacted append-only audit projection exposed by the API.
+// AuditRecord 是 API 暴露的脱敏追加型审计投影。
 type AuditRecord struct {
-	// ID uniquely identifies the audit fact.
+	// ID 唯一标识该审计事实。
 	ID uuid.UUID
-	// TenantSlug identifies the owning tenant, or is nil for a platform fact.
+	// TenantSlug 标识所属租户；平台级事实为 nil。
 	TenantSlug *string
-	// ActorID identifies the user actor when one exists.
+	// ActorID 标识用户操作者（存在时）。
 	ActorID *uuid.UUID
-	// Action is the stable audited operation identifier.
+	// Action 是稳定的被审计操作标识。
 	Action string
-	// ResourceType identifies the affected resource category.
+	// ResourceType 标识受影响的资源类别。
 	ResourceType string
-	// ResourceID identifies the affected resource when one exists.
+	// ResourceID 标识受影响的资源（存在时）。
 	ResourceID *string
-	// RequestID correlates the fact with an HTTP request when one exists.
+	// RequestID 在存在时将事实关联到 HTTP 请求。
 	RequestID *string
-	// Metadata contains redacted identifiers, counters, and hashes only.
+	// Metadata 仅包含脱敏标识、计数与哈希。
 	Metadata map[string]any
-	// CreatedAt is the UTC transaction time at which the fact committed.
+	// CreatedAt 是事实提交的 UTC 事务时间。
 	CreatedAt time.Time
 }
 
-// AuditFilter selects audit metadata using bounded, typed predicates.
+// AuditFilter 使用有界、类型化的谓词选择审计元数据。
 type AuditFilter struct {
-	// ActorID restricts results to one user actor when non-nil.
+	// ActorID 在非空时将结果限定为一个用户操作者。
 	ActorID *uuid.UUID
-	// Actions restricts results to exact stable action identifiers.
+	// Actions 将结果限定为精确的稳定操作标识。
 	Actions []string
-	// ResourceType restricts results to one exact resource category.
+	// ResourceType 将结果限定为一个精确的资源类别。
 	ResourceType string
-	// ResourceID restricts results to one exact resource identifier.
+	// ResourceID 将结果限定为一个精确的资源标识。
 	ResourceID string
-	// From includes facts created at or after this instant when non-nil.
+	// From 在非空时包含该时刻或之后创建的事实。
 	From *time.Time
-	// To includes facts created at or before this instant when non-nil.
+	// To 在非空时包含该时刻或之前创建的事实。
 	To *time.Time
-	// TenantSlug restricts platform results to one tenant when non-empty.
+	// TenantSlug 在非空时将平台结果限定为一个租户。
 	TenantSlug string
 }
 
-// AuditStore is the persistence boundary for redacted audit queries.
+// AuditStore 是脱敏审计查询的持久化边界。
 type AuditStore interface {
 	ListTenantAudits(context.Context, uuid.UUID, AuditFilter, int32, int32) ([]AuditRecord, int64, error)
 	ListPlatformAudits(context.Context, AuditFilter, int32, int32) ([]AuditRecord, int64, error)

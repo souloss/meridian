@@ -84,9 +84,9 @@ func TestCliContract(t *testing.T) {
 
 	// exitCodes.error classes.
 	for _, testCase := range []struct {
-		name   string
-		got    int
-		want   int
+		name string
+		got  int
+		want int
 	}{
 		{"localUsageOrValidation", usageError("x").(*CliError).ExitCode(), exitCodeUsage},
 		{"http401", httpError(401, "x").(*CliError).ExitCode(), exitCodeUnauthenticated},

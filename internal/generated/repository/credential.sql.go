@@ -17,17 +17,17 @@ INSERT INTO credential_team_shares (tenant_id, credential_id, team_id)
 VALUES ($1, $2, $3)
 `
 
-// AddCredentialTeamShareParams contains the strongly typed arguments for the AddCredentialTeamShare query.
+// AddCredentialTeamShareParams 包含 AddCredentialTeamShare 查询的强类型参数。
 type AddCredentialTeamShareParams struct {
-	// TenantID is the tenant id value supplied to the AddCredentialTeamShare query.
+	// TenantID 是提供给 AddCredentialTeamShare 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// CredentialID is the credential id value supplied to the AddCredentialTeamShare query.
+	// CredentialID 是提供给 AddCredentialTeamShare 查询的 CredentialID 值。
 	CredentialID uuid.UUID `json:"credential_id"`
-	// TeamID is the team id value supplied to the AddCredentialTeamShare query.
+	// TeamID 是提供给 AddCredentialTeamShare 查询的 TeamID 值。
 	TeamID uuid.UUID `json:"team_id"`
 }
 
-// AddCredentialTeamShare executes the generated AddCredentialTeamShare database query.
+// AddCredentialTeamShare 执行生成的 AddCredentialTeamShare 数据库查询。
 // 授予一条同租户团队可见性关系。
 func (q *Queries) AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error {
 	_, err := q.db.Exec(ctx, addCredentialTeamShare, arg.TenantID, arg.CredentialID, arg.TeamID)
@@ -42,15 +42,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// CountCredentialRepositoriesParams contains the strongly typed arguments for the CountCredentialRepositories query.
+// CountCredentialRepositoriesParams 包含 CountCredentialRepositories 查询的强类型参数。
 type CountCredentialRepositoriesParams struct {
-	// TenantID is the tenant id value supplied to the CountCredentialRepositories query.
+	// TenantID 是提供给 CountCredentialRepositories 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// CredentialID is the credential id value supplied to the CountCredentialRepositories query.
+	// CredentialID 是提供给 CountCredentialRepositories 查询的 CredentialID 值。
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// CountCredentialRepositories executes the generated CountCredentialRepositories database query.
+// CountCredentialRepositories 执行生成的 CountCredentialRepositories 数据库查询。
 // 统计引用某条租户凭据的有效仓库数量。
 func (q *Queries) CountCredentialRepositories(ctx context.Context, arg CountCredentialRepositoriesParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countCredentialRepositories, arg.TenantID, arg.CredentialID)
@@ -66,7 +66,7 @@ WHERE global_credential_id = $1
   AND deleted_at IS NULL
 `
 
-// CountGlobalCredentialRepositories executes the generated CountGlobalCredentialRepositories database query.
+// CountGlobalCredentialRepositories 执行生成的 CountGlobalCredentialRepositories 数据库查询。
 // 统计引用某条平台凭据的有效仓库数量。
 func (q *Queries) CountGlobalCredentialRepositories(ctx context.Context, credentialID *uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countGlobalCredentialRepositories, credentialID)
@@ -79,7 +79,7 @@ const countGlobalCredentials = `-- name: CountGlobalCredentials :one
 SELECT count(*) FROM global_credentials
 `
 
-// CountGlobalCredentials executes the generated CountGlobalCredentials database query.
+// CountGlobalCredentials 执行生成的 CountGlobalCredentials 数据库查询。
 // 统计全部平台凭据数量。
 func (q *Queries) CountGlobalCredentials(ctx context.Context) (int64, error) {
 	row := q.db.QueryRow(ctx, countGlobalCredentials)
@@ -92,7 +92,7 @@ const countKnownHosts = `-- name: CountKnownHosts :one
 SELECT count(*) FROM known_hosts WHERE tenant_id = $1
 `
 
-// CountKnownHosts executes the generated CountKnownHosts database query.
+// CountKnownHosts 执行生成的 CountKnownHosts 数据库查询。
 // 统计一个租户认可的主机身份数量。
 func (q *Queries) CountKnownHosts(ctx context.Context, tenantID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countKnownHosts, tenantID)
@@ -126,15 +126,15 @@ SELECT (
 )::bigint + (SELECT count(*) FROM global_credentials)::bigint
 `
 
-// CountTenantCredentialsParams contains the strongly typed arguments for the CountTenantCredentials query.
+// CountTenantCredentialsParams 包含 CountTenantCredentials 查询的强类型参数。
 type CountTenantCredentialsParams struct {
-	// TenantID is the tenant id value supplied to the CountTenantCredentials query.
+	// TenantID 是提供给 CountTenantCredentials 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// UserID is the user id value supplied to the CountTenantCredentials query.
+	// UserID 是提供给 CountTenantCredentials 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// CountTenantCredentials executes the generated CountTenantCredentials database query.
+// CountTenantCredentials 执行生成的 CountTenantCredentials 数据库查询。
 // 统计一个租户成员可见的租户凭据和平台凭据数量。
 func (q *Queries) CountTenantCredentials(ctx context.Context, arg CountTenantCredentialsParams) (int32, error) {
 	row := q.db.QueryRow(ctx, countTenantCredentials, arg.TenantID, arg.UserID)
@@ -155,31 +155,31 @@ INSERT INTO credentials (
 RETURNING tenant_id, id, name, kind, ciphertext, nonce, key_version, fingerprint, shared_scope, created_by, last_used_at, revision, created_at, updated_at
 `
 
-// CreateCredentialParams contains the strongly typed arguments for the CreateCredential query.
+// CreateCredentialParams 包含 CreateCredential 查询的强类型参数。
 type CreateCredentialParams struct {
-	// TenantID is the tenant id value supplied to the CreateCredential query.
+	// TenantID 是提供给 CreateCredential 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateCredential query.
+	// ID 是提供给 CreateCredential 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Name is the name value supplied to the CreateCredential query.
+	// Name 是提供给 CreateCredential 查询的 Name 值。
 	Name string `json:"name"`
-	// Kind is the kind value supplied to the CreateCredential query.
+	// Kind 是提供给 CreateCredential 查询的 Kind 值。
 	Kind string `json:"kind"`
-	// Ciphertext is the ciphertext value supplied to the CreateCredential query.
+	// Ciphertext 是提供给 CreateCredential 查询的 Ciphertext 值。
 	Ciphertext []byte `json:"ciphertext"`
-	// Nonce is the nonce value supplied to the CreateCredential query.
+	// Nonce 是提供给 CreateCredential 查询的 Nonce 值。
 	Nonce []byte `json:"nonce"`
-	// KeyVersion is the key version value supplied to the CreateCredential query.
+	// KeyVersion 是提供给 CreateCredential 查询的 KeyVersion 值。
 	KeyVersion int32 `json:"key_version"`
-	// Fingerprint is the fingerprint value supplied to the CreateCredential query.
+	// Fingerprint 是提供给 CreateCredential 查询的 Fingerprint 值。
 	Fingerprint string `json:"fingerprint"`
-	// SharedScope is the shared scope value supplied to the CreateCredential query.
+	// SharedScope 是提供给 CreateCredential 查询的 SharedScope 值。
 	SharedScope string `json:"shared_scope"`
-	// CreatedBy is the created by value supplied to the CreateCredential query.
+	// CreatedBy 是提供给 CreateCredential 查询的 CreatedBy 值。
 	CreatedBy uuid.UUID `json:"created_by"`
 }
 
-// CreateCredential executes the generated CreateCredential database query.
+// CreateCredential 执行生成的 CreateCredential 数据库查询。
 // 写入一条租户拥有的加密凭据，并返回元数据和密文。
 // 查询不会接收秘密明文，服务层只提供加密后的投影。
 func (q *Queries) CreateCredential(ctx context.Context, arg CreateCredentialParams) (Credential, error) {
@@ -225,23 +225,23 @@ INSERT INTO idempotency_records (
 )
 `
 
-// CreateCredentialRotationIdempotencyParams contains the strongly typed arguments for the CreateCredentialRotationIdempotency query.
+// CreateCredentialRotationIdempotencyParams 包含 CreateCredentialRotationIdempotency 查询的强类型参数。
 type CreateCredentialRotationIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the CreateCredentialRotationIdempotency query.
+	// TenantID 是提供给 CreateCredentialRotationIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the CreateCredentialRotationIdempotency query.
+	// PrincipalType 是提供给 CreateCredentialRotationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the CreateCredentialRotationIdempotency query.
+	// PrincipalID 是提供给 CreateCredentialRotationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the CreateCredentialRotationIdempotency query.
+	// IdempotencyKey 是提供给 CreateCredentialRotationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
-	// RequestHash is the request hash value supplied to the CreateCredentialRotationIdempotency query.
+	// RequestHash 是提供给 CreateCredentialRotationIdempotency 查询的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value supplied to the CreateCredentialRotationIdempotency query.
+	// ResponseBody 是提供给 CreateCredentialRotationIdempotency 查询的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
 }
 
-// CreateCredentialRotationIdempotency executes the generated CreateCredentialRotationIdempotency database query.
+// CreateCredentialRotationIdempotency 执行生成的 CreateCredentialRotationIdempotency 数据库查询。
 // 保存可安全精确重放 24 小时的租户凭据轮换响应。
 // 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 func (q *Queries) CreateCredentialRotationIdempotency(ctx context.Context, arg CreateCredentialRotationIdempotencyParams) error {
@@ -269,25 +269,25 @@ ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// CreateCredentialSyncJobParams contains the strongly typed arguments for the CreateCredentialSyncJob query.
+// CreateCredentialSyncJobParams 包含 CreateCredentialSyncJob 查询的强类型参数。
 type CreateCredentialSyncJobParams struct {
-	// TenantID is the tenant id value supplied to the CreateCredentialSyncJob query.
+	// TenantID 是提供给 CreateCredentialSyncJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateCredentialSyncJob query.
+	// ID 是提供给 CreateCredentialSyncJob 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RepositoryID is the repository id value supplied to the CreateCredentialSyncJob query.
+	// RepositoryID 是提供给 CreateCredentialSyncJob 查询的 RepositoryID 值。
 	RepositoryID *uuid.UUID `json:"repository_id"`
-	// RefName is the ref name value supplied to the CreateCredentialSyncJob query.
+	// RefName 是提供给 CreateCredentialSyncJob 查询的 RefName 值。
 	RefName *string `json:"ref_name"`
-	// JobInput is the job input value supplied to the CreateCredentialSyncJob query.
+	// JobInput 是提供给 CreateCredentialSyncJob 查询的 JobInput 值。
 	JobInput []byte `json:"job_input"`
-	// DedupeKey is the dedupe key value supplied to the CreateCredentialSyncJob query.
+	// DedupeKey 是提供给 CreateCredentialSyncJob 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
-	// ActiveGeneration is the active generation value supplied to the CreateCredentialSyncJob query.
+	// ActiveGeneration 是提供给 CreateCredentialSyncJob 查询的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// CreateCredentialSyncJob executes the generated CreateCredentialSyncJob database query.
+// CreateCredentialSyncJob 执行生成的 CreateCredentialSyncJob 数据库查询。
 // 记录一条持久化的默认分支仓库同步请求。
 // 输入只包含非敏感凭据标识和轮换原因。
 func (q *Queries) CreateCredentialSyncJob(ctx context.Context, arg CreateCredentialSyncJobParams) (Job, error) {
@@ -342,27 +342,27 @@ INSERT INTO global_credentials (
 RETURNING id, name, kind, ciphertext, nonce, key_version, fingerprint, created_by, last_used_at, revision, created_at, updated_at
 `
 
-// CreateGlobalCredentialParams contains the strongly typed arguments for the CreateGlobalCredential query.
+// CreateGlobalCredentialParams 包含 CreateGlobalCredential 查询的强类型参数。
 type CreateGlobalCredentialParams struct {
-	// ID is the id value supplied to the CreateGlobalCredential query.
+	// ID 是提供给 CreateGlobalCredential 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Name is the name value supplied to the CreateGlobalCredential query.
+	// Name 是提供给 CreateGlobalCredential 查询的 Name 值。
 	Name string `json:"name"`
-	// Kind is the kind value supplied to the CreateGlobalCredential query.
+	// Kind 是提供给 CreateGlobalCredential 查询的 Kind 值。
 	Kind string `json:"kind"`
-	// Ciphertext is the ciphertext value supplied to the CreateGlobalCredential query.
+	// Ciphertext 是提供给 CreateGlobalCredential 查询的 Ciphertext 值。
 	Ciphertext []byte `json:"ciphertext"`
-	// Nonce is the nonce value supplied to the CreateGlobalCredential query.
+	// Nonce 是提供给 CreateGlobalCredential 查询的 Nonce 值。
 	Nonce []byte `json:"nonce"`
-	// KeyVersion is the key version value supplied to the CreateGlobalCredential query.
+	// KeyVersion 是提供给 CreateGlobalCredential 查询的 KeyVersion 值。
 	KeyVersion int32 `json:"key_version"`
-	// Fingerprint is the fingerprint value supplied to the CreateGlobalCredential query.
+	// Fingerprint 是提供给 CreateGlobalCredential 查询的 Fingerprint 值。
 	Fingerprint string `json:"fingerprint"`
-	// CreatedBy is the created by value supplied to the CreateGlobalCredential query.
+	// CreatedBy 是提供给 CreateGlobalCredential 查询的 CreatedBy 值。
 	CreatedBy uuid.UUID `json:"created_by"`
 }
 
-// CreateGlobalCredential executes the generated CreateGlobalCredential database query.
+// CreateGlobalCredential 执行生成的 CreateGlobalCredential 数据库查询。
 // 写入一条平台拥有的加密凭据。
 func (q *Queries) CreateGlobalCredential(ctx context.Context, arg CreateGlobalCredentialParams) (GlobalCredential, error) {
 	row := q.db.QueryRow(ctx, createGlobalCredential,
@@ -403,21 +403,21 @@ INSERT INTO global_idempotency_records (
 )
 `
 
-// CreateGlobalCredentialRotationIdempotencyParams contains the strongly typed arguments for the CreateGlobalCredentialRotationIdempotency query.
+// CreateGlobalCredentialRotationIdempotencyParams 包含 CreateGlobalCredentialRotationIdempotency 查询的强类型参数。
 type CreateGlobalCredentialRotationIdempotencyParams struct {
-	// PrincipalType is the principal type value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	// PrincipalType 是提供给 CreateGlobalCredentialRotationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	// PrincipalID 是提供给 CreateGlobalCredentialRotationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	// IdempotencyKey 是提供给 CreateGlobalCredentialRotationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
-	// RequestHash is the request hash value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	// RequestHash 是提供给 CreateGlobalCredentialRotationIdempotency 查询的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value supplied to the CreateGlobalCredentialRotationIdempotency query.
+	// ResponseBody 是提供给 CreateGlobalCredentialRotationIdempotency 查询的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
 }
 
-// CreateGlobalCredentialRotationIdempotency executes the generated CreateGlobalCredentialRotationIdempotency database query.
+// CreateGlobalCredentialRotationIdempotency 执行生成的 CreateGlobalCredentialRotationIdempotency 数据库查询。
 // 保存可安全精确重放 24 小时的平台凭据轮换响应。
 // 适配器会从 response_body 排除密文、nonce 和其他所有敏感字段。
 func (q *Queries) CreateGlobalCredentialRotationIdempotency(ctx context.Context, arg CreateGlobalCredentialRotationIdempotencyParams) error {
@@ -441,29 +441,29 @@ INSERT INTO known_hosts (
 RETURNING tenant_id, id, host, port, key_type, public_key, fingerprint, source, created_by, created_at, updated_at
 `
 
-// CreateKnownHostParams contains the strongly typed arguments for the CreateKnownHost query.
+// CreateKnownHostParams 包含 CreateKnownHost 查询的强类型参数。
 type CreateKnownHostParams struct {
-	// TenantID is the tenant id value supplied to the CreateKnownHost query.
+	// TenantID 是提供给 CreateKnownHost 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateKnownHost query.
+	// ID 是提供给 CreateKnownHost 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Host is the host value supplied to the CreateKnownHost query.
+	// Host 是提供给 CreateKnownHost 查询的 Host 值。
 	Host string `json:"host"`
-	// Port is the port value supplied to the CreateKnownHost query.
+	// Port 是提供给 CreateKnownHost 查询的 Port 值。
 	Port int32 `json:"port"`
-	// KeyType is the key type value supplied to the CreateKnownHost query.
+	// KeyType 是提供给 CreateKnownHost 查询的 KeyType 值。
 	KeyType string `json:"key_type"`
-	// PublicKey is the public key value supplied to the CreateKnownHost query.
+	// PublicKey 是提供给 CreateKnownHost 查询的 PublicKey 值。
 	PublicKey []byte `json:"public_key"`
-	// Fingerprint is the fingerprint value supplied to the CreateKnownHost query.
+	// Fingerprint 是提供给 CreateKnownHost 查询的 Fingerprint 值。
 	Fingerprint string `json:"fingerprint"`
-	// Source is the source value supplied to the CreateKnownHost query.
+	// Source 是提供给 CreateKnownHost 查询的 Source 值。
 	Source string `json:"source"`
-	// CreatedBy is the created by value supplied to the CreateKnownHost query.
+	// CreatedBy 是提供给 CreateKnownHost 查询的 CreatedBy 值。
 	CreatedBy *uuid.UUID `json:"created_by"`
 }
 
-// CreateKnownHost executes the generated CreateKnownHost database query.
+// CreateKnownHost 执行生成的 CreateKnownHost 数据库查询。
 // 写入一条由服务端派生的已认可 SSH 主机身份。
 func (q *Queries) CreateKnownHost(ctx context.Context, arg CreateKnownHostParams) (KnownHost, error) {
 	row := q.db.QueryRow(ctx, createKnownHost,
@@ -501,17 +501,17 @@ WHERE tenant_id = $1
   AND revision = $3
 `
 
-// DeleteCredentialParams contains the strongly typed arguments for the DeleteCredential query.
+// DeleteCredentialParams 包含 DeleteCredential 查询的强类型参数。
 type DeleteCredentialParams struct {
-	// TenantID is the tenant id value supplied to the DeleteCredential query.
+	// TenantID 是提供给 DeleteCredential 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the DeleteCredential query.
+	// ID 是提供给 DeleteCredential 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the DeleteCredential query.
+	// ExpectedRevision 是提供给 DeleteCredential 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// DeleteCredential executes the generated DeleteCredential database query.
+// DeleteCredential 执行生成的 DeleteCredential 数据库查询。
 // 调用方完成引用和 ETag 检查后，删除一条租户凭据。
 func (q *Queries) DeleteCredential(ctx context.Context, arg DeleteCredentialParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteCredential, arg.TenantID, arg.ID, arg.ExpectedRevision)
@@ -530,19 +530,19 @@ WHERE tenant_id = $1
   AND idempotency_key = $4
 `
 
-// DeleteCredentialRotationIdempotencyParams contains the strongly typed arguments for the DeleteCredentialRotationIdempotency query.
+// DeleteCredentialRotationIdempotencyParams 包含 DeleteCredentialRotationIdempotency 查询的强类型参数。
 type DeleteCredentialRotationIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the DeleteCredentialRotationIdempotency query.
+	// TenantID 是提供给 DeleteCredentialRotationIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the DeleteCredentialRotationIdempotency query.
+	// PrincipalType 是提供给 DeleteCredentialRotationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the DeleteCredentialRotationIdempotency query.
+	// PrincipalID 是提供给 DeleteCredentialRotationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the DeleteCredentialRotationIdempotency query.
+	// IdempotencyKey 是提供给 DeleteCredentialRotationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// DeleteCredentialRotationIdempotency executes the generated DeleteCredentialRotationIdempotency database query.
+// DeleteCredentialRotationIdempotency 执行生成的 DeleteCredentialRotationIdempotency 数据库查询。
 // 在重新使用前删除已过期的租户凭据轮换重放记录。
 func (q *Queries) DeleteCredentialRotationIdempotency(ctx context.Context, arg DeleteCredentialRotationIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, deleteCredentialRotationIdempotency,
@@ -560,15 +560,15 @@ WHERE id = $1
   AND revision = $2
 `
 
-// DeleteGlobalCredentialParams contains the strongly typed arguments for the DeleteGlobalCredential query.
+// DeleteGlobalCredentialParams 包含 DeleteGlobalCredential 查询的强类型参数。
 type DeleteGlobalCredentialParams struct {
-	// ID is the id value supplied to the DeleteGlobalCredential query.
+	// ID 是提供给 DeleteGlobalCredential 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the DeleteGlobalCredential query.
+	// ExpectedRevision 是提供给 DeleteGlobalCredential 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// DeleteGlobalCredential executes the generated DeleteGlobalCredential database query.
+// DeleteGlobalCredential 执行生成的 DeleteGlobalCredential 数据库查询。
 // 完成引用和 ETag 检查后，删除一条平台凭据。
 func (q *Queries) DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCredentialParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteGlobalCredential, arg.ID, arg.ExpectedRevision)
@@ -587,17 +587,17 @@ WHERE context_type = 'platform'
   AND idempotency_key = $3
 `
 
-// DeleteGlobalCredentialRotationIdempotencyParams contains the strongly typed arguments for the DeleteGlobalCredentialRotationIdempotency query.
+// DeleteGlobalCredentialRotationIdempotencyParams 包含 DeleteGlobalCredentialRotationIdempotency 查询的强类型参数。
 type DeleteGlobalCredentialRotationIdempotencyParams struct {
-	// PrincipalType is the principal type value supplied to the DeleteGlobalCredentialRotationIdempotency query.
+	// PrincipalType 是提供给 DeleteGlobalCredentialRotationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the DeleteGlobalCredentialRotationIdempotency query.
+	// PrincipalID 是提供给 DeleteGlobalCredentialRotationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the DeleteGlobalCredentialRotationIdempotency query.
+	// IdempotencyKey 是提供给 DeleteGlobalCredentialRotationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// DeleteGlobalCredentialRotationIdempotency executes the generated DeleteGlobalCredentialRotationIdempotency database query.
+// DeleteGlobalCredentialRotationIdempotency 执行生成的 DeleteGlobalCredentialRotationIdempotency 数据库查询。
 // 在重新使用前删除已过期的平台凭据轮换重放记录。
 func (q *Queries) DeleteGlobalCredentialRotationIdempotency(ctx context.Context, arg DeleteGlobalCredentialRotationIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, deleteGlobalCredentialRotationIdempotency, arg.PrincipalType, arg.PrincipalID, arg.IdempotencyKey)
@@ -615,29 +615,29 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// GetCredentialRotationIdempotencyParams contains the strongly typed arguments for the GetCredentialRotationIdempotency query.
+// GetCredentialRotationIdempotencyParams 包含 GetCredentialRotationIdempotency 查询的强类型参数。
 type GetCredentialRotationIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the GetCredentialRotationIdempotency query.
+	// TenantID 是提供给 GetCredentialRotationIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the GetCredentialRotationIdempotency query.
+	// PrincipalType 是提供给 GetCredentialRotationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the GetCredentialRotationIdempotency query.
+	// PrincipalID 是提供给 GetCredentialRotationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the GetCredentialRotationIdempotency query.
+	// IdempotencyKey 是提供给 GetCredentialRotationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// GetCredentialRotationIdempotencyRow contains the columns returned by the GetCredentialRotationIdempotency query.
+// GetCredentialRotationIdempotencyRow 包含 GetCredentialRotationIdempotency 查询返回的列。
 type GetCredentialRotationIdempotencyRow struct {
-	// RequestHash is the request hash value returned by the GetCredentialRotationIdempotency query.
+	// RequestHash 是 GetCredentialRotationIdempotency 查询返回的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value returned by the GetCredentialRotationIdempotency query.
+	// ResponseBody 是 GetCredentialRotationIdempotency 查询返回的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
-	// ExpiresAt is the expires at value returned by the GetCredentialRotationIdempotency query.
+	// ExpiresAt 是 GetCredentialRotationIdempotency 查询返回的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// GetCredentialRotationIdempotency executes the generated GetCredentialRotationIdempotency database query.
+// GetCredentialRotationIdempotency 执行生成的 GetCredentialRotationIdempotency 数据库查询。
 // 返回保留的租户凭据轮换重放记录及其过期时间。
 func (q *Queries) GetCredentialRotationIdempotency(ctx context.Context, arg GetCredentialRotationIdempotencyParams) (GetCredentialRotationIdempotencyRow, error) {
 	row := q.db.QueryRow(ctx, getCredentialRotationIdempotency,
@@ -655,7 +655,7 @@ const getGlobalCredential = `-- name: GetGlobalCredential :one
 SELECT id, name, kind, ciphertext, nonce, key_version, fingerprint, created_by, last_used_at, revision, created_at, updated_at FROM global_credentials WHERE id = $1
 `
 
-// GetGlobalCredential executes the generated GetGlobalCredential database query.
+// GetGlobalCredential 执行生成的 GetGlobalCredential 数据库查询。
 // 返回一条平台凭据。
 func (q *Queries) GetGlobalCredential(ctx context.Context, id uuid.UUID) (GlobalCredential, error) {
 	row := q.db.QueryRow(ctx, getGlobalCredential, id)
@@ -688,27 +688,27 @@ WHERE context_type = 'platform'
 FOR UPDATE
 `
 
-// GetGlobalCredentialRotationIdempotencyParams contains the strongly typed arguments for the GetGlobalCredentialRotationIdempotency query.
+// GetGlobalCredentialRotationIdempotencyParams 包含 GetGlobalCredentialRotationIdempotency 查询的强类型参数。
 type GetGlobalCredentialRotationIdempotencyParams struct {
-	// PrincipalType is the principal type value supplied to the GetGlobalCredentialRotationIdempotency query.
+	// PrincipalType 是提供给 GetGlobalCredentialRotationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the GetGlobalCredentialRotationIdempotency query.
+	// PrincipalID 是提供给 GetGlobalCredentialRotationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the GetGlobalCredentialRotationIdempotency query.
+	// IdempotencyKey 是提供给 GetGlobalCredentialRotationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// GetGlobalCredentialRotationIdempotencyRow contains the columns returned by the GetGlobalCredentialRotationIdempotency query.
+// GetGlobalCredentialRotationIdempotencyRow 包含 GetGlobalCredentialRotationIdempotency 查询返回的列。
 type GetGlobalCredentialRotationIdempotencyRow struct {
-	// RequestHash is the request hash value returned by the GetGlobalCredentialRotationIdempotency query.
+	// RequestHash 是 GetGlobalCredentialRotationIdempotency 查询返回的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value returned by the GetGlobalCredentialRotationIdempotency query.
+	// ResponseBody 是 GetGlobalCredentialRotationIdempotency 查询返回的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
-	// ExpiresAt is the expires at value returned by the GetGlobalCredentialRotationIdempotency query.
+	// ExpiresAt 是 GetGlobalCredentialRotationIdempotency 查询返回的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// GetGlobalCredentialRotationIdempotency executes the generated GetGlobalCredentialRotationIdempotency database query.
+// GetGlobalCredentialRotationIdempotency 执行生成的 GetGlobalCredentialRotationIdempotency 数据库查询。
 // 返回保留的平台凭据轮换重放记录。
 func (q *Queries) GetGlobalCredentialRotationIdempotency(ctx context.Context, arg GetGlobalCredentialRotationIdempotencyParams) (GetGlobalCredentialRotationIdempotencyRow, error) {
 	row := q.db.QueryRow(ctx, getGlobalCredentialRotationIdempotency, arg.PrincipalType, arg.PrincipalID, arg.IdempotencyKey)
@@ -765,51 +765,51 @@ GROUP BY c.tenant_id, c.id, c.name, c.kind, c.ciphertext, c.nonce, c.key_version
   c.created_at, c.updated_at
 `
 
-// GetTenantCredentialParams contains the strongly typed arguments for the GetTenantCredential query.
+// GetTenantCredentialParams 包含 GetTenantCredential 查询的强类型参数。
 type GetTenantCredentialParams struct {
-	// TenantID is the tenant id value supplied to the GetTenantCredential query.
+	// TenantID 是提供给 GetTenantCredential 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetTenantCredential query.
+	// ID 是提供给 GetTenantCredential 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// UserID is the user id value supplied to the GetTenantCredential query.
+	// UserID 是提供给 GetTenantCredential 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// GetTenantCredentialRow contains the columns returned by the GetTenantCredential query.
+// GetTenantCredentialRow 包含 GetTenantCredential 查询返回的列。
 type GetTenantCredentialRow struct {
-	// TenantID is the tenant id value returned by the GetTenantCredential query.
+	// TenantID 是 GetTenantCredential 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value returned by the GetTenantCredential query.
+	// ID 是 GetTenantCredential 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Name is the name value returned by the GetTenantCredential query.
+	// Name 是 GetTenantCredential 查询返回的 Name 值。
 	Name string `json:"name"`
-	// Kind is the kind value returned by the GetTenantCredential query.
+	// Kind 是 GetTenantCredential 查询返回的 Kind 值。
 	Kind string `json:"kind"`
-	// Ciphertext is the ciphertext value returned by the GetTenantCredential query.
+	// Ciphertext 是 GetTenantCredential 查询返回的 Ciphertext 值。
 	Ciphertext []byte `json:"ciphertext"`
-	// Nonce is the nonce value returned by the GetTenantCredential query.
+	// Nonce 是 GetTenantCredential 查询返回的 Nonce 值。
 	Nonce []byte `json:"nonce"`
-	// KeyVersion is the key version value returned by the GetTenantCredential query.
+	// KeyVersion 是 GetTenantCredential 查询返回的 KeyVersion 值。
 	KeyVersion int32 `json:"key_version"`
-	// Fingerprint is the fingerprint value returned by the GetTenantCredential query.
+	// Fingerprint 是 GetTenantCredential 查询返回的 Fingerprint 值。
 	Fingerprint string `json:"fingerprint"`
-	// SharedScope is the shared scope value returned by the GetTenantCredential query.
+	// SharedScope 是 GetTenantCredential 查询返回的 SharedScope 值。
 	SharedScope string `json:"shared_scope"`
-	// CreatedBy is the created by value returned by the GetTenantCredential query.
+	// CreatedBy 是 GetTenantCredential 查询返回的 CreatedBy 值。
 	CreatedBy uuid.UUID `json:"created_by"`
-	// LastUsedAt is the last used at value returned by the GetTenantCredential query.
+	// LastUsedAt 是 GetTenantCredential 查询返回的 LastUsedAt 值。
 	LastUsedAt pgtype.Timestamptz `json:"last_used_at"`
-	// Revision is the revision value returned by the GetTenantCredential query.
+	// Revision 是 GetTenantCredential 查询返回的 Revision 值。
 	Revision int64 `json:"revision"`
-	// CreatedAt is the created at value returned by the GetTenantCredential query.
+	// CreatedAt 是 GetTenantCredential 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// UpdatedAt is the updated at value returned by the GetTenantCredential query.
+	// UpdatedAt 是 GetTenantCredential 查询返回的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TeamIds is the team ids value returned by the GetTenantCredential query.
+	// TeamIds 是 GetTenantCredential 查询返回的 TeamIds 值。
 	TeamIds string `json:"team_ids"`
 }
 
-// GetTenantCredential executes the generated GetTenantCredential database query.
+// GetTenantCredential 执行生成的 GetTenantCredential 数据库查询。
 // 返回一条可见的租户凭据及其团队共享标识。
 func (q *Queries) GetTenantCredential(ctx context.Context, arg GetTenantCredentialParams) (GetTenantCredentialRow, error) {
 	row := q.db.QueryRow(ctx, getTenantCredential, arg.TenantID, arg.ID, arg.UserID)
@@ -841,15 +841,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetTenantCredentialForMutationParams contains the strongly typed arguments for the GetTenantCredentialForMutation query.
+// GetTenantCredentialForMutationParams 包含 GetTenantCredentialForMutation 查询的强类型参数。
 type GetTenantCredentialForMutationParams struct {
-	// TenantID is the tenant id value supplied to the GetTenantCredentialForMutation query.
+	// TenantID 是提供给 GetTenantCredentialForMutation 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetTenantCredentialForMutation query.
+	// ID 是提供给 GetTenantCredentialForMutation 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetTenantCredentialForMutation executes the generated GetTenantCredentialForMutation database query.
+// GetTenantCredentialForMutation 执行生成的 GetTenantCredentialForMutation 数据库查询。
 // 返回一条不经过可见性过滤的租户凭据。
 // 服务层已完成租户操作授权，本查询保留 404 与 412 的区别。
 func (q *Queries) GetTenantCredentialForMutation(ctx context.Context, arg GetTenantCredentialForMutationParams) (Credential, error) {
@@ -882,15 +882,15 @@ WHERE tenant_id = $1
 ORDER BY team_id
 `
 
-// ListCredentialTeamSharesParams contains the strongly typed arguments for the ListCredentialTeamShares query.
+// ListCredentialTeamSharesParams 包含 ListCredentialTeamShares 查询的强类型参数。
 type ListCredentialTeamSharesParams struct {
-	// TenantID is the tenant id value supplied to the ListCredentialTeamShares query.
+	// TenantID 是提供给 ListCredentialTeamShares 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// CredentialID is the credential id value supplied to the ListCredentialTeamShares query.
+	// CredentialID 是提供给 ListCredentialTeamShares 查询的 CredentialID 值。
 	CredentialID uuid.UUID `json:"credential_id"`
 }
 
-// ListCredentialTeamShares executes the generated ListCredentialTeamShares database query.
+// ListCredentialTeamShares 执行生成的 ListCredentialTeamShares 数据库查询。
 // 返回一条租户凭据完整且有序的团队共享集合。
 func (q *Queries) ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error) {
 	rows, err := q.db.Query(ctx, listCredentialTeamShares, arg.TenantID, arg.CredentialID)
@@ -920,15 +920,15 @@ LIMIT $2
 OFFSET $1
 `
 
-// ListGlobalCredentialsParams contains the strongly typed arguments for the ListGlobalCredentials query.
+// ListGlobalCredentialsParams 包含 ListGlobalCredentials 查询的强类型参数。
 type ListGlobalCredentialsParams struct {
-	// PageOffset is the page offset value supplied to the ListGlobalCredentials query.
+	// PageOffset 是提供给 ListGlobalCredentials 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListGlobalCredentials query.
+	// PageLimit 是提供给 ListGlobalCredentials 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListGlobalCredentials executes the generated ListGlobalCredentials database query.
+// ListGlobalCredentials 执行生成的 ListGlobalCredentials 数据库查询。
 // 返回平台凭据的稳定分页结果。
 func (q *Queries) ListGlobalCredentials(ctx context.Context, arg ListGlobalCredentialsParams) ([]GlobalCredential, error) {
 	rows, err := q.db.Query(ctx, listGlobalCredentials, arg.PageOffset, arg.PageLimit)
@@ -972,17 +972,17 @@ LIMIT $3
 OFFSET $2
 `
 
-// ListKnownHostsParams contains the strongly typed arguments for the ListKnownHosts query.
+// ListKnownHostsParams 包含 ListKnownHosts 查询的强类型参数。
 type ListKnownHostsParams struct {
-	// TenantID is the tenant id value supplied to the ListKnownHosts query.
+	// TenantID 是提供给 ListKnownHosts 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PageOffset is the page offset value supplied to the ListKnownHosts query.
+	// PageOffset 是提供给 ListKnownHosts 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListKnownHosts query.
+	// PageLimit 是提供给 ListKnownHosts 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListKnownHosts executes the generated ListKnownHosts database query.
+// ListKnownHosts 执行生成的 ListKnownHosts 数据库查询。
 // 返回租户认可的 SSH 主机身份稳定分页结果。
 func (q *Queries) ListKnownHosts(ctx context.Context, arg ListKnownHostsParams) ([]KnownHost, error) {
 	rows, err := q.db.Query(ctx, listKnownHosts, arg.TenantID, arg.PageOffset, arg.PageLimit)
@@ -1030,27 +1030,27 @@ WHERE repositories.tenant_id = $1
 ORDER BY tenants.slug, repositories.id
 `
 
-// ListRepositoriesForCredentialParams contains the strongly typed arguments for the ListRepositoriesForCredential query.
+// ListRepositoriesForCredentialParams 包含 ListRepositoriesForCredential 查询的强类型参数。
 type ListRepositoriesForCredentialParams struct {
-	// TenantID is the tenant id value supplied to the ListRepositoriesForCredential query.
+	// TenantID 是提供给 ListRepositoriesForCredential 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// CredentialID is the credential id value supplied to the ListRepositoriesForCredential query.
+	// CredentialID 是提供给 ListRepositoriesForCredential 查询的 CredentialID 值。
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// ListRepositoriesForCredentialRow contains the columns returned by the ListRepositoriesForCredential query.
+// ListRepositoriesForCredentialRow 包含 ListRepositoriesForCredential 查询返回的列。
 type ListRepositoriesForCredentialRow struct {
-	// TenantID is the tenant id value returned by the ListRepositoriesForCredential query.
+	// TenantID 是 ListRepositoriesForCredential 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TenantSlug is the tenant slug value returned by the ListRepositoriesForCredential query.
+	// TenantSlug 是 ListRepositoriesForCredential 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// RepositoryID is the repository id value returned by the ListRepositoriesForCredential query.
+	// RepositoryID 是 ListRepositoriesForCredential 查询返回的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
-	// DefaultBranch is the default branch value returned by the ListRepositoriesForCredential query.
+	// DefaultBranch 是 ListRepositoriesForCredential 查询返回的 DefaultBranch 值。
 	DefaultBranch string `json:"default_branch"`
 }
 
-// ListRepositoriesForCredential executes the generated ListRepositoriesForCredential database query.
+// ListRepositoriesForCredential 执行生成的 ListRepositoriesForCredential 数据库查询。
 // 按契约响应顺序返回未删除仓库对该凭据的引用。
 func (q *Queries) ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error) {
 	rows, err := q.db.Query(ctx, listRepositoriesForCredential, arg.TenantID, arg.CredentialID)
@@ -1090,19 +1090,19 @@ WHERE repositories.global_credential_id = $1
 ORDER BY tenants.slug, repositories.id
 `
 
-// ListRepositoriesForGlobalCredentialRow contains the columns returned by the ListRepositoriesForGlobalCredential query.
+// ListRepositoriesForGlobalCredentialRow 包含 ListRepositoriesForGlobalCredential 查询返回的列。
 type ListRepositoriesForGlobalCredentialRow struct {
-	// TenantID is the tenant id value returned by the ListRepositoriesForGlobalCredential query.
+	// TenantID 是 ListRepositoriesForGlobalCredential 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TenantSlug is the tenant slug value returned by the ListRepositoriesForGlobalCredential query.
+	// TenantSlug 是 ListRepositoriesForGlobalCredential 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// RepositoryID is the repository id value returned by the ListRepositoriesForGlobalCredential query.
+	// RepositoryID 是 ListRepositoriesForGlobalCredential 查询返回的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
-	// DefaultBranch is the default branch value returned by the ListRepositoriesForGlobalCredential query.
+	// DefaultBranch 是 ListRepositoriesForGlobalCredential 查询返回的 DefaultBranch 值。
 	DefaultBranch string `json:"default_branch"`
 }
 
-// ListRepositoriesForGlobalCredential executes the generated ListRepositoriesForGlobalCredential database query.
+// ListRepositoriesForGlobalCredential 执行生成的 ListRepositoriesForGlobalCredential 数据库查询。
 // 返回引用某条平台凭据的未删除仓库。
 func (q *Queries) ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error) {
 	rows, err := q.db.Query(ctx, listRepositoriesForGlobalCredential, credentialID)
@@ -1202,55 +1202,55 @@ LIMIT $4
 OFFSET $3
 `
 
-// ListTenantCredentialsParams contains the strongly typed arguments for the ListTenantCredentials query.
+// ListTenantCredentialsParams 包含 ListTenantCredentials 查询的强类型参数。
 type ListTenantCredentialsParams struct {
-	// TenantID is the tenant id value supplied to the ListTenantCredentials query.
+	// TenantID 是提供给 ListTenantCredentials 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// UserID is the user id value supplied to the ListTenantCredentials query.
+	// UserID 是提供给 ListTenantCredentials 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// PageOffset is the page offset value supplied to the ListTenantCredentials query.
+	// PageOffset 是提供给 ListTenantCredentials 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListTenantCredentials query.
+	// PageLimit 是提供给 ListTenantCredentials 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListTenantCredentialsRow contains the columns returned by the ListTenantCredentials query.
+// ListTenantCredentialsRow 包含 ListTenantCredentials 查询返回的列。
 type ListTenantCredentialsRow struct {
-	// TenantID is the tenant id value returned by the ListTenantCredentials query.
+	// TenantID 是 ListTenantCredentials 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value returned by the ListTenantCredentials query.
+	// ID 是 ListTenantCredentials 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// IsGlobal is the is global value returned by the ListTenantCredentials query.
+	// IsGlobal 是 ListTenantCredentials 查询返回的 IsGlobal 值。
 	IsGlobal bool `json:"is_global"`
-	// Name is the name value returned by the ListTenantCredentials query.
+	// Name 是 ListTenantCredentials 查询返回的 Name 值。
 	Name string `json:"name"`
-	// Kind is the kind value returned by the ListTenantCredentials query.
+	// Kind 是 ListTenantCredentials 查询返回的 Kind 值。
 	Kind string `json:"kind"`
-	// Ciphertext is the ciphertext value returned by the ListTenantCredentials query.
+	// Ciphertext 是 ListTenantCredentials 查询返回的 Ciphertext 值。
 	Ciphertext []byte `json:"ciphertext"`
-	// Nonce is the nonce value returned by the ListTenantCredentials query.
+	// Nonce 是 ListTenantCredentials 查询返回的 Nonce 值。
 	Nonce []byte `json:"nonce"`
-	// KeyVersion is the key version value returned by the ListTenantCredentials query.
+	// KeyVersion 是 ListTenantCredentials 查询返回的 KeyVersion 值。
 	KeyVersion int32 `json:"key_version"`
-	// Fingerprint is the fingerprint value returned by the ListTenantCredentials query.
+	// Fingerprint 是 ListTenantCredentials 查询返回的 Fingerprint 值。
 	Fingerprint string `json:"fingerprint"`
-	// SharedScope is the shared scope value returned by the ListTenantCredentials query.
+	// SharedScope 是 ListTenantCredentials 查询返回的 SharedScope 值。
 	SharedScope string `json:"shared_scope"`
-	// CreatedBy is the created by value returned by the ListTenantCredentials query.
+	// CreatedBy 是 ListTenantCredentials 查询返回的 CreatedBy 值。
 	CreatedBy uuid.UUID `json:"created_by"`
-	// LastUsedAt is the last used at value returned by the ListTenantCredentials query.
+	// LastUsedAt 是 ListTenantCredentials 查询返回的 LastUsedAt 值。
 	LastUsedAt pgtype.Timestamptz `json:"last_used_at"`
-	// Revision is the revision value returned by the ListTenantCredentials query.
+	// Revision 是 ListTenantCredentials 查询返回的 Revision 值。
 	Revision int64 `json:"revision"`
-	// CreatedAt is the created at value returned by the ListTenantCredentials query.
+	// CreatedAt 是 ListTenantCredentials 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// UpdatedAt is the updated at value returned by the ListTenantCredentials query.
+	// UpdatedAt 是 ListTenantCredentials 查询返回的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TeamIds is the team ids value returned by the ListTenantCredentials query.
+	// TeamIds 是 ListTenantCredentials 查询返回的 TeamIds 值。
 	TeamIds string `json:"team_ids"`
 }
 
-// ListTenantCredentials executes the generated ListTenantCredentials database query.
+// ListTenantCredentials 执行生成的 ListTenantCredentials 数据库查询。
 // 返回一个用户在一个有效租户内可见的凭据。
 // 团队可见性通过同租户团队成员条件判断；平台凭据以 is_global=true 和租户共享投影追加返回。
 func (q *Queries) ListTenantCredentials(ctx context.Context, arg ListTenantCredentialsParams) ([]ListTenantCredentialsRow, error) {
@@ -1299,7 +1299,7 @@ const lockCredentialRotationIdempotency = `-- name: LockCredentialRotationIdempo
 SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
 `
 
-// LockCredentialRotationIdempotency executes the generated LockCredentialRotationIdempotency database query.
+// LockCredentialRotationIdempotency 执行生成的 LockCredentialRotationIdempotency 数据库查询。
 // 在并发 HTTP 请求之间串行化一个轮换幂等键。
 // 锁键由认证主体和操作派生，绝不来自秘密明文。
 func (q *Queries) LockCredentialRotationIdempotency(ctx context.Context, lockKey string) error {
@@ -1317,27 +1317,27 @@ LIMIT 1
 FOR UPDATE
 `
 
-// LockLatestCredentialSyncJobParams contains the strongly typed arguments for the LockLatestCredentialSyncJob query.
+// LockLatestCredentialSyncJobParams 包含 LockLatestCredentialSyncJob 查询的强类型参数。
 type LockLatestCredentialSyncJobParams struct {
-	// TenantID is the tenant id value supplied to the LockLatestCredentialSyncJob query.
+	// TenantID 是提供给 LockLatestCredentialSyncJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// DedupeKey is the dedupe key value supplied to the LockLatestCredentialSyncJob query.
+	// DedupeKey 是提供给 LockLatestCredentialSyncJob 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
 }
 
-// LockLatestCredentialSyncJobRow contains the columns returned by the LockLatestCredentialSyncJob query.
+// LockLatestCredentialSyncJobRow 包含 LockLatestCredentialSyncJob 查询返回的列。
 type LockLatestCredentialSyncJobRow struct {
-	// ID is the id value returned by the LockLatestCredentialSyncJob query.
+	// ID 是 LockLatestCredentialSyncJob 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TenantID is the tenant id value returned by the LockLatestCredentialSyncJob query.
+	// TenantID 是 LockLatestCredentialSyncJob 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// Status is the status value returned by the LockLatestCredentialSyncJob query.
+	// Status 是 LockLatestCredentialSyncJob 查询返回的 Status 值。
 	Status string `json:"status"`
-	// ActiveGeneration is the active generation value returned by the LockLatestCredentialSyncJob query.
+	// ActiveGeneration 是 LockLatestCredentialSyncJob 查询返回的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// LockLatestCredentialSyncJob executes the generated LockLatestCredentialSyncJob database query.
+// LockLatestCredentialSyncJob 执行生成的 LockLatestCredentialSyncJob 数据库查询。
 // 串行化一个仓库分支的凭据轮换去重。
 // 状态为 pending 或 running 的记录会复用；终态记录会递增 active_generation 以接受新工作。
 func (q *Queries) LockLatestCredentialSyncJob(ctx context.Context, arg LockLatestCredentialSyncJobParams) (LockLatestCredentialSyncJobRow, error) {
@@ -1358,15 +1358,15 @@ WHERE tenant_id = $1
   AND credential_id = $2
 `
 
-// ReplaceCredentialTeamSharesParams contains the strongly typed arguments for the ReplaceCredentialTeamShares query.
+// ReplaceCredentialTeamSharesParams 包含 ReplaceCredentialTeamShares 查询的强类型参数。
 type ReplaceCredentialTeamSharesParams struct {
-	// TenantID is the tenant id value supplied to the ReplaceCredentialTeamShares query.
+	// TenantID 是提供给 ReplaceCredentialTeamShares 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// CredentialID is the credential id value supplied to the ReplaceCredentialTeamShares query.
+	// CredentialID 是提供给 ReplaceCredentialTeamShares 查询的 CredentialID 值。
 	CredentialID uuid.UUID `json:"credential_id"`
 }
 
-// ReplaceCredentialTeamShares executes the generated ReplaceCredentialTeamShares database query.
+// ReplaceCredentialTeamShares 执行生成的 ReplaceCredentialTeamShares 数据库查询。
 // 在一个事务内删除并重建完整的凭据团队共享投影。
 func (q *Queries) ReplaceCredentialTeamShares(ctx context.Context, arg ReplaceCredentialTeamSharesParams) error {
 	_, err := q.db.Exec(ctx, replaceCredentialTeamShares, arg.TenantID, arg.CredentialID)
@@ -1388,27 +1388,27 @@ WHERE tenant_id = $6
 RETURNING tenant_id, id, name, kind, ciphertext, nonce, key_version, fingerprint, shared_scope, created_by, last_used_at, revision, created_at, updated_at
 `
 
-// RotateCredentialSecretParams contains the strongly typed arguments for the RotateCredentialSecret query.
+// RotateCredentialSecretParams 包含 RotateCredentialSecret 查询的强类型参数。
 type RotateCredentialSecretParams struct {
-	// Ciphertext is the ciphertext value supplied to the RotateCredentialSecret query.
+	// Ciphertext 是提供给 RotateCredentialSecret 查询的 Ciphertext 值。
 	Ciphertext []byte `json:"ciphertext"`
-	// Nonce is the nonce value supplied to the RotateCredentialSecret query.
+	// Nonce 是提供给 RotateCredentialSecret 查询的 Nonce 值。
 	Nonce []byte `json:"nonce"`
-	// KeyVersion is the key version value supplied to the RotateCredentialSecret query.
+	// KeyVersion 是提供给 RotateCredentialSecret 查询的 KeyVersion 值。
 	KeyVersion int32 `json:"key_version"`
-	// Fingerprint is the fingerprint value supplied to the RotateCredentialSecret query.
+	// Fingerprint 是提供给 RotateCredentialSecret 查询的 Fingerprint 值。
 	Fingerprint string `json:"fingerprint"`
-	// UpdatedAt is the updated at value supplied to the RotateCredentialSecret query.
+	// UpdatedAt 是提供给 RotateCredentialSecret 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the RotateCredentialSecret query.
+	// TenantID 是提供给 RotateCredentialSecret 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the RotateCredentialSecret query.
+	// ID 是提供给 RotateCredentialSecret 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the RotateCredentialSecret query.
+	// ExpectedRevision 是提供给 RotateCredentialSecret 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// RotateCredentialSecret executes the generated RotateCredentialSecret database query.
+// RotateCredentialSecret 执行生成的 RotateCredentialSecret 数据库查询。
 // 有条件地替换加密秘密材料并递增凭据版本号。
 func (q *Queries) RotateCredentialSecret(ctx context.Context, arg RotateCredentialSecretParams) (Credential, error) {
 	row := q.db.QueryRow(ctx, rotateCredentialSecret,
@@ -1455,25 +1455,25 @@ WHERE id = $6
 RETURNING id, name, kind, ciphertext, nonce, key_version, fingerprint, created_by, last_used_at, revision, created_at, updated_at
 `
 
-// RotateGlobalCredentialSecretParams contains the strongly typed arguments for the RotateGlobalCredentialSecret query.
+// RotateGlobalCredentialSecretParams 包含 RotateGlobalCredentialSecret 查询的强类型参数。
 type RotateGlobalCredentialSecretParams struct {
-	// Ciphertext is the ciphertext value supplied to the RotateGlobalCredentialSecret query.
+	// Ciphertext 是提供给 RotateGlobalCredentialSecret 查询的 Ciphertext 值。
 	Ciphertext []byte `json:"ciphertext"`
-	// Nonce is the nonce value supplied to the RotateGlobalCredentialSecret query.
+	// Nonce 是提供给 RotateGlobalCredentialSecret 查询的 Nonce 值。
 	Nonce []byte `json:"nonce"`
-	// KeyVersion is the key version value supplied to the RotateGlobalCredentialSecret query.
+	// KeyVersion 是提供给 RotateGlobalCredentialSecret 查询的 KeyVersion 值。
 	KeyVersion int32 `json:"key_version"`
-	// Fingerprint is the fingerprint value supplied to the RotateGlobalCredentialSecret query.
+	// Fingerprint 是提供给 RotateGlobalCredentialSecret 查询的 Fingerprint 值。
 	Fingerprint string `json:"fingerprint"`
-	// UpdatedAt is the updated at value supplied to the RotateGlobalCredentialSecret query.
+	// UpdatedAt 是提供给 RotateGlobalCredentialSecret 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// ID is the id value supplied to the RotateGlobalCredentialSecret query.
+	// ID 是提供给 RotateGlobalCredentialSecret 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the RotateGlobalCredentialSecret query.
+	// ExpectedRevision 是提供给 RotateGlobalCredentialSecret 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// RotateGlobalCredentialSecret executes the generated RotateGlobalCredentialSecret database query.
+// RotateGlobalCredentialSecret 执行生成的 RotateGlobalCredentialSecret 数据库查询。
 // 有条件地替换平台加密秘密材料并递增版本号。
 func (q *Queries) RotateGlobalCredentialSecret(ctx context.Context, arg RotateGlobalCredentialSecretParams) (GlobalCredential, error) {
 	row := q.db.QueryRow(ctx, rotateGlobalCredentialSecret,
@@ -1522,17 +1522,17 @@ WHERE tenant_id = $2
   AND credential_id = $3
 `
 
-// UnbindCredentialRepositoriesParams contains the strongly typed arguments for the UnbindCredentialRepositories query.
+// UnbindCredentialRepositoriesParams 包含 UnbindCredentialRepositories 查询的强类型参数。
 type UnbindCredentialRepositoriesParams struct {
-	// UpdatedAt is the updated at value supplied to the UnbindCredentialRepositories query.
+	// UpdatedAt 是提供给 UnbindCredentialRepositories 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the UnbindCredentialRepositories query.
+	// TenantID 是提供给 UnbindCredentialRepositories 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// CredentialID is the credential id value supplied to the UnbindCredentialRepositories query.
+	// CredentialID 是提供给 UnbindCredentialRepositories 查询的 CredentialID 值。
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// UnbindCredentialRepositories executes the generated UnbindCredentialRepositories database query.
+// UnbindCredentialRepositories 执行生成的 UnbindCredentialRepositories 数据库查询。
 // 通过有效引用策略检查后，清除所有仓库引用。
 // 归档仓库保留健康状态和历史，但不能继续持有已删除凭据的外键。
 func (q *Queries) UnbindCredentialRepositories(ctx context.Context, arg UnbindCredentialRepositoriesParams) error {
@@ -1558,15 +1558,15 @@ SET
 WHERE global_credential_id = $2
 `
 
-// UnbindGlobalCredentialRepositoriesParams contains the strongly typed arguments for the UnbindGlobalCredentialRepositories query.
+// UnbindGlobalCredentialRepositoriesParams 包含 UnbindGlobalCredentialRepositories 查询的强类型参数。
 type UnbindGlobalCredentialRepositoriesParams struct {
-	// UpdatedAt is the updated at value supplied to the UnbindGlobalCredentialRepositories query.
+	// UpdatedAt 是提供给 UnbindGlobalCredentialRepositories 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// CredentialID is the credential id value supplied to the UnbindGlobalCredentialRepositories query.
+	// CredentialID 是提供给 UnbindGlobalCredentialRepositories 查询的 CredentialID 值。
 	CredentialID *uuid.UUID `json:"credential_id"`
 }
 
-// UnbindGlobalCredentialRepositories executes the generated UnbindGlobalCredentialRepositories database query.
+// UnbindGlobalCredentialRepositories 执行生成的 UnbindGlobalCredentialRepositories 数据库查询。
 // 在删除平台凭据前清除有效和归档仓库的引用。
 // 只有有效仓库会记录需要重新认证的健康错误。
 func (q *Queries) UnbindGlobalCredentialRepositories(ctx context.Context, arg UnbindGlobalCredentialRepositoriesParams) error {
@@ -1587,23 +1587,23 @@ WHERE tenant_id = $4
 RETURNING tenant_id, id, name, kind, ciphertext, nonce, key_version, fingerprint, shared_scope, created_by, last_used_at, revision, created_at, updated_at
 `
 
-// UpdateCredentialMetadataParams contains the strongly typed arguments for the UpdateCredentialMetadata query.
+// UpdateCredentialMetadataParams 包含 UpdateCredentialMetadata 查询的强类型参数。
 type UpdateCredentialMetadataParams struct {
-	// Name is the name value supplied to the UpdateCredentialMetadata query.
+	// Name 是提供给 UpdateCredentialMetadata 查询的 Name 值。
 	Name *string `json:"name"`
-	// SharedScope is the shared scope value supplied to the UpdateCredentialMetadata query.
+	// SharedScope 是提供给 UpdateCredentialMetadata 查询的 SharedScope 值。
 	SharedScope *string `json:"shared_scope"`
-	// UpdatedAt is the updated at value supplied to the UpdateCredentialMetadata query.
+	// UpdatedAt 是提供给 UpdateCredentialMetadata 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the UpdateCredentialMetadata query.
+	// TenantID 是提供给 UpdateCredentialMetadata 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateCredentialMetadata query.
+	// ID 是提供给 UpdateCredentialMetadata 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the UpdateCredentialMetadata query.
+	// ExpectedRevision 是提供给 UpdateCredentialMetadata 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateCredentialMetadata executes the generated UpdateCredentialMetadata database query.
+// UpdateCredentialMetadata 执行生成的 UpdateCredentialMetadata 数据库查询。
 // 有条件地更新租户凭据元数据并递增版本号。
 func (q *Queries) UpdateCredentialMetadata(ctx context.Context, arg UpdateCredentialMetadataParams) (Credential, error) {
 	row := q.db.QueryRow(ctx, updateCredentialMetadata,
@@ -1642,19 +1642,19 @@ WHERE id = $3
 RETURNING id, name, kind, ciphertext, nonce, key_version, fingerprint, created_by, last_used_at, revision, created_at, updated_at
 `
 
-// UpdateGlobalCredentialMetadataParams contains the strongly typed arguments for the UpdateGlobalCredentialMetadata query.
+// UpdateGlobalCredentialMetadataParams 包含 UpdateGlobalCredentialMetadata 查询的强类型参数。
 type UpdateGlobalCredentialMetadataParams struct {
-	// Name is the name value supplied to the UpdateGlobalCredentialMetadata query.
+	// Name 是提供给 UpdateGlobalCredentialMetadata 查询的 Name 值。
 	Name string `json:"name"`
-	// UpdatedAt is the updated at value supplied to the UpdateGlobalCredentialMetadata query.
+	// UpdatedAt 是提供给 UpdateGlobalCredentialMetadata 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// ID is the id value supplied to the UpdateGlobalCredentialMetadata query.
+	// ID 是提供给 UpdateGlobalCredentialMetadata 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the UpdateGlobalCredentialMetadata query.
+	// ExpectedRevision 是提供给 UpdateGlobalCredentialMetadata 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateGlobalCredentialMetadata executes the generated UpdateGlobalCredentialMetadata database query.
+// UpdateGlobalCredentialMetadata 执行生成的 UpdateGlobalCredentialMetadata 数据库查询。
 // 有条件地更新平台凭据名称并递增版本号。
 func (q *Queries) UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error) {
 	row := q.db.QueryRow(ctx, updateGlobalCredentialMetadata,

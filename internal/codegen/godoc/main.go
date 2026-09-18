@@ -1,4 +1,4 @@
-// Command godoc completes documentation on generated API and repository code.
+// Command godoc 为生成的 API 与仓储代码补齐文档注释。
 package main
 
 import (
@@ -65,8 +65,8 @@ func documentFile(filename string, kind generatedKind) error {
 	if err != nil {
 		return fmt.Errorf("read %s: %w", filename, err)
 	}
-	// Upstream generators still emit the pre-Go 1.18 spelling in a few stable
-	// interfaces. The generated surface targets Go 1.27 exclusively.
+	// 上游生成器在若干稳定接口中仍输出 Go 1.18 之前的拼写。
+	// 生成的表面代码仅面向 Go 1.27。
 	source = bytes.ReplaceAll(source, []byte("interface{}"), []byte("any"))
 	files := token.NewFileSet()
 	parsed, err := parser.ParseFile(files, filename, source, parser.ParseComments)
@@ -182,36 +182,36 @@ func typeComment(name string, kind generatedKind) string {
 	if kind == repositoryKind {
 		switch {
 		case name == "DBTX":
-			return "DBTX is the pgx query and transaction surface required by generated repository methods."
+			return "DBTX 是生成仓储方法所需的 pgx 查询与事务接口。"
 		case name == "Queries":
-			return "Queries executes the strongly typed SQL statements generated from migrations/queries."
+			return "Queries 执行从 migrations/queries 生成的强类型 SQL 语句。"
 		case name == "Querier":
-			return "Querier exposes every generated Meridian database query for dependency injection and tests."
+			return "Querier 暴露每一个生成的 Meridian 数据库查询，供依赖注入与测试使用。"
 		case strings.HasSuffix(name, "Params"):
-			return name + " contains the strongly typed arguments for the " + strings.TrimSuffix(name, "Params") + " query."
+			return name + " 包含 " + strings.TrimSuffix(name, "Params") + " 查询的强类型参数。"
 		case strings.HasSuffix(name, "Row"):
-			return name + " contains the columns returned by the " + strings.TrimSuffix(name, "Row") + " query."
+			return name + " 包含 " + strings.TrimSuffix(name, "Row") + " 查询返回的列。"
 		default:
-			return name + " is the generated PostgreSQL representation of the corresponding Meridian table row."
+			return name + " 是相应 Meridian 表行的生成 PostgreSQL 表示。"
 		}
 	}
 	switch {
 	case name == "HttpRequestDoer":
-		return "HttpRequestDoer sends generated client requests and returns HTTP responses."
+		return "HttpRequestDoer 发送生成的客户端请求并返回 HTTP 响应。"
 	case name == "ClientInterface" || name == "ClientWithResponsesInterface":
-		return name + " exposes every client operation generated from the OpenAPI contract."
+		return name + " 暴露从 OpenAPI 契约生成的每一个客户端操作。"
 	case strings.HasSuffix(name, "RequestObject"):
-		return name + " contains validated inputs for its OpenAPI operation."
+		return name + " 包含其 OpenAPI 操作的已校验输入。"
 	case strings.HasSuffix(name, "ResponseObject"):
-		return name + " is implemented by every declared response for its OpenAPI operation."
+		return name + " 由其 OpenAPI 操作声明的每一个响应实现。"
 	case strings.HasSuffix(name, "ResponseHeaders") || strings.HasSuffix(name, "Headers"):
-		return name + " contains headers declared by the corresponding OpenAPI response."
+		return name + " 包含对应 OpenAPI 响应声明的头部。"
 	case strings.HasSuffix(name, "Response"):
-		return name + " contains the raw HTTP response and any decoded response body."
+		return name + " 包含原始 HTTP 响应与解码后的响应体。"
 	case strings.HasSuffix(name, "Params"):
-		return name + " contains validated path, query, header, or cookie parameters."
+		return name + " 包含已校验的路径、查询、头部或 Cookie 参数。"
 	default:
-		return name + " is generated transport code derived from the Meridian OpenAPI contract."
+		return name + " 是从 Meridian OpenAPI 契约派生的生成传输代码。"
 	}
 }
 
@@ -219,66 +219,66 @@ func functionComment(name string, kind generatedKind) string {
 	if kind == repositoryKind {
 		switch name {
 		case "New":
-			return "New binds generated repository queries to a pgx pool or transaction."
+			return "New 将生成的仓储查询绑定到 pgx 连接池或事务。"
 		case "WithTx":
-			return "WithTx returns generated repository queries bound to the supplied pgx transaction."
+			return "WithTx 返回绑定到所提供 pgx 事务的生成仓储查询。"
 		default:
-			return name + " executes the generated " + name + " database query."
+			return name + " 执行生成的 " + name + " 数据库查询。"
 		}
 	}
-	return name + " implements generated transport behavior for the Meridian OpenAPI contract."
+	return name + " 实现 Meridian OpenAPI 契约的生成传输行为。"
 }
 
 func valueComment(name string) string {
-	return name + " is generated from the Meridian OpenAPI contract."
+	return name + " 从 Meridian OpenAPI 契约生成。"
 }
 
 func fieldComment(owner, name string, kind generatedKind) string {
 	if kind == repositoryKind {
 		if owner == "Querier" || owner == "DBTX" {
-			return name + " exposes the corresponding strongly typed database operation."
+			return name + " 暴露相应的强类型数据库操作。"
 		}
 		query := strings.TrimSuffix(strings.TrimSuffix(owner, "Params"), "Row")
 		if strings.HasSuffix(owner, "Row") {
-			return name + " is the " + splitIdentifier(name) + " value returned by the " + query + " query."
+			return name + " 是 " + query + " 查询返回的 " + name + " 值。"
 		}
 		if strings.HasSuffix(owner, "Params") {
-			return name + " is the " + splitIdentifier(name) + " value supplied to the " + query + " query."
+			return name + " 是提供给 " + query + " 查询的 " + name + " 值。"
 		}
-		return name + " is the generated " + splitIdentifier(name) + " database value for " + owner + "."
+		return name + " 是 " + owner + " 的生成 " + name + " 数据库值。"
 	}
 	switch name {
 	case "Do":
-		return "Do sends one HTTP request and returns its response."
+		return "Do 发送一次 HTTP 请求并返回其响应。"
 	case "Server":
-		return "Server is the base URL used for generated client requests."
+		return "Server 是生成客户端请求使用的基础 URL。"
 	case "Client":
-		return "Client performs generated HTTP requests."
+		return "Client 执行生成的 HTTP 请求。"
 	case "RequestEditors":
-		return "RequestEditors mutate each generated request before it is sent."
+		return "RequestEditors 在请求发送前修改每一个生成的请求。"
 	case "Body":
-		return "Body contains the decoded or raw HTTP response body."
+		return "Body 包含解码或原始的 HTTP 响应体。"
 	case "HTTPResponse":
-		return "HTTPResponse is the underlying response returned by net/http."
+		return "HTTPResponse 是 net/http 返回的底层响应。"
 	case "Params":
-		return "Params contains the validated parameters for this request."
+		return "Params 包含此请求的已校验参数。"
 	case "Headers":
-		return "Headers contains the headers declared for this response."
+		return "Headers 包含为此响应声明的头部。"
 	case "StatusCode":
-		return "StatusCode is the HTTP status code for a variable-status response."
+		return "StatusCode 是变状态响应的 HTTP 状态码。"
 	case "ContentType":
-		return "ContentType is the media type of the request or response body."
+		return "ContentType 是请求或响应体的媒体类型。"
 	case "ContentLength":
-		return "ContentLength is the byte length of an unparsed response body."
+		return "ContentLength 是未解析响应体的字节长度。"
 	case "XRequestId":
-		return "XRequestId correlates the response with server logs and audit records."
+		return "XRequestId 将响应与服务端日志及审计记录关联。"
 	case "ETag":
-		return "ETag is the entity tag used for optimistic concurrency control."
+		return "ETag 是用于乐观并发控制的实体标签。"
 	default:
 		if strings.HasSuffix(owner, "Interface") {
-			return name + " handles the corresponding operation from the Meridian OpenAPI contract."
+			return name + " 处理 Meridian OpenAPI 契约中的对应操作。"
 		}
-		return name + " carries the generated " + splitIdentifier(name) + " value for " + owner + "."
+		return name + " 承载 " + owner + " 的生成 " + name + " 值。"
 	}
 }
 

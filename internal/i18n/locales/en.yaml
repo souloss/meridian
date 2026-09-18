@@ -1,0 +1,33 @@
+# Meridian English error messages.
+# Key structure: error.<code>, where <code> is the frozen ErrorCode enum
+# from contracts/openapi.yaml. Variable messages use Go template placeholders
+# {{.Var}}; plural messages provide the "other" form.
+error:
+  unauthenticated: "Authentication is required."
+  not_found: "The resource is absent or unauthorized."
+  validation_error: "The request does not satisfy the API contract."
+  asset_path_not_found: "The source file path was not found."
+  overlay_invalid: "The overlay document is invalid."
+  input_spec_mismatch: "The view input does not satisfy the view contract."
+  branch_not_indexed: "The selected branch is not indexed."
+  upload_expired: "The upload has expired."
+  nesting_too_deep: "The document nesting is too deep."
+  producer_profile_unavailable: "The selected producer profile is unavailable."
+  unsupported_kind: "The asset kind is unsupported."
+  duplicate: "The resource already exists."
+  version_not_publishable: "The version is not publishable."
+  base_layer_exists: "An AI-generated base layer already exists."
+  quota_exceeded:
+    other: "The tenant quota would be exceeded (current {{.Current}}, limit {{.Limit}})."
+  last_admin: "The last tenant administrator cannot be removed."
+  credential_in_use: "The credential is still referenced by a repository."
+  invalid_state: "The resource lifecycle forbids the requested transition."
+  idempotency_conflict: "The idempotency key was already used for a different request."
+  job_not_cancellable: "The job has reached a terminal state and cannot be cancelled."
+  config_import_conflict: "The configuration import conflicts with the current database state."
+  ai_disabled: "AI generation is disabled."
+  kind_disabled: "The asset kind is disabled."
+  content_too_large: "The content exceeds the size limit."
+  rate_limited: "Too many requests; please retry later."
+  precondition_failed: "The resource has changed; refresh and retry."
+  internal_error: "The request failed."

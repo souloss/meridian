@@ -19,15 +19,15 @@ WHERE tenant_id = $1
   AND status IN ('pending', 'running')
 `
 
-// CancelServiceJobParams contains the strongly typed arguments for the CancelServiceJob query.
+// CancelServiceJobParams 包含 CancelServiceJob 查询的强类型参数。
 type CancelServiceJobParams struct {
-	// TenantID is the tenant id value supplied to the CancelServiceJob query.
+	// TenantID 是提供给 CancelServiceJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CancelServiceJob query.
+	// ID 是提供给 CancelServiceJob 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// CancelServiceJob executes the generated CancelServiceJob database query.
+// CancelServiceJob 执行生成的 CancelServiceJob 数据库查询。
 // 将一条仍待执行的任务转为 cancelled 终态。
 func (q *Queries) CancelServiceJob(ctx context.Context, arg CancelServiceJobParams) (int64, error) {
 	result, err := q.db.Exec(ctx, cancelServiceJob, arg.TenantID, arg.ID)
@@ -47,15 +47,15 @@ WHERE track.tenant_id = $1
   )
 `
 
-// DeactivateServiceTracksParams contains the strongly typed arguments for the DeactivateServiceTracks query.
+// DeactivateServiceTracksParams 包含 DeactivateServiceTracks 查询的强类型参数。
 type DeactivateServiceTracksParams struct {
-	// TenantID is the tenant id value supplied to the DeactivateServiceTracks query.
+	// TenantID 是提供给 DeactivateServiceTracks 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the DeactivateServiceTracks query.
+	// ServiceID 是提供给 DeactivateServiceTracks 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// DeactivateServiceTracks executes the generated DeactivateServiceTracks database query.
+// DeactivateServiceTracks 执行生成的 DeactivateServiceTracks 数据库查询。
 // 停用一个服务下全部引用轨迹并递增期望代次。
 func (q *Queries) DeactivateServiceTracks(ctx context.Context, arg DeactivateServiceTracksParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deactivateServiceTracks, arg.TenantID, arg.ServiceID)
@@ -71,15 +71,15 @@ WHERE tenant_id = $1
   AND service_id = $2
 `
 
-// DeleteRecentServicesForServiceParams contains the strongly typed arguments for the DeleteRecentServicesForService query.
+// DeleteRecentServicesForServiceParams 包含 DeleteRecentServicesForService 查询的强类型参数。
 type DeleteRecentServicesForServiceParams struct {
-	// TenantID is the tenant id value supplied to the DeleteRecentServicesForService query.
+	// TenantID 是提供给 DeleteRecentServicesForService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the DeleteRecentServicesForService query.
+	// ServiceID 是提供给 DeleteRecentServicesForService 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// DeleteRecentServicesForService executes the generated DeleteRecentServicesForService database query.
+// DeleteRecentServicesForService 执行生成的 DeleteRecentServicesForService 数据库查询。
 // 移除一个服务对应的最近访问记录。
 func (q *Queries) DeleteRecentServicesForService(ctx context.Context, arg DeleteRecentServicesForServiceParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteRecentServicesForService, arg.TenantID, arg.ServiceID)
@@ -99,17 +99,17 @@ WHERE tenant_id = $1
 RETURNING tenant_id, id, repository_id, slug, display_name, description, root_dir, language, framework, owners, maintainers, lifecycle, visibility, revision, deleted_at, created_at, updated_at
 `
 
-// DeleteServiceParams contains the strongly typed arguments for the DeleteService query.
+// DeleteServiceParams 包含 DeleteService 查询的强类型参数。
 type DeleteServiceParams struct {
-	// TenantID is the tenant id value supplied to the DeleteService query.
+	// TenantID 是提供给 DeleteService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the DeleteService query.
+	// ID 是提供给 DeleteService 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the DeleteService query.
+	// ExpectedRevision 是提供给 DeleteService 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// DeleteService executes the generated DeleteService database query.
+// DeleteService 执行生成的 DeleteService 数据库查询。
 // 软删除一条服务并递增 revision。
 func (q *Queries) DeleteService(ctx context.Context, arg DeleteServiceParams) (Service, error) {
 	row := q.db.QueryRow(ctx, deleteService, arg.TenantID, arg.ID, arg.ExpectedRevision)
@@ -144,15 +144,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// DeleteServiceAssetsParams contains the strongly typed arguments for the DeleteServiceAssets query.
+// DeleteServiceAssetsParams 包含 DeleteServiceAssets 查询的强类型参数。
 type DeleteServiceAssetsParams struct {
-	// TenantID is the tenant id value supplied to the DeleteServiceAssets query.
+	// TenantID 是提供给 DeleteServiceAssets 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the DeleteServiceAssets query.
+	// ServiceID 是提供给 DeleteServiceAssets 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// DeleteServiceAssets executes the generated DeleteServiceAssets database query.
+// DeleteServiceAssets 执行生成的 DeleteServiceAssets 数据库查询。
 // 软删除一个服务下全部活跃资产。
 func (q *Queries) DeleteServiceAssets(ctx context.Context, arg DeleteServiceAssetsParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteServiceAssets, arg.TenantID, arg.ServiceID)
@@ -173,15 +173,15 @@ WHERE layer.tenant_id = $1
   AND layer.deleted_at IS NULL
 `
 
-// DeleteServiceLayersParams contains the strongly typed arguments for the DeleteServiceLayers query.
+// DeleteServiceLayersParams 包含 DeleteServiceLayers 查询的强类型参数。
 type DeleteServiceLayersParams struct {
-	// TenantID is the tenant id value supplied to the DeleteServiceLayers query.
+	// TenantID 是提供给 DeleteServiceLayers 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the DeleteServiceLayers query.
+	// ServiceID 是提供给 DeleteServiceLayers 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// DeleteServiceLayers executes the generated DeleteServiceLayers database query.
+// DeleteServiceLayers 执行生成的 DeleteServiceLayers 数据库查询。
 // 软删除一个服务下全部活跃层。
 func (q *Queries) DeleteServiceLayers(ctx context.Context, arg DeleteServiceLayersParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteServiceLayers, arg.TenantID, arg.ServiceID)
@@ -199,15 +199,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// DeleteServiceSourceSpecsParams contains the strongly typed arguments for the DeleteServiceSourceSpecs query.
+// DeleteServiceSourceSpecsParams 包含 DeleteServiceSourceSpecs 查询的强类型参数。
 type DeleteServiceSourceSpecsParams struct {
-	// TenantID is the tenant id value supplied to the DeleteServiceSourceSpecs query.
+	// TenantID 是提供给 DeleteServiceSourceSpecs 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the DeleteServiceSourceSpecs query.
+	// ServiceID 是提供给 DeleteServiceSourceSpecs 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// DeleteServiceSourceSpecs executes the generated DeleteServiceSourceSpecs database query.
+// DeleteServiceSourceSpecs 执行生成的 DeleteServiceSourceSpecs 数据库查询。
 // 软删除一个服务下全部活跃源配置。
 func (q *Queries) DeleteServiceSourceSpecs(ctx context.Context, arg DeleteServiceSourceSpecsParams) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteServiceSourceSpecs, arg.TenantID, arg.ServiceID)
@@ -226,15 +226,15 @@ WHERE t.slug = $1
   AND s.deleted_at IS NULL
 `
 
-// GetPublicServiceBySlugParams contains the strongly typed arguments for the GetPublicServiceBySlug query.
+// GetPublicServiceBySlugParams 包含 GetPublicServiceBySlug 查询的强类型参数。
 type GetPublicServiceBySlugParams struct {
-	// TenantSlug is the tenant slug value supplied to the GetPublicServiceBySlug query.
+	// TenantSlug 是提供给 GetPublicServiceBySlug 查询的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// ServiceSlug is the service slug value supplied to the GetPublicServiceBySlug query.
+	// ServiceSlug 是提供给 GetPublicServiceBySlug 查询的 ServiceSlug 值。
 	ServiceSlug string `json:"service_slug"`
 }
 
-// GetPublicServiceBySlug executes the generated GetPublicServiceBySlug database query.
+// GetPublicServiceBySlug 执行生成的 GetPublicServiceBySlug 数据库查询。
 // 按 tenant_slug + service_slug 返回一条活跃服务，供匿名公开读取解析。
 func (q *Queries) GetPublicServiceBySlug(ctx context.Context, arg GetPublicServiceBySlugParams) (Service, error) {
 	row := q.db.QueryRow(ctx, getPublicServiceBySlug, arg.TenantSlug, arg.ServiceSlug)
@@ -271,15 +271,15 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// GetServiceForUpdateParams contains the strongly typed arguments for the GetServiceForUpdate query.
+// GetServiceForUpdateParams 包含 GetServiceForUpdate 查询的强类型参数。
 type GetServiceForUpdateParams struct {
-	// TenantID is the tenant id value supplied to the GetServiceForUpdate query.
+	// TenantID 是提供给 GetServiceForUpdate 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetServiceForUpdate query.
+	// ID 是提供给 GetServiceForUpdate 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetServiceForUpdate executes the generated GetServiceForUpdate database query.
+// GetServiceForUpdate 执行生成的 GetServiceForUpdate 数据库查询。
 // M1 服务生命周期、公开读取与软删除的持久化查询。
 // 全部查询保留 tenant_id 谓词；公开读取按 tenant_slug + service_slug 跨表解析。
 // 锁定一条活跃服务行，供条件更新与删除前校验 revision。
@@ -333,23 +333,23 @@ WHERE job.tenant_id = $1
 FOR UPDATE
 `
 
-// LockPendingServiceJobsParams contains the strongly typed arguments for the LockPendingServiceJobs query.
+// LockPendingServiceJobsParams 包含 LockPendingServiceJobs 查询的强类型参数。
 type LockPendingServiceJobsParams struct {
-	// TenantID is the tenant id value supplied to the LockPendingServiceJobs query.
+	// TenantID 是提供给 LockPendingServiceJobs 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the LockPendingServiceJobs query.
+	// ServiceID 是提供给 LockPendingServiceJobs 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// LockPendingServiceJobsRow contains the columns returned by the LockPendingServiceJobs query.
+// LockPendingServiceJobsRow 包含 LockPendingServiceJobs 查询返回的列。
 type LockPendingServiceJobsRow struct {
-	// ID is the id value returned by the LockPendingServiceJobs query.
+	// ID 是 LockPendingServiceJobs 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RiverJobID is the river job id value returned by the LockPendingServiceJobs query.
+	// RiverJobID 是 LockPendingServiceJobs 查询返回的 RiverJobID 值。
 	RiverJobID *int64 `json:"river_job_id"`
 }
 
-// LockPendingServiceJobs executes the generated LockPendingServiceJobs database query.
+// LockPendingServiceJobs 执行生成的 LockPendingServiceJobs 数据库查询。
 // 锁定一个服务及其子资源作用域下仍待执行的任务，供删除事务统一取消。
 func (q *Queries) LockPendingServiceJobs(ctx context.Context, arg LockPendingServiceJobsParams) ([]LockPendingServiceJobsRow, error) {
 	rows, err := q.db.Query(ctx, lockPendingServiceJobs, arg.TenantID, arg.ServiceID)
@@ -382,15 +382,15 @@ WHERE binding.tenant_id = $1
   AND binding.state = 'active'
 `
 
-// StaleServiceBindingsParams contains the strongly typed arguments for the StaleServiceBindings query.
+// StaleServiceBindingsParams 包含 StaleServiceBindings 查询的强类型参数。
 type StaleServiceBindingsParams struct {
-	// TenantID is the tenant id value supplied to the StaleServiceBindings query.
+	// TenantID 是提供给 StaleServiceBindings 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the StaleServiceBindings query.
+	// ServiceID 是提供给 StaleServiceBindings 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// StaleServiceBindings executes the generated StaleServiceBindings database query.
+// StaleServiceBindings 执行生成的 StaleServiceBindings 数据库查询。
 // 将一个服务下全部活跃源绑定标记为 stale（保留 resolved_path）。
 func (q *Queries) StaleServiceBindings(ctx context.Context, arg StaleServiceBindingsParams) (int64, error) {
 	result, err := q.db.Exec(ctx, staleServiceBindings, arg.TenantID, arg.ServiceID)
@@ -416,27 +416,27 @@ WHERE tenant_id = $6
 RETURNING tenant_id, id, repository_id, slug, display_name, description, root_dir, language, framework, owners, maintainers, lifecycle, visibility, revision, deleted_at, created_at, updated_at
 `
 
-// UpdateServiceParams contains the strongly typed arguments for the UpdateService query.
+// UpdateServiceParams 包含 UpdateService 查询的强类型参数。
 type UpdateServiceParams struct {
-	// DisplayName is the display name value supplied to the UpdateService query.
+	// DisplayName 是提供给 UpdateService 查询的 DisplayName 值。
 	DisplayName *string `json:"display_name"`
-	// SetDescription is the set description value supplied to the UpdateService query.
+	// SetDescription 是提供给 UpdateService 查询的 SetDescription 值。
 	SetDescription bool `json:"set_description"`
-	// Description is the description value supplied to the UpdateService query.
+	// Description 是提供给 UpdateService 查询的 Description 值。
 	Description *string `json:"description"`
-	// Visibility is the visibility value supplied to the UpdateService query.
+	// Visibility 是提供给 UpdateService 查询的 Visibility 值。
 	Visibility *string `json:"visibility"`
-	// Lifecycle is the lifecycle value supplied to the UpdateService query.
+	// Lifecycle 是提供给 UpdateService 查询的 Lifecycle 值。
 	Lifecycle *string `json:"lifecycle"`
-	// TenantID is the tenant id value supplied to the UpdateService query.
+	// TenantID 是提供给 UpdateService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateService query.
+	// ID 是提供给 UpdateService 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the UpdateService query.
+	// ExpectedRevision 是提供给 UpdateService 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateService executes the generated UpdateService database query.
+// UpdateService 执行生成的 UpdateService 数据库查询。
 // 有条件地更新服务元数据并递增 revision。
 // description 使用 set 标志保留「未提供」与「显式置空」的区别。
 func (q *Queries) UpdateService(ctx context.Context, arg UpdateServiceParams) (Service, error) {

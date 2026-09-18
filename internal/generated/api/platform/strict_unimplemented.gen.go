@@ -8,126 +8,126 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// ListPlatformAuditLogs returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListPlatformAuditLogs 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListPlatformAuditLogs(ctx context.Context, request ListPlatformAuditLogsRequestObject) (ListPlatformAuditLogsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListGlobalCredentials returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListGlobalCredentials 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListGlobalCredentials(ctx context.Context, request ListGlobalCredentialsRequestObject) (ListGlobalCredentialsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateGlobalCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateGlobalCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateGlobalCredential(ctx context.Context, request CreateGlobalCredentialRequestObject) (CreateGlobalCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteGlobalCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteGlobalCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteGlobalCredential(ctx context.Context, request DeleteGlobalCredentialRequestObject) (DeleteGlobalCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateGlobalCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateGlobalCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateGlobalCredential(ctx context.Context, request UpdateGlobalCredentialRequestObject) (UpdateGlobalCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RotateGlobalCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RotateGlobalCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RotateGlobalCredential(ctx context.Context, request RotateGlobalCredentialRequestObject) (RotateGlobalCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// TestGlobalCredential returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// TestGlobalCredential 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) TestGlobalCredential(ctx context.Context, request TestGlobalCredentialRequestObject) (TestGlobalCredentialResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListPlatformJobs returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListPlatformJobs 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListPlatformJobs(ctx context.Context, request ListPlatformJobsRequestObject) (ListPlatformJobsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetPlatformJob returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetPlatformJob 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetPlatformJob(ctx context.Context, request GetPlatformJobRequestObject) (GetPlatformJobResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListProducerProfiles returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListProducerProfiles 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListProducerProfiles(ctx context.Context, request ListProducerProfilesRequestObject) (ListProducerProfilesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateProducerProfile returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateProducerProfile 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateProducerProfile(ctx context.Context, request CreateProducerProfileRequestObject) (CreateProducerProfileResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteProducerProfile returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteProducerProfile 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteProducerProfile(ctx context.Context, request DeleteProducerProfileRequestObject) (DeleteProducerProfileResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetProducerProfile returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetProducerProfile 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetProducerProfile(ctx context.Context, request GetProducerProfileRequestObject) (GetProducerProfileResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateProducerProfile returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateProducerProfile 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateProducerProfile(ctx context.Context, request UpdateProducerProfileRequestObject) (UpdateProducerProfileResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetPlatformSettings returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetPlatformSettings 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetPlatformSettings(ctx context.Context, request GetPlatformSettingsRequestObject) (GetPlatformSettingsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdatePlatformSettings returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdatePlatformSettings 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdatePlatformSettings(ctx context.Context, request UpdatePlatformSettingsRequestObject) (UpdatePlatformSettingsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListTenants returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListTenants 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListTenants(ctx context.Context, request ListTenantsRequestObject) (ListTenantsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateTenant returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateTenant 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateTenant(ctx context.Context, request CreateTenantRequestObject) (CreateTenantResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteTenant returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteTenant 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteTenant(ctx context.Context, request DeleteTenantRequestObject) (DeleteTenantResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateTenant returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateTenant 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateTenant(ctx context.Context, request UpdateTenantRequestObject) (UpdateTenantResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PutTenantMemberAsPlatformAdmin returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PutTenantMemberAsPlatformAdmin 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PutTenantMemberAsPlatformAdmin(ctx context.Context, request PutTenantMemberAsPlatformAdminRequestObject) (PutTenantMemberAsPlatformAdminResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListUsers returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListUsers 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListUsers(ctx context.Context, request ListUsersRequestObject) (ListUsersResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateUser returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateUser 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateUser(ctx context.Context, request CreateUserRequestObject) (CreateUserResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateUser returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateUser 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateUser(ctx context.Context, request UpdateUserRequestObject) (UpdateUserResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

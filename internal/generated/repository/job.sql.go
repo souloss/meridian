@@ -24,17 +24,17 @@ WHERE tenant_id = $2
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// CancelTenantJobParams contains the strongly typed arguments for the CancelTenantJob query.
+// CancelTenantJobParams 包含 CancelTenantJob 查询的强类型参数。
 type CancelTenantJobParams struct {
-	// FinishedAt is the finished at value supplied to the CancelTenantJob query.
+	// FinishedAt 是提供给 CancelTenantJob 查询的 FinishedAt 值。
 	FinishedAt pgtype.Timestamptz `json:"finished_at"`
-	// TenantID is the tenant id value supplied to the CancelTenantJob query.
+	// TenantID 是提供给 CancelTenantJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CancelTenantJob query.
+	// ID 是提供给 CancelTenantJob 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// CancelTenantJob executes the generated CancelTenantJob database query.
+// CancelTenantJob 执行生成的 CancelTenantJob 数据库查询。
 // 仅将 pending 或 running 的租户任务转为持久化的 cancelled 终态。
 func (q *Queries) CancelTenantJob(ctx context.Context, arg CancelTenantJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, cancelTenantJob, arg.FinishedAt, arg.TenantID, arg.ID)
@@ -87,21 +87,21 @@ WHERE (
   AND ($5::text = '' OR tenants.slug = $5::text)
 `
 
-// CountPlatformJobsParams contains the strongly typed arguments for the CountPlatformJobs query.
+// CountPlatformJobsParams 包含 CountPlatformJobs 查询的强类型参数。
 type CountPlatformJobsParams struct {
-	// TypeFilter is the type filter value supplied to the CountPlatformJobs query.
+	// TypeFilter 是提供给 CountPlatformJobs 查询的 TypeFilter 值。
 	TypeFilter []string `json:"type_filter"`
-	// StatusFilter is the status filter value supplied to the CountPlatformJobs query.
+	// StatusFilter 是提供给 CountPlatformJobs 查询的 StatusFilter 值。
 	StatusFilter []string `json:"status_filter"`
-	// ScopeType is the scope type value supplied to the CountPlatformJobs query.
+	// ScopeType 是提供给 CountPlatformJobs 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeID is the scope id value supplied to the CountPlatformJobs query.
+	// ScopeID 是提供给 CountPlatformJobs 查询的 ScopeID 值。
 	ScopeID string `json:"scope_id"`
-	// TenantSlug is the tenant slug value supplied to the CountPlatformJobs query.
+	// TenantSlug 是提供给 CountPlatformJobs 查询的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
 }
 
-// CountPlatformJobs executes the generated CountPlatformJobs database query.
+// CountPlatformJobs 执行生成的 CountPlatformJobs 数据库查询。
 // 返回匹配给定条件的脱敏平台任务总数。
 // 复用 ListPlatformJobs 的完整谓词，避免分页总数与结果集不一致。
 func (q *Queries) CountPlatformJobs(ctx context.Context, arg CountPlatformJobsParams) (int64, error) {
@@ -133,21 +133,21 @@ WHERE jobs.tenant_id = $1
   AND ($5::text = '' OR jobs.scope_id::text = $5::text)
 `
 
-// CountTenantJobsParams contains the strongly typed arguments for the CountTenantJobs query.
+// CountTenantJobsParams 包含 CountTenantJobs 查询的强类型参数。
 type CountTenantJobsParams struct {
-	// TenantID is the tenant id value supplied to the CountTenantJobs query.
+	// TenantID 是提供给 CountTenantJobs 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TypeFilter is the type filter value supplied to the CountTenantJobs query.
+	// TypeFilter 是提供给 CountTenantJobs 查询的 TypeFilter 值。
 	TypeFilter []string `json:"type_filter"`
-	// StatusFilter is the status filter value supplied to the CountTenantJobs query.
+	// StatusFilter 是提供给 CountTenantJobs 查询的 StatusFilter 值。
 	StatusFilter []string `json:"status_filter"`
-	// ScopeType is the scope type value supplied to the CountTenantJobs query.
+	// ScopeType 是提供给 CountTenantJobs 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeID is the scope id value supplied to the CountTenantJobs query.
+	// ScopeID 是提供给 CountTenantJobs 查询的 ScopeID 值。
 	ScopeID string `json:"scope_id"`
 }
 
-// CountTenantJobs executes the generated CountTenantJobs database query.
+// CountTenantJobs 执行生成的 CountTenantJobs 数据库查询。
 // 返回 ListTenantJobs 所用谓词对应的准确总数。
 func (q *Queries) CountTenantJobs(ctx context.Context, arg CountTenantJobsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countTenantJobs,
@@ -190,19 +190,19 @@ WHERE source.tenant_id = $3
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// CreateRetriedTenantJobParams contains the strongly typed arguments for the CreateRetriedTenantJob query.
+// CreateRetriedTenantJobParams 包含 CreateRetriedTenantJob 查询的强类型参数。
 type CreateRetriedTenantJobParams struct {
-	// NewJobID is the new job id value supplied to the CreateRetriedTenantJob query.
+	// NewJobID 是提供给 CreateRetriedTenantJob 查询的 NewJobID 值。
 	NewJobID uuid.UUID `json:"new_job_id"`
-	// ActiveGeneration is the active generation value supplied to the CreateRetriedTenantJob query.
+	// ActiveGeneration 是提供给 CreateRetriedTenantJob 查询的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
-	// TenantID is the tenant id value supplied to the CreateRetriedTenantJob query.
+	// TenantID 是提供给 CreateRetriedTenantJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SourceJobID is the source job id value supplied to the CreateRetriedTenantJob query.
+	// SourceJobID 是提供给 CreateRetriedTenantJob 查询的 SourceJobID 值。
 	SourceJobID uuid.UUID `json:"source_job_id"`
 }
 
-// CreateRetriedTenantJob executes the generated CreateRetriedTenantJob database query.
+// CreateRetriedTenantJob 执行生成的 CreateRetriedTenantJob 数据库查询。
 // 根据不可变的源执行输入创建一个新的 pending 代次。
 // 结果、错误、阶段、尝试次数和时间戳会重置，形成独立重试。
 func (q *Queries) CreateRetriedTenantJob(ctx context.Context, arg CreateRetriedTenantJobParams) (Job, error) {
@@ -254,23 +254,23 @@ INSERT INTO idempotency_records (
 )
 `
 
-// CreateRetryJobIdempotencyParams contains the strongly typed arguments for the CreateRetryJobIdempotency query.
+// CreateRetryJobIdempotencyParams 包含 CreateRetryJobIdempotency 查询的强类型参数。
 type CreateRetryJobIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the CreateRetryJobIdempotency query.
+	// TenantID 是提供给 CreateRetryJobIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the CreateRetryJobIdempotency query.
+	// PrincipalType 是提供给 CreateRetryJobIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the CreateRetryJobIdempotency query.
+	// PrincipalID 是提供给 CreateRetryJobIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the CreateRetryJobIdempotency query.
+	// IdempotencyKey 是提供给 CreateRetryJobIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
-	// RequestHash is the request hash value supplied to the CreateRetryJobIdempotency query.
+	// RequestHash 是提供给 CreateRetryJobIdempotency 查询的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value supplied to the CreateRetryJobIdempotency query.
+	// ResponseBody 是提供给 CreateRetryJobIdempotency 查询的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
 }
 
-// CreateRetryJobIdempotency executes the generated CreateRetryJobIdempotency database query.
+// CreateRetryJobIdempotency 执行生成的 CreateRetryJobIdempotency 数据库查询。
 // 保存可重放 24 小时的准确、非敏感 202 响应。
 func (q *Queries) CreateRetryJobIdempotency(ctx context.Context, arg CreateRetryJobIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, createRetryJobIdempotency,
@@ -293,19 +293,19 @@ WHERE tenant_id = $1
   AND idempotency_key = $4
 `
 
-// DeleteRetryJobIdempotencyParams contains the strongly typed arguments for the DeleteRetryJobIdempotency query.
+// DeleteRetryJobIdempotencyParams 包含 DeleteRetryJobIdempotency 查询的强类型参数。
 type DeleteRetryJobIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the DeleteRetryJobIdempotency query.
+	// TenantID 是提供给 DeleteRetryJobIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the DeleteRetryJobIdempotency query.
+	// PrincipalType 是提供给 DeleteRetryJobIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the DeleteRetryJobIdempotency query.
+	// PrincipalID 是提供给 DeleteRetryJobIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the DeleteRetryJobIdempotency query.
+	// IdempotencyKey 是提供给 DeleteRetryJobIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// DeleteRetryJobIdempotency executes the generated DeleteRetryJobIdempotency database query.
+// DeleteRetryJobIdempotency 执行生成的 DeleteRetryJobIdempotency 数据库查询。
 // 在重新使用幂等键前删除已过期的重试重放记录。
 func (q *Queries) DeleteRetryJobIdempotency(ctx context.Context, arg DeleteRetryJobIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, deleteRetryJobIdempotency,
@@ -341,33 +341,33 @@ JOIN tenants ON tenants.id = jobs.tenant_id
 WHERE jobs.id = $1
 `
 
-// GetPlatformJobRow contains the columns returned by the GetPlatformJob query.
+// GetPlatformJobRow 包含 GetPlatformJob 查询返回的列。
 type GetPlatformJobRow struct {
-	// ID is the id value returned by the GetPlatformJob query.
+	// ID 是 GetPlatformJob 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TenantSlug is the tenant slug value returned by the GetPlatformJob query.
+	// TenantSlug 是 GetPlatformJob 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// Type is the type value returned by the GetPlatformJob query.
+	// Type 是 GetPlatformJob 查询返回的 Type 值。
 	Type string `json:"type"`
-	// Trigger is the trigger value returned by the GetPlatformJob query.
+	// Trigger 是 GetPlatformJob 查询返回的 Trigger 值。
 	Trigger string `json:"trigger"`
-	// Status is the status value returned by the GetPlatformJob query.
+	// Status 是 GetPlatformJob 查询返回的 Status 值。
 	Status string `json:"status"`
-	// Stage is the stage value returned by the GetPlatformJob query.
+	// Stage 是 GetPlatformJob 查询返回的 Stage 值。
 	Stage *string `json:"stage"`
-	// ScopeType is the scope type value returned by the GetPlatformJob query.
+	// ScopeType 是 GetPlatformJob 查询返回的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeID is the scope id value returned by the GetPlatformJob query.
+	// ScopeID 是 GetPlatformJob 查询返回的 ScopeID 值。
 	ScopeID string `json:"scope_id"`
-	// CreatedAt is the created at value returned by the GetPlatformJob query.
+	// CreatedAt 是 GetPlatformJob 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// StartedAt is the started at value returned by the GetPlatformJob query.
+	// StartedAt 是 GetPlatformJob 查询返回的 StartedAt 值。
 	StartedAt pgtype.Timestamptz `json:"started_at"`
-	// FinishedAt is the finished at value returned by the GetPlatformJob query.
+	// FinishedAt 是 GetPlatformJob 查询返回的 FinishedAt 值。
 	FinishedAt pgtype.Timestamptz `json:"finished_at"`
 }
 
-// GetPlatformJob executes the generated GetPlatformJob database query.
+// GetPlatformJob 执行生成的 GetPlatformJob 数据库查询。
 // 返回一条脱敏平台任务，不包含租户拥有的负载或执行详情。
 // 保留租户和仓库范围的作用域标识，与公开 PlatformJob 契约一致。
 func (q *Queries) GetPlatformJob(ctx context.Context, id uuid.UUID) (GetPlatformJobRow, error) {
@@ -400,29 +400,29 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// GetRetryJobIdempotencyParams contains the strongly typed arguments for the GetRetryJobIdempotency query.
+// GetRetryJobIdempotencyParams 包含 GetRetryJobIdempotency 查询的强类型参数。
 type GetRetryJobIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the GetRetryJobIdempotency query.
+	// TenantID 是提供给 GetRetryJobIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the GetRetryJobIdempotency query.
+	// PrincipalType 是提供给 GetRetryJobIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the GetRetryJobIdempotency query.
+	// PrincipalID 是提供给 GetRetryJobIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the GetRetryJobIdempotency query.
+	// IdempotencyKey 是提供给 GetRetryJobIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// GetRetryJobIdempotencyRow contains the columns returned by the GetRetryJobIdempotency query.
+// GetRetryJobIdempotencyRow 包含 GetRetryJobIdempotency 查询返回的列。
 type GetRetryJobIdempotencyRow struct {
-	// RequestHash is the request hash value returned by the GetRetryJobIdempotency query.
+	// RequestHash 是 GetRetryJobIdempotency 查询返回的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value returned by the GetRetryJobIdempotency query.
+	// ResponseBody 是 GetRetryJobIdempotency 查询返回的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
-	// ExpiresAt is the expires at value returned by the GetRetryJobIdempotency query.
+	// ExpiresAt 是 GetRetryJobIdempotency 查询返回的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// GetRetryJobIdempotency executes the generated GetRetryJobIdempotency database query.
+// GetRetryJobIdempotency 执行生成的 GetRetryJobIdempotency 数据库查询。
 // 返回 retryJob 请求保留的准确响应。
 func (q *Queries) GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error) {
 	row := q.db.QueryRow(ctx, getRetryJobIdempotency,
@@ -443,15 +443,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetTenantJobParams contains the strongly typed arguments for the GetTenantJob query.
+// GetTenantJobParams 包含 GetTenantJob 查询的强类型参数。
 type GetTenantJobParams struct {
-	// TenantID is the tenant id value supplied to the GetTenantJob query.
+	// TenantID 是提供给 GetTenantJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetTenantJob query.
+	// ID 是提供给 GetTenantJob 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetTenantJob executes the generated GetTenantJob database query.
+// GetTenantJob 执行生成的 GetTenantJob 数据库查询。
 // 保留租户条件，返回一条租户可见的完整任务记录。
 func (q *Queries) GetTenantJob(ctx context.Context, arg GetTenantJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, getTenantJob, arg.TenantID, arg.ID)
@@ -500,73 +500,73 @@ WHERE jobs.tenant_id = $1
   AND jobs.id = $2
 `
 
-// GetTenantJobStreamStateParams contains the strongly typed arguments for the GetTenantJobStreamState query.
+// GetTenantJobStreamStateParams 包含 GetTenantJobStreamState 查询的强类型参数。
 type GetTenantJobStreamStateParams struct {
-	// TenantID is the tenant id value supplied to the GetTenantJobStreamState query.
+	// TenantID 是提供给 GetTenantJobStreamState 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetTenantJobStreamState query.
+	// ID 是提供给 GetTenantJobStreamState 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetTenantJobStreamStateRow contains the columns returned by the GetTenantJobStreamState query.
+// GetTenantJobStreamStateRow 包含 GetTenantJobStreamState 查询返回的列。
 type GetTenantJobStreamStateRow struct {
-	// TenantID is the tenant id value returned by the GetTenantJobStreamState query.
+	// TenantID 是 GetTenantJobStreamState 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value returned by the GetTenantJobStreamState query.
+	// ID 是 GetTenantJobStreamState 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RetryOfJobID is the retry of job id value returned by the GetTenantJobStreamState query.
+	// RetryOfJobID 是 GetTenantJobStreamState 查询返回的 RetryOfJobID 值。
 	RetryOfJobID *uuid.UUID `json:"retry_of_job_id"`
-	// RiverJobID is the river job id value returned by the GetTenantJobStreamState query.
+	// RiverJobID 是 GetTenantJobStreamState 查询返回的 RiverJobID 值。
 	RiverJobID *int64 `json:"river_job_id"`
-	// Type is the type value returned by the GetTenantJobStreamState query.
+	// Type 是 GetTenantJobStreamState 查询返回的 Type 值。
 	Type string `json:"type"`
-	// ScopeType is the scope type value returned by the GetTenantJobStreamState query.
+	// ScopeType 是 GetTenantJobStreamState 查询返回的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeID is the scope id value returned by the GetTenantJobStreamState query.
+	// ScopeID 是 GetTenantJobStreamState 查询返回的 ScopeID 值。
 	ScopeID *uuid.UUID `json:"scope_id"`
-	// RefType is the ref type value returned by the GetTenantJobStreamState query.
+	// RefType 是 GetTenantJobStreamState 查询返回的 RefType 值。
 	RefType *string `json:"ref_type"`
-	// RefName is the ref name value returned by the GetTenantJobStreamState query.
+	// RefName 是 GetTenantJobStreamState 查询返回的 RefName 值。
 	RefName *string `json:"ref_name"`
-	// Trigger is the trigger value returned by the GetTenantJobStreamState query.
+	// Trigger 是 GetTenantJobStreamState 查询返回的 Trigger 值。
 	Trigger string `json:"trigger"`
-	// Input is the input value returned by the GetTenantJobStreamState query.
+	// Input 是 GetTenantJobStreamState 查询返回的 Input 值。
 	Input []byte `json:"input"`
-	// Result is the result value returned by the GetTenantJobStreamState query.
+	// Result 是 GetTenantJobStreamState 查询返回的 Result 值。
 	Result []byte `json:"result"`
-	// Status is the status value returned by the GetTenantJobStreamState query.
+	// Status 是 GetTenantJobStreamState 查询返回的 Status 值。
 	Status string `json:"status"`
-	// Stage is the stage value returned by the GetTenantJobStreamState query.
+	// Stage 是 GetTenantJobStreamState 查询返回的 Stage 值。
 	Stage *string `json:"stage"`
-	// Attempt is the attempt value returned by the GetTenantJobStreamState query.
+	// Attempt 是 GetTenantJobStreamState 查询返回的 Attempt 值。
 	Attempt int32 `json:"attempt"`
-	// MaxAttempts is the max attempts value returned by the GetTenantJobStreamState query.
+	// MaxAttempts 是 GetTenantJobStreamState 查询返回的 MaxAttempts 值。
 	MaxAttempts int32 `json:"max_attempts"`
-	// NextAttemptAt is the next attempt at value returned by the GetTenantJobStreamState query.
+	// NextAttemptAt 是 GetTenantJobStreamState 查询返回的 NextAttemptAt 值。
 	NextAttemptAt pgtype.Timestamptz `json:"next_attempt_at"`
-	// DedupeKey is the dedupe key value returned by the GetTenantJobStreamState query.
+	// DedupeKey 是 GetTenantJobStreamState 查询返回的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
-	// ActiveGeneration is the active generation value returned by the GetTenantJobStreamState query.
+	// ActiveGeneration 是 GetTenantJobStreamState 查询返回的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
-	// Dirty is the dirty value returned by the GetTenantJobStreamState query.
+	// Dirty 是 GetTenantJobStreamState 查询返回的 Dirty 值。
 	Dirty bool `json:"dirty"`
-	// ReplaySafe is the replay safe value returned by the GetTenantJobStreamState query.
+	// ReplaySafe 是 GetTenantJobStreamState 查询返回的 ReplaySafe 值。
 	ReplaySafe bool `json:"replay_safe"`
-	// Error is the error value returned by the GetTenantJobStreamState query.
+	// Error 是 GetTenantJobStreamState 查询返回的 Error 值。
 	Error []byte `json:"error"`
-	// StartedAt is the started at value returned by the GetTenantJobStreamState query.
+	// StartedAt 是 GetTenantJobStreamState 查询返回的 StartedAt 值。
 	StartedAt pgtype.Timestamptz `json:"started_at"`
-	// FinishedAt is the finished at value returned by the GetTenantJobStreamState query.
+	// FinishedAt 是 GetTenantJobStreamState 查询返回的 FinishedAt 值。
 	FinishedAt pgtype.Timestamptz `json:"finished_at"`
-	// CreatedAt is the created at value returned by the GetTenantJobStreamState query.
+	// CreatedAt 是 GetTenantJobStreamState 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// UpdatedAt is the updated at value returned by the GetTenantJobStreamState query.
+	// UpdatedAt 是 GetTenantJobStreamState 查询返回的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// LogCursor is the log cursor value returned by the GetTenantJobStreamState query.
+	// LogCursor 是 GetTenantJobStreamState 查询返回的 LogCursor 值。
 	LogCursor int64 `json:"log_cursor"`
 }
 
-// GetTenantJobStreamState executes the generated GetTenantJobStreamState database query.
+// GetTenantJobStreamState 执行生成的 GetTenantJobStreamState 数据库查询。
 // 在一条 PostgreSQL 语句中返回任务状态和已持久化日志的最大游标，
 // 确保 SSE 不会发送领先于日志记录的状态。
 func (q *Queries) GetTenantJobStreamState(ctx context.Context, arg GetTenantJobStreamStateParams) (GetTenantJobStreamStateRow, error) {
@@ -641,51 +641,51 @@ LIMIT $7
 OFFSET $6
 `
 
-// ListPlatformJobsParams contains the strongly typed arguments for the ListPlatformJobs query.
+// ListPlatformJobsParams 包含 ListPlatformJobs 查询的强类型参数。
 type ListPlatformJobsParams struct {
-	// TypeFilter is the type filter value supplied to the ListPlatformJobs query.
+	// TypeFilter 是提供给 ListPlatformJobs 查询的 TypeFilter 值。
 	TypeFilter []string `json:"type_filter"`
-	// StatusFilter is the status filter value supplied to the ListPlatformJobs query.
+	// StatusFilter 是提供给 ListPlatformJobs 查询的 StatusFilter 值。
 	StatusFilter []string `json:"status_filter"`
-	// ScopeType is the scope type value supplied to the ListPlatformJobs query.
+	// ScopeType 是提供给 ListPlatformJobs 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeID is the scope id value supplied to the ListPlatformJobs query.
+	// ScopeID 是提供给 ListPlatformJobs 查询的 ScopeID 值。
 	ScopeID string `json:"scope_id"`
-	// TenantSlug is the tenant slug value supplied to the ListPlatformJobs query.
+	// TenantSlug 是提供给 ListPlatformJobs 查询的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// PageOffset is the page offset value supplied to the ListPlatformJobs query.
+	// PageOffset 是提供给 ListPlatformJobs 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListPlatformJobs query.
+	// PageLimit 是提供给 ListPlatformJobs 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListPlatformJobsRow contains the columns returned by the ListPlatformJobs query.
+// ListPlatformJobsRow 包含 ListPlatformJobs 查询返回的列。
 type ListPlatformJobsRow struct {
-	// ID is the id value returned by the ListPlatformJobs query.
+	// ID 是 ListPlatformJobs 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TenantSlug is the tenant slug value returned by the ListPlatformJobs query.
+	// TenantSlug 是 ListPlatformJobs 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// Type is the type value returned by the ListPlatformJobs query.
+	// Type 是 ListPlatformJobs 查询返回的 Type 值。
 	Type string `json:"type"`
-	// Trigger is the trigger value returned by the ListPlatformJobs query.
+	// Trigger 是 ListPlatformJobs 查询返回的 Trigger 值。
 	Trigger string `json:"trigger"`
-	// Status is the status value returned by the ListPlatformJobs query.
+	// Status 是 ListPlatformJobs 查询返回的 Status 值。
 	Status string `json:"status"`
-	// Stage is the stage value returned by the ListPlatformJobs query.
+	// Stage 是 ListPlatformJobs 查询返回的 Stage 值。
 	Stage *string `json:"stage"`
-	// ScopeType is the scope type value returned by the ListPlatformJobs query.
+	// ScopeType 是 ListPlatformJobs 查询返回的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeID is the scope id value returned by the ListPlatformJobs query.
+	// ScopeID 是 ListPlatformJobs 查询返回的 ScopeID 值。
 	ScopeID string `json:"scope_id"`
-	// CreatedAt is the created at value returned by the ListPlatformJobs query.
+	// CreatedAt 是 ListPlatformJobs 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// StartedAt is the started at value returned by the ListPlatformJobs query.
+	// StartedAt 是 ListPlatformJobs 查询返回的 StartedAt 值。
 	StartedAt pgtype.Timestamptz `json:"started_at"`
-	// FinishedAt is the finished at value returned by the ListPlatformJobs query.
+	// FinishedAt 是 ListPlatformJobs 查询返回的 FinishedAt 值。
 	FinishedAt pgtype.Timestamptz `json:"finished_at"`
 }
 
-// ListPlatformJobs executes the generated ListPlatformJobs database query.
+// ListPlatformJobs 执行生成的 ListPlatformJobs 数据库查询。
 // 按最新时间优先返回脱敏的跨租户任务元数据。
 // 结果刻意排除输入、结果、错误、尝试次数、引用、River 标识和日志。
 // 空过滤数组和空字符串表示不限制；只有租户和仓库范围任务暴露作用域标识。
@@ -737,15 +737,15 @@ WHERE tenant_id = $1
 ORDER BY job_id, attempt, sequence
 `
 
-// ListTenantJobAttemptLogsParams contains the strongly typed arguments for the ListTenantJobAttemptLogs query.
+// ListTenantJobAttemptLogsParams 包含 ListTenantJobAttemptLogs 查询的强类型参数。
 type ListTenantJobAttemptLogsParams struct {
-	// TenantID is the tenant id value supplied to the ListTenantJobAttemptLogs query.
+	// TenantID 是提供给 ListTenantJobAttemptLogs 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// JobIds is the job ids value supplied to the ListTenantJobAttemptLogs query.
+	// JobIds 是提供给 ListTenantJobAttemptLogs 查询的 JobIds 值。
 	JobIds []uuid.UUID `json:"job_ids"`
 }
 
-// ListTenantJobAttemptLogs executes the generated ListTenantJobAttemptLogs database query.
+// ListTenantJobAttemptLogs 执行生成的 ListTenantJobAttemptLogs 数据库查询。
 // 批量加载一页任务的持久化事件，避免 N+1 查询。
 // 调用方按任务、一基尝试次数和阶段分组，构造 API 尝试投影。
 func (q *Queries) ListTenantJobAttemptLogs(ctx context.Context, arg ListTenantJobAttemptLogsParams) ([]JobStageLog, error) {
@@ -787,19 +787,19 @@ ORDER BY sequence
 LIMIT $4
 `
 
-// ListTenantJobLogsAfterParams contains the strongly typed arguments for the ListTenantJobLogsAfter query.
+// ListTenantJobLogsAfterParams 包含 ListTenantJobLogsAfter 查询的强类型参数。
 type ListTenantJobLogsAfterParams struct {
-	// TenantID is the tenant id value supplied to the ListTenantJobLogsAfter query.
+	// TenantID 是提供给 ListTenantJobLogsAfter 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// JobID is the job id value supplied to the ListTenantJobLogsAfter query.
+	// JobID 是提供给 ListTenantJobLogsAfter 查询的 JobID 值。
 	JobID uuid.UUID `json:"job_id"`
-	// AfterSequence is the after sequence value supplied to the ListTenantJobLogsAfter query.
+	// AfterSequence 是提供给 ListTenantJobLogsAfter 查询的 AfterSequence 值。
 	AfterSequence int64 `json:"after_sequence"`
-	// EventLimit is the event limit value supplied to the ListTenantJobLogsAfter query.
+	// EventLimit 是提供给 ListTenantJobLogsAfter 查询的 EventLimit 值。
 	EventLimit int32 `json:"event_limit"`
 }
 
-// ListTenantJobLogsAfter executes the generated ListTenantJobLogsAfter database query.
+// ListTenantJobLogsAfter 执行生成的 ListTenantJobLogsAfter 数据库查询。
 // 返回持久化序号游标之后、数量受限的 SSE 回放记录。
 func (q *Queries) ListTenantJobLogsAfter(ctx context.Context, arg ListTenantJobLogsAfterParams) ([]JobStageLog, error) {
 	rows, err := q.db.Query(ctx, listTenantJobLogsAfter,
@@ -854,25 +854,25 @@ LIMIT $7
 OFFSET $6
 `
 
-// ListTenantJobsParams contains the strongly typed arguments for the ListTenantJobs query.
+// ListTenantJobsParams 包含 ListTenantJobs 查询的强类型参数。
 type ListTenantJobsParams struct {
-	// TenantID is the tenant id value supplied to the ListTenantJobs query.
+	// TenantID 是提供给 ListTenantJobs 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TypeFilter is the type filter value supplied to the ListTenantJobs query.
+	// TypeFilter 是提供给 ListTenantJobs 查询的 TypeFilter 值。
 	TypeFilter []string `json:"type_filter"`
-	// StatusFilter is the status filter value supplied to the ListTenantJobs query.
+	// StatusFilter 是提供给 ListTenantJobs 查询的 StatusFilter 值。
 	StatusFilter []string `json:"status_filter"`
-	// ScopeType is the scope type value supplied to the ListTenantJobs query.
+	// ScopeType 是提供给 ListTenantJobs 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeID is the scope id value supplied to the ListTenantJobs query.
+	// ScopeID 是提供给 ListTenantJobs 查询的 ScopeID 值。
 	ScopeID string `json:"scope_id"`
-	// PageOffset is the page offset value supplied to the ListTenantJobs query.
+	// PageOffset 是提供给 ListTenantJobs 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListTenantJobs query.
+	// PageLimit 是提供给 ListTenantJobs 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListTenantJobs executes the generated ListTenantJobs database query.
+// ListTenantJobs 执行生成的 ListTenantJobs 数据库查询。
 // 在一个租户标识边界内按最新时间优先返回任务分页。
 // 空过滤数组和空字符串表示不限制；执行输入和 River 标识仍为内部字段。
 func (q *Queries) ListTenantJobs(ctx context.Context, arg ListTenantJobsParams) ([]Job, error) {
@@ -940,15 +940,15 @@ LIMIT 1
 FOR UPDATE
 `
 
-// LockLatestTenantJobGenerationParams contains the strongly typed arguments for the LockLatestTenantJobGeneration query.
+// LockLatestTenantJobGenerationParams 包含 LockLatestTenantJobGeneration 查询的强类型参数。
 type LockLatestTenantJobGenerationParams struct {
-	// TenantID is the tenant id value supplied to the LockLatestTenantJobGeneration query.
+	// TenantID 是提供给 LockLatestTenantJobGeneration 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// DedupeKey is the dedupe key value supplied to the LockLatestTenantJobGeneration query.
+	// DedupeKey 是提供给 LockLatestTenantJobGeneration 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
 }
 
-// LockLatestTenantJobGeneration executes the generated LockLatestTenantJobGeneration database query.
+// LockLatestTenantJobGeneration 执行生成的 LockLatestTenantJobGeneration 数据库查询。
 // 持有行锁时返回最新的语义代次。
 func (q *Queries) LockLatestTenantJobGeneration(ctx context.Context, arg LockLatestTenantJobGenerationParams) (Job, error) {
 	row := q.db.QueryRow(ctx, lockLatestTenantJobGeneration, arg.TenantID, arg.DedupeKey)
@@ -988,7 +988,7 @@ const lockRetryJobIdempotency = `-- name: LockRetryJobIdempotency :exec
 SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
 `
 
-// LockRetryJobIdempotency executes the generated LockRetryJobIdempotency database query.
+// LockRetryJobIdempotency 执行生成的 LockRetryJobIdempotency 数据库查询。
 // 为已认证的租户主体串行化一个重试幂等键。
 func (q *Queries) LockRetryJobIdempotency(ctx context.Context, lockKey string) error {
 	_, err := q.db.Exec(ctx, lockRetryJobIdempotency, lockKey)
@@ -1003,15 +1003,15 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// LockTenantJobForControlParams contains the strongly typed arguments for the LockTenantJobForControl query.
+// LockTenantJobForControlParams 包含 LockTenantJobForControl 查询的强类型参数。
 type LockTenantJobForControlParams struct {
-	// TenantID is the tenant id value supplied to the LockTenantJobForControl query.
+	// TenantID 是提供给 LockTenantJobForControl 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the LockTenantJobForControl query.
+	// ID 是提供给 LockTenantJobForControl 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// LockTenantJobForControl executes the generated LockTenantJobForControl database query.
+// LockTenantJobForControl 执行生成的 LockTenantJobForControl 数据库查询。
 // 串行化一个租户任务的取消和手动重试决策。
 func (q *Queries) LockTenantJobForControl(ctx context.Context, arg LockTenantJobForControlParams) (Job, error) {
 	row := q.db.QueryRow(ctx, lockTenantJobForControl, arg.TenantID, arg.ID)

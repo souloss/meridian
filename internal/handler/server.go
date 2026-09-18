@@ -38,39 +38,45 @@ type Server struct {
 	configImport     *service.ConfigImport
 	aiWorkflow       *service.AiWorkflow
 	diffService      *service.DiffService
+	searchService    *service.Search
+	systemGroups     *service.SystemGroups
 	secureCookies    bool
 }
 
-// Dependencies groups the independently testable use cases exposed by the HTTP server.
+// Dependencies 聚合 HTTP 服务暴露的可独立测试用例。
 type Dependencies struct {
-	// Identity provides authentication, user, tenant, membership, and PAT use cases.
+	// Identity 提供认证、用户、租户、成员与 PAT 用例。
 	Identity *service.Identity
-	// Credentials provides tenant and platform credential use cases.
+	// Credentials 提供租户与平台凭据用例。
 	Credentials *service.Credentials
-	// Repositories provides tenant repository configuration use cases.
+	// Repositories 提供租户仓库配置用例。
 	Repositories *service.Repositories
-	// Jobs provides redacted platform job query use cases.
+	// Jobs 提供脱敏的平台任务查询用例。
 	Jobs *service.Jobs
-	// Audits provides tenant and platform audit query use cases.
+	// Audits 提供租户与平台审计查询用例。
 	Audits *service.Audits
-	// Producers provides platform producer configuration and tenant selection.
+	// Producers 提供平台生产者配置与租户选择。
 	Producers *service.Producers
-	// Discovery provides repository discovery, candidate acceptance, and source configuration.
+	// Discovery 提供仓库发现、候选接受与源配置。
 	Discovery *service.Discovery
-	// Assets provides asset, version, and item read use cases.
+	// Assets 提供资产、版本与条目读取用例。
 	Assets *service.Assets
-	// Views provides built-in view resolution.
+	// Views 提供内置视图解析。
 	Views *service.Views
-	// ServiceLifecycle provides service metadata updates, public reads, and delete.
+	// ServiceLifecycle 提供服务元数据更新、公开读取与删除。
 	ServiceLifecycle *service.ServiceLifecycle
-	// LayerEdit provides overlay revisions, ordering, rollback, merge preview, and provenance.
+	// LayerEdit 提供 overlay 修订、排序、回滚、合并预览与溯源。
 	LayerEdit *service.LayerEdit
-	// ConfigImport provides gitops repository configuration preview and apply.
+	// ConfigImport 提供 gitops 仓库配置预览与落库。
 	ConfigImport *service.ConfigImport
-	// AiWorkflow provides AI generation, revision review, and version publish.
+	// AiWorkflow 提供 AI 生成、修订审核与版本发布。
 	AiWorkflow *service.AiWorkflow
-	// DiffService provides diff, snapshot share, breaking todos, uploads, and push.
+	// DiffService 提供差异、快照分享、破坏性待办、上传与推送。
 	DiffService *service.DiffService
+	// Search 提供跨类别租户搜索工作流。
+	Search *service.Search
+	// SystemGroups 提供系统分组创建与成员替换。
+	SystemGroups *service.SystemGroups
 }
 
 func New() *Server {
@@ -79,23 +85,23 @@ func New() *Server {
 	return s
 }
 
-// NewWithIdentity constructs a server with M0 identity use cases enabled.
+// NewWithIdentity 构造一个启用 M0 身份用例的服务器。
 func NewWithIdentity(identity *service.Identity, secureCookies bool) *Server {
 	return NewWithServices(identity, nil, secureCookies)
 }
 
-// NewWithServices constructs an HTTP server with explicitly wired M0 use cases.
-// A nil use case leaves its generated strict operations returning the contract's 501 stub.
+// NewWithServices 用显式装配的 M0 用例构造 HTTP 服务器。
+// 为 nil 的用例会使其生成的严格操作返回契约的 501 桩实现。
 func NewWithServices(identity *service.Identity, credentials *service.Credentials, secureCookies bool) *Server {
 	return NewWithAllServices(identity, credentials, nil, secureCookies)
 }
 
-// NewWithAllServices constructs an HTTP server with every currently implemented M0 use case.
+// NewWithAllServices 构造一个启用当前已实现全部 M0 用例的服务器。
 func NewWithAllServices(identity *service.Identity, credentials *service.Credentials, repositories *service.Repositories, secureCookies bool) *Server {
 	return NewWithRuntimeServices(Dependencies{Identity: identity, Credentials: credentials, Repositories: repositories}, secureCookies)
 }
 
-// NewWithRuntimeServices constructs an HTTP server from explicit application use-case dependencies.
+// NewWithRuntimeServices 从显式应用用例依赖构造 HTTP 服务器。
 func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Server {
 	s := New()
 	s.identity = dependencies.Identity
@@ -112,6 +118,8 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.configImport = dependencies.ConfigImport
 	s.aiWorkflow = dependencies.AiWorkflow
 	s.diffService = dependencies.DiffService
+	s.searchService = dependencies.Search
+	s.systemGroups = dependencies.SystemGroups
 	s.secureCookies = secureCookies
 	return s
 }
@@ -130,74 +138,74 @@ func (s *Server) Handler() http.Handler {
 }
 
 func requestErrorHandler(w http.ResponseWriter, r *http.Request, _ error) {
-	writeError(w, r, http.StatusBadRequest, "validation_error", "request does not satisfy the API contract")
+	writeError(w, r, http.StatusBadRequest, errorCodeValidation, nil)
 }
 
 func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 	var overlayErr *service.OverlayInvalidError
 	if quotaErr, ok := errors.AsType[*service.QuotaExceededError](err); ok {
-		writeErrorDetails(w, r, http.StatusConflict, "quota_exceeded", "tenant resource quota would be exceeded", map[string]any{
+		writeErrorDetails(w, r, http.StatusConflict, errorCodeQuotaExceeded, map[string]any{
 			"quota": quotaErr.Resource, "current": quotaErr.Current, "limit": quotaErr.Limit,
-		})
+		}, map[string]any{"Current": quotaErr.Current, "Limit": quotaErr.Limit})
 		return
 	}
 	switch {
 	case errors.Is(err, service.ErrUnauthenticated):
-		writeError(w, r, http.StatusUnauthorized, "unauthenticated", "authentication required")
+		writeError(w, r, http.StatusUnauthorized, errorCodeUnauthenticated, nil)
 		return
 	case errors.Is(err, service.ErrNotFound):
-		writeError(w, r, http.StatusNotFound, "not_found", "resource not found")
+		writeError(w, r, http.StatusNotFound, errorCodeNotFound, nil)
 		return
 	case errors.Is(err, service.ErrDuplicate):
-		writeError(w, r, http.StatusConflict, "duplicate", "resource already exists")
+		writeError(w, r, http.StatusConflict, errorCodeDuplicate, nil)
 		return
 	case errors.As(err, &overlayErr):
-		writeErrorDetails(w, r, http.StatusUnprocessableEntity, "overlay_invalid", "overlay document is invalid", overlayErrorDetails(overlayErr))
+		writeErrorDetails(w, r, http.StatusUnprocessableEntity, errorCodeOverlayInvalid, overlayErrorDetails(overlayErr), nil)
 		return
 	case errors.Is(err, service.ErrValidation):
-		writeError(w, r, http.StatusUnprocessableEntity, "validation_error", "request violates a domain rule")
+		writeError(w, r, http.StatusUnprocessableEntity, errorCodeValidation, nil)
 		return
 	case errors.Is(err, service.ErrPrecondition):
-		writeError(w, r, http.StatusPreconditionFailed, "precondition_failed", "resource changed; refresh and retry")
+		writeError(w, r, http.StatusPreconditionFailed, errorCodePreconditionFailed, nil)
 		return
 	case errors.Is(err, service.ErrCredentialInUse):
-		writeError(w, r, http.StatusConflict, "credential_in_use", "credential is still referenced by a repository")
+		writeError(w, r, http.StatusConflict, errorCodeCredentialInUse, nil)
 		return
 	case errors.Is(err, service.ErrIdempotencyConflict):
-		writeError(w, r, http.StatusConflict, "idempotency_conflict", "idempotency key was already used for a different request")
+		writeError(w, r, http.StatusConflict, errorCodeIdempotencyConflict, nil)
 		return
 	case errors.Is(err, service.ErrJobNotCancellable):
-		writeError(w, r, http.StatusConflict, "job_not_cancellable", "job has already reached a terminal state")
+		writeError(w, r, http.StatusConflict, errorCodeJobNotCancellable, nil)
 		return
 	case errors.Is(err, service.ErrJobNotRetryable):
-		writeError(w, r, http.StatusConflict, "invalid_state", "job cannot be retried from its current state")
+		writeError(w, r, http.StatusConflict, errorCodeInvalidState, nil)
 		return
 	case errors.Is(err, service.ErrViewInputMismatch):
-		writeError(w, r, http.StatusUnprocessableEntity, "input_spec_mismatch", "view input does not satisfy the view contract")
+		writeError(w, r, http.StatusUnprocessableEntity, errorCodeInputSpecMismatch, nil)
 		return
 	case errors.Is(err, service.ErrBranchNotIndexed):
-		writeError(w, r, http.StatusUnprocessableEntity, "branch_not_indexed", "the selected branch is not indexed")
+		writeError(w, r, http.StatusUnprocessableEntity, errorCodeBranchNotIndexed, nil)
 		return
 	case errors.Is(err, service.ErrInvalidState):
-		writeError(w, r, http.StatusConflict, "invalid_state", "resource lifecycle forbids the requested transition")
+		writeError(w, r, http.StatusConflict, errorCodeInvalidState, nil)
 		return
 	case errors.Is(err, service.ErrBaseLayerExists):
-		writeError(w, r, http.StatusConflict, "base_layer_exists", "an AI-generated base layer already exists")
+		writeError(w, r, http.StatusConflict, errorCodeBaseLayerExists, nil)
 		return
 	case func() bool { _, ok := errors.AsType[*service.VersionNotPublishableError](err); return ok }():
-		writeErrorDetails(w, r, http.StatusConflict, "version_not_publishable", "version is not publishable", map[string]any{
+		writeErrorDetails(w, r, http.StatusConflict, errorCodeVersionNotPublishable, map[string]any{
 			"blockingRevisions": []any{}, "layerId": nil, "revisionId": nil, "reviewStatus": nil,
-		})
+		}, nil)
 		return
 	case errors.Is(err, api.ErrStrictOperationNotImplemented):
-		writeError(w, r, http.StatusNotImplemented, "internal_error", "operation is not implemented")
+		writeError(w, r, http.StatusNotImplemented, errorCodeInternal, nil)
 		return
 	}
 	if _, ok := errors.AsType[*service.ProducerUnavailableError](err); ok {
-		writeError(w, r, http.StatusUnprocessableEntity, "producer_profile_unavailable", "the selected producer profile is not available")
+		writeError(w, r, http.StatusUnprocessableEntity, errorCodeProducerUnavailable, nil)
 		return
 	}
-	writeError(w, r, http.StatusInternalServerError, "internal_error", "request failed")
+	writeError(w, r, http.StatusInternalServerError, errorCodeInternal, nil)
 	slog.Error("unhandled response error", "error", err)
 }
 
@@ -210,15 +218,15 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 		Options: openapi3filter.Options{AuthenticationFunc: openapi3filter.NoopAuthenticationFunc},
 		ErrorHandlerWithOpts: func(_ context.Context, _ error, w http.ResponseWriter, r *http.Request, options nethttpmiddleware.ErrorHandlerOpts) {
 			if options.MatchedRoute == nil {
-				writeError(w, r, http.StatusNotFound, "not_found", "resource not found")
+				writeError(w, r, http.StatusNotFound, errorCodeNotFound, nil)
 				return
 			}
 			status := http.StatusBadRequest
-			// Known Host key validation may fail before the domain handler runs.
+			// 已知主机密钥校验可能在领域处理器运行前失败。
 			if route := options.MatchedRoute.Route; route != nil && route.Method == http.MethodPost && route.Path == "/api/v1/t/{tenantSlug}/known-hosts" {
 				status = http.StatusUnprocessableEntity
 			}
-			writeError(w, r, status, "validation_error", "request does not satisfy the API contract")
+			writeError(w, r, status, errorCodeValidation, nil)
 		},
 		DoNotValidateServers: true,
 		Skipper: func(r *http.Request) bool {
@@ -229,7 +237,7 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 		validated := validator(next)
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if isKnownHostCreateRequest(r) && hasDerivedKnownHostFields(r) {
-				writeError(w, r, http.StatusUnprocessableEntity, "validation_error", "request does not satisfy the API contract")
+				writeError(w, r, http.StatusUnprocessableEntity, errorCodeValidation, nil)
 				return
 			}
 			validated.ServeHTTP(w, r)

@@ -8,31 +8,31 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// ListJobs returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListJobs 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListJobs(ctx context.Context, request ListJobsRequestObject) (ListJobsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetJob returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetJob 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetJob(ctx context.Context, request GetJobRequestObject) (GetJobResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// StreamJobLogs returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// StreamJobLogs 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) StreamJobLogs(ctx context.Context, request StreamJobLogsRequestObject) (StreamJobLogsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CancelJob returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CancelJob 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CancelJob(ctx context.Context, request CancelJobRequestObject) (CancelJobResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RetryJob returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RetryJob 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RetryJob(ctx context.Context, request RetryJobRequestObject) (RetryJobResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

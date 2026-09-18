@@ -8,91 +8,91 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// ResolvePublicView returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ResolvePublicView 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ResolvePublicView(ctx context.Context, request ResolvePublicViewRequestObject) (ResolvePublicViewResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetSharedView returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetSharedView 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetSharedView(ctx context.Context, request GetSharedViewRequestObject) (GetSharedViewResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PreviewAssetView returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PreviewAssetView 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PreviewAssetView(ctx context.Context, request PreviewAssetViewRequestObject) (PreviewAssetViewResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListShareLinks returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListShareLinks 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListShareLinks(ctx context.Context, request ListShareLinksRequestObject) (ListShareLinksResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateShareLink returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateShareLink 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateShareLink(ctx context.Context, request CreateShareLinkRequestObject) (CreateShareLinkResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RevokeShareLink returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RevokeShareLink 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RevokeShareLink(ctx context.Context, request RevokeShareLinkRequestObject) (RevokeShareLinkResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListSystemGroups returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListSystemGroups 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListSystemGroups(ctx context.Context, request ListSystemGroupsRequestObject) (ListSystemGroupsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateSystemGroup returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateSystemGroup 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateSystemGroup(ctx context.Context, request CreateSystemGroupRequestObject) (CreateSystemGroupResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteSystemGroup returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteSystemGroup 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteSystemGroup(ctx context.Context, request DeleteSystemGroupRequestObject) (DeleteSystemGroupResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetSystemGroup returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetSystemGroup 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetSystemGroup(ctx context.Context, request GetSystemGroupRequestObject) (GetSystemGroupResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateSystemGroup returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateSystemGroup 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateSystemGroup(ctx context.Context, request UpdateSystemGroupRequestObject) (UpdateSystemGroupResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PutSystemGroupMembers returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PutSystemGroupMembers 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PutSystemGroupMembers(ctx context.Context, request PutSystemGroupMembersRequestObject) (PutSystemGroupMembersResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListViewOverrides returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListViewOverrides 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListViewOverrides(ctx context.Context, request ListViewOverridesRequestObject) (ListViewOverridesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteViewOverride returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteViewOverride 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteViewOverride(ctx context.Context, request DeleteViewOverrideRequestObject) (DeleteViewOverrideResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PutViewOverride returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PutViewOverride 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PutViewOverride(ctx context.Context, request PutViewOverrideRequestObject) (PutViewOverrideResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListViews returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListViews 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListViews(ctx context.Context, request ListViewsRequestObject) (ListViewsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ResolveView returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ResolveView 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ResolveView(ctx context.Context, request ResolveViewRequestObject) (ResolveViewResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

@@ -2,14 +2,13 @@ package handler
 
 import (
 	"context"
-	"strings"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
 	asset "github.com/meridian-labs/meridian/internal/generated/api/asset"
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
-// PushAssetRevision ingests a third-party pushed revision as a pending candidate.
+// PushAssetRevision 将第三方推送的修订作为待审核候选接收。
 func (s *Server) PushAssetRevision(ctx context.Context, request asset.PushAssetRevisionRequestObject) (asset.PushAssetRevisionResponseObject, error) {
 	if s.diffService == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -18,11 +17,11 @@ func (s *Server) PushAssetRevision(ctx context.Context, request asset.PushAssetR
 	if err != nil {
 		return nil, err
 	}
-	refType := "branch"
+	refType := string(api.RefTypeBranch)
 	if request.Body.RefType != nil {
 		refType = string(*request.Body.RefType)
 	}
-	role := "base"
+	role := string(api.Base)
 	if request.Body.Role != nil {
 		role = string(*request.Body.Role)
 	}
@@ -36,7 +35,7 @@ func (s *Server) PushAssetRevision(ctx context.Context, request asset.PushAssetR
 		value := request.Body.SourceCommit.MustGet()
 		sourceCommit = &value
 	}
-	requestHash, err := service.RequestDigest("pushAssetRevision", map[string]any{
+	requestHash, err := service.RequestDigest(operationPushAssetRevision, map[string]any{
 		"tenantSlug": string(request.TenantSlug),
 	}, map[string]any{}, request.Body)
 	if err != nil {
@@ -46,7 +45,7 @@ func (s *Server) PushAssetRevision(ctx context.Context, request asset.PushAssetR
 		ServiceSlug: string(request.Body.ServiceSlug), Kind: string(request.Body.Kind), Name: string(request.Body.Name),
 		RefType: refType, Ref: string(request.Body.Ref), SourceSystem: request.Body.SourceSystem,
 		CreateIfMissing: request.Body.CreateIfMissing != nil && *request.Body.CreateIfMissing,
-		Content: request.Body.Content, ContentType: string(request.Body.ContentType),
+		Content:         request.Body.Content, ContentType: string(request.Body.ContentType),
 		Role: role, Dialect: dialect, SourceCommit: sourceCommit,
 		IdempotencyKey: serviceUUID(api.Uuid(request.Params.IdempotencyKey)),
 		PrincipalType:  string(principal.Kind), PrincipalID: rotationPrincipalID(principal), RequestHash: requestHash,
@@ -61,4 +60,7 @@ func (s *Server) PushAssetRevision(ctx context.Context, request asset.PushAssetR
 	return asset.PushAssetRevision200JSONResponse(body), nil
 }
 
-var _ = strings.TrimSpace
+const (
+	// operationPushAssetRevision 是资产修订推送的幂等摘要操作名。
+	operationPushAssetRevision = "pushAssetRevision"
+)

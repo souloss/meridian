@@ -25,21 +25,21 @@ WHERE tenant_id = $4
 RETURNING tenant_id, id, asset_version_id, service_id, status, acked_by, acked_at, comment, created_at, updated_at
 `
 
-// AckBreakingTodoParams contains the strongly typed arguments for the AckBreakingTodo query.
+// AckBreakingTodoParams 包含 AckBreakingTodo 查询的强类型参数。
 type AckBreakingTodoParams struct {
-	// AckedBy is the acked by value supplied to the AckBreakingTodo query.
+	// AckedBy 是提供给 AckBreakingTodo 查询的 AckedBy 值。
 	AckedBy *uuid.UUID `json:"acked_by"`
-	// AckedAt is the acked at value supplied to the AckBreakingTodo query.
+	// AckedAt 是提供给 AckBreakingTodo 查询的 AckedAt 值。
 	AckedAt pgtype.Timestamptz `json:"acked_at"`
-	// Comment is the comment value supplied to the AckBreakingTodo query.
+	// Comment 是提供给 AckBreakingTodo 查询的 Comment 值。
 	Comment *string `json:"comment"`
-	// TenantID is the tenant id value supplied to the AckBreakingTodo query.
+	// TenantID 是提供给 AckBreakingTodo 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the AckBreakingTodo query.
+	// ID 是提供给 AckBreakingTodo 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// AckBreakingTodo executes the generated AckBreakingTodo database query.
+// AckBreakingTodo 执行生成的 AckBreakingTodo 数据库查询。
 // 确认一条待办（任意授权服务成员确认即关闭）。
 func (q *Queries) AckBreakingTodo(ctx context.Context, arg AckBreakingTodoParams) (BreakingTodo, error) {
 	row := q.db.QueryRow(ctx, ackBreakingTodo,
@@ -72,15 +72,15 @@ WHERE tenant_id = $1
   AND ($2::text = '' OR status = $2)
 `
 
-// CountBreakingTodosParams contains the strongly typed arguments for the CountBreakingTodos query.
+// CountBreakingTodosParams 包含 CountBreakingTodos 查询的强类型参数。
 type CountBreakingTodosParams struct {
-	// TenantID is the tenant id value supplied to the CountBreakingTodos query.
+	// TenantID 是提供给 CountBreakingTodos 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// StatusFilter is the status filter value supplied to the CountBreakingTodos query.
+	// StatusFilter 是提供给 CountBreakingTodos 查询的 StatusFilter 值。
 	StatusFilter string `json:"status_filter"`
 }
 
-// CountBreakingTodos executes the generated CountBreakingTodos database query.
+// CountBreakingTodos 执行生成的 CountBreakingTodos 数据库查询。
 // 统计破坏性变更待办总数。
 func (q *Queries) CountBreakingTodos(ctx context.Context, arg CountBreakingTodosParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countBreakingTodos, arg.TenantID, arg.StatusFilter)
@@ -96,19 +96,19 @@ ON CONFLICT (tenant_id, asset_version_id, service_id) DO NOTHING
 RETURNING tenant_id, id, asset_version_id, service_id, status, acked_by, acked_at, comment, created_at, updated_at
 `
 
-// CreateBreakingTodoIfAbsentParams contains the strongly typed arguments for the CreateBreakingTodoIfAbsent query.
+// CreateBreakingTodoIfAbsentParams 包含 CreateBreakingTodoIfAbsent 查询的强类型参数。
 type CreateBreakingTodoIfAbsentParams struct {
-	// TenantID is the tenant id value supplied to the CreateBreakingTodoIfAbsent query.
+	// TenantID 是提供给 CreateBreakingTodoIfAbsent 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateBreakingTodoIfAbsent query.
+	// ID 是提供给 CreateBreakingTodoIfAbsent 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// AssetVersionID is the asset version id value supplied to the CreateBreakingTodoIfAbsent query.
+	// AssetVersionID 是提供给 CreateBreakingTodoIfAbsent 查询的 AssetVersionID 值。
 	AssetVersionID uuid.UUID `json:"asset_version_id"`
-	// ServiceID is the service id value supplied to the CreateBreakingTodoIfAbsent query.
+	// ServiceID 是提供给 CreateBreakingTodoIfAbsent 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
 }
 
-// CreateBreakingTodoIfAbsent executes the generated CreateBreakingTodoIfAbsent database query.
+// CreateBreakingTodoIfAbsent 执行生成的 CreateBreakingTodoIfAbsent 数据库查询。
 // 幂等创建一条破坏性变更待办（唯一键 asset_version_id + service_id）。
 func (q *Queries) CreateBreakingTodoIfAbsent(ctx context.Context, arg CreateBreakingTodoIfAbsentParams) (BreakingTodo, error) {
 	row := q.db.QueryRow(ctx, createBreakingTodoIfAbsent,
@@ -145,31 +145,31 @@ INSERT INTO diff_snapshots (
 RETURNING tenant_id, id, left_selector, right_selector, left_artifact_ref, right_artifact_ref, rule_set_id, result_ref, summary, created_by, created_at
 `
 
-// CreateDiffSnapshotParams contains the strongly typed arguments for the CreateDiffSnapshot query.
+// CreateDiffSnapshotParams 包含 CreateDiffSnapshot 查询的强类型参数。
 type CreateDiffSnapshotParams struct {
-	// TenantID is the tenant id value supplied to the CreateDiffSnapshot query.
+	// TenantID 是提供给 CreateDiffSnapshot 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateDiffSnapshot query.
+	// ID 是提供给 CreateDiffSnapshot 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// LeftSelector is the left selector value supplied to the CreateDiffSnapshot query.
+	// LeftSelector 是提供给 CreateDiffSnapshot 查询的 LeftSelector 值。
 	LeftSelector []byte `json:"left_selector"`
-	// RightSelector is the right selector value supplied to the CreateDiffSnapshot query.
+	// RightSelector 是提供给 CreateDiffSnapshot 查询的 RightSelector 值。
 	RightSelector []byte `json:"right_selector"`
-	// LeftArtifactRef is the left artifact ref value supplied to the CreateDiffSnapshot query.
+	// LeftArtifactRef 是提供给 CreateDiffSnapshot 查询的 LeftArtifactRef 值。
 	LeftArtifactRef string `json:"left_artifact_ref"`
-	// RightArtifactRef is the right artifact ref value supplied to the CreateDiffSnapshot query.
+	// RightArtifactRef 是提供给 CreateDiffSnapshot 查询的 RightArtifactRef 值。
 	RightArtifactRef string `json:"right_artifact_ref"`
-	// RuleSetID is the rule set id value supplied to the CreateDiffSnapshot query.
+	// RuleSetID 是提供给 CreateDiffSnapshot 查询的 RuleSetID 值。
 	RuleSetID *uuid.UUID `json:"rule_set_id"`
-	// ResultRef is the result ref value supplied to the CreateDiffSnapshot query.
+	// ResultRef 是提供给 CreateDiffSnapshot 查询的 ResultRef 值。
 	ResultRef string `json:"result_ref"`
-	// Summary is the summary value supplied to the CreateDiffSnapshot query.
+	// Summary 是提供给 CreateDiffSnapshot 查询的 Summary 值。
 	Summary []byte `json:"summary"`
-	// CreatedBy is the created by value supplied to the CreateDiffSnapshot query.
+	// CreatedBy 是提供给 CreateDiffSnapshot 查询的 CreatedBy 值。
 	CreatedBy uuid.UUID `json:"created_by"`
 }
 
-// CreateDiffSnapshot executes the generated CreateDiffSnapshot database query.
+// CreateDiffSnapshot 执行生成的 CreateDiffSnapshot 数据库查询。
 // 创建一条差异快照，冻结解析后的选择器与产物。
 func (q *Queries) CreateDiffSnapshot(ctx context.Context, arg CreateDiffSnapshotParams) (DiffSnapshot, error) {
 	row := q.db.QueryRow(ctx, createDiffSnapshot,
@@ -214,33 +214,33 @@ INSERT INTO share_links (
 RETURNING tenant_id, id, token_hash, creator_id, resource_type, resource_id, descriptor, view_id, options, artifact_allowlist, expires_at, revoked_at, created_at
 `
 
-// CreateShareLinkParams contains the strongly typed arguments for the CreateShareLink query.
+// CreateShareLinkParams 包含 CreateShareLink 查询的强类型参数。
 type CreateShareLinkParams struct {
-	// TenantID is the tenant id value supplied to the CreateShareLink query.
+	// TenantID 是提供给 CreateShareLink 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateShareLink query.
+	// ID 是提供给 CreateShareLink 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TokenHash is the token hash value supplied to the CreateShareLink query.
+	// TokenHash 是提供给 CreateShareLink 查询的 TokenHash 值。
 	TokenHash []byte `json:"token_hash"`
-	// CreatorID is the creator id value supplied to the CreateShareLink query.
+	// CreatorID 是提供给 CreateShareLink 查询的 CreatorID 值。
 	CreatorID uuid.UUID `json:"creator_id"`
-	// ResourceType is the resource type value supplied to the CreateShareLink query.
+	// ResourceType 是提供给 CreateShareLink 查询的 ResourceType 值。
 	ResourceType string `json:"resource_type"`
-	// ResourceID is the resource id value supplied to the CreateShareLink query.
+	// ResourceID 是提供给 CreateShareLink 查询的 ResourceID 值。
 	ResourceID *uuid.UUID `json:"resource_id"`
-	// Descriptor is the descriptor value supplied to the CreateShareLink query.
+	// Descriptor 是提供给 CreateShareLink 查询的 Descriptor 值。
 	Descriptor []byte `json:"descriptor"`
-	// ViewID is the view id value supplied to the CreateShareLink query.
+	// ViewID 是提供给 CreateShareLink 查询的 ViewID 值。
 	ViewID *string `json:"view_id"`
-	// Options is the options value supplied to the CreateShareLink query.
+	// Options 是提供给 CreateShareLink 查询的 Options 值。
 	Options []byte `json:"options"`
-	// ArtifactAllowlist is the artifact allowlist value supplied to the CreateShareLink query.
+	// ArtifactAllowlist 是提供给 CreateShareLink 查询的 ArtifactAllowlist 值。
 	ArtifactAllowlist []byte `json:"artifact_allowlist"`
-	// ExpiresAt is the expires at value supplied to the CreateShareLink query.
+	// ExpiresAt 是提供给 CreateShareLink 查询的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// CreateShareLink executes the generated CreateShareLink database query.
+// CreateShareLink 执行生成的 CreateShareLink 数据库查询。
 // 创建一条分享链接，令牌哈希全局唯一。
 func (q *Queries) CreateShareLink(ctx context.Context, arg CreateShareLinkParams) (ShareLink, error) {
 	row := q.db.QueryRow(ctx, createShareLink,
@@ -284,27 +284,27 @@ VALUES (
 RETURNING tenant_id, id, blob_digest, kind, content_type, size_bytes, expires_at, created_by, created_at
 `
 
-// CreateUploadParams contains the strongly typed arguments for the CreateUpload query.
+// CreateUploadParams 包含 CreateUpload 查询的强类型参数。
 type CreateUploadParams struct {
-	// TenantID is the tenant id value supplied to the CreateUpload query.
+	// TenantID 是提供给 CreateUpload 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateUpload query.
+	// ID 是提供给 CreateUpload 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// BlobDigest is the blob digest value supplied to the CreateUpload query.
+	// BlobDigest 是提供给 CreateUpload 查询的 BlobDigest 值。
 	BlobDigest string `json:"blob_digest"`
-	// Kind is the kind value supplied to the CreateUpload query.
+	// Kind 是提供给 CreateUpload 查询的 Kind 值。
 	Kind string `json:"kind"`
-	// ContentType is the content type value supplied to the CreateUpload query.
+	// ContentType 是提供给 CreateUpload 查询的 ContentType 值。
 	ContentType string `json:"content_type"`
-	// SizeBytes is the size bytes value supplied to the CreateUpload query.
+	// SizeBytes 是提供给 CreateUpload 查询的 SizeBytes 值。
 	SizeBytes int64 `json:"size_bytes"`
-	// ExpiresAt is the expires at value supplied to the CreateUpload query.
+	// ExpiresAt 是提供给 CreateUpload 查询的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
-	// CreatedBy is the created by value supplied to the CreateUpload query.
+	// CreatedBy 是提供给 CreateUpload 查询的 CreatedBy 值。
 	CreatedBy *uuid.UUID `json:"created_by"`
 }
 
-// CreateUpload executes the generated CreateUpload database query.
+// CreateUpload 执行生成的 CreateUpload 数据库查询。
 // 创建一条上传。
 func (q *Queries) CreateUpload(ctx context.Context, arg CreateUploadParams) (Upload, error) {
 	row := q.db.QueryRow(ctx, createUpload,
@@ -339,15 +339,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetDiffSnapshotParams contains the strongly typed arguments for the GetDiffSnapshot query.
+// GetDiffSnapshotParams 包含 GetDiffSnapshot 查询的强类型参数。
 type GetDiffSnapshotParams struct {
-	// TenantID is the tenant id value supplied to the GetDiffSnapshot query.
+	// TenantID 是提供给 GetDiffSnapshot 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetDiffSnapshot query.
+	// ID 是提供给 GetDiffSnapshot 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetDiffSnapshot executes the generated GetDiffSnapshot database query.
+// GetDiffSnapshot 执行生成的 GetDiffSnapshot 数据库查询。
 // 返回一条差异快照，供分享描述符冻结。
 func (q *Queries) GetDiffSnapshot(ctx context.Context, arg GetDiffSnapshotParams) (DiffSnapshot, error) {
 	row := q.db.QueryRow(ctx, getDiffSnapshot, arg.TenantID, arg.ID)
@@ -376,7 +376,7 @@ WHERE token_hash = $1
   AND expires_at > now()
 `
 
-// GetShareLinkByTokenHash executes the generated GetShareLinkByTokenHash database query.
+// GetShareLinkByTokenHash 执行生成的 GetShareLinkByTokenHash 数据库查询。
 // 按令牌哈希返回一条未撤销且未过期的分享链接。
 func (q *Queries) GetShareLinkByTokenHash(ctx context.Context, tokenHash []byte) (ShareLink, error) {
 	row := q.db.QueryRow(ctx, getShareLinkByTokenHash, tokenHash)
@@ -412,15 +412,15 @@ WHERE layers.tenant_id = $1
 LIMIT 1
 `
 
-// GetSourceLayerByPushKeyParams contains the strongly typed arguments for the GetSourceLayerByPushKey query.
+// GetSourceLayerByPushKeyParams 包含 GetSourceLayerByPushKey 查询的强类型参数。
 type GetSourceLayerByPushKeyParams struct {
-	// TenantID is the tenant id value supplied to the GetSourceLayerByPushKey query.
+	// TenantID 是提供给 GetSourceLayerByPushKey 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetID is the asset id value supplied to the GetSourceLayerByPushKey query.
+	// AssetID 是提供给 GetSourceLayerByPushKey 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
 }
 
-// GetSourceLayerByPushKey executes the generated GetSourceLayerByPushKey database query.
+// GetSourceLayerByPushKey 执行生成的 GetSourceLayerByPushKey 数据库查询。
 // 返回资产下按推送身份（kind + 资产名模板）匹配的推送层，供重复推送复用同一 overlay 层。
 func (q *Queries) GetSourceLayerByPushKey(ctx context.Context, arg GetSourceLayerByPushKeyParams) (Layer, error) {
 	row := q.db.QueryRow(ctx, getSourceLayerByPushKey, arg.TenantID, arg.AssetID)
@@ -454,15 +454,15 @@ WHERE tenant_id = $1
   AND expires_at > now()
 `
 
-// GetUploadParams contains the strongly typed arguments for the GetUpload query.
+// GetUploadParams 包含 GetUpload 查询的强类型参数。
 type GetUploadParams struct {
-	// TenantID is the tenant id value supplied to the GetUpload query.
+	// TenantID 是提供给 GetUpload 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetUpload query.
+	// ID 是提供给 GetUpload 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetUpload executes the generated GetUpload database query.
+// GetUpload 执行生成的 GetUpload 数据库查询。
 // M3 差异、分享与待办的持久化查询。
 // 全部查询保留 tenant_id 谓词。
 // 返回一条上传，供文件选择器解析。
@@ -493,19 +493,19 @@ LIMIT $4
 OFFSET $3
 `
 
-// ListBreakingTodosParams contains the strongly typed arguments for the ListBreakingTodos query.
+// ListBreakingTodosParams 包含 ListBreakingTodos 查询的强类型参数。
 type ListBreakingTodosParams struct {
-	// TenantID is the tenant id value supplied to the ListBreakingTodos query.
+	// TenantID 是提供给 ListBreakingTodos 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// StatusFilter is the status filter value supplied to the ListBreakingTodos query.
+	// StatusFilter 是提供给 ListBreakingTodos 查询的 StatusFilter 值。
 	StatusFilter string `json:"status_filter"`
-	// PageOffset is the page offset value supplied to the ListBreakingTodos query.
+	// PageOffset 是提供给 ListBreakingTodos 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListBreakingTodos query.
+	// PageLimit 是提供给 ListBreakingTodos 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListBreakingTodos executes the generated ListBreakingTodos database query.
+// ListBreakingTodos 执行生成的 ListBreakingTodos 数据库查询。
 // 列出破坏性变更待办，按状态过滤并分页。
 func (q *Queries) ListBreakingTodos(ctx context.Context, arg ListBreakingTodosParams) ([]BreakingTodo, error) {
 	rows, err := q.db.Query(ctx, listBreakingTodos,

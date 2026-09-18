@@ -15,7 +15,7 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// EnqueueSyncJob records one repo.sync job and its River work atomically.
+// EnqueueSyncJob 原子地记录一条 repo.sync 任务及其 River 工作。
 func (store *DiscoveryStore) EnqueueSyncJob(ctx context.Context, input service.SyncJobInput) (service.JobAccepted, error) {
 	dedupeKey := syncDedupeKey(input.RepositoryID, input.RefType, input.RefName)
 	jobInput, err := json.Marshal(struct {
@@ -32,7 +32,7 @@ func (store *DiscoveryStore) EnqueueSyncJob(ctx context.Context, input service.S
 	queries := generated.New(tx)
 
 	// Idempotency replay: one winner enqueues; concurrent same-key requests
-	// replay the exact stored response, a different digest yields 409.
+	// 重放完全一致的已存响应；摘要不同则返回 409。
 	if input.IdempotencyKey != uuid.Nil() {
 		if err := queries.LockSyncIdempotency(ctx, syncIdempotencyLockKey(input)); err != nil {
 			return service.JobAccepted{}, normalizeError(err)
@@ -46,12 +46,12 @@ func (store *DiscoveryStore) EnqueueSyncJob(ctx context.Context, input service.S
 
 	for {
 		latest, err := queries.LockLatestDiscoveryJob(ctx, generated.LockLatestDiscoveryJobParams{TenantID: input.TenantID, DedupeKey: dedupeKey})
-		generation := int64(1)
+		generation := jobGenerationInitial
 		if err == nil {
-			if latest.Status == "pending" || latest.Status == "running" {
-				// A duplicate request while a job is running sets the dirty flag so
-				// one successor processes the latest input after completion.
-				if latest.Status == "running" {
+			if latest.Status == service.JobStatusPending || latest.Status == service.JobStatusRunning {
+				// 任务运行期间的重复请求置位 dirty 标志，
+				// 使一个后继在完成后处理最新输入。
+				if latest.Status == service.JobStatusRunning {
 					if _, err := queries.MarkSyncJobDirty(ctx, generated.MarkSyncJobDirtyParams{TenantID: input.TenantID, DedupeKey: dedupeKey, ActiveGeneration: latest.ActiveGeneration}); err != nil {
 						return service.JobAccepted{}, normalizeError(err)
 					}
@@ -83,7 +83,7 @@ func (store *DiscoveryStore) EnqueueSyncJob(ctx context.Context, input service.S
 					TenantID: input.TenantID, ID: row.ID, RiverJobID: new(inserted.Job.ID), UpdatedAt: timestamp(time.Now().UTC()),
 				}); err != nil {
 					return service.JobAccepted{}, normalizeError(err)
-				} else if changed != 1 {
+				} else if changed != rowsAffectedOne {
 					return service.JobAccepted{}, fmt.Errorf("attach River job %d to domain job %s: %w", inserted.Job.ID, row.ID, service.ErrPrecondition)
 				}
 			}
@@ -105,10 +105,10 @@ func (store *DiscoveryStore) EnqueueSyncJob(ctx context.Context, input service.S
 }
 
 func syncDedupeKey(repositoryID uuid.UUID, refType, refName string) string {
-	return "repo:" + repositoryID.String() + ":" + refType + ":" + refName
+	return dedupeKeyPrefixSync + repositoryID.String() + ":" + refType + ":" + refName
 }
 
-// MarkSyncJobDirty flags a running repo.sync job for one successor after completion.
+// MarkSyncJobDirty 将一条运行中的 repo.sync 任务标记为脏，使其完成后派生一个后继。
 func (store *DiscoveryStore) MarkSyncJobDirty(ctx context.Context, tenantID uuid.UUID, dedupeKey string, activeGeneration int64) error {
 	if _, err := store.queries.MarkSyncJobDirty(ctx, generated.MarkSyncJobDirtyParams{TenantID: tenantID, DedupeKey: dedupeKey, ActiveGeneration: activeGeneration}); err != nil {
 		return normalizeError(err)
@@ -116,8 +116,7 @@ func (store *DiscoveryStore) MarkSyncJobDirty(ctx context.Context, tenantID uuid
 	return nil
 }
 
-// GetSyncJobForSuccessor returns the completion state used to decide whether a
-// dirty sync job must spawn a successor.
+// GetSyncJobForSuccessor 返回用于判断脏同步任务是否必须派生后继的完成状态。
 func (store *DiscoveryStore) GetSyncJobForSuccessor(ctx context.Context, tenantID, jobID uuid.UUID) (service.SyncJobSuccessorState, error) {
 	row, err := store.queries.GetSyncJobForSuccessor(ctx, generated.GetSyncJobForSuccessorParams{TenantID: tenantID, ID: jobID})
 	if err != nil {
@@ -129,7 +128,7 @@ func (store *DiscoveryStore) GetSyncJobForSuccessor(ctx context.Context, tenantI
 	}, nil
 }
 
-// ClearSyncJobDirty clears the dirty flag once the successor has been enqueued.
+// ClearSyncJobDirty 在后继已入队后清除脏标记。
 func (store *DiscoveryStore) ClearSyncJobDirty(ctx context.Context, tenantID, jobID uuid.UUID) error {
 	if _, err := store.queries.ClearSyncJobDirty(ctx, generated.ClearSyncJobDirtyParams{TenantID: tenantID, ID: jobID}); err != nil {
 		return normalizeError(err)
@@ -138,7 +137,7 @@ func (store *DiscoveryStore) ClearSyncJobDirty(ctx context.Context, tenantID, jo
 }
 
 func syncIdempotencyLockKey(input service.SyncJobInput) string {
-	return "syncRepository:" + input.TenantID.String() + ":" + input.PrincipalType + ":" + input.PrincipalID.String() + ":" + input.IdempotencyKey.String()
+	return syncIdempotencyLockPrefix + input.TenantID.String() + ":" + input.PrincipalType + ":" + input.PrincipalID.String() + ":" + input.IdempotencyKey.String()
 }
 
 func loadSyncReplay(ctx context.Context, queries *generated.Queries, input service.SyncJobInput) (service.JobAccepted, bool, error) {
@@ -160,7 +159,7 @@ func loadSyncReplay(ctx context.Context, queries *generated.Queries, input servi
 		}
 		return service.JobAccepted{}, false, nil
 	}
-	if len(input.RequestHash) != 32 || string(row.RequestHash) != string(input.RequestHash) {
+	if len(input.RequestHash) != sha256DigestBytes || string(row.RequestHash) != string(input.RequestHash) {
 		return service.JobAccepted{}, false, service.ErrIdempotencyConflict
 	}
 	var replay syncReplay
@@ -171,8 +170,10 @@ func loadSyncReplay(ctx context.Context, queries *generated.Queries, input servi
 }
 
 type syncReplay struct {
-	JobID       uuid.UUID `json:"jobId"`
-	Deduplicated bool     `json:"deduplicated"`
+	// JobID 是回放响应中的任务标识。
+	JobID uuid.UUID `json:"jobId"`
+	// Deduplicated 标识该响应来自去重回放。
+	Deduplicated bool `json:"deduplicated"`
 }
 
 func saveSyncReplay(ctx context.Context, queries *generated.Queries, input service.SyncJobInput, accepted service.JobAccepted) error {

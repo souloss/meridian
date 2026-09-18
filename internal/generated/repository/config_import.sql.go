@@ -23,29 +23,29 @@ INSERT INTO config_import_previews (
 RETURNING tenant_id, id, repository_id, ref_type, ref_name, commit, config_digest, preview, created_at, expires_at
 `
 
-// CreateConfigImportPreviewParams contains the strongly typed arguments for the CreateConfigImportPreview query.
+// CreateConfigImportPreviewParams 包含 CreateConfigImportPreview 查询的强类型参数。
 type CreateConfigImportPreviewParams struct {
-	// TenantID is the tenant id value supplied to the CreateConfigImportPreview query.
+	// TenantID 是提供给 CreateConfigImportPreview 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateConfigImportPreview query.
+	// ID 是提供给 CreateConfigImportPreview 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RepositoryID is the repository id value supplied to the CreateConfigImportPreview query.
+	// RepositoryID 是提供给 CreateConfigImportPreview 查询的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
-	// RefType is the ref type value supplied to the CreateConfigImportPreview query.
+	// RefType 是提供给 CreateConfigImportPreview 查询的 RefType 值。
 	RefType string `json:"ref_type"`
-	// RefName is the ref name value supplied to the CreateConfigImportPreview query.
+	// RefName 是提供给 CreateConfigImportPreview 查询的 RefName 值。
 	RefName string `json:"ref_name"`
-	// Commit is the commit value supplied to the CreateConfigImportPreview query.
+	// Commit 是提供给 CreateConfigImportPreview 查询的 Commit 值。
 	Commit string `json:"commit"`
-	// ConfigDigest is the config digest value supplied to the CreateConfigImportPreview query.
+	// ConfigDigest 是提供给 CreateConfigImportPreview 查询的 ConfigDigest 值。
 	ConfigDigest string `json:"config_digest"`
-	// Preview is the preview value supplied to the CreateConfigImportPreview query.
+	// Preview 是提供给 CreateConfigImportPreview 查询的 Preview 值。
 	Preview []byte `json:"preview"`
-	// ExpiresAt is the expires at value supplied to the CreateConfigImportPreview query.
+	// ExpiresAt 是提供给 CreateConfigImportPreview 查询的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// CreateConfigImportPreview executes the generated CreateConfigImportPreview database query.
+// CreateConfigImportPreview 执行生成的 CreateConfigImportPreview 数据库查询。
 // M2 gitops 配置导入的持久化查询。
 // 全部查询保留 tenant_id 谓词。
 // 插入一次可应用的配置导入预览。
@@ -87,17 +87,17 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// GetConfigImportPreviewParams contains the strongly typed arguments for the GetConfigImportPreview query.
+// GetConfigImportPreviewParams 包含 GetConfigImportPreview 查询的强类型参数。
 type GetConfigImportPreviewParams struct {
-	// TenantID is the tenant id value supplied to the GetConfigImportPreview query.
+	// TenantID 是提供给 GetConfigImportPreview 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetConfigImportPreview query.
+	// ID 是提供给 GetConfigImportPreview 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// RepositoryID is the repository id value supplied to the GetConfigImportPreview query.
+	// RepositoryID 是提供给 GetConfigImportPreview 查询的 RepositoryID 值。
 	RepositoryID uuid.UUID `json:"repository_id"`
 }
 
-// GetConfigImportPreview executes the generated GetConfigImportPreview database query.
+// GetConfigImportPreview 执行生成的 GetConfigImportPreview 数据库查询。
 // 返回一次未过期的配置导入预览，锁定供 apply 串行化。
 func (q *Queries) GetConfigImportPreview(ctx context.Context, arg GetConfigImportPreviewParams) (ConfigImportPreview, error) {
 	row := q.db.QueryRow(ctx, getConfigImportPreview, arg.TenantID, arg.ID, arg.RepositoryID)
@@ -124,15 +124,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetConfigImportPreviewByIDParams contains the strongly typed arguments for the GetConfigImportPreviewByID query.
+// GetConfigImportPreviewByIDParams 包含 GetConfigImportPreviewByID 查询的强类型参数。
 type GetConfigImportPreviewByIDParams struct {
-	// TenantID is the tenant id value supplied to the GetConfigImportPreviewByID query.
+	// TenantID 是提供给 GetConfigImportPreviewByID 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetConfigImportPreviewByID query.
+	// ID 是提供给 GetConfigImportPreviewByID 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetConfigImportPreviewByID executes the generated GetConfigImportPreviewByID database query.
+// GetConfigImportPreviewByID 执行生成的 GetConfigImportPreviewByID 数据库查询。
 // 按预览 id 返回一次配置导入预览（跨仓库校验失败时保持只读）。
 func (q *Queries) GetConfigImportPreviewByID(ctx context.Context, arg GetConfigImportPreviewByIDParams) (ConfigImportPreview, error) {
 	row := q.db.QueryRow(ctx, getConfigImportPreviewByID, arg.TenantID, arg.ID)

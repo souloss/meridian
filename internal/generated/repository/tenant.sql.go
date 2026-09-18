@@ -17,7 +17,7 @@ SELECT count(*)::bigint
 FROM tenants
 `
 
-// CountTenants executes the generated CountTenants database query.
+// CountTenants 执行生成的 CountTenants 数据库查询。
 // 返回平台管理可见的租户生命周期记录数量。
 func (q *Queries) CountTenants(ctx context.Context) (int64, error) {
 	row := q.db.QueryRow(ctx, countTenants)
@@ -43,21 +43,21 @@ INSERT INTO tenants (
 RETURNING id, slug, display_name, status, quota, settings, revision, created_at, updated_at
 `
 
-// CreateTenantParams contains the strongly typed arguments for the CreateTenant query.
+// CreateTenantParams 包含 CreateTenant 查询的强类型参数。
 type CreateTenantParams struct {
-	// ID is the id value supplied to the CreateTenant query.
+	// ID 是提供给 CreateTenant 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Slug is the slug value supplied to the CreateTenant query.
+	// Slug 是提供给 CreateTenant 查询的 Slug 值。
 	Slug string `json:"slug"`
-	// DisplayName is the display name value supplied to the CreateTenant query.
+	// DisplayName 是提供给 CreateTenant 查询的 DisplayName 值。
 	DisplayName string `json:"display_name"`
-	// Quota is the quota value supplied to the CreateTenant query.
+	// Quota 是提供给 CreateTenant 查询的 Quota 值。
 	Quota []byte `json:"quota"`
-	// Settings is the settings value supplied to the CreateTenant query.
+	// Settings 是提供给 CreateTenant 查询的 Settings 值。
 	Settings []byte `json:"settings"`
 }
 
-// CreateTenant executes the generated CreateTenant database query.
+// CreateTenant 执行生成的 CreateTenant 数据库查询。
 // 使用明确的配额和设置快照创建租户，快照来自平台默认配置。
 func (q *Queries) CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error) {
 	row := q.db.QueryRow(ctx, createTenant,
@@ -89,7 +89,7 @@ WHERE slug = $1
   AND status = 'active'
 `
 
-// GetActiveTenantBySlug executes the generated GetActiveTenantBySlug database query.
+// GetActiveTenantBySlug 执行生成的 GetActiveTenantBySlug 数据库查询。
 // 仅按 slug 返回有效租户，供租户范围业务访问使用。
 func (q *Queries) GetActiveTenantBySlug(ctx context.Context, slug string) (Tenant, error) {
 	row := q.db.QueryRow(ctx, getActiveTenantBySlug, slug)
@@ -121,27 +121,27 @@ WHERE tenant_members.user_id = $1
   AND tenants.status = 'active'
 `
 
-// GetActiveTenantMembershipParams contains the strongly typed arguments for the GetActiveTenantMembership query.
+// GetActiveTenantMembershipParams 包含 GetActiveTenantMembership 查询的强类型参数。
 type GetActiveTenantMembershipParams struct {
-	// UserID is the user id value supplied to the GetActiveTenantMembership query.
+	// UserID 是提供给 GetActiveTenantMembership 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// TenantSlug is the tenant slug value supplied to the GetActiveTenantMembership query.
+	// TenantSlug 是提供给 GetActiveTenantMembership 查询的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
 }
 
-// GetActiveTenantMembershipRow contains the columns returned by the GetActiveTenantMembership query.
+// GetActiveTenantMembershipRow 包含 GetActiveTenantMembership 查询返回的列。
 type GetActiveTenantMembershipRow struct {
-	// TenantID is the tenant id value returned by the GetActiveTenantMembership query.
+	// TenantID 是 GetActiveTenantMembership 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TenantSlug is the tenant slug value returned by the GetActiveTenantMembership query.
+	// TenantSlug 是 GetActiveTenantMembership 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// TenantDisplayName is the tenant display name value returned by the GetActiveTenantMembership query.
+	// TenantDisplayName 是 GetActiveTenantMembership 查询返回的 TenantDisplayName 值。
 	TenantDisplayName string `json:"tenant_display_name"`
-	// Role is the role value returned by the GetActiveTenantMembership query.
+	// Role 是 GetActiveTenantMembership 查询返回的 Role 值。
 	Role string `json:"role"`
 }
 
-// GetActiveTenantMembership executes the generated GetActiveTenantMembership database query.
+// GetActiveTenantMembership 执行生成的 GetActiveTenantMembership 数据库查询。
 // 返回一条有效租户成员关系，不泄露已停用租户记录。
 func (q *Queries) GetActiveTenantMembership(ctx context.Context, arg GetActiveTenantMembershipParams) (GetActiveTenantMembershipRow, error) {
 	row := q.db.QueryRow(ctx, getActiveTenantMembership, arg.UserID, arg.TenantSlug)
@@ -161,7 +161,7 @@ FROM platform_settings
 WHERE id = 'default'
 `
 
-// GetPlatformSettingsForTenantCreate executes the generated GetPlatformSettingsForTenantCreate database query.
+// GetPlatformSettingsForTenantCreate 执行生成的 GetPlatformSettingsForTenantCreate 数据库查询。
 // 返回创建租户时原子复制到新租户的单例 JSON 默认配置。
 func (q *Queries) GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error) {
 	row := q.db.QueryRow(ctx, getPlatformSettingsForTenantCreate)
@@ -176,7 +176,7 @@ FROM tenants
 WHERE slug = $1
 `
 
-// GetTenantBySlug executes the generated GetTenantBySlug database query.
+// GetTenantBySlug 执行生成的 GetTenantBySlug 数据库查询。
 // 按 slug 返回任意生命周期状态的租户，供平台管理使用。
 func (q *Queries) GetTenantBySlug(ctx context.Context, slug string) (Tenant, error) {
 	row := q.db.QueryRow(ctx, getTenantBySlug, slug)
@@ -208,19 +208,19 @@ WHERE tenant_members.user_id = $1
 ORDER BY tenants.slug, tenants.id
 `
 
-// ListActiveTenantMembershipsRow contains the columns returned by the ListActiveTenantMemberships query.
+// ListActiveTenantMembershipsRow 包含 ListActiveTenantMemberships 查询返回的列。
 type ListActiveTenantMembershipsRow struct {
-	// TenantID is the tenant id value returned by the ListActiveTenantMemberships query.
+	// TenantID 是 ListActiveTenantMemberships 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TenantSlug is the tenant slug value returned by the ListActiveTenantMemberships query.
+	// TenantSlug 是 ListActiveTenantMemberships 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// TenantDisplayName is the tenant display name value returned by the ListActiveTenantMemberships query.
+	// TenantDisplayName 是 ListActiveTenantMemberships 查询返回的 TenantDisplayName 值。
 	TenantDisplayName string `json:"tenant_display_name"`
-	// Role is the role value returned by the ListActiveTenantMemberships query.
+	// Role 是 ListActiveTenantMemberships 查询返回的 Role 值。
 	Role string `json:"role"`
 }
 
-// ListActiveTenantMemberships executes the generated ListActiveTenantMemberships database query.
+// ListActiveTenantMemberships 执行生成的 ListActiveTenantMemberships 数据库查询。
 // 按稳定 slug 和 UUID 顺序返回用户的有效租户成员关系。
 func (q *Queries) ListActiveTenantMemberships(ctx context.Context, userID uuid.UUID) ([]ListActiveTenantMembershipsRow, error) {
 	rows, err := q.db.Query(ctx, listActiveTenantMemberships, userID)
@@ -255,35 +255,35 @@ LIMIT $2
 OFFSET $1
 `
 
-// ListTenantsParams contains the strongly typed arguments for the ListTenants query.
+// ListTenantsParams 包含 ListTenants 查询的强类型参数。
 type ListTenantsParams struct {
-	// PageOffset is the page offset value supplied to the ListTenants query.
+	// PageOffset 是提供给 ListTenants 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListTenants query.
+	// PageLimit 是提供给 ListTenants 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListTenantsRow contains the columns returned by the ListTenants query.
+// ListTenantsRow 包含 ListTenants 查询返回的列。
 type ListTenantsRow struct {
-	// ID is the id value returned by the ListTenants query.
+	// ID 是 ListTenants 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Slug is the slug value returned by the ListTenants query.
+	// Slug 是 ListTenants 查询返回的 Slug 值。
 	Slug string `json:"slug"`
-	// DisplayName is the display name value returned by the ListTenants query.
+	// DisplayName 是 ListTenants 查询返回的 DisplayName 值。
 	DisplayName string `json:"display_name"`
-	// Status is the status value returned by the ListTenants query.
+	// Status 是 ListTenants 查询返回的 Status 值。
 	Status string `json:"status"`
-	// Quota is the quota value returned by the ListTenants query.
+	// Quota 是 ListTenants 查询返回的 Quota 值。
 	Quota []byte `json:"quota"`
-	// Revision is the revision value returned by the ListTenants query.
+	// Revision 是 ListTenants 查询返回的 Revision 值。
 	Revision int64 `json:"revision"`
-	// CreatedAt is the created at value returned by the ListTenants query.
+	// CreatedAt 是 ListTenants 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// UpdatedAt is the updated at value returned by the ListTenants query.
+	// UpdatedAt 是 ListTenants 查询返回的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
-// ListTenants executes the generated ListTenants database query.
+// ListTenants 执行生成的 ListTenants 数据库查询。
 // 按稳定 slug 和 UUID 顺序返回全部租户生命周期记录，供平台管理使用。
 func (q *Queries) ListTenants(ctx context.Context, arg ListTenantsParams) ([]ListTenantsRow, error) {
 	rows, err := q.db.Query(ctx, listTenants, arg.PageOffset, arg.PageLimit)
@@ -327,29 +327,29 @@ WHERE slug = $8
 RETURNING id, slug, display_name, status, quota, settings, revision, created_at, updated_at
 `
 
-// UpdateTenantParams contains the strongly typed arguments for the UpdateTenant query.
+// UpdateTenantParams 包含 UpdateTenant 查询的强类型参数。
 type UpdateTenantParams struct {
-	// SetDisplayName is the set display name value supplied to the UpdateTenant query.
+	// SetDisplayName 是提供给 UpdateTenant 查询的 SetDisplayName 值。
 	SetDisplayName bool `json:"set_display_name"`
-	// DisplayName is the display name value supplied to the UpdateTenant query.
+	// DisplayName 是提供给 UpdateTenant 查询的 DisplayName 值。
 	DisplayName string `json:"display_name"`
-	// SetStatus is the set status value supplied to the UpdateTenant query.
+	// SetStatus 是提供给 UpdateTenant 查询的 SetStatus 值。
 	SetStatus bool `json:"set_status"`
-	// Status is the status value supplied to the UpdateTenant query.
+	// Status 是提供给 UpdateTenant 查询的 Status 值。
 	Status string `json:"status"`
-	// SetQuota is the set quota value supplied to the UpdateTenant query.
+	// SetQuota 是提供给 UpdateTenant 查询的 SetQuota 值。
 	SetQuota bool `json:"set_quota"`
-	// Quota is the quota value supplied to the UpdateTenant query.
+	// Quota 是提供给 UpdateTenant 查询的 Quota 值。
 	Quota []byte `json:"quota"`
-	// UpdatedAt is the updated at value supplied to the UpdateTenant query.
+	// UpdatedAt 是提供给 UpdateTenant 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// Slug is the slug value supplied to the UpdateTenant query.
+	// Slug 是提供给 UpdateTenant 查询的 Slug 值。
 	Slug string `json:"slug"`
-	// ExpectedRevision is the expected revision value supplied to the UpdateTenant query.
+	// ExpectedRevision 是提供给 UpdateTenant 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateTenant executes the generated UpdateTenant database query.
+// UpdateTenant 执行生成的 UpdateTenant 数据库查询。
 // 有条件地更新平台控制的租户字段并递增版本号。
 // 字段 set 标志保留 PATCH 字段省略状态，同时允许完整替换配额。
 func (q *Queries) UpdateTenant(ctx context.Context, arg UpdateTenantParams) (Tenant, error) {
@@ -396,19 +396,19 @@ SET
 RETURNING tenant_id, user_id, role, created_at, updated_at
 `
 
-// UpsertTenantMemberParams contains the strongly typed arguments for the UpsertTenantMember query.
+// UpsertTenantMemberParams 包含 UpsertTenantMember 查询的强类型参数。
 type UpsertTenantMemberParams struct {
-	// TenantID is the tenant id value supplied to the UpsertTenantMember query.
+	// TenantID 是提供给 UpsertTenantMember 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// UserID is the user id value supplied to the UpsertTenantMember query.
+	// UserID 是提供给 UpsertTenantMember 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// Role is the role value supplied to the UpsertTenantMember query.
+	// Role 是提供给 UpsertTenantMember 查询的 Role 值。
 	Role string `json:"role"`
-	// UpdatedAt is the updated at value supplied to the UpsertTenantMember query.
+	// UpdatedAt 是提供给 UpsertTenantMember 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
-// UpsertTenantMember executes the generated UpsertTenantMember database query.
+// UpsertTenantMember 执行生成的 UpsertTenantMember 数据库查询。
 // 创建或替换租户角色关系，并记录调用方提供的更新时间。
 func (q *Queries) UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error) {
 	row := q.db.QueryRow(ctx, upsertTenantMember,

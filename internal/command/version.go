@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// newVersionCommand 构造打印 Meridian 构建版本的子命令。
 func newVersionCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",

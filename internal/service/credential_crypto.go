@@ -24,17 +24,22 @@ const (
 	credentialKeyBytes   = 32
 	credentialNonceBytes = 12
 	credentialHKDFInfo   = "meridian-credential-v1"
+	// credentialUsernameMaxBytes 是 HTTP 凭据用户名的最大字节长度。
+	credentialUsernameMaxBytes = 128
+	// credentialTokenMinBytes 是 HTTP 凭据令牌的最小字节长度。
+	credentialTokenMinBytes = 8
 )
 
 var (
-	// ErrCredentialSecretInvalid means a credential secret failed structural or cryptographic validation.
+	// ErrCredentialSecretInvalid 表示凭据秘密未通过结构或密码学校验。
+	// 对外映射：ErrorCodeValidation（HTTP 422）。
 	ErrCredentialSecretInvalid = errors.New("credential secret is invalid")
-	// ErrCredentialKeyUnavailable means an encrypted row references no configured master-key version.
+	// ErrCredentialKeyUnavailable 表示加密行引用了未配置的主密钥版本。
+	// 对外映射：ErrorCodeInternal（HTTP 500）。
 	ErrCredentialKeyUnavailable = errors.New("credential master-key version is unavailable")
 )
 
-// CredentialSecret is write-only material accepted by the credential use cases.
-// Exactly one of SSH or HTTP is populated according to Kind.
+// CredentialSecret 是凭据用例接受的仅写入材料。根据 Kind 恰好填充 SSH 或 HTTP 之一。
 type CredentialSecret struct {
 	Kind         string
 	PrivateKey   string
@@ -43,7 +48,7 @@ type CredentialSecret struct {
 	HTTPToken    string
 }
 
-// EncryptedCredential is the storage projection of one encrypted secret.
+// EncryptedCredential 是一个加密秘密的存储投影。
 type EncryptedCredential struct {
 	Ciphertext  []byte
 	Nonce       []byte
@@ -51,21 +56,21 @@ type EncryptedCredential struct {
 	Fingerprint string
 }
 
-// KnownHostIdentity is the server-derived identity of an RFC 4253 public key blob.
+// KnownHostIdentity 是由服务器派生的 RFC 4253 公钥 blob 身份。
 type KnownHostIdentity struct {
 	KeyType     string
 	PublicKey   []byte
 	Fingerprint string
 }
 
-// CredentialKeyring encrypts credential rows with per-row HKDF-derived AES-256-GCM keys.
+// CredentialKeyring 使用按行 HKDF 派生的 AES-256-GCM 密钥加密凭据行。
 type CredentialKeyring struct {
 	activeVersion  int32
 	keys           map[int32][credentialKeyBytes]byte
 	fingerprintKey [credentialKeyBytes]byte
 }
 
-// NewCredentialKeyring validates active master and fingerprint keys.
+// NewCredentialKeyring 校验活跃主密钥与指纹密钥。
 func NewCredentialKeyring(masterKey string, activeVersion int32, fingerprintKey string) (CredentialKeyring, error) {
 	master, err := decodeBase64Key(masterKey, base64.StdEncoding)
 	if err != nil {
@@ -88,7 +93,7 @@ func NewCredentialKeyring(masterKey string, activeVersion int32, fingerprintKey 
 	}, nil
 }
 
-// NewCredentialKeyringWithPrevious adds validated previous master-key versions for decrypt-only use.
+// NewCredentialKeyringWithPrevious 添加校验后的历史主密钥版本，仅供解密使用。
 func NewCredentialKeyringWithPrevious(masterKey string, activeVersion int32, fingerprintKey string, previous map[int32]string) (CredentialKeyring, error) {
 	keyring, err := NewCredentialKeyring(masterKey, activeVersion, fingerprintKey)
 	if err != nil {
@@ -112,7 +117,7 @@ func NewCredentialKeyringWithPrevious(masterKey string, activeVersion int32, fin
 	return keyring, nil
 }
 
-// Encrypt validates and encrypts one credential secret for its immutable row identity.
+// Encrypt 校验并加密一个凭据秘密，绑定其不可变行身份。
 func (keyring CredentialKeyring) Encrypt(scopeID string, credentialID uuid.UUID, secret CredentialSecret) (EncryptedCredential, error) {
 	if err := validateCredentialSecret(secret); err != nil {
 		return EncryptedCredential{}, err
@@ -145,7 +150,7 @@ func (keyring CredentialKeyring) Encrypt(scopeID string, credentialID uuid.UUID,
 	return EncryptedCredential{Ciphertext: ciphertext, Nonce: nonce, KeyVersion: keyring.activeVersion, Fingerprint: fingerprint}, nil
 }
 
-// Decrypt verifies and decrypts one stored credential secret under its row-bound AAD.
+// Decrypt 在其行绑定 AAD 下校验并解密一个已存储的凭据秘密。
 func (keyring CredentialKeyring) Decrypt(scopeID string, credentialID uuid.UUID, kind string, encrypted EncryptedCredential) (CredentialSecret, error) {
 	if len(encrypted.Nonce) != credentialNonceBytes || encrypted.KeyVersion < 1 {
 		return CredentialSecret{}, ErrCredentialSecretInvalid
@@ -177,12 +182,12 @@ func (keyring CredentialKeyring) Decrypt(scopeID string, credentialID uuid.UUID,
 	return secret, nil
 }
 
-// Fingerprint derives a stable non-secret credential identity for rotation comparison.
+// Fingerprint 派生稳定的非秘密凭据身份，用于轮换比较。
 func (keyring CredentialKeyring) Fingerprint(secret CredentialSecret) (string, error) {
 	if err := validateCredentialSecret(secret); err != nil {
 		return "", err
 	}
-	if secret.Kind == "ssh_key" {
+	if secret.Kind == credentialKindSSHKey {
 		signer, err := parsePrivateKey(secret)
 		if err != nil {
 			return "", err
@@ -199,7 +204,7 @@ func (keyring CredentialKeyring) Fingerprint(secret CredentialSecret) (string, e
 	return "HMAC-SHA256:" + base64.RawURLEncoding.EncodeToString(mac.Sum(nil)), nil
 }
 
-// ParseKnownHostPublicKey strictly derives key type and fingerprint from an RFC 4253 blob.
+// ParseKnownHostPublicKey 从 RFC 4253 blob 严格派生出密钥类型与指纹。
 func ParseKnownHostPublicKey(encoded string) (KnownHostIdentity, error) {
 	decoded, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
@@ -273,15 +278,15 @@ func (envelope credentialSecretEnvelope) secret() CredentialSecret {
 
 func validateCredentialSecret(secret CredentialSecret) error {
 	switch secret.Kind {
-	case "ssh_key":
+	case credentialKindSSHKey:
 		if strings.TrimSpace(secret.PrivateKey) == "" {
 			return fmt.Errorf("%w: SSH private key is required", ErrCredentialSecretInvalid)
 		}
 		if _, err := parsePrivateKey(secret); err != nil {
 			return err
 		}
-	case "http_token":
-		if strings.TrimSpace(secret.HTTPUsername) == "" || len([]byte(secret.HTTPUsername)) > 128 || len([]byte(secret.HTTPToken)) < 8 {
+	case credentialKindHTTPToken:
+		if strings.TrimSpace(secret.HTTPUsername) == "" || len([]byte(secret.HTTPUsername)) > credentialUsernameMaxBytes || len([]byte(secret.HTTPToken)) < credentialTokenMinBytes {
 			return fmt.Errorf("%w: HTTP username and token are invalid", ErrCredentialSecretInvalid)
 		}
 	default:

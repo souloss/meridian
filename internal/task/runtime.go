@@ -11,34 +11,43 @@ import (
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 )
 
-const riverSchema = "river"
-const outboxDispatchInterval = time.Minute
+// 运行时配置常量。
+const (
+	// riverSchema 是 River 队列使用的数据库 schema 名。
+	riverSchema = "river"
+	// outboxDispatchInterval 是出箱派发的周期扫描间隔。
+	outboxDispatchInterval = time.Minute
+	// queueDefaultMaxWorkers 是默认队列并发执行的工作器数量上限。
+	queueDefaultMaxWorkers = 4
+	// outboxDispatchJobID 是周期性出箱派发任务在 River 中的稳定标识。
+	outboxDispatchJobID = "meridian_outbox_dispatch"
+)
 
-// RuntimeDependencies groups worker persistence and execution ports.
+// RuntimeDependencies 聚合工作器持久化与执行端口。
 type RuntimeDependencies struct {
-	// Executions persists repository synchronization lifecycle transitions.
+	// Executions 持久化仓库同步生命周期迁移。
 	Executions ExecutionStore
-	// SyncRunner executes the M1 repository synchronization pipeline.
+	// SyncRunner 执行 M1 仓库同步流水线。
 	SyncRunner SyncRunner
-	// DiscoverRunner executes the M1 repository discovery pipeline.
+	// DiscoverRunner 执行 M1 仓库发现流水线。
 	DiscoverRunner DiscoverRunner
-	// MergeRunner executes the M2 asset merge pipeline.
+	// MergeRunner 执行 M2 资产合并流水线。
 	MergeRunner MergeRunner
-	// AiGenerateRunner executes the M3 asset AI generation pipeline.
+	// AiGenerateRunner 执行 M3 资产 AI 生成流水线。
 	AiGenerateRunner AiGenerateRunner
-	// Outbox persists delivery leases, retries, and completions.
+	// Outbox 持久化投递租约、重试与完成。
 	Outbox OutboxStore
-	// OutboxDeliverer sends events through configured channel adapters.
+	// OutboxDeliverer 通过已配置的渠道适配器发送事件。
 	OutboxDeliverer OutboxDeliverer
 }
 
-// Runtime owns the River client and the registered Meridian workers.
+// Runtime 拥有 River 客户端与已注册的 Meridian 工作器。
 type Runtime struct {
 	client *river.Client[pgx.Tx]
 }
 
-// NewRuntime constructs an executable River client for the application queue.
-// The caller must start it only after database migrations have completed.
+// NewRuntime 为应用队列构造一个可执行的 River 客户端。
+// 调用者必须仅在数据库迁移完成后启动它。
 func NewRuntime(pool *pgxpool.Pool, dependencies RuntimeDependencies, logger *slog.Logger) (*Runtime, error) {
 	if logger == nil {
 		logger = slog.Default()
@@ -56,9 +65,9 @@ func NewRuntime(pool *pgxpool.Pool, dependencies RuntimeDependencies, logger *sl
 		PeriodicJobs: []*river.PeriodicJob{river.NewPeriodicJob(
 			river.PeriodicInterval(outboxDispatchInterval),
 			func() (river.JobArgs, *river.InsertOpts) { return OutboxDispatchArgs{}, nil },
-			&river.PeriodicJobOpts{ID: "meridian_outbox_dispatch", RunOnStart: true},
+			&river.PeriodicJobOpts{ID: outboxDispatchJobID, RunOnStart: true},
 		)},
-		Queues: map[string]river.QueueConfig{river.QueueDefault: {MaxWorkers: 4}},
+		Queues: map[string]river.QueueConfig{river.QueueDefault: {MaxWorkers: queueDefaultMaxWorkers}},
 		Schema: riverSchema, Workers: workers,
 	})
 	if err != nil {
@@ -67,11 +76,11 @@ func NewRuntime(pool *pgxpool.Pool, dependencies RuntimeDependencies, logger *sl
 	return &Runtime{client: client}, nil
 }
 
-// Client returns the River client used for transactionally inserting jobs.
+// Client 返回用于事务性插入任务的 River 客户端。
 func (runtime *Runtime) Client() *river.Client[pgx.Tx] { return runtime.client }
 
-// Start starts queue polling and worker execution.
+// Start 启动队列轮询与工作器执行。
 func (runtime *Runtime) Start(ctx context.Context) error { return runtime.client.Start(ctx) }
 
-// Stop waits for in-flight workers and releases River resources.
+// Stop 等待在途工作器并释放 River 资源。
 func (runtime *Runtime) Stop(ctx context.Context) error { return runtime.client.Stop(ctx) }

@@ -15,7 +15,7 @@ import (
 	"github.com/oapi-codegen/nullable"
 )
 
-// DiscoverRepository enqueues one repository discovery job.
+// DiscoverRepository 入队一次仓库发现任务。
 func (s *Server) DiscoverRepository(ctx context.Context, request repository.DiscoverRepositoryRequestObject) (repository.DiscoverRepositoryResponseObject, error) {
 	if s.discovery == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -24,7 +24,7 @@ func (s *Server) DiscoverRepository(ctx context.Context, request repository.Disc
 	if err != nil {
 		return nil, err
 	}
-	refType, refName := "branch", ""
+	refType, refName := string(api.RefTypeBranch), ""
 	if request.Body.RefType != nil {
 		refType = string(*request.Body.RefType)
 	}
@@ -41,7 +41,7 @@ func (s *Server) DiscoverRepository(ctx context.Context, request repository.Disc
 	return repository.DiscoverRepository202JSONResponse(jobAcceptedResponse(accepted)), nil
 }
 
-// ListDiscoveryCandidates returns the discovery candidate page for a repository.
+// ListDiscoveryCandidates 返回仓库的发现候选分页。
 func (s *Server) ListDiscoveryCandidates(ctx context.Context, request repository.ListDiscoveryCandidatesRequestObject) (repository.ListDiscoveryCandidatesResponseObject, error) {
 	if s.discovery == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -64,7 +64,7 @@ func (s *Server) ListDiscoveryCandidates(ctx context.Context, request repository
 	}), nil
 }
 
-// AcceptDiscoveryCandidates converts pending candidates into services.
+// AcceptDiscoveryCandidates 将待处理候选转换为服务。
 func (s *Server) AcceptDiscoveryCandidates(ctx context.Context, request repository.AcceptDiscoveryCandidatesRequestObject) (repository.AcceptDiscoveryCandidatesResponseObject, error) {
 	if s.discovery == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -110,7 +110,7 @@ func (s *Server) AcceptDiscoveryCandidates(ctx context.Context, request reposito
 	return repository.AcceptDiscoveryCandidates200JSONResponse(api.ServiceList{Items: responses}), nil
 }
 
-// ListAvailableProducerProfiles returns profiles selectable for a tenant source.
+// ListAvailableProducerProfiles 返回可供租户源选择的生产者配置。
 func (s *Server) ListAvailableProducerProfiles(ctx context.Context, request tenant.ListAvailableProducerProfilesRequestObject) (tenant.ListAvailableProducerProfilesResponseObject, error) {
 	if s.producers == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -134,7 +134,7 @@ func (s *Server) ListAvailableProducerProfiles(ctx context.Context, request tena
 	return tenant.ListAvailableProducerProfiles200JSONResponse(api.ProducerProfileOptionList{Items: responses}), nil
 }
 
-// CreateProducerProfile registers one platform producer configuration.
+// CreateProducerProfile 注册一份平台生产者配置。
 func (s *Server) CreateProducerProfile(ctx context.Context, request platform.CreateProducerProfileRequestObject) (platform.CreateProducerProfileResponseObject, error) {
 	if s.producers == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -163,7 +163,7 @@ func (s *Server) CreateProducerProfile(ctx context.Context, request platform.Cre
 	}, nil
 }
 
-// CreateSourceSpec registers one source configuration for a service.
+// CreateSourceSpec 为服务注册一份源配置。
 func (s *Server) CreateSourceSpec(ctx context.Context, request asset.CreateSourceSpecRequestObject) (asset.CreateSourceSpecResponseObject, error) {
 	if s.discovery == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -182,7 +182,7 @@ func (s *Server) CreateSourceSpec(ctx context.Context, request asset.CreateSourc
 	}, nil
 }
 
-// ListSourceSpecs returns the active source specs for one service.
+// ListSourceSpecs 返回一个服务的有效源配置。
 func (s *Server) ListSourceSpecs(ctx context.Context, request asset.ListSourceSpecsRequestObject) (asset.ListSourceSpecsResponseObject, error) {
 	if s.discovery == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -202,7 +202,7 @@ func (s *Server) ListSourceSpecs(ctx context.Context, request asset.ListSourceSp
 	return asset.ListSourceSpecs200JSONResponse(api.SourceSpecList{Items: responses}), nil
 }
 
-// ListSourceBindings returns the current bindings for one source spec.
+// ListSourceBindings 返回一份源配置的当前绑定。
 func (s *Server) ListSourceBindings(ctx context.Context, request asset.ListSourceBindingsRequestObject) (asset.ListSourceBindingsResponseObject, error) {
 	principal, err := principalFromContext(ctx)
 	if err != nil {
@@ -219,16 +219,17 @@ func (s *Server) ListSourceBindings(ctx context.Context, request asset.ListSourc
 	return asset.ListSourceBindings200JSONResponse(api.SourceBindingList{Items: responses}), nil
 }
 
+// discoveryCandidateResponse 将发现候选记录投影为 API 形状。
 func discoveryCandidateResponse(record service.DiscoveryCandidateRecord) api.DiscoveryCandidate {
 	detectedKinds := make([]api.KindId, 0)
 	return api.DiscoveryCandidate{
 		Id: api.Uuid(record.ID), Path: record.RootDir, SuggestedSlug: api.Slug(serviceSlug(record.RootDir)),
-		DisplayName: serviceDisplayName(record.RootDir), Confidence: 1, DetectedKinds: detectedKinds,
+		DisplayName: serviceDisplayName(record.RootDir), Confidence: detectedCandidateConfidence, DetectedKinds: detectedKinds,
 		Status: api.DiscoveryCandidateStatus(record.Status), DiscoveredAt: record.UpdatedAt,
 	}
 }
 
-// serviceSlug derives a stable lowercase slug from a repository root directory.
+// serviceSlug 从仓库根目录推导稳定的小写 slug。
 func serviceSlug(rootDir string) string {
 	base := serviceDisplayName(rootDir)
 	var builder strings.Builder
@@ -247,18 +248,19 @@ func serviceSlug(rootDir string) string {
 	}
 	result := strings.TrimSuffix(builder.String(), "-")
 	if result == "" {
-		return "service"
+		return defaultServiceName
 	}
-	if len(result) > 63 {
-		result = strings.TrimSuffix(result[:63], "-")
+	if len(result) > maxServiceSlugLength {
+		result = strings.TrimSuffix(result[:maxServiceSlugLength], "-")
 	}
 	return result
 }
 
+// serviceDisplayName 从仓库根目录路径提取目录名作为服务显示名。
 func serviceDisplayName(rootDir string) string {
 	trimmed := strings.TrimSuffix(rootDir, "/")
 	if trimmed == "" {
-		return "service"
+		return defaultServiceName
 	}
 	if index := strings.LastIndexByte(trimmed, '/'); index >= 0 {
 		trimmed = trimmed[index+1:]
@@ -266,6 +268,7 @@ func serviceDisplayName(rootDir string) string {
 	return trimmed
 }
 
+// producerProfileOptionResponse 将可选生产者配置投影为 API 形状。
 func producerProfileOptionResponse(record service.ProducerProfileOption) api.ProducerProfileOption {
 	reason := nullable.NewNullNullable[string]()
 	if record.UnavailableReason != nil {
@@ -278,13 +281,14 @@ func producerProfileOptionResponse(record service.ProducerProfileOption) api.Pro
 	}
 }
 
+// producerProfileResponse 将生产者配置记录投影为 API 形状。
 func producerProfileResponse(record service.ProducerProfile) api.ProducerProfile {
 	reason := nullable.NewNullNullable[string]()
 	if record.UnavailableReason != nil {
 		reason = nullable.NewNullableWithValue(*record.UnavailableReason)
 	}
 	return api.ProducerProfile{
-		Id: api.Uuid(record.ID), Etag: revisionETag("producer-profile", record.ID.String(), record.Revision),
+		Id: api.Uuid(record.ID), Etag: revisionETag(etagKindProducerProfile, record.ID.String(), record.Revision),
 		Name: record.Name, Kind: api.ProducerProfileKind(record.Kind), Executable: record.Executable,
 		Args: append([]string(nil), record.Args...), EnvAllowlist: append([]string(nil), record.EnvAllowlist...),
 		SupportedKinds: append([]api.KindId{}, record.SupportedKinds...), ReplaySafe: record.ReplaySafe,
@@ -295,6 +299,7 @@ func producerProfileResponse(record service.ProducerProfile) api.ProducerProfile
 	}
 }
 
+// sourceSpecResponse 将源配置记录投影为 API 形状。
 func sourceSpecResponse(record service.SourceSpecRecord) api.SourceSpec {
 	path := nullable.NewNullNullable[string]()
 	if record.Path != nil {
@@ -311,7 +316,7 @@ func sourceSpecResponse(record service.SourceSpecRecord) api.SourceSpec {
 		initialLayer = nullable.NewNullableWithValue(api.Uuid(*record.InitialLayerID))
 	}
 	return api.SourceSpec{
-		Id: api.Uuid(record.ID), Etag: revisionETag("source-spec", record.ID.String(), record.Revision),
+		Id: api.Uuid(record.ID), Etag: revisionETag(etagKindSourceSpec, record.ID.String(), record.Revision),
 		ServiceId: api.Uuid(record.ServiceID), Kind: api.KindId(record.Kind), AssetNameTemplate: api.AssetNameTemplate(record.AssetNameTemplate),
 		Role: api.LayerRole(record.Role), Origin: api.LayerOrigin(record.Origin), Mode: api.SourceMode(record.Mode),
 		Path: path, ProducerProfileId: profileID, Ord: record.Ord, TimeoutSec: record.TimeoutSec,
@@ -321,6 +326,7 @@ func sourceSpecResponse(record service.SourceSpecRecord) api.SourceSpec {
 	}
 }
 
+// sourceBindingResponse 将源绑定记录投影为 API 形状。
 func sourceBindingResponse(record service.SourceBindingRecord) api.SourceBinding {
 	path := nullable.NewNullNullable[string]()
 	if record.ResolvedPath != nil {
@@ -338,6 +344,7 @@ func sourceBindingResponse(record service.SourceBindingRecord) api.SourceBinding
 	}
 }
 
+// serviceResponse 将服务记录投影为 API 形状。
 func serviceResponse(record service.ServiceRecord) api.Service {
 	description := nullable.NewNullNullable[string]()
 	if record.Description != nil {
@@ -352,20 +359,19 @@ func serviceResponse(record service.ServiceRecord) api.Service {
 		framework = nullable.NewNullableWithValue(*record.Framework)
 	}
 	return api.Service{
-		Id: api.Uuid(record.ID), Etag: revisionETag("service", record.ID.String(), record.Revision),
+		Id: api.Uuid(record.ID), Etag: revisionETag(etagKindService, record.ID.String(), record.Revision),
 		Slug: api.Slug(record.Slug), DisplayName: record.DisplayName, Description: description, RootDir: record.RootDir,
 		Language: language, Framework: framework, Visibility: api.ServiceVisibility(record.Visibility),
-		Lifecycle: api.Lifecycle(record.Lifecycle),
-		Repository: api.RepositoryRef{Id: api.Uuid(record.RepositoryID)},
-		Owners:    api.OwnerRefs{UserIds: []api.Uuid{}, TeamIds: []api.Uuid{}},
+		Lifecycle:   api.Lifecycle(record.Lifecycle),
+		Repository:  api.RepositoryRef{Id: api.Uuid(record.RepositoryID)},
+		Owners:      api.OwnerRefs{UserIds: []api.Uuid{}, TeamIds: []api.Uuid{}},
 		Maintainers: api.OwnerRefs{UserIds: []api.Uuid{}, TeamIds: []api.Uuid{}},
-		Tags: []api.Tag{}, Assets: []api.AssetSummary{}, MissingKinds: []api.MissingKind{},
+		Tags:        []api.Tag{}, Assets: []api.AssetSummary{}, MissingKinds: []api.MissingKind{},
 		Capabilities: api.CapabilityList{}, Starred: false, CreatedAt: record.CreatedAt, UpdatedAt: record.UpdatedAt,
 	}
 }
 
-// serviceResponseWithAssets renders a service response enriched with its asset
-// summaries and missing kinds resolved through the asset read use cases.
+// serviceResponseWithAssets 渲染一个服务响应，并通过资产读取用例补充资产摘要与缺失 kind。
 func serviceResponseWithAssets(record service.ServiceRecord, summaries []service.AssetSummaryRecord, missing []service.MissingKindRecord) api.Service {
 	response := serviceResponse(record)
 	response.Assets = make([]api.AssetSummary, 0, len(summaries))
@@ -391,16 +397,17 @@ func serviceResponseWithAssets(record service.ServiceRecord, summaries []service
 	return response
 }
 
+// sourceSpecInput 将源配置创建请求投影为服务层输入。
 func sourceSpecInput(body api.SourceSpecCreateRequest) service.NewSourceSpec {
 	assetNameTemplate := defaultSourceAssetNameTemplate
 	if body.AssetNameTemplate != nil {
 		assetNameTemplate = string(*body.AssetNameTemplate)
 	}
-	role := "base"
+	role := string(api.Base)
 	if body.Role != "" {
 		role = string(body.Role)
 	}
-	origin := "repo"
+	origin := string(api.LayerOriginRepo)
 	if body.Origin != "" {
 		origin = string(body.Origin)
 	}
@@ -429,16 +436,35 @@ func sourceSpecInput(body api.SourceSpecCreateRequest) service.NewSourceSpec {
 	if body.Enabled != nil {
 		enabled = *body.Enabled
 	}
-	branchPatterns := []string{"**"}
+	branchPatterns := []string{defaultBranchPattern}
 	if body.BranchPatterns != nil {
 		branchPatterns = append([]string(nil), *body.BranchPatterns...)
 	}
 	return service.NewSourceSpec{
 		Kind: string(body.Kind), AssetNameTemplate: assetNameTemplate, Role: role, Origin: origin, Mode: mode,
 		Path: path, ProducerProfileID: profileID, Ord: ord, TimeoutSec: timeoutSec,
-		BranchPatterns: branchPatterns, Enabled: enabled, ConfigOrigin: "api", TargetAssetID: targetAssetID,
+		BranchPatterns: branchPatterns, Enabled: enabled, ConfigOrigin: sourceConfigOriginAPI, TargetAssetID: targetAssetID,
 		ReplaceAiBase: body.ReplaceAiBase != nil && *body.ReplaceAiBase,
 	}
 }
 
-const defaultSourceAssetNameTemplate = "{file_stem}"
+const (
+	// defaultSourceAssetNameTemplate 是源配置缺省的资产名模板。
+	defaultSourceAssetNameTemplate = "{file_stem}"
+	// defaultBranchPattern 是源配置缺省的分支匹配模式（匹配所有分支）。
+	defaultBranchPattern = "**"
+	// sourceConfigOriginAPI 是 API 创建源配置的配置来源标识。
+	sourceConfigOriginAPI = "api"
+	// etagKindSourceSpec 是源配置 ETag 的实体类型令牌。
+	etagKindSourceSpec = "source-spec"
+	// etagKindProducerProfile 是生产者配置 ETag 的实体类型令牌。
+	etagKindProducerProfile = "producer-profile"
+	// etagKindService 是服务 ETag 的实体类型令牌。
+	etagKindService = "service"
+	// defaultServiceName 是空根目录/空目录名回退到的服务名。
+	defaultServiceName = "service"
+	// maxServiceSlugLength 是服务 slug 的最大长度（域名标签风格边界）。
+	maxServiceSlugLength = 63
+	// detectedCandidateConfidence 是发现候选的固定置信度（当前检测器无打分，按契约上限填充）。
+	detectedCandidateConfidence = 1
+)

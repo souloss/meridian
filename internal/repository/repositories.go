@@ -14,18 +14,18 @@ import (
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
-// RepositoryStore implements repository persistence with explicit tenant predicates.
+// RepositoryStore 以显式租户谓词实现仓库持久化。
 type RepositoryStore struct {
 	pool    *pgxpool.Pool
 	queries *generated.Queries
 }
 
-// NewRepositoryStore binds repository persistence to a native pgx pool.
+// NewRepositoryStore 将仓库持久化绑定到原生 pgx 连接池。
 func NewRepositoryStore(pool *pgxpool.Pool) *RepositoryStore {
 	return &RepositoryStore{pool: pool, queries: generated.New(pool)}
 }
 
-// ResolveCredentialReference resolves a visible tenant or global credential UUID.
+// ResolveCredentialReference 解析一个可见的租户或全局凭据 UUID。
 func (store *RepositoryStore) ResolveCredentialReference(ctx context.Context, tenantID, userID, credentialID uuid.UUID) (service.CredentialReference, bool, error) {
 	row, err := store.queries.ResolveRepositoryCredential(ctx, generated.ResolveRepositoryCredentialParams{TenantID: tenantID, UserID: userID, CredentialID: credentialID})
 	if err != nil {
@@ -37,7 +37,7 @@ func (store *RepositoryStore) ResolveCredentialReference(ctx context.Context, te
 	return service.CredentialReference{ID: row.ResolvedID, IsGlobal: row.IsGlobal}, true, nil
 }
 
-// CountRepositories returns active tenant count and the frozen repository quota.
+// CountRepositories 返回活跃租户数与该租户冻结的仓库配额。
 func (store *RepositoryStore) CountRepositories(ctx context.Context, tenantID uuid.UUID) (int64, int64, error) {
 	row, err := store.queries.CountRepositories(ctx, tenantID)
 	if err != nil {
@@ -46,7 +46,7 @@ func (store *RepositoryStore) CountRepositories(ctx context.Context, tenantID uu
 	return row.CurrentCount, row.LimitCount, nil
 }
 
-// ListRepositories returns one deterministic active repository page.
+// ListRepositories 返回一页确定性的活跃仓库。
 func (store *RepositoryStore) ListRepositories(ctx context.Context, tenantID uuid.UUID, query string, limit, offset int32) ([]service.RepositoryRecord, int64, error) {
 	total, err := store.queries.CountListedRepositories(ctx, generated.CountListedRepositoriesParams{TenantID: tenantID, SearchQuery: query})
 	if err != nil {
@@ -67,7 +67,7 @@ func (store *RepositoryStore) ListRepositories(ctx context.Context, tenantID uui
 	return items, total, nil
 }
 
-// GetRepository returns one active repository inside the supplied tenant.
+// GetRepository 返回所给租户内的一条活跃仓库。
 func (store *RepositoryStore) GetRepository(ctx context.Context, tenantID, id uuid.UUID) (service.RepositoryRecord, error) {
 	row, err := store.queries.GetRepository(ctx, generated.GetRepositoryParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -76,7 +76,7 @@ func (store *RepositoryStore) GetRepository(ctx context.Context, tenantID, id uu
 	return repositoryFromRow(row)
 }
 
-// CreateRepository inserts one repository and serializes its policy/config JSON atomically.
+// CreateRepository 插入一条仓库，并原子地序列化其策略/配置 JSON。
 func (store *RepositoryStore) CreateRepository(ctx context.Context, input service.NewRepository) (service.RepositoryRecord, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -93,7 +93,7 @@ func (store *RepositoryStore) CreateRepository(ctx context.Context, input servic
 		return service.RepositoryRecord{}, normalizeError(err)
 	}
 	if count.CurrentCount >= quota {
-		return service.RepositoryRecord{}, &service.QuotaExceededError{Resource: "repositories", Current: count.CurrentCount, Limit: quota}
+		return service.RepositoryRecord{}, &service.QuotaExceededError{Resource: quotaResourceRepositories, Current: count.CurrentCount, Limit: quota}
 	}
 	branchPolicy, err := json.Marshal(input.BranchPolicy)
 	if err != nil {
@@ -117,7 +117,7 @@ func (store *RepositoryStore) CreateRepository(ctx context.Context, input servic
 	return repositoryFromRow(row)
 }
 
-// UpdateRepository conditionally changes repository metadata and advances its ETag revision.
+// UpdateRepository 条件性地变更仓库元数据并推进其 ETag 修订号。
 func (store *RepositoryStore) UpdateRepository(ctx context.Context, input service.UpdateRepository) (service.RepositoryRecord, error) {
 	branchPolicy, err := optionalRepositoryJSON(input.BranchPolicy)
 	if err != nil {
@@ -168,7 +168,7 @@ func (store *RepositoryStore) UpdateRepository(ctx context.Context, input servic
 	return repositoryFromRow(row)
 }
 
-// DeleteRepository soft-deletes one active repository under the expected revision.
+// DeleteRepository 在期望修订号下软删除一条活跃仓库。
 func (store *RepositoryStore) DeleteRepository(ctx context.Context, tenantID, id uuid.UUID, expectedRevision int64, deletedAt time.Time) error {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -187,7 +187,7 @@ func (store *RepositoryStore) DeleteRepository(ctx context.Context, tenantID, id
 	if err != nil {
 		return normalizeError(err)
 	}
-	if changed != 1 {
+	if changed != rowsAffectedOne {
 		return service.ErrPrecondition
 	}
 	return normalizeError(tx.Commit(ctx))
@@ -212,11 +212,16 @@ func optionalStringPointer(value **string) *string {
 }
 
 type repositoryHealthWire struct {
-	LastSyncAt *time.Time               `json:"lastSyncAt"`
-	LastCommit *string                  `json:"lastCommit"`
-	LastError  *service.RepositoryError `json:"lastError"`
-	FailStreak int                      `json:"failStreak"`
-	DurationMS *int                     `json:"durationMs"`
+	// LastSyncAt 是最近一次成功同步的时刻。
+	LastSyncAt *time.Time `json:"lastSyncAt"`
+	// LastCommit 是最近一次同步到的提交。
+	LastCommit *string `json:"lastCommit"`
+	// LastError 是最近一次同步失败的错误。
+	LastError *service.RepositoryError `json:"lastError"`
+	// FailStreak 是连续失败次数。
+	FailStreak int `json:"failStreak"`
+	// DurationMS 是最近一次完成操作耗时（毫秒）。
+	DurationMS *int `json:"durationMs"`
 }
 
 func repositoryFromRow(row generated.Repository) (service.RepositoryRecord, error) {

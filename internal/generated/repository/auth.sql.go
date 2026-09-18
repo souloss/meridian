@@ -19,15 +19,15 @@ WHERE tenant_id = $1
   AND user_id = $2
 `
 
-// CountAPITokensByUserParams contains the strongly typed arguments for the CountAPITokensByUser query.
+// CountAPITokensByUserParams 包含 CountAPITokensByUser 查询的强类型参数。
 type CountAPITokensByUserParams struct {
-	// TenantID is the tenant id value supplied to the CountAPITokensByUser query.
+	// TenantID 是提供给 CountAPITokensByUser 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// UserID is the user id value supplied to the CountAPITokensByUser query.
+	// UserID 是提供给 CountAPITokensByUser 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// CountAPITokensByUser executes the generated CountAPITokensByUser database query.
+// CountAPITokensByUser 执行生成的 CountAPITokensByUser 数据库查询。
 // 返回一个用户在一个租户内拥有的 PAT 元数据总数。
 func (q *Queries) CountAPITokensByUser(ctx context.Context, arg CountAPITokensByUserParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countAPITokensByUser, arg.TenantID, arg.UserID)
@@ -46,7 +46,7 @@ WHERE (
 )
 `
 
-// CountUsers executes the generated CountUsers database query.
+// CountUsers 执行生成的 CountUsers 数据库查询。
 // 返回匹配一次平台搜索的身份数量。
 func (q *Queries) CountUsers(ctx context.Context, searchQuery string) (int64, error) {
 	row := q.db.QueryRow(ctx, countUsers, searchQuery)
@@ -76,25 +76,25 @@ INSERT INTO api_tokens (
 RETURNING tenant_id, id, user_id, name, token_hash, scopes, expires_at, last_used_at, revoked_at, created_at, updated_at
 `
 
-// CreateAPITokenParams contains the strongly typed arguments for the CreateAPIToken query.
+// CreateAPITokenParams 包含 CreateAPIToken 查询的强类型参数。
 type CreateAPITokenParams struct {
-	// TenantID is the tenant id value supplied to the CreateAPIToken query.
+	// TenantID 是提供给 CreateAPIToken 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateAPIToken query.
+	// ID 是提供给 CreateAPIToken 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// UserID is the user id value supplied to the CreateAPIToken query.
+	// UserID 是提供给 CreateAPIToken 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// Name is the name value supplied to the CreateAPIToken query.
+	// Name 是提供给 CreateAPIToken 查询的 Name 值。
 	Name string `json:"name"`
-	// TokenHash is the token hash value supplied to the CreateAPIToken query.
+	// TokenHash 是提供给 CreateAPIToken 查询的 TokenHash 值。
 	TokenHash []byte `json:"token_hash"`
-	// Scopes is the scopes value supplied to the CreateAPIToken query.
+	// Scopes 是提供给 CreateAPIToken 查询的 Scopes 值。
 	Scopes []string `json:"scopes"`
-	// ExpiresAt is the expires at value supplied to the CreateAPIToken query.
+	// ExpiresAt 是提供给 CreateAPIToken 查询的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// CreateAPIToken executes the generated CreateAPIToken database query.
+// CreateAPIToken 执行生成的 CreateAPIToken 数据库查询。
 // 保存租户范围内的 PAT 元数据和令牌摘要，不保存令牌明文。
 func (q *Queries) CreateAPIToken(ctx context.Context, arg CreateAPITokenParams) (ApiToken, error) {
 	row := q.db.QueryRow(ctx, createAPIToken,
@@ -129,7 +129,7 @@ VALUES ($1)
 RETURNING user_id, locale, theme, default_views, revision, created_at, updated_at
 `
 
-// CreateDefaultUserPreferences executes the generated CreateDefaultUserPreferences database query.
+// CreateDefaultUserPreferences 执行生成的 CreateDefaultUserPreferences 数据库查询。
 // 为新身份创建语言、主题和默认视图偏好。
 func (q *Queries) CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error) {
 	row := q.db.QueryRow(ctx, createDefaultUserPreferences, userID)
@@ -163,21 +163,21 @@ INSERT INTO refresh_tokens (
 RETURNING id, user_id, token_hash, family_id, expires_at, revoked_at, replaced_by, created_at
 `
 
-// CreateRefreshTokenParams contains the strongly typed arguments for the CreateRefreshToken query.
+// CreateRefreshTokenParams 包含 CreateRefreshToken 查询的强类型参数。
 type CreateRefreshTokenParams struct {
-	// ID is the id value supplied to the CreateRefreshToken query.
+	// ID 是提供给 CreateRefreshToken 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// UserID is the user id value supplied to the CreateRefreshToken query.
+	// UserID 是提供给 CreateRefreshToken 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// TokenHash is the token hash value supplied to the CreateRefreshToken query.
+	// TokenHash 是提供给 CreateRefreshToken 查询的 TokenHash 值。
 	TokenHash []byte `json:"token_hash"`
-	// FamilyID is the family id value supplied to the CreateRefreshToken query.
+	// FamilyID 是提供给 CreateRefreshToken 查询的 FamilyID 值。
 	FamilyID uuid.UUID `json:"family_id"`
-	// ExpiresAt is the expires at value supplied to the CreateRefreshToken query.
+	// ExpiresAt 是提供给 CreateRefreshToken 查询的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// CreateRefreshToken executes the generated CreateRefreshToken database query.
+// CreateRefreshToken 执行生成的 CreateRefreshToken 数据库查询。
 // 保存刷新令牌摘要，不保存明文；family_id 用于轮换家族与重放检测。
 func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error) {
 	row := q.db.QueryRow(ctx, createRefreshToken,
@@ -220,23 +220,23 @@ INSERT INTO users (
 RETURNING id, username, password_hash, display_name, email, status, is_platform_admin, revision, created_at, updated_at
 `
 
-// CreateUserParams contains the strongly typed arguments for the CreateUser query.
+// CreateUserParams 包含 CreateUser 查询的强类型参数。
 type CreateUserParams struct {
-	// ID is the id value supplied to the CreateUser query.
+	// ID 是提供给 CreateUser 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Username is the username value supplied to the CreateUser query.
+	// Username 是提供给 CreateUser 查询的 Username 值。
 	Username string `json:"username"`
-	// PasswordHash is the password hash value supplied to the CreateUser query.
+	// PasswordHash 是提供给 CreateUser 查询的 PasswordHash 值。
 	PasswordHash string `json:"password_hash"`
-	// DisplayName is the display name value supplied to the CreateUser query.
+	// DisplayName 是提供给 CreateUser 查询的 DisplayName 值。
 	DisplayName string `json:"display_name"`
-	// Email is the email value supplied to the CreateUser query.
+	// Email 是提供给 CreateUser 查询的 Email 值。
 	Email *string `json:"email"`
-	// IsPlatformAdmin is the is platform admin value supplied to the CreateUser query.
+	// IsPlatformAdmin 是提供给 CreateUser 查询的 IsPlatformAdmin 值。
 	IsPlatformAdmin bool `json:"is_platform_admin"`
 }
 
-// CreateUser executes the generated CreateUser database query.
+// CreateUser 执行生成的 CreateUser 数据库查询。
 // 创建一个全局身份，保存 Argon2id PHC 校验值，不保存密码明文。
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser,
@@ -292,47 +292,47 @@ WHERE api_tokens.token_hash = $1
   AND tenants.status = 'active'
 `
 
-// GetAPITokenPrincipalByTokenHashParams contains the strongly typed arguments for the GetAPITokenPrincipalByTokenHash query.
+// GetAPITokenPrincipalByTokenHashParams 包含 GetAPITokenPrincipalByTokenHash 查询的强类型参数。
 type GetAPITokenPrincipalByTokenHashParams struct {
-	// TokenHash is the token hash value supplied to the GetAPITokenPrincipalByTokenHash query.
+	// TokenHash 是提供给 GetAPITokenPrincipalByTokenHash 查询的 TokenHash 值。
 	TokenHash []byte `json:"token_hash"`
-	// AuthenticatedAt is the authenticated at value supplied to the GetAPITokenPrincipalByTokenHash query.
+	// AuthenticatedAt 是提供给 GetAPITokenPrincipalByTokenHash 查询的 AuthenticatedAt 值。
 	AuthenticatedAt pgtype.Timestamptz `json:"authenticated_at"`
 }
 
-// GetAPITokenPrincipalByTokenHashRow contains the columns returned by the GetAPITokenPrincipalByTokenHash query.
+// GetAPITokenPrincipalByTokenHashRow 包含 GetAPITokenPrincipalByTokenHash 查询返回的列。
 type GetAPITokenPrincipalByTokenHashRow struct {
-	// TenantID is the tenant id value returned by the GetAPITokenPrincipalByTokenHash query.
+	// TenantID 是 GetAPITokenPrincipalByTokenHash 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// TokenID is the token id value returned by the GetAPITokenPrincipalByTokenHash query.
+	// TokenID 是 GetAPITokenPrincipalByTokenHash 查询返回的 TokenID 值。
 	TokenID uuid.UUID `json:"token_id"`
-	// UserID is the user id value returned by the GetAPITokenPrincipalByTokenHash query.
+	// UserID 是 GetAPITokenPrincipalByTokenHash 查询返回的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// Scopes is the scopes value returned by the GetAPITokenPrincipalByTokenHash query.
+	// Scopes 是 GetAPITokenPrincipalByTokenHash 查询返回的 Scopes 值。
 	Scopes []string `json:"scopes"`
-	// ExpiresAt is the expires at value returned by the GetAPITokenPrincipalByTokenHash query.
+	// ExpiresAt 是 GetAPITokenPrincipalByTokenHash 查询返回的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
-	// Username is the username value returned by the GetAPITokenPrincipalByTokenHash query.
+	// Username 是 GetAPITokenPrincipalByTokenHash 查询返回的 Username 值。
 	Username string `json:"username"`
-	// DisplayName is the display name value returned by the GetAPITokenPrincipalByTokenHash query.
+	// DisplayName 是 GetAPITokenPrincipalByTokenHash 查询返回的 DisplayName 值。
 	DisplayName string `json:"display_name"`
-	// Email is the email value returned by the GetAPITokenPrincipalByTokenHash query.
+	// Email 是 GetAPITokenPrincipalByTokenHash 查询返回的 Email 值。
 	Email *string `json:"email"`
-	// UserStatus is the user status value returned by the GetAPITokenPrincipalByTokenHash query.
+	// UserStatus 是 GetAPITokenPrincipalByTokenHash 查询返回的 UserStatus 值。
 	UserStatus string `json:"user_status"`
-	// UserRevision is the user revision value returned by the GetAPITokenPrincipalByTokenHash query.
+	// UserRevision 是 GetAPITokenPrincipalByTokenHash 查询返回的 UserRevision 值。
 	UserRevision int64 `json:"user_revision"`
-	// UserCreatedAt is the user created at value returned by the GetAPITokenPrincipalByTokenHash query.
+	// UserCreatedAt 是 GetAPITokenPrincipalByTokenHash 查询返回的 UserCreatedAt 值。
 	UserCreatedAt pgtype.Timestamptz `json:"user_created_at"`
-	// UserUpdatedAt is the user updated at value returned by the GetAPITokenPrincipalByTokenHash query.
+	// UserUpdatedAt 是 GetAPITokenPrincipalByTokenHash 查询返回的 UserUpdatedAt 值。
 	UserUpdatedAt pgtype.Timestamptz `json:"user_updated_at"`
-	// Role is the role value returned by the GetAPITokenPrincipalByTokenHash query.
+	// Role 是 GetAPITokenPrincipalByTokenHash 查询返回的 Role 值。
 	Role string `json:"role"`
-	// TenantSlug is the tenant slug value returned by the GetAPITokenPrincipalByTokenHash query.
+	// TenantSlug 是 GetAPITokenPrincipalByTokenHash 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
 }
 
-// GetAPITokenPrincipalByTokenHash executes the generated GetAPITokenPrincipalByTokenHash database query.
+// GetAPITokenPrincipalByTokenHash 执行生成的 GetAPITokenPrincipalByTokenHash 数据库查询。
 // 根据令牌摘要认证一个用户、成员关系和租户均有效的 PAT。
 func (q *Queries) GetAPITokenPrincipalByTokenHash(ctx context.Context, arg GetAPITokenPrincipalByTokenHashParams) (GetAPITokenPrincipalByTokenHashRow, error) {
 	row := q.db.QueryRow(ctx, getAPITokenPrincipalByTokenHash, arg.TokenHash, arg.AuthenticatedAt)
@@ -378,45 +378,45 @@ WHERE refresh_tokens.token_hash = $1
   AND users.status = 'active'
 `
 
-// GetRefreshTokenPrincipalByTokenHashParams contains the strongly typed arguments for the GetRefreshTokenPrincipalByTokenHash query.
+// GetRefreshTokenPrincipalByTokenHashParams 包含 GetRefreshTokenPrincipalByTokenHash 查询的强类型参数。
 type GetRefreshTokenPrincipalByTokenHashParams struct {
-	// TokenHash is the token hash value supplied to the GetRefreshTokenPrincipalByTokenHash query.
+	// TokenHash 是提供给 GetRefreshTokenPrincipalByTokenHash 查询的 TokenHash 值。
 	TokenHash []byte `json:"token_hash"`
-	// AuthenticatedAt is the authenticated at value supplied to the GetRefreshTokenPrincipalByTokenHash query.
+	// AuthenticatedAt 是提供给 GetRefreshTokenPrincipalByTokenHash 查询的 AuthenticatedAt 值。
 	AuthenticatedAt pgtype.Timestamptz `json:"authenticated_at"`
 }
 
-// GetRefreshTokenPrincipalByTokenHashRow contains the columns returned by the GetRefreshTokenPrincipalByTokenHash query.
+// GetRefreshTokenPrincipalByTokenHashRow 包含 GetRefreshTokenPrincipalByTokenHash 查询返回的列。
 type GetRefreshTokenPrincipalByTokenHashRow struct {
-	// TokenID is the token id value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// TokenID 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 TokenID 值。
 	TokenID uuid.UUID `json:"token_id"`
-	// UserID is the user id value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// UserID 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// FamilyID is the family id value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// FamilyID 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 FamilyID 值。
 	FamilyID uuid.UUID `json:"family_id"`
-	// RevokedAt is the revoked at value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// RevokedAt 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 RevokedAt 值。
 	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
-	// ExpiresAt is the expires at value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// ExpiresAt 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
-	// Username is the username value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// Username 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 Username 值。
 	Username string `json:"username"`
-	// DisplayName is the display name value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// DisplayName 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 DisplayName 值。
 	DisplayName string `json:"display_name"`
-	// Email is the email value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// Email 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 Email 值。
 	Email *string `json:"email"`
-	// UserStatus is the user status value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// UserStatus 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 UserStatus 值。
 	UserStatus string `json:"user_status"`
-	// IsPlatformAdmin is the is platform admin value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// IsPlatformAdmin 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 IsPlatformAdmin 值。
 	IsPlatformAdmin bool `json:"is_platform_admin"`
-	// UserRevision is the user revision value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// UserRevision 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 UserRevision 值。
 	UserRevision int64 `json:"user_revision"`
-	// UserCreatedAt is the user created at value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// UserCreatedAt 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 UserCreatedAt 值。
 	UserCreatedAt pgtype.Timestamptz `json:"user_created_at"`
-	// UserUpdatedAt is the user updated at value returned by the GetRefreshTokenPrincipalByTokenHash query.
+	// UserUpdatedAt 是 GetRefreshTokenPrincipalByTokenHash 查询返回的 UserUpdatedAt 值。
 	UserUpdatedAt pgtype.Timestamptz `json:"user_updated_at"`
 }
 
-// GetRefreshTokenPrincipalByTokenHash executes the generated GetRefreshTokenPrincipalByTokenHash database query.
+// GetRefreshTokenPrincipalByTokenHash 执行生成的 GetRefreshTokenPrincipalByTokenHash 数据库查询。
 // 在调用方指定的时间点，根据令牌摘要认证一个有效刷新令牌和有效用户。
 func (q *Queries) GetRefreshTokenPrincipalByTokenHash(ctx context.Context, arg GetRefreshTokenPrincipalByTokenHashParams) (GetRefreshTokenPrincipalByTokenHashRow, error) {
 	row := q.db.QueryRow(ctx, getRefreshTokenPrincipalByTokenHash, arg.TokenHash, arg.AuthenticatedAt)
@@ -445,7 +445,7 @@ FROM users
 WHERE id = $1
 `
 
-// GetUserByID executes the generated GetUserByID database query.
+// GetUserByID 执行生成的 GetUserByID 数据库查询。
 // 按传入 UUID 返回对应的全局身份。
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByID, id)
@@ -471,7 +471,7 @@ FROM users
 WHERE username = $1
 `
 
-// GetUserByUsername executes the generated GetUserByUsername database query.
+// GetUserByUsername 执行生成的 GetUserByUsername 数据库查询。
 // 按准确且唯一的登录名返回全局身份。
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByUsername, username)
@@ -501,19 +501,19 @@ LIMIT $4
 OFFSET $3
 `
 
-// ListAPITokensByUserParams contains the strongly typed arguments for the ListAPITokensByUser query.
+// ListAPITokensByUserParams 包含 ListAPITokensByUser 查询的强类型参数。
 type ListAPITokensByUserParams struct {
-	// TenantID is the tenant id value supplied to the ListAPITokensByUser query.
+	// TenantID 是提供给 ListAPITokensByUser 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// UserID is the user id value supplied to the ListAPITokensByUser query.
+	// UserID 是提供给 ListAPITokensByUser 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
-	// PageOffset is the page offset value supplied to the ListAPITokensByUser query.
+	// PageOffset 是提供给 ListAPITokensByUser 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListAPITokensByUser query.
+	// PageLimit 是提供给 ListAPITokensByUser 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListAPITokensByUser executes the generated ListAPITokensByUser database query.
+// ListAPITokensByUser 执行生成的 ListAPITokensByUser 数据库查询。
 // 在明确的租户边界内，返回一个用户的稳定分页 PAT 元数据。
 func (q *Queries) ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUserParams) ([]ApiToken, error) {
 	rows, err := q.db.Query(ctx, listAPITokensByUser,
@@ -565,39 +565,39 @@ LIMIT $3
 OFFSET $2
 `
 
-// ListUsersParams contains the strongly typed arguments for the ListUsers query.
+// ListUsersParams 包含 ListUsers 查询的强类型参数。
 type ListUsersParams struct {
-	// SearchQuery is the search query value supplied to the ListUsers query.
+	// SearchQuery 是提供给 ListUsers 查询的 SearchQuery 值。
 	SearchQuery string `json:"search_query"`
-	// PageOffset is the page offset value supplied to the ListUsers query.
+	// PageOffset 是提供给 ListUsers 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListUsers query.
+	// PageLimit 是提供给 ListUsers 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListUsersRow contains the columns returned by the ListUsers query.
+// ListUsersRow 包含 ListUsers 查询返回的列。
 type ListUsersRow struct {
-	// ID is the id value returned by the ListUsers query.
+	// ID 是 ListUsers 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Username is the username value returned by the ListUsers query.
+	// Username 是 ListUsers 查询返回的 Username 值。
 	Username string `json:"username"`
-	// DisplayName is the display name value returned by the ListUsers query.
+	// DisplayName 是 ListUsers 查询返回的 DisplayName 值。
 	DisplayName string `json:"display_name"`
-	// Email is the email value returned by the ListUsers query.
+	// Email 是 ListUsers 查询返回的 Email 值。
 	Email *string `json:"email"`
-	// Status is the status value returned by the ListUsers query.
+	// Status 是 ListUsers 查询返回的 Status 值。
 	Status string `json:"status"`
-	// IsPlatformAdmin is the is platform admin value returned by the ListUsers query.
+	// IsPlatformAdmin 是 ListUsers 查询返回的 IsPlatformAdmin 值。
 	IsPlatformAdmin bool `json:"is_platform_admin"`
-	// Revision is the revision value returned by the ListUsers query.
+	// Revision 是 ListUsers 查询返回的 Revision 值。
 	Revision int64 `json:"revision"`
-	// CreatedAt is the created at value returned by the ListUsers query.
+	// CreatedAt 是 ListUsers 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// UpdatedAt is the updated at value returned by the ListUsers query.
+	// UpdatedAt 是 ListUsers 查询返回的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
-// ListUsers executes the generated ListUsers database query.
+// ListUsers 执行生成的 ListUsers 数据库查询。
 // 为平台管理员返回稳定分页的身份元数据，不包含密码或会话秘密。
 // 可选搜索值只匹配 username 和 display_name。
 func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error) {
@@ -640,15 +640,15 @@ WHERE id = $2
 RETURNING id, username, password_hash, display_name, email, status, is_platform_admin, revision, created_at, updated_at
 `
 
-// PromoteUserToPlatformAdminParams contains the strongly typed arguments for the PromoteUserToPlatformAdmin query.
+// PromoteUserToPlatformAdminParams 包含 PromoteUserToPlatformAdmin 查询的强类型参数。
 type PromoteUserToPlatformAdminParams struct {
-	// UpdatedAt is the updated at value supplied to the PromoteUserToPlatformAdmin query.
+	// UpdatedAt 是提供给 PromoteUserToPlatformAdmin 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// ID is the id value supplied to the PromoteUserToPlatformAdmin query.
+	// ID 是提供给 PromoteUserToPlatformAdmin 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// PromoteUserToPlatformAdmin executes the generated PromoteUserToPlatformAdmin database query.
+// PromoteUserToPlatformAdmin 执行生成的 PromoteUserToPlatformAdmin 数据库查询。
 // 授予平台控制面权限，并递增用户版本号。
 func (q *Queries) PromoteUserToPlatformAdmin(ctx context.Context, arg PromoteUserToPlatformAdminParams) (User, error) {
 	row := q.db.QueryRow(ctx, promoteUserToPlatformAdmin, arg.UpdatedAt, arg.ID)
@@ -679,19 +679,19 @@ WHERE tenant_id = $2
 RETURNING id
 `
 
-// RevokeAPITokenParams contains the strongly typed arguments for the RevokeAPIToken query.
+// RevokeAPITokenParams 包含 RevokeAPIToken 查询的强类型参数。
 type RevokeAPITokenParams struct {
-	// RevokedAt is the revoked at value supplied to the RevokeAPIToken query.
+	// RevokedAt 是提供给 RevokeAPIToken 查询的 RevokedAt 值。
 	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
-	// TenantID is the tenant id value supplied to the RevokeAPIToken query.
+	// TenantID 是提供给 RevokeAPIToken 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the RevokeAPIToken query.
+	// ID 是提供给 RevokeAPIToken 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// UserID is the user id value supplied to the RevokeAPIToken query.
+	// UserID 是提供给 RevokeAPIToken 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// RevokeAPIToken executes the generated RevokeAPIToken database query.
+// RevokeAPIToken 执行生成的 RevokeAPIToken 数据库查询。
 // 幂等撤销一个租户内用户拥有的 PAT，并返回其标识。
 // 返回已经撤销的匹配记录以保持幂等；不存在或属于其他主体的记录仍视为未找到。
 func (q *Queries) RevokeAPIToken(ctx context.Context, arg RevokeAPITokenParams) (uuid.UUID, error) {
@@ -714,15 +714,15 @@ WHERE family_id = $2
   AND revoked_at IS NULL
 `
 
-// RevokeRefreshTokenFamilyParams contains the strongly typed arguments for the RevokeRefreshTokenFamily query.
+// RevokeRefreshTokenFamilyParams 包含 RevokeRefreshTokenFamily 查询的强类型参数。
 type RevokeRefreshTokenFamilyParams struct {
-	// RevokedAt is the revoked at value supplied to the RevokeRefreshTokenFamily query.
+	// RevokedAt 是提供给 RevokeRefreshTokenFamily 查询的 RevokedAt 值。
 	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
-	// FamilyID is the family id value supplied to the RevokeRefreshTokenFamily query.
+	// FamilyID 是提供给 RevokeRefreshTokenFamily 查询的 FamilyID 值。
 	FamilyID uuid.UUID `json:"family_id"`
 }
 
-// RevokeRefreshTokenFamily executes the generated RevokeRefreshTokenFamily database query.
+// RevokeRefreshTokenFamily 执行生成的 RevokeRefreshTokenFamily 数据库查询。
 // 撤销一个刷新令牌家族的全部有效令牌，用于登出或重放检测。
 func (q *Queries) RevokeRefreshTokenFamily(ctx context.Context, arg RevokeRefreshTokenFamilyParams) (int64, error) {
 	result, err := q.db.Exec(ctx, revokeRefreshTokenFamily, arg.RevokedAt, arg.FamilyID)
@@ -741,17 +741,17 @@ WHERE id = $3
   AND revoked_at IS NULL
 `
 
-// RotateRefreshTokenParams contains the strongly typed arguments for the RotateRefreshToken query.
+// RotateRefreshTokenParams 包含 RotateRefreshToken 查询的强类型参数。
 type RotateRefreshTokenParams struct {
-	// RevokedAt is the revoked at value supplied to the RotateRefreshToken query.
+	// RevokedAt 是提供给 RotateRefreshToken 查询的 RevokedAt 值。
 	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
-	// ReplacedBy is the replaced by value supplied to the RotateRefreshToken query.
+	// ReplacedBy 是提供给 RotateRefreshToken 查询的 ReplacedBy 值。
 	ReplacedBy *uuid.UUID `json:"replaced_by"`
-	// ID is the id value supplied to the RotateRefreshToken query.
+	// ID 是提供给 RotateRefreshToken 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// RotateRefreshToken executes the generated RotateRefreshToken database query.
+// RotateRefreshToken 执行生成的 RotateRefreshToken 数据库查询。
 // 原子轮换一个刷新令牌：撤销旧令牌并记录替换的新令牌，返回是否有记录发生变化。
 func (q *Queries) RotateRefreshToken(ctx context.Context, arg RotateRefreshTokenParams) (int64, error) {
 	result, err := q.db.Exec(ctx, rotateRefreshToken, arg.RevokedAt, arg.ReplacedBy, arg.ID)
@@ -771,17 +771,17 @@ WHERE tenant_id = $2
   AND revoked_at IS NULL
 `
 
-// TouchAPITokenParams contains the strongly typed arguments for the TouchAPIToken query.
+// TouchAPITokenParams 包含 TouchAPIToken 查询的强类型参数。
 type TouchAPITokenParams struct {
-	// UsedAt is the used at value supplied to the TouchAPIToken query.
+	// UsedAt 是提供给 TouchAPIToken 查询的 UsedAt 值。
 	UsedAt pgtype.Timestamptz `json:"used_at"`
-	// TenantID is the tenant id value supplied to the TouchAPIToken query.
+	// TenantID 是提供给 TouchAPIToken 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the TouchAPIToken query.
+	// ID 是提供给 TouchAPIToken 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// TouchAPIToken executes the generated TouchAPIToken database query.
+// TouchAPIToken 执行生成的 TouchAPIToken 数据库查询。
 // 记录未撤销租户 PAT 最近一次成功使用的时间。
 func (q *Queries) TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error {
 	_, err := q.db.Exec(ctx, touchAPIToken, arg.UsedAt, arg.TenantID, arg.ID)

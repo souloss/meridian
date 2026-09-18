@@ -8,7 +8,7 @@ import (
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
-// ListPlatformJobs returns only the redacted fields approved by the platform-job contract.
+// ListPlatformJobs 仅返回平台任务契约批准的已脱敏字段。
 func (store *RepositoryStore) ListPlatformJobs(ctx context.Context, filter service.PlatformJobFilter, limit, offset int32) ([]service.PlatformJobRecord, int64, error) {
 	params := generated.ListPlatformJobsParams{
 		TypeFilter: filter.Types, StatusFilter: filter.Statuses, ScopeType: filter.ScopeType,
@@ -32,7 +32,7 @@ func (store *RepositoryStore) ListPlatformJobs(ctx context.Context, filter servi
 	return items, total, nil
 }
 
-// GetPlatformJob returns one redacted job projection by its global UUID.
+// GetPlatformJob 按其全局 UUID 返回一条已脱敏的任务投影。
 func (store *RepositoryStore) GetPlatformJob(ctx context.Context, id uuid.UUID) (service.PlatformJobRecord, error) {
 	row, err := store.queries.GetPlatformJob(ctx, id)
 	if err != nil {

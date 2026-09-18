@@ -23,8 +23,7 @@ const (
 	maxSourcePathRunes             = 512
 )
 
-// Discovery coordinates repository discovery job enqueueing, candidate listing,
-// candidate acceptance, and source configuration use cases.
+// Discovery 协调仓库发现任务入队、候选列表、候选验收与源配置用例。
 type Discovery struct {
 	store      DiscoveryStore
 	identities IdentityStore
@@ -32,27 +31,27 @@ type Discovery struct {
 	now        func() time.Time
 }
 
-// NewDiscovery constructs discovery use cases with caller-owned persistence.
+// NewDiscovery 构造由调用方持有持久化的发现用例。
 func NewDiscovery(store DiscoveryStore, identities IdentityStore) *Discovery {
 	return &Discovery{store: store, identities: identities, now: time.Now}
 }
 
-// WithAssets binds the asset read use cases used to enrich service responses.
+// WithAssets 绑定用于丰富服务响应的资产读取用例。
 func (discovery *Discovery) WithAssets(assets *Assets) *Discovery {
 	discovery.assets = assets
 	return discovery
 }
 
-// Discover enqueues one idempotent repository discovery job and returns its identity.
+// Discover 入队一个幂等仓库发现任务并返回其标识。
 func (discovery *Discovery) Discover(ctx context.Context, actor Principal, tenantSlug string, repositoryID, idempotencyKey uuid.UUID, refType, refName string) (JobAccepted, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "repository:sync")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeRepositorySync)
 	if err != nil {
 		return JobAccepted{}, err
 	}
 	if idempotencyKey == uuid.Nil() {
 		return JobAccepted{}, ErrValidation
 	}
-	if refType != "branch" && refType != "tag" {
+	if refType != refTypeBranch && refType != refTypeTag {
 		return JobAccepted{}, ErrValidation
 	}
 	if refName == "" || !validGitRefName(refName) {
@@ -66,9 +65,9 @@ func (discovery *Discovery) Discover(ctx context.Context, actor Principal, tenan
 	})
 }
 
-// ListCandidates returns one deterministic page of discovery candidates for a repository.
+// ListCandidates 返回仓库的一页确定性发现候选。
 func (discovery *Discovery) ListCandidates(ctx context.Context, actor Principal, tenantSlug string, repositoryID uuid.UUID, page, pageSize int) ([]DiscoveryCandidateRecord, int64, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "repository:read")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryRead)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -78,15 +77,14 @@ func (discovery *Discovery) ListCandidates(ctx context.Context, actor Principal,
 	return discovery.store.ListDiscoveryCandidates(ctx, membership.TenantID, repositoryID, int32(pageSize), int32((page-1)*pageSize))
 }
 
-// AcceptCandidates converts pending candidates into services and returns the
-// accepted service list. Candidate overrides adjust slug, display name, and
-// visibility; the default visibility is private per the frozen contract.
+// AcceptCandidates 将待处理候选转为服务并返回已验收服务列表。候选覆盖调整 slug、展示名与
+// 可见性；默认可见性按冻结契约为 private。
 func (discovery *Discovery) AcceptCandidates(ctx context.Context, actor Principal, tenantSlug string, repositoryID, idempotencyKey uuid.UUID, candidateIDs []uuid.UUID, overrides []CandidateOverride) ([]ServiceRecord, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "service:create")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeServiceCreate)
 	if err != nil {
 		return nil, err
 	}
-	if idempotencyKey == uuid.Nil() || len(candidateIDs) == 0 || len(candidateIDs) > 100 {
+	if idempotencyKey == uuid.Nil() || len(candidateIDs) == 0 || len(candidateIDs) > maxCandidatesPerAccept {
 		return nil, ErrValidation
 	}
 	if _, err := discovery.store.GetRepository(ctx, membership.TenantID, repositoryID); err != nil {
@@ -118,7 +116,7 @@ func (discovery *Discovery) AcceptCandidates(ctx context.Context, actor Principa
 		if candidate.RepositoryID != repositoryID {
 			return nil, ErrNotFound
 		}
-		if candidate.Status != "pending" {
+		if candidate.Status != JobStatusPending {
 			return nil, ErrValidation
 		}
 		override := overrideByID[candidateID]
@@ -127,7 +125,7 @@ func (discovery *Discovery) AcceptCandidates(ctx context.Context, actor Principa
 		if override.DisplayName != nil {
 			displayName = *override.DisplayName
 		}
-		visibility := "private"
+		visibility := serviceVisibilityPrivate
 		if override.Visibility != nil {
 			visibility = *override.Visibility
 		}
@@ -151,9 +149,9 @@ func (discovery *Discovery) AcceptCandidates(ctx context.Context, actor Principa
 	return accepted, nil
 }
 
-// CreateSourceSpec validates mode field compatibility and inserts one source configuration.
+// CreateSourceSpec 校验模式字段兼容性并插入一个源配置。
 func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principal, tenantSlug, serviceSlug string, input NewSourceSpec) (SourceSpecRecord, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "layer:edit")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
 	if err != nil {
 		return SourceSpecRecord{}, err
 	}
@@ -161,7 +159,7 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 	if err != nil {
 		return SourceSpecRecord{}, err
 	}
-	if validated.Mode == "command" || validated.Mode == "ai" {
+	if validated.Mode == sourceModeCommand || validated.Mode == aiMode {
 		if validated.ProducerProfileID == nil {
 			return SourceSpecRecord{}, ErrValidation
 		}
@@ -169,7 +167,7 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 		if err != nil {
 			return SourceSpecRecord{}, err
 		}
-		if profile.DependencyStatus == "unavailable" || !profile.Enabled {
+		if profile.DependencyStatus == dependencyStatusUnavailable || !profile.Enabled {
 			return SourceSpecRecord{}, &ProducerUnavailableError{Kind: validated.Kind}
 		}
 		if !slices.Contains(profile.SupportedKinds, validated.Kind) {
@@ -180,13 +178,13 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 	if err != nil {
 		return SourceSpecRecord{}, err
 	}
-	if service.Lifecycle == "retired" {
+	if service.Lifecycle == serviceLifecycleRetired {
 		return SourceSpecRecord{}, ErrInvalidState
 	}
-	if validated.Mode == "manual" && input.TargetAssetID == nil {
+	if validated.Mode == sourceModeManual && input.TargetAssetID == nil {
 		return SourceSpecRecord{}, ErrValidation
 	}
-	if validated.Role == "base" && validated.Origin == "repo" {
+	if validated.Role == layerRoleBase && validated.Origin == layerOriginRepo {
 		if err := discovery.enforceRepoBaseReplacement(ctx, membership.TenantID, service.ID, input.Kind, input.ReplaceAiBase); err != nil {
 			return SourceSpecRecord{}, err
 		}
@@ -204,8 +202,8 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 	return record, nil
 }
 
-// enforceRepoBaseReplacement rejects an implicit repo base that would replace an
-// AI-generated base, and archives the AI base when replaceAiBase is requested.
+// enforceRepoBaseReplacement 拒绝会替换 AI 生成 base 的隐式仓库 base，并在请求 replaceAiBase
+// 时归档 AI base。
 func (discovery *Discovery) enforceRepoBaseReplacement(ctx context.Context, tenantID, serviceID uuid.UUID, kind string, replace bool) error {
 	if !replace {
 		if _, err := discovery.store.GetAiBaseForService(ctx, tenantID, serviceID, kind); err == nil {
@@ -218,9 +216,9 @@ func (discovery *Discovery) enforceRepoBaseReplacement(ctx context.Context, tena
 	return discovery.store.ReplaceAiBaseForService(ctx, tenantID, serviceID, kind)
 }
 
-// ListSourceBindings returns the current materialized bindings for one source spec.
+// ListSourceBindings 返回某源配置当前的物化绑定。
 func (discovery *Discovery) ListSourceBindings(ctx context.Context, actor Principal, tenantSlug string, sourceID uuid.UUID) ([]SourceBindingRecord, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "asset:read")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeAssetRead)
 	if err != nil {
 		return nil, err
 	}
@@ -230,9 +228,9 @@ func (discovery *Discovery) ListSourceBindings(ctx context.Context, actor Princi
 	return discovery.store.ListSourceBindings(ctx, membership.TenantID, sourceID)
 }
 
-// ListSourceSpecs returns the active source specs for one service.
+// ListSourceSpecs 返回某服务的活跃源配置。
 func (discovery *Discovery) ListSourceSpecs(ctx context.Context, actor Principal, tenantSlug, serviceSlug string) ([]SourceSpecRecord, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "asset:read")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeAssetRead)
 	if err != nil {
 		return nil, err
 	}
@@ -253,9 +251,9 @@ func (discovery *Discovery) ListSourceSpecs(ctx context.Context, actor Principal
 	return specs, nil
 }
 
-// Sync enqueues one idempotent repository synchronization job.
+// Sync 入队一个幂等仓库同步任务。
 func (discovery *Discovery) Sync(ctx context.Context, actor Principal, tenantSlug string, repositoryID, idempotencyKey uuid.UUID, input RepositorySyncInput) (JobAccepted, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "repository:sync")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeRepositorySync)
 	if err != nil {
 		return JobAccepted{}, err
 	}
@@ -264,9 +262,9 @@ func (discovery *Discovery) Sync(ctx context.Context, actor Principal, tenantSlu
 	}
 	refType := input.RefType
 	if refType == "" {
-		refType = "branch"
+		refType = refTypeBranch
 	}
-	if refType != "branch" && refType != "tag" {
+	if refType != refTypeBranch && refType != refTypeTag {
 		return JobAccepted{}, ErrValidation
 	}
 	refName := input.RefName
@@ -296,9 +294,9 @@ func (discovery *Discovery) Sync(ctx context.Context, actor Principal, tenantSlu
 	})
 }
 
-// UpdateSourceSpec applies a validated patch to one source spec.
+// UpdateSourceSpec 对某源配置应用校验后的补丁。
 func (discovery *Discovery) UpdateSourceSpec(ctx context.Context, actor Principal, tenantSlug string, sourceID uuid.UUID, etag string, input SourceSpecPatchInput) (SourceSpecRecord, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "layer:edit")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
 	if err != nil {
 		return SourceSpecRecord{}, err
 	}
@@ -348,9 +346,9 @@ func (discovery *Discovery) UpdateSourceSpec(ctx context.Context, actor Principa
 	return discovery.store.UpdateSourceSpec(ctx, patch)
 }
 
-// GetService returns one service detail and records a successful read.
+// GetService 返回一个服务详情并记录成功读取。
 func (discovery *Discovery) GetService(ctx context.Context, actor Principal, tenantSlug, serviceSlug string) (ServiceRecord, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "service:read")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeServiceRead)
 	if err != nil {
 		return ServiceRecord{}, err
 	}
@@ -364,17 +362,16 @@ func (discovery *Discovery) GetService(ctx context.Context, actor Principal, ten
 	return record, nil
 }
 
-// ServiceDetail carries one service together with its asset summaries and missing kinds.
+// ServiceDetail 携带一个服务及其资产摘要与缺失类别。
 type ServiceDetail struct {
 	Service        ServiceRecord
 	AssetSummaries []AssetSummaryRecord
 	MissingKinds   []MissingKindRecord
 }
 
-// GetServiceDetail returns one service detail enriched with its asset summaries
-// and missing kinds, and records a successful read.
+// GetServiceDetail 返回一个经资产摘要与缺失类别丰富的服务详情，并记录成功读取。
 func (discovery *Discovery) GetServiceDetail(ctx context.Context, actor Principal, tenantSlug, serviceSlug string) (ServiceDetail, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "service:read")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeServiceRead)
 	if err != nil {
 		return ServiceDetail{}, err
 	}
@@ -398,9 +395,9 @@ func (discovery *Discovery) GetServiceDetail(ctx context.Context, actor Principa
 	return detail, nil
 }
 
-// ListRecentServices returns the caller's recently viewed services.
+// ListRecentServices 返回调用方最近浏览的服务。
 func (discovery *Discovery) ListRecentServices(ctx context.Context, actor Principal, tenantSlug string, page, pageSize int) ([]ServiceRecord, int64, error) {
-	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, "service:read")
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeServiceRead)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -456,7 +453,8 @@ func validateMergedSourceSpec(spec SourceSpecRecord) error {
 	return nil
 }
 
-// ProducerUnavailableError reports that the selected producer profile is not usable.
+// ProducerUnavailableError 报告所选生产者配置不可用。
+// 对外映射：ErrorCodeProducerUnavailable（HTTP 422）。
 type ProducerUnavailableError struct {
 	Kind string
 }
@@ -465,7 +463,7 @@ func (err *ProducerUnavailableError) Error() string {
 	return "selected producer profile is unavailable for kind " + err.Kind
 }
 
-// CandidateOverride adjusts one candidate during acceptance.
+// CandidateOverride 在验收期间调整一个候选。
 type CandidateOverride struct {
 	CandidateID uuid.UUID
 	Slug        *string
@@ -525,28 +523,28 @@ func validateNewSourceSpec(input NewSourceSpec) (NewSourceSpec, error) {
 	if !validKindID(input.Kind) {
 		return NewSourceSpec{}, ErrValidation
 	}
-	if input.Role != "base" && input.Role != "overlay" {
+	if input.Role != layerRoleBase && input.Role != layerRoleOverlay {
 		return NewSourceSpec{}, ErrValidation
 	}
 	switch input.Mode {
-	case "builtin":
-		if input.Origin != "repo" || input.Path == nil || input.ProducerProfileID != nil {
+	case sourceModeBuiltin:
+		if input.Origin != layerOriginRepo || input.Path == nil || input.ProducerProfileID != nil {
 			return NewSourceSpec{}, ErrValidation
 		}
-	case "command":
-		if input.Origin != "repo" || input.Path != nil || input.ProducerProfileID == nil {
+	case sourceModeCommand:
+		if input.Origin != layerOriginRepo || input.Path != nil || input.ProducerProfileID == nil {
 			return NewSourceSpec{}, ErrValidation
 		}
-	case "ai":
-		if input.Origin != "ai_generated" || input.Path != nil || input.ProducerProfileID == nil {
+	case aiMode:
+		if input.Origin != aiOrigin || input.Path != nil || input.ProducerProfileID == nil {
 			return NewSourceSpec{}, ErrValidation
 		}
-	case "push":
-		if input.Origin != "third_party" || input.Path != nil || input.ProducerProfileID != nil {
+	case sourceModePush:
+		if input.Origin != layerOriginThirdParty || input.Path != nil || input.ProducerProfileID != nil {
 			return NewSourceSpec{}, ErrValidation
 		}
-	case "manual":
-		if input.Origin != "manual" || input.Path != nil || input.ProducerProfileID != nil {
+	case sourceModeManual:
+		if input.Origin != layerOriginManual || input.Path != nil || input.ProducerProfileID != nil {
 			return NewSourceSpec{}, ErrValidation
 		}
 	default:
@@ -561,14 +559,14 @@ func validateNewSourceSpec(input NewSourceSpec) (NewSourceSpec, error) {
 	if input.TimeoutSec == 0 {
 		input.TimeoutSec = defaultSourceTimeoutByMode(input.Mode)
 	}
-	if input.TimeoutSec < 10 || input.TimeoutSec > 3600 {
+	if input.TimeoutSec < sourceTimeoutMinSec || input.TimeoutSec > sourceTimeoutMaxSec {
 		return NewSourceSpec{}, ErrValidation
 	}
 	if len(input.BranchPatterns) == 0 {
-		input.BranchPatterns = []string{"**"}
+		input.BranchPatterns = []string{sourceBranchPatternAll}
 	}
 	if input.ConfigOrigin == "" {
-		input.ConfigOrigin = "api"
+		input.ConfigOrigin = sourceConfigOriginAPI
 	}
 	input.BranchPatterns = slices.Clone(input.BranchPatterns)
 	return input, nil
@@ -576,15 +574,15 @@ func validateNewSourceSpec(input NewSourceSpec) (NewSourceSpec, error) {
 
 func defaultSourceTimeoutByMode(mode string) int {
 	switch mode {
-	case "ai":
+	case aiMode:
 		return defaultSourceTimeoutAI
-	case "builtin":
+	case sourceModeBuiltin:
 		return defaultSourceTimeoutBuiltin
-	case "command":
+	case sourceModeCommand:
 		return defaultSourceTimeoutCommand
-	case "push":
+	case sourceModePush:
 		return defaultSourceTimeoutPush
-	case "manual":
+	case sourceModeManual:
 		return defaultSourceTimeoutManual
 	default:
 		return 0
@@ -592,12 +590,12 @@ func defaultSourceTimeoutByMode(mode string) int {
 }
 
 func validServiceVisibility(visibility string) bool {
-	return visibility == "private" || visibility == "internal" || visibility == "public"
+	return visibility == serviceVisibilityPrivate || visibility == serviceVisibilityInternal || visibility == serviceVisibilityPublic
 }
 
 func (discovery *Discovery) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil

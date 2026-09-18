@@ -24,15 +24,15 @@ WHERE tenant_id = $1
   )
 `
 
-// CountListedRepositoriesParams contains the strongly typed arguments for the CountListedRepositories query.
+// CountListedRepositoriesParams 包含 CountListedRepositories 查询的强类型参数。
 type CountListedRepositoriesParams struct {
-	// TenantID is the tenant id value supplied to the CountListedRepositories query.
+	// TenantID 是提供给 CountListedRepositories 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SearchQuery is the search query value supplied to the CountListedRepositories query.
+	// SearchQuery 是提供给 CountListedRepositories 查询的 SearchQuery 值。
 	SearchQuery string `json:"search_query"`
 }
 
-// CountListedRepositories executes the generated CountListedRepositories database query.
+// CountListedRepositories 执行生成的 CountListedRepositories 数据库查询。
 // 返回匹配一次租户搜索的有效仓库数量。
 func (q *Queries) CountListedRepositories(ctx context.Context, arg CountListedRepositoriesParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countListedRepositories, arg.TenantID, arg.SearchQuery)
@@ -52,15 +52,15 @@ SELECT
             WHERE id = $1), 0)::bigint AS limit_count
 `
 
-// CountRepositoriesRow contains the columns returned by the CountRepositories query.
+// CountRepositoriesRow 包含 CountRepositories 查询返回的列。
 type CountRepositoriesRow struct {
-	// CurrentCount is the current count value returned by the CountRepositories query.
+	// CurrentCount 是 CountRepositories 查询返回的 CurrentCount 值。
 	CurrentCount int64 `json:"current_count"`
-	// LimitCount is the limit count value returned by the CountRepositories query.
+	// LimitCount 是 CountRepositories 查询返回的 LimitCount 值。
 	LimitCount int64 `json:"limit_count"`
 }
 
-// CountRepositories executes the generated CountRepositories database query.
+// CountRepositories 执行生成的 CountRepositories 数据库查询。
 // 返回有效仓库数量和租户固定的仓库配额。
 // 配额读取租户快照，不读取可变的平台默认值。
 func (q *Queries) CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error) {
@@ -82,33 +82,33 @@ INSERT INTO repositories (
 RETURNING tenant_id, id, url, canonical_url, credential_id, global_credential_id, default_branch, branch_policy, fetch_config, sync_cron, note, webhook_secret_hash, health, revision, deleted_at, created_at, updated_at
 `
 
-// CreateRepositoryParams contains the strongly typed arguments for the CreateRepository query.
+// CreateRepositoryParams 包含 CreateRepository 查询的强类型参数。
 type CreateRepositoryParams struct {
-	// TenantID is the tenant id value supplied to the CreateRepository query.
+	// TenantID 是提供给 CreateRepository 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateRepository query.
+	// ID 是提供给 CreateRepository 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Url is the url value supplied to the CreateRepository query.
+	// Url 是提供给 CreateRepository 查询的 Url 值。
 	Url string `json:"url"`
-	// CanonicalUrl is the canonical url value supplied to the CreateRepository query.
+	// CanonicalUrl 是提供给 CreateRepository 查询的 CanonicalUrl 值。
 	CanonicalUrl string `json:"canonical_url"`
-	// CredentialID is the credential id value supplied to the CreateRepository query.
+	// CredentialID 是提供给 CreateRepository 查询的 CredentialID 值。
 	CredentialID *uuid.UUID `json:"credential_id"`
-	// GlobalCredentialID is the global credential id value supplied to the CreateRepository query.
+	// GlobalCredentialID 是提供给 CreateRepository 查询的 GlobalCredentialID 值。
 	GlobalCredentialID *uuid.UUID `json:"global_credential_id"`
-	// DefaultBranch is the default branch value supplied to the CreateRepository query.
+	// DefaultBranch 是提供给 CreateRepository 查询的 DefaultBranch 值。
 	DefaultBranch string `json:"default_branch"`
-	// BranchPolicy is the branch policy value supplied to the CreateRepository query.
+	// BranchPolicy 是提供给 CreateRepository 查询的 BranchPolicy 值。
 	BranchPolicy []byte `json:"branch_policy"`
-	// FetchConfig is the fetch config value supplied to the CreateRepository query.
+	// FetchConfig 是提供给 CreateRepository 查询的 FetchConfig 值。
 	FetchConfig []byte `json:"fetch_config"`
-	// SyncCron is the sync cron value supplied to the CreateRepository query.
+	// SyncCron 是提供给 CreateRepository 查询的 SyncCron 值。
 	SyncCron *string `json:"sync_cron"`
-	// Note is the note value supplied to the CreateRepository query.
+	// Note 是提供给 CreateRepository 查询的 Note 值。
 	Note *string `json:"note"`
 }
 
-// CreateRepository executes the generated CreateRepository database query.
+// CreateRepository 执行生成的 CreateRepository 数据库查询。
 // 持久化仓库配置，并初始化空的健康状态摘要。
 // 仓库 URL 字段不含凭据，凭据只通过 UUID 外键引用。
 func (q *Queries) CreateRepository(ctx context.Context, arg CreateRepositoryParams) (Repository, error) {
@@ -157,21 +157,21 @@ WHERE tenant_id = $3
   AND revision = $5
 `
 
-// DeleteRepositoryParams contains the strongly typed arguments for the DeleteRepository query.
+// DeleteRepositoryParams 包含 DeleteRepository 查询的强类型参数。
 type DeleteRepositoryParams struct {
-	// DeletedAt is the deleted at value supplied to the DeleteRepository query.
+	// DeletedAt 是提供给 DeleteRepository 查询的 DeletedAt 值。
 	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
-	// UpdatedAt is the updated at value supplied to the DeleteRepository query.
+	// UpdatedAt 是提供给 DeleteRepository 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the DeleteRepository query.
+	// TenantID 是提供给 DeleteRepository 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the DeleteRepository query.
+	// ID 是提供给 DeleteRepository 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the DeleteRepository query.
+	// ExpectedRevision 是提供给 DeleteRepository 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// DeleteRepository executes the generated DeleteRepository database query.
+// DeleteRepository 执行生成的 DeleteRepository 数据库查询。
 // 软删除仓库；URL 和分支能否复用由策略决定。
 // 历史任务和审计记录在更新后仍保持租户范围。
 func (q *Queries) DeleteRepository(ctx context.Context, arg DeleteRepositoryParams) (int64, error) {
@@ -196,15 +196,15 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// GetRepositoryParams contains the strongly typed arguments for the GetRepository query.
+// GetRepositoryParams 包含 GetRepository 查询的强类型参数。
 type GetRepositoryParams struct {
-	// TenantID is the tenant id value supplied to the GetRepository query.
+	// TenantID 是提供给 GetRepository 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetRepository query.
+	// ID 是提供给 GetRepository 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetRepository executes the generated GetRepository database query.
+// GetRepository 执行生成的 GetRepository 数据库查询。
 // 返回一条有效仓库；软删除记录按设计视为不存在。
 func (q *Queries) GetRepository(ctx context.Context, arg GetRepositoryParams) (Repository, error) {
 	row := q.db.QueryRow(ctx, getRepository, arg.TenantID, arg.ID)
@@ -246,19 +246,19 @@ LIMIT $4
 OFFSET $3
 `
 
-// ListRepositoriesParams contains the strongly typed arguments for the ListRepositories query.
+// ListRepositoriesParams 包含 ListRepositories 查询的强类型参数。
 type ListRepositoriesParams struct {
-	// TenantID is the tenant id value supplied to the ListRepositories query.
+	// TenantID 是提供给 ListRepositories 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// SearchQuery is the search query value supplied to the ListRepositories query.
+	// SearchQuery 是提供给 ListRepositories 查询的 SearchQuery 值。
 	SearchQuery string `json:"search_query"`
-	// PageOffset is the page offset value supplied to the ListRepositories query.
+	// PageOffset 是提供给 ListRepositories 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListRepositories query.
+	// PageLimit 是提供给 ListRepositories 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListRepositories executes the generated ListRepositories database query.
+// ListRepositories 执行生成的 ListRepositories 数据库查询。
 // 按规范化 URL 和 UUID 的确定顺序返回有效仓库。
 // 即使搜索字符串为空，查询及全部谓词仍保留租户边界。
 func (q *Queries) ListRepositories(ctx context.Context, arg ListRepositoriesParams) ([]Repository, error) {
@@ -311,7 +311,7 @@ WHERE id = $1
 FOR UPDATE
 `
 
-// LockRepositoryQuota executes the generated LockRepositoryQuota database query.
+// LockRepositoryQuota 执行生成的 LockRepositoryQuota 数据库查询。
 // 使用租户配额行锁串行化仓库创建。
 // 适配器在计数和插入期间持有该锁，避免并发创建超过租户配额。
 func (q *Queries) LockRepositoryQuota(ctx context.Context, tenantID uuid.UUID) (int64, error) {
@@ -350,25 +350,25 @@ WHERE global_credentials.id = $2
 LIMIT 1
 `
 
-// ResolveRepositoryCredentialParams contains the strongly typed arguments for the ResolveRepositoryCredential query.
+// ResolveRepositoryCredentialParams 包含 ResolveRepositoryCredential 查询的强类型参数。
 type ResolveRepositoryCredentialParams struct {
-	// TenantID is the tenant id value supplied to the ResolveRepositoryCredential query.
+	// TenantID 是提供给 ResolveRepositoryCredential 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// CredentialID is the credential id value supplied to the ResolveRepositoryCredential query.
+	// CredentialID 是提供给 ResolveRepositoryCredential 查询的 CredentialID 值。
 	CredentialID uuid.UUID `json:"credential_id"`
-	// UserID is the user id value supplied to the ResolveRepositoryCredential query.
+	// UserID 是提供给 ResolveRepositoryCredential 查询的 UserID 值。
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// ResolveRepositoryCredentialRow contains the columns returned by the ResolveRepositoryCredential query.
+// ResolveRepositoryCredentialRow 包含 ResolveRepositoryCredential 查询返回的列。
 type ResolveRepositoryCredentialRow struct {
-	// ResolvedID is the resolved id value returned by the ResolveRepositoryCredential query.
+	// ResolvedID 是 ResolveRepositoryCredential 查询返回的 ResolvedID 值。
 	ResolvedID uuid.UUID `json:"resolved_id"`
-	// IsGlobal is the is global value returned by the ResolveRepositoryCredential query.
+	// IsGlobal 是 ResolveRepositoryCredential 查询返回的 IsGlobal 值。
 	IsGlobal bool `json:"is_global"`
 }
 
-// ResolveRepositoryCredential executes the generated ResolveRepositoryCredential database query.
+// ResolveRepositoryCredential 执行生成的 ResolveRepositoryCredential 数据库查询。
 // 将一个租户可见的凭据 UUID 解析到唯一的所属表。
 // 租户凭据使用与凭据列表相同的可见性条件；平台凭据可被有效成员选择，但仍由平台管理员管理。
 func (q *Queries) ResolveRepositoryCredential(ctx context.Context, arg ResolveRepositoryCredentialParams) (ResolveRepositoryCredentialRow, error) {
@@ -409,41 +409,41 @@ WHERE tenant_id = $13
 RETURNING tenant_id, id, url, canonical_url, credential_id, global_credential_id, default_branch, branch_policy, fetch_config, sync_cron, note, webhook_secret_hash, health, revision, deleted_at, created_at, updated_at
 `
 
-// UpdateRepositoryParams contains the strongly typed arguments for the UpdateRepository query.
+// UpdateRepositoryParams 包含 UpdateRepository 查询的强类型参数。
 type UpdateRepositoryParams struct {
-	// SetCredentialID is the set credential id value supplied to the UpdateRepository query.
+	// SetCredentialID 是提供给 UpdateRepository 查询的 SetCredentialID 值。
 	SetCredentialID bool `json:"set_credential_id"`
-	// CredentialID is the credential id value supplied to the UpdateRepository query.
+	// CredentialID 是提供给 UpdateRepository 查询的 CredentialID 值。
 	CredentialID *uuid.UUID `json:"credential_id"`
-	// SetGlobalCredentialID is the set global credential id value supplied to the UpdateRepository query.
+	// SetGlobalCredentialID 是提供给 UpdateRepository 查询的 SetGlobalCredentialID 值。
 	SetGlobalCredentialID bool `json:"set_global_credential_id"`
-	// GlobalCredentialID is the global credential id value supplied to the UpdateRepository query.
+	// GlobalCredentialID 是提供给 UpdateRepository 查询的 GlobalCredentialID 值。
 	GlobalCredentialID *uuid.UUID `json:"global_credential_id"`
-	// DefaultBranch is the default branch value supplied to the UpdateRepository query.
+	// DefaultBranch 是提供给 UpdateRepository 查询的 DefaultBranch 值。
 	DefaultBranch *string `json:"default_branch"`
-	// BranchPolicy is the branch policy value supplied to the UpdateRepository query.
+	// BranchPolicy 是提供给 UpdateRepository 查询的 BranchPolicy 值。
 	BranchPolicy []byte `json:"branch_policy"`
-	// FetchConfig is the fetch config value supplied to the UpdateRepository query.
+	// FetchConfig 是提供给 UpdateRepository 查询的 FetchConfig 值。
 	FetchConfig []byte `json:"fetch_config"`
-	// SetSyncCron is the set sync cron value supplied to the UpdateRepository query.
+	// SetSyncCron 是提供给 UpdateRepository 查询的 SetSyncCron 值。
 	SetSyncCron bool `json:"set_sync_cron"`
-	// SyncCron is the sync cron value supplied to the UpdateRepository query.
+	// SyncCron 是提供给 UpdateRepository 查询的 SyncCron 值。
 	SyncCron *string `json:"sync_cron"`
-	// SetNote is the set note value supplied to the UpdateRepository query.
+	// SetNote 是提供给 UpdateRepository 查询的 SetNote 值。
 	SetNote bool `json:"set_note"`
-	// Note is the note value supplied to the UpdateRepository query.
+	// Note 是提供给 UpdateRepository 查询的 Note 值。
 	Note *string `json:"note"`
-	// UpdatedAt is the updated at value supplied to the UpdateRepository query.
+	// UpdatedAt 是提供给 UpdateRepository 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the UpdateRepository query.
+	// TenantID 是提供给 UpdateRepository 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateRepository query.
+	// ID 是提供给 UpdateRepository 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the UpdateRepository query.
+	// ExpectedRevision 是提供给 UpdateRepository 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateRepository executes the generated UpdateRepository database query.
+// UpdateRepository 执行生成的 UpdateRepository 数据库查询。
 // 有条件地更新明确提供的仓库字段并递增版本号。
 // 字段 set 标志保留字段省略和显式 JSON null 之间的区别。
 func (q *Queries) UpdateRepository(ctx context.Context, arg UpdateRepositoryParams) (Repository, error) {

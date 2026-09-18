@@ -10,7 +10,7 @@ import (
 	"github.com/oapi-codegen/nullable"
 )
 
-// ListRepositories returns the tenant-scoped repository page and per-item capabilities.
+// ListRepositories 返回租户范围的仓库分页与逐项能力。
 func (s *Server) ListRepositories(ctx context.Context, request repository.ListRepositoriesRequestObject) (repository.ListRepositoriesResponseObject, error) {
 	if s.repositories == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -37,7 +37,7 @@ func (s *Server) ListRepositories(ctx context.Context, request repository.ListRe
 	}), nil
 }
 
-// CreateRepository validates, authorizes, and persists one tenant repository.
+// CreateRepository 校验、授权并持久化一个租户仓库。
 func (s *Server) CreateRepository(ctx context.Context, request repository.CreateRepositoryRequestObject) (repository.CreateRepositoryResponseObject, error) {
 	if s.repositories == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -54,7 +54,7 @@ func (s *Server) CreateRepository(ctx context.Context, request repository.Create
 	return repository.CreateRepository201JSONResponse{Body: body, Headers: repository.CreateRepository201ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// GetRepository returns one tenant repository without exposing credential material.
+// GetRepository 返回一个租户仓库（不暴露凭据材料）。
 func (s *Server) GetRepository(ctx context.Context, request repository.GetRepositoryRequestObject) (repository.GetRepositoryResponseObject, error) {
 	if s.repositories == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -71,7 +71,7 @@ func (s *Server) GetRepository(ctx context.Context, request repository.GetReposi
 	return repository.GetRepository200JSONResponse{Body: body, Headers: repository.GetRepository200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// UpdateRepository applies a three-state patch under the caller's If-Match ETag.
+// UpdateRepository 在调用者 If-Match ETag 下应用三态补丁。
 func (s *Server) UpdateRepository(ctx context.Context, request repository.UpdateRepositoryRequestObject) (repository.UpdateRepositoryResponseObject, error) {
 	if s.repositories == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -88,7 +88,7 @@ func (s *Server) UpdateRepository(ctx context.Context, request repository.Update
 	return repository.UpdateRepository200JSONResponse{Body: body, Headers: repository.UpdateRepository200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// DeleteRepository soft-deletes one repository under its current ETag.
+// DeleteRepository 在当前 ETag 下软删除一个仓库。
 func (s *Server) DeleteRepository(ctx context.Context, request repository.DeleteRepositoryRequestObject) (repository.DeleteRepositoryResponseObject, error) {
 	if s.repositories == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -103,6 +103,7 @@ func (s *Server) DeleteRepository(ctx context.Context, request repository.Delete
 	return repository.DeleteRepository204Response{}, nil
 }
 
+// newRepositoryInput 将仓库创建请求投影为服务层输入。
 func newRepositoryInput(body api.RepositoryCreateRequest) service.NewRepositoryInput {
 	return service.NewRepositoryInput{
 		URL:           string(body.Url),
@@ -115,6 +116,7 @@ func newRepositoryInput(body api.RepositoryCreateRequest) service.NewRepositoryI
 	}
 }
 
+// repositoryPatchInput 将仓库补丁请求投影为服务层输入。
 func repositoryPatchInput(body api.RepositoryPatchRequest) service.RepositoryPatchInput {
 	return service.RepositoryPatchInput{
 		CredentialID:  nullableUUIDPatch(body.CredentialId),
@@ -126,6 +128,7 @@ func repositoryPatchInput(body api.RepositoryPatchRequest) service.RepositoryPat
 	}
 }
 
+// branchPolicyInput 将可空分支策略请求投影为服务层输入（nil 透传）。
 func branchPolicyInput(value *api.BranchPolicy) *service.RepositoryBranchPolicy {
 	if value == nil {
 		return nil
@@ -138,6 +141,7 @@ func branchPolicyInput(value *api.BranchPolicy) *service.RepositoryBranchPolicy 
 	return new(service.RepositoryBranchPolicy{BranchPatterns: branchPatterns, TagPatterns: tagPatterns})
 }
 
+// fetchConfigInput 将可空抓取配置请求投影为服务层输入（nil 透传）。
 func fetchConfigInput(value *api.FetchConfig) *service.RepositoryFetchConfig {
 	if value == nil {
 		return nil
@@ -157,6 +161,7 @@ func fetchConfigInput(value *api.FetchConfig) *service.RepositoryFetchConfig {
 	})
 }
 
+// nullableUUIDValue 将可空 API UUID 包装为服务层 UUID 指针。
 func nullableUUIDValue(value nullable.Nullable[api.Uuid]) *uuid.UUID {
 	if !value.IsSpecified() || value.IsNull() {
 		return nil
@@ -164,6 +169,7 @@ func nullableUUIDValue(value nullable.Nullable[api.Uuid]) *uuid.UUID {
 	return new(serviceUUID(value.MustGet()))
 }
 
+// nullableUUIDPatch 将可空 API UUID 包装为服务层可空补丁指针（区分「未指定」与「置空」）。
 func nullableUUIDPatch(value nullable.Nullable[api.Uuid]) **uuid.UUID {
 	if !value.IsSpecified() {
 		return nil
@@ -175,6 +181,7 @@ func nullableUUIDPatch(value nullable.Nullable[api.Uuid]) **uuid.UUID {
 	return new(id)
 }
 
+// nullableStringValue 将可空字符串包装为指针。
 func nullableStringValue(value nullable.Nullable[string]) *string {
 	if !value.IsSpecified() || value.IsNull() {
 		return nil
@@ -182,6 +189,7 @@ func nullableStringValue(value nullable.Nullable[string]) *string {
 	return new(value.MustGet())
 }
 
+// nullableStringPatch 将可空字符串包装为服务层可空补丁指针（区分「未指定」与「置空」）。
 func nullableStringPatch(value nullable.Nullable[string]) **string {
 	if !value.IsSpecified() {
 		return nil
@@ -193,9 +201,10 @@ func nullableStringPatch(value nullable.Nullable[string]) **string {
 	return new(text)
 }
 
+// repositoryResponse 将仓库记录投影为 API 形状。
 func repositoryResponse(record service.RepositoryRecord) api.Repository {
 	return api.Repository{
-		Id: api.Uuid(record.ID), Etag: revisionETag("repository", record.ID.String(), record.Revision), Url: api.GitRemoteUrl(record.URL),
+		Id: api.Uuid(record.ID), Etag: revisionETag(etagKindRepository, record.ID.String(), record.Revision), Url: api.GitRemoteUrl(record.URL),
 		CredentialId: nullableUUIDResponse(record.CredentialID), DefaultBranch: record.DefaultBranch,
 		BranchPolicy: branchPolicyResponse(record.BranchPolicy), FetchConfig: fetchConfigResponse(record.FetchConfig),
 		SyncCron: nullableStringResponse(record.SyncCron), Note: nullableStringResponse(record.Note), Health: repositoryHealthResponse(record.Health),
@@ -203,6 +212,7 @@ func repositoryResponse(record service.RepositoryRecord) api.Repository {
 	}
 }
 
+// branchPolicyResponse 将分支策略投影为 API 形状。
 func branchPolicyResponse(value service.RepositoryBranchPolicy) api.BranchPolicy {
 	branches := make([]api.RefGlob, len(value.BranchPatterns))
 	for index, pattern := range value.BranchPatterns {
@@ -215,6 +225,7 @@ func branchPolicyResponse(value service.RepositoryBranchPolicy) api.BranchPolicy
 	return api.BranchPolicy{BranchPatterns: branches, TagPatterns: tags}
 }
 
+// fetchConfigResponse 将抓取配置投影为 API 形状。
 func fetchConfigResponse(value service.RepositoryFetchConfig) api.FetchConfig {
 	depth := nullable.NewNullNullable[int]()
 	if value.Depth != nil {
@@ -231,6 +242,7 @@ func fetchConfigResponse(value service.RepositoryFetchConfig) api.FetchConfig {
 	}
 }
 
+// repositoryHealthResponse 将仓库健康信息投影为 API 形状。
 func repositoryHealthResponse(value service.RepositoryHealth) api.RepositoryHealth {
 	lastSyncAt := nullable.NewNullNullable[api.Timestamp]()
 	if value.LastSyncAt != nil {
@@ -251,6 +263,7 @@ func repositoryHealthResponse(value service.RepositoryHealth) api.RepositoryHeal
 	return api.RepositoryHealth{LastSyncAt: lastSyncAt, LastCommit: lastCommit, LastError: lastError, FailStreak: value.FailStreak, DurationMs: duration}
 }
 
+// nullableUUIDResponse 将可空 UUID 指针包装为可空 API 值。
 func nullableUUIDResponse(value *uuid.UUID) nullable.Nullable[api.Uuid] {
 	if value == nil {
 		return nullable.NewNullNullable[api.Uuid]()
@@ -258,9 +271,15 @@ func nullableUUIDResponse(value *uuid.UUID) nullable.Nullable[api.Uuid] {
 	return nullable.NewNullableWithValue(api.Uuid(*value))
 }
 
+// nullableStringResponse 将可空字符串指针包装为可空 API 值。
 func nullableStringResponse(value *string) nullable.Nullable[string] {
 	if value == nil {
 		return nullable.NewNullNullable[string]()
 	}
 	return nullable.NewNullableWithValue(*value)
 }
+
+const (
+	// etagKindRepository 是仓库 ETag 的实体类型令牌。
+	etagKindRepository = "repository"
+)

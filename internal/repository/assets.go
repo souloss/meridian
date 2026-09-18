@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"encoding/json/v2"
-	"fmt"
 	"time"
 	"uuid"
 
@@ -12,20 +11,19 @@ import (
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
-// AssetStore implements the M1 asset pipeline persistence boundary on top of
-// the generated repository queries. It embeds RepositoryStore to reuse the
-// repository read path and keeps the tenant predicate on every read.
+// AssetStore 在生成的 repository 查询之上实现 M1 资产流水线持久化边界。
+// 它内嵌 RepositoryStore 复用仓库读取路径，并在每次读取时保留租户谓词。
 type AssetStore struct {
 	*RepositoryStore
 	queries *generated.Queries
 }
 
-// NewAssetStore binds asset pipeline persistence to a native pgx pool.
+// NewAssetStore 将资产流水线持久化绑定到原生 pgx 连接池。
 func NewAssetStore(pool *pgxpool.Pool) *AssetStore {
 	return &AssetStore{RepositoryStore: NewRepositoryStore(pool), queries: generated.New(pool)}
 }
 
-// GetAssetKind returns one platform asset kind registration.
+// GetAssetKind 返回一条平台资产 kind 注册。
 func (store *AssetStore) GetAssetKind(ctx context.Context, id string) (service.AssetKindRecord, error) {
 	row, err := store.queries.GetAssetKind(ctx, id)
 	if err != nil {
@@ -34,7 +32,7 @@ func (store *AssetStore) GetAssetKind(ctx context.Context, id string) (service.A
 	return service.AssetKindRecord{ID: row.ID, ContractVersion: row.ContractVersion, Enabled: row.Enabled, PluginVersion: row.PluginVersion}, nil
 }
 
-// ListAssetKinds returns every registered asset kind, including disabled ones.
+// ListAssetKinds 返回所有已注册的资产 kind，包括已禁用的。
 func (store *AssetStore) ListAssetKinds(ctx context.Context) ([]service.AssetKindRecord, error) {
 	rows, err := store.queries.ListAssetKinds(ctx)
 	if err != nil {
@@ -47,12 +45,12 @@ func (store *AssetStore) ListAssetKinds(ctx context.Context) ([]service.AssetKin
 	return items, nil
 }
 
-// GetAssetRepositoryDefaultBranch resolves the default branch of an asset's repository.
+// GetAssetRepositoryDefaultBranch 解析资产所属仓库的默认分支。
 func (store *AssetStore) GetAssetRepositoryDefaultBranch(ctx context.Context, tenantID, assetID uuid.UUID) (string, error) {
 	return store.queries.GetAssetRepositoryDefaultBranch(ctx, generated.GetAssetRepositoryDefaultBranchParams{TenantID: tenantID, AssetID: assetID})
 }
 
-// ListServicesByRepository returns active services for one repository.
+// ListServicesByRepository 返回某一仓库的活跃服务。
 func (store *AssetStore) ListServicesByRepository(ctx context.Context, tenantID, repositoryID uuid.UUID) ([]service.ServiceRecord, error) {
 	rows, err := store.queries.ListServicesByRepository(ctx, generated.ListServicesByRepositoryParams{TenantID: tenantID, RepositoryID: repositoryID})
 	if err != nil {
@@ -70,7 +68,7 @@ func (store *AssetStore) ListServicesByRepository(ctx context.Context, tenantID,
 	return items, nil
 }
 
-// ListAssetsForService returns active assets for one service.
+// ListAssetsForService 返回某一服务的活跃资产。
 func (store *AssetStore) ListAssetsForService(ctx context.Context, tenantID, serviceID uuid.UUID) ([]service.AssetRecord, error) {
 	rows, err := store.queries.ListAssetsForService(ctx, generated.ListAssetsForServiceParams{TenantID: tenantID, ServiceID: serviceID})
 	if err != nil {
@@ -83,7 +81,7 @@ func (store *AssetStore) ListAssetsForService(ctx context.Context, tenantID, ser
 	return items, nil
 }
 
-// ListSourceSpecsForService returns active source specs for one service.
+// ListSourceSpecsForService 返回某一服务的活跃源配置。
 func (store *AssetStore) ListSourceSpecsForService(ctx context.Context, tenantID, serviceID uuid.UUID) ([]service.SourceSpecRecord, error) {
 	rows, err := store.queries.ListSourceSpecsForService(ctx, generated.ListSourceSpecsForServiceParams{TenantID: tenantID, ServiceID: serviceID})
 	if err != nil {
@@ -102,7 +100,7 @@ func (store *AssetStore) ListSourceSpecsForService(ctx context.Context, tenantID
 	return items, nil
 }
 
-// UpsertAsset creates or reuses one asset by its unique (service, kind, name) key.
+// UpsertAsset 按唯一 (service, kind, name) 键创建或复用一条资产。
 func (store *AssetStore) UpsertAsset(ctx context.Context, input service.NewAsset) (service.AssetRecord, error) {
 	row, err := store.queries.UpsertAsset(ctx, generated.UpsertAssetParams{
 		TenantID: input.TenantID, ID: input.ID, ServiceID: input.ServiceID, Kind: input.Kind, Name: input.Name,
@@ -113,7 +111,7 @@ func (store *AssetStore) UpsertAsset(ctx context.Context, input service.NewAsset
 	return service.AssetRecord{ID: row.ID, ServiceID: row.ServiceID, Kind: row.Kind, Name: row.Name, Revision: row.Revision, CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time}, nil
 }
 
-// GetAssetByName returns one active asset by its unique key.
+// GetAssetByName 按其唯一键返回一条活跃资产。
 func (store *AssetStore) GetAssetByName(ctx context.Context, tenantID, serviceID uuid.UUID, kind, name string) (service.AssetRecord, error) {
 	row, err := store.queries.GetAssetByName(ctx, generated.GetAssetByNameParams{TenantID: tenantID, ServiceID: serviceID, Kind: kind, Name: name})
 	if err != nil {
@@ -122,7 +120,7 @@ func (store *AssetStore) GetAssetByName(ctx context.Context, tenantID, serviceID
 	return service.AssetRecord{ID: row.ID, ServiceID: row.ServiceID, Kind: row.Kind, Name: row.Name, Revision: row.Revision, CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time}, nil
 }
 
-// GetAsset returns one active asset by id.
+// GetAsset 按 id 返回一条活跃资产。
 func (store *AssetStore) GetAsset(ctx context.Context, tenantID, id uuid.UUID) (service.AssetRecord, error) {
 	row, err := store.queries.GetAsset(ctx, generated.GetAssetParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -131,7 +129,7 @@ func (store *AssetStore) GetAsset(ctx context.Context, tenantID, id uuid.UUID) (
 	return service.AssetRecord{ID: row.ID, ServiceID: row.ServiceID, Kind: row.Kind, Name: row.Name, Revision: row.Revision, CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time}, nil
 }
 
-// CreateAssetRefTrack creates or reactivates one asset ref track.
+// CreateAssetRefTrack 创建或重新激活一条资产 ref track。
 func (store *AssetStore) CreateAssetRefTrack(ctx context.Context, input service.NewAssetRefTrack) (service.AssetRefTrackRecord, error) {
 	row, err := store.queries.CreateAssetRefTrack(ctx, generated.CreateAssetRefTrackParams{
 		TenantID: input.TenantID, ID: input.ID, AssetID: input.AssetID, RefType: input.RefType, RefName: input.RefName, Health: input.Health,
@@ -142,7 +140,7 @@ func (store *AssetStore) CreateAssetRefTrack(ctx context.Context, input service.
 	return service.AssetRefTrackRecord{ID: row.ID, AssetID: row.AssetID, RefType: row.RefType, RefName: row.RefName, LatestVersionID: row.LatestVersionID, CurrentVersionID: row.CurrentVersionID, Health: row.Health}, nil
 }
 
-// GetAssetRefTrack returns one asset ref track.
+// GetAssetRefTrack 返回一条资产 ref track。
 func (store *AssetStore) GetAssetRefTrack(ctx context.Context, tenantID, assetID uuid.UUID, refType, refName string) (service.AssetRefTrackRecord, error) {
 	row, err := store.queries.GetAssetRefTrack(ctx, generated.GetAssetRefTrackParams{TenantID: tenantID, AssetID: assetID, RefType: refType, RefName: refName})
 	if err != nil {
@@ -151,7 +149,7 @@ func (store *AssetStore) GetAssetRefTrack(ctx context.Context, tenantID, assetID
 	return service.AssetRefTrackRecord{ID: row.ID, AssetID: row.AssetID, RefType: row.RefType, RefName: row.RefName, LatestVersionID: row.LatestVersionID, CurrentVersionID: row.CurrentVersionID, Health: row.Health}, nil
 }
 
-// CreateLayer inserts one asset layer.
+// CreateLayer 插入一条资产层。
 func (store *AssetStore) CreateLayer(ctx context.Context, input service.NewLayer) (service.LayerRecord, error) {
 	row, err := store.queries.CreateLayer(ctx, generated.CreateLayerParams{
 		TenantID: input.TenantID, ID: input.ID, AssetID: input.AssetID, SourceSpecID: input.SourceSpecID,
@@ -164,7 +162,7 @@ func (store *AssetStore) CreateLayer(ctx context.Context, input service.NewLayer
 	return layerFromRow(row), nil
 }
 
-// GetBaseLayerForAsset returns the base layer of an asset.
+// GetBaseLayerForAsset 返回资产的 base 层。
 func (store *AssetStore) GetBaseLayerForAsset(ctx context.Context, tenantID, assetID uuid.UUID) (service.LayerRecord, error) {
 	row, err := store.queries.GetBaseLayerForAsset(ctx, generated.GetBaseLayerForAssetParams{TenantID: tenantID, AssetID: assetID})
 	if err != nil {
@@ -173,7 +171,7 @@ func (store *AssetStore) GetBaseLayerForAsset(ctx context.Context, tenantID, ass
 	return layerFromRow(row), nil
 }
 
-// CreateLayerRevision inserts one immutable layer revision.
+// CreateLayerRevision 插入一条不可变的层修订。
 func (store *AssetStore) CreateLayerRevision(ctx context.Context, input service.NewLayerRevision) (service.LayerRevisionRecord, error) {
 	row, err := store.queries.CreateLayerRevision(ctx, generated.CreateLayerRevisionParams{
 		TenantID: input.TenantID, ID: input.ID, LayerID: input.LayerID, ScopeType: input.ScopeType, ScopeKey: input.ScopeKey,
@@ -190,7 +188,7 @@ func (store *AssetStore) CreateLayerRevision(ctx context.Context, input service.
 	}, nil
 }
 
-// GetLatestLayerRevision returns the newest revision in one layer scope.
+// GetLatestLayerRevision 返回某一层作用域内最新的修订。
 func (store *AssetStore) GetLatestLayerRevision(ctx context.Context, tenantID, layerID uuid.UUID, scopeType, scopeKey string) (service.LayerRevisionRecord, error) {
 	row, err := store.queries.GetLatestLayerRevision(ctx, generated.GetLatestLayerRevisionParams{TenantID: tenantID, LayerID: layerID, ScopeType: scopeType, ScopeKey: scopeKey})
 	if err != nil {
@@ -203,7 +201,7 @@ func (store *AssetStore) GetLatestLayerRevision(ctx context.Context, tenantID, l
 	}, nil
 }
 
-// UpsertLayerHead upserts one layer head pointer.
+// UpsertLayerHead 覆盖写入一条层头指针。
 func (store *AssetStore) UpsertLayerHead(ctx context.Context, input service.NewLayerHead) (service.LayerHeadRecord, error) {
 	row, err := store.queries.UpsertLayerHead(ctx, generated.UpsertLayerHeadParams{
 		TenantID: input.TenantID, LayerID: input.LayerID, ScopeType: input.ScopeType, ScopeKey: input.ScopeKey,
@@ -218,7 +216,7 @@ func (store *AssetStore) UpsertLayerHead(ctx context.Context, input service.NewL
 	}, nil
 }
 
-// CreateAssetVersion inserts one asset version.
+// CreateAssetVersion 插入一条资产版本。
 func (store *AssetStore) CreateAssetVersion(ctx context.Context, input service.NewAssetVersion) (service.AssetVersionRecord, error) {
 	row, err := store.queries.CreateAssetVersion(ctx, generated.CreateAssetVersionParams{
 		TenantID: input.TenantID, ID: input.ID, AssetID: input.AssetID, TrackID: input.TrackID, SequenceNo: input.SequenceNo, Version: input.Version, Lifecycle: input.Lifecycle, Revision: input.Revision,
@@ -233,7 +231,7 @@ func (store *AssetStore) CreateAssetVersion(ctx context.Context, input service.N
 	return assetVersionFromRow(row), nil
 }
 
-// GetAssetVersion returns one asset version.
+// GetAssetVersion 返回一条资产版本。
 func (store *AssetStore) GetAssetVersion(ctx context.Context, tenantID, id uuid.UUID) (service.AssetVersionRecord, error) {
 	row, err := store.queries.GetAssetVersion(ctx, generated.GetAssetVersionParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -242,19 +240,19 @@ func (store *AssetStore) GetAssetVersion(ctx context.Context, tenantID, id uuid.
 	return assetVersionFromRow(row), nil
 }
 
-// MarkAssetVersionIndexed marks one asset version as fully item-indexed.
+// MarkAssetVersionIndexed 将一条资产版本标记为条目索引已完成。
 func (store *AssetStore) MarkAssetVersionIndexed(ctx context.Context, tenantID, id uuid.UUID) error {
 	changed, err := store.queries.MarkAssetVersionIndexed(ctx, generated.MarkAssetVersionIndexedParams{TenantID: tenantID, ID: id})
 	if err != nil {
 		return normalizeError(err)
 	}
-	if changed != 1 {
+	if changed != rowsAffectedOne {
 		return service.ErrNotFound
 	}
 	return nil
 }
 
-// GetLatestVersionInTrack returns the newest version in a track.
+// GetLatestVersionInTrack 返回 track 中最新的版本。
 func (store *AssetStore) GetLatestVersionInTrack(ctx context.Context, tenantID, trackID uuid.UUID) (service.AssetVersionRecord, error) {
 	row, err := store.queries.GetLatestVersionInTrack(ctx, generated.GetLatestVersionInTrackParams{TenantID: tenantID, TrackID: trackID})
 	if err != nil {
@@ -263,7 +261,7 @@ func (store *AssetStore) GetLatestVersionInTrack(ctx context.Context, tenantID, 
 	return assetVersionFromRow(row), nil
 }
 
-// GetCurrentVersionInTrack returns the currently published version in a track.
+// GetCurrentVersionInTrack 返回 track 中当前已发布的版本。
 func (store *AssetStore) GetCurrentVersionInTrack(ctx context.Context, tenantID, trackID uuid.UUID) (service.AssetVersionRecord, error) {
 	row, err := store.queries.GetCurrentVersionInTrack(ctx, generated.GetCurrentVersionInTrackParams{TenantID: tenantID, TrackID: trackID})
 	if err != nil {
@@ -272,7 +270,7 @@ func (store *AssetStore) GetCurrentVersionInTrack(ctx context.Context, tenantID,
 	return assetVersionFromRow(row), nil
 }
 
-// UpdateAssetRefTrackHead updates the version pointers on a track.
+// UpdateAssetRefTrackHead 更新 track 上的版本指针。
 func (store *AssetStore) UpdateAssetRefTrackHead(ctx context.Context, tenantID, trackID uuid.UUID, latestVersionID, currentVersionID *uuid.UUID, processedGeneration int64) error {
 	changed, err := store.queries.UpdateAssetRefTrackHead(ctx, generated.UpdateAssetRefTrackHeadParams{
 		TenantID: tenantID, ID: trackID, LatestVersionID: latestVersionID, CurrentVersionID: currentVersionID, ProcessedGeneration: processedGeneration,
@@ -280,13 +278,13 @@ func (store *AssetStore) UpdateAssetRefTrackHead(ctx context.Context, tenantID, 
 	if err != nil {
 		return normalizeError(err)
 	}
-	if changed != 1 {
+	if changed != rowsAffectedOne {
 		return service.ErrPrecondition
 	}
 	return nil
 }
 
-// UpdateSourceSpec applies a validated source spec patch under its revision.
+// UpdateSourceSpec 在其修订号下应用一次经过校验的源配置补丁。
 func (store *AssetStore) UpdateSourceSpec(ctx context.Context, input service.SourceSpecPatch) (service.SourceSpecRecord, error) {
 	row, err := store.queries.UpdateSourceSpec(ctx, generated.UpdateSourceSpecParams{
 		TenantID: input.TenantID, ID: input.ID, ExpectedRevision: input.ExpectedRevision,
@@ -314,7 +312,7 @@ func int32Pointer(value *int) *int32 {
 	return new(int32(*value))
 }
 
-// CreateAssetItem inserts one indexed asset item.
+// CreateAssetItem 插入一条已索引的资产条目。
 func (store *AssetStore) CreateAssetItem(ctx context.Context, input service.NewAssetItem) (service.AssetItemRecord, error) {
 	row, err := store.queries.CreateAssetItem(ctx, generated.CreateAssetItemParams{
 		TenantID: input.TenantID, ID: input.ID, AssetVersionID: input.AssetVersionID, AssetID: input.AssetID, ServiceID: input.ServiceID,
@@ -326,19 +324,19 @@ func (store *AssetStore) CreateAssetItem(ctx context.Context, input service.NewA
 	return assetItemFromRow(row), nil
 }
 
-// UpdateAssetItemSearchVector refreshes the tsvector for one item.
+// UpdateAssetItemSearchVector 刷新某一条目的 tsvector。
 func (store *AssetStore) UpdateAssetItemSearchVector(ctx context.Context, tenantID, id uuid.UUID, searchText string) error {
 	changed, err := store.queries.UpdateAssetItemSearchVector(ctx, generated.UpdateAssetItemSearchVectorParams{TenantID: tenantID, ID: id, SearchText: []byte(searchText)})
 	if err != nil {
 		return normalizeError(err)
 	}
-	if changed != 1 {
+	if changed != rowsAffectedOne {
 		return service.ErrNotFound
 	}
 	return nil
 }
 
-// ListAssetVersionItems returns one item page.
+// ListAssetVersionItems 返回一页资产版本条目。
 func (store *AssetStore) ListAssetVersionItems(ctx context.Context, tenantID, versionID uuid.UUID, query string, limit, offset int32) ([]service.AssetItemRecord, int64, error) {
 	total, err := store.queries.CountAssetVersionItems(ctx, generated.CountAssetVersionItemsParams{TenantID: tenantID, AssetVersionID: versionID})
 	if err != nil {
@@ -357,7 +355,81 @@ func (store *AssetStore) ListAssetVersionItems(ctx context.Context, tenantID, ve
 	return items, total, nil
 }
 
-// UpsertSourceBinding upserts one source binding for a scope+expansion key.
+// SearchItems 按搜索查询分页检索跨 kind 的已索引资产条目，并可附带单个 kind 过滤。
+// 多 kind 与布尔面过滤在 SQL 分页取出后由 Search 服务层应用。
+func (store *AssetStore) SearchItems(ctx context.Context, tenantID uuid.UUID, query string, filter service.SearchFilter, limit, offset int32) ([]service.AssetItemRecord, int64, error) {
+	kindFilter := ""
+	if len(filter.Kinds) == searchKindFilterCount {
+		kindFilter = filter.Kinds[0]
+	}
+	total, err := store.queries.CountSearchableAssetItems(ctx, generated.CountSearchableAssetItemsParams{
+		TenantID: tenantID, SearchQuery: query, KindFilter: kindFilter,
+	})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	rows, err := store.queries.ListSearchableAssetItems(ctx, generated.ListSearchableAssetItemsParams{
+		TenantID: tenantID, SearchQuery: query, KindFilter: kindFilter, PageLimit: limit, PageOffset: offset,
+	})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	items := make([]service.AssetItemRecord, 0, len(rows))
+	for _, row := range rows {
+		items = append(items, assetItemFromRow(row))
+	}
+	return items, total, nil
+}
+
+// GetServiceByID 在租户内按 id 返回一条服务。
+func (store *AssetStore) GetServiceByID(ctx context.Context, tenantID, id uuid.UUID) (service.ServiceRecord, error) {
+	row, err := store.queries.GetServiceByID(ctx, generated.GetServiceByIDParams{TenantID: tenantID, ID: id})
+	if err != nil {
+		return service.ServiceRecord{}, normalizeError(err)
+	}
+	return serviceRecordFromRow(row), nil
+}
+
+// GetRepositoryByService 返回拥有某一服务的仓库。
+func (store *AssetStore) GetRepositoryByService(ctx context.Context, tenantID, serviceID uuid.UUID) (service.RepositoryRecord, error) {
+	row, err := store.queries.GetRepositoryByService(ctx, generated.GetRepositoryByServiceParams{TenantID: tenantID, ServiceID: serviceID})
+	if err != nil {
+		return service.RepositoryRecord{}, normalizeError(err)
+	}
+	return repositoryFromRow(row)
+}
+
+// ListSystemGroupMembers 返回某一系统分组的成员服务 id。
+func (store *AssetStore) ListSystemGroupMembers(ctx context.Context, tenantID, groupID uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := store.queries.ListSystemGroupMembers(ctx, generated.ListSystemGroupMembersParams{TenantID: tenantID, GroupID: groupID})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	ids := make([]uuid.UUID, 0, len(rows))
+	for _, row := range rows {
+		ids = append(ids, row.ServiceID)
+	}
+	return ids, nil
+}
+
+// ListServicesForTenant 分页返回租户内所有活跃服务。
+func (store *AssetStore) ListServicesForTenant(ctx context.Context, tenantID uuid.UUID, limit, offset int32) ([]service.ServiceRecord, int64, error) {
+	total, err := store.queries.CountListedServices(ctx, tenantID)
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	rows, err := store.queries.ListServices(ctx, generated.ListServicesParams{TenantID: tenantID, PageLimit: limit, PageOffset: offset})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	items := make([]service.ServiceRecord, 0, len(rows))
+	for _, row := range rows {
+		items = append(items, serviceRecordFromRow(row))
+	}
+	return items, total, nil
+}
+
+// UpsertSourceBinding 按 scope+expansion 键覆盖写入一条源绑定。
 func (store *AssetStore) UpsertSourceBinding(ctx context.Context, input service.NewSourceBinding) (service.SourceBindingRecord, error) {
 	row, err := store.queries.UpsertSourceBinding(ctx, generated.UpsertSourceBindingParams{
 		TenantID: input.TenantID, ID: input.ID, SourceSpecID: input.SourceSpecID, ScopeType: input.ScopeType, ScopeKey: input.ScopeKey,
@@ -373,7 +445,7 @@ func (store *AssetStore) UpsertSourceBinding(ctx context.Context, input service.
 	}, nil
 }
 
-// ListActiveBindingsForScope returns active bindings for one scope.
+// ListActiveBindingsForScope 返回某一作用域的活跃绑定。
 func (store *AssetStore) ListActiveBindingsForScope(ctx context.Context, tenantID, sourceSpecID uuid.UUID, scopeType, scopeKey string) ([]service.SourceBindingRecord, error) {
 	rows, err := store.queries.ListActiveBindingsForScope(ctx, generated.ListActiveBindingsForScopeParams{
 		TenantID: tenantID, SourceSpecID: sourceSpecID, ScopeType: scopeType, ScopeKey: scopeKey,
@@ -392,7 +464,7 @@ func (store *AssetStore) ListActiveBindingsForScope(ctx context.Context, tenantI
 	return items, nil
 }
 
-// MarkBindingsStaleInScope marks unseen bindings in one scope stale.
+// MarkBindingsStaleInScope 将某作用域内未再出现的绑定标记为失效。
 func (store *AssetStore) MarkBindingsStaleInScope(ctx context.Context, tenantID, sourceSpecID uuid.UUID, scopeType, scopeKey string, seenIDs []uuid.UUID) error {
 	if _, err := store.queries.MarkBindingsStaleInScope(ctx, generated.MarkBindingsStaleInScopeParams{
 		TenantID: tenantID, SourceSpecID: sourceSpecID, ScopeType: scopeType, ScopeKey: scopeKey, SeenIds: seenIDs,
@@ -402,12 +474,12 @@ func (store *AssetStore) MarkBindingsStaleInScope(ctx context.Context, tenantID,
 	return nil
 }
 
-// CountActiveBindings returns the active binding count for one source spec.
+// CountActiveBindings 返回某一源配置的活跃绑定数。
 func (store *AssetStore) CountActiveBindings(ctx context.Context, tenantID, sourceSpecID uuid.UUID) (int64, error) {
 	return store.queries.CountActiveBindings(ctx, generated.CountActiveBindingsParams{TenantID: tenantID, SourceSpecID: sourceSpecID})
 }
 
-// SetSourceLastError records one source materialization failure.
+// SetSourceLastError 记录一次源物化失败。
 func (store *AssetStore) SetSourceLastError(ctx context.Context, tenantID, sourceSpecID uuid.UUID, message string) error {
 	if _, err := store.queries.SetSourceLastError(ctx, generated.SetSourceLastErrorParams{TenantID: tenantID, ID: sourceSpecID, LastError: new(message)}); err != nil {
 		return normalizeError(err)
@@ -415,7 +487,7 @@ func (store *AssetStore) SetSourceLastError(ctx context.Context, tenantID, sourc
 	return nil
 }
 
-// ClearSourceLastError clears a source failure after a successful materialization.
+// ClearSourceLastError 在成功物化后清除源失败。
 func (store *AssetStore) ClearSourceLastError(ctx context.Context, tenantID, sourceSpecID uuid.UUID) error {
 	if _, err := store.queries.ClearSourceLastError(ctx, generated.ClearSourceLastErrorParams{TenantID: tenantID, ID: sourceSpecID}); err != nil {
 		return normalizeError(err)
@@ -423,7 +495,7 @@ func (store *AssetStore) ClearSourceLastError(ctx context.Context, tenantID, sou
 	return nil
 }
 
-// MarkTracksStaleForSourceSpec marks every track of a source's assets stale.
+// MarkTracksStaleForSourceSpec 将某源资产的所有 track 标记为失效。
 func (store *AssetStore) MarkTracksStaleForSourceSpec(ctx context.Context, tenantID, sourceSpecID uuid.UUID) error {
 	if _, err := store.queries.MarkTracksStaleForSourceSpec(ctx, generated.MarkTracksStaleForSourceSpecParams{TenantID: tenantID, SourceSpecID: sourceSpecID}); err != nil {
 		return normalizeError(err)
@@ -431,7 +503,7 @@ func (store *AssetStore) MarkTracksStaleForSourceSpec(ctx context.Context, tenan
 	return nil
 }
 
-// MarkTracksHealthyForSourceSpec restores every track of a source's assets to ok.
+// MarkTracksHealthyForSourceSpec 将某源资产的所有 track 恢复为正常。
 func (store *AssetStore) MarkTracksHealthyForSourceSpec(ctx context.Context, tenantID, sourceSpecID uuid.UUID) error {
 	if _, err := store.queries.MarkTracksHealthyForSourceSpec(ctx, generated.MarkTracksHealthyForSourceSpecParams{TenantID: tenantID, SourceSpecID: sourceSpecID}); err != nil {
 		return normalizeError(err)
@@ -439,7 +511,7 @@ func (store *AssetStore) MarkTracksHealthyForSourceSpec(ctx context.Context, ten
 	return nil
 }
 
-// UpsertRecentService records one successful service detail read.
+// UpsertRecentService 记录一次成功的服务详情读取。
 func (store *AssetStore) UpsertRecentService(ctx context.Context, tenantID, userID, serviceID uuid.UUID, viewedAt time.Time) error {
 	if _, err := store.queries.UpsertRecentService(ctx, generated.UpsertRecentServiceParams{TenantID: tenantID, UserID: userID, ServiceID: serviceID, ViewedAt: timestamp(viewedAt)}); err != nil {
 		return normalizeError(err)
@@ -447,7 +519,7 @@ func (store *AssetStore) UpsertRecentService(ctx context.Context, tenantID, user
 	return nil
 }
 
-// ListRecentServices returns one page of recently viewed services.
+// ListRecentServices 返回一页最近查看过的服务。
 func (store *AssetStore) ListRecentServices(ctx context.Context, tenantID, userID uuid.UUID, limit, offset int32) ([]service.ServiceRecord, int64, error) {
 	total, err := store.queries.CountRecentServices(ctx, generated.CountRecentServicesParams{TenantID: tenantID, UserID: userID})
 	if err != nil {
@@ -499,9 +571,10 @@ func assetItemFromRow(row generated.AssetItem) service.AssetItemRecord {
 	if display == nil {
 		display = map[string]any{}
 	}
-	return service.AssetItemRecord{ItemType: row.ItemType, Key: row.Key, Display: display}
+	return service.AssetItemRecord{
+		ItemType: row.ItemType, Key: row.Key, Display: display,
+		Kind: row.Kind, AssetID: row.AssetID, AssetVersionID: row.AssetVersionID, ServiceID: row.ServiceID, SearchText: row.SearchText,
+	}
 }
 
 var _ service.AssetStore = (*AssetStore)(nil)
-
-var _ = fmt.Sprintf

@@ -8,36 +8,36 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// DownloadSignedContent returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DownloadSignedContent 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DownloadSignedContent(ctx context.Context, request DownloadSignedContentRequestObject) (DownloadSignedContentResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetOpenApiContract returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetOpenApiContract 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetOpenApiContract(ctx context.Context, request GetOpenApiContractRequestObject) (GetOpenApiContractResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetVersion returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetVersion 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetVersion(ctx context.Context, request GetVersionRequestObject) (GetVersionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// Healthz returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// Healthz 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) Healthz(ctx context.Context, request HealthzRequestObject) (HealthzResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// Metrics returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// Metrics 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) Metrics(ctx context.Context, request MetricsRequestObject) (MetricsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// Readyz returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// Readyz 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) Readyz(ctx context.Context, request ReadyzRequestObject) (ReadyzResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

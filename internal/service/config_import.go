@@ -22,9 +22,8 @@ const (
 	configPreviewRefTypeBranch = "branch"
 )
 
-// ConfigImportStore is the persistence boundary for M2 gitops config import:
-// preview persistence and the service/source/producer profile reads needed to
-// materialize an apply.
+// ConfigImportStore 是 M2 gitops 配置导入的持久化边界：预览持久化，以及物化 apply 所需的
+// 服务/源/生产者配置读取。
 type ConfigImportStore interface {
 	GetRepository(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
 	CreateConfigImportPreview(context.Context, NewConfigImportPreview) (ConfigImportPreviewRecord, error)
@@ -38,7 +37,7 @@ type ConfigImportStore interface {
 	ListSourceSpecsForService(context.Context, uuid.UUID, uuid.UUID) ([]SourceSpecRecord, error)
 }
 
-// NewConfigImportPreview carries one preview insert.
+// NewConfigImportPreview 承载一次预览插入。
 type NewConfigImportPreview struct {
 	TenantID     uuid.UUID
 	ID           uuid.UUID
@@ -51,7 +50,7 @@ type NewConfigImportPreview struct {
 	ExpiresAt    time.Time
 }
 
-// ConfigImportPreviewRecord is one persisted preview snapshot.
+// ConfigImportPreviewRecord 是一个已持久化的预览快照。
 type ConfigImportPreviewRecord struct {
 	ID           uuid.UUID
 	RepositoryID uuid.UUID
@@ -63,7 +62,7 @@ type ConfigImportPreviewRecord struct {
 	ExpiresAt    time.Time
 }
 
-// ConfigImportPreview is the API projection of one preview.
+// ConfigImportPreview 是一个预览的 API 投影。
 type ConfigImportPreview struct {
 	PreviewID    uuid.UUID
 	RepositoryID uuid.UUID
@@ -74,7 +73,7 @@ type ConfigImportPreview struct {
 	ExpiresAt    time.Time
 }
 
-// ConfigImportResult reports the outcome of one apply.
+// ConfigImportResult 报告一次 apply 的结局。
 type ConfigImportResult struct {
 	RepositoryID    uuid.UUID
 	Commit          string
@@ -84,9 +83,8 @@ type ConfigImportResult struct {
 	SourceSpecs     []uuid.UUID
 }
 
-// ConfigImport coordinates the preview/apply two-phase repository configuration
-// import. The database remains authoritative: apply only creates or updates the
-// resources explicitly listed in the preview, and never overwrites manual edits.
+// ConfigImport 协调仓库配置导入的 preview/apply 两阶段。数据库始终权威：apply 仅创建或更新
+// 预览中显式列出的资源，绝不覆盖手工编辑。
 type ConfigImport struct {
 	store      ConfigImportStore
 	identities IdentityStore
@@ -95,15 +93,14 @@ type ConfigImport struct {
 	now        func() time.Time
 }
 
-// NewConfigImport constructs the gitops config import use cases.
+// NewConfigImport 构造 gitops 配置导入用例。
 func NewConfigImport(store ConfigImportStore, identities IdentityStore, workspace string) *ConfigImport {
 	return &ConfigImport{store: store, identities: identities, workspace: workspace, gitBinary: "git", now: time.Now}
 }
 
-// Preview validates and normalizes the repository configuration at a ref and
-// persists a non-authoritative preview snapshot.
+// Preview 校验并规范化某引用处的仓库配置，并持久化一个非权威预览快照。
 func (imports *ConfigImport) Preview(ctx context.Context, actor Principal, tenantSlug string, repositoryID, idempotencyKey uuid.UUID, refType, refName string) (ConfigImportPreview, error) {
-	membership, err := imports.tenantMembership(ctx, actor, tenantSlug, "repository:write")
+	membership, err := imports.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryWrite)
 	if err != nil {
 		return ConfigImportPreview{}, err
 	}
@@ -150,11 +147,9 @@ func (imports *ConfigImport) Preview(ctx context.Context, actor Principal, tenan
 	return preview, nil
 }
 
-// Apply materializes one previously persisted preview when its commit and
-// config digest match the request, creating or updating only the resources
-// listed in the preview.
+// Apply 在预览的提交与配置摘要匹配请求时物化一个先前持久化的预览，仅创建或更新预览中列出的资源。
 func (imports *ConfigImport) Apply(ctx context.Context, actor Principal, tenantSlug string, repositoryID, previewID, idempotencyKey uuid.UUID, configDigest string, replaceAiBases bool) (ConfigImportResult, error) {
-	membership, err := imports.tenantMembership(ctx, actor, tenantSlug, "repository:write")
+	membership, err := imports.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryWrite)
 	if err != nil {
 		return ConfigImportResult{}, err
 	}
@@ -193,14 +188,14 @@ func (imports *ConfigImport) Apply(ctx context.Context, actor Principal, tenantS
 		var serviceRecord ServiceRecord
 		current, exists := existingBySlug[service.Name]
 		if !exists {
-			// A root-dir collision with a different slug is a validation error.
+			// 根目录与不同 slug 冲突是校验错误。
 			if other, collision := existingByRoot[service.Root]; collision && other.Slug != service.Name {
 				return ConfigImportResult{}, ErrDuplicate
 			}
 			serviceRecord, err = imports.store.CreateService(ctx, NewService{
 				TenantID: membership.TenantID, ID: uuid.NewV7(), RepositoryID: repositoryID,
 				Slug: service.Name, DisplayName: displayNameOrDefault(service), RootDir: service.Root,
-				Visibility: "private",
+				Visibility: serviceVisibilityPrivate,
 			})
 			if err != nil {
 				return ConfigImportResult{}, err
@@ -208,7 +203,7 @@ func (imports *ConfigImport) Apply(ctx context.Context, actor Principal, tenantS
 			result.CreatedServices = append(result.CreatedServices, serviceRecord.ID)
 		} else {
 			serviceRecord = current
-			// Manual edits are authoritative: the import never overwrites them.
+			// 手工编辑权威：导入绝不覆盖它们。
 			result.UpdatedServices = append(result.UpdatedServices, serviceRecord.ID)
 		}
 
@@ -223,8 +218,7 @@ func (imports *ConfigImport) Apply(ctx context.Context, actor Principal, tenantS
 	return result, nil
 }
 
-// resolvePreview renders the services and source specs a preview would create or
-// update without persisting anything.
+// resolvePreview 渲染预览将要创建或更新的服务与源配置，而不持久化任何内容。
 func (imports *ConfigImport) resolvePreview(ctx context.Context, tenantID, repositoryID uuid.UUID, config RepositoryConfig) ([]ServiceRecord, []SourceSpecRecord, error) {
 	services := make([]ServiceRecord, 0, len(config.Services))
 	sources := make([]SourceSpecRecord, 0)
@@ -232,22 +226,21 @@ func (imports *ConfigImport) resolvePreview(ctx context.Context, tenantID, repos
 		services = append(services, ServiceRecord{
 			TenantID: tenantID, RepositoryID: repositoryID, Slug: service.Name,
 			DisplayName: displayNameOrDefault(service), RootDir: service.Root,
-			Visibility: "private", Lifecycle: "draft",
+			Visibility: serviceVisibilityPrivate, Lifecycle: lifecycleDraft,
 		})
 		for _, asset := range service.Assets {
 			if asset.Base != nil {
-				sources = append(sources, configSourceProjection(tenantID, service.Name, asset, *asset.Base, "base"))
+				sources = append(sources, configSourceProjection(tenantID, service.Name, asset, *asset.Base, layerRoleBase))
 			}
 			for _, overlay := range asset.Overlays {
-				sources = append(sources, configSourceProjection(tenantID, service.Name, asset, overlay, "overlay"))
+				sources = append(sources, configSourceProjection(tenantID, service.Name, asset, overlay, layerRoleOverlay))
 			}
 		}
 	}
 	return services, sources, nil
 }
 
-// applyAssetSources creates the source specs declared by one asset, resolving
-// producer profile names to ids.
+// applyAssetSources 创建某资产声明的源配置，将生产者配置名解析为 id。
 func (imports *ConfigImport) applyAssetSources(ctx context.Context, tenantID uuid.UUID, service ServiceRecord, asset ConfigAsset, replaceAiBases bool) ([]uuid.UUID, error) {
 	created := make([]uuid.UUID, 0, len(asset.Overlays)+1)
 	apply := func(raw ConfigSource, role string) error {
@@ -263,7 +256,7 @@ func (imports *ConfigImport) applyAssetSources(ctx context.Context, tenantID uui
 			TenantID: tenantID, ID: uuid.NewV7(), ServiceID: service.ID, Kind: asset.Kind,
 			AssetNameTemplate: assetNameTemplateOrDefault(asset), Role: role, Origin: raw.Origin, Mode: raw.Mode,
 			Path: raw.Path, ProducerProfileID: producerProfileID, Ord: raw.Order, TimeoutSec: raw.TimeoutSec,
-			BranchPatterns: raw.BranchPatterns, Enabled: raw.Enabled == nil || *raw.Enabled, ConfigOrigin: "repository",
+			BranchPatterns: raw.BranchPatterns, Enabled: raw.Enabled == nil || *raw.Enabled, ConfigOrigin: sourceConfigOriginRepository,
 		})
 		if err != nil {
 			return err
@@ -272,12 +265,12 @@ func (imports *ConfigImport) applyAssetSources(ctx context.Context, tenantID uui
 		return nil
 	}
 	if asset.Base != nil {
-		if err := apply(*asset.Base, "base"); err != nil {
+		if err := apply(*asset.Base, layerRoleBase); err != nil {
 			return nil, err
 		}
 	}
 	for _, overlay := range asset.Overlays {
-		if err := apply(overlay, "overlay"); err != nil {
+		if err := apply(overlay, layerRoleOverlay); err != nil {
 			return nil, err
 		}
 	}
@@ -285,8 +278,7 @@ func (imports *ConfigImport) applyAssetSources(ctx context.Context, tenantID uui
 	return created, nil
 }
 
-// readConfig clones the repository at the ref and returns the resolved commit
-// and the raw configuration file content.
+// readConfig 在该引用处克隆仓库，并返回解析出的提交与原始配置文件内容。
 func (imports *ConfigImport) readConfig(ctx context.Context, record RepositoryRecord, refName string) (string, []byte, error) {
 	if imports.workspace == "" || !filepath.IsAbs(imports.workspace) {
 		return "", nil, errors.New("config import workspace root is not an absolute path")
@@ -344,7 +336,7 @@ func assetNameTemplateOrDefault(asset ConfigAsset) string {
 
 func (imports *ConfigImport) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil

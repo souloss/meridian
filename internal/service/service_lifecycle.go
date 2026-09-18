@@ -17,8 +17,7 @@ const (
 	maxServiceVisibilityRunes  = 16
 )
 
-// ServiceLifecycle coordinates service metadata updates, public reads, and
-// soft deletion under the frozen lifecycle state machine.
+// ServiceLifecycle 在冻结生命周期状态机下协调服务元数据更新、公开读取与软删除。
 type ServiceLifecycle struct {
 	store      ServiceLifecycleStore
 	assets     *Assets
@@ -26,16 +25,15 @@ type ServiceLifecycle struct {
 	now        func() time.Time
 }
 
-// NewServiceLifecycle constructs service lifecycle use cases.
+// NewServiceLifecycle 构造服务生命周期用例。
 func NewServiceLifecycle(store ServiceLifecycleStore, assets *Assets, identities IdentityStore) *ServiceLifecycle {
 	return &ServiceLifecycle{store: store, assets: assets, identities: identities, now: time.Now}
 }
 
-// Update applies a validated service patch under the expected revision and
-// advances the lifecycle state machine, emitting the service.deprecated event
-// on the published-to-deprecated transition.
+// Update 在期望版本下应用校验后的服务补丁并推进生命周期状态机，在
+// published→deprecated 迁移时发出 service.deprecated 事件。
 func (lifecycle *ServiceLifecycle) Update(ctx context.Context, actor Principal, tenantSlug, serviceSlug, etag string, input ServicePatchInput) (ServiceRecord, error) {
-	membership, err := lifecycle.tenantMembership(ctx, actor, tenantSlug, "service:write")
+	membership, err := lifecycle.tenantMembership(ctx, actor, tenantSlug, scopeServiceWrite)
 	if err != nil {
 		return ServiceRecord{}, err
 	}
@@ -93,8 +91,8 @@ func (lifecycle *ServiceLifecycle) Update(ctx context.Context, actor Principal, 
 	return record, nil
 }
 
-// GetPublic resolves an anonymous public service view gated by visibility and
-// lifecycle, returning 404 for private/internal or non-published states.
+// GetPublic 解析受可见性与生命周期门控的匿名公开服务视图，对 private/internal 或
+// 未发布状态返回 404。
 func (lifecycle *ServiceLifecycle) GetPublic(ctx context.Context, tenantSlug, serviceSlug string) (PublicServiceRecord, error) {
 	record, err := lifecycle.store.GetPublicServiceBySlug(ctx, tenantSlug, serviceSlug)
 	if err != nil {
@@ -116,10 +114,9 @@ func (lifecycle *ServiceLifecycle) GetPublic(ctx context.Context, tenantSlug, se
 	}, nil
 }
 
-// Delete soft-deletes one service under its revision, cascading logical state
-// and cancelling pending service-scoped work.
+// Delete 在其版本下软删除一个服务，级联逻辑状态并取消待处理的服务作用域工作。
 func (lifecycle *ServiceLifecycle) Delete(ctx context.Context, actor Principal, tenantSlug, serviceSlug, etag string) error {
-	membership, err := lifecycle.tenantMembership(ctx, actor, tenantSlug, "service:write")
+	membership, err := lifecycle.tenantMembership(ctx, actor, tenantSlug, scopeServiceWrite)
 	if err != nil {
 		return err
 	}
@@ -152,15 +149,14 @@ func (lifecycle *ServiceLifecycle) publicAssetSummaries(ctx context.Context, rec
 }
 
 func (lifecycle *ServiceLifecycle) appendServiceDeprecatedEvent(ctx context.Context, tenantID uuid.UUID, record ServiceRecord) error {
-	// M1 records the service.deprecated event through the notify_outbox; the
-	// outbox store is not part of this boundary yet, so this is a no-op seam
-	// wired when event delivery lands with M1-AGENT-003/M3.
+	// M1 通过 notify_outbox 记录 service.deprecated 事件；outbox store 尚不在此边界内，
+	// 因此这是一个在 M1-AGENT-003/M3 事件投递落地时接入的无操作接缝。
 	return nil
 }
 
 func (lifecycle *ServiceLifecycle) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
@@ -178,7 +174,7 @@ func (lifecycle *ServiceLifecycle) tenantMembership(ctx context.Context, actor P
 	return membership, nil
 }
 
-// ServicePatchInput carries explicit PATCH fields for one service update.
+// ServicePatchInput 承载一次服务更新的显式 PATCH 字段。
 type ServicePatchInput struct {
 	DisplayName *string
 	Description *string
@@ -187,7 +183,7 @@ type ServicePatchInput struct {
 }
 
 func validateServicePatch(input ServicePatchInput) error {
-	if input.DisplayName != nil && (utf8.RuneCountInString(*input.DisplayName) < 1 || utf8.RuneCountInString(*input.DisplayName) > 128) {
+	if input.DisplayName != nil && (utf8.RuneCountInString(*input.DisplayName) < 1 || utf8.RuneCountInString(*input.DisplayName) > maxDisplayNameRunes) {
 		return ErrValidation
 	}
 	if input.Description != nil && utf8.RuneCountInString(*input.Description) > 2000 {

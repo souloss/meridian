@@ -8,66 +8,66 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// RunDiff returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RunDiff 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RunDiff(ctx context.Context, request RunDiffRequestObject) (RunDiffResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListDiffRuleSets returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListDiffRuleSets 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListDiffRuleSets(ctx context.Context, request ListDiffRuleSetsRequestObject) (ListDiffRuleSetsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateDiffRuleSet returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateDiffRuleSet 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateDiffRuleSet(ctx context.Context, request CreateDiffRuleSetRequestObject) (CreateDiffRuleSetResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteDiffRuleSet returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteDiffRuleSet 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteDiffRuleSet(ctx context.Context, request DeleteDiffRuleSetRequestObject) (DeleteDiffRuleSetResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateDiffRuleSet returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateDiffRuleSet 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateDiffRuleSet(ctx context.Context, request UpdateDiffRuleSetRequestObject) (UpdateDiffRuleSetResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListDiffSnapshots returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListDiffSnapshots 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListDiffSnapshots(ctx context.Context, request ListDiffSnapshotsRequestObject) (ListDiffSnapshotsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteDiffSnapshot returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteDiffSnapshot 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteDiffSnapshot(ctx context.Context, request DeleteDiffSnapshotRequestObject) (DeleteDiffSnapshotResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetDiffSnapshot returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetDiffSnapshot 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetDiffSnapshot(ctx context.Context, request GetDiffSnapshotRequestObject) (GetDiffSnapshotResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ExportDiffSnapshot returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ExportDiffSnapshot 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ExportDiffSnapshot(ctx context.Context, request ExportDiffSnapshotRequestObject) (ExportDiffSnapshotResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateDiffSnapshotShareLink returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateDiffSnapshotShareLink 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateDiffSnapshotShareLink(ctx context.Context, request CreateDiffSnapshotShareLinkRequestObject) (CreateDiffSnapshotShareLinkResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// Search returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// Search 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) Search(ctx context.Context, request SearchRequestObject) (SearchResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateDiffUpload returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateDiffUpload 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateDiffUpload(ctx context.Context, request CreateDiffUploadRequestObject) (CreateDiffUploadResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

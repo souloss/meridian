@@ -20,16 +20,16 @@ WHERE tenant_id = $1
   AND status = 'succeeded'
 `
 
-// ClearSyncJobDirtyParams contains the strongly typed arguments for the ClearSyncJobDirty query.
+// ClearSyncJobDirtyParams 包含 ClearSyncJobDirty 查询的强类型参数。
 type ClearSyncJobDirtyParams struct {
-	// TenantID is the tenant id value supplied to the ClearSyncJobDirty query.
+	// TenantID 是提供给 ClearSyncJobDirty 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the ClearSyncJobDirty query.
+	// ID 是提供给 ClearSyncJobDirty 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// ClearSyncJobDirty executes the generated ClearSyncJobDirty database query.
-// 清空一条已成功任务的 dirty 标记，保证后续任只入队一次。
+// ClearSyncJobDirty 执行生成的 ClearSyncJobDirty 数据库查询。
+// 清空一条已成功任务的 dirty 标记，保证后续任务只入队一次。
 func (q *Queries) ClearSyncJobDirty(ctx context.Context, arg ClearSyncJobDirtyParams) (int64, error) {
 	result, err := q.db.Exec(ctx, clearSyncJobDirty, arg.TenantID, arg.ID)
 	if err != nil {
@@ -46,33 +46,33 @@ WHERE tenant_id = $1
   AND type = 'repo.sync'
 `
 
-// GetSyncJobForSuccessorParams contains the strongly typed arguments for the GetSyncJobForSuccessor query.
+// GetSyncJobForSuccessorParams 包含 GetSyncJobForSuccessor 查询的强类型参数。
 type GetSyncJobForSuccessorParams struct {
-	// TenantID is the tenant id value supplied to the GetSyncJobForSuccessor query.
+	// TenantID 是提供给 GetSyncJobForSuccessor 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetSyncJobForSuccessor query.
+	// ID 是提供给 GetSyncJobForSuccessor 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetSyncJobForSuccessorRow contains the columns returned by the GetSyncJobForSuccessor query.
+// GetSyncJobForSuccessorRow 包含 GetSyncJobForSuccessor 查询返回的列。
 type GetSyncJobForSuccessorRow struct {
-	// ID is the id value returned by the GetSyncJobForSuccessor query.
+	// ID 是 GetSyncJobForSuccessor 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// Status is the status value returned by the GetSyncJobForSuccessor query.
+	// Status 是 GetSyncJobForSuccessor 查询返回的 Status 值。
 	Status string `json:"status"`
-	// Dirty is the dirty value returned by the GetSyncJobForSuccessor query.
+	// Dirty 是 GetSyncJobForSuccessor 查询返回的 Dirty 值。
 	Dirty bool `json:"dirty"`
-	// ScopeID is the scope id value returned by the GetSyncJobForSuccessor query.
+	// ScopeID 是 GetSyncJobForSuccessor 查询返回的 ScopeID 值。
 	ScopeID *uuid.UUID `json:"scope_id"`
-	// RefType is the ref type value returned by the GetSyncJobForSuccessor query.
+	// RefType 是 GetSyncJobForSuccessor 查询返回的 RefType 值。
 	RefType *string `json:"ref_type"`
-	// RefName is the ref name value returned by the GetSyncJobForSuccessor query.
+	// RefName 是 GetSyncJobForSuccessor 查询返回的 RefName 值。
 	RefName *string `json:"ref_name"`
-	// ActiveGeneration is the active generation value returned by the GetSyncJobForSuccessor query.
+	// ActiveGeneration 是 GetSyncJobForSuccessor 查询返回的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// GetSyncJobForSuccessor executes the generated GetSyncJobForSuccessor database query.
+// GetSyncJobForSuccessor 执行生成的 GetSyncJobForSuccessor 数据库查询。
 // 返回一条 repo.sync 任务，供完成后判断是否需要后续任。
 func (q *Queries) GetSyncJobForSuccessor(ctx context.Context, arg GetSyncJobForSuccessorParams) (GetSyncJobForSuccessorRow, error) {
 	row := q.db.QueryRow(ctx, getSyncJobForSuccessor, arg.TenantID, arg.ID)
@@ -99,17 +99,17 @@ WHERE tenant_id = $1
   AND active_generation = $3
 `
 
-// MarkSyncJobDirtyParams contains the strongly typed arguments for the MarkSyncJobDirty query.
+// MarkSyncJobDirtyParams 包含 MarkSyncJobDirty 查询的强类型参数。
 type MarkSyncJobDirtyParams struct {
-	// TenantID is the tenant id value supplied to the MarkSyncJobDirty query.
+	// TenantID 是提供给 MarkSyncJobDirty 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// DedupeKey is the dedupe key value supplied to the MarkSyncJobDirty query.
+	// DedupeKey 是提供给 MarkSyncJobDirty 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
-	// ActiveGeneration is the active generation value supplied to the MarkSyncJobDirty query.
+	// ActiveGeneration 是提供给 MarkSyncJobDirty 查询的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// MarkSyncJobDirty executes the generated MarkSyncJobDirty database query.
+// MarkSyncJobDirty 执行生成的 MarkSyncJobDirty 数据库查询。
 // syncRepository 的 dirty 标记与完成后续任物化查询。
 // dirty 语义对齐 contracts/domain.yaml 的 coalescing：运行中收到重复请求置 dirty，
 // 完成后若 dirty 置位则入队一个使用最新输入的后续任。

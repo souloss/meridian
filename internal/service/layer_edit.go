@@ -16,9 +16,8 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-// LayerEditStore is the persistence boundary for M2 layer editing: overlay
-// revisions, ordering, rollback, merge preview, and provenance reads. Every
-// method retains the tenant predicate.
+// LayerEditStore 是 M2 层编辑的持久化边界：overlay 修订、排序、回滚、合并预览与溯源读取。
+// 每个方法都保留租户谓词。
 type LayerEditStore interface {
 	GetLayer(context.Context, uuid.UUID, uuid.UUID) (LayerRecord, error)
 	ListLayersForAsset(context.Context, uuid.UUID, uuid.UUID) ([]LayerRecord, error)
@@ -36,18 +35,20 @@ type LayerEditStore interface {
 	GetLatestVersionInTrack(context.Context, uuid.UUID, uuid.UUID) (AssetVersionRecord, error)
 	CreateAssetVersion(context.Context, NewAssetVersion) (AssetVersionRecord, error)
 	UpdateAssetRefTrackHead(context.Context, uuid.UUID, uuid.UUID, *uuid.UUID, *uuid.UUID, int64) error
+	CreateAssetItem(context.Context, NewAssetItem) (AssetItemRecord, error)
+	MarkAssetVersionIndexed(context.Context, uuid.UUID, uuid.UUID) error
 	EnqueueMergeJob(context.Context, MergeJobInput) (JobAccepted, error)
 }
 
-// MergeJobInput describes one idempotent asset.merge request for a track.
+// MergeJobInput 描述某轨道的一次幂等 asset.merge 请求。
 type MergeJobInput struct {
 	TenantID       uuid.UUID
 	TrackID        uuid.UUID
 	IdempotencyKey uuid.UUID
 }
 
-// LayerEdit coordinates overlay revision submission, layer ordering, rollback,
-// and non-persisting merge preview against the M2 platform-v1 merge engine.
+// LayerEdit 面向 M2 platform-v1 合并引擎协调 overlay 修订提交、层排序、回滚与
+// 非持久化合并预览。
 type LayerEdit struct {
 	store      LayerEditStore
 	blobs      BlobStore
@@ -55,16 +56,15 @@ type LayerEdit struct {
 	now        func() time.Time
 }
 
-// NewLayerEdit constructs M2 layer editing use cases.
+// NewLayerEdit 构造 M2 层编辑用例。
 func NewLayerEdit(store LayerEditStore, blobs BlobStore, identities IdentityStore) *LayerEdit {
 	return &LayerEdit{store: store, blobs: blobs, identities: identities, now: time.Now}
 }
 
-// PreviewMerge runs the real merge engine over an asset's effective layers
-// without persisting anything. The result carries the merged content, the
-// canonical fingerprint, and provenance as json-pointer → last-writing layer.
+// PreviewMerge 对资产的生效层运行真实合并引擎而不持久化任何内容。结果携带合并内容、
+// 规范指纹与溯源（json-pointer → 最后写入层）。
 func (editor *LayerEdit) PreviewMerge(ctx context.Context, actor Principal, tenantSlug string, input MergePreviewInput) (MergePreviewResult, error) {
-	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, "layer:read")
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerRead)
 	if err != nil {
 		return MergePreviewResult{}, err
 	}
@@ -81,8 +81,7 @@ func (editor *LayerEdit) PreviewMerge(ctx context.Context, actor Principal, tena
 		return MergePreviewResult{}, err
 	}
 
-	// Selection: an explicit layer selection replaces the asset's application
-	// order; otherwise effective heads are merged in ord order.
+	// 选择：显式层选择替换资产的应用顺序；否则按 ord 顺序合并生效层头。
 	selected, err := editor.selectedRevisions(ctx, membership.TenantID, input, base, overlays)
 	if err != nil {
 		return MergePreviewResult{}, err
@@ -116,7 +115,7 @@ func (editor *LayerEdit) PreviewMerge(ctx context.Context, actor Principal, tena
 		}
 	}
 
-	// A base-owning entry marks the document root when no overlay wrote it.
+	// 无 overlay 写入文档根时，拥有 base 的条目标记文档根。
 	if len(provenance) > 0 && provenance[0].Pointer == "" && len(provenance) == 1 {
 		provenance[0].Pointer = ""
 	}
@@ -138,11 +137,10 @@ func (editor *LayerEdit) PreviewMerge(ctx context.Context, actor Principal, tena
 	}, nil
 }
 
-// CreateLayerRevision validates and persists one manual overlay revision, then
-// advances the layer head and enqueues a merge job. Invalid overlays are
-// rejected without persistence.
+// CreateLayerRevision 校验并持久化一个手动 overlay 修订，然后推进层头并入队合并任务。
+// 非法 overlay 被拒绝且不持久化。
 func (editor *LayerEdit) CreateLayerRevision(ctx context.Context, actor Principal, tenantSlug string, layerID uuid.UUID, input LayerRevisionInput) (LayerRevisionResult, error) {
-	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, "layer:edit")
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
 	if err != nil {
 		return LayerRevisionResult{}, err
 	}
@@ -153,7 +151,7 @@ func (editor *LayerEdit) CreateLayerRevision(ctx context.Context, actor Principa
 	if layer.Role != layerRoleOverlay {
 		return LayerRevisionResult{}, ErrValidation
 	}
-	// Validate before persisting anything: parse + compile the overlay.
+	// 在持久化任何内容前校验：解析 + 编译 overlay。
 	if _, err := ParseOverlay([]byte(input.Content)); err != nil {
 		return LayerRevisionResult{}, err
 	}
@@ -171,7 +169,7 @@ func (editor *LayerEdit) CreateLayerRevision(ctx context.Context, actor Principa
 	if err != nil {
 		return LayerRevisionResult{}, err
 	}
-	// Manual overlays are always not_required per the revision state machine.
+	// 按修订状态机，手动 overlay 恒为 not_required。
 	reviewStatus := layerRevisionReviewNotRequired
 	createdBy := membership.UserID
 	revision, err := editor.store.CreateLayerRevision(ctx, NewLayerRevision{
@@ -184,7 +182,7 @@ func (editor *LayerEdit) CreateLayerRevision(ctx context.Context, actor Principa
 		return LayerRevisionResult{}, err
 	}
 
-	// Advance the head: not_required moves latest+effective.
+	// 推进层头：not_required 移动 latest+effective。
 	next := NewLayerHead{
 		TenantID: membership.TenantID, LayerID: layer.ID, ScopeType: scopeType, ScopeKey: scopeKey,
 		LatestRevisionID:    &revision.ID,
@@ -199,7 +197,7 @@ func (editor *LayerEdit) CreateLayerRevision(ctx context.Context, actor Principa
 		return LayerRevisionResult{}, err
 	}
 
-	// Enqueue a merge job to materialize the new effective content.
+	// 入队合并任务以物化新的生效内容。
 	track, err := editor.resolveTrack(ctx, membership.TenantID, layer.AssetID, scopeType, scopeKey)
 	if err != nil {
 		return LayerRevisionResult{}, err
@@ -213,18 +211,16 @@ func (editor *LayerEdit) CreateLayerRevision(ctx context.Context, actor Principa
 	return LayerRevisionResult{Revision: revision, JobID: accepted.JobID, Deduplicated: accepted.Deduplicated}, nil
 }
 
-// LayerRevisionResult carries one persisted overlay revision plus the merge job
-// enqueued to materialize it.
+// LayerRevisionResult 承载一个已持久化的 overlay 修订，以及为物化它而入队的合并任务。
 type LayerRevisionResult struct {
 	Revision     LayerRevisionRecord
 	JobID        uuid.UUID
 	Deduplicated bool
 }
 
-// GetAssetVersionProvenance returns the last-writing layer and revision per
-// JSON pointer for a materialized version, derived from its layer manifest.
+// GetAssetVersionProvenance 从层清单推导物化版本每个 JSON 指针的最后写入层与修订。
 func (editor *LayerEdit) GetAssetVersionProvenance(ctx context.Context, actor Principal, tenantSlug string, versionID uuid.UUID) ([]ProvenanceEntryRecord, error) {
-	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, "layer:read")
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerRead)
 	if err != nil {
 		return nil, err
 	}
@@ -239,10 +235,9 @@ func (editor *LayerEdit) GetAssetVersionProvenance(ctx context.Context, actor Pr
 	return entries, nil
 }
 
-// ReorderAssetLayers persists a new overlay ord sequence under optimistic
-// concurrency. Duplicate layer ids and non-overlay layers are rejected.
+// ReorderAssetLayers 在乐观并发下持久化新的 overlay ord 序列。重复层 id 与非 overlay 层被拒绝。
 func (editor *LayerEdit) ReorderAssetLayers(ctx context.Context, actor Principal, tenantSlug string, assetID uuid.UUID, etag string, layerIDs []uuid.UUID) ([]LayerRecord, error) {
-	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, "layer:edit")
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
 	if err != nil {
 		return nil, err
 	}
@@ -284,10 +279,9 @@ func (editor *LayerEdit) ReorderAssetLayers(ctx context.Context, actor Principal
 	return ordered, nil
 }
 
-// RollbackLayer moves one layer's effective head to a historical revision and
-// enqueues a merge job. The revision count is unchanged: no new revision row.
+// RollbackLayer 将层的生效头移到历史修订并入队合并任务。修订数不变：不产生新修订行。
 func (editor *LayerEdit) RollbackLayer(ctx context.Context, actor Principal, tenantSlug string, layerID, idempotencyKey uuid.UUID, input LayerRollbackInput) (JobAccepted, error) {
-	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, "layer:edit")
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
 	if err != nil {
 		return JobAccepted{}, err
 	}
@@ -324,8 +318,7 @@ func (editor *LayerEdit) RollbackLayer(ctx context.Context, actor Principal, ten
 		return JobAccepted{}, err
 	}
 
-	// Resolve the asset's track for this scope and enqueue a merge job. The
-	// merge worker materializes the next version (+1) without a new revision.
+	// 解析该作用域下资产的轨道并入队合并任务。合并 worker 在无新修订的情况下物化下一版本（+1）。
 	track, err := editor.resolveTrack(ctx, membership.TenantID, layer.AssetID, scopeType, scopeKey)
 	if err != nil {
 		return JobAccepted{}, err
@@ -335,9 +328,8 @@ func (editor *LayerEdit) RollbackLayer(ctx context.Context, actor Principal, ten
 	})
 }
 
-// MaterializeTrack re-merges one track's effective layers into a new version
-// and advances the track head. It is invoked by the asset.merge worker after a
-// layer head mutation. Re-merging identical input is a no-op.
+// MaterializeTrack 将轨道的生效层重合并为新版本并推进轨道头。它在层头变更后由
+// asset.merge worker 调用。重合并相同输入是无操作。
 func (editor *LayerEdit) MaterializeTrack(ctx context.Context, tenantID, trackID uuid.UUID) (AssetVersionRecord, bool, error) {
 	track, err := editor.store.GetAssetRefTrackByID(ctx, tenantID, trackID)
 	if err != nil {
@@ -347,8 +339,7 @@ func (editor *LayerEdit) MaterializeTrack(ctx context.Context, tenantID, trackID
 	return editor.materialize(ctx, tenantID, asset, track)
 }
 
-// Run adapts the asset.merge worker invocation to the layer editing use case,
-// so the LayerEdit service satisfies task.MergeRunner.
+// Run 将 asset.merge worker 调用适配到层编辑用例，使 LayerEdit 服务满足 task.MergeRunner。
 func (editor *LayerEdit) Run(ctx context.Context, args task.MergeArgs) (task.MergeResult, error) {
 	version, noop, err := editor.MaterializeTrack(ctx, args.TenantID, args.TrackID)
 	if err != nil {
@@ -357,8 +348,7 @@ func (editor *LayerEdit) Run(ctx context.Context, args task.MergeArgs) (task.Mer
 	return task.MergeResult{VersionID: version.ID, Noop: noop}, nil
 }
 
-// buildFingerprint derives the deterministic build fingerprint over the ordered
-// layer-revision manifest and the merge-engine version.
+// buildFingerprint 对有序层修订清单与合并引擎版本派生确定性构建指纹。
 func (editor *LayerEdit) buildFingerprint(selected []selectedLayer) (string, error) {
 	manifest := make([]LayerManifestEntry, 0, len(selected))
 	for _, layer := range selected {
@@ -379,7 +369,7 @@ func (editor *LayerEdit) buildFingerprint(selected []selectedLayer) (string, err
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// selectedLayer is one layer revision chosen for a merge.
+// selectedLayer 是为合并选中的一个层修订。
 type selectedLayer struct {
 	LayerID      uuid.UUID
 	RevisionID   uuid.UUID
@@ -393,8 +383,7 @@ type selectedLayer struct {
 	Content      string
 }
 
-// effectiveRevision resolves the effective head revision for one layer scope,
-// falling back to the global head when an exact-branch head is absent.
+// effectiveRevision 解析层作用域的生效头修订，在精确分支头缺失时回退到全局头。
 func (editor *LayerEdit) effectiveRevision(ctx context.Context, tenantID uuid.UUID, layer LayerRecord, scopeType, scopeKey string) (LayerRevisionRecord, error) {
 	head, err := editor.store.GetLayerHead(ctx, tenantID, layer.ID, scopeType, scopeKey)
 	if err != nil {
@@ -415,10 +404,10 @@ func (editor *LayerEdit) effectiveRevision(ctx context.Context, tenantID uuid.UU
 	return editor.store.GetLayerRevision(ctx, tenantID, *revisionID)
 }
 
-// selectedRevisions materializes the ordered layer selection for a preview.
+// selectedRevisions 物化预览的有序层选择。
 func (editor *LayerEdit) selectedRevisions(ctx context.Context, tenantID uuid.UUID, input MergePreviewInput, base LayerRecord, overlays []LayerRecord) ([]selectedLayer, error) {
 	if len(input.Layers) > 0 {
-		// Explicit selection: resolve each (layerId, revisionId) pair directly.
+		// 显式选择：直接解析每个 (layerId, revisionId) 对。
 		selected := make([]selectedLayer, 0, len(input.Layers))
 		for _, selector := range input.Layers {
 			revision, err := editor.store.GetLayerRevision(ctx, tenantID, selector.RevisionID)
@@ -439,7 +428,7 @@ func (editor *LayerEdit) selectedRevisions(ctx context.Context, tenantID uuid.UU
 				Content: revision.ContentRef,
 			})
 		}
-		// Load blob content for each selected revision.
+		// 为每个选中修订加载 blob 内容。
 		for index := range selected {
 			content, err := editor.blobContent(ctx, selected[index].Content)
 			if err != nil {
@@ -483,8 +472,7 @@ func (editor *LayerEdit) selectedRevisions(ctx context.Context, tenantID uuid.UU
 	return selected, nil
 }
 
-// materialize merges a track's effective layers into a new version, or returns
-// the existing latest version when the fingerprint is unchanged.
+// materialize 将轨道的生效层合并为新版本，或在指纹未变时返回现有最新版本。
 func (editor *LayerEdit) materialize(ctx context.Context, tenantID uuid.UUID, asset AssetRecord, track AssetRefTrackRecord) (AssetVersionRecord, bool, error) {
 	layers, err := editor.store.ListLayersForAsset(ctx, tenantID, asset.ID)
 	if err != nil {
@@ -552,8 +540,8 @@ func (editor *LayerEdit) materialize(ctx context.Context, tenantID uuid.UUID, as
 	mergedHash := sha256.Sum256(mergedBytes)
 	mergedHashText := hex.EncodeToString(mergedHash[:])
 
-	// Persist the merged document to the blob store and record its content ref
-	// so downstream consumers (diff, provenance) can read the merged document.
+	// 将合并文档持久化到 blob store 并记录其内容引用，使下游消费者（diff、provenance）
+	// 能读取合并文档。
 	mergedRef := new(string(""))
 	if editor.blobs != nil {
 		blob, putErr := editor.blobs.Put(ctx, strings.NewReader(string(mergedBytes)))
@@ -591,7 +579,7 @@ func (editor *LayerEdit) materialize(ctx context.Context, tenantID uuid.UUID, as
 	}
 	version, err := editor.store.CreateAssetVersion(ctx, NewAssetVersion{
 		TenantID: tenantID, ID: uuid.NewV7(), AssetID: asset.ID, TrackID: track.ID, SequenceNo: sequence,
-		Version: nextVersionLabel(latest, sequence), Lifecycle: "draft", Revision: 1,
+		Version: nextVersionLabel(latest, sequence), Lifecycle: lifecycleDraft, Revision: 1,
 		InputFingerprint: fingerprint, MergeEngineVersion: mergeEngineVersion,
 		KindPluginVersion: new(openapiPluginVersion), LayerManifest: manifestBytes,
 		MergedHash: new(mergedHashText), MergedRef: mergedRef, SourceCommit: nil, BaselineVersionID: nil,
@@ -603,10 +591,42 @@ func (editor *LayerEdit) materialize(ctx context.Context, tenantID uuid.UUID, as
 	if err := editor.store.UpdateAssetRefTrackHead(ctx, tenantID, track.ID, new(version.ID), nil, 1); err != nil {
 		return AssetVersionRecord{}, false, err
 	}
+	// 通用类别（dbschema / dependency）从合并文档索引其条目；openapi 路径改为在同步管线中索引。
+	if err := editor.indexGenericItems(ctx, tenantID, asset, version, content); err != nil {
+		return AssetVersionRecord{}, false, err
+	}
 	return version, true, nil
 }
 
-// resolveTrack returns the existing or newly created track for a layer scope.
+// indexGenericItems 为通用资产类别索引 table/column/edge 条目，并在类别具备条目模式时
+// 将版本标记为已索引。
+func (editor *LayerEdit) indexGenericItems(ctx context.Context, tenantID uuid.UUID, asset AssetRecord, version AssetVersionRecord, content map[string]any) error {
+	assetRecord, assetErr := editor.store.GetAsset(ctx, tenantID, asset.ID)
+	if assetErr != nil {
+		return assetErr
+	}
+	items, err := indexGenericKindItems(assetRecord.Kind, content)
+	if err != nil {
+		return err
+	}
+	if items == nil {
+		return nil
+	}
+	serviceID := assetRecord.ServiceID
+	for _, item := range items {
+		displayBytes, _ := json.Marshal(item.Display)
+		if _, err := editor.store.CreateAssetItem(ctx, NewAssetItem{
+			TenantID: tenantID, ID: uuid.NewV7(), AssetVersionID: version.ID, AssetID: asset.ID, ServiceID: serviceID,
+			Kind: assetRecord.Kind, ItemType: item.ItemType, Key: item.Key, Display: displayBytes,
+			SearchText: item.SearchText, SearchRaw: displayBytes, Provenance: []byte("{}"),
+		}); err != nil {
+			return err
+		}
+	}
+	return editor.store.MarkAssetVersionIndexed(ctx, tenantID, version.ID)
+}
+
+// resolveTrack 返回层作用域的现有或新建轨道。
 func (editor *LayerEdit) resolveTrack(ctx context.Context, tenantID, assetID uuid.UUID, scopeType, scopeKey string) (AssetRefTrackRecord, error) {
 	if scopeType == overlayScopeGlobal {
 		defaultBranch, err := editor.store.GetAssetRepositoryDefaultBranch(ctx, tenantID, assetID)
@@ -629,7 +649,7 @@ func (editor *LayerEdit) resolveTrack(ctx context.Context, tenantID, assetID uui
 		return AssetRefTrackRecord{}, err
 	}
 	return editor.store.CreateAssetRefTrack(ctx, NewAssetRefTrack{
-		TenantID: tenantID, ID: uuid.NewV7(), AssetID: assetID, RefType: refType, RefName: refName, Health: "ok",
+		TenantID: tenantID, ID: uuid.NewV7(), AssetID: assetID, RefType: refType, RefName: refName, Health: assetHealthOK,
 	})
 }
 
@@ -651,7 +671,7 @@ func (editor *LayerEdit) blobContent(ctx context.Context, contentRef string) (st
 
 func (editor *LayerEdit) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
@@ -669,8 +689,8 @@ func (editor *LayerEdit) tenantMembership(ctx context.Context, actor Principal, 
 	return membership, nil
 }
 
-// splitBaseAndOverlays orders the asset's layers: base first, then overlays by
-// ord. A missing base is a validation error; duplicate overlay ord is rejected.
+// splitBaseAndOverlays 排序资产层：base 在前，随后按 ord 排 overlay。缺失 base 是校验错误；
+// 重复 overlay ord 被拒绝。
 func splitBaseAndOverlays(layers []LayerRecord) (LayerRecord, []LayerRecord, error) {
 	var base LayerRecord
 	foundBase := false
@@ -703,8 +723,8 @@ func splitBaseAndOverlays(layers []LayerRecord) (LayerRecord, []LayerRecord, err
 	return base, overlays, nil
 }
 
-// decodeBaseDocument parses a base layer document. Base content is JSON or
-// YAML; it is normalized to the decoded document form for overlay application.
+// decodeBaseDocument 解析 base 层文档。base 内容为 JSON 或 YAML；为应用 overlay 规范化
+// 为解码文档形式。
 func decodeBaseDocument(content string) (map[string]any, error) {
 	var decoded map[string]any
 	if err := json.Unmarshal([]byte(content), &decoded); err == nil {
@@ -716,8 +736,7 @@ func decodeBaseDocument(content string) (map[string]any, error) {
 	return decoded, nil
 }
 
-// normalizeScope fills the scope_type and scope_key defaults for a manual
-// submission: an empty scope type defaults to the global scope.
+// normalizeScope 为手动提交填充 scope_type 与 scope_key 默认值：空作用域类型默认全局作用域。
 func normalizeScope(scopeType, scopeKey string) (string, string) {
 	if scopeType == "" {
 		scopeType = overlayScopeGlobal
@@ -728,7 +747,7 @@ func normalizeScope(scopeType, scopeKey string) (string, string) {
 	return scopeType, scopeKey
 }
 
-// previewScope resolves a merge preview's ref into a layer scope.
+// previewScope 将合并预览的 ref 解析为层作用域。
 func previewScope(refType, refName string) (string, string) {
 	if refName == "" {
 		return overlayScopeGlobal, overlayScopeKeyGlobal
@@ -739,13 +758,13 @@ func previewScope(refType, refName string) (string, string) {
 	return overlayScopeRef, refType + mergeScopeRefSelectorPrefix + refName
 }
 
-// parseAssetLayersETag validates the opaque If-Match token for a reorder.
+// parseAssetLayersETag 校验重排序的不透明 If-Match 令牌。
 func parseAssetLayersETag(etag string, assetID uuid.UUID) error {
 	_, err := parseRevisionETag(etag, "asset-layers", assetID)
 	return err
 }
 
-// MergePreviewInput describes one non-persisting merge preview request.
+// MergePreviewInput 描述一次非持久化合并预览请求。
 type MergePreviewInput struct {
 	AssetID uuid.UUID
 	RefType string
@@ -753,13 +772,13 @@ type MergePreviewInput struct {
 	Layers  []MergeLayerSelector
 }
 
-// MergeLayerSelector selects one layer revision for a preview.
+// MergeLayerSelector 为预览选择一个层修订。
 type MergeLayerSelector struct {
 	LayerID    uuid.UUID
 	RevisionID uuid.UUID
 }
 
-// MergePreviewResult carries the non-persisted merge output.
+// MergePreviewResult 承载非持久化的合并输出。
 type MergePreviewResult struct {
 	InputFingerprint string
 	Content          string
@@ -768,7 +787,7 @@ type MergePreviewResult struct {
 	Provenance       []ProvenanceEntryRecord
 }
 
-// LayerRevisionInput describes one manual overlay revision submission.
+// LayerRevisionInput 描述一次手动 overlay 修订提交。
 type LayerRevisionInput struct {
 	ScopeType       string
 	ScopeKey        string
@@ -778,7 +797,7 @@ type LayerRevisionInput struct {
 	SubmitForReview bool
 }
 
-// LayerRollbackInput describes one rollback request.
+// LayerRollbackInput 描述一次回滚请求。
 type LayerRollbackInput struct {
 	ScopeType                   string
 	ScopeKey                    string
@@ -786,7 +805,7 @@ type LayerRollbackInput struct {
 	TargetRevisionID            uuid.UUID
 }
 
-// ProvenanceEntryRecord is one pointer-to-last-writing-layer provenance entry.
+// ProvenanceEntryRecord 是指针到最后写入层的溯源条目。
 type ProvenanceEntryRecord struct {
 	Pointer    string
 	LayerID    uuid.UUID

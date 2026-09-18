@@ -2,8 +2,8 @@ package handler
 
 import "github.com/meridian-labs/meridian/internal/service"
 
-// overlayErrorDetails renders the contract-defined overlay_invalid error detail
-// list: one-based {line, column, message} entries plus the issue code.
+// overlayErrorDetails 渲染契约定义的 overlay_invalid 错误详情列表：
+// 一基的 {line, column, message} 条目加上 issue code。
 func overlayErrorDetails(err *service.OverlayInvalidError) map[string]any {
 	type overlayIssueDetail struct {
 		Line    int    `json:"line"`

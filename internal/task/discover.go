@@ -10,41 +10,50 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// DiscoverArgs is the durable, non-secret argument carried by a repository
-// discovery job. Credentials are deliberately absent: the runner resolves the
-// current repository configuration at execution time and never receives secrets.
+// 阶段日志消息常量（值 = job_stage_log.message 同口径，供阶段推进与终态落库使用）。
+const (
+	// stageMessageRepositoryDiscoveryStarted 表示仓库发现阶段已开始。
+	stageMessageRepositoryDiscoveryStarted = "repository discovery started"
+	// stageMessageRepositoryDiscoveryCompleted 表示仓库发现成功完成。
+	stageMessageRepositoryDiscoveryCompleted = "repository discovery completed"
+	// stageMessageRepositoryDiscoveryFailed 表示仓库发现失败。
+	stageMessageRepositoryDiscoveryFailed = "repository discovery failed"
+)
+
+// DiscoverArgs 是仓库发现任务携带的持久化且不含机密信息的参数。
+// 凭据被刻意排除：运行器在执行时解析当前仓库配置，永不接收机密数据。
 type DiscoverArgs struct {
-	// TenantID identifies the tenant boundary for every execution query.
+	// TenantID 标识每次执行查询的租户边界。
 	TenantID uuid.UUID `json:"tenantId"`
-	// JobID identifies the application-owned durable job row.
+	// JobID 标识应用自有的持久化任务行。
 	JobID uuid.UUID `json:"jobId"`
-	// RepositoryID identifies the repository that requested discovery.
+	// RepositoryID 标识发起发现的仓库。
 	RepositoryID uuid.UUID `json:"repositoryId"`
-	// RefType identifies the Git ref category (branch or tag).
+	// RefType 标识 Git 引用类别（分支或标签）。
 	RefType string `json:"refType"`
-	// RefName identifies the normalized Git ref to discover.
+	// RefName 标识待发现的规范化 Git 引用。
 	RefName string `json:"refName"`
 }
 
-// Kind returns the stable River kind name persisted in the River schema.
+// Kind 返回持久化在 River schema 中的稳定 River 任务类型名。
 func (DiscoverArgs) Kind() string { return "meridian_repo_discover" }
 
-// DiscoverResult is the secret-free outcome of one repository discovery run.
+// DiscoverResult 是一次仓库发现运行的脱敏结果。
 type DiscoverResult struct {
-	// ResolvedCommit is the commit SHA resolved at discovery time.
+	// ResolvedCommit 是发现时解析出的提交 SHA。
 	ResolvedCommit string
-	// CandidateCount is the number of candidate root directories persisted.
+	// CandidateCount 是持久化的候选根目录数量。
 	CandidateCount int
 }
 
-// DiscoverRunner performs repository discovery after the durable job is claimed.
-// The concrete implementation walks the checkout tree and upserts candidates.
+// DiscoverRunner 在持久化任务被领取后执行仓库发现。
+// 具体实现遍历检出目录并 upsert 候选。
 type DiscoverRunner interface {
 	RunDiscovery(context.Context, DiscoverArgs) (DiscoverResult, error)
 }
 
-// DiscoverWorker advances durable Meridian state around one repository
-// discovery River attempt and persists the resolved commit in the job result.
+// DiscoverWorker 围绕一次仓库发现 River 尝试推进持久化的 Meridian 状态，
+// 并将解析出的提交写入任务结果。
 type DiscoverWorker struct {
 	river.WorkerDefaults[DiscoverArgs]
 	store  ExecutionStore
@@ -52,14 +61,13 @@ type DiscoverWorker struct {
 	now    func() time.Time
 }
 
-// NewDiscoverWorker constructs the discovery worker with explicit persistence
-// and runner dependencies.
+// NewDiscoverWorker 使用显式的持久化与运行器依赖构造发现工作器。
 func NewDiscoverWorker(store ExecutionStore, runner DiscoverRunner) *DiscoverWorker {
 	return &DiscoverWorker{store: store, runner: runner, now: time.Now}
 }
 
-// Work claims the durable job, records the resolve and discover stage
-// transitions, runs discovery, and finishes the job with a redacted result.
+// Work 领取持久化任务，记录 resolve 与 discover 阶段迁移，执行发现，
+// 并以脱敏的结果收尾。
 func (worker *DiscoverWorker) Work(ctx context.Context, job *river.Job[DiscoverArgs]) error {
 	if worker.store == nil {
 		return errors.New("discovery worker has no execution store")
@@ -80,7 +88,7 @@ func (worker *DiscoverWorker) Work(ctx context.Context, job *river.Job[DiscoverA
 	}
 	if err := worker.store.SetJobStage(ctx, StageInput{
 		TenantID: job.Args.TenantID, JobID: job.Args.JobID, Stage: StageDiscover,
-		ExpectedAttempt: job.Attempt, Level: "info", Message: "repository discovery started", OccurredAt: worker.now().UTC(),
+		ExpectedAttempt: job.Attempt, Level: logLevelInfo, Message: stageMessageRepositoryDiscoveryStarted, OccurredAt: worker.now().UTC(),
 	}); err != nil {
 		return err
 	}
@@ -102,24 +110,25 @@ func (worker *DiscoverWorker) Work(ctx context.Context, job *river.Job[DiscoverA
 		return err
 	}
 	return worker.store.FinishJob(ctx, FinishInput{
-		TenantID: job.Args.TenantID, JobID: job.Args.JobID, Status: "succeeded", Result: payload,
-		ExpectedAttempt: job.Attempt, Stage: StageDiscover, Level: "info",
-		Message: "repository discovery completed", Terminal: true, FinishedAt: worker.now().UTC(),
+		TenantID: job.Args.TenantID, JobID: job.Args.JobID, Status: jobStatusSucceeded, Result: payload,
+		ExpectedAttempt: job.Attempt, Stage: StageDiscover, Level: logLevelInfo,
+		Message: stageMessageRepositoryDiscoveryCompleted, Terminal: true, FinishedAt: worker.now().UTC(),
 	})
 }
 
+// finishFailure 将一次发现失败持久化为终态失败，并写入稳定的错误码。
 func (worker *DiscoverWorker) finishFailure(ctx context.Context, args DiscoverArgs, expectedAttempt int, cause error) error {
 	errorPayload, err := json.Marshal(struct {
 		Code string `json:"code"`
-	}{Code: "internal_error"})
+	}{Code: errorCodeInternal})
 	if err != nil {
 		return err
 	}
 	finishErr := worker.store.FinishJob(ctx, FinishInput{
 		TenantID: args.TenantID, JobID: args.JobID, RepositoryID: args.RepositoryID,
-		Status: "failed", Error: errorPayload, ErrorCode: "internal_error",
+		Status: jobStatusFailed, Error: errorPayload, ErrorCode: errorCodeInternal,
 		ExpectedAttempt: expectedAttempt,
-		Stage:           StageDiscover, Level: "error", Message: "repository discovery failed", Terminal: true, FinishedAt: worker.now().UTC(),
+		Stage:           StageDiscover, Level: logLevelError, Message: stageMessageRepositoryDiscoveryFailed, Terminal: true, FinishedAt: worker.now().UTC(),
 	})
 	if finishErr != nil {
 		return errors.Join(cause, finishErr)

@@ -22,23 +22,23 @@ INSERT INTO idempotency_records (
 )
 `
 
-// CreateSyncIdempotencyParams contains the strongly typed arguments for the CreateSyncIdempotency query.
+// CreateSyncIdempotencyParams 包含 CreateSyncIdempotency 查询的强类型参数。
 type CreateSyncIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the CreateSyncIdempotency query.
+	// TenantID 是提供给 CreateSyncIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the CreateSyncIdempotency query.
+	// PrincipalType 是提供给 CreateSyncIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the CreateSyncIdempotency query.
+	// PrincipalID 是提供给 CreateSyncIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the CreateSyncIdempotency query.
+	// IdempotencyKey 是提供给 CreateSyncIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
-	// RequestHash is the request hash value supplied to the CreateSyncIdempotency query.
+	// RequestHash 是提供给 CreateSyncIdempotency 查询的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value supplied to the CreateSyncIdempotency query.
+	// ResponseBody 是提供给 CreateSyncIdempotency 查询的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
 }
 
-// CreateSyncIdempotency executes the generated CreateSyncIdempotency database query.
+// CreateSyncIdempotency 执行生成的 CreateSyncIdempotency 数据库查询。
 // 保存可重放 24 小时的准确、非敏感 202 响应。
 func (q *Queries) CreateSyncIdempotency(ctx context.Context, arg CreateSyncIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, createSyncIdempotency,
@@ -61,19 +61,19 @@ WHERE tenant_id = $1
   AND idempotency_key = $4
 `
 
-// DeleteSyncIdempotencyParams contains the strongly typed arguments for the DeleteSyncIdempotency query.
+// DeleteSyncIdempotencyParams 包含 DeleteSyncIdempotency 查询的强类型参数。
 type DeleteSyncIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the DeleteSyncIdempotency query.
+	// TenantID 是提供给 DeleteSyncIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the DeleteSyncIdempotency query.
+	// PrincipalType 是提供给 DeleteSyncIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the DeleteSyncIdempotency query.
+	// PrincipalID 是提供给 DeleteSyncIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the DeleteSyncIdempotency query.
+	// IdempotencyKey 是提供给 DeleteSyncIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// DeleteSyncIdempotency executes the generated DeleteSyncIdempotency database query.
+// DeleteSyncIdempotency 执行生成的 DeleteSyncIdempotency 数据库查询。
 // 在重新使用幂等键前删除已过期的 syncRepository 重放记录。
 func (q *Queries) DeleteSyncIdempotency(ctx context.Context, arg DeleteSyncIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, deleteSyncIdempotency,
@@ -96,29 +96,29 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// GetSyncIdempotencyParams contains the strongly typed arguments for the GetSyncIdempotency query.
+// GetSyncIdempotencyParams 包含 GetSyncIdempotency 查询的强类型参数。
 type GetSyncIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the GetSyncIdempotency query.
+	// TenantID 是提供给 GetSyncIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the GetSyncIdempotency query.
+	// PrincipalType 是提供给 GetSyncIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the GetSyncIdempotency query.
+	// PrincipalID 是提供给 GetSyncIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the GetSyncIdempotency query.
+	// IdempotencyKey 是提供给 GetSyncIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// GetSyncIdempotencyRow contains the columns returned by the GetSyncIdempotency query.
+// GetSyncIdempotencyRow 包含 GetSyncIdempotency 查询返回的列。
 type GetSyncIdempotencyRow struct {
-	// RequestHash is the request hash value returned by the GetSyncIdempotency query.
+	// RequestHash 是 GetSyncIdempotency 查询返回的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value returned by the GetSyncIdempotency query.
+	// ResponseBody 是 GetSyncIdempotency 查询返回的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
-	// ExpiresAt is the expires at value returned by the GetSyncIdempotency query.
+	// ExpiresAt 是 GetSyncIdempotency 查询返回的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// GetSyncIdempotency executes the generated GetSyncIdempotency database query.
+// GetSyncIdempotency 执行生成的 GetSyncIdempotency 数据库查询。
 // 返回 syncRepository 请求保留的准确响应。
 func (q *Queries) GetSyncIdempotency(ctx context.Context, arg GetSyncIdempotencyParams) (GetSyncIdempotencyRow, error) {
 	row := q.db.QueryRow(ctx, getSyncIdempotency,
@@ -137,7 +137,7 @@ const lockSyncIdempotency = `-- name: LockSyncIdempotency :exec
 SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
 `
 
-// LockSyncIdempotency executes the generated LockSyncIdempotency database query.
+// LockSyncIdempotency 执行生成的 LockSyncIdempotency 数据库查询。
 // syncRepository 的幂等重放持久化查询。
 // 重放身份为 [tenantId, principalType, principalId, operationId, idempotencyKey]。
 // 在调用方事务内串行化一个 syncRepository 重放身份。

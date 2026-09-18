@@ -1,4 +1,4 @@
-// Package task contains River job arguments and execution orchestration.
+// Package task 包含 River 任务参数与执行编排。
 package task
 
 import (
@@ -11,33 +11,43 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// MergeArgs is the durable, non-secret argument carried by an asset.merge job.
+// 阶段日志消息常量（值 = job_stage_log.message 同口径，供阶段推进与终态落库使用）。
+const (
+	// stageMessageMergeCompleted 表示合并阶段已完成。
+	stageMessageMergeCompleted = "merge completed"
+	// stageMessageAssetMergeCompleted 表示资产合并成功完成。
+	stageMessageAssetMergeCompleted = "asset merge completed"
+	// stageMessageAssetMergeFailed 表示资产合并失败。
+	stageMessageAssetMergeFailed = "asset merge failed"
+)
+
+// MergeArgs 是 asset.merge 任务携带的持久化且不含机密信息的参数。
 type MergeArgs struct {
-	// TenantID identifies the tenant boundary for every execution query.
+	// TenantID 标识每次执行查询的租户边界。
 	TenantID uuid.UUID `json:"tenantId"`
-	// JobID identifies the application-owned durable job row.
+	// JobID 标识应用自有的持久化任务行。
 	JobID uuid.UUID `json:"jobId"`
-	// TrackID identifies the asset ref track whose layers are re-merged.
+	// TrackID 标识需要重新合并层的资产引用轨道。
 	TrackID uuid.UUID `json:"trackId"`
 }
 
-// Kind returns the stable River kind name persisted in the River schema.
+// Kind 返回持久化在 River schema 中的稳定 River 任务类型名。
 func (MergeArgs) Kind() string { return "meridian_asset_merge" }
 
-// MergeResult carries the materialized version for a completed merge.
+// MergeResult 携带一次已完成合并的物化版本。
 type MergeResult struct {
-	// VersionID identifies the new or reused version, when one was produced.
+	// VersionID 标识新建或复用的版本（当产生版本时）。
 	VersionID uuid.UUID `json:"versionId,omitempty"`
-	// Noop reports whether the merge reused an identical existing version.
+	// Noop 表示合并是否复用了完全相同的既有版本。
 	Noop bool `json:"noop"`
 }
 
-// MergeRunner re-merges one track's effective layers into a version.
+// MergeRunner 将一条轨道的生效层重新合并为一个版本。
 type MergeRunner interface {
 	Run(context.Context, MergeArgs) (MergeResult, error)
 }
 
-// MergeWorker advances durable Meridian state around one asset.merge attempt.
+// MergeWorker 围绕一次 asset.merge 尝试推进持久化的 Meridian 状态。
 type MergeWorker struct {
 	river.WorkerDefaults[MergeArgs]
 	store  ExecutionStore
@@ -45,13 +55,12 @@ type MergeWorker struct {
 	now    func() time.Time
 }
 
-// NewMergeWorker constructs the M2 asset.merge worker.
+// NewMergeWorker 构造 M2 的 asset.merge 工作器。
 func NewMergeWorker(store ExecutionStore, runner MergeRunner) *MergeWorker {
 	return &MergeWorker{store: store, runner: runner, now: time.Now}
 }
 
-// Work claims the durable job, runs the merge, and finishes it with a redacted
-// result or error.
+// Work 领取持久化任务，执行合并，并以脱敏的结果或错误收尾。
 func (worker *MergeWorker) Work(ctx context.Context, job *river.Job[MergeArgs]) error {
 	if worker.store == nil {
 		return errors.New("merge worker has no execution store")
@@ -77,7 +86,7 @@ func (worker *MergeWorker) Work(ctx context.Context, job *river.Job[MergeArgs]) 
 	if err := worker.store.SetJobStage(ctx, StageInput{
 		TenantID: job.Args.TenantID, JobID: job.Args.JobID, Stage: StageIndex,
 		ExpectedAttempt: job.Attempt,
-		Level:           "info", Message: "merge completed", OccurredAt: worker.now().UTC(),
+		Level:           logLevelInfo, Message: stageMessageMergeCompleted, OccurredAt: worker.now().UTC(),
 	}); err != nil {
 		return err
 	}
@@ -86,24 +95,25 @@ func (worker *MergeWorker) Work(ctx context.Context, job *river.Job[MergeArgs]) 
 		return err
 	}
 	return worker.store.FinishJob(ctx, FinishInput{
-		TenantID: job.Args.TenantID, JobID: job.Args.JobID, Status: "succeeded", Result: resultBytes,
+		TenantID: job.Args.TenantID, JobID: job.Args.JobID, Status: jobStatusSucceeded, Result: resultBytes,
 		ExpectedAttempt: job.Attempt,
-		Stage:           StageIndex, Level: "info", Message: "asset merge completed",
+		Stage:           StageIndex, Level: logLevelInfo, Message: stageMessageAssetMergeCompleted,
 		Terminal: true, FinishedAt: worker.now().UTC(),
 	})
 }
 
+// finishFailure 将一次合并失败持久化为终态失败，并写入稳定的错误码。
 func (worker *MergeWorker) finishFailure(ctx context.Context, args MergeArgs, expectedAttempt int, cause error) error {
 	errorPayload, err := json.Marshal(struct {
 		Code string `json:"code"`
-	}{Code: "internal_error"})
+	}{Code: errorCodeInternal})
 	if err != nil {
 		return err
 	}
 	finishErr := worker.store.FinishJob(ctx, FinishInput{
-		TenantID: args.TenantID, JobID: args.JobID, Status: "failed", Error: errorPayload, ErrorCode: "internal_error",
+		TenantID: args.TenantID, JobID: args.JobID, Status: jobStatusFailed, Error: errorPayload, ErrorCode: errorCodeInternal,
 		ExpectedAttempt: expectedAttempt,
-		Stage:           StageMerge, Level: "error", Message: "asset merge failed", Terminal: true, FinishedAt: worker.now().UTC(),
+		Stage:           StageMerge, Level: logLevelError, Message: stageMessageAssetMergeFailed, Terminal: true, FinishedAt: worker.now().UTC(),
 	})
 	if finishErr != nil {
 		return errors.Join(cause, finishErr)

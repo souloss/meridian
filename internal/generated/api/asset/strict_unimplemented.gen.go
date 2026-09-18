@@ -8,111 +8,111 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// GetPublicAsset returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetPublicAsset 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetPublicAsset(ctx context.Context, request GetPublicAssetRequestObject) (GetPublicAssetResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListAssetKinds returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListAssetKinds 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListAssetKinds(ctx context.Context, request ListAssetKindsRequestObject) (ListAssetKindsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateAssetKindState returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateAssetKindState 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateAssetKindState(ctx context.Context, request UpdateAssetKindStateRequestObject) (UpdateAssetKindStateResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetAssetVersion returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetAssetVersion 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetAssetVersion(ctx context.Context, request GetAssetVersionRequestObject) (GetAssetVersionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListAssetVersionItems returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListAssetVersionItems 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListAssetVersionItems(ctx context.Context, request ListAssetVersionItemsRequestObject) (ListAssetVersionItemsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetAssetVersionProvenance returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetAssetVersionProvenance 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetAssetVersionProvenance(ctx context.Context, request GetAssetVersionProvenanceRequestObject) (GetAssetVersionProvenanceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeprecateAssetVersion returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeprecateAssetVersion 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeprecateAssetVersion(ctx context.Context, request DeprecateAssetVersionRequestObject) (DeprecateAssetVersionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PublishAssetVersion returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PublishAssetVersion 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PublishAssetVersion(ctx context.Context, request PublishAssetVersionRequestObject) (PublishAssetVersionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// RetireAssetVersion returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// RetireAssetVersion 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) RetireAssetVersion(ctx context.Context, request RetireAssetVersionRequestObject) (RetireAssetVersionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetAsset returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetAsset 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetAsset(ctx context.Context, request GetAssetRequestObject) (GetAssetResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListAssetVersions returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListAssetVersions 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListAssetVersions(ctx context.Context, request ListAssetVersionsRequestObject) (ListAssetVersionsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GenerateAssetWithAi returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GenerateAssetWithAi 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GenerateAssetWithAi(ctx context.Context, request GenerateAssetWithAiRequestObject) (GenerateAssetWithAiResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PreviewMerge returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PreviewMerge 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PreviewMerge(ctx context.Context, request PreviewMergeRequestObject) (PreviewMergeResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PushAssetRevision returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PushAssetRevision 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PushAssetRevision(ctx context.Context, request PushAssetRevisionRequestObject) (PushAssetRevisionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GenerateMissingAssetWithAi returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GenerateMissingAssetWithAi 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GenerateMissingAssetWithAi(ctx context.Context, request GenerateMissingAssetWithAiRequestObject) (GenerateMissingAssetWithAiResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListSourceSpecs returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListSourceSpecs 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListSourceSpecs(ctx context.Context, request ListSourceSpecsRequestObject) (ListSourceSpecsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateSourceSpec returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateSourceSpec 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateSourceSpec(ctx context.Context, request CreateSourceSpecRequestObject) (CreateSourceSpecResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteSourceSpec returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteSourceSpec 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteSourceSpec(ctx context.Context, request DeleteSourceSpecRequestObject) (DeleteSourceSpecResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateSourceSpec returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateSourceSpec 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateSourceSpec(ctx context.Context, request UpdateSourceSpecRequestObject) (UpdateSourceSpecResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListSourceBindings returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListSourceBindings 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListSourceBindings(ctx context.Context, request ListSourceBindingsRequestObject) (ListSourceBindingsResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ProduceSource returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ProduceSource 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ProduceSource(ctx context.Context, request ProduceSourceRequestObject) (ProduceSourceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

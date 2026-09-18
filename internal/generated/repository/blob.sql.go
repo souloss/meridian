@@ -21,17 +21,17 @@ SET ref_count = tenant_blob_refs.ref_count + 1,
 RETURNING tenant_id, blob_digest, ref_count, last_referenced_at
 `
 
-// AddTenantBlobReferenceParams contains the strongly typed arguments for the AddTenantBlobReference query.
+// AddTenantBlobReferenceParams 包含 AddTenantBlobReference 查询的强类型参数。
 type AddTenantBlobReferenceParams struct {
-	// TenantID is the tenant id value supplied to the AddTenantBlobReference query.
+	// TenantID 是提供给 AddTenantBlobReference 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// BlobDigest is the blob digest value supplied to the AddTenantBlobReference query.
+	// BlobDigest 是提供给 AddTenantBlobReference 查询的 BlobDigest 值。
 	BlobDigest string `json:"blob_digest"`
-	// ReferencedAt is the referenced at value supplied to the AddTenantBlobReference query.
+	// ReferencedAt 是提供给 AddTenantBlobReference 查询的 ReferencedAt 值。
 	ReferencedAt pgtype.Timestamptz `json:"referenced_at"`
 }
 
-// AddTenantBlobReference executes the generated AddTenantBlobReference database query.
+// AddTenantBlobReference 执行生成的 AddTenantBlobReference 数据库查询。
 // 调用方完成串行化并校验唯一字节配额后，创建或递增一条租户对象引用。
 func (q *Queries) AddTenantBlobReference(ctx context.Context, arg AddTenantBlobReferenceParams) (TenantBlobRef, error) {
 	row := q.db.QueryRow(ctx, addTenantBlobReference, arg.TenantID, arg.BlobDigest, arg.ReferencedAt)
@@ -53,7 +53,7 @@ WHERE tenant_blob_refs.tenant_id = $1
   AND tenant_blob_refs.ref_count > 0
 `
 
-// CountTenantUniqueBlobBytes executes the generated CountTenantUniqueBlobBytes database query.
+// CountTenantUniqueBlobBytes 执行生成的 CountTenantUniqueBlobBytes 数据库查询。
 // 每个有正引用的全局对象只计入一次，避免相同内容的重复版本重复消耗配额。
 func (q *Queries) CountTenantUniqueBlobBytes(ctx context.Context, tenantID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countTenantUniqueBlobBytes, tenantID)
@@ -69,19 +69,19 @@ ON CONFLICT (blob_digest) DO NOTHING
 RETURNING blob_digest, storage_key, size_bytes, media_type, created_at
 `
 
-// CreateBlobMetadataParams contains the strongly typed arguments for the CreateBlobMetadata query.
+// CreateBlobMetadataParams 包含 CreateBlobMetadata 查询的强类型参数。
 type CreateBlobMetadataParams struct {
-	// BlobDigest is the blob digest value supplied to the CreateBlobMetadata query.
+	// BlobDigest 是提供给 CreateBlobMetadata 查询的 BlobDigest 值。
 	BlobDigest string `json:"blob_digest"`
-	// StorageKey is the storage key value supplied to the CreateBlobMetadata query.
+	// StorageKey 是提供给 CreateBlobMetadata 查询的 StorageKey 值。
 	StorageKey string `json:"storage_key"`
-	// SizeBytes is the size bytes value supplied to the CreateBlobMetadata query.
+	// SizeBytes 是提供给 CreateBlobMetadata 查询的 SizeBytes 值。
 	SizeBytes int64 `json:"size_bytes"`
-	// MediaType is the media type value supplied to the CreateBlobMetadata query.
+	// MediaType 是提供给 CreateBlobMetadata 查询的 MediaType 值。
 	MediaType string `json:"media_type"`
 }
 
-// CreateBlobMetadata executes the generated CreateBlobMetadata database query.
+// CreateBlobMetadata 执行生成的 CreateBlobMetadata 数据库查询。
 // 写入不可变的内容寻址元数据；其他租户或请求已登记相同摘要时不返回记录。
 func (q *Queries) CreateBlobMetadata(ctx context.Context, arg CreateBlobMetadataParams) (Blob, error) {
 	row := q.db.QueryRow(ctx, createBlobMetadata,
@@ -107,7 +107,7 @@ FROM blobs
 WHERE blob_digest = $1
 `
 
-// GetBlobMetadata executes the generated GetBlobMetadata database query.
+// GetBlobMetadata 执行生成的 GetBlobMetadata 数据库查询。
 // 返回不可变对象元数据，用于校验重复使用的摘要。
 func (q *Queries) GetBlobMetadata(ctx context.Context, blobDigest string) (Blob, error) {
 	row := q.db.QueryRow(ctx, getBlobMetadata, blobDigest)
@@ -129,15 +129,15 @@ WHERE tenant_id = $1
   AND blob_digest = $2
 `
 
-// GetTenantBlobReferenceParams contains the strongly typed arguments for the GetTenantBlobReference query.
+// GetTenantBlobReferenceParams 包含 GetTenantBlobReference 查询的强类型参数。
 type GetTenantBlobReferenceParams struct {
-	// TenantID is the tenant id value supplied to the GetTenantBlobReference query.
+	// TenantID 是提供给 GetTenantBlobReference 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// BlobDigest is the blob digest value supplied to the GetTenantBlobReference query.
+	// BlobDigest 是提供给 GetTenantBlobReference 查询的 BlobDigest 值。
 	BlobDigest string `json:"blob_digest"`
 }
 
-// GetTenantBlobReference executes the generated GetTenantBlobReference database query.
+// GetTenantBlobReference 执行生成的 GetTenantBlobReference 数据库查询。
 // 调用方锁定租户配额行后，返回当前对象引用数。
 func (q *Queries) GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error) {
 	row := q.db.QueryRow(ctx, getTenantBlobReference, arg.TenantID, arg.BlobDigest)
@@ -159,7 +159,7 @@ WHERE id = $1
 FOR UPDATE
 `
 
-// LockTenantStorageQuota executes the generated LockTenantStorageQuota database query.
+// LockTenantStorageQuota 执行生成的 LockTenantStorageQuota 数据库查询。
 // 串行化租户对象引用的全部配额核算，并返回复制到租户快照中的固定字节配额。
 func (q *Queries) LockTenantStorageQuota(ctx context.Context, tenantID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, lockTenantStorageQuota, tenantID)

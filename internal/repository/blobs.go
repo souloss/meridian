@@ -15,7 +15,7 @@ import (
 	"github.com/meridian-labs/meridian/internal/storage"
 )
 
-// AddBlobReference atomically validates immutable metadata and tenant unique-byte quota.
+// AddBlobReference 原子地校验不可变元数据与租户的按字节去重配额。
 func (store *RepositoryStore) AddBlobReference(ctx context.Context, tenantID uuid.UUID, blob storage.Blob, mediaType string, referencedAt time.Time) error {
 	expectedKey, err := storage.StorageKey(blob.Digest)
 	if err != nil || expectedKey != blob.StorageKey || blob.Size < 0 {
@@ -57,7 +57,7 @@ func (store *RepositoryStore) AddBlobReference(ctx context.Context, tenantID uui
 			return normalizeError(err)
 		}
 		if current > limit-blob.Size {
-			return &service.QuotaExceededError{Resource: "storageBytes", Current: current, Limit: limit}
+			return &service.QuotaExceededError{Resource: quotaResourceStorageBytes, Current: current, Limit: limit}
 		}
 	}
 	if _, err := queries.AddTenantBlobReference(ctx, generated.AddTenantBlobReferenceParams{

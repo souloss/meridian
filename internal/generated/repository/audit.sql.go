@@ -28,31 +28,31 @@ WHERE (NOT $1::boolean OR audit_logs.actor_id = $2::uuid)
   AND ($10::text = '' OR tenants.slug = $10::text)
 `
 
-// CountPlatformAuditLogsParams contains the strongly typed arguments for the CountPlatformAuditLogs query.
+// CountPlatformAuditLogsParams 包含 CountPlatformAuditLogs 查询的强类型参数。
 type CountPlatformAuditLogsParams struct {
-	// ActorIDSet is the actor id set value supplied to the CountPlatformAuditLogs query.
+	// ActorIDSet 是提供给 CountPlatformAuditLogs 查询的 ActorIDSet 值。
 	ActorIDSet bool `json:"actor_id_set"`
-	// ActorID is the actor id value supplied to the CountPlatformAuditLogs query.
+	// ActorID 是提供给 CountPlatformAuditLogs 查询的 ActorID 值。
 	ActorID uuid.UUID `json:"actor_id"`
-	// ActionFilter is the action filter value supplied to the CountPlatformAuditLogs query.
+	// ActionFilter 是提供给 CountPlatformAuditLogs 查询的 ActionFilter 值。
 	ActionFilter []string `json:"action_filter"`
-	// TargetType is the target type value supplied to the CountPlatformAuditLogs query.
+	// TargetType 是提供给 CountPlatformAuditLogs 查询的 TargetType 值。
 	TargetType string `json:"target_type"`
-	// TargetID is the target id value supplied to the CountPlatformAuditLogs query.
+	// TargetID 是提供给 CountPlatformAuditLogs 查询的 TargetID 值。
 	TargetID string `json:"target_id"`
-	// FromSet is the from set value supplied to the CountPlatformAuditLogs query.
+	// FromSet 是提供给 CountPlatformAuditLogs 查询的 FromSet 值。
 	FromSet bool `json:"from_set"`
-	// FromTime is the from time value supplied to the CountPlatformAuditLogs query.
+	// FromTime 是提供给 CountPlatformAuditLogs 查询的 FromTime 值。
 	FromTime pgtype.Timestamptz `json:"from_time"`
-	// ToSet is the to set value supplied to the CountPlatformAuditLogs query.
+	// ToSet 是提供给 CountPlatformAuditLogs 查询的 ToSet 值。
 	ToSet bool `json:"to_set"`
-	// ToTime is the to time value supplied to the CountPlatformAuditLogs query.
+	// ToTime 是提供给 CountPlatformAuditLogs 查询的 ToTime 值。
 	ToTime pgtype.Timestamptz `json:"to_time"`
-	// TenantSlug is the tenant slug value supplied to the CountPlatformAuditLogs query.
+	// TenantSlug 是提供给 CountPlatformAuditLogs 查询的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
 }
 
-// CountPlatformAuditLogs executes the generated CountPlatformAuditLogs database query.
+// CountPlatformAuditLogs 执行生成的 CountPlatformAuditLogs 数据库查询。
 // 按照 ListPlatformAuditLogs 的跨租户条件和全部可选过滤条件返回准确总数。
 func (q *Queries) CountPlatformAuditLogs(ctx context.Context, arg CountPlatformAuditLogsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countPlatformAuditLogs,
@@ -87,31 +87,31 @@ WHERE audit_logs.tenant_id = $1
   AND (NOT $9::boolean OR audit_logs.created_at <= $10::timestamptz)
 `
 
-// CountTenantAuditLogsParams contains the strongly typed arguments for the CountTenantAuditLogs query.
+// CountTenantAuditLogsParams 包含 CountTenantAuditLogs 查询的强类型参数。
 type CountTenantAuditLogsParams struct {
-	// TenantID is the tenant id value supplied to the CountTenantAuditLogs query.
+	// TenantID 是提供给 CountTenantAuditLogs 查询的 TenantID 值。
 	TenantID *uuid.UUID `json:"tenant_id"`
-	// ActorIDSet is the actor id set value supplied to the CountTenantAuditLogs query.
+	// ActorIDSet 是提供给 CountTenantAuditLogs 查询的 ActorIDSet 值。
 	ActorIDSet bool `json:"actor_id_set"`
-	// ActorID is the actor id value supplied to the CountTenantAuditLogs query.
+	// ActorID 是提供给 CountTenantAuditLogs 查询的 ActorID 值。
 	ActorID uuid.UUID `json:"actor_id"`
-	// ActionFilter is the action filter value supplied to the CountTenantAuditLogs query.
+	// ActionFilter 是提供给 CountTenantAuditLogs 查询的 ActionFilter 值。
 	ActionFilter []string `json:"action_filter"`
-	// TargetType is the target type value supplied to the CountTenantAuditLogs query.
+	// TargetType 是提供给 CountTenantAuditLogs 查询的 TargetType 值。
 	TargetType string `json:"target_type"`
-	// TargetID is the target id value supplied to the CountTenantAuditLogs query.
+	// TargetID 是提供给 CountTenantAuditLogs 查询的 TargetID 值。
 	TargetID string `json:"target_id"`
-	// FromSet is the from set value supplied to the CountTenantAuditLogs query.
+	// FromSet 是提供给 CountTenantAuditLogs 查询的 FromSet 值。
 	FromSet bool `json:"from_set"`
-	// FromTime is the from time value supplied to the CountTenantAuditLogs query.
+	// FromTime 是提供给 CountTenantAuditLogs 查询的 FromTime 值。
 	FromTime pgtype.Timestamptz `json:"from_time"`
-	// ToSet is the to set value supplied to the CountTenantAuditLogs query.
+	// ToSet 是提供给 CountTenantAuditLogs 查询的 ToSet 值。
 	ToSet bool `json:"to_set"`
-	// ToTime is the to time value supplied to the CountTenantAuditLogs query.
+	// ToTime 是提供给 CountTenantAuditLogs 查询的 ToTime 值。
 	ToTime pgtype.Timestamptz `json:"to_time"`
 }
 
-// CountTenantAuditLogs executes the generated CountTenantAuditLogs database query.
+// CountTenantAuditLogs 执行生成的 CountTenantAuditLogs 数据库查询。
 // 按照 ListTenantAuditLogs 的租户条件和全部可选过滤条件返回准确总数。
 func (q *Queries) CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error) {
 	row := q.db.QueryRow(ctx, countTenantAuditLogs,
@@ -159,57 +159,57 @@ LIMIT $12
 OFFSET $11
 `
 
-// ListPlatformAuditLogsParams contains the strongly typed arguments for the ListPlatformAuditLogs query.
+// ListPlatformAuditLogsParams 包含 ListPlatformAuditLogs 查询的强类型参数。
 type ListPlatformAuditLogsParams struct {
-	// ActorIDSet is the actor id set value supplied to the ListPlatformAuditLogs query.
+	// ActorIDSet 是提供给 ListPlatformAuditLogs 查询的 ActorIDSet 值。
 	ActorIDSet bool `json:"actor_id_set"`
-	// ActorID is the actor id value supplied to the ListPlatformAuditLogs query.
+	// ActorID 是提供给 ListPlatformAuditLogs 查询的 ActorID 值。
 	ActorID uuid.UUID `json:"actor_id"`
-	// ActionFilter is the action filter value supplied to the ListPlatformAuditLogs query.
+	// ActionFilter 是提供给 ListPlatformAuditLogs 查询的 ActionFilter 值。
 	ActionFilter []string `json:"action_filter"`
-	// TargetType is the target type value supplied to the ListPlatformAuditLogs query.
+	// TargetType 是提供给 ListPlatformAuditLogs 查询的 TargetType 值。
 	TargetType string `json:"target_type"`
-	// TargetID is the target id value supplied to the ListPlatformAuditLogs query.
+	// TargetID 是提供给 ListPlatformAuditLogs 查询的 TargetID 值。
 	TargetID string `json:"target_id"`
-	// FromSet is the from set value supplied to the ListPlatformAuditLogs query.
+	// FromSet 是提供给 ListPlatformAuditLogs 查询的 FromSet 值。
 	FromSet bool `json:"from_set"`
-	// FromTime is the from time value supplied to the ListPlatformAuditLogs query.
+	// FromTime 是提供给 ListPlatformAuditLogs 查询的 FromTime 值。
 	FromTime pgtype.Timestamptz `json:"from_time"`
-	// ToSet is the to set value supplied to the ListPlatformAuditLogs query.
+	// ToSet 是提供给 ListPlatformAuditLogs 查询的 ToSet 值。
 	ToSet bool `json:"to_set"`
-	// ToTime is the to time value supplied to the ListPlatformAuditLogs query.
+	// ToTime 是提供给 ListPlatformAuditLogs 查询的 ToTime 值。
 	ToTime pgtype.Timestamptz `json:"to_time"`
-	// TenantSlug is the tenant slug value supplied to the ListPlatformAuditLogs query.
+	// TenantSlug 是提供给 ListPlatformAuditLogs 查询的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// PageOffset is the page offset value supplied to the ListPlatformAuditLogs query.
+	// PageOffset 是提供给 ListPlatformAuditLogs 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListPlatformAuditLogs query.
+	// PageLimit 是提供给 ListPlatformAuditLogs 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListPlatformAuditLogsRow contains the columns returned by the ListPlatformAuditLogs query.
+// ListPlatformAuditLogsRow 包含 ListPlatformAuditLogs 查询返回的列。
 type ListPlatformAuditLogsRow struct {
-	// ID is the id value returned by the ListPlatformAuditLogs query.
+	// ID 是 ListPlatformAuditLogs 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TenantSlug is the tenant slug value returned by the ListPlatformAuditLogs query.
+	// TenantSlug 是 ListPlatformAuditLogs 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// ActorID is the actor id value returned by the ListPlatformAuditLogs query.
+	// ActorID 是 ListPlatformAuditLogs 查询返回的 ActorID 值。
 	ActorID *uuid.UUID `json:"actor_id"`
-	// Action is the action value returned by the ListPlatformAuditLogs query.
+	// Action 是 ListPlatformAuditLogs 查询返回的 Action 值。
 	Action string `json:"action"`
-	// TargetType is the target type value returned by the ListPlatformAuditLogs query.
+	// TargetType 是 ListPlatformAuditLogs 查询返回的 TargetType 值。
 	TargetType string `json:"target_type"`
-	// TargetID is the target id value returned by the ListPlatformAuditLogs query.
+	// TargetID 是 ListPlatformAuditLogs 查询返回的 TargetID 值。
 	TargetID string `json:"target_id"`
-	// RequestID is the request id value returned by the ListPlatformAuditLogs query.
+	// RequestID 是 ListPlatformAuditLogs 查询返回的 RequestID 值。
 	RequestID string `json:"request_id"`
-	// Detail is the detail value returned by the ListPlatformAuditLogs query.
+	// Detail 是 ListPlatformAuditLogs 查询返回的 Detail 值。
 	Detail []byte `json:"detail"`
-	// CreatedAt is the created at value returned by the ListPlatformAuditLogs query.
+	// CreatedAt 是 ListPlatformAuditLogs 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
-// ListPlatformAuditLogs executes the generated ListPlatformAuditLogs database query.
+// ListPlatformAuditLogs 执行生成的 ListPlatformAuditLogs 数据库查询。
 // 为平台控制面返回一页按最新时间优先排列的跨租户审计元数据。
 // 平台级记录的可空租户归属会保留在结果中。
 func (q *Queries) ListPlatformAuditLogs(ctx context.Context, arg ListPlatformAuditLogsParams) ([]ListPlatformAuditLogsRow, error) {
@@ -283,57 +283,57 @@ LIMIT $12
 OFFSET $11
 `
 
-// ListTenantAuditLogsParams contains the strongly typed arguments for the ListTenantAuditLogs query.
+// ListTenantAuditLogsParams 包含 ListTenantAuditLogs 查询的强类型参数。
 type ListTenantAuditLogsParams struct {
-	// TenantID is the tenant id value supplied to the ListTenantAuditLogs query.
+	// TenantID 是提供给 ListTenantAuditLogs 查询的 TenantID 值。
 	TenantID *uuid.UUID `json:"tenant_id"`
-	// ActorIDSet is the actor id set value supplied to the ListTenantAuditLogs query.
+	// ActorIDSet 是提供给 ListTenantAuditLogs 查询的 ActorIDSet 值。
 	ActorIDSet bool `json:"actor_id_set"`
-	// ActorID is the actor id value supplied to the ListTenantAuditLogs query.
+	// ActorID 是提供给 ListTenantAuditLogs 查询的 ActorID 值。
 	ActorID uuid.UUID `json:"actor_id"`
-	// ActionFilter is the action filter value supplied to the ListTenantAuditLogs query.
+	// ActionFilter 是提供给 ListTenantAuditLogs 查询的 ActionFilter 值。
 	ActionFilter []string `json:"action_filter"`
-	// TargetType is the target type value supplied to the ListTenantAuditLogs query.
+	// TargetType 是提供给 ListTenantAuditLogs 查询的 TargetType 值。
 	TargetType string `json:"target_type"`
-	// TargetID is the target id value supplied to the ListTenantAuditLogs query.
+	// TargetID 是提供给 ListTenantAuditLogs 查询的 TargetID 值。
 	TargetID string `json:"target_id"`
-	// FromSet is the from set value supplied to the ListTenantAuditLogs query.
+	// FromSet 是提供给 ListTenantAuditLogs 查询的 FromSet 值。
 	FromSet bool `json:"from_set"`
-	// FromTime is the from time value supplied to the ListTenantAuditLogs query.
+	// FromTime 是提供给 ListTenantAuditLogs 查询的 FromTime 值。
 	FromTime pgtype.Timestamptz `json:"from_time"`
-	// ToSet is the to set value supplied to the ListTenantAuditLogs query.
+	// ToSet 是提供给 ListTenantAuditLogs 查询的 ToSet 值。
 	ToSet bool `json:"to_set"`
-	// ToTime is the to time value supplied to the ListTenantAuditLogs query.
+	// ToTime 是提供给 ListTenantAuditLogs 查询的 ToTime 值。
 	ToTime pgtype.Timestamptz `json:"to_time"`
-	// PageOffset is the page offset value supplied to the ListTenantAuditLogs query.
+	// PageOffset 是提供给 ListTenantAuditLogs 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
-	// PageLimit is the page limit value supplied to the ListTenantAuditLogs query.
+	// PageLimit 是提供给 ListTenantAuditLogs 查询的 PageLimit 值。
 	PageLimit int32 `json:"page_limit"`
 }
 
-// ListTenantAuditLogsRow contains the columns returned by the ListTenantAuditLogs query.
+// ListTenantAuditLogsRow 包含 ListTenantAuditLogs 查询返回的列。
 type ListTenantAuditLogsRow struct {
-	// ID is the id value returned by the ListTenantAuditLogs query.
+	// ID 是 ListTenantAuditLogs 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// TenantSlug is the tenant slug value returned by the ListTenantAuditLogs query.
+	// TenantSlug 是 ListTenantAuditLogs 查询返回的 TenantSlug 值。
 	TenantSlug string `json:"tenant_slug"`
-	// ActorID is the actor id value returned by the ListTenantAuditLogs query.
+	// ActorID 是 ListTenantAuditLogs 查询返回的 ActorID 值。
 	ActorID *uuid.UUID `json:"actor_id"`
-	// Action is the action value returned by the ListTenantAuditLogs query.
+	// Action 是 ListTenantAuditLogs 查询返回的 Action 值。
 	Action string `json:"action"`
-	// TargetType is the target type value returned by the ListTenantAuditLogs query.
+	// TargetType 是 ListTenantAuditLogs 查询返回的 TargetType 值。
 	TargetType string `json:"target_type"`
-	// TargetID is the target id value returned by the ListTenantAuditLogs query.
+	// TargetID 是 ListTenantAuditLogs 查询返回的 TargetID 值。
 	TargetID string `json:"target_id"`
-	// RequestID is the request id value returned by the ListTenantAuditLogs query.
+	// RequestID 是 ListTenantAuditLogs 查询返回的 RequestID 值。
 	RequestID string `json:"request_id"`
-	// Detail is the detail value returned by the ListTenantAuditLogs query.
+	// Detail 是 ListTenantAuditLogs 查询返回的 Detail 值。
 	Detail []byte `json:"detail"`
-	// CreatedAt is the created at value returned by the ListTenantAuditLogs query.
+	// CreatedAt 是 ListTenantAuditLogs 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
-// ListTenantAuditLogs executes the generated ListTenantAuditLogs database query.
+// ListTenantAuditLogs 执行生成的 ListTenantAuditLogs 数据库查询。
 // 返回租户范围内按最新时间优先排列的一页追加式审计元数据。
 // 查询始终受 tenant_id 限制，结果不包含业务内容或携带秘密的字段。
 func (q *Queries) ListTenantAuditLogs(ctx context.Context, arg ListTenantAuditLogsParams) ([]ListTenantAuditLogsRow, error) {

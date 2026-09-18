@@ -12,8 +12,7 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-// OverlayIssue is one merge or validation issue, carrying one-based line and
-// column coordinates when the issue originates from an overlay document.
+// OverlayIssue 是一个合并或校验问题，当问题源于 overlay 文档时携带基于 1 的行列坐标。
 type OverlayIssue struct {
 	Severity string
 	Code     string
@@ -23,13 +22,14 @@ type OverlayIssue struct {
 	Column   int
 }
 
-// OverlayInvalidError reports an overlay document that failed validation or a
-// strict-mode target miss. The handler maps it to a 422 with the issue list.
+// OverlayInvalidError 报告一个校验失败或严格模式目标未命中的 overlay 文档。
+// 处理器将其映射为带问题列表的 422。
+// 对外映射：ErrorCodeOverlayInvalid（HTTP 422）。
 type OverlayInvalidError struct {
 	Errors []OverlayIssue
 }
 
-// Error implements error using the first issue message.
+// Error 使用首个问题消息实现 error 接口。
 func (err *OverlayInvalidError) Error() string {
 	if len(err.Errors) > 0 {
 		return err.Errors[0].Message
@@ -37,7 +37,7 @@ func (err *OverlayInvalidError) Error() string {
 	return "invalid overlay"
 }
 
-// Unwrap lets errors.Is match ErrValidation for a generic 422 fallback.
+// Unwrap 使 errors.Is 能匹配 ErrValidation，作为通用 422 回退。
 func (err *OverlayInvalidError) Unwrap() error { return ErrValidation }
 
 const (
@@ -45,16 +45,40 @@ const (
 	overlayTargetMissLenient = "lenient"
 	overlayTargetMissStrict  = "strict"
 	overlayInvalidCode       = "overlay_invalid"
+	// overlayActionMerge 是 platform-v1 的 merge 动作类型。
+	overlayActionMerge = "merge"
+	// overlayActionRemove 是 platform-v1 的 remove 动作类型。
+	overlayActionRemove = "remove"
+	// overlayActionPatch 是 platform-v1 的 patch 动作类型。
+	overlayActionPatch = "patch"
+	// patchOpAdd 是 RFC 6902 的 add 操作。
+	patchOpAdd = "add"
+	// patchOpReplace 是 RFC 6902 的 replace 操作。
+	patchOpReplace = "replace"
+	// patchOpTest 是 RFC 6902 的 test 操作。
+	patchOpTest = "test"
+	// patchOpRemove 是 RFC 6902 的 remove 操作。
+	patchOpRemove = "remove"
+	// patchOpMove 是 RFC 6902 的 move 操作。
+	patchOpMove = "move"
+	// patchOpCopy 是 RFC 6902 的 copy 操作。
+	patchOpCopy = "copy"
+	// overlayIssueSeverityError 是校验问题的错误级别。
+	overlayIssueSeverityError = "error"
+	// overlayIssueSeverityWarning 是校验问题的告警级别。
+	overlayIssueSeverityWarning = "warning"
+	// overlayIssueCodeTargetMiss 是目标未命中的问题码。
+	overlayIssueCodeTargetMiss = "target_miss"
 )
 
-// platformOverlay is the decoded platform-v1 overlay document.
+// platformOverlay 是解码后的 platform-v1 overlay 文档。
 type platformOverlay struct {
 	TargetKind string
 	Mode       string
 	Actions    []overlayAction
 }
 
-// overlayAction is one compiled platform-v1 action in document order.
+// overlayAction 是按文档顺序编译的一个 platform-v1 动作。
 type overlayAction struct {
 	Target string
 	Op     string // merge | remove | patch
@@ -64,7 +88,7 @@ type overlayAction struct {
 	Column int
 }
 
-// patchOp is one RFC 6902 operation carried by a patch action.
+// patchOp 是 patch 动作携带的一个 RFC 6902 操作。
 type patchOp struct {
 	Op     string
 	Path   string
@@ -74,9 +98,8 @@ type patchOp struct {
 	Column int
 }
 
-// ParseOverlay validates and compiles one platform-v1 overlay document. It
-// rejects duplicate object keys and structural violations with one-based
-// coordinates before any merge is attempted.
+// ParseOverlay 校验并编译一个 platform-v1 overlay 文档。它在尝试任何合并前，以基于 1 的
+// 坐标拒绝重复对象键与结构违规。
 func ParseOverlay(content []byte) (map[string]any, error) {
 	var root yaml.Node
 	if err := yaml.Unmarshal(content, &root); err != nil {
@@ -99,10 +122,9 @@ func ParseOverlay(content []byte) (map[string]any, error) {
 	return raw, nil
 }
 
-// ApplyPlatformOverlay merges one validated platform-v1 overlay into a base
-// document, returning the merged document and the JSON pointers it wrote in
-// document order. Target misses are warnings in lenient mode and errors in
-// strict mode. The base document is never mutated.
+// ApplyPlatformOverlay 将校验后的 platform-v1 overlay 合并进 base 文档，返回合并文档及
+// 其按文档顺序写入的 JSON 指针。目标未命中在 lenient 模式为告警，strict 模式为错误。
+// base 文档绝不被修改。
 func ApplyPlatformOverlay(base map[string]any, raw map[string]any) (merged map[string]any, pointers []string, warnings []OverlayIssue, err error) {
 	overlay, issue := compilePlatformOverlay(raw)
 	if issue != nil {
@@ -119,7 +141,7 @@ func ApplyPlatformOverlay(base map[string]any, raw map[string]any) (merged map[s
 		var touched []string
 		var actionWarnings []OverlayIssue
 		var actionErr error
-		if action.Op == "remove" {
+		if action.Op == overlayActionRemove {
 			var updated map[string]any
 			updated, touched, actionWarnings, actionErr = applyOverlayRemoveInPlace(result, action, mode)
 			result = updated
@@ -140,12 +162,11 @@ func ApplyPlatformOverlay(base map[string]any, raw map[string]any) (merged map[s
 	return result, order, warnings, nil
 }
 
-// CanonicalJSON serializes a decoded document deterministically using sorted
-// object keys, satisfying the RFC 8785 JCS canonicalization used by the merge
-// engine and provenance hashes.
+// CanonicalJSON 使用排序对象键确定性地序列化解码文档，满足合并引擎与溯源哈希使用的
+// RFC 8785 JCS 规范化。
 func CanonicalJSON(value any) ([]byte, error) { return json.Marshal(value) }
 
-// CanonicalHash returns the lowercase SHA-256 of the canonical JSON form.
+// CanonicalHash 返回规范 JSON 形式的小写 SHA-256。
 func CanonicalHash(value any) (string, error) {
 	encoded, err := CanonicalJSON(value)
 	if err != nil {
@@ -155,8 +176,7 @@ func CanonicalHash(value any) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// DeepCopy returns an independent copy of a decoded document so the base is
-// never mutated by an overlay application.
+// DeepCopy 返回解码文档的独立副本，使 base 绝不被 overlay 应用修改。
 func DeepCopy(value any) any { return deepCopy(value) }
 
 func deepCopy(value any) any {
@@ -182,22 +202,22 @@ func compilePlatformOverlay(raw map[string]any) (platformOverlay, *OverlayIssue)
 	overlay := platformOverlay{Mode: overlayTargetMissLenient}
 	kind, _ := raw["overlay"].(string)
 	if kind != overlaySchemaKind {
-		return overlay, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: fmt.Sprintf("overlay must be %q", overlaySchemaKind), Line: 1, Column: 1}
+		return overlay, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: fmt.Sprintf("overlay must be %q", overlaySchemaKind), Line: 1, Column: 1}
 	}
 	targetKind, _ := raw["target_kind"].(string)
 	if targetKind == "" {
-		return overlay, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "target_kind is required", Line: 1, Column: 1}
+		return overlay, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "target_kind is required", Line: 1, Column: 1}
 	}
 	overlay.TargetKind = targetKind
 	if mode, ok := raw["mode"].(string); ok {
 		if mode != overlayTargetMissLenient && mode != overlayTargetMissStrict {
-			return overlay, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "mode must be lenient or strict", Line: 1, Column: 1}
+			return overlay, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "mode must be lenient or strict", Line: 1, Column: 1}
 		}
 		overlay.Mode = mode
 	}
 	actionsRaw, ok := raw["actions"].([]any)
 	if !ok || len(actionsRaw) == 0 {
-		return overlay, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "actions must be a non-empty array", Line: 1, Column: 1}
+		return overlay, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "actions must be a non-empty array", Line: 1, Column: 1}
 	}
 	overlay.Actions = make([]overlayAction, 0, len(actionsRaw))
 	for _, entry := range actionsRaw {
@@ -213,7 +233,7 @@ func compilePlatformOverlay(raw map[string]any) (platformOverlay, *OverlayIssue)
 func compileOverlayAction(entry any) (overlayAction, *OverlayIssue) {
 	actionMap, ok := entry.(map[string]any)
 	if !ok {
-		return overlayAction{}, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "each action must be an object", Line: 1, Column: 1}
+		return overlayAction{}, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "each action must be an object", Line: 1, Column: 1}
 	}
 	action := overlayAction{}
 	hasTarget := actionMap["target"] != nil
@@ -224,57 +244,57 @@ func compileOverlayAction(entry any) (overlayAction, *OverlayIssue) {
 	case hasMerge && !hasRemove && !hasPatch && hasTarget:
 		target, ok := actionMap["target"].(string)
 		if !ok || target == "" {
-			return overlayAction{}, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "merge target must be a non-empty string", Line: 1, Column: 1}
+			return overlayAction{}, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "merge target must be a non-empty string", Line: 1, Column: 1}
 		}
-		action.Op = "merge"
+		action.Op = overlayActionMerge
 		action.Target = target
 		mergeValue, ok := actionMap["merge"].(map[string]any)
 		if !ok {
-			return overlayAction{}, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "merge value must be an object", Line: 1, Column: 1}
+			return overlayAction{}, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "merge value must be an object", Line: 1, Column: 1}
 		}
 		action.Merge = mergeValue
 	case hasRemove && !hasMerge && !hasPatch && hasTarget:
 		target, ok := actionMap["target"].(string)
 		if !ok || target == "" {
-			return overlayAction{}, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "remove target must be a non-empty string", Line: 1, Column: 1}
+			return overlayAction{}, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "remove target must be a non-empty string", Line: 1, Column: 1}
 		}
-		action.Op = "remove"
+		action.Op = overlayActionRemove
 		action.Target = target
 	case hasPatch && !hasMerge && !hasRemove && !hasTarget:
-		action.Op = "patch"
+		action.Op = overlayActionPatch
 		patchList, ok := actionMap["patch"].([]any)
 		if !ok || len(patchList) == 0 {
-			return overlayAction{}, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "patch must be a non-empty array", Line: 1, Column: 1}
+			return overlayAction{}, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "patch must be a non-empty array", Line: 1, Column: 1}
 		}
 		for _, opEntry := range patchList {
 			opMap, ok := opEntry.(map[string]any)
 			if !ok {
-				return overlayAction{}, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "each patch operation must be an object", Line: 1, Column: 1}
+				return overlayAction{}, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "each patch operation must be an object", Line: 1, Column: 1}
 			}
 			op := patchOp{Op: opMap["op"].(string), Path: opMap["path"].(string), Value: opMap["value"]}
 			if from, ok := opMap["from"].(string); ok {
 				op.From = from
 			}
 			if !validPatchOp(op) {
-				return overlayAction{}, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: fmt.Sprintf("invalid patch operation %q", op.Op), Line: 1, Column: 1}
+				return overlayAction{}, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: fmt.Sprintf("invalid patch operation %q", op.Op), Line: 1, Column: 1}
 			}
 			action.Patch = append(action.Patch, op)
 		}
 	default:
-		return overlayAction{}, &OverlayIssue{Severity: "error", Code: overlayInvalidCode, Message: "action must be exactly one of merge, remove, or patch", Line: 1, Column: 1}
+		return overlayAction{}, &OverlayIssue{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: "action must be exactly one of merge, remove, or patch", Line: 1, Column: 1}
 	}
 	return action, nil
 }
 
 func validPatchOp(op patchOp) bool {
 	switch op.Op {
-	case "add":
+	case patchOpAdd:
 		return true
-	case "replace", "test":
+	case patchOpReplace, patchOpTest:
 		return op.Path != ""
-	case "remove":
+	case patchOpRemove:
 		return op.Path != ""
-	case "move", "copy":
+	case patchOpMove, patchOpCopy:
 		return op.From != "" && op.Path != ""
 	default:
 		return false
@@ -283,9 +303,9 @@ func validPatchOp(op patchOp) bool {
 
 func applyOverlayAction(document map[string]any, action overlayAction, mode string) ([]string, []OverlayIssue, error) {
 	switch action.Op {
-	case "merge":
+	case overlayActionMerge:
 		return applyOverlayMerge(document, action, mode)
-	case "patch":
+	case overlayActionPatch:
 		return applyOverlayPatch(document, action)
 	}
 	return nil, nil, nil
@@ -300,7 +320,7 @@ func applyOverlayMerge(document map[string]any, action overlayAction, mode strin
 		if mode == overlayTargetMissStrict {
 			return nil, nil, overlayInvalidAt(fmt.Sprintf("merge target %q not found", action.Target), action.Line, action.Column)
 		}
-		return nil, []OverlayIssue{{Severity: "warning", Code: "target_miss", Message: fmt.Sprintf("merge target %q not found", action.Target), Line: action.Line, Column: action.Column}}, nil
+		return nil, []OverlayIssue{{Severity: overlayIssueSeverityWarning, Code: overlayIssueCodeTargetMiss, Message: fmt.Sprintf("merge target %q not found", action.Target), Line: action.Line, Column: action.Column}}, nil
 	}
 	for _, path := range paths {
 		value, ok := getNode(document, path)
@@ -322,8 +342,7 @@ func applyOverlayMerge(document map[string]any, action overlayAction, mode strin
 	return []string{action.Target}, nil, nil
 }
 
-// applyOverlayRemoveInPlace removes the selected nodes and returns the new root
-// document so the removal is persisted into the merge result.
+// applyOverlayRemoveInPlace 移除选中节点并返回新根文档，使移除持久化进合并结果。
 func applyOverlayRemoveInPlace(document map[string]any, action overlayAction, mode string) (map[string]any, []string, []OverlayIssue, error) {
 	paths, err := expandSelector(document, action.Target)
 	if err != nil {
@@ -333,9 +352,9 @@ func applyOverlayRemoveInPlace(document map[string]any, action overlayAction, mo
 		if mode == overlayTargetMissStrict {
 			return document, nil, nil, overlayInvalidAt(fmt.Sprintf("remove target %q not found", action.Target), action.Line, action.Column)
 		}
-		return document, nil, []OverlayIssue{{Severity: "warning", Code: "target_miss", Message: fmt.Sprintf("remove target %q not found", action.Target), Line: action.Line, Column: action.Column}}, nil
+		return document, nil, []OverlayIssue{{Severity: overlayIssueSeverityWarning, Code: overlayIssueCodeTargetMiss, Message: fmt.Sprintf("remove target %q not found", action.Target), Line: action.Line, Column: action.Column}}, nil
 	}
-	// Array deletions run in reverse document order so indices stay valid.
+	// 数组删除按文档逆序执行，使索引保持有效。
 	sort.SliceStable(paths, func(i, j int) bool {
 		return len(paths[i]) > len(paths[j]) || (len(paths[i]) == len(paths[j]) && paths[i][len(paths[i])-1] > paths[j][len(paths[j])-1])
 	})
@@ -359,15 +378,14 @@ func applyOverlayPatch(document map[string]any, action overlayAction) ([]string,
 		if err := applyPatchOperation(document, op); err != nil {
 			return nil, nil, err
 		}
-		if op.Op != "test" {
+		if op.Op != patchOpTest {
 			written = append(written, op.Path)
 		}
 	}
 	return written, nil, nil
 }
 
-// mergeObject implements RFC 7386 merge: null removes, objects recurse, and
-// other values overwrite. The target map is mutated in place.
+// mergeObject 实现 RFC 7386 合并：null 移除、对象递归、其他值覆盖。目标 map 就地修改。
 func mergeObject(target map[string]any, patch map[string]any) {
 	for key, value := range patch {
 		if value == nil {
@@ -384,8 +402,8 @@ func mergeObject(target map[string]any, patch map[string]any) {
 	}
 }
 
-// expandSelector resolves a selector (JSON Pointer tokens with '*' wildcard and
-// array indices) into the set of concrete token paths it addresses.
+// expandSelector 将选择器（带 '*' 通配符与数组索引的 JSON Pointer 令牌）解析为其寻址的
+// 具体令牌路径集合。
 func expandSelector(root any, selector string) ([][]string, error) {
 	tokens, err := splitPointer(selector)
 	if err != nil {
@@ -442,7 +460,7 @@ func appendPath(prefix []string, token string) []string {
 	return result
 }
 
-// getNode reads the value at a concrete token path.
+// getNode 读取具体令牌路径处的值。
 func getNode(root any, path []string) (any, bool) {
 	current := root
 	for _, token := range path {
@@ -466,7 +484,7 @@ func getNode(root any, path []string) (any, bool) {
 	return current, true
 }
 
-// setNode writes a value at a concrete token path, rebuilding array parents.
+// setNode 在具体令牌路径写入值，重建数组父级。
 func setNode(root any, path []string, value any) (any, error) {
 	if len(path) == 0 {
 		return deepCopy(value), nil
@@ -518,8 +536,7 @@ func setNodeRecursive(node any, path []string, value any) (any, error) {
 	}
 }
 
-// removeNode removes the value at a concrete token path, rebuilding parents.
-// It returns the updated root and whether a value was removed.
+// removeNode 移除具体令牌路径处的值，重建父级。返回更新后的根与是否移除了值。
 func removeNode(root any, path []string) (any, bool, error) {
 	if len(path) == 0 {
 		return root, false, nil
@@ -583,8 +600,7 @@ func removeNodeRecursive(node any, path []string) (any, bool, error) {
 	}
 }
 
-// addNode inserts a value at a concrete path, supporting array indices and the
-// '-' append marker.
+// addNode 在具体路径插入值，支持数组索引与 '-' 追加标记。
 func addNode(root any, path []string, value any) (any, error) {
 	if len(path) == 0 {
 		return deepCopy(value), nil
@@ -644,10 +660,10 @@ func addNodeRecursive(node any, path []string, value any) (any, error) {
 	}
 }
 
-// applyPatchOperation applies one RFC 6902 operation against the document.
+// applyPatchOperation 对文档应用一个 RFC 6902 操作。
 func applyPatchOperation(document map[string]any, op patchOp) error {
 	switch op.Op {
-	case "add":
+	case patchOpAdd:
 		path, err := splitPointer(op.Path)
 		if err != nil {
 			return overlayInvalidAt(err.Error(), op.Line, op.Column)
@@ -658,7 +674,7 @@ func applyPatchOperation(document map[string]any, op patchOp) error {
 		}
 		replaceRoot(document, updated)
 		return nil
-	case "remove":
+	case patchOpRemove:
 		path, err := splitPointer(op.Path)
 		if err != nil {
 			return overlayInvalidAt(err.Error(), op.Line, op.Column)
@@ -672,7 +688,7 @@ func applyPatchOperation(document map[string]any, op patchOp) error {
 		}
 		replaceRoot(document, updated)
 		return nil
-	case "replace":
+	case patchOpReplace:
 		path, err := splitPointer(op.Path)
 		if err != nil {
 			return overlayInvalidAt(err.Error(), op.Line, op.Column)
@@ -686,11 +702,11 @@ func applyPatchOperation(document map[string]any, op patchOp) error {
 		}
 		replaceRoot(document, updated)
 		return nil
-	case "move":
+	case patchOpMove:
 		return applyMoveCopy(document, op, true)
-	case "copy":
+	case patchOpCopy:
 		return applyMoveCopy(document, op, false)
-	case "test":
+	case patchOpTest:
 		path, err := splitPointer(op.Path)
 		if err != nil {
 			return overlayInvalidAt(err.Error(), op.Line, op.Column)
@@ -735,7 +751,7 @@ func applyMoveCopy(document map[string]any, op patchOp, removeSource bool) error
 }
 
 func replaceRoot(document map[string]any, updated any) {
-	// The document argument is always a map[string]any; swap its contents.
+	// document 参数恒为 map[string]any；交换其内容。
 	for key := range document {
 		delete(document, key)
 	}
@@ -800,7 +816,7 @@ func rejectDuplicateOverlayKeys(node *yaml.Node, prefix string) error {
 }
 
 func overlayInvalidAt(message string, line, column int) error {
-	return &OverlayInvalidError{Errors: []OverlayIssue{{Severity: "error", Code: overlayInvalidCode, Message: message, Line: line, Column: column}}}
+	return &OverlayInvalidError{Errors: []OverlayIssue{{Severity: overlayIssueSeverityError, Code: overlayInvalidCode, Message: message, Line: line, Column: column}}}
 }
 
 func jsonEqual(left, right any) bool {

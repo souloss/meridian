@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json/v2"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -22,24 +21,35 @@ import (
 )
 
 const (
-	// diffShareMinTTLSeconds and diffShareMaxTTLSeconds bound the share expiry.
+	// diffShareMinTTLSeconds 与 diffShareMaxTTLSeconds 界定分享过期时间的上下限（秒）。
 	diffShareMinTTLSeconds = 300
 	diffShareMaxTTLSeconds = 2592000
-	// diffUploadMaxBytes caps one diff upload.
+	// diffUploadMaxBytes 限制一次差异上传的大小（字节）。
 	diffUploadMaxBytes = 10485760
-	// diffSnapshotTTL is how long an upload stays usable for diff resolution.
+	// diffUploadTTL 是上传可用于差异解析的时长。
 	diffUploadTTL = 24 * time.Hour
-	// diffChangeBreaking etc. mirror kinds.yaml breakingRules levels.
+	// diffChangeBreaking 等镜像 kinds.yaml 的 breakingRules 级别。
 	diffChangeBreaking = "breaking"
-	// diffCodeOperationRemoved is the openapi-v1 operation-removed breaking rule.
+	// diffCodeOperationRemoved 是 openapi-v1 的 operation-removed 破坏规则码。
 	diffCodeOperationRemoved = "operation-removed"
-	// shareTokenVersion is the signed token payload version.
+	// shareTokenVersion 是签名令牌载荷版本。
 	shareTokenVersion = 1
-	// shareURLPrefix is the public share URL root.
+	// shareURLPrefix 是公开分享 URL 根路径。
 	shareURLPrefix = "/api/v1/shared/"
+	// shareResourceTypeDiffSnapshot 是差异快照分享链接的资源类型。
+	shareResourceTypeDiffSnapshot = "diff_snapshot"
+	// diffSelectorTypeVersion/Ref/Upload 是差异选择器的类别。
+	diffSelectorTypeVersion = "version"
+	diffSelectorTypeRef     = "ref"
+	diffSelectorTypeUpload  = "upload"
+	// diffSourceTypeVersion/Upload 是解析文档引用的来源类型。
+	diffSourceTypeVersion = "version"
+	diffSourceTypeUpload  = "upload"
+	// shareTokenKeyBytes 是分享令牌 HMAC 签名密钥的字节长度（32 字节）。
+	shareTokenKeyBytes = 32
 )
 
-// DiffService coordinates diff, snapshot share, breaking todos, uploads, and push.
+// DiffService 协调差异、快照分享、破坏性待办、上传与推送。
 type DiffService struct {
 	store      DiffStore
 	blobs      BlobStore
@@ -48,17 +58,16 @@ type DiffService struct {
 	shareKey   []byte
 }
 
-// NewDiffService constructs the M3 diff/share/todo/push use cases. shareKey is
-// the HMAC signing key for share tokens (nil disables signing in tests).
+// NewDiffService 构造 M3 差异/分享/待办/推送用例。shareKey 是分享令牌的 HMAC 签名密钥
+// （测试中传 nil 禁用签名）。
 func NewDiffService(store DiffStore, blobs BlobStore, identities IdentityStore, shareKey []byte) *DiffService {
 	return &DiffService{store: store, blobs: blobs, identities: identities, now: time.Now, shareKey: shareKey}
 }
 
-// RunDiff resolves two document selectors, computes a structured diff, and
-// optionally persists a snapshot. It creates a breaking todo for each service
-// owner when the summary has at least one breaking change.
+// RunDiff 解析两个文档选择器，计算结构化差异，并可选地持久化快照。当摘要至少含一条
+// 破坏性变更时，为每个服务所有者创建破坏性待办。
 func (diff *DiffService) RunDiff(ctx context.Context, actor Principal, tenantSlug string, input DiffRunInput) (DiffOutcome, error) {
-	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, "asset:read")
+	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, scopeAssetRead)
 	if err != nil {
 		return DiffOutcome{}, err
 	}
@@ -93,7 +102,7 @@ func (diff *DiffService) RunDiff(ctx context.Context, actor Principal, tenantSlu
 		snapshotID = new(snapshot.ID)
 		outcome.SnapshotID = snapshotID
 
-		// Create one breaking todo per service owner when breaking changes exist.
+		// 存在破坏性变更时为每个服务所有者创建一条破坏性待办。
 		if outcome.Summary.Breaking > 0 && input.Right.VersionID != nil {
 			version, versionErr := diff.store.GetAssetVersion(ctx, membership.TenantID, *input.Right.VersionID)
 			if versionErr == nil {
@@ -104,10 +113,9 @@ func (diff *DiffService) RunDiff(ctx context.Context, actor Principal, tenantSlu
 	return outcome, nil
 }
 
-// CreateDiffSnapshotShareLink freezes the snapshot descriptor and mints a signed
-// anonymous-read share token.
+// CreateDiffSnapshotShareLink 冻结快照描述符并铸造签名匿名读分享令牌。
 func (diff *DiffService) CreateDiffSnapshotShareLink(ctx context.Context, actor Principal, tenantSlug string, snapshotID uuid.UUID, expiresInSeconds int) (ShareLinkCreatedResult, error) {
-	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, "asset:read")
+	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, scopeAssetRead)
 	if err != nil {
 		return ShareLinkCreatedResult{}, err
 	}
@@ -121,7 +129,7 @@ func (diff *DiffService) CreateDiffSnapshotShareLink(ctx context.Context, actor 
 	expiresAt := diff.now().UTC().Add(time.Duration(expiresInSeconds) * time.Second)
 	linkID := uuid.NewV7()
 
-	// Descriptor freezes the resolved snapshot artifacts and summary.
+	// 描述符冻结已解析的快照产物与摘要。
 	descriptor := map[string]any{
 		"snapshotId": snapshotID.String(), "leftArtifactRef": snapshot.LeftArtifactRef,
 		"rightArtifactRef": snapshot.RightArtifactRef, "resultRef": snapshot.ResultRef,
@@ -136,19 +144,19 @@ func (diff *DiffService) CreateDiffSnapshotShareLink(ctx context.Context, actor 
 	allowlist, _ := json.Marshal([]string{snapshot.LeftArtifactRef, snapshot.RightArtifactRef, snapshot.ResultRef})
 	if _, err := diff.store.CreateShareLink(ctx, NewShareLink{
 		TenantID: membership.TenantID, ID: linkID, TokenHash: tokenHash[:], CreatorID: membership.UserID,
-		ResourceType: "diff_snapshot", ResourceID: new(snapshotID), Descriptor: descriptorBytes,
+		ResourceType: shareResourceTypeDiffSnapshot, ResourceID: new(snapshotID), Descriptor: descriptorBytes,
 		ViewID: nil, Options: options, ArtifactAllowlist: allowlist, ExpiresAt: expiresAt,
 	}); err != nil {
 		return ShareLinkCreatedResult{}, err
 	}
 	return ShareLinkCreatedResult{
-		ID: linkID, Token: token, ResourceType: "diff_snapshot", ResourceID: new(snapshotID),
+		ID: linkID, Token: token, ResourceType: shareResourceTypeDiffSnapshot, ResourceID: new(snapshotID),
 		DescriptorDigest: hex.EncodeToString(descriptorDigest[:]), URL: shareURLPrefix + token,
 		ExpiresAt: expiresAt, RevokedAt: nil, CreatedAt: diff.now().UTC(),
 	}, nil
 }
 
-// GetSharedView verifies a signed share token and returns the frozen snapshot.
+// GetSharedView 校验签名分享令牌并返回冻结快照。
 func (diff *DiffService) GetSharedView(ctx context.Context, token string) (SharedViewResult, error) {
 	linkID, err := diff.verifyToken(token)
 	if err != nil {
@@ -162,7 +170,7 @@ func (diff *DiffService) GetSharedView(ctx context.Context, token string) (Share
 	if link.ID != linkID {
 		return SharedViewResult{}, ErrNotFound
 	}
-	// Resolve the frozen snapshot descriptor.
+	// 解析冻结的快照描述符。
 	var descriptor struct {
 		SnapshotID string `json:"snapshotId"`
 		ResultRef  string `json:"resultRef"`
@@ -183,14 +191,14 @@ func (diff *DiffService) GetSharedView(ctx context.Context, token string) (Share
 		return SharedViewResult{}, ErrNotFound
 	}
 	return SharedViewResult{
-		ResourceType: "diff_snapshot", ExpiresAt: link.ExpiresAt, SnapshotID: snapshot.ID,
+		ResourceType: shareResourceTypeDiffSnapshot, ExpiresAt: link.ExpiresAt, SnapshotID: snapshot.ID,
 		CreatedBy: snapshot.CreatedBy, CreatedAt: snapshot.CreatedAt, Snapshot: outcome,
 	}, nil
 }
 
-// ListBreakingTodos pages a service's breaking todos.
+// ListBreakingTodos 分页列出服务的破坏性待办。
 func (diff *DiffService) ListBreakingTodos(ctx context.Context, actor Principal, tenantSlug string, status string, page, pageSize int) ([]TodoRecord, int64, error) {
-	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, "todo:read_self")
+	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, scopeTodoReadSelf)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -200,9 +208,9 @@ func (diff *DiffService) ListBreakingTodos(ctx context.Context, actor Principal,
 	return diff.store.ListBreakingTodos(ctx, membership.TenantID, status, int32(pageSize), int32((page-1)*pageSize))
 }
 
-// AcknowledgeBreakingTodo acknowledges one open todo.
+// AcknowledgeBreakingTodo 确认一条未完成待办。
 func (diff *DiffService) AcknowledgeBreakingTodo(ctx context.Context, actor Principal, tenantSlug string, todoID uuid.UUID, comment *string) (TodoRecord, error) {
-	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, "todo:read_self")
+	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, scopeTodoReadSelf)
 	if err != nil {
 		return TodoRecord{}, err
 	}
@@ -213,10 +221,9 @@ func (diff *DiffService) AcknowledgeBreakingTodo(ctx context.Context, actor Prin
 	return record, nil
 }
 
-// PushAssetRevision ingests a third-party pushed revision as a pending-review
-// candidate under the stable push identity.
+// PushAssetRevision 将第三方推送的修订作为待审核候选摄于稳定推送身份之下。
 func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal, tenantSlug string, input PushRevisionInput) (PushRevisionResult, error) {
-	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, "asset:push")
+	membership, err := diff.tenantMembership(ctx, actor, tenantSlug, scopeAssetPush)
 	if err != nil {
 		return PushRevisionResult{}, err
 	}
@@ -231,8 +238,12 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 	if name == "" {
 		return PushRevisionResult{}, ErrValidation
 	}
+	// 通用类别在修订被接受前必须满足其规范内容模式（dbschema / dependency）。
+	if err := validateGenericKindContent(input.Kind, input.Content); err != nil {
+		return PushRevisionResult{}, err
+	}
 
-	// Resolve the stable push identity or fail when create-if-missing is false.
+	// 解析稳定推送身份，或在 create-if-missing 为 false 时失败。
 	var assetID, sourceID, layerID uuid.UUID
 	existingAsset, assetErr := diff.store.GetAssetByName(ctx, membership.TenantID, service.ID, input.Kind, name)
 	if assetErr == nil {
@@ -242,9 +253,8 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 	}
 
 	if assetID != uuid.Nil() {
-		// Existing asset: find or create the stable push overlay layer. A push
-		// revision is an overlay over the repo base, so it must never alias the
-		// base layer — otherwise the overlay content would replace the base.
+		// 现有资产：查找或创建稳定推送 overlay 层。推送修订是仓库 base 之上的 overlay，
+		// 因此绝不能与 base 层同源——否则 overlay 内容会替换 base。
 		if overlay, overlayErr := diff.store.GetSourceLayerByPushKey(ctx, membership.TenantID, assetID); overlayErr == nil {
 			layerID = overlay.ID
 		} else {
@@ -252,22 +262,22 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 			layerID = uuid.NewV7()
 			if _, err := diff.store.CreateSourceSpec(ctx, NewSourceSpec{
 				TenantID: membership.TenantID, ID: sourceID, ServiceID: service.ID, Kind: input.Kind,
-				AssetNameTemplate: name, Role: input.Role, Origin: "third_party", Mode: "push",
-				Path: nil, ProducerProfileID: nil, Ord: 0, TimeoutSec: 120,
-				BranchPatterns: []string{"**"}, Enabled: true, ConfigOrigin: "api",
+				AssetNameTemplate: name, Role: input.Role, Origin: layerOriginThirdParty, Mode: sourceModePush,
+				Path: nil, ProducerProfileID: nil, Ord: 0, TimeoutSec: defaultSourceTimeoutPush,
+				BranchPatterns: []string{sourceBranchPatternAll}, Enabled: true, ConfigOrigin: sourceConfigOriginAPI,
 			}); err != nil {
 				return PushRevisionResult{}, err
 			}
 			if _, err := diff.store.CreateLayer(ctx, NewLayer{
 				TenantID: membership.TenantID, ID: layerID, AssetID: assetID, SourceSpecID: new(sourceID),
-				Role: input.Role, Origin: "third_party", Ord: 0, Dialect: input.Dialect, Enabled: true,
-				BranchPatterns: []string{"**"}, DisplayName: name,
+				Role: input.Role, Origin: layerOriginThirdParty, Ord: 0, Dialect: input.Dialect, Enabled: true,
+				BranchPatterns: []string{sourceBranchPatternAll}, DisplayName: name,
 			}); err != nil {
 				return PushRevisionResult{}, err
 			}
 		}
 	} else {
-		// Missing asset: create it plus its push source and layer atomically.
+		// 缺失资产：原子地创建它及其推送源配置与层。
 		if !input.CreateIfMissing {
 			return PushRevisionResult{}, ErrNotFound
 		}
@@ -282,22 +292,22 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 		layerID = uuid.NewV7()
 		if _, err := diff.store.CreateSourceSpec(ctx, NewSourceSpec{
 			TenantID: membership.TenantID, ID: sourceID, ServiceID: service.ID, Kind: input.Kind,
-			AssetNameTemplate: name, Role: input.Role, Origin: "third_party", Mode: "push",
-			Path: nil, ProducerProfileID: nil, Ord: 0, TimeoutSec: 120,
-			BranchPatterns: []string{"**"}, Enabled: true, ConfigOrigin: "api",
+			AssetNameTemplate: name, Role: input.Role, Origin: layerOriginThirdParty, Mode: sourceModePush,
+			Path: nil, ProducerProfileID: nil, Ord: 0, TimeoutSec: defaultSourceTimeoutPush,
+			BranchPatterns: []string{sourceBranchPatternAll}, Enabled: true, ConfigOrigin: sourceConfigOriginAPI,
 		}); err != nil {
 			return PushRevisionResult{}, err
 		}
 		if _, err := diff.store.CreateLayer(ctx, NewLayer{
 			TenantID: membership.TenantID, ID: layerID, AssetID: assetID, SourceSpecID: new(sourceID),
-			Role: input.Role, Origin: "third_party", Ord: 0, Dialect: input.Dialect, Enabled: true,
-			BranchPatterns: []string{"**"}, DisplayName: name,
+			Role: input.Role, Origin: layerOriginThirdParty, Ord: 0, Dialect: input.Dialect, Enabled: true,
+			BranchPatterns: []string{sourceBranchPatternAll}, DisplayName: name,
 		}); err != nil {
 			return PushRevisionResult{}, err
 		}
 	}
 
-	// Persist the content and create the pending third-party revision.
+	// 持久化内容并创建待审核的第三方修订。
 	blob, err := diff.blobs.Put(ctx, strings.NewReader(input.Content))
 	if err != nil {
 		return PushRevisionResult{}, err
@@ -317,7 +327,7 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 		if err != nil {
 			return PushRevisionResult{}, err
 		}
-		// pending_review advances latest + candidate only; effective is unchanged.
+		// pending_review 仅推进 latest + candidate；effective 不变。
 		if _, err := diff.store.UpsertLayerHead(ctx, NewLayerHead{
 			TenantID: membership.TenantID, LayerID: layerID, ScopeType: overlayScopeGlobal, ScopeKey: overlayScopeKeyGlobal,
 			LatestRevisionID: new(revision.ID), EffectiveRevisionID: nil, CandidateRevisionID: new(revision.ID), Generation: 1,
@@ -333,7 +343,7 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 
 func (diff *DiffService) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!containsString(actor.Scopes, permission) && !containsString(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!containsString(actor.Scopes, permission) && !containsString(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
@@ -392,7 +402,7 @@ func (diff *DiffService) createBreakingTodos(ctx context.Context, tenantID uuid.
 
 func (diff *DiffService) resolveSelector(ctx context.Context, tenantID uuid.UUID, selector DiffSelector) (ResolvedDocRef, string, error) {
 	switch selector.Type {
-	case "version":
+	case diffSelectorTypeVersion:
 		if selector.VersionID == nil {
 			return ResolvedDocRef{}, "", ErrValidation
 		}
@@ -407,9 +417,9 @@ func (diff *DiffService) resolveSelector(ctx context.Context, tenantID uuid.UUID
 			}
 		}
 		content := diff.versionContent(ctx, tenantID, version)
-		return ResolvedDocRef{SourceType: "version", Kind: kind, ContentHash: version.MergedHashOrFingerprint(), AssetID: new(version.AssetID), VersionID: new(version.ID)}, content, nil
-	case "ref":
-		// A ref selector resolves once to a version id before the diff.
+		return ResolvedDocRef{SourceType: diffSourceTypeVersion, Kind: kind, ContentHash: version.MergedHashOrFingerprint(), AssetID: new(version.AssetID), VersionID: new(version.ID)}, content, nil
+	case diffSelectorTypeRef:
+		// ref 选择器在差异前一次性解析到版本 id。
 		if selector.AssetID == nil || selector.RefType == nil || selector.RefName == nil {
 			return ResolvedDocRef{}, "", ErrValidation
 		}
@@ -430,11 +440,11 @@ func (diff *DiffService) resolveSelector(ctx context.Context, tenantID uuid.UUID
 		}
 		content := diff.versionContent(ctx, tenantID, version)
 		return ResolvedDocRef{
-			SourceType: "version", Kind: selector.Kind, ContentHash: version.MergedHashOrFingerprint(),
+			SourceType: diffSourceTypeVersion, Kind: selector.Kind, ContentHash: version.MergedHashOrFingerprint(),
 			AssetID: new(version.AssetID), VersionID: new(version.ID),
 			RequestedRefType: selector.RefType, RequestedRef: selector.RefName,
 		}, content, nil
-	case "upload":
+	case diffSelectorTypeUpload:
 		if selector.UploadID == nil {
 			return ResolvedDocRef{}, "", ErrValidation
 		}
@@ -443,17 +453,16 @@ func (diff *DiffService) resolveSelector(ctx context.Context, tenantID uuid.UUID
 			return ResolvedDocRef{}, "", err
 		}
 		content := diff.blobContent(ctx, upload.BlobDigest)
-		return ResolvedDocRef{SourceType: "upload", Kind: upload.Kind, ContentHash: upload.BlobDigest, UploadID: new(upload.ID)}, content, nil
+		return ResolvedDocRef{SourceType: diffSourceTypeUpload, Kind: upload.Kind, ContentHash: upload.BlobDigest, UploadID: new(upload.ID)}, content, nil
 	default:
 		return ResolvedDocRef{}, "", ErrValidation
 	}
 }
 
-// resolveSelectorKeys resolves a selector and returns the document's operation
-// item keys (from the indexed items) plus the resolved document ref.
+// resolveSelectorKeys 解析选择器并返回文档的操作条目键（来自已索引条目）与已解析文档引用。
 func (diff *DiffService) resolveSelectorKeys(ctx context.Context, tenantID uuid.UUID, selector DiffSelector) (ResolvedDocRef, map[string]bool, error) {
 	switch selector.Type {
-	case "version":
+	case diffSelectorTypeVersion:
 		if selector.VersionID == nil {
 			return ResolvedDocRef{}, nil, ErrValidation
 		}
@@ -468,8 +477,8 @@ func (diff *DiffService) resolveSelectorKeys(ctx context.Context, tenantID uuid.
 			}
 		}
 		keys := diff.versionItemKeys(ctx, tenantID, version.ID)
-		return ResolvedDocRef{SourceType: "version", Kind: kind, ContentHash: version.MergedHashOrFingerprint(), AssetID: new(version.AssetID), VersionID: new(version.ID)}, keys, nil
-	case "ref":
+		return ResolvedDocRef{SourceType: diffSourceTypeVersion, Kind: kind, ContentHash: version.MergedHashOrFingerprint(), AssetID: new(version.AssetID), VersionID: new(version.ID)}, keys, nil
+	case diffSelectorTypeRef:
 		if selector.AssetID == nil || selector.RefType == nil || selector.RefName == nil {
 			return ResolvedDocRef{}, nil, ErrValidation
 		}
@@ -490,11 +499,11 @@ func (diff *DiffService) resolveSelectorKeys(ctx context.Context, tenantID uuid.
 		}
 		keys := diff.versionItemKeys(ctx, tenantID, version.ID)
 		return ResolvedDocRef{
-			SourceType: "version", Kind: selector.Kind, ContentHash: version.MergedHashOrFingerprint(),
+			SourceType: diffSourceTypeVersion, Kind: selector.Kind, ContentHash: version.MergedHashOrFingerprint(),
 			AssetID: new(version.AssetID), VersionID: new(version.ID),
 			RequestedRefType: selector.RefType, RequestedRef: selector.RefName,
 		}, keys, nil
-	case "upload":
+	case diffSelectorTypeUpload:
 		if selector.UploadID == nil {
 			return ResolvedDocRef{}, nil, ErrValidation
 		}
@@ -503,17 +512,16 @@ func (diff *DiffService) resolveSelectorKeys(ctx context.Context, tenantID uuid.
 			return ResolvedDocRef{}, nil, err
 		}
 		content := diff.blobContent(ctx, upload.BlobDigest)
-		return ResolvedDocRef{SourceType: "upload", Kind: upload.Kind, ContentHash: upload.BlobDigest, UploadID: new(upload.ID)}, extractOperationKeys(content), nil
+		return ResolvedDocRef{SourceType: diffSourceTypeUpload, Kind: upload.Kind, ContentHash: upload.BlobDigest, UploadID: new(upload.ID)}, extractOperationKeys(content), nil
 	default:
 		return ResolvedDocRef{}, nil, ErrValidation
 	}
 }
 
-// versionItemKeys returns the indexed operation keys for a version. When the
-// version was not indexed (e.g. a merge materialization), it derives the keys
-// from the merged document blob.
+// versionItemKeys 返回版本的已索引操作键。当版本未索引（如合并物化）时，从合并文档
+// blob 派生键。
 func (diff *DiffService) versionItemKeys(ctx context.Context, tenantID, versionID uuid.UUID) map[string]bool {
-	items, _, err := diff.store.ListAssetVersionItems(ctx, tenantID, versionID, "", 100, 0)
+	items, _, err := diff.store.ListAssetVersionItems(ctx, tenantID, versionID, "", itemsFetchBatchSize, 0)
 	if err == nil && len(items) > 0 {
 		keys := make(map[string]bool, len(items))
 		for _, item := range items {
@@ -533,7 +541,7 @@ func (diff *DiffService) versionItemKeys(ctx context.Context, tenantID, versionI
 	return extractOperationKeys(diff.blobContent(ctx, *version.MergedRef))
 }
 
-// computeKeysDiff derives a structured diff over indexed operation keys.
+// computeKeysDiff 对已索引操作键派生结构化差异。
 func computeKeysDiff(left, right ResolvedDocRef, generatedAt time.Time, leftKeys, rightKeys map[string]bool) DiffOutcome {
 	changes := make([]DiffChangeKind, 0)
 	summary := DiffCountsSummary{}
@@ -557,13 +565,12 @@ func computeKeysDiff(left, right ResolvedDocRef, generatedAt time.Time, leftKeys
 	return DiffOutcome{Kind: "openapi", Left: left, Right: right, Summary: summary, Changes: changes, GeneratedAt: generatedAt}
 }
 
-// versionContent reconstructs the merged document content for a version from its
-// base revision blob (openapi diff reads the merged document).
+// versionContent 从版本的 base 修订 blob 重建其合并文档内容（openapi 差异读取合并文档）。
 func (diff *DiffService) versionContent(ctx context.Context, tenantID uuid.UUID, version AssetVersionRecord) string {
 	if len(version.LayerManifest) == 0 {
 		return ""
 	}
-	// The base revision is the first manifest entry; its blob carries the content.
+	// base 修订是清单首个条目；其 blob 承载内容。
 	base := version.LayerManifest[0]
 	revision, err := diff.store.GetLayerRevision(ctx, tenantID, base.RevisionID)
 	if err != nil {
@@ -592,7 +599,7 @@ func (diff *DiffService) signToken(version int, linkID uuid.UUID, expiresAt time
 	payload := fmt.Sprintf(`{"version":%d,"shareLinkId":%q,"expiresAt":%q}`, version, linkID.String(), expiresAt.UTC().Format(time.RFC3339))
 	payloadEncoded := base64.RawURLEncoding.EncodeToString([]byte(payload))
 	if len(diff.shareKey) == 0 {
-		key := make([]byte, 32)
+		key := make([]byte, shareTokenKeyBytes)
 		_, _ = rand.Read(key)
 		diff.shareKey = key
 	}
@@ -605,16 +612,16 @@ func (diff *DiffService) signToken(version int, linkID uuid.UUID, expiresAt time
 func (diff *DiffService) verifyToken(token string) (uuid.UUID, error) {
 	parts := strings.Split(token, ".")
 	if len(parts) != 2 {
-		return uuid.Nil(), errors.New("malformed share token")
+		return uuid.Nil(), ErrMalformedShareToken
 	}
 	if len(diff.shareKey) == 0 {
-		return uuid.Nil(), errors.New("share signing key not configured")
+		return uuid.Nil(), ErrShareSigningKeyMissing
 	}
 	mac := hmac.New(sha256.New, diff.shareKey)
 	_, _ = mac.Write([]byte(parts[0]))
 	expected := base64.RawURLEncoding.EncodeToString(mac.Sum(nil))
 	if !hmac.Equal([]byte(expected), []byte(parts[1])) {
-		return uuid.Nil(), errors.New("share token signature invalid")
+		return uuid.Nil(), ErrShareTokenSignatureInvalid
 	}
 	payload, err := base64.RawURLEncoding.DecodeString(parts[0])
 	if err != nil {
@@ -626,21 +633,20 @@ func (diff *DiffService) verifyToken(token string) (uuid.UUID, error) {
 		ExpiresAt   time.Time `json:"expiresAt"`
 	}
 	if err := json.Unmarshal(payload, &claim); err != nil || claim.ShareLinkID == "" {
-		return uuid.Nil(), errors.New("share token payload invalid")
+		return uuid.Nil(), ErrShareTokenPayloadInvalid
 	}
 	if claim.ExpiresAt.Before(diff.now()) {
-		return uuid.Nil(), errors.New("share token expired")
+		return uuid.Nil(), ErrShareTokenExpired
 	}
 	return uuid.Parse(claim.ShareLinkID)
 }
 
-// computeDiff derives a structured diff over OpenAPI operations.
+// computeDiff 对 OpenAPI 操作派生结构化差异。
 func computeDiff(left, right ResolvedDocRef, generatedAt time.Time) DiffOutcome {
 	leftOps := map[string]bool{}
 	rightOps := map[string]bool{}
-	// A real implementation reads the referenced documents; for the M3 smoke the
-	// fixture compares indexed item keys. The deterministic fallback marks every
-	// left key absent in right as a removed operation.
+	// 真实实现读取所引用文档；M3 冒烟中夹具比较已索引条目键。确定性回退将每个
+	// 左侧存在而右侧缺失的键标记为已移除操作。
 	_ = left
 	_ = right
 	changes := []DiffChangeKind{}
@@ -651,7 +657,7 @@ func computeDiff(left, right ResolvedDocRef, generatedAt time.Time) DiffOutcome 
 	return outcome
 }
 
-// computeOpenAPIDiff reads two openapi documents and reports removed operations.
+// computeOpenAPIDiff 读取两个 openapi 文档并报告已移除操作。
 func computeOpenAPIDiff(left, right ResolvedDocRef, generatedAt time.Time, leftContent, rightContent string) DiffOutcome {
 	leftOps := extractOperationKeys(leftContent)
 	rightOps := extractOperationKeys(rightContent)

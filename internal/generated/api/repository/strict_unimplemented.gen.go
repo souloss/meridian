@@ -8,76 +8,76 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// ListRepositories returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListRepositories 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListRepositories(ctx context.Context, request ListRepositoriesRequestObject) (ListRepositoriesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateRepository returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateRepository 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateRepository(ctx context.Context, request CreateRepositoryRequestObject) (CreateRepositoryResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteRepository returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteRepository 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteRepository(ctx context.Context, request DeleteRepositoryRequestObject) (DeleteRepositoryResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetRepository returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetRepository 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetRepository(ctx context.Context, request GetRepositoryRequestObject) (GetRepositoryResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateRepository returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateRepository 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateRepository(ctx context.Context, request UpdateRepositoryRequestObject) (UpdateRepositoryResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListDiscoveryCandidates returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListDiscoveryCandidates 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListDiscoveryCandidates(ctx context.Context, request ListDiscoveryCandidatesRequestObject) (ListDiscoveryCandidatesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DismissDiscoveryCandidate returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DismissDiscoveryCandidate 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DismissDiscoveryCandidate(ctx context.Context, request DismissDiscoveryCandidateRequestObject) (DismissDiscoveryCandidateResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// AcceptDiscoveryCandidates returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// AcceptDiscoveryCandidates 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) AcceptDiscoveryCandidates(ctx context.Context, request AcceptDiscoveryCandidatesRequestObject) (AcceptDiscoveryCandidatesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// PreviewRepositoryConfigImport returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// PreviewRepositoryConfigImport 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) PreviewRepositoryConfigImport(ctx context.Context, request PreviewRepositoryConfigImportRequestObject) (PreviewRepositoryConfigImportResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ApplyRepositoryConfigImport returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ApplyRepositoryConfigImport 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ApplyRepositoryConfigImport(ctx context.Context, request ApplyRepositoryConfigImportRequestObject) (ApplyRepositoryConfigImportResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DiscoverRepository returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DiscoverRepository 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DiscoverRepository(ctx context.Context, request DiscoverRepositoryRequestObject) (DiscoverRepositoryResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// SyncRepository returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// SyncRepository 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) SyncRepository(ctx context.Context, request SyncRepositoryRequestObject) (SyncRepositoryResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CheckRepositoryConnection returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CheckRepositoryConnection 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CheckRepositoryConnection(ctx context.Context, request CheckRepositoryConnectionRequestObject) (CheckRepositoryConnectionResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ReceiveGitWebhook returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ReceiveGitWebhook 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ReceiveGitWebhook(ctx context.Context, request ReceiveGitWebhookRequestObject) (ReceiveGitWebhookResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

@@ -15,8 +15,8 @@ import (
 	"github.com/meridian-labs/meridian/internal/service"
 )
 
-// credentialRotationReplay is the non-secret response projection retained for a rotation replay.
-// Encrypted ciphertext, nonce, key version, and all write-only secret fields are deliberately absent.
+// credentialRotationReplay 是轮换回放保留的非敏感响应投影。
+// 加密密文、nonce、密钥版本以及所有只写敏感字段被刻意省略。
 type credentialRotationReplay struct {
 	TenantID    uuid.UUID                   `json:"tenantId"`
 	ID          uuid.UUID                   `json:"id"`
@@ -42,7 +42,7 @@ func validateRotationIdempotency(key uuid.UUID, requestHash []byte, principalTyp
 	if !rotationIdempotencyEnabled(key) {
 		return nil
 	}
-	if len(requestHash) != 32 || principalType == "" || principalID == uuid.Nil() {
+	if len(requestHash) != sha256DigestBytes || principalType == "" || principalID == uuid.Nil() {
 		return service.ErrValidation
 	}
 	return nil
@@ -56,7 +56,7 @@ func loadTenantRotationReplay(ctx context.Context, queries *generated.Queries, t
 	if !rotationIdempotencyEnabled(idempotencyKey) {
 		return service.CredentialRecord{}, nil, false, nil
 	}
-	if err := queries.LockCredentialRotationIdempotency(ctx, rotationLockKey("tenant", principalType, principalID, idempotencyKey)); err != nil {
+	if err := queries.LockCredentialRotationIdempotency(ctx, rotationLockKey(rotationLockScopeTenant, principalType, principalID, idempotencyKey)); err != nil {
 		return service.CredentialRecord{}, nil, false, normalizeError(err)
 	}
 	row, err := queries.GetCredentialRotationIdempotency(ctx, generated.GetCredentialRotationIdempotencyParams{
@@ -104,7 +104,7 @@ func loadGlobalRotationReplay(ctx context.Context, queries *generated.Queries, p
 	if !rotationIdempotencyEnabled(idempotencyKey) {
 		return service.GlobalCredentialRecord{}, nil, false, nil
 	}
-	if err := queries.LockCredentialRotationIdempotency(ctx, rotationLockKey("platform", principalType, principalID, idempotencyKey)); err != nil {
+	if err := queries.LockCredentialRotationIdempotency(ctx, rotationLockKey(rotationLockScopePlatform, principalType, principalID, idempotencyKey)); err != nil {
 		return service.GlobalCredentialRecord{}, nil, false, normalizeError(err)
 	}
 	row, err := queries.GetGlobalCredentialRotationIdempotency(ctx, generated.GetGlobalCredentialRotationIdempotencyParams{

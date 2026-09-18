@@ -7,14 +7,24 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
+	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
 	tenant "github.com/meridian-labs/meridian/internal/generated/api/tenant"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
-
-	// ListCredentials returns tenant-visible credential metadata without secret material.
-	platform "github.com/meridian-labs/meridian/internal/generated/api/platform"
 )
 
+const (
+	// etagKindCredential 是租户凭据 ETag 的实体类型令牌。
+	etagKindCredential = "credential"
+	// etagKindGlobalCredential 是平台凭据 ETag 的实体类型令牌。
+	etagKindGlobalCredential = "global-credential"
+	// operationRotateCredential 是租户凭据轮换的幂等摘要操作名。
+	operationRotateCredential = "rotateCredential"
+	// operationRotateGlobalCredential 是平台凭据轮换的幂等摘要操作名。
+	operationRotateGlobalCredential = "rotateGlobalCredential"
+)
+
+// ListCredentials 返回租户可见的凭据元数据（不含秘密材料）。
 func (s *Server) ListCredentials(ctx context.Context, request tenant.ListCredentialsRequestObject) (tenant.ListCredentialsResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -37,7 +47,7 @@ func (s *Server) ListCredentials(ctx context.Context, request tenant.ListCredent
 	}), nil
 }
 
-// CreateCredential encrypts and persists one tenant-owned credential.
+// CreateCredential 加密并持久化一个租户自有凭据。
 func (s *Server) CreateCredential(ctx context.Context, request tenant.CreateCredentialRequestObject) (tenant.CreateCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -58,7 +68,7 @@ func (s *Server) CreateCredential(ctx context.Context, request tenant.CreateCred
 	return tenant.CreateCredential201JSONResponse{Body: body, Headers: tenant.CreateCredential201ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// UpdateCredential conditionally changes tenant credential metadata and sharing.
+// UpdateCredential 在条件约束下修改租户凭据的元数据与共享范围。
 func (s *Server) UpdateCredential(ctx context.Context, request tenant.UpdateCredentialRequestObject) (tenant.UpdateCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -87,7 +97,7 @@ func (s *Server) UpdateCredential(ctx context.Context, request tenant.UpdateCred
 	return tenant.UpdateCredential200JSONResponse{Body: body, Headers: tenant.UpdateCredential200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// DeleteCredential conditionally removes a tenant credential and supports forced unbinding.
+// DeleteCredential 在条件约束下删除一个租户凭据，并支持强制解绑。
 func (s *Server) DeleteCredential(ctx context.Context, request tenant.DeleteCredentialRequestObject) (tenant.DeleteCredentialResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -103,7 +113,7 @@ func (s *Server) DeleteCredential(ctx context.Context, request tenant.DeleteCred
 	return tenant.DeleteCredential204Response{}, nil
 }
 
-// RotateCredential replaces a tenant secret under the supplied ETag.
+// RotateCredential 在提供的 ETag 下替换租户凭据的秘密。
 func (s *Server) RotateCredential(ctx context.Context, request tenant.RotateCredentialRequestObject) (tenant.RotateCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -116,7 +126,7 @@ func (s *Server) RotateCredential(ctx context.Context, request tenant.RotateCred
 	if err != nil {
 		return nil, err
 	}
-	requestHash, err := credentialRotationRequestHash("rotateCredential", request.TenantSlug, serviceUUID(request.CredentialId), request.Params.IfMatch, secret, request.Body.ResyncRepositories != nil && *request.Body.ResyncRepositories)
+	requestHash, err := credentialRotationRequestHash(operationRotateCredential, request.TenantSlug, serviceUUID(request.CredentialId), request.Params.IfMatch, secret, request.Body.ResyncRepositories != nil && *request.Body.ResyncRepositories)
 	if err != nil {
 		return nil, service.ErrValidation
 	}
@@ -135,7 +145,7 @@ func (s *Server) RotateCredential(ctx context.Context, request tenant.RotateCred
 	return tenant.RotateCredential200JSONResponse{Body: body, Headers: tenant.RotateCredential200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// ListGlobalCredentials returns platform credential metadata for a platform administrator.
+// ListGlobalCredentials 为平台管理员返回平台凭据元数据。
 func (s *Server) ListGlobalCredentials(ctx context.Context, request platform.ListGlobalCredentialsRequestObject) (platform.ListGlobalCredentialsResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -158,7 +168,7 @@ func (s *Server) ListGlobalCredentials(ctx context.Context, request platform.Lis
 	}), nil
 }
 
-// CreateGlobalCredential encrypts and persists one platform-owned credential.
+// CreateGlobalCredential 加密并持久化一个平台自有凭据。
 func (s *Server) CreateGlobalCredential(ctx context.Context, request platform.CreateGlobalCredentialRequestObject) (platform.CreateGlobalCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -179,7 +189,7 @@ func (s *Server) CreateGlobalCredential(ctx context.Context, request platform.Cr
 	return platform.CreateGlobalCredential201JSONResponse{Body: body, Headers: platform.CreateGlobalCredential201ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// UpdateGlobalCredential conditionally changes a platform credential name.
+// UpdateGlobalCredential 在条件约束下修改平台凭据的名称。
 func (s *Server) UpdateGlobalCredential(ctx context.Context, request platform.UpdateGlobalCredentialRequestObject) (platform.UpdateGlobalCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -196,7 +206,7 @@ func (s *Server) UpdateGlobalCredential(ctx context.Context, request platform.Up
 	return platform.UpdateGlobalCredential200JSONResponse{Body: body, Headers: platform.UpdateGlobalCredential200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// DeleteGlobalCredential conditionally removes a platform credential and supports forced unbinding.
+// DeleteGlobalCredential 在条件约束下删除一个平台凭据，并支持强制解绑。
 func (s *Server) DeleteGlobalCredential(ctx context.Context, request platform.DeleteGlobalCredentialRequestObject) (platform.DeleteGlobalCredentialResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -212,7 +222,7 @@ func (s *Server) DeleteGlobalCredential(ctx context.Context, request platform.De
 	return platform.DeleteGlobalCredential204Response{}, nil
 }
 
-// RotateGlobalCredential replaces a platform secret under the supplied ETag.
+// RotateGlobalCredential 在提供的 ETag 下替换平台凭据的秘密。
 func (s *Server) RotateGlobalCredential(ctx context.Context, request platform.RotateGlobalCredentialRequestObject) (platform.RotateGlobalCredentialResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -225,7 +235,7 @@ func (s *Server) RotateGlobalCredential(ctx context.Context, request platform.Ro
 	if err != nil {
 		return nil, err
 	}
-	requestHash, err := credentialRotationRequestHash("rotateGlobalCredential", "", serviceUUID(request.CredentialId), request.Params.IfMatch, secret, request.Body.ResyncRepositories != nil && *request.Body.ResyncRepositories)
+	requestHash, err := credentialRotationRequestHash(operationRotateGlobalCredential, "", serviceUUID(request.CredentialId), request.Params.IfMatch, secret, request.Body.ResyncRepositories != nil && *request.Body.ResyncRepositories)
 	if err != nil {
 		return nil, service.ErrValidation
 	}
@@ -241,7 +251,7 @@ func (s *Server) RotateGlobalCredential(ctx context.Context, request platform.Ro
 	return platform.RotateGlobalCredential200JSONResponse{Body: body, Headers: platform.RotateGlobalCredential200ResponseHeaders{Etag: new(body.Etag)}}, nil
 }
 
-// ListKnownHosts returns tenant-approved SSH host identities without stored public-key material.
+// ListKnownHosts 返回租户已批准的 SSH 主机身份（不含存储的公钥材料）。
 func (s *Server) ListKnownHosts(ctx context.Context, request tenant.ListKnownHostsRequestObject) (tenant.ListKnownHostsResponseObject, error) {
 	if s.credentials == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -264,7 +274,7 @@ func (s *Server) ListKnownHosts(ctx context.Context, request tenant.ListKnownHos
 	}), nil
 }
 
-// CreateKnownHost validates and stores one manually approved SSH host key.
+// CreateKnownHost 校验并存储一个手动批准的 SSH 主机公钥。
 func (s *Server) CreateKnownHost(ctx context.Context, request tenant.CreateKnownHostRequestObject) (tenant.CreateKnownHostResponseObject, error) {
 	if s.credentials == nil || request.Body == nil {
 		return nil, service.ErrValidation
@@ -280,62 +290,66 @@ func (s *Server) CreateKnownHost(ctx context.Context, request tenant.CreateKnown
 	return tenant.CreateKnownHost201JSONResponse(knownHostResponse(created)), nil
 }
 
+// tenantCredentialInput 将租户凭据创建请求的联合体投影为服务层输入。
 func tenantCredentialInput(body api.CredentialCreateRequest) (service.CredentialInput, error) {
-	if sshInput, err := body.AsCredentialCreateRequest0(); err == nil && string(sshInput.Kind) == "ssh_key" {
+	if sshInput, err := body.AsCredentialCreateRequest0(); err == nil && string(sshInput.Kind) == string(api.CredentialKindSshKey) {
 		if sshInput.SshKey.PrivateKeyPem == "" {
 			return service.CredentialInput{}, service.ErrValidation
 		}
 		return service.CredentialInput{
-			Name: sshInput.Name, Secret: service.CredentialSecret{Kind: "ssh_key", PrivateKey: sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase)},
+			Name: sshInput.Name, Secret: service.CredentialSecret{Kind: string(api.CredentialKindSshKey), PrivateKey: sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase)},
 			SharedScope: optionalSharedScope0(sshInput.SharedScope), TeamIDs: apiUUIDs(sshInput.TeamIds),
 		}, nil
 	}
-	if httpInput, err := body.AsCredentialCreateRequest1(); err == nil && string(httpInput.Kind) == "http_token" {
+	if httpInput, err := body.AsCredentialCreateRequest1(); err == nil && string(httpInput.Kind) == string(api.CredentialKindHttpToken) {
 		if httpInput.HttpToken.Token == "" {
 			return service.CredentialInput{}, service.ErrValidation
 		}
 		return service.CredentialInput{
-			Name: httpInput.Name, Secret: service.CredentialSecret{Kind: "http_token", HTTPUsername: httpInput.HttpToken.Username, HTTPToken: httpInput.HttpToken.Token},
+			Name: httpInput.Name, Secret: service.CredentialSecret{Kind: string(api.CredentialKindHttpToken), HTTPUsername: httpInput.HttpToken.Username, HTTPToken: httpInput.HttpToken.Token},
 			SharedScope: optionalSharedScope1(httpInput.SharedScope), TeamIDs: apiUUIDs(httpInput.TeamIds),
 		}, nil
 	}
 	return service.CredentialInput{}, service.ErrValidation
 }
 
+// globalCredentialInput 将平台凭据创建请求的联合体投影为服务层输入。
 func globalCredentialInput(body api.GlobalCredentialCreateRequest) (service.CredentialInput, error) {
-	if sshInput, err := body.AsGlobalCredentialCreateRequest0(); err == nil && string(sshInput.Kind) == "ssh_key" {
+	if sshInput, err := body.AsGlobalCredentialCreateRequest0(); err == nil && string(sshInput.Kind) == string(api.CredentialKindSshKey) {
 		if sshInput.SshKey.PrivateKeyPem == "" {
 			return service.CredentialInput{}, service.ErrValidation
 		}
-		return service.CredentialInput{Name: sshInput.Name, SharedScope: "private", Secret: service.CredentialSecret{
-			Kind: "ssh_key", PrivateKey: sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase),
+		return service.CredentialInput{Name: sshInput.Name, SharedScope: string(api.CredentialSharedScopePrivate), Secret: service.CredentialSecret{
+			Kind: string(api.CredentialKindSshKey), PrivateKey: sshInput.SshKey.PrivateKeyPem, Passphrase: optionalString(sshInput.SshKey.Passphrase),
 		}}, nil
 	}
-	if httpInput, err := body.AsGlobalCredentialCreateRequest1(); err == nil && string(httpInput.Kind) == "http_token" {
+	if httpInput, err := body.AsGlobalCredentialCreateRequest1(); err == nil && string(httpInput.Kind) == string(api.CredentialKindHttpToken) {
 		if httpInput.HttpToken.Token == "" {
 			return service.CredentialInput{}, service.ErrValidation
 		}
-		return service.CredentialInput{Name: httpInput.Name, SharedScope: "private", Secret: service.CredentialSecret{
-			Kind: "http_token", HTTPUsername: httpInput.HttpToken.Username, HTTPToken: httpInput.HttpToken.Token,
+		return service.CredentialInput{Name: httpInput.Name, SharedScope: string(api.CredentialSharedScopePrivate), Secret: service.CredentialSecret{
+			Kind: string(api.CredentialKindHttpToken), HTTPUsername: httpInput.HttpToken.Username, HTTPToken: httpInput.HttpToken.Token,
 		}}, nil
 	}
 	return service.CredentialInput{}, service.ErrValidation
 }
 
+// rotateSecret 将凭据轮换请求的秘密联合体投影为服务层秘密输入。
 func rotateSecret(value api.CredentialRotateRequest_Secret) (service.CredentialSecret, error) {
 	if sshInput, err := value.AsSshSecretInput(); err == nil && sshInput.PrivateKeyPem != "" {
-		return service.CredentialSecret{Kind: "ssh_key", PrivateKey: sshInput.PrivateKeyPem, Passphrase: optionalString(sshInput.Passphrase)}, nil
+		return service.CredentialSecret{Kind: string(api.CredentialKindSshKey), PrivateKey: sshInput.PrivateKeyPem, Passphrase: optionalString(sshInput.Passphrase)}, nil
 	}
 	if httpInput, err := value.AsHttpSecretInput(); err == nil && httpInput.Token != "" {
-		return service.CredentialSecret{Kind: "http_token", HTTPUsername: httpInput.Username, HTTPToken: httpInput.Token}, nil
+		return service.CredentialSecret{Kind: string(api.CredentialKindHttpToken), HTTPUsername: httpInput.Username, HTTPToken: httpInput.Token}, nil
 	}
 	return service.CredentialSecret{}, service.ErrValidation
 }
 
+// credentialResponse 将租户/平台凭据记录投影为租户可见的 API 形状。
 func credentialResponse(record service.CredentialRecord) api.Credential {
-	etagKind := "credential"
+	etagKind := etagKindCredential
 	if record.IsGlobal {
-		etagKind = "global-credential"
+		etagKind = etagKindGlobalCredential
 	}
 	return api.Credential{
 		Id: api.Uuid(record.ID), Etag: revisionETag(etagKind, record.ID.String(), record.Revision), Name: record.Name,
@@ -345,18 +359,21 @@ func credentialResponse(record service.CredentialRecord) api.Credential {
 	}
 }
 
+// globalCredentialResponse 将平台凭据记录投影为平台管理员的 API 形状。
 func globalCredentialResponse(record service.GlobalCredentialRecord) api.GlobalCredential {
 	return api.GlobalCredential{
-		Id: api.Uuid(record.ID), Etag: revisionETag("global-credential", record.ID.String(), record.Revision), Name: record.Name,
+		Id: api.Uuid(record.ID), Etag: revisionETag(etagKindGlobalCredential, record.ID.String(), record.Revision), Name: record.Name,
 		Kind: api.CredentialKind(record.Kind), Fingerprint: record.Encrypted.Fingerprint, CreatedBy: api.Uuid(record.CreatedBy),
 		LastUsedAt: nullableTime(record.LastUsedAt), Revision: int(record.Revision), CreatedAt: record.CreatedAt, UpdatedAt: record.UpdatedAt,
 	}
 }
 
+// knownHostResponse 将已批准主机记录投影为 API 形状。
 func knownHostResponse(record service.KnownHostRecord) api.KnownHost {
 	return api.KnownHost{Id: api.Uuid(record.ID), Host: record.Host, Port: int(record.Port), KeyType: api.KnownHostKeyType(record.KeyType), Fingerprint: record.Fingerprint, Source: api.KnownHostSource(record.Source), CreatedAt: record.CreatedAt}
 }
 
+// syncJobResponses 将凭据同步任务列表投影为 API 形状。
 func syncJobResponses(jobs []service.CredentialSyncJob) []api.CredentialSyncJob {
 	responses := make([]api.CredentialSyncJob, 0, len(jobs))
 	for _, job := range jobs {
@@ -365,20 +382,23 @@ func syncJobResponses(jobs []service.CredentialSyncJob) []api.CredentialSyncJob 
 	return responses
 }
 
+// optionalSharedScope0 解包 SSH 创建联合体的共享范围（缺省为 private）。
 func optionalSharedScope0(value *api.CredentialCreateRequest0SharedScope) string {
 	if value == nil {
-		return "private"
+		return string(api.CredentialSharedScopePrivate)
 	}
 	return string(*value)
 }
 
+// optionalSharedScope1 解包 HTTP 创建联合体的共享范围（缺省为 private）。
 func optionalSharedScope1(value *api.CredentialCreateRequest1SharedScope) string {
 	if value == nil {
-		return "private"
+		return string(api.CredentialSharedScopePrivate)
 	}
 	return string(*value)
 }
 
+// apiUUIDs 将可空 API UUID 切片转换为服务层 UUID 切片（nil 透传）。
 func apiUUIDs(value *[]api.Uuid) []uuid.UUID {
 	if value == nil {
 		return nil
@@ -390,6 +410,7 @@ func apiUUIDs(value *[]api.Uuid) []uuid.UUID {
 	return ids
 }
 
+// optionalString 将可空字符串包装为指针（未指定或空视为 nil）。
 func optionalString(value nullable.Nullable[string]) *string {
 	if !value.IsSpecified() || value.IsNull() {
 		return nil
@@ -397,6 +418,7 @@ func optionalString(value nullable.Nullable[string]) *string {
 	return new(value.MustGet())
 }
 
+// uuidResponses 将服务层 UUID 切片投影为 API UUID 切片。
 func uuidResponses(values []uuid.UUID) []api.Uuid {
 	responses := make([]api.Uuid, len(values))
 	for index, value := range values {
@@ -405,6 +427,7 @@ func uuidResponses(values []uuid.UUID) []api.Uuid {
 	return responses
 }
 
+// credentialRotationRequestHash 计算凭据轮换请求的幂等摘要。
 func credentialRotationRequestHash(operation, tenantSlug string, credentialID uuid.UUID, ifMatch string, secret service.CredentialSecret, resyncRepositories bool) ([]byte, error) {
 	payload, err := json.Marshal(struct {
 		Operation          string    `json:"operation"`

@@ -125,14 +125,14 @@ func newM1PipelineFixture(t *testing.T) *m1PipelineFixture {
 	serviceLifecycle := service.NewServiceLifecycle(serviceLifecycleStore, assets, store)
 
 	handler := NewWithRuntimeServices(Dependencies{
-		Identity:     identity,
-		Credentials:  service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), store, keyring),
-		Repositories: service.NewRepositories(repositoryStore, store),
-		Jobs:         service.NewJobs(repository.NewJobControlStore(db.Pool, runtime.Client()), store),
-		Producers:    service.NewProducers(discoveryStore, store),
-		Discovery:    discovery,
-		Assets:       assets,
-		Views:        views,
+		Identity:         identity,
+		Credentials:      service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), store, keyring),
+		Repositories:     service.NewRepositories(repositoryStore, store),
+		Jobs:             service.NewJobs(repository.NewJobControlStore(db.Pool, runtime.Client()), store),
+		Producers:        service.NewProducers(discoveryStore, store),
+		Discovery:        discovery,
+		Assets:           assets,
+		Views:            views,
 		ServiceLifecycle: serviceLifecycle,
 	}, false).Handler()
 

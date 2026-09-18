@@ -53,6 +53,14 @@ const (
 	aiDefaultTimeoutSec = 600
 )
 
+// AI 生成结果错误码（ai_generation_results.error_code 与 task.AiGenerateResult.ErrorCode）。
+const (
+	// errProducerTimedOutCode 表示生产者执行超时。
+	errProducerTimedOutCode = "timeout"
+	// errProducerFailedCode 表示生产者进程执行失败（非零退出）。
+	errProducerFailedCode = "producer_failed"
+)
+
 const (
 	// aiGenerationRefTypeDefault 是 AI 生成任务缺省的引用类别。
 	aiGenerationRefTypeDefault = "branch"
@@ -61,7 +69,6 @@ const (
 )
 
 // trustApprovedForOrigin 判定给定 trust 模式是否让某来源的初始审核状态直接为 approved。
-// 对齐 domain.yaml sourceCompatibility.trustSetting：
 //
 //	review_required           → ai_generated-pending, third_party-pending
 //	trust_ai                  → ai_generated-approved, third_party-pending
@@ -71,7 +78,7 @@ func trustApprovedForOrigin(trustMode, origin string) bool {
 	case trustModeTrustAI:
 		return origin == aiOrigin
 	case trustModeTrustAIAndThirdParty:
-		return origin == aiOrigin || origin == "third_party"
+		return origin == aiOrigin || origin == layerOriginThirdParty
 	default:
 		return false
 	}

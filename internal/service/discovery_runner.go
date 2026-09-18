@@ -15,17 +15,16 @@ import (
 	"github.com/meridian-labs/meridian/internal/task"
 )
 
-// discoveryMarkerFiles are the contract-defined files that mark a service root.
+// discoveryMarkerFiles 是契约定义的服务根标记文件。
 var discoveryMarkerFiles = [...]string{
 	"go.mod", "pom.xml", "build.gradle", "build.gradle.kts", "package.json", "pyproject.toml", "Cargo.toml",
 }
 
-// discoveryMarkerDirectories are the contract-defined directories that mark a service root.
+// discoveryMarkerDirectories 是契约定义的服务根标记目录。
 var discoveryMarkerDirectories = [...]string{"proto"}
 
-// DiscoveryRunner walks a cloned repository tree and upserts discovery
-// candidates. The default implementation clones with the git CLI into the
-// workspace root and computes markers from the resolved tree.
+// DiscoveryRunner 遍历克隆的仓库树并 upsert 发现候选。
+// 默认实现通过 git CLI 克隆到工作区根，并从解析后的树计算标记。
 type DiscoveryRunner struct {
 	store     DiscoveryStore
 	workspace string
@@ -33,8 +32,8 @@ type DiscoveryRunner struct {
 	now       func() time.Time
 }
 
-// NewDiscoveryRunner constructs the production repository discovery runner.
-// The workspace root must be an absolute path on a persistent or rebuildable volume.
+// NewDiscoveryRunner 构造生产仓库发现运行器。
+// 工作区根必须是持久或可重建卷上的绝对路径。
 func NewDiscoveryRunner(store DiscoveryStore, workspace string) *DiscoveryRunner {
 	return &DiscoveryRunner{store: store, workspace: workspace, gitBinary: "git", now: time.Now}
 }
@@ -116,7 +115,7 @@ func (runner *DiscoveryRunner) resolveCommit(ctx context.Context, checkout strin
 
 type markerSet map[string]bool
 
-// walkMarkers returns a map from directory path to the set of marker names found in it.
+// walkMarkers 返回目录路径到其中发现的标记名集合的映射。
 func walkMarkers(checkout string) (map[string]markerSet, error) {
 	markers := make(map[string]markerSet)
 	err := filepath.WalkDir(checkout, func(path string, entry os.DirEntry, walkErr error) error {
@@ -158,8 +157,7 @@ func walkMarkers(checkout string) (map[string]markerSet, error) {
 	return markers, err
 }
 
-// candidateRoots returns the marker-bearing directories, including the
-// repository root when any file at the root carries a marker.
+// candidateRoots 返回携带标记的目录，当根目录存在任何标记文件时也包含仓库根。
 func candidateRoots(markers map[string]markerSet) []string {
 	roots := make([]string, 0, len(markers))
 	for root := range markers {

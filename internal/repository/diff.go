@@ -17,27 +17,25 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// DiffStore implements the M3 diff, snapshot share, breaking todo, upload, and
-// push persistence boundary. It embeds AssetStore for the version/track read
-// path and keeps the tenant predicate on every read.
+// DiffStore 实现 M3 的差异、快照分享、破坏性待办、上传与推送持久化边界。
+// 它内嵌 AssetStore 复用版本/track 读取路径，并在每次读取时保留租户谓词。
 type DiffStore struct {
 	*AssetStore
 	queries     *generated.Queries
 	riverClient *river.Client[pgx.Tx]
 }
 
-// NewDiffStore binds diff persistence to a native pgx pool.
+// NewDiffStore 将差异持久化绑定到原生 pgx 连接池。
 func NewDiffStore(pool *pgxpool.Pool) *DiffStore {
 	return &DiffStore{AssetStore: NewAssetStore(pool), queries: generated.New(pool)}
 }
 
-// BindRiver attaches the process River client so push merge jobs can be
-// enqueued transactionally with their domain rows.
+// BindRiver 挂接进程 River 客户端，使推送合并任务可与领域行在同一事务内入队。
 func (store *DiffStore) BindRiver(riverClient *river.Client[pgx.Tx]) {
 	store.riverClient = riverClient
 }
 
-// CreateSourceSpec inserts one push source spec.
+// CreateSourceSpec 插入一条推送源配置。
 func (store *DiffStore) CreateSourceSpec(ctx context.Context, input service.NewSourceSpec) (service.SourceSpecRecord, error) {
 	row, err := store.queries.CreateSourceSpec(ctx, generated.CreateSourceSpecParams{
 		TenantID: input.TenantID, ID: input.ID, ServiceID: input.ServiceID, Kind: input.Kind,
@@ -51,7 +49,7 @@ func (store *DiffStore) CreateSourceSpec(ctx context.Context, input service.NewS
 	return sourceSpecFromRow(row, 0), nil
 }
 
-// CreateLayer inserts one push layer.
+// CreateLayer 插入一条推送层。
 func (store *DiffStore) CreateLayer(ctx context.Context, input service.NewLayer) (service.LayerRecord, error) {
 	row, err := store.queries.CreateLayer(ctx, generated.CreateLayerParams{
 		TenantID: input.TenantID, ID: input.ID, AssetID: input.AssetID, SourceSpecID: input.SourceSpecID,
@@ -64,12 +62,12 @@ func (store *DiffStore) CreateLayer(ctx context.Context, input service.NewLayer)
 	return layerFromRow(row), nil
 }
 
-// EnqueueMergeJob records one asset.merge job for a pushed revision.
+// EnqueueMergeJob 为一次推送修订记录一条 asset.merge 任务。
 func (store *DiffStore) EnqueueMergeJob(ctx context.Context, input service.MergeJobInput) (service.JobAccepted, error) {
 	if store.riverClient == nil {
 		return service.JobAccepted{}, errors.New("diff store has no River client")
 	}
-	dedupeKey := "merge:" + input.TrackID.String()
+	dedupeKey := dedupeKeyPrefixMerge + input.TrackID.String()
 	jobInput, err := json.Marshal(struct {
 		TrackID string `json:"trackId"`
 	}{TrackID: input.TrackID.String()})
@@ -83,9 +81,9 @@ func (store *DiffStore) EnqueueMergeJob(ctx context.Context, input service.Merge
 	defer func() { _ = tx.Rollback(ctx) }()
 	queries := generated.New(tx)
 	latest, err := queries.LockLatestDiscoveryJob(ctx, generated.LockLatestDiscoveryJobParams{TenantID: input.TenantID, DedupeKey: dedupeKey})
-	generation := int64(1)
+	generation := jobGenerationInitial
 	if err == nil {
-		if latest.Status == "pending" || latest.Status == "running" {
+		if latest.Status == service.JobStatusPending || latest.Status == service.JobStatusRunning {
 			return service.JobAccepted{JobID: latest.ID, Deduplicated: true}, nil
 		}
 		generation = latest.ActiveGeneration + 1
@@ -110,7 +108,7 @@ func (store *DiffStore) EnqueueMergeJob(ctx context.Context, input service.Merge
 		TenantID: input.TenantID, ID: row.ID, RiverJobID: new(inserted.Job.ID), UpdatedAt: timestamp(time.Now().UTC()),
 	}); err != nil {
 		return service.JobAccepted{}, normalizeError(err)
-	} else if changed != 1 {
+	} else if changed != rowsAffectedOne {
 		return service.JobAccepted{}, fmt.Errorf("attach River job %d to domain job %s: %w", inserted.Job.ID, row.ID, service.ErrPrecondition)
 	}
 	if err := tx.Commit(ctx); err != nil {
@@ -119,7 +117,7 @@ func (store *DiffStore) EnqueueMergeJob(ctx context.Context, input service.Merge
 	return service.JobAccepted{JobID: row.ID, Deduplicated: false}, nil
 }
 
-// GetServiceBySlug returns one active service by slug.
+// GetServiceBySlug 按 slug 返回一条活跃服务。
 func (store *DiffStore) GetServiceBySlug(ctx context.Context, tenantID uuid.UUID, slug string) (service.ServiceRecord, error) {
 	row, err := store.queries.GetServiceBySlug(ctx, generated.GetServiceBySlugParams{TenantID: tenantID, Slug: slug})
 	if err != nil {
@@ -128,7 +126,7 @@ func (store *DiffStore) GetServiceBySlug(ctx context.Context, tenantID uuid.UUID
 	return serviceRecordFromRow(row), nil
 }
 
-// ListServicesByRepositoryOwners returns the service ids owning an asset.
+// ListServicesByRepositoryOwners 返回拥有某资产的服务 id。
 func (store *DiffStore) ListServicesByRepositoryOwners(ctx context.Context, tenantID, assetID uuid.UUID) ([]uuid.UUID, error) {
 	asset, err := store.GetAsset(ctx, tenantID, assetID)
 	if err != nil {
@@ -137,7 +135,7 @@ func (store *DiffStore) ListServicesByRepositoryOwners(ctx context.Context, tena
 	return []uuid.UUID{asset.ServiceID}, nil
 }
 
-// GetSourceSpec returns one active source configuration.
+// GetSourceSpec 返回一条活跃源配置。
 func (store *DiffStore) GetSourceSpec(ctx context.Context, tenantID, id uuid.UUID) (service.SourceSpecRecord, error) {
 	row, err := store.queries.GetSourceSpec(ctx, generated.GetSourceSpecParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -146,7 +144,7 @@ func (store *DiffStore) GetSourceSpec(ctx context.Context, tenantID, id uuid.UUI
 	return sourceSpecFromRow(row, 0), nil
 }
 
-// GetLayerRevision returns one immutable layer revision.
+// GetLayerRevision 返回一条不可变的层修订。
 func (store *DiffStore) GetLayerRevision(ctx context.Context, tenantID, id uuid.UUID) (service.LayerRevisionRecord, error) {
 	row, err := store.queries.GetLayerRevision(ctx, generated.GetLayerRevisionParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -155,7 +153,7 @@ func (store *DiffStore) GetLayerRevision(ctx context.Context, tenantID, id uuid.
 	return layerRevisionFromRow(row), nil
 }
 
-// GetAssetRefTrackByID returns one asset ref track by its id.
+// GetAssetRefTrackByID 按其 id 返回一条资产 ref track。
 func (store *DiffStore) GetAssetRefTrackByID(ctx context.Context, tenantID, id uuid.UUID) (service.AssetRefTrackRecord, error) {
 	row, err := store.queries.GetAssetRefTrackByID(ctx, generated.GetAssetRefTrackByIDParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -167,7 +165,7 @@ func (store *DiffStore) GetAssetRefTrackByID(ctx context.Context, tenantID, id u
 	}, nil
 }
 
-// CreateUpload persists one diff upload.
+// CreateUpload 持久化一次差异上传。
 func (store *DiffStore) CreateUpload(ctx context.Context, input service.NewUpload) (service.UploadRecord, error) {
 	row, err := store.queries.CreateUpload(ctx, generated.CreateUploadParams{
 		TenantID: input.TenantID, ID: input.ID, BlobDigest: input.BlobDigest, Kind: input.Kind,
@@ -179,7 +177,7 @@ func (store *DiffStore) CreateUpload(ctx context.Context, input service.NewUploa
 	return uploadFromRow(row), nil
 }
 
-// GetUpload returns one unexpired upload.
+// GetUpload 返回一次未过期的上传。
 func (store *DiffStore) GetUpload(ctx context.Context, tenantID, id uuid.UUID) (service.UploadRecord, error) {
 	row, err := store.queries.GetUpload(ctx, generated.GetUploadParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -188,7 +186,7 @@ func (store *DiffStore) GetUpload(ctx context.Context, tenantID, id uuid.UUID) (
 	return uploadFromRow(row), nil
 }
 
-// CreateDiffSnapshot persists one frozen diff result.
+// CreateDiffSnapshot 持久化一份冻结的差异结果。
 func (store *DiffStore) CreateDiffSnapshot(ctx context.Context, input service.NewDiffSnapshot) (service.DiffSnapshotRecord, error) {
 	row, err := store.queries.CreateDiffSnapshot(ctx, generated.CreateDiffSnapshotParams{
 		TenantID: input.TenantID, ID: input.ID, LeftSelector: input.LeftSelector, RightSelector: input.RightSelector,
@@ -201,7 +199,7 @@ func (store *DiffStore) CreateDiffSnapshot(ctx context.Context, input service.Ne
 	return diffSnapshotFromRow(row), nil
 }
 
-// GetDiffSnapshot returns one snapshot.
+// GetDiffSnapshot 返回一份快照。
 func (store *DiffStore) GetDiffSnapshot(ctx context.Context, tenantID, id uuid.UUID) (service.DiffSnapshotRecord, error) {
 	row, err := store.queries.GetDiffSnapshot(ctx, generated.GetDiffSnapshotParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -210,7 +208,7 @@ func (store *DiffStore) GetDiffSnapshot(ctx context.Context, tenantID, id uuid.U
 	return diffSnapshotFromRow(row), nil
 }
 
-// CreateShareLink persists one share link.
+// CreateShareLink 持久化一条分享链接。
 func (store *DiffStore) CreateShareLink(ctx context.Context, input service.NewShareLink) (service.ShareLinkRecord, error) {
 	row, err := store.queries.CreateShareLink(ctx, generated.CreateShareLinkParams{
 		TenantID: input.TenantID, ID: input.ID, TokenHash: input.TokenHash, CreatorID: input.CreatorID,
@@ -223,7 +221,7 @@ func (store *DiffStore) CreateShareLink(ctx context.Context, input service.NewSh
 	return shareLinkFromRow(row), nil
 }
 
-// GetShareLinkByTokenHash returns one active share link.
+// GetShareLinkByTokenHash 返回一条活跃分享链接。
 func (store *DiffStore) GetShareLinkByTokenHash(ctx context.Context, tokenHash []byte) (service.ShareLinkRecord, error) {
 	row, err := store.queries.GetShareLinkByTokenHash(ctx, tokenHash)
 	if err != nil {
@@ -232,7 +230,7 @@ func (store *DiffStore) GetShareLinkByTokenHash(ctx context.Context, tokenHash [
 	return shareLinkFromRow(row), nil
 }
 
-// CreateBreakingTodoIfAbsent creates one todo keyed by version+service.
+// CreateBreakingTodoIfAbsent 按 version+service 键创建一条待办。
 func (store *DiffStore) CreateBreakingTodoIfAbsent(ctx context.Context, tenantID, assetVersionID, serviceID uuid.UUID) (service.TodoRecord, error) {
 	row, err := store.queries.CreateBreakingTodoIfAbsent(ctx, generated.CreateBreakingTodoIfAbsentParams{
 		TenantID: tenantID, ID: uuid.NewV7(), AssetVersionID: assetVersionID, ServiceID: serviceID,
@@ -243,7 +241,7 @@ func (store *DiffStore) CreateBreakingTodoIfAbsent(ctx context.Context, tenantID
 	return todoFromRow(row), nil
 }
 
-// ListBreakingTodos pages todos by status.
+// ListBreakingTodos 按状态分页返回待办。
 func (store *DiffStore) ListBreakingTodos(ctx context.Context, tenantID uuid.UUID, status string, limit, offset int32) ([]service.TodoRecord, int64, error) {
 	rows, err := store.queries.ListBreakingTodos(ctx, generated.ListBreakingTodosParams{
 		TenantID: tenantID, StatusFilter: status, PageLimit: limit, PageOffset: offset,
@@ -262,7 +260,7 @@ func (store *DiffStore) ListBreakingTodos(ctx context.Context, tenantID uuid.UUI
 	return items, total, nil
 }
 
-// AckBreakingTodo acknowledges one open todo.
+// AckBreakingTodo 确认一条未关闭的待办。
 func (store *DiffStore) AckBreakingTodo(ctx context.Context, tenantID, todoID, ackedBy uuid.UUID, ackedAt time.Time, comment *string) (service.TodoRecord, error) {
 	row, err := store.queries.AckBreakingTodo(ctx, generated.AckBreakingTodoParams{
 		TenantID: tenantID, ID: todoID, AckedBy: new(ackedBy), AckedAt: timestamp(ackedAt), Comment: comment,
@@ -273,9 +271,8 @@ func (store *DiffStore) AckBreakingTodo(ctx context.Context, tenantID, todoID, a
 	return todoFromRow(row), nil
 }
 
-// GetSourceLayerByPushKey returns the push-mode overlay layer of an asset by its
-// stable push identity (kind + name), so repeated pushes reuse one overlay layer
-// instead of aliasing the repo base.
+// GetSourceLayerByPushKey 按其稳定推送身份（kind + name）返回资产的推送模式 overlay 层，
+// 使重复推送复用同一 overlay 层，而非给仓库 base 起别名。
 func (store *DiffStore) GetSourceLayerByPushKey(ctx context.Context, tenantID, assetID uuid.UUID) (service.LayerRecord, error) {
 	row, err := store.queries.GetSourceLayerByPushKey(ctx, generated.GetSourceLayerByPushKeyParams{
 		TenantID: tenantID, AssetID: assetID,
@@ -322,8 +319,6 @@ func todoFromRow(row generated.BreakingTodo) service.TodoRecord {
 }
 
 var _ service.DiffStore = (*DiffStore)(nil)
-var _ = fmt.Sprintf
-var _ = json.Marshal
 
 func timePtr(value pgtype.Timestamptz) *time.Time {
 	if !value.Valid {

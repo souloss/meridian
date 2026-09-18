@@ -25,50 +25,62 @@ type assetServer struct {
 	server *Server
 }
 
+// CreateSourceSpec 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) CreateSourceSpec(ctx context.Context, request asset.CreateSourceSpecRequestObject) (asset.CreateSourceSpecResponseObject, error) {
 	return adapter.server.CreateSourceSpec(ctx, request)
 }
 
+// GenerateMissingAssetWithAi 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) GenerateMissingAssetWithAi(ctx context.Context, request asset.GenerateMissingAssetWithAiRequestObject) (asset.GenerateMissingAssetWithAiResponseObject, error) {
 	return adapter.server.GenerateMissingAssetWithAi(ctx, request)
 }
 
+// GetAsset 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) GetAsset(ctx context.Context, request asset.GetAssetRequestObject) (asset.GetAssetResponseObject, error) {
 	return adapter.server.GetAsset(ctx, request)
 }
 
+// GetAssetVersion 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) GetAssetVersion(ctx context.Context, request asset.GetAssetVersionRequestObject) (asset.GetAssetVersionResponseObject, error) {
 	return adapter.server.GetAssetVersion(ctx, request)
 }
 
+// GetAssetVersionProvenance 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) GetAssetVersionProvenance(ctx context.Context, request asset.GetAssetVersionProvenanceRequestObject) (asset.GetAssetVersionProvenanceResponseObject, error) {
 	return adapter.server.GetAssetVersionProvenance(ctx, request)
 }
 
+// ListAssetVersionItems 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) ListAssetVersionItems(ctx context.Context, request asset.ListAssetVersionItemsRequestObject) (asset.ListAssetVersionItemsResponseObject, error) {
 	return adapter.server.ListAssetVersionItems(ctx, request)
 }
 
+// ListSourceBindings 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) ListSourceBindings(ctx context.Context, request asset.ListSourceBindingsRequestObject) (asset.ListSourceBindingsResponseObject, error) {
 	return adapter.server.ListSourceBindings(ctx, request)
 }
 
+// ListSourceSpecs 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) ListSourceSpecs(ctx context.Context, request asset.ListSourceSpecsRequestObject) (asset.ListSourceSpecsResponseObject, error) {
 	return adapter.server.ListSourceSpecs(ctx, request)
 }
 
+// PreviewMerge 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) PreviewMerge(ctx context.Context, request asset.PreviewMergeRequestObject) (asset.PreviewMergeResponseObject, error) {
 	return adapter.server.PreviewMerge(ctx, request)
 }
 
+// PublishAssetVersion 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) PublishAssetVersion(ctx context.Context, request asset.PublishAssetVersionRequestObject) (asset.PublishAssetVersionResponseObject, error) {
 	return adapter.server.PublishAssetVersion(ctx, request)
 }
 
+// PushAssetRevision 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) PushAssetRevision(ctx context.Context, request asset.PushAssetRevisionRequestObject) (asset.PushAssetRevisionResponseObject, error) {
 	return adapter.server.PushAssetRevision(ctx, request)
 }
 
+// UpdateSourceSpec 将 asset 的严格操作委托给对应的 Handler 实现。
 func (adapter assetServer) UpdateSourceSpec(ctx context.Context, request asset.UpdateSourceSpecRequestObject) (asset.UpdateSourceSpecResponseObject, error) {
 	return adapter.server.UpdateSourceSpec(ctx, request)
 }
@@ -78,18 +90,22 @@ type authServer struct {
 	server *Server
 }
 
+// GetMe 将 auth 的严格操作委托给对应的 Handler 实现。
 func (adapter authServer) GetMe(ctx context.Context, request auth.GetMeRequestObject) (auth.GetMeResponseObject, error) {
 	return adapter.server.GetMe(ctx, request)
 }
 
+// Login 将 auth 的严格操作委托给对应的 Handler 实现。
 func (adapter authServer) Login(ctx context.Context, request auth.LoginRequestObject) (auth.LoginResponseObject, error) {
 	return adapter.server.Login(ctx, request)
 }
 
+// Logout 将 auth 的严格操作委托给对应的 Handler 实现。
 func (adapter authServer) Logout(ctx context.Context, request auth.LogoutRequestObject) (auth.LogoutResponseObject, error) {
 	return adapter.server.Logout(ctx, request)
 }
 
+// Refresh 将 auth 的严格操作委托给对应的 Handler 实现。
 func (adapter authServer) Refresh(ctx context.Context, request auth.RefreshRequestObject) (auth.RefreshResponseObject, error) {
 	return adapter.server.Refresh(ctx, request)
 }
@@ -99,14 +115,17 @@ type collaborationServer struct {
 	server *Server
 }
 
+// AcknowledgeBreakingTodo 将 collaboration 的严格操作委托给对应的 Handler 实现。
 func (adapter collaborationServer) AcknowledgeBreakingTodo(ctx context.Context, request collaboration.AcknowledgeBreakingTodoRequestObject) (collaboration.AcknowledgeBreakingTodoResponseObject, error) {
 	return adapter.server.AcknowledgeBreakingTodo(ctx, request)
 }
 
+// ListAuditLogs 将 collaboration 的严格操作委托给对应的 Handler 实现。
 func (adapter collaborationServer) ListAuditLogs(ctx context.Context, request collaboration.ListAuditLogsRequestObject) (collaboration.ListAuditLogsResponseObject, error) {
 	return adapter.server.ListAuditLogs(ctx, request)
 }
 
+// ListBreakingTodos 将 collaboration 的严格操作委托给对应的 Handler 实现。
 func (adapter collaborationServer) ListBreakingTodos(ctx context.Context, request collaboration.ListBreakingTodosRequestObject) (collaboration.ListBreakingTodosResponseObject, error) {
 	return adapter.server.ListBreakingTodos(ctx, request)
 }
@@ -116,12 +135,19 @@ type diffServer struct {
 	server *Server
 }
 
+// CreateDiffSnapshotShareLink 将 diff 的严格操作委托给对应的 Handler 实现。
 func (adapter diffServer) CreateDiffSnapshotShareLink(ctx context.Context, request diff.CreateDiffSnapshotShareLinkRequestObject) (diff.CreateDiffSnapshotShareLinkResponseObject, error) {
 	return adapter.server.CreateDiffSnapshotShareLink(ctx, request)
 }
 
+// RunDiff 将 diff 的严格操作委托给对应的 Handler 实现。
 func (adapter diffServer) RunDiff(ctx context.Context, request diff.RunDiffRequestObject) (diff.RunDiffResponseObject, error) {
 	return adapter.server.RunDiff(ctx, request)
+}
+
+// Search 将 diff 的严格操作委托给对应的 Handler 实现。
+func (adapter diffServer) Search(ctx context.Context, request diff.SearchRequestObject) (diff.SearchResponseObject, error) {
+	return adapter.server.Search(ctx, request)
 }
 
 type jobServer struct {
@@ -129,22 +155,27 @@ type jobServer struct {
 	server *Server
 }
 
+// CancelJob 将 job 的严格操作委托给对应的 Handler 实现。
 func (adapter jobServer) CancelJob(ctx context.Context, request job.CancelJobRequestObject) (job.CancelJobResponseObject, error) {
 	return adapter.server.CancelJob(ctx, request)
 }
 
+// GetJob 将 job 的严格操作委托给对应的 Handler 实现。
 func (adapter jobServer) GetJob(ctx context.Context, request job.GetJobRequestObject) (job.GetJobResponseObject, error) {
 	return adapter.server.GetJob(ctx, request)
 }
 
+// ListJobs 将 job 的严格操作委托给对应的 Handler 实现。
 func (adapter jobServer) ListJobs(ctx context.Context, request job.ListJobsRequestObject) (job.ListJobsResponseObject, error) {
 	return adapter.server.ListJobs(ctx, request)
 }
 
+// RetryJob 将 job 的严格操作委托给对应的 Handler 实现。
 func (adapter jobServer) RetryJob(ctx context.Context, request job.RetryJobRequestObject) (job.RetryJobResponseObject, error) {
 	return adapter.server.RetryJob(ctx, request)
 }
 
+// StreamJobLogs 将 job 的严格操作委托给对应的 Handler 实现。
 func (adapter jobServer) StreamJobLogs(ctx context.Context, request job.StreamJobLogsRequestObject) (job.StreamJobLogsResponseObject, error) {
 	return adapter.server.StreamJobLogs(ctx, request)
 }
@@ -154,26 +185,32 @@ type layerServer struct {
 	server *Server
 }
 
+// ApproveLayerRevision 将 layer 的严格操作委托给对应的 Handler 实现。
 func (adapter layerServer) ApproveLayerRevision(ctx context.Context, request layer.ApproveLayerRevisionRequestObject) (layer.ApproveLayerRevisionResponseObject, error) {
 	return adapter.server.ApproveLayerRevision(ctx, request)
 }
 
+// CreateLayerRevision 将 layer 的严格操作委托给对应的 Handler 实现。
 func (adapter layerServer) CreateLayerRevision(ctx context.Context, request layer.CreateLayerRevisionRequestObject) (layer.CreateLayerRevisionResponseObject, error) {
 	return adapter.server.CreateLayerRevision(ctx, request)
 }
 
+// GetReviewContext 将 layer 的严格操作委托给对应的 Handler 实现。
 func (adapter layerServer) GetReviewContext(ctx context.Context, request layer.GetReviewContextRequestObject) (layer.GetReviewContextResponseObject, error) {
 	return adapter.server.GetReviewContext(ctx, request)
 }
 
+// RejectLayerRevision 将 layer 的严格操作委托给对应的 Handler 实现。
 func (adapter layerServer) RejectLayerRevision(ctx context.Context, request layer.RejectLayerRevisionRequestObject) (layer.RejectLayerRevisionResponseObject, error) {
 	return adapter.server.RejectLayerRevision(ctx, request)
 }
 
+// ReorderAssetLayers 将 layer 的严格操作委托给对应的 Handler 实现。
 func (adapter layerServer) ReorderAssetLayers(ctx context.Context, request layer.ReorderAssetLayersRequestObject) (layer.ReorderAssetLayersResponseObject, error) {
 	return adapter.server.ReorderAssetLayers(ctx, request)
 }
 
+// RollbackLayer 将 layer 的严格操作委托给对应的 Handler 实现。
 func (adapter layerServer) RollbackLayer(ctx context.Context, request layer.RollbackLayerRequestObject) (layer.RollbackLayerResponseObject, error) {
 	return adapter.server.RollbackLayer(ctx, request)
 }
@@ -183,66 +220,82 @@ type platformServer struct {
 	server *Server
 }
 
+// CreateGlobalCredential 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) CreateGlobalCredential(ctx context.Context, request platform.CreateGlobalCredentialRequestObject) (platform.CreateGlobalCredentialResponseObject, error) {
 	return adapter.server.CreateGlobalCredential(ctx, request)
 }
 
+// CreateProducerProfile 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) CreateProducerProfile(ctx context.Context, request platform.CreateProducerProfileRequestObject) (platform.CreateProducerProfileResponseObject, error) {
 	return adapter.server.CreateProducerProfile(ctx, request)
 }
 
+// CreateTenant 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) CreateTenant(ctx context.Context, request platform.CreateTenantRequestObject) (platform.CreateTenantResponseObject, error) {
 	return adapter.server.CreateTenant(ctx, request)
 }
 
+// CreateUser 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) CreateUser(ctx context.Context, request platform.CreateUserRequestObject) (platform.CreateUserResponseObject, error) {
 	return adapter.server.CreateUser(ctx, request)
 }
 
+// DeleteGlobalCredential 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) DeleteGlobalCredential(ctx context.Context, request platform.DeleteGlobalCredentialRequestObject) (platform.DeleteGlobalCredentialResponseObject, error) {
 	return adapter.server.DeleteGlobalCredential(ctx, request)
 }
 
+// GetPlatformJob 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) GetPlatformJob(ctx context.Context, request platform.GetPlatformJobRequestObject) (platform.GetPlatformJobResponseObject, error) {
 	return adapter.server.GetPlatformJob(ctx, request)
 }
 
+// ListGlobalCredentials 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) ListGlobalCredentials(ctx context.Context, request platform.ListGlobalCredentialsRequestObject) (platform.ListGlobalCredentialsResponseObject, error) {
 	return adapter.server.ListGlobalCredentials(ctx, request)
 }
 
+// ListPlatformAuditLogs 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) ListPlatformAuditLogs(ctx context.Context, request platform.ListPlatformAuditLogsRequestObject) (platform.ListPlatformAuditLogsResponseObject, error) {
 	return adapter.server.ListPlatformAuditLogs(ctx, request)
 }
 
+// ListPlatformJobs 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) ListPlatformJobs(ctx context.Context, request platform.ListPlatformJobsRequestObject) (platform.ListPlatformJobsResponseObject, error) {
 	return adapter.server.ListPlatformJobs(ctx, request)
 }
 
+// ListTenants 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) ListTenants(ctx context.Context, request platform.ListTenantsRequestObject) (platform.ListTenantsResponseObject, error) {
 	return adapter.server.ListTenants(ctx, request)
 }
 
+// ListUsers 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) ListUsers(ctx context.Context, request platform.ListUsersRequestObject) (platform.ListUsersResponseObject, error) {
 	return adapter.server.ListUsers(ctx, request)
 }
 
+// PutTenantMemberAsPlatformAdmin 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) PutTenantMemberAsPlatformAdmin(ctx context.Context, request platform.PutTenantMemberAsPlatformAdminRequestObject) (platform.PutTenantMemberAsPlatformAdminResponseObject, error) {
 	return adapter.server.PutTenantMemberAsPlatformAdmin(ctx, request)
 }
 
+// RotateGlobalCredential 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) RotateGlobalCredential(ctx context.Context, request platform.RotateGlobalCredentialRequestObject) (platform.RotateGlobalCredentialResponseObject, error) {
 	return adapter.server.RotateGlobalCredential(ctx, request)
 }
 
+// TestGlobalCredential 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) TestGlobalCredential(ctx context.Context, request platform.TestGlobalCredentialRequestObject) (platform.TestGlobalCredentialResponseObject, error) {
 	return adapter.server.TestGlobalCredential(ctx, request)
 }
 
+// UpdateGlobalCredential 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) UpdateGlobalCredential(ctx context.Context, request platform.UpdateGlobalCredentialRequestObject) (platform.UpdateGlobalCredentialResponseObject, error) {
 	return adapter.server.UpdateGlobalCredential(ctx, request)
 }
 
+// UpdateTenant 将 platform 的严格操作委托给对应的 Handler 实现。
 func (adapter platformServer) UpdateTenant(ctx context.Context, request platform.UpdateTenantRequestObject) (platform.UpdateTenantResponseObject, error) {
 	return adapter.server.UpdateTenant(ctx, request)
 }
@@ -252,50 +305,62 @@ type repositoryServer struct {
 	server *Server
 }
 
+// AcceptDiscoveryCandidates 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) AcceptDiscoveryCandidates(ctx context.Context, request repository.AcceptDiscoveryCandidatesRequestObject) (repository.AcceptDiscoveryCandidatesResponseObject, error) {
 	return adapter.server.AcceptDiscoveryCandidates(ctx, request)
 }
 
+// ApplyRepositoryConfigImport 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) ApplyRepositoryConfigImport(ctx context.Context, request repository.ApplyRepositoryConfigImportRequestObject) (repository.ApplyRepositoryConfigImportResponseObject, error) {
 	return adapter.server.ApplyRepositoryConfigImport(ctx, request)
 }
 
+// CheckRepositoryConnection 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) CheckRepositoryConnection(ctx context.Context, request repository.CheckRepositoryConnectionRequestObject) (repository.CheckRepositoryConnectionResponseObject, error) {
 	return adapter.server.CheckRepositoryConnection(ctx, request)
 }
 
+// CreateRepository 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) CreateRepository(ctx context.Context, request repository.CreateRepositoryRequestObject) (repository.CreateRepositoryResponseObject, error) {
 	return adapter.server.CreateRepository(ctx, request)
 }
 
+// DeleteRepository 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) DeleteRepository(ctx context.Context, request repository.DeleteRepositoryRequestObject) (repository.DeleteRepositoryResponseObject, error) {
 	return adapter.server.DeleteRepository(ctx, request)
 }
 
+// DiscoverRepository 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) DiscoverRepository(ctx context.Context, request repository.DiscoverRepositoryRequestObject) (repository.DiscoverRepositoryResponseObject, error) {
 	return adapter.server.DiscoverRepository(ctx, request)
 }
 
+// GetRepository 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) GetRepository(ctx context.Context, request repository.GetRepositoryRequestObject) (repository.GetRepositoryResponseObject, error) {
 	return adapter.server.GetRepository(ctx, request)
 }
 
+// ListDiscoveryCandidates 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) ListDiscoveryCandidates(ctx context.Context, request repository.ListDiscoveryCandidatesRequestObject) (repository.ListDiscoveryCandidatesResponseObject, error) {
 	return adapter.server.ListDiscoveryCandidates(ctx, request)
 }
 
+// ListRepositories 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) ListRepositories(ctx context.Context, request repository.ListRepositoriesRequestObject) (repository.ListRepositoriesResponseObject, error) {
 	return adapter.server.ListRepositories(ctx, request)
 }
 
+// PreviewRepositoryConfigImport 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) PreviewRepositoryConfigImport(ctx context.Context, request repository.PreviewRepositoryConfigImportRequestObject) (repository.PreviewRepositoryConfigImportResponseObject, error) {
 	return adapter.server.PreviewRepositoryConfigImport(ctx, request)
 }
 
+// SyncRepository 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) SyncRepository(ctx context.Context, request repository.SyncRepositoryRequestObject) (repository.SyncRepositoryResponseObject, error) {
 	return adapter.server.SyncRepository(ctx, request)
 }
 
+// UpdateRepository 将 repository 的严格操作委托给对应的 Handler 实现。
 func (adapter repositoryServer) UpdateRepository(ctx context.Context, request repository.UpdateRepositoryRequestObject) (repository.UpdateRepositoryResponseObject, error) {
 	return adapter.server.UpdateRepository(ctx, request)
 }
@@ -305,22 +370,27 @@ type serviceServer struct {
 	server *Server
 }
 
+// DeleteService 将 service 的严格操作委托给对应的 Handler 实现。
 func (adapter serviceServer) DeleteService(ctx context.Context, request serviceapi.DeleteServiceRequestObject) (serviceapi.DeleteServiceResponseObject, error) {
 	return adapter.server.DeleteService(ctx, request)
 }
 
+// GetPublicService 将 service 的严格操作委托给对应的 Handler 实现。
 func (adapter serviceServer) GetPublicService(ctx context.Context, request serviceapi.GetPublicServiceRequestObject) (serviceapi.GetPublicServiceResponseObject, error) {
 	return adapter.server.GetPublicService(ctx, request)
 }
 
+// GetService 将 service 的严格操作委托给对应的 Handler 实现。
 func (adapter serviceServer) GetService(ctx context.Context, request serviceapi.GetServiceRequestObject) (serviceapi.GetServiceResponseObject, error) {
 	return adapter.server.GetService(ctx, request)
 }
 
+// ListRecentServices 将 service 的严格操作委托给对应的 Handler 实现。
 func (adapter serviceServer) ListRecentServices(ctx context.Context, request serviceapi.ListRecentServicesRequestObject) (serviceapi.ListRecentServicesResponseObject, error) {
 	return adapter.server.ListRecentServices(ctx, request)
 }
 
+// UpdateService 将 service 的严格操作委托给对应的 Handler 实现。
 func (adapter serviceServer) UpdateService(ctx context.Context, request serviceapi.UpdateServiceRequestObject) (serviceapi.UpdateServiceResponseObject, error) {
 	return adapter.server.UpdateService(ctx, request)
 }
@@ -330,22 +400,27 @@ type systemServer struct {
 	server *Server
 }
 
+// GetOpenApiContract 将 system 的严格操作委托给对应的 Handler 实现。
 func (adapter systemServer) GetOpenApiContract(ctx context.Context, request system.GetOpenApiContractRequestObject) (system.GetOpenApiContractResponseObject, error) {
 	return adapter.server.GetOpenApiContract(ctx, request)
 }
 
+// GetVersion 将 system 的严格操作委托给对应的 Handler 实现。
 func (adapter systemServer) GetVersion(ctx context.Context, request system.GetVersionRequestObject) (system.GetVersionResponseObject, error) {
 	return adapter.server.GetVersion(ctx, request)
 }
 
+// Healthz 将 system 的严格操作委托给对应的 Handler 实现。
 func (adapter systemServer) Healthz(ctx context.Context, request system.HealthzRequestObject) (system.HealthzResponseObject, error) {
 	return adapter.server.Healthz(ctx, request)
 }
 
+// Metrics 将 system 的严格操作委托给对应的 Handler 实现。
 func (adapter systemServer) Metrics(ctx context.Context, request system.MetricsRequestObject) (system.MetricsResponseObject, error) {
 	return adapter.server.Metrics(ctx, request)
 }
 
+// Readyz 将 system 的严格操作委托给对应的 Handler 实现。
 func (adapter systemServer) Readyz(ctx context.Context, request system.ReadyzRequestObject) (system.ReadyzResponseObject, error) {
 	return adapter.server.Readyz(ctx, request)
 }
@@ -355,50 +430,62 @@ type tenantServer struct {
 	server *Server
 }
 
+// CreateCredential 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) CreateCredential(ctx context.Context, request tenant.CreateCredentialRequestObject) (tenant.CreateCredentialResponseObject, error) {
 	return adapter.server.CreateCredential(ctx, request)
 }
 
+// CreateKnownHost 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) CreateKnownHost(ctx context.Context, request tenant.CreateKnownHostRequestObject) (tenant.CreateKnownHostResponseObject, error) {
 	return adapter.server.CreateKnownHost(ctx, request)
 }
 
+// CreateToken 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) CreateToken(ctx context.Context, request tenant.CreateTokenRequestObject) (tenant.CreateTokenResponseObject, error) {
 	return adapter.server.CreateToken(ctx, request)
 }
 
+// DeleteCredential 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) DeleteCredential(ctx context.Context, request tenant.DeleteCredentialRequestObject) (tenant.DeleteCredentialResponseObject, error) {
 	return adapter.server.DeleteCredential(ctx, request)
 }
 
+// ListAvailableProducerProfiles 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) ListAvailableProducerProfiles(ctx context.Context, request tenant.ListAvailableProducerProfilesRequestObject) (tenant.ListAvailableProducerProfilesResponseObject, error) {
 	return adapter.server.ListAvailableProducerProfiles(ctx, request)
 }
 
+// ListCredentials 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) ListCredentials(ctx context.Context, request tenant.ListCredentialsRequestObject) (tenant.ListCredentialsResponseObject, error) {
 	return adapter.server.ListCredentials(ctx, request)
 }
 
+// ListKnownHosts 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) ListKnownHosts(ctx context.Context, request tenant.ListKnownHostsRequestObject) (tenant.ListKnownHostsResponseObject, error) {
 	return adapter.server.ListKnownHosts(ctx, request)
 }
 
+// ListTokens 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) ListTokens(ctx context.Context, request tenant.ListTokensRequestObject) (tenant.ListTokensResponseObject, error) {
 	return adapter.server.ListTokens(ctx, request)
 }
 
+// RevokeToken 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) RevokeToken(ctx context.Context, request tenant.RevokeTokenRequestObject) (tenant.RevokeTokenResponseObject, error) {
 	return adapter.server.RevokeToken(ctx, request)
 }
 
+// RotateCredential 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) RotateCredential(ctx context.Context, request tenant.RotateCredentialRequestObject) (tenant.RotateCredentialResponseObject, error) {
 	return adapter.server.RotateCredential(ctx, request)
 }
 
+// TestCredential 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) TestCredential(ctx context.Context, request tenant.TestCredentialRequestObject) (tenant.TestCredentialResponseObject, error) {
 	return adapter.server.TestCredential(ctx, request)
 }
 
+// UpdateCredential 将 tenant 的严格操作委托给对应的 Handler 实现。
 func (adapter tenantServer) UpdateCredential(ctx context.Context, request tenant.UpdateCredentialRequestObject) (tenant.UpdateCredentialResponseObject, error) {
 	return adapter.server.UpdateCredential(ctx, request)
 }
@@ -408,10 +495,22 @@ type viewServer struct {
 	server *Server
 }
 
+// CreateSystemGroup 将 view 的严格操作委托给对应的 Handler 实现。
+func (adapter viewServer) CreateSystemGroup(ctx context.Context, request view.CreateSystemGroupRequestObject) (view.CreateSystemGroupResponseObject, error) {
+	return adapter.server.CreateSystemGroup(ctx, request)
+}
+
+// GetSharedView 将 view 的严格操作委托给对应的 Handler 实现。
 func (adapter viewServer) GetSharedView(ctx context.Context, request view.GetSharedViewRequestObject) (view.GetSharedViewResponseObject, error) {
 	return adapter.server.GetSharedView(ctx, request)
 }
 
+// PutSystemGroupMembers 将 view 的严格操作委托给对应的 Handler 实现。
+func (adapter viewServer) PutSystemGroupMembers(ctx context.Context, request view.PutSystemGroupMembersRequestObject) (view.PutSystemGroupMembersResponseObject, error) {
+	return adapter.server.PutSystemGroupMembers(ctx, request)
+}
+
+// ResolveView 将 view 的严格操作委托给对应的 Handler 实现。
 func (adapter viewServer) ResolveView(ctx context.Context, request view.ResolveViewRequestObject) (view.ResolveViewResponseObject, error) {
 	return adapter.server.ResolveView(ctx, request)
 }

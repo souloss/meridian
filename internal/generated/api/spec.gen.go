@@ -584,7 +584,7 @@ func decodeSpecCached() func() ([]byte, error) {
 	}
 }
 
-// PathToRawSpec implements generated transport behavior for the Meridian OpenAPI contract.
+// PathToRawSpec 实现 Meridian OpenAPI 契约的生成传输行为。
 // Constructs a synthetic filesystem for resolving external references when loading openapi specifications.
 func PathToRawSpec(pathToFile string) map[string]func() ([]byte, error) {
 	res := make(map[string]func() ([]byte, error))

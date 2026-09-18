@@ -1,0 +1,32 @@
+# Meridian 简体中文错误消息（缺省语言）。
+# 键结构：error.<错误码>，错误码来自 contracts/openapi.yaml 的 ErrorCode 冻结枚举。
+# 带变量的消息使用 Go 模板占位符 {{.Var}}；单复数消息提供 other 形式。
+error:
+  unauthenticated: "需要登录后才能访问该资源。"
+  not_found: "资源不存在或无权访问。"
+  validation_error: "请求不符合 API 契约。"
+  asset_path_not_found: "源文件路径未找到。"
+  overlay_invalid: "overlay 文档无效。"
+  input_spec_mismatch: "视图输入不满足视图契约。"
+  branch_not_indexed: "所选分支尚未建立索引。"
+  upload_expired: "上传内容已过期。"
+  nesting_too_deep: "文档嵌套层级过深。"
+  producer_profile_unavailable: "所选生产者配置不可用。"
+  unsupported_kind: "不支持的资产类别。"
+  duplicate: "资源已存在。"
+  version_not_publishable: "版本当前不可发布。"
+  base_layer_exists: "已存在 AI 生成的 base 层。"
+  quota_exceeded:
+    other: "租户资源配额将超出限制（当前 {{.Current}}，上限 {{.Limit}}）。"
+  last_admin: "不能移除租户的最后一名管理员。"
+  credential_in_use: "凭据仍被某个仓库引用。"
+  invalid_state: "资源生命周期不允许该操作。"
+  idempotency_conflict: "幂等键已用于另一个不同的请求。"
+  job_not_cancellable: "任务已进入终态，无法取消。"
+  config_import_conflict: "配置导入与当前数据库状态冲突。"
+  ai_disabled: "AI 能力已停用。"
+  kind_disabled: "该资产类别已停用。"
+  content_too_large: "内容大小超出限制。"
+  rate_limited: "请求过于频繁，请稍后重试。"
+  precondition_failed: "资源已变更，请刷新后重试。"
+  internal_error: "请求处理失败。"

@@ -12,7 +12,17 @@ import (
 	"github.com/oapi-codegen/nullable"
 )
 
-// RunDiff runs a structured diff between two document selectors.
+// diffSelectorType* 是 DocumentSelector 判别值对应的服务层选择器类型。
+const (
+	// diffSelectorTypeVersion 表示按资产版本选择文档。
+	diffSelectorTypeVersion = "version"
+	// diffSelectorTypeRef 表示按引用（branch/tag）选择文档。
+	diffSelectorTypeRef = "ref"
+	// diffSelectorTypeUpload 表示按上传文档选择。
+	diffSelectorTypeUpload = "upload"
+)
+
+// RunDiff 在两个文档选择器之间执行一次结构化差异对比。
 func (s *Server) RunDiff(ctx context.Context, request diff.RunDiffRequestObject) (diff.RunDiffResponseObject, error) {
 	if s.diffService == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -47,7 +57,7 @@ func (s *Server) RunDiff(ctx context.Context, request diff.RunDiffRequestObject)
 	return diff.RunDiff200JSONResponse(diffResultResponse(outcome)), nil
 }
 
-// CreateDiffSnapshotShareLink mints a share token for a frozen snapshot.
+// CreateDiffSnapshotShareLink 为冻结快照铸造一个分享令牌。
 func (s *Server) CreateDiffSnapshotShareLink(ctx context.Context, request diff.CreateDiffSnapshotShareLinkRequestObject) (diff.CreateDiffSnapshotShareLinkResponseObject, error) {
 	if s.diffService == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -65,7 +75,7 @@ func (s *Server) CreateDiffSnapshotShareLink(ctx context.Context, request diff.C
 	return diff.CreateDiffSnapshotShareLink201JSONResponse(shareLinkCreatedResponse(created)), nil
 }
 
-// GetSharedView resolves an anonymous share token to its frozen snapshot.
+// GetSharedView 将匿名分享令牌解析为其冻结快照。
 func (s *Server) GetSharedView(ctx context.Context, request view.GetSharedViewRequestObject) (view.GetSharedViewResponseObject, error) {
 	if s.diffService == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -85,7 +95,7 @@ func (s *Server) GetSharedView(ctx context.Context, request view.GetSharedViewRe
 	}), nil
 }
 
-// ListBreakingTodos pages breaking todos for a tenant.
+// ListBreakingTodos 分页返回租户的破坏性待办。
 func (s *Server) ListBreakingTodos(ctx context.Context, request collaboration.ListBreakingTodosRequestObject) (collaboration.ListBreakingTodosResponseObject, error) {
 	if s.diffService == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -94,14 +104,7 @@ func (s *Server) ListBreakingTodos(ctx context.Context, request collaboration.Li
 	if err != nil {
 		return nil, err
 	}
-	page := 1
-	if request.Params.Page != nil {
-		page = *request.Params.Page
-	}
-	pageSize := 20
-	if request.Params.PageSize != nil {
-		pageSize = *request.Params.PageSize
-	}
+	page, pageSize := pagination(request.Params.Page, request.Params.PageSize)
 	status := ""
 	if request.Params.Status != nil {
 		status = string(*request.Params.Status)
@@ -119,7 +122,7 @@ func (s *Server) ListBreakingTodos(ctx context.Context, request collaboration.Li
 	}), nil
 }
 
-// AcknowledgeBreakingTodo acknowledges one open todo.
+// AcknowledgeBreakingTodo 确认一条未关闭的待办。
 func (s *Server) AcknowledgeBreakingTodo(ctx context.Context, request collaboration.AcknowledgeBreakingTodoRequestObject) (collaboration.AcknowledgeBreakingTodoResponseObject, error) {
 	if s.diffService == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -140,6 +143,7 @@ func (s *Server) AcknowledgeBreakingTodo(ctx context.Context, request collaborat
 	return collaboration.AcknowledgeBreakingTodo200JSONResponse(breakingTodoResponse(record)), nil
 }
 
+// breakingTodoResponse 将破坏性待办记录投影为 API 形状。
 func breakingTodoResponse(record service.TodoRecord) api.BreakingTodo {
 	ackedBy := nullable.NewNullNullable[api.Uuid]()
 	if record.AckedBy != nil {
@@ -160,6 +164,7 @@ func breakingTodoResponse(record service.TodoRecord) api.BreakingTodo {
 	}
 }
 
+// shareLinkCreatedResponse 将分享令牌创建结果投影为 API 形状。
 func shareLinkCreatedResponse(result service.ShareLinkCreatedResult) api.ShareLinkCreated {
 	resourceID := nullable.NewNullNullable[api.Uuid]()
 	if result.ResourceID != nil {
@@ -173,6 +178,7 @@ func shareLinkCreatedResponse(result service.ShareLinkCreatedResult) api.ShareLi
 	}
 }
 
+// diffSnapshotResponse 将分享视图快照投影为 API 形状。
 func diffSnapshotResponse(result service.SharedViewResult) api.DiffSnapshot {
 	return api.DiffSnapshot{
 		Id:        api.Uuid(result.SnapshotID),
@@ -182,6 +188,7 @@ func diffSnapshotResponse(result service.SharedViewResult) api.DiffSnapshot {
 	}
 }
 
+// diffResultResponse 将差异结果投影为 API 形状。
 func diffResultResponse(outcome service.DiffOutcome) api.DiffResult {
 	changes := make([]api.DiffChange, 0, len(outcome.Changes))
 	for _, change := range outcome.Changes {
@@ -200,6 +207,7 @@ func diffResultResponse(outcome service.DiffOutcome) api.DiffResult {
 	}
 }
 
+// resolvedRefResponse 将已解析文档引用投影为 API 形状。
 func resolvedRefResponse(ref service.ResolvedDocRef) api.ResolvedDocumentRef {
 	assetID := nullable.NewNullNullable[api.Uuid]()
 	if ref.AssetID != nil {
@@ -227,6 +235,7 @@ func resolvedRefResponse(ref service.ResolvedDocRef) api.ResolvedDocumentRef {
 	}
 }
 
+// diffCountsResponse 将差异计数投影为 API 形状。
 func diffCountsResponse(summary service.DiffCountsSummary) api.DiffCounts {
 	return api.DiffCounts{
 		Added: summary.Added, Removed: summary.Removed, Modified: summary.Modified, Breaking: summary.Breaking,
@@ -234,7 +243,7 @@ func diffCountsResponse(summary service.DiffCountsSummary) api.DiffCounts {
 	}
 }
 
-// diffSelector converts a generated DocumentSelector union into the service shape.
+// diffSelector 将生成的 DocumentSelector 联合体转换为服务层形状。
 func diffSelector(selector api.DocumentSelector) (service.DiffSelector, error) {
 	value, err := selector.ValueByDiscriminator()
 	if err != nil {
@@ -243,15 +252,15 @@ func diffSelector(selector api.DocumentSelector) (service.DiffSelector, error) {
 	switch typed := value.(type) {
 	case api.VersionSelector:
 		versionID := serviceUUID(typed.VersionId)
-		return service.DiffSelector{Type: "version", VersionID: &versionID}, nil
+		return service.DiffSelector{Type: diffSelectorTypeVersion, VersionID: &versionID}, nil
 	case api.RefSelector:
 		assetID := serviceUUID(typed.AssetId)
 		refType := string(typed.RefType)
 		refName := string(typed.Ref)
-		return service.DiffSelector{Type: "ref", AssetID: &assetID, RefType: &refType, RefName: &refName}, nil
+		return service.DiffSelector{Type: diffSelectorTypeRef, AssetID: &assetID, RefType: &refType, RefName: &refName}, nil
 	case api.UploadSelector:
 		uploadID := serviceUUID(typed.UploadId)
-		return service.DiffSelector{Type: "upload", UploadID: &uploadID}, nil
+		return service.DiffSelector{Type: diffSelectorTypeUpload, UploadID: &uploadID}, nil
 	default:
 		return service.DiffSelector{}, service.ErrValidation
 	}

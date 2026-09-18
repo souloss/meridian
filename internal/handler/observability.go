@@ -30,59 +30,55 @@ import (
 	system "github.com/meridian-labs/meridian/internal/generated/api/system"
 )
 
-// Observability constants. Names and shapes are aligned with GoFr so dashboards
-// and alerts written against GoFr's conventions keep working unchanged.
+// 可观测性常量。名称与形状对齐 GoFr，使针对 GoFr 约定编写的仪表盘与告警无需改动即可继续工作。
 const (
-	// correlationIDHeader is the response header carrying the W3C trace ID of
-	// the request, aligned with GoFr's X-Correlation-Id (canonical spelling).
+	// correlationIDHeader 是承载请求 W3C trace ID 的响应头，对齐 GoFr 的 X-Correlation-Id（规范拼写）。
 	correlationIDHeader = "X-Correlation-Id"
 
-	// xffHeader is the proxy header consulted to resolve the immediate client
-	// IP, following GoFr's getIPAddress (GCLB-style first-hop extraction).
+	// xffHeader 是用于解析直接客户端 IP 的代理头，遵循 GoFr 的 getIPAddress（GCLB 风格首跳提取）。
 	xffHeader = "X-Forwarded-For"
 
-	// tracerName is the OpenTelemetry instrumentation scope name for Meridian.
+	// tracerName 是 Meridian 的 OpenTelemetry 插桩作用域名称。
 	tracerName = "meridian"
 
-	// zeroTraceID and zeroSpanID are the W3C invalid-ID spellings emitted when
-	// no span context is in scope, so the trace_id / span_id fields keep a
-	// stable placeholder instead of an empty string (aligned with GoFr).
+	// zeroTraceID 与 zeroSpanID 是 W3C 无效 ID 的拼写，在无 span 上下文时发出，
+	// 使 trace_id / span_id 字段保持稳定占位而非空串（对齐 GoFr）。
 	zeroTraceID = "00000000000000000000000000000000"
 	zeroSpanID  = "0000000000000000"
 
-	// httpResponseMetricName mirrors GoFr's app_http_response latency histogram.
+	// httpResponseMetricName 镜像 GoFr 的 app_http_response 延迟直方图。
 	httpResponseMetricName = "app_http_response"
 
-	// Prometheus label keys of the latency histogram.
+	// 延迟直方图的 Prometheus 标签键。
 	metricLabelPath   = "path"
 	metricLabelMethod = "method"
 	metricLabelStatus = "status"
 
-	// OpenTelemetry HTTP semantic-convention attribute keys (stable, ≥ v1.21).
-	// Kept inline rather than importing semconv to avoid an extra dependency.
+	// OpenTelemetry HTTP 语义约定属性键（稳定版，≥ v1.21）。
+	// 保持内联而非引入 semconv，避免额外依赖。
 	spanAttributeMethod     = "http.request.method"
 	spanAttributeRoute      = "http.route"
 	spanAttributeStatusCode = "http.response.status_code"
 
-	// Trace exporter environment variables, aligned with GoFr's TRACE_EXPORTER
-	// and TRACER_URL so an OTLP collector endpoint drops in without a shim.
+	// 追踪导出器环境变量，对齐 GoFr 的 TRACE_EXPORTER 与 TRACER_URL，
+	// 使 OTLP 采集器端点无需适配层即可接入。
 	envTraceExporter = "TRACE_EXPORTER"
 	envTracerURL     = "TRACER_URL"
 
-	// otlpExporter selects the OTLP/gRPC trace exporter.
+	// otlpExporter 选择 OTLP/gRPC 追踪导出器。
 	otlpExporter = "otlp"
 
-	// defaultOTLPEndpoint is the OTLP/gRPC endpoint used when TRACER_URL is
-	// unset, following the standard collector gRPC port.
+	// defaultOTLPEndpoint 是 TRACER_URL 未设置时使用的 OTLP/gRPC 端点，
+	// 遵循标准采集器 gRPC 端口。
 	defaultOTLPEndpoint = "localhost:4317"
 )
 
-// httpLatencyBuckets are the Prometheus histogram boundaries in seconds,
-// spanning 1ms through 10s — the typical range for a control-plane request.
+// httpLatencyBuckets 是 Prometheus 直方图以秒为单位的边界，
+// 覆盖 1ms 到 10s —— 控制平面请求的典型范围。
 var httpLatencyBuckets = []float64{0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10}
 
-// httpResponseHistogram records HTTP latency (seconds) by route template,
-// method and status code, aligned with GoFr's app_http_response metric.
+// httpResponseHistogram 按路由模板、方法与状态码记录 HTTP 延迟（秒），
+// 对齐 GoFr 的 app_http_response 指标。
 var httpResponseHistogram = promauto.NewHistogramVec(
 	prometheus.HistogramOpts{
 		Name:    httpResponseMetricName,
@@ -92,11 +88,11 @@ var httpResponseHistogram = promauto.NewHistogramVec(
 	[]string{metricLabelPath, metricLabelMethod, metricLabelStatus},
 )
 
+// errHijackNotSupported 表示底层 ResponseWriter 不支持连接劫持。
 var errHijackNotSupported = errors.New("response writer does not support hijacking")
 
-// StatusResponseWriter captures the HTTP status and body size so middlewares
-// can read them after the handler returns. It mirrors GoFr's wrapper and adds
-// Flush/Hijack forwarding so streaming (SSE) and upgrades keep working.
+// StatusResponseWriter 捕获 HTTP 状态码与响应体大小，使中间件可在处理器返回后读取。
+// 它镜像 GoFr 的包装器，并追加 Flush/Hijack 转发，使流式（SSE）与协议升级继续可用。
 type StatusResponseWriter struct {
 	http.ResponseWriter
 	status      int
@@ -104,6 +100,7 @@ type StatusResponseWriter struct {
 	wroteHeader bool
 }
 
+// WriteHeader 记录首个写入的状态码并透传给底层写入器。
 func (w *StatusResponseWriter) WriteHeader(status int) {
 	if w.wroteHeader {
 		return
@@ -113,6 +110,7 @@ func (w *StatusResponseWriter) WriteHeader(status int) {
 	w.ResponseWriter.WriteHeader(status)
 }
 
+// Write 记录写入字节数，并在处理器未显式调用 WriteHeader 时隐式记录 200。
 func (w *StatusResponseWriter) Write(b []byte) (int, error) {
 	if !w.wroteHeader {
 		w.status = http.StatusOK
@@ -123,9 +121,8 @@ func (w *StatusResponseWriter) Write(b []byte) (int, error) {
 	return n, err
 }
 
-// Status returns the status as it appears on the wire: net/http emits an
-// implicit 200 when a handler writes a body without calling WriteHeader, so a
-// zero internal value is normalized to 200 rather than reported as 0.
+// Status 返回实际出现在线路上的状态码：net/http 在处理器写正文但未调用
+// WriteHeader 时会隐式发出 200，因此零内部值被归一化为 200 而非上报为 0。
 func (w *StatusResponseWriter) Status() int {
 	if w.status == 0 {
 		return http.StatusOK
@@ -133,19 +130,20 @@ func (w *StatusResponseWriter) Status() int {
 	return w.status
 }
 
+// BytesWritten 返回已写入的响应体字节数。
 func (w *StatusResponseWriter) BytesWritten() int { return w.bytes }
 
+// Unwrap 暴露底层 ResponseWriter。
 func (w *StatusResponseWriter) Unwrap() http.ResponseWriter { return w.ResponseWriter }
 
-// Flush forwards to the underlying writer so streaming responses (SSE) that
-// assert http.Flusher keep working through this wrapper.
+// Flush 转发到底层写入器，使断言 http.Flusher 的流式响应（SSE）能穿透本包装器继续工作。
 func (w *StatusResponseWriter) Flush() {
 	if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
 		flusher.Flush()
 	}
 }
 
-// Hijack forwards to the underlying writer so WebSocket upgrades keep working.
+// Hijack 转发到底层写入器，使 WebSocket 升级继续工作。
 func (w *StatusResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	if hijacker, ok := w.ResponseWriter.(http.Hijacker); ok {
 		return hijacker.Hijack()
@@ -153,13 +151,11 @@ func (w *StatusResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	return nil, nil, errHijackNotSupported
 }
 
-// ConfigureTracer installs Meridian's default OpenTelemetry setup, aligned
-// with GoFr: W3C TraceContext+Baggage propagation, and an OTLP/gRPC trace
-// exporter when TRACE_EXPORTER=otlp with TRACER_URL set (default
-// localhost:4317). Spans then carry a valid, unique trace/span ID for
-// correlation AND are exported to the collector. With no exporter configured,
-// the provider is sampled with NeverSample so IDs stay present but no spans are
-// exported and no sampling cost is paid. Call once at startup, before serving.
+// ConfigureTracer 安装 Meridian 的默认 OpenTelemetry 配置，对齐 GoFr：
+// W3C TraceContext+Baggage 传播；当 TRACE_EXPORTER=otlp 且 TRACER_URL 设置
+// （默认 localhost:4317）时启用 OTLP/gRPC 追踪导出器。此后 span 既携带有效且唯一的
+// trace/span ID 用于关联，也被导出到采集器。未配置导出器时，provider 以 NeverSample
+// 采样，使 ID 仍在但无 span 导出且不付采样成本。启动时调用一次，须在开始服务之前。
 func ConfigureTracer() error {
 	if len(otel.GetTextMapPropagator().Fields()) == 0 {
 		otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
@@ -191,7 +187,7 @@ func ConfigureTracer() error {
 	}
 
 	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithResource(resource.NewSchemaless(attribute.String("service.name", "meridian"))),
+		sdktrace.WithResource(resource.NewSchemaless(attribute.String("service.name", tracerName))),
 		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.TraceIDRatioBased(1.0))),
 		sdktrace.WithBatcher(exporter),
 	)
@@ -199,10 +195,9 @@ func ConfigureTracer() error {
 	return nil
 }
 
-// requestRoute returns the matched chi route template (e.g.
-// "/api/v1/t/{tenantSlug}/repositories") so logs, metrics and span names stay
-// bounded by route count instead of one entry per concrete path. Falls back to
-// the raw path for unmatched requests (404 / static assets).
+// requestRoute 返回匹配到的 chi 路由模板（例如
+// "/api/v1/t/{tenantSlug}/repositories"），使日志、指标与 span 名受路由数量约束
+// 而非每条具体路径一项。对未匹配请求（404 / 静态资源）回退到原始路径。
 func requestRoute(r *http.Request) string {
 	if rctx := chi.RouteContext(r.Context()); rctx != nil {
 		if pattern := rctx.RoutePattern(); pattern != "" && pattern != "/*" {
@@ -212,8 +207,8 @@ func requestRoute(r *http.Request) string {
 	return r.URL.Path
 }
 
-// spanIDs resolves the trace and span IDs of the in-scope span, substituting
-// the all-zero placeholders when no span is present (noop or unset provider).
+// spanIDs 解析当前作用域 span 的 trace 与 span ID；当无 span 存在
+// （noop 或未设置的 provider）时替换为全零占位。
 func spanIDs(ctx context.Context) (traceID, spanID string) {
 	sc := trace.SpanFromContext(ctx).SpanContext()
 	if !sc.IsValid() {
@@ -222,19 +217,17 @@ func spanIDs(ctx context.Context) (traceID, spanID string) {
 	return sc.TraceID().String(), sc.SpanID().String()
 }
 
-// traceRequests starts a span per request and stamps the response with the
-// trace ID, aligned with GoFr's Tracer middleware. It is the outermost of the
-// observability middlewares: it always wraps the ResponseWriter so downstream
-// logging/metrics middlewares can reuse the same StatusResponseWriter.
+// traceRequests 为每个请求开启一个 span 并以 trace ID 加盖响应头，对齐 GoFr 的
+// Tracer 中间件。它是可观测性中间件的最外层：始终包装 ResponseWriter，
+// 使下游日志/指标中间件可复用同一个 StatusResponseWriter。
 func traceRequests(next http.Handler) http.Handler {
 	tracer := otel.Tracer(tracerName)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
 
 		method := r.Method
-		// Route matching happens after middleware in chi, so the template is
-		// resolved after the handler returns and the span name/attributes are
-		// finalized in the defer below.
+		// chi 中路由匹配发生在中间件之后，因此模板在处理器返回后解析，
+		// span 名与属性在下方的 defer 中最终确定。
 		ctx, span := tracer.Start(ctx, method+" "+r.URL.Path)
 		defer span.End()
 
@@ -255,11 +248,9 @@ func traceRequests(next http.Handler) http.Handler {
 	})
 }
 
-// logRequests emits one structured log line per request with the method, route
-// template, status, latency, body sizes, trace/span/request IDs and client
-// identity — the fields GoFr's Logging middleware records, extended with the
-// request body size. 5xx responses are logged at Error level, everything else
-// at Info.
+// logRequests 为每个请求输出一行结构化日志，包含方法、路由模板、状态码、延迟、
+// 请求/响应体大小、trace/span/请求 ID 与客户端身份 —— GoFr Logging 中间件记录的字段，
+// 并追加请求体大小。5xx 响应以 Error 级别记录，其余以 Info 记录。
 func logRequests(logger *slog.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -293,8 +284,8 @@ func logRequests(logger *slog.Logger) func(http.Handler) http.Handler {
 	}
 }
 
-// measureRequests records request latency into the Prometheus histogram,
-// reusing the StatusResponseWriter installed by an outer middleware.
+// measureRequests 将请求延迟记录到 Prometheus 直方图，
+// 复用外层中间件安装的 StatusResponseWriter。
 func measureRequests(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		srw, ok := w.(*StatusResponseWriter)
@@ -311,8 +302,8 @@ func measureRequests(next http.Handler) http.Handler {
 	})
 }
 
-// clientIP resolves the immediate client IP from X-Forwarded-For, falling back
-// to the connection's remote address, matching GoFr's getIPAddress.
+// clientIP 从 X-Forwarded-For 解析直接客户端 IP，回退到连接远端地址，
+// 匹配 GoFr 的 getIPAddress。
 func clientIP(r *http.Request) string {
 	forwarded := r.Header.Get(xffHeader)
 	if i := strings.IndexByte(forwarded, ','); i >= 0 {
@@ -324,8 +315,8 @@ func clientIP(r *http.Request) string {
 	return strings.TrimSpace(forwarded)
 }
 
-// Metrics renders the default Prometheus registry in text exposition format,
-// serving the contract's GET /metrics endpoint.
+// Metrics 以文本展示格式渲染默认 Prometheus 注册表，
+// 服务契约的 GET /metrics 端点。
 func (s *Server) Metrics(context.Context, system.MetricsRequestObject) (system.MetricsResponseObject, error) {
 	body, err := renderMetrics()
 	if err != nil {
@@ -334,7 +325,7 @@ func (s *Server) Metrics(context.Context, system.MetricsRequestObject) (system.M
 	return system.Metrics200TextResponse(body), nil
 }
 
-// renderMetrics gathers the default registry and encodes it as Prometheus text.
+// renderMetrics 收集默认注册表并将其编码为 Prometheus 文本。
 func renderMetrics() ([]byte, error) {
 	families, err := prometheus.DefaultGatherer.Gather()
 	if err != nil {

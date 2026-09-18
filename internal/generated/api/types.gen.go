@@ -6715,13 +6715,13 @@ func (t *CredentialCreateRequest) MergeCredentialCreateRequest1(v CredentialCrea
 	return err
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t CredentialCreateRequest) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *CredentialCreateRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6779,13 +6779,13 @@ func (t *CredentialRotateRequest_Secret) MergeHttpSecretInput(v HttpSecretInput)
 	return err
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t CredentialRotateRequest_Secret) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *CredentialRotateRequest_Secret) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6893,7 +6893,7 @@ func (t *DocumentSelector) MergeUploadSelector(v UploadSelector) error {
 	return err
 }
 
-// Discriminator implements generated transport behavior for the Meridian OpenAPI contract.
+// Discriminator 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t DocumentSelector) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"type"`
@@ -6902,7 +6902,7 @@ func (t DocumentSelector) Discriminator() (string, error) {
 	return discriminator.Discriminator, err
 }
 
-// ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
+// ValueByDiscriminator 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t DocumentSelector) ValueByDiscriminator() (any, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
@@ -6920,13 +6920,13 @@ func (t DocumentSelector) ValueByDiscriminator() (any, error) {
 	}
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t DocumentSelector) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *DocumentSelector) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -6984,13 +6984,13 @@ func (t *GlobalCredentialCreateRequest) MergeGlobalCredentialCreateRequest1(v Gl
 	return err
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t GlobalCredentialCreateRequest) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *GlobalCredentialCreateRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -7064,7 +7064,7 @@ func (t *JobSseEvent) MergeJobStateEvent(v JobStateEvent) error {
 	return err
 }
 
-// Discriminator implements generated transport behavior for the Meridian OpenAPI contract.
+// Discriminator 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t JobSseEvent) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"event"`
@@ -7073,7 +7073,7 @@ func (t JobSseEvent) Discriminator() (string, error) {
 	return discriminator.Discriminator, err
 }
 
-// ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
+// ValueByDiscriminator 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t JobSseEvent) ValueByDiscriminator() (any, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
@@ -7089,13 +7089,13 @@ func (t JobSseEvent) ValueByDiscriminator() (any, error) {
 	}
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t JobSseEvent) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *JobSseEvent) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -7153,13 +7153,13 @@ func (t *SharedView_Resolution) MergeDiffSnapshot(v DiffSnapshot) error {
 	return err
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t SharedView_Resolution) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *SharedView_Resolution) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -7217,13 +7217,13 @@ func (t *Subscription_ScopeId) MergeKindId(v KindId) error {
 	return err
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t Subscription_ScopeId) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *Subscription_ScopeId) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -7281,13 +7281,13 @@ func (t *SubscriptionPutRequest_ScopeId) MergeKindId(v KindId) error {
 	return err
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t SubscriptionPutRequest_ScopeId) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *SubscriptionPutRequest_ScopeId) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -7345,13 +7345,13 @@ func (t *ViewInputSpec_Kinds) MergeViewInputSpecKinds1(v ViewInputSpecKinds1) er
 	return err
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t ViewInputSpec_Kinds) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *ViewInputSpec_Kinds) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
@@ -7493,7 +7493,7 @@ func (t *ViewResolution) MergeDashboardViewResolution(v DashboardViewResolution)
 	return err
 }
 
-// Discriminator implements generated transport behavior for the Meridian OpenAPI contract.
+// Discriminator 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t ViewResolution) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"kind"`
@@ -7502,7 +7502,7 @@ func (t ViewResolution) Discriminator() (string, error) {
 	return discriminator.Discriminator, err
 }
 
-// ValueByDiscriminator implements generated transport behavior for the Meridian OpenAPI contract.
+// ValueByDiscriminator 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t ViewResolution) ValueByDiscriminator() (any, error) {
 	discriminator, err := t.Discriminator()
 	if err != nil {
@@ -7522,13 +7522,13 @@ func (t ViewResolution) ValueByDiscriminator() (any, error) {
 	}
 }
 
-// MarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// MarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t ViewResolution) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-// UnmarshalJSON implements generated transport behavior for the Meridian OpenAPI contract.
+// UnmarshalJSON 实现 Meridian OpenAPI 契约的生成传输行为。
 func (t *ViewResolution) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err

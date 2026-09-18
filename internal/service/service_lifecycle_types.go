@@ -6,20 +6,26 @@ import (
 	"uuid"
 )
 
-// PublicServiceRecord is the anonymous public projection of one service.
+// PublicServiceRecord 是一个服务的匿名公开投影。
 type PublicServiceRecord struct {
-	Slug        string
+	// Slug 是服务 slug。
+	Slug string
+	// DisplayName 是展示名。
 	DisplayName string
+	// Description 是描述（可为空）。
 	Description *string
-	Lifecycle   string
-	Tags        []string
-	Assets      []AssetSummaryRecord
-	UpdatedAt   time.Time
+	// Lifecycle 是生命周期状态。
+	Lifecycle string
+	// Tags 是标签列表。
+	Tags []string
+	// Assets 是资产摘要列表。
+	Assets []AssetSummaryRecord
+	// UpdatedAt 是最近更新时间。
+	UpdatedAt time.Time
 }
 
-// ServiceLifecycleStore is the persistence boundary for service lifecycle,
-// public read, and soft delete. Every method retains the tenant predicate,
-// except public reads that resolve by tenant and service slug.
+// ServiceLifecycleStore 是服务生命周期、公开读取与软删除的持久化边界。
+// 每个方法都保留租户谓词，除按租户与服务 slug 解析的公开读取外。
 type ServiceLifecycleStore interface {
 	GetServiceBySlug(context.Context, uuid.UUID, string) (ServiceRecord, error)
 	GetServiceForUpdate(context.Context, uuid.UUID, uuid.UUID) (ServiceRecord, error)
@@ -36,20 +42,30 @@ type ServiceLifecycleStore interface {
 	CancelServiceJob(context.Context, uuid.UUID, uuid.UUID) error
 }
 
-// PendingServiceJob is one cancellable job scoped to a service being deleted.
+// PendingServiceJob 是一个可取消的、以被删除服务为作用域的任务。
 type PendingServiceJob struct {
-	ID         uuid.UUID
+	// ID 是任务标识。
+	ID uuid.UUID
+	// RiverJobID 是 River 任务标识（可为空）。
 	RiverJobID *int64
 }
 
-// ServicePatch carries explicit PATCH fields for one service update.
+// ServicePatch 承载一次服务更新的显式 PATCH 字段。
 type ServicePatch struct {
-	TenantID        uuid.UUID
-	ID              uuid.UUID
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// ID 是服务的标识。
+	ID uuid.UUID
+	// ExpectedRevision 是乐观并发所需版本号。
 	ExpectedRevision int64
-	DisplayName     *string
-	Description     *string
-	SetDescription  bool
-	Visibility      *string
-	Lifecycle       *string
+	// DisplayName 是新的展示名（可为空）。
+	DisplayName *string
+	// Description 是新的描述（可为空）。
+	Description *string
+	// SetDescription 表示是否显式设置描述。
+	SetDescription bool
+	// Visibility 是新的可见性（可为空）。
+	Visibility *string
+	// Lifecycle 是新的生命周期状态（可为空）。
+	Lifecycle *string
 }

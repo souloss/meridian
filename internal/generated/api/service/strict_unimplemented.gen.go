@@ -8,51 +8,51 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// GetPublicService returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetPublicService 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetPublicService(ctx context.Context, request GetPublicServiceRequestObject) (GetPublicServiceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// CreateServiceInRepository returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// CreateServiceInRepository 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) CreateServiceInRepository(ctx context.Context, request CreateServiceInRepositoryRequestObject) (CreateServiceInRepositoryResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListServices returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListServices 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListServices(ctx context.Context, request ListServicesRequestObject) (ListServicesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// DeleteService returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// DeleteService 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) DeleteService(ctx context.Context, request DeleteServiceRequestObject) (DeleteServiceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetService returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetService 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetService(ctx context.Context, request GetServiceRequestObject) (GetServiceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateService returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateService 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateService(ctx context.Context, request UpdateServiceRequestObject) (UpdateServiceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// StarService returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// StarService 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) StarService(ctx context.Context, request StarServiceRequestObject) (StarServiceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UnstarService returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UnstarService 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UnstarService(ctx context.Context, request UnstarServiceRequestObject) (UnstarServiceResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// ListRecentServices returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// ListRecentServices 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) ListRecentServices(ctx context.Context, request ListRecentServicesRequestObject) (ListRecentServicesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

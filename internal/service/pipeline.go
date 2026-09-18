@@ -30,14 +30,13 @@ const (
 	initialVersionLabel      = "1.0.0"
 )
 
-// BlobStore persists immutable content-addressed bytes for layer revisions.
+// BlobStore 持久化层修订的不可变内容寻址字节。
 type BlobStore interface {
 	Put(context.Context, io.Reader) (storage.Blob, error)
 	Open(string) (*os.File, storage.Blob, error)
 }
 
-// PipelineRunner materializes repository sources into assets, layers,
-// revisions, versions, items, and source bindings. It implements task.SyncRunner.
+// PipelineRunner 将仓库源物化为资产、层、修订、版本、条目与源绑定。它实现 task.SyncRunner。
 type PipelineRunner struct {
 	store     AssetStore
 	blobs     BlobStore
@@ -46,12 +45,12 @@ type PipelineRunner struct {
 	now       func() time.Time
 }
 
-// NewPipelineRunner constructs the M1 repository synchronization pipeline.
+// NewPipelineRunner 构造 M1 仓库同步管线。
 func NewPipelineRunner(store AssetStore, blobs BlobStore, workspace string) *PipelineRunner {
 	return &PipelineRunner{store: store, blobs: blobs, workspace: workspace, gitBinary: "git", now: time.Now}
 }
 
-// Run performs one repository synchronization across the six pipeline stages.
+// Run 跨六个管线阶段执行一次仓库同步。
 func (runner *PipelineRunner) Run(ctx context.Context, args task.CredentialSyncArgs) (task.SyncResult, error) {
 	if runner.store == nil {
 		return task.SyncResult{}, errors.New("pipeline runner has no asset store")
@@ -66,7 +65,7 @@ func (runner *PipelineRunner) Run(ctx context.Context, args task.CredentialSyncA
 	if err != nil {
 		return task.SyncResult{}, err
 	}
-	refType := "branch"
+	refType := refTypeBranch
 	scopeKey := refType + ":" + args.RefName
 
 	services, err := runner.store.ListServicesByRepository(ctx, args.TenantID, args.RepositoryID)
@@ -122,7 +121,7 @@ func (runner *PipelineRunner) checkout(ctx context.Context, args task.Credential
 	return checkout, strings.TrimSpace(string(output)), cleanup, nil
 }
 
-// materializeService synchronizes all builtin source specs of one service.
+// materializeService 同步某服务的全部 builtin 源配置。
 func (runner *PipelineRunner) materializeService(ctx context.Context, tenantID uuid.UUID, service ServiceRecord, defaultBranch, refType, refName, scopeKey, commit, checkout string) error {
 	specs, err := runner.store.ListSourceSpecsForService(ctx, tenantID, service.ID)
 	if err != nil {
@@ -139,8 +138,8 @@ func (runner *PipelineRunner) materializeService(ctx context.Context, tenantID u
 	return nil
 }
 
-// materializeSource globs one builtin source spec path and materializes one
-// asset per matched file, then commits the resolved scope atomically.
+// materializeSource 对某 builtin 源配置路径做 glob，并为每个匹配文件物化一个资产，
+// 然后原子提交解析出的作用域。
 func (runner *PipelineRunner) materializeSource(ctx context.Context, tenantID uuid.UUID, service ServiceRecord, spec SourceSpecRecord, defaultBranch, refType, refName, scopeKey, commit, checkout string) error {
 	pattern := ""
 	if spec.Path != nil {
@@ -153,8 +152,7 @@ func (runner *PipelineRunner) materializeSource(ctx context.Context, tenantID uu
 	sort.Strings(matches)
 
 	if len(matches) == 0 {
-		// No files matched the path: record the source error on the spec and
-		// mark the dependent asset tracks stale.
+		// 路径无匹配文件：在源配置上记录源错误，并将依赖的资产轨道标记为 stale。
 		return runner.recordSourceError(ctx, tenantID, spec, "asset_path_not_found", scopeKey, commit)
 	}
 
@@ -183,9 +181,9 @@ func (runner *PipelineRunner) materializeSource(ctx context.Context, tenantID uu
 			return err
 		}
 		binding, err := runner.store.UpsertSourceBinding(ctx, NewSourceBinding{
-			TenantID: tenantID, ID: uuid.NewV7(), SourceSpecID: spec.ID, ScopeType: "ref", ScopeKey: scopeKey,
+			TenantID: tenantID, ID: uuid.NewV7(), SourceSpecID: spec.ID, ScopeType: overlayScopeRef, ScopeKey: scopeKey,
 			ExpansionKey: relative, ResolvedPath: new(relative), AssetID: asset.ID, LayerID: layer.ID,
-			State: "active", LastSeenCommit: new(commit),
+			State: sourceBindingStateActive, LastSeenCommit: new(commit),
 		})
 		if err != nil {
 			return err
@@ -193,11 +191,10 @@ func (runner *PipelineRunner) materializeSource(ctx context.Context, tenantID uu
 		seen = append(seen, binding.ID)
 		_ = head
 	}
-	if err := runner.store.MarkBindingsStaleInScope(ctx, tenantID, spec.ID, "ref", scopeKey, seen); err != nil {
+	if err := runner.store.MarkBindingsStaleInScope(ctx, tenantID, spec.ID, overlayScopeRef, scopeKey, seen); err != nil {
 		return err
 	}
-	// The source materialized successfully: clear any prior failure and restore
-	// the dependent asset tracks to ok.
+	// 源物化成功：清除任何先前失败并将依赖资产轨道恢复为 ok。
 	if err := runner.store.ClearSourceLastError(ctx, tenantID, spec.ID); err != nil {
 		return err
 	}
@@ -289,9 +286,8 @@ func (runner *PipelineRunner) storeRevision(ctx context.Context, tenantID uuid.U
 	}
 	hash := sha256.Sum256(content)
 	contentHash := hex.EncodeToString(hash[:])
-	// A repeat sync with identical content must not mint a new revision: reuse
-	// the latest revision in this scope when its content hash is unchanged.
-	if existing, getErr := runner.store.GetLatestLayerRevision(ctx, tenantID, layer.ID, "ref", scopeKey); getErr == nil && existing.ContentHash == contentHash {
+	// 相同内容的重复同步不得铸造新修订：当该作用域最新修订内容哈希未变时复用之。
+	if existing, getErr := runner.store.GetLatestLayerRevision(ctx, tenantID, layer.ID, overlayScopeRef, scopeKey); getErr == nil && existing.ContentHash == contentHash {
 		return existing, contentHash, nil
 	}
 	blob, err := runner.blobs.Put(ctx, strings.NewReader(string(content)))
@@ -299,9 +295,9 @@ func (runner *PipelineRunner) storeRevision(ctx context.Context, tenantID uuid.U
 		return LayerRevisionRecord{}, "", fmt.Errorf("store layer content blob: %w", err)
 	}
 	revision, err := runner.store.CreateLayerRevision(ctx, NewLayerRevision{
-		TenantID: tenantID, ID: uuid.NewV7(), LayerID: layer.ID, ScopeType: "ref", ScopeKey: scopeKey,
-		ContentHash: contentHash, ContentRef: blob.Digest, ContentType: "application/yaml",
-		Dialect: nil, SourceBranch: new(strings.TrimPrefix(scopeKey, "branch:")), ReviewStatus: openapiReviewNotRequired,
+		TenantID: tenantID, ID: uuid.NewV7(), LayerID: layer.ID, ScopeType: overlayScopeRef, ScopeKey: scopeKey,
+		ContentHash: contentHash, ContentRef: blob.Digest, ContentType: contentTypeYAML,
+		Dialect: nil, SourceBranch: new(strings.TrimPrefix(scopeKey, overlayRefTypeBranch+mergeScopeRefSelectorPrefix)), ReviewStatus: openapiReviewNotRequired,
 		GitCommit: new(commit), CreatedBy: nil, ProducerRunID: nil,
 	})
 	if err != nil {
@@ -312,14 +308,14 @@ func (runner *PipelineRunner) storeRevision(ctx context.Context, tenantID uuid.U
 
 func (runner *PipelineRunner) upsertLayerHead(ctx context.Context, tenantID uuid.UUID, layer LayerRecord, scopeKey string, revisionID uuid.UUID) (LayerHeadRecord, error) {
 	return runner.store.UpsertLayerHead(ctx, NewLayerHead{
-		TenantID: tenantID, LayerID: layer.ID, ScopeType: "ref", ScopeKey: scopeKey,
+		TenantID: tenantID, LayerID: layer.ID, ScopeType: overlayScopeRef, ScopeKey: scopeKey,
 		LatestRevisionID: new(revisionID), EffectiveRevisionID: new(revisionID), CandidateRevisionID: nil, Generation: 1,
 	})
 }
 
 func (runner *PipelineRunner) materializeVersion(ctx context.Context, tenantID uuid.UUID, asset AssetRecord, service ServiceRecord, spec SourceSpecRecord, layer LayerRecord, revision LayerRevisionRecord, contentHash, commit, defaultBranch, refType, refName, checkout, relative string) error {
 	track, err := runner.store.CreateAssetRefTrack(ctx, NewAssetRefTrack{
-		TenantID: tenantID, ID: uuid.NewV7(), AssetID: asset.ID, RefType: refType, RefName: refName, Health: "ok",
+		TenantID: tenantID, ID: uuid.NewV7(), AssetID: asset.ID, RefType: refType, RefName: refName, Health: assetHealthOK,
 	})
 	if err != nil {
 		return err
@@ -327,13 +323,13 @@ func (runner *PipelineRunner) materializeVersion(ctx context.Context, tenantID u
 
 	manifest := []LayerManifestEntry{{
 		LayerID: layer.ID, RevisionID: revision.ID, Role: layer.Role, Origin: layer.Origin, Ord: layer.Ord,
-		ScopeType: "ref", ScopeKey: "branch:" + refName, ReviewStatus: openapiReviewNotRequired, ContentHash: contentHash,
+		ScopeType: overlayScopeRef, ScopeKey: overlayRefTypeBranch + mergeScopeRefSelectorPrefix + refName, ReviewStatus: openapiReviewNotRequired, ContentHash: contentHash,
 	}}
 	fingerprint := runner.buildFingerprint(manifest)
 
 	latest, err := runner.store.GetLatestVersionInTrack(ctx, tenantID, track.ID)
 	if err == nil && latest.InputFingerprint == fingerprint {
-		// No new version: content is identical to the current latest.
+		// 无新版本：内容与当前最新版本相同。
 		return nil
 	}
 	_ = latest
@@ -356,7 +352,7 @@ func (runner *PipelineRunner) materializeVersion(ctx context.Context, tenantID u
 	sourceCommit := new(commit)
 	version, err := runner.store.CreateAssetVersion(ctx, NewAssetVersion{
 		TenantID: tenantID, ID: uuid.NewV7(), AssetID: asset.ID, TrackID: track.ID, SequenceNo: sequence,
-		Version: nextVersionLabel(latest, sequence), Lifecycle: "draft", Revision: 1,
+		Version: nextVersionLabel(latest, sequence), Lifecycle: lifecycleDraft, Revision: 1,
 		InputFingerprint: fingerprint, MergeEngineVersion: mergeEngineVersion,
 		KindPluginVersion: new(openapiPluginVersion), LayerManifest: manifestBytes,
 		MergedHash: new(contentHash), SourceCommit: sourceCommit, BaselineVersionID: baseline,
@@ -371,8 +367,7 @@ func (runner *PipelineRunner) materializeVersion(ctx context.Context, tenantID u
 	if err := runner.indexOpenAPIItems(ctx, tenantID, asset, service, version, checkout, relative); err != nil {
 		return err
 	}
-	// Items for the openapi kind are fully materialized; mark the version
-	// indexed so the operations view resolves to its item set.
+	// openapi 类别的条目已完全物化；将版本标记为已索引，使 operations 视图解析到其条目集。
 	return runner.store.MarkAssetVersionIndexed(ctx, tenantID, version.ID)
 }
 
@@ -389,12 +384,11 @@ func nextVersionLabel(latest AssetVersionRecord, sequence int64) string {
 	if latest.Version == "" {
 		return initialVersionLabel
 	}
-	// Increment the patch segment; breaking/major decisions are a later milestone.
+	// 递增 patch 段；破坏性/主版本决策属于后续里程碑。
 	return incrementVersionLabel(latest.Version)
 }
 
-// incrementVersionLabel bumps the patch segment of a semver label. This is the
-// M2 automatic-increment default for "all other input changes".
+// incrementVersionLabel 递增 semver 标签的补丁段。这是「其他一切输入变更」的 M2 自动递增默认。
 func incrementVersionLabel(version string) string {
 	major, minor, patch := "0", "0", "0"
 	parts := strings.SplitN(version, ".", 3)
@@ -415,9 +409,8 @@ func incrementVersionLabel(version string) string {
 }
 
 func (runner *PipelineRunner) recordSourceError(ctx context.Context, tenantID uuid.UUID, spec SourceSpecRecord, code, scopeKey, commit string) error {
-	// M1 records the failure as an error binding state for the scope so that
-	// listSourceBindings and source status reflect the asset_path_not_found.
-	if err := runner.store.MarkBindingsStaleInScope(ctx, tenantID, spec.ID, "ref", scopeKey, nil); err != nil {
+	// M1 将失败记录为该作用域的错误绑定状态，使 listSourceBindings 与源状态反映 asset_path_not_found。
+	if err := runner.store.MarkBindingsStaleInScope(ctx, tenantID, spec.ID, overlayScopeRef, scopeKey, nil); err != nil {
 		return err
 	}
 	if err := runner.store.SetSourceLastError(ctx, tenantID, spec.ID, code); err != nil {
@@ -429,7 +422,7 @@ func (runner *PipelineRunner) recordSourceError(ctx context.Context, tenantID uu
 	return &SourceMaterializationError{Code: code, Commit: commit}
 }
 
-// SourceMaterializationError is a secret-free pipeline stage failure.
+// SourceMaterializationError 是不含秘密的管线阶段失败。
 type SourceMaterializationError struct {
 	Code   string
 	Commit string
@@ -439,7 +432,7 @@ func (err *SourceMaterializationError) Error() string {
 	return "source materialization failed: " + err.Code
 }
 
-// openapiOperationItem is one operation extracted from a parsed OpenAPI document.
+// openapiOperationItem 是从解析后的 OpenAPI 文档提取的一个操作。
 type openapiOperationItem struct {
 	Method     string
 	Path       string
@@ -448,8 +441,8 @@ type openapiOperationItem struct {
 	Deprecated bool
 }
 
-// indexOpenAPIItems parses the normalized OpenAPI document and indexes each
-// operation as an asset item keyed by 'UPPER(method) normalizedPath'.
+// indexOpenAPIItems 解析规范化 OpenAPI 文档，并将每个操作以 'UPPER(method) normalizedPath' 为键
+// 索引为资产条目。
 func (runner *PipelineRunner) indexOpenAPIItems(ctx context.Context, tenantID uuid.UUID, asset AssetRecord, service ServiceRecord, version AssetVersionRecord, checkout, relative string) error {
 	content, err := os.ReadFile(filepath.Join(checkout, filepath.FromSlash(relative)))
 	if err != nil {
@@ -477,9 +470,8 @@ func (runner *PipelineRunner) indexOpenAPIItems(ctx context.Context, tenantID uu
 	return nil
 }
 
-// parseOpenAPIOperations parses an OpenAPI YAML document and returns its
-// operations deterministically ordered by path then method. This is the
-// extraction step shared with the perf gate.
+// parseOpenAPIOperations 解析 OpenAPI YAML 文档，并按路径后方法确定性排序返回其操作。
+// 这是与性能门禁共享的提取步骤。
 func parseOpenAPIOperations(content []byte) ([]openapiOperationItem, error) {
 	var document map[string]any
 	if err := yaml.Unmarshal(content, &document); err != nil {

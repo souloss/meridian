@@ -8,203 +8,205 @@ import (
 )
 
 var (
-	// ErrJobNotCancellable indicates that a job is already terminal and cannot accept cancellation.
+	// ErrJobNotCancellable 表示任务已进入终态，无法接受取消。
+	// 对外映射：ErrorCodeJobNotCancellable（HTTP 409）。
 	ErrJobNotCancellable = errors.New("job is not cancellable")
-	// ErrJobNotRetryable indicates that a job state or active generation forbids manual retry.
+	// ErrJobNotRetryable 表示任务状态或活跃代次禁止手动重试。
+	// 对外映射：ErrorCodeInvalidState（HTTP 409）。
 	ErrJobNotRetryable = errors.New("job is not retryable")
 )
 
-// JobFilter selects tenant jobs using the finite contract-defined fields.
+// JobFilter 使用契约定义的有限字段筛选租户任务。
 type JobFilter struct {
-	// Types restricts results to registered job behavior identifiers.
+	// Types 将结果限定为已注册的任务行为标识。
 	Types []string
-	// Statuses restricts results to durable lifecycle states.
+	// Statuses 将结果限定为持久化生命周期状态。
 	Statuses []string
-	// ScopeType restricts results to one resource category.
+	// ScopeType 将结果限定为一个资源类别。
 	ScopeType string
-	// ScopeID restricts results to one resource UUID string.
+	// ScopeID 将结果限定为一个资源 UUID 字符串。
 	ScopeID string
 }
 
-// JobError is a secret-free asynchronous failure projection.
+// JobError 是一个不含秘密的异步失败投影。
 type JobError struct {
-	// Code is a stable API error category.
+	// Code 是稳定的 API 错误类别。
 	Code string
-	// Message is safe for an authenticated tenant member.
+	// Message 对认证过的租户成员安全。
 	Message string
-	// RequestID correlates the failure with the durable job when no HTTP request created it.
+	// RequestID 在失败并非由 HTTP 请求创建时，将失败关联到持久化任务。
 	RequestID string
-	// Details contains optional non-secret structured diagnostics.
+	// Details 包含可选的非秘密结构化诊断信息。
 	Details map[string]any
 }
 
-// JobStageAttempt summarizes one stage during one River execution attempt.
+// JobStageAttempt 总结一次 River 执行尝试中的一个阶段。
 type JobStageAttempt struct {
-	// Stage identifies the pipeline stage.
+	// Stage 标识管线阶段。
 	Stage string
-	// Attempt is the one-based River execution attempt.
+	// Attempt 是基于 1 的 River 执行尝试次数。
 	Attempt int
-	// Status is the stage outcome derived from durable logs and current job state.
+	// Status 是由持久化日志与当前任务状态推导出的阶段结果。
 	Status string
-	// StartedAt is the first persisted event time for this stage.
+	// StartedAt 是该阶段首个持久化事件时间。
 	StartedAt *time.Time
-	// FinishedAt is the terminal or next-stage boundary when known.
+	// FinishedAt 是已知时的终态或下一阶段边界时间。
 	FinishedAt *time.Time
-	// Error contains a secret-free failure only when this stage failed.
+	// Error 仅在该阶段失败时包含不含秘密的失败信息。
 	Error *JobError
 }
 
-// JobRecord is the tenant-visible durable job projection.
+// JobRecord 是租户可见的持久化任务投影。
 type JobRecord struct {
-	// ID identifies the Meridian job.
+	// ID 标识 Meridian 任务。
 	ID uuid.UUID
-	// TenantSlug identifies the owning tenant in URLs and responses.
+	// TenantSlug 在 URL 与响应中标识所属租户。
 	TenantSlug string
-	// RetryOfJobID identifies the same-tenant source job for a manual retry.
+	// RetryOfJobID 标识手动重试的同一租户源任务。
 	RetryOfJobID *uuid.UUID
-	// Type identifies the registered job behavior.
+	// Type 标识已注册的任务行为。
 	Type string
-	// Trigger identifies the request origin.
+	// Trigger 标识请求来源。
 	Trigger string
-	// Status is the current durable lifecycle state.
+	// Status 是当前持久化生命周期状态。
 	Status string
-	// Stage is the active or final pipeline stage when present.
+	// Stage 是活跃或最终管线阶段（存在时）。
 	Stage *string
-	// ScopeType identifies the resource category used for authorization.
+	// ScopeType 标识用于授权的资源类别。
 	ScopeType string
-	// ScopeID identifies the scoped resource when present.
+	// ScopeID 标识作用域资源（存在时）。
 	ScopeID *string
-	// RefType identifies a branch or tag when the job is ref-scoped.
+	// RefType 在任务以引用为作用域时标识 branch 或 tag。
 	RefType *string
-	// Ref contains the normalized Git ref name when present.
+	// Ref 是规范化 Git 引用名（存在时）。
 	Ref *string
-	// Result contains operation-specific non-secret identifiers and counters.
+	// Result 包含操作特定的非秘密标识与计数。
 	Result map[string]any
-	// Progress is the deterministic percentage derived from status and stage.
+	// Progress 是由状态与阶段推导出的确定性百分比。
 	Progress int
-	// Dirty indicates that newer equivalent work arrived during execution.
+	// Dirty 表示执行期间有更新的等价工作到达。
 	Dirty bool
-	// Attempt is the number of River attempts already started.
+	// Attempt 是已启动的 River 尝试次数。
 	Attempt int
-	// MaxAttempts is the maximum automatic River attempts.
+	// MaxAttempts 是 River 自动尝试的最大次数。
 	MaxAttempts int
-	// NextAttemptAt is the next automatic retry time when present.
+	// NextAttemptAt 是下一次自动重试时间（存在时）。
 	NextAttemptAt *time.Time
-	// Attempts contains ordered persisted stage-attempt summaries.
+	// Attempts 包含有序持久化的阶段尝试摘要。
 	Attempts []JobStageAttempt
-	// Error contains the current secret-free asynchronous failure when present.
+	// Error 是当前不含秘密的异步失败信息（存在时）。
 	Error *JobError
-	// CreatedAt is when the job was accepted.
+	// CreatedAt 是任务被接受的时间。
 	CreatedAt time.Time
-	// StartedAt is when execution first began.
+	// StartedAt 是首次开始执行的时间。
 	StartedAt *time.Time
-	// FinishedAt is when the job reached a terminal state.
+	// FinishedAt 是任务到达终态的时间。
 	FinishedAt *time.Time
-	// UpdatedAt tracks material state changes for SSE snapshots.
+	// UpdatedAt 跟踪实质性状态变化，用于 SSE 快照。
 	UpdatedAt time.Time
-	// Capabilities lists currently authorized operations for this job.
+	// Capabilities 列出当前授权的操作。
 	Capabilities []string
 }
 
-// JobLogRecord is one persisted, replayable and secret-free stage event.
+// JobLogRecord 是一个持久化、可重放且不含秘密的阶段事件。
 type JobLogRecord struct {
-	// Sequence is the strictly increasing per-job replay cursor.
+	// Sequence 是严格递增的按任务重放游标。
 	Sequence int64
-	// Stage is the pipeline stage active for the event when present.
+	// Stage 是事件发生时活跃的管线阶段（存在时）。
 	Stage *string
-	// Message is the persisted redacted diagnostic.
+	// Message 是持久化的脱敏诊断信息。
 	Message string
-	// OccurredAt is when the event was persisted.
+	// OccurredAt 是事件持久化的时间。
 	OccurredAt time.Time
 }
 
-// JobStateEvent is one material state snapshot emitted to a job stream.
+// JobStateEvent 是发给任务流的一次实质性状态快照。
 type JobStateEvent struct {
-	// Cursor is the latest persisted log sequence covered by the snapshot.
+	// Cursor 是快照覆盖的最新持久化日志序号。
 	Cursor int64
-	// Status is the current durable job lifecycle state.
+	// Status 是当前持久化任务生命周期状态。
 	Status string
-	// Progress is the deterministic completion percentage.
+	// Progress 是确定性的完成百分比。
 	Progress int
-	// At is the latest durable state update time.
+	// At 是最新持久化状态更新时间。
 	At time.Time
 }
 
-// JobEventSink receives ordered stream state, log, and heartbeat events.
+// JobEventSink 接收有序的流状态、日志与心跳事件。
 type JobEventSink interface {
 	State(JobStateEvent) error
 	Log(JobLogRecord) error
 	Heartbeat() error
 }
 
-// JobAccepted identifies one newly accepted or exactly replayed asynchronous job.
+// JobAccepted 标识一个刚被接受或精确重放的异步任务。
 type JobAccepted struct {
-	// JobID identifies the durable Meridian job.
+	// JobID 标识持久化 Meridian 任务。
 	JobID uuid.UUID `json:"jobId"`
-	// Deduplicated reports whether semantic coalescing selected existing work.
+	// Deduplicated 报告语义合并是否选中了现有工作。
 	Deduplicated bool `json:"deduplicated"`
 }
 
-// RetryJobRequest carries the authenticated idempotency identity into one atomic retry transaction.
+// RetryJobRequest 将认证后的幂等身份带入一次原子重试事务。
 type RetryJobRequest struct {
-	// TenantID identifies the owning tenant.
+	// TenantID 标识所属租户。
 	TenantID uuid.UUID
-	// SourceJobID identifies the failed or cancelled source job.
+	// SourceJobID 标识失败或被取消的源任务。
 	SourceJobID uuid.UUID
-	// PrincipalType identifies session or PAT authentication.
+	// PrincipalType 标识会话或 PAT 认证。
 	PrincipalType string
-	// PrincipalID identifies the exact authenticated session or PAT.
+	// PrincipalID 标识确切的认证会话或 PAT。
 	PrincipalID uuid.UUID
-	// IdempotencyKey identifies this semantic retry request for 24 hours.
+	// IdempotencyKey 在 24 小时内标识该语义重试请求。
 	IdempotencyKey uuid.UUID
-	// RequestHash is the canonical 32-byte semantic request digest.
+	// RequestHash 是规范 32 字节语义请求摘要。
 	RequestHash []byte
-	// RequestedAt is the UTC time at which the retry was accepted.
+	// RequestedAt 是重试被接受的 UTC 时间。
 	RequestedAt time.Time
 }
 
-// PlatformJobRecord is the redacted cross-tenant job projection exposed to platform administrators.
-// It intentionally excludes payloads, errors, attempts, refs, and River internals.
+// PlatformJobRecord 是暴露给平台管理员的脱敏跨租户任务投影。
+// 它有意排除载荷、错误、尝试、引用与 River 内部信息。
 type PlatformJobRecord struct {
-	// ID identifies the durable Meridian job.
+	// ID 标识持久化 Meridian 任务。
 	ID uuid.UUID
-	// TenantSlug identifies the tenant that owns the job.
+	// TenantSlug 标识拥有任务所在租户。
 	TenantSlug string
-	// Type identifies the registered job behavior.
+	// Type 标识已注册的任务行为。
 	Type string
-	// Trigger identifies the request origin.
+	// Trigger 标识请求来源。
 	Trigger string
-	// Status is the current durable job state.
+	// Status 是当前持久化任务状态。
 	Status string
-	// Stage is the active or final pipeline stage, when present.
+	// Stage 是活跃或最终管线阶段（存在时）。
 	Stage *string
-	// ScopeType identifies the resource category used for authorization.
+	// ScopeType 标识用于授权的资源类别。
 	ScopeType string
-	// ScopeID is exposed only for tenant and repository scopes.
+	// ScopeID 仅对租户与仓库作用域暴露。
 	ScopeID *string
-	// CreatedAt is the UTC instant when the job was accepted.
+	// CreatedAt 是任务被接受的 UTC 时刻。
 	CreatedAt time.Time
-	// StartedAt is the UTC instant when execution began, when present.
+	// StartedAt 是开始执行的 UTC 时刻（存在时）。
 	StartedAt *time.Time
-	// FinishedAt is the UTC instant when execution reached a terminal state, when present.
+	// FinishedAt 是到达终态的 UTC 时刻（存在时）。
 	FinishedAt *time.Time
 }
 
-// PlatformJobFilter selects redacted jobs without permitting arbitrary SQL expressions.
+// PlatformJobFilter 在不允许任意 SQL 表达式的前提下筛选脱敏任务。
 type PlatformJobFilter struct {
-	// Types restricts results to known job behavior identifiers.
+	// Types 将结果限定为已知任务行为标识。
 	Types []string
-	// Statuses restricts results to known durable job states.
+	// Statuses 将结果限定为已知持久化任务状态。
 	Statuses []string
-	// ScopeType restricts results to one known scope category.
+	// ScopeType 将结果限定为一个已知作用域类别。
 	ScopeType string
-	// ScopeID restricts results to one scope identifier string.
+	// ScopeID 将结果限定为一个作用域标识字符串。
 	ScopeID string
-	// TenantSlug restricts results to one active tenant slug.
+	// TenantSlug 将结果限定为一个活跃租户 slug。
 	TenantSlug string
 }
 
-// JobStore is the persistence boundary for tenant control and redacted platform queries.
+// JobStore 是租户控制与脱敏平台查询的持久化边界。
 type JobStore interface {
 	ListPlatformJobs(context.Context, PlatformJobFilter, int32, int32) ([]PlatformJobRecord, int64, error)
 	GetPlatformJob(context.Context, uuid.UUID) (PlatformJobRecord, error)

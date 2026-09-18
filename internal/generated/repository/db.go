@@ -11,27 +11,27 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-// DBTX is the pgx query and transaction surface required by generated repository methods.
+// DBTX 是生成仓储方法所需的 pgx 查询与事务接口。
 type DBTX interface {
-	// Exec exposes the corresponding strongly typed database operation.
+	// Exec 暴露相应的强类型数据库操作。
 	Exec(context.Context, string, ...any) (pgconn.CommandTag, error)
-	// Query exposes the corresponding strongly typed database operation.
+	// Query 暴露相应的强类型数据库操作。
 	Query(context.Context, string, ...any) (pgx.Rows, error)
-	// QueryRow exposes the corresponding strongly typed database operation.
+	// QueryRow 暴露相应的强类型数据库操作。
 	QueryRow(context.Context, string, ...any) pgx.Row
 }
 
-// New binds generated repository queries to a pgx pool or transaction.
+// New 将生成的仓储查询绑定到 pgx 连接池或事务。
 func New(db DBTX) *Queries {
 	return &Queries{db: db}
 }
 
-// Queries executes the strongly typed SQL statements generated from migrations/queries.
+// Queries 执行从 migrations/queries 生成的强类型 SQL 语句。
 type Queries struct {
 	db DBTX
 }
 
-// WithTx returns generated repository queries bound to the supplied pgx transaction.
+// WithTx 返回绑定到所提供 pgx 事务的生成仓储查询。
 func (q *Queries) WithTx(tx pgx.Tx) *Queries {
 	return &Queries{
 		db: tx,

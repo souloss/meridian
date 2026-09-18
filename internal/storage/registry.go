@@ -7,10 +7,10 @@ import (
 	"uuid"
 )
 
-// ErrBlobMetadataConflict indicates that immutable database metadata disagrees with stored content.
+// ErrBlobMetadataConflict 表示不可变的数据库元数据与已存储内容不一致。
 var ErrBlobMetadataConflict = errors.New("blob metadata conflicts with an existing digest")
 
-// ReferenceRegistry atomically registers tenant ownership and unique-byte accounting.
+// ReferenceRegistry 原子地登记租户所有权与唯一字节记账。
 type ReferenceRegistry interface {
 	AddBlobReference(context.Context, uuid.UUID, Blob, string, time.Time) error
 }

@@ -17,9 +17,8 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-// AiWorkflow coordinates AI asset generation, revision review, and version
-// publish use cases. It depends on AiGenerationStore for persistence and BlobStore
-// for content-addressed revision storage.
+// AiWorkflow 协调 AI 资产生成、修订审核与版本发布用例。它依赖 AiGenerationStore 持久化，
+// 依赖 BlobStore 做内容寻址的修订存储。
 type AiWorkflow struct {
 	store      AiGenerationStore
 	blobs      BlobStore
@@ -27,16 +26,15 @@ type AiWorkflow struct {
 	now        func() time.Time
 }
 
-// NewAiWorkflow constructs the M3 AI generation/review/publish use cases.
+// NewAiWorkflow 构造 M3 AI 生成/审核/发布用例。
 func NewAiWorkflow(store AiGenerationStore, blobs BlobStore, identities IdentityStore) *AiWorkflow {
 	return &AiWorkflow{store: store, blobs: blobs, identities: identities, now: time.Now}
 }
 
-// GenerateMissingAsset enqueues one AI generation for a service's missing asset.
-// It resolves the producer profile (requested or tenant default), creates the AI
-// source spec, layer, and job atomically, and returns the 202 projection.
+// GenerateMissingAsset 为某服务的缺失资产入队一次 AI 生成。它解析生产者配置（请求指定或
+// 租户默认），原子地创建 AI 源配置、层与任务，并返回 202 投影。
 func (workflow *AiWorkflow) GenerateMissingAsset(ctx context.Context, actor Principal, tenantSlug, serviceSlug string, input AiGenerateInput) (AiGenerateAccepted, error) {
-	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, "layer:edit")
+	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
 	if err != nil {
 		return AiGenerateAccepted{}, err
 	}
@@ -55,11 +53,11 @@ func (workflow *AiWorkflow) GenerateMissingAsset(ctx context.Context, actor Prin
 	if err != nil {
 		return AiGenerateAccepted{}, err
 	}
-	if service.Lifecycle == "retired" {
+	if service.Lifecycle == serviceLifecycleRetired {
 		return AiGenerateAccepted{}, ErrInvalidState
 	}
 
-	// Producer selection: requested profile, else tenant default, else validation error.
+	// 生产者选择：请求指定配置，否则租户默认，否则校验错误。
 	profileID := input.ProducerProfileID
 	if profileID == uuid.Nil() {
 		settings, settingsErr := workflow.tenantAISettings(ctx, membership.TenantID)
@@ -74,14 +72,14 @@ func (workflow *AiWorkflow) GenerateMissingAsset(ctx context.Context, actor Prin
 	if err != nil {
 		return AiGenerateAccepted{}, err
 	}
-	if profile.Kind != producerKindAI || !profile.Enabled || profile.DependencyStatus == "unavailable" {
+	if profile.Kind != producerKindAI || !profile.Enabled || profile.DependencyStatus == dependencyStatusUnavailable {
 		return AiGenerateAccepted{}, &ProducerUnavailableError{Kind: input.Kind}
 	}
 	if !containsString(profile.SupportedKinds, input.Kind) {
 		return AiGenerateAccepted{}, ErrValidation
 	}
 
-	// The missing asset must not already exist for this service and kind.
+	// 缺失资产必须尚未在该服务与类别下存在。
 	existing, existingErr := workflow.store.GetAssetByName(ctx, membership.TenantID, service.ID, input.Kind, name)
 	assetID := uuid.NewV7()
 	if existingErr == nil {
@@ -90,7 +88,7 @@ func (workflow *AiWorkflow) GenerateMissingAsset(ctx context.Context, actor Prin
 		return AiGenerateAccepted{}, existingErr
 	}
 
-	// AI role: base when the asset has no effective base, otherwise overlay.
+	// AI 角色：资产无生效 base 时为 base，否则为 overlay。
 	role := layerRoleOverlay
 	ord := 0
 	baseLayer, baseErr := workflow.store.GetBaseLayerForAsset(ctx, membership.TenantID, assetID)
@@ -114,17 +112,16 @@ func (workflow *AiWorkflow) GenerateMissingAsset(ctx context.Context, actor Prin
 		Hint: input.Hint, ProducerProfileID: profileID, AssetID: assetID,
 		SourceID: uuid.NewV7(), LayerID: uuid.NewV7(), Role: role, Ord: ord,
 		ScopeType: scopeType, ScopeKey: scopeKey, RefType: refType, RefName: input.Ref,
-		ServiceRoot: service.RootDir,
+		ServiceRoot:    service.RootDir,
 		IdempotencyKey: input.IdempotencyKey, PrincipalType: input.PrincipalType, PrincipalID: input.PrincipalID,
 		RequestHash: input.RequestHash,
 	}
 	return workflow.store.EnqueueAiGeneration(ctx, enqueue)
 }
 
-// GetReviewContext returns one candidate revision, the current effective
-// revision (nil for a cold-start base), and the author for review.
+// GetReviewContext 返回候选修订、当前生效修订（冷启动 base 时为 nil）与作者，供审核使用。
 func (workflow *AiWorkflow) GetReviewContext(ctx context.Context, actor Principal, tenantSlug string, revisionID uuid.UUID) (ReviewContextResult, error) {
-	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, "layer:approve")
+	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, scopeLayerApprove)
 	if err != nil {
 		return ReviewContextResult{}, err
 	}
@@ -148,18 +145,18 @@ func (workflow *AiWorkflow) GetReviewContext(ctx context.Context, actor Principa
 	return ReviewContextResult{Revision: revision.LayerRevisionRecord, CurrentEffectiveRevision: current, Author: author}, nil
 }
 
-// ApproveLayerRevision approves one pending candidate and enqueues a merge job.
+// ApproveLayerRevision 批准一个待审核候选并入队合并任务。
 func (workflow *AiWorkflow) ApproveLayerRevision(ctx context.Context, actor Principal, tenantSlug string, revisionID, idempotencyKey uuid.UUID, comment *string) (ReviewDecision, error) {
 	return workflow.decide(ctx, actor, tenantSlug, revisionID, idempotencyKey, comment, reviewStatusApproved)
 }
 
-// RejectLayerRevision rejects one pending candidate without advancing the head.
+// RejectLayerRevision 拒绝一个待审核候选而不推进层头。
 func (workflow *AiWorkflow) RejectLayerRevision(ctx context.Context, actor Principal, tenantSlug string, revisionID, idempotencyKey uuid.UUID, comment string) (ReviewDecision, error) {
 	return workflow.decide(ctx, actor, tenantSlug, revisionID, idempotencyKey, &comment, reviewStatusRejected)
 }
 
 func (workflow *AiWorkflow) decide(ctx context.Context, actor Principal, tenantSlug string, revisionID, idempotencyKey uuid.UUID, comment *string, target string) (ReviewDecision, error) {
-	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, "layer:approve")
+	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, scopeLayerApprove)
 	if err != nil {
 		return ReviewDecision{}, err
 	}
@@ -205,7 +202,7 @@ func (workflow *AiWorkflow) decide(ctx context.Context, actor Principal, tenantS
 		}, nil
 	}
 
-	// Reject: mark rejected and clear the candidate, leaving effective unchanged.
+	// 拒绝：标记为已拒绝并清除候选，生效版本保持不变。
 	updated, err := workflow.store.UpdateLayerRevisionReview(ctx, membership.TenantID, revision.ID, reviewStatusRejected, comment)
 	if err != nil {
 		return ReviewDecision{}, err
@@ -237,8 +234,7 @@ func (workflow *AiWorkflow) resolveTrackForRevision(ctx context.Context, tenantI
 	return workflow.resolveTrack(ctx, tenantID, revision.AssetID, refType, refName)
 }
 
-// resolveTrack returns the existing track or creates one when the asset has not
-// yet materialized a version on this ref.
+// resolveTrack 返回现有轨道，或在该引用上尚未物化版本时创建一个。
 func (workflow *AiWorkflow) resolveTrack(ctx context.Context, tenantID, assetID uuid.UUID, refType, refName string) (AssetRefTrackRecord, error) {
 	track, err := workflow.store.GetAssetRefTrack(ctx, tenantID, assetID, refType, refName)
 	if err == nil {
@@ -248,14 +244,13 @@ func (workflow *AiWorkflow) resolveTrack(ctx context.Context, tenantID, assetID 
 		return AssetRefTrackRecord{}, err
 	}
 	return workflow.store.CreateAssetRefTrack(ctx, NewAssetRefTrack{
-		TenantID: tenantID, ID: uuid.NewV7(), AssetID: assetID, RefType: refType, RefName: refName, Health: "ok",
+		TenantID: tenantID, ID: uuid.NewV7(), AssetID: assetID, RefType: refType, RefName: refName, Health: assetHealthOK,
 	})
 }
 
-// PublishAssetVersion publishes one draft version under the If-Match revision
-// and the publish preconditions, advancing the track current head.
+// PublishAssetVersion 在 If-Match 版本与发布前置条件下发布一个 draft 版本，推进轨道当前头。
 func (workflow *AiWorkflow) PublishAssetVersion(ctx context.Context, actor Principal, tenantSlug string, versionID uuid.UUID, input PublishInput) (AssetVersionRecord, error) {
-	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, "asset:publish")
+	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, scopeAssetPublish)
 	if err != nil {
 		return AssetVersionRecord{}, err
 	}
@@ -273,11 +268,10 @@ func (workflow *AiWorkflow) PublishAssetVersion(ctx context.Context, actor Princ
 		return AssetVersionRecord{}, ErrPrecondition
 	}
 	if version.Lifecycle == lifecyclePublished {
-		return version, nil // idempotent when already published
+		return version, nil // 已发布时幂等返回
 	}
 
-	// Preconditions: every manifest revision not_required or approved, and no
-	// enabled applicable layer head has a candidate revision.
+	// 前置条件：每个清单修订为 not_required 或已通过，且没有启用中的适用层头持有候选修订。
 	for _, entry := range version.LayerManifest {
 		if entry.ReviewStatus != reviewStatusNotRequired && entry.ReviewStatus != reviewStatusApproved {
 			return AssetVersionRecord{}, errVersionNotPublishable(version)
@@ -300,7 +294,7 @@ func (workflow *AiWorkflow) PublishAssetVersion(ctx context.Context, actor Princ
 	if err != nil {
 		return AssetVersionRecord{}, err
 	}
-	// Advance the track current head to the published version.
+	// 将轨道当前头推进到已发布版本。
 	if err := workflow.store.UpdateAssetRefTrackHead(ctx, membership.TenantID, version.TrackID, &version.ID, &version.ID, 1); err != nil {
 		return AssetVersionRecord{}, err
 	}
@@ -315,98 +309,94 @@ func (workflow *AiWorkflow) trackRefName(ctx context.Context, tenantID, trackID 
 	return track.RefName
 }
 
-// errVersionNotPublishable returns the 409 version_not_publishable classification.
+// errVersionNotPublishable 返回 409 version_not_publishable 分类。
 func errVersionNotPublishable(version AssetVersionRecord) error {
 	return &VersionNotPublishableError{VersionID: version.ID}
 }
 
-// VersionNotPublishableError reports a version blocked by candidate revisions.
+// VersionNotPublishableError 报告一个被候选修订阻塞的版本。
 type VersionNotPublishableError struct {
 	VersionID uuid.UUID
 }
 
 func (err *VersionNotPublishableError) Error() string { return "version is not publishable" }
 
-// RunAiGeneration executes one AI generation job: runs the producer, ingests the
-// completion manifest or classifies the failure, and persists the revision when
-// successful. It satisfies task.AiGenerateRunner.
+// RunAiGeneration 执行一次 AI 生成任务：运行生产者，摄取完成清单或分类失败，并在成功时
+// 持久化修订。它满足 task.AiGenerateRunner 接口。
 func (workflow *AiWorkflow) RunAiGeneration(ctx context.Context, args task.AiGenerateArgs) (task.AiGenerateResult, error) {
 	jobContext, err := workflow.store.GetAiGenerationJobContext(ctx, args.TenantID, args.JobID)
 	if err != nil {
-		return task.AiGenerateResult{Stage: "extract"}, err
+		return task.AiGenerateResult{Stage: StageExtract}, err
 	}
 	profile, err := workflow.store.GetProducerProfile(ctx, jobContext.ProducerProfileID)
 	if err != nil {
-		return workflow.failGeneration(ctx, args, "extract", "producer_profile_unavailable")
+		return workflow.failGeneration(ctx, args, StageExtract, ErrorCodeProducerUnavailable)
 	}
 
 	content, manifest, stage, code, err := workflow.runProducer(ctx, profile, jobContext)
-	if err != nil || stage != "normalize" {
-		outcome := AiGenerationOutcome{JobID: args.JobID, Stage: stage, Status: "failed", ErrorCode: code, Manifest: manifest}
+	if err != nil || stage != StageNormalize {
+		outcome := AiGenerationOutcome{JobID: args.JobID, Stage: stage, Status: JobStatusFailed, ErrorCode: code, Manifest: manifest}
 		_ = workflow.store.UpsertAiGenerationResult(ctx, args.TenantID, outcome)
 		return task.AiGenerateResult{Stage: stage, ErrorCode: code}, err
 	}
 
-	// Success: persist the revision and advance the head as a candidate or
-	// effective revision depending on the tenant trust mode.
+	// 成功：持久化修订并按租户 trust 模式推进层头为候选或生效修订。
 	revision, err := workflow.persistGeneratedRevision(ctx, args.TenantID, jobContext, content)
 	if err != nil {
-		return task.AiGenerateResult{Stage: "normalize", ErrorCode: "validation_error"}, err
+		return task.AiGenerateResult{Stage: StageNormalize, ErrorCode: ErrorCodeValidation}, err
 	}
 	outcome := AiGenerationOutcome{
-		JobID: args.JobID, Stage: "normalize", Status: "succeeded", ErrorCode: "",
+		JobID: args.JobID, Stage: StageNormalize, Status: JobStatusSucceeded, ErrorCode: "",
 		ContentRef: &revision.ContentRef, ContentHash: &revision.ContentHash, ContentType: &revision.ContentType,
 		Manifest: manifest, RevisionID: &revision.ID,
 	}
 	_ = workflow.store.UpsertAiGenerationResult(ctx, args.TenantID, outcome)
-	return task.AiGenerateResult{Stage: "index", RevisionID: revision.ID}, nil
+	return task.AiGenerateResult{Stage: StageIndex, RevisionID: revision.ID}, nil
 }
 
 func (workflow *AiWorkflow) failGeneration(ctx context.Context, args task.AiGenerateArgs, stage, code string) (task.AiGenerateResult, error) {
-	outcome := AiGenerationOutcome{JobID: args.JobID, Stage: stage, Status: "failed", ErrorCode: code, Manifest: map[string]any{}}
+	outcome := AiGenerationOutcome{JobID: args.JobID, Stage: stage, Status: JobStatusFailed, ErrorCode: code, Manifest: map[string]any{}}
 	_ = workflow.store.UpsertAiGenerationResult(ctx, args.TenantID, outcome)
 	return task.AiGenerateResult{Stage: stage, ErrorCode: code}, errors.New("AI generation failed: " + code)
 }
 
-// runProducer executes the producer executable and returns the content, the
-// completion manifest, the terminal stage, and a stable error code. It supports
-// the fake-ai contract fixtures by name:
-//   - names ending in "-timeout" simulate a timeout with no completion manifest;
-//   - names ending in "-invalid" emit structurally invalid output;
-//   - otherwise the producer writes a manifest with the configured files.
+// runProducer 执行生产者可执行文件并返回内容、完成清单、终态阶段与稳定错误码。它按名称支持
+// fake-ai 契约夹具：
+//   - 以 "-timeout" 结尾的名称模拟无完成清单的超时；
+//   - 以 "-invalid" 结尾的名称输出结构非法内容；
+//   - 否则生产者按配置的文件写出清单。
 func (workflow *AiWorkflow) runProducer(ctx context.Context, profile ProducerProfile, jobContext AiGenerationJobContext) (content string, manifest map[string]any, stage string, code string, err error) {
 	outputDir, err := os.MkdirTemp("", "meridian-ai-out")
 	if err != nil {
-		return "", nil, "extract", "internal_error", err
+		return "", nil, StageExtract, ErrorCodeInternal, err
 	}
 	defer os.RemoveAll(outputDir)
 
 	lowerName := strings.ToLower(profile.Name)
 	switch {
 	case strings.HasSuffix(lowerName, "-timeout"):
-		return "", map[string]any{}, "extract", "timeout", errors.New("producer timed out")
+		return "", map[string]any{}, StageExtract, errProducerTimedOutCode, ErrProducerTimedOut
 	case strings.HasSuffix(lowerName, "-invalid"):
 		invalid := "not: [valid: yaml"
 		if err := os.WriteFile(filepath.Join(outputDir, producerManifestFile), []byte(invalid), 0o644); err != nil {
-			return "", nil, "extract", "internal_error", err
+			return "", nil, StageExtract, ErrorCodeInternal, err
 		}
-		return "", map[string]any{}, "normalize", "validation_error", errors.New("invalid producer output")
+		return "", map[string]any{}, StageNormalize, ErrorCodeValidation, ErrInvalidProducerOutput
 	case strings.HasSuffix(lowerName, "-success"):
-		// Fake success: emit a completion manifest plus a minimal openapi content
-		// file without invoking an external executable, matching the fake-ai
-		// contract fixture (replaySafe, outputOperations 2).
+		// 伪造成功：产出完成清单与一个最小 openapi 内容文件，不调用外部可执行程序，
+		// 与 fake-ai 契约夹具保持一致（replaySafe、outputOperations 2）。
 		manifest := "files:\n  - path: openapi.yaml\n    kind: openapi\n    role: base\n    contentType: application/yaml\n"
 		content := "openapi: 3.1.0\ninfo: {title: " + jobContext.Name + ", version: 1.0.0}\npaths:\n  /a:\n    get: {responses: {}}\n  /b:\n    get: {responses: {}}\n"
 		if err := os.WriteFile(filepath.Join(outputDir, producerManifestFile), []byte(manifest), 0o644); err != nil {
-			return "", nil, "extract", "internal_error", err
+			return "", nil, StageExtract, ErrorCodeInternal, err
 		}
 		if err := os.WriteFile(filepath.Join(outputDir, "openapi.yaml"), []byte(content), 0o644); err != nil {
-			return "", nil, "extract", "internal_error", err
+			return "", nil, StageExtract, ErrorCodeInternal, err
 		}
 		return workflow.ingestManifest(ctx, outputDir, jobContext)
 	}
 
-	// Default producer: run the executable, then read the manifest.
+	// 默认生产者：运行可执行文件，然后读取清单。
 	timeout := time.Duration(profile.TimeoutSec) * time.Second
 	runContext, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -414,51 +404,49 @@ func (workflow *AiWorkflow) runProducer(ctx context.Context, profile ProducerPro
 	command.Dir = outputDir
 	command.Env = append(producerEnvironment(jobContext), "OUTPUT_DIR="+outputDir)
 	if output, runErr := command.CombinedOutput(); runErr != nil {
-		return "", map[string]any{}, "extract", "producer_failed", runErr
+		return "", map[string]any{}, StageExtract, errProducerFailedCode, runErr
 	} else {
 		_ = output
 	}
 	return workflow.ingestManifest(ctx, outputDir, jobContext)
 }
 
-// ingestManifest reads and validates the completion manifest, returning the
-// first file's content plus the normalized manifest projection.
+// ingestManifest 读取并校验完成清单，返回首个文件的内容与规范化清单投影。
 func (workflow *AiWorkflow) ingestManifest(ctx context.Context, outputDir string, jobContext AiGenerationJobContext) (string, map[string]any, string, string, error) {
 	manifestPath := filepath.Join(outputDir, producerManifestFile)
 	raw, err := os.ReadFile(manifestPath)
 	if err != nil {
-		return "", map[string]any{}, "extract", "producer_failed", err
+		return "", map[string]any{}, StageExtract, errProducerFailedCode, err
 	}
 	var parsed map[string]any
 	if err := yamlUnmarshal(raw, &parsed); err != nil {
-		return "", map[string]any{}, "normalize", "validation_error", err
+		return "", map[string]any{}, StageNormalize, ErrorCodeValidation, err
 	}
 	files, ok := parsed["files"].([]any)
 	if !ok || len(files) == 0 {
-		return "", map[string]any{}, "normalize", "validation_error", errors.New("manifest has no files")
+		return "", map[string]any{}, StageNormalize, ErrorCodeValidation, ErrManifestNoFiles
 	}
 	first, ok := files[0].(map[string]any)
 	if !ok {
-		return "", map[string]any{}, "normalize", "validation_error", errors.New("manifest file entry invalid")
+		return "", map[string]any{}, StageNormalize, ErrorCodeValidation, ErrManifestFileEntryInvalid
 	}
 	path, _ := first["path"].(string)
 	if path == "" {
-		return "", map[string]any{}, "normalize", "validation_error", errors.New("manifest file path missing")
+		return "", map[string]any{}, StageNormalize, ErrorCodeValidation, ErrManifestFilePathMissing
 	}
 	contentBytes, err := os.ReadFile(filepath.Join(outputDir, filepath.FromSlash(path)))
 	if err != nil {
-		return "", map[string]any{}, "normalize", "validation_error", err
+		return "", map[string]any{}, StageNormalize, ErrorCodeValidation, err
 	}
-	return string(contentBytes), parsed, "normalize", "", nil
+	return string(contentBytes), parsed, StageNormalize, "", nil
 }
 
-// persistGeneratedRevision stores the generated content as a new layer revision
-// and advances the head per the tenant trust mode.
+// persistGeneratedRevision 将生成内容存为新层修订，并按租户 trust 模式推进层头。
 func (workflow *AiWorkflow) persistGeneratedRevision(ctx context.Context, tenantID uuid.UUID, jobContext AiGenerationJobContext, content string) (LayerRevisionRecord, error) {
 	settings, _ := workflow.tenantAISettings(ctx, tenantID)
 	trusted := trustApprovedForOrigin(settings.ExternalRevisionTrustMode, aiOrigin)
 
-	// Reuse the latest revision when its content hash is unchanged.
+	// 当内容哈希未变时复用最新修订。
 	hash := sha256Hex(content)
 	if existing, err := workflow.store.GetLatestLayerRevision(ctx, tenantID, jobContext.LayerID, jobContext.ScopeType, jobContext.ScopeKey); err == nil && existing.ContentHash == hash {
 		return existing, nil
@@ -522,7 +510,7 @@ func (workflow *AiWorkflow) tenantAISettings(ctx context.Context, tenantID uuid.
 
 func (workflow *AiWorkflow) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!containsString(actor.Scopes, permission) && !containsString(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!containsString(actor.Scopes, permission) && !containsString(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil

@@ -1,5 +1,5 @@
-// Command domainadapter generates the compatibility bridge from domain-owned
-// oapi-codegen servers to the existing handler implementations.
+// Command domainadapter 从领域自有的 oapi-codegen 服务器生成到既有 Handler
+// 实现的兼容桥接层。
 package main
 
 import (
@@ -71,6 +71,7 @@ func generate() error {
 	for _, domain := range domains {
 		fmt.Fprintf(&output, "type %sServer struct {\n\t%s.UnimplementedStrictServer\n\tserver *Server\n}\n\n", domain.name, domain.packageName)
 		for _, method := range domain.methods {
+			fmt.Fprintf(&output, "// %s 将 %s 的严格操作委托给对应的 Handler 实现。\n", method, domain.name)
 			fmt.Fprintf(&output, "func (adapter %sServer) %s(ctx context.Context, request %s.%sRequestObject) (%s.%sResponseObject, error) {\n", domain.name, method, domain.packageName, method, domain.packageName, method)
 			fmt.Fprintf(&output, "\treturn adapter.server.%s(ctx, request)\n}\n\n", method)
 		}

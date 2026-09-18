@@ -16,26 +16,25 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// CredentialStore implements credential persistence with explicit transaction boundaries.
+// CredentialStore 以显式事务边界实现凭据持久化。
 type CredentialStore struct {
 	pool        *pgxpool.Pool
 	queries     *generated.Queries
 	riverClient *river.Client[pgx.Tx]
 }
 
-// NewCredentialStore binds credential persistence to a native pgx pool.
+// NewCredentialStore 将凭据持久化绑定到原生 pgx 连接池。
 func NewCredentialStore(pool *pgxpool.Pool) *CredentialStore {
 	return NewCredentialStoreWithRiver(pool, nil)
 }
 
-// NewCredentialStoreWithRiver binds credential persistence to a River client.
-// When configured, every newly created sync job is inserted into River inside
-// the same PostgreSQL transaction as the credential rotation and domain row.
+// NewCredentialStoreWithRiver 将凭据持久化绑定到 River 客户端。
+// 配置后，每个新建的同步任务都会在凭据轮换与领域行所在的同一 PostgreSQL 事务内插入 River。
 func NewCredentialStoreWithRiver(pool *pgxpool.Pool, riverClient *river.Client[pgx.Tx]) *CredentialStore {
 	return &CredentialStore{pool: pool, queries: generated.New(pool), riverClient: riverClient}
 }
 
-// CreateCredential inserts encrypted metadata and all team shares atomically.
+// CreateCredential 原子地插入加密元数据与全部团队共享。
 func (store *CredentialStore) CreateCredential(ctx context.Context, input service.NewCredential) (service.CredentialRecord, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -61,7 +60,7 @@ func (store *CredentialStore) CreateCredential(ctx context.Context, input servic
 	return credentialFromRow(row, input.TeamIDs), nil
 }
 
-// ListCredentials returns tenant-visible records, including all global credentials.
+// ListCredentials 返回租户可见的记录，包括所有全局凭据。
 func (store *CredentialStore) ListCredentials(ctx context.Context, tenantID, userID uuid.UUID, limit, offset int32) ([]service.CredentialRecord, int64, error) {
 	total, err := store.queries.CountTenantCredentials(ctx, generated.CountTenantCredentialsParams{TenantID: tenantID, UserID: userID})
 	if err != nil {
@@ -84,7 +83,7 @@ func (store *CredentialStore) ListCredentials(ctx context.Context, tenantID, use
 	return items, int64(total), nil
 }
 
-// GetCredential returns one visible tenant-owned credential.
+// GetCredential 返回一条可见的租户自有凭据。
 func (store *CredentialStore) GetCredential(ctx context.Context, tenantID, id, userID uuid.UUID) (service.CredentialRecord, error) {
 	row, err := store.queries.GetTenantCredential(ctx, generated.GetTenantCredentialParams{TenantID: tenantID, ID: id, UserID: userID})
 	if err != nil {
@@ -103,7 +102,7 @@ func (store *CredentialStore) GetCredential(ctx context.Context, tenantID, id, u
 	}, nil
 }
 
-// UpdateCredential conditionally updates metadata and replaces team shares in one transaction.
+// UpdateCredential 在一个事务内条件性地更新元数据并替换团队共享。
 func (store *CredentialStore) UpdateCredential(ctx context.Context, input service.UpdateCredential) (service.CredentialRecord, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -122,7 +121,7 @@ func (store *CredentialStore) UpdateCredential(ctx context.Context, input servic
 	if input.SharedScope != nil {
 		resultingScope = *input.SharedScope
 	}
-	if resultingScope != "team" && len(valueOrEmpty(input.TeamIDs)) != 0 {
+	if resultingScope != credentialSharedScopeTeam && len(valueOrEmpty(input.TeamIDs)) != 0 {
 		return service.CredentialRecord{}, service.ErrValidation
 	}
 	row, err := queries.UpdateCredentialMetadata(ctx, generated.UpdateCredentialMetadataParams{
@@ -153,7 +152,7 @@ func (store *CredentialStore) UpdateCredential(ctx context.Context, input servic
 	return credentialFromRow(row, teamIDs), nil
 }
 
-// DeleteCredential conditionally deletes a tenant credential and optionally unbinds references.
+// DeleteCredential 条件性地删除一条租户凭据，并可选地解绑引用。
 func (store *CredentialStore) DeleteCredential(ctx context.Context, tenantID, id uuid.UUID, expectedRevision int64, force bool, updatedAt time.Time) error {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -184,7 +183,7 @@ func (store *CredentialStore) DeleteCredential(ctx context.Context, tenantID, id
 	if err != nil {
 		return normalizeError(err)
 	}
-	if deleted != 1 {
+	if deleted != rowsAffectedOne {
 		return service.ErrPrecondition
 	}
 	if err := tx.Commit(ctx); err != nil {
@@ -193,7 +192,7 @@ func (store *CredentialStore) DeleteCredential(ctx context.Context, tenantID, id
 	return nil
 }
 
-// LookupCredentialRotation checks a tenant rotation replay under the same transaction lock used by writes.
+// LookupCredentialRotation 在与写入相同的锁边界下检查租户轮换回放。
 func (store *CredentialStore) LookupCredentialRotation(ctx context.Context, tenantID uuid.UUID, principalType string, principalID, idempotencyKey uuid.UUID, requestHash []byte) (service.CredentialRecord, []service.CredentialSyncJob, bool, error) {
 	if err := validateRotationIdempotency(idempotencyKey, requestHash, principalType, principalID); err != nil {
 		return service.CredentialRecord{}, nil, false, err
@@ -216,7 +215,7 @@ func (store *CredentialStore) LookupCredentialRotation(ctx context.Context, tena
 	return record, jobs, found, nil
 }
 
-// RotateCredential atomically updates encrypted secret material and optional repository sync jobs.
+// RotateCredential 原子地更新加密密钥材料与可选的仓库同步任务。
 func (store *CredentialStore) RotateCredential(ctx context.Context, input service.RotateCredential) (service.CredentialRecord, []service.CredentialSyncJob, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -277,7 +276,7 @@ func (store *CredentialStore) RotateCredential(ctx context.Context, input servic
 	return credentialFromRow(row, teamIDs), jobs, nil
 }
 
-// ListGlobalCredentials returns one page of platform-owned credential metadata.
+// ListGlobalCredentials 返回一页平台自有凭据元数据。
 func (store *CredentialStore) ListGlobalCredentials(ctx context.Context, limit, offset int32) ([]service.GlobalCredentialRecord, int64, error) {
 	total, err := store.queries.CountGlobalCredentials(ctx)
 	if err != nil {
@@ -294,7 +293,7 @@ func (store *CredentialStore) ListGlobalCredentials(ctx context.Context, limit, 
 	return items, total, nil
 }
 
-// CreateGlobalCredential inserts one platform-owned encrypted credential.
+// CreateGlobalCredential 插入一条平台自有的加密凭据。
 func (store *CredentialStore) CreateGlobalCredential(ctx context.Context, input service.NewGlobalCredential) (service.GlobalCredentialRecord, error) {
 	row, err := store.queries.CreateGlobalCredential(ctx, generated.CreateGlobalCredentialParams{
 		ID: input.ID, Name: input.Name, Kind: input.Kind, Ciphertext: input.Encrypted.Ciphertext,
@@ -307,7 +306,7 @@ func (store *CredentialStore) CreateGlobalCredential(ctx context.Context, input 
 	return globalCredentialFromRow(row), nil
 }
 
-// GetGlobalCredential returns one platform-owned encrypted credential projection.
+// GetGlobalCredential 返回一条平台自有加密凭据投影。
 func (store *CredentialStore) GetGlobalCredential(ctx context.Context, id uuid.UUID) (service.GlobalCredentialRecord, error) {
 	row, err := store.queries.GetGlobalCredential(ctx, id)
 	if err != nil {
@@ -316,7 +315,7 @@ func (store *CredentialStore) GetGlobalCredential(ctx context.Context, id uuid.U
 	return globalCredentialFromRow(row), nil
 }
 
-// UpdateGlobalCredential conditionally updates a global credential name.
+// UpdateGlobalCredential 条件性地更新一条全局凭据的名称。
 func (store *CredentialStore) UpdateGlobalCredential(ctx context.Context, input service.UpdateGlobalCredential) (service.GlobalCredentialRecord, error) {
 	row, err := store.queries.UpdateGlobalCredentialMetadata(ctx, generated.UpdateGlobalCredentialMetadataParams{
 		ID: input.ID, ExpectedRevision: input.ExpectedRevision, Name: input.Name, UpdatedAt: timestamp(input.UpdatedAt),
@@ -330,7 +329,7 @@ func (store *CredentialStore) UpdateGlobalCredential(ctx context.Context, input 
 	return globalCredentialFromRow(row), nil
 }
 
-// DeleteGlobalCredential conditionally deletes a platform credential and optionally unbinds references.
+// DeleteGlobalCredential 条件性地删除一条平台凭据，并可选地解绑引用。
 func (store *CredentialStore) DeleteGlobalCredential(ctx context.Context, id uuid.UUID, expectedRevision int64, force bool, updatedAt time.Time) error {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -361,7 +360,7 @@ func (store *CredentialStore) DeleteGlobalCredential(ctx context.Context, id uui
 	if err != nil {
 		return normalizeError(err)
 	}
-	if deleted != 1 {
+	if deleted != rowsAffectedOne {
 		return service.ErrPrecondition
 	}
 	if err := tx.Commit(ctx); err != nil {
@@ -370,7 +369,7 @@ func (store *CredentialStore) DeleteGlobalCredential(ctx context.Context, id uui
 	return nil
 }
 
-// LookupGlobalCredentialRotation checks a platform rotation replay under the write lock boundary.
+// LookupGlobalCredentialRotation 在写锁边界下检查平台轮换回放。
 func (store *CredentialStore) LookupGlobalCredentialRotation(ctx context.Context, principalType string, principalID, idempotencyKey uuid.UUID, requestHash []byte) (service.GlobalCredentialRecord, []service.CredentialSyncJob, bool, error) {
 	if err := validateRotationIdempotency(idempotencyKey, requestHash, principalType, principalID); err != nil {
 		return service.GlobalCredentialRecord{}, nil, false, err
@@ -393,7 +392,7 @@ func (store *CredentialStore) LookupGlobalCredentialRotation(ctx context.Context
 	return record, jobs, found, nil
 }
 
-// RotateGlobalCredential atomically updates a platform credential secret and optional sync jobs.
+// RotateGlobalCredential 原子地更新平台凭据密钥与可选的同步任务。
 func (store *CredentialStore) RotateGlobalCredential(ctx context.Context, input service.RotateGlobalCredential) (service.GlobalCredentialRecord, []service.CredentialSyncJob, error) {
 	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -441,7 +440,7 @@ func (store *CredentialStore) RotateGlobalCredential(ctx context.Context, input 
 	return updated, jobs, nil
 }
 
-// ListKnownHosts returns approved host identities without private material.
+// ListKnownHosts 返回已批准的主机身份（不含私密材料）。
 func (store *CredentialStore) ListKnownHosts(ctx context.Context, tenantID uuid.UUID, limit, offset int32) ([]service.KnownHostRecord, int64, error) {
 	total, err := store.queries.CountKnownHosts(ctx, tenantID)
 	if err != nil {
@@ -458,7 +457,7 @@ func (store *CredentialStore) ListKnownHosts(ctx context.Context, tenantID uuid.
 	return items, total, nil
 }
 
-// CreateKnownHost stores one server-derived host-key identity.
+// CreateKnownHost 存储一条由服务器派生的主机密钥身份。
 func (store *CredentialStore) CreateKnownHost(ctx context.Context, input service.NewKnownHost) (service.KnownHostRecord, error) {
 	row, err := store.queries.CreateKnownHost(ctx, generated.CreateKnownHostParams{
 		TenantID: input.TenantID, ID: input.ID, Host: input.Host, Port: input.Port,
@@ -542,19 +541,19 @@ func enqueueCredentialSyncJobs(ctx context.Context, queries *generated.Queries, 
 }
 
 func enqueueCredentialSyncJob(ctx context.Context, queries *generated.Queries, tx pgx.Tx, riverClient *river.Client[pgx.Tx], tenantID uuid.UUID, tenantSlug string, repositoryID uuid.UUID, refName string, credentialID uuid.UUID, updatedAt time.Time) (service.CredentialSyncJob, error) {
-	dedupeKey := "repository:" + repositoryID.String() + ":branch:" + refName
+	dedupeKey := dedupeKeyRepositoryBranch + repositoryID.String() + ":branch:" + refName
 	jobInput, err := json.Marshal(struct {
 		CredentialID uuid.UUID `json:"credentialId"`
 		Reason       string    `json:"reason"`
-	}{CredentialID: credentialID, Reason: "credential-rotated"})
+	}{CredentialID: credentialID, Reason: credentialRotationSyncReason})
 	if err != nil {
 		return service.CredentialSyncJob{}, fmt.Errorf("encode credential sync job input: %w", err)
 	}
 	for {
 		latest, err := queries.LockLatestCredentialSyncJob(ctx, generated.LockLatestCredentialSyncJobParams{TenantID: tenantID, DedupeKey: dedupeKey})
-		generation := int64(1)
+		generation := jobGenerationInitial
 		if err == nil {
-			if latest.Status == "pending" || latest.Status == "running" {
+			if latest.Status == service.JobStatusPending || latest.Status == service.JobStatusRunning {
 				return service.CredentialSyncJob{TenantSlug: tenantSlug, RepositoryID: repositoryID, JobID: latest.ID, Deduplicated: true}, nil
 			}
 			generation = latest.ActiveGeneration + 1
@@ -579,7 +578,7 @@ func enqueueCredentialSyncJob(ctx context.Context, queries *generated.Queries, t
 					TenantID: tenantID, ID: row.ID, RiverJobID: new(result.Job.ID), UpdatedAt: timestamp(updatedAt),
 				}); err != nil {
 					return service.CredentialSyncJob{}, normalizeError(err)
-				} else if changed != 1 {
+				} else if changed != rowsAffectedOne {
 					return service.CredentialSyncJob{}, fmt.Errorf("attach River job %d to domain job %s: %w", result.Job.ID, row.ID, service.ErrPrecondition)
 				}
 			}
@@ -588,8 +587,8 @@ func enqueueCredentialSyncJob(ctx context.Context, queries *generated.Queries, t
 		if !errors.Is(err, pgx.ErrNoRows) {
 			return service.CredentialSyncJob{}, normalizeError(err)
 		}
-		// Another transaction won the unique dedupe key between the lock query and
-		// insert. Its row is now visible to the next lock iteration.
+		// 在锁查询与插入之间，另一事务赢得了唯一去重键。
+		// 其行现在对下一次锁迭代可见。
 	}
 }
 

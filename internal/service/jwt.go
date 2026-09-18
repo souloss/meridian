@@ -21,18 +21,16 @@ const (
 	jwtSigningMethodName = "HS256"
 )
 
-// JWTIssuer mints and verifies short-lived browser access tokens.
+// JWTIssuer 铸造并校验短时浏览器访问令牌。
 //
-// Access tokens are stateless: the subject is the user UUID and every request
-// still resolves the live user row so disabled or deleted users stop being
-// honored immediately. The signing key is deployment-only and never leaves
-// the process.
+// 访问令牌无状态：主体是用户 UUID，且每个请求仍解析实时用户行，使被禁用或删除的
+// 用户立即停止被认可。签名密钥仅存在于部署环境且绝不离开进程。
 type JWTIssuer struct {
 	key []byte
 	now func() time.Time
 }
 
-// NewJWTIssuer validates an unpadded base64url-encoded 32-byte signing key.
+// NewJWTIssuer 校验未填充 base64url 编码的 32 字节签名密钥。
 func NewJWTIssuer(encodedKey string) (*JWTIssuer, error) {
 	decoded, err := base64.RawURLEncoding.DecodeString(encodedKey)
 	if err != nil {
@@ -44,7 +42,7 @@ func NewJWTIssuer(encodedKey string) (*JWTIssuer, error) {
 	return &JWTIssuer{key: decoded, now: time.Now}, nil
 }
 
-// IssueAccessToken returns a signed HS256 access token and its remaining lifetime.
+// IssueAccessToken 返回签名的 HS256 访问令牌及其剩余有效时长。
 func (issuer *JWTIssuer) IssueAccessToken(userID uuid.UUID) (string, time.Duration, error) {
 	now := issuer.now().UTC()
 	expiresAt := now.Add(accessTokenTTL)
@@ -62,7 +60,7 @@ func (issuer *JWTIssuer) IssueAccessToken(userID uuid.UUID) (string, time.Durati
 	return signed, accessTokenTTL, nil
 }
 
-// VerifyAccessToken validates an HS256 token and returns its user subject.
+// VerifyAccessToken 校验 HS256 令牌并返回其用户主体。
 func (issuer *JWTIssuer) VerifyAccessToken(plaintext string) (uuid.UUID, error) {
 	var claims jwt.RegisteredClaims
 	token, err := jwt.ParseWithClaims(plaintext, &claims, func(token *jwt.Token) (any, error) {

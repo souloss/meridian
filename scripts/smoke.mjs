@@ -17,6 +17,7 @@ const ids = mode === '--credentials' ? ['SMK-005', 'SMK-031', 'SMK-035']
   : mode === '--m2-gitops' ? ['SMK-028', 'SMK-038']
   : mode === '--m3-ai' ? ['SMK-015', 'SMK-016', 'SMK-017', 'SMK-033']
   : mode === '--m3-diff-cli' ? ['SMK-018', 'SMK-019', 'SMK-020', 'SMK-021', 'SMK-026']
+  : mode === '--m4-global-views' ? ['SMK-022', 'SMK-023', 'SMK-024']
   : mode === '--all' ? Object.keys(catalog).filter(id => catalog[id].milestone <= milestone)
   : catalog[mode] ? [mode] : []
 if (ids.length === 0) {

@@ -6,255 +6,393 @@ import (
 	"uuid"
 )
 
-// DiffChangeKind carries one structured diff change classification.
+// DiffChangeKind 承载一条结构化的差异变更分类。
 type DiffChangeKind struct {
-	// ID is a stable, deterministic per-run identifier.
+	// ID 是稳定、确定性的单次运行内标识。
 	ID string
-	// Level is breaking / risky / non_breaking / informational.
+	// Level 是破坏级别（breaking / risky / non_breaking / informational）。
 	Level string
-	// Code is the breaking-rule or change code (e.g. operation-removed).
+	// Code 是破坏规则或变更码（如 operation-removed）。
 	Code string
-	// Path locates the changed element.
+	// Path 定位被变更的元素。
 	Path string
-	// Summary is a human-readable change description.
+	// Summary 是人类可读的变更描述。
 	Summary string
-	// Before and After carry the raw JSON value on each side (nil when absent).
+	// Before 与 After 分别携带两侧原始 JSON 值（缺失时为 nil）。
 	Before any
 	After  any
 }
 
-// DiffCountsSummary aggregates a diff result's change counters.
+// DiffCountsSummary 聚合一次差异结果的变更计数。
 type DiffCountsSummary struct {
-	Added         int
-	Removed       int
-	Modified      int
-	Breaking      int
-	Risky         int
-	NonBreaking   int
+	// Added 是新增数量。
+	Added int
+	// Removed 是移除数量。
+	Removed int
+	// Modified 是修改数量。
+	Modified int
+	// Breaking 是破坏性变更数量。
+	Breaking int
+	// Risky 是有风险变更数量。
+	Risky int
+	// NonBreaking 是非破坏性变更数量。
+	NonBreaking int
+	// Informational 是信息性变更数量。
 	Informational int
 }
 
-// ResolvedDocRef is the immutable document reference reported by a diff.
+// ResolvedDocRef 是差异结果所报告的不变文档引用。
 type ResolvedDocRef struct {
-	SourceType       string
-	Kind             string
-	ContentHash      string
-	AssetID          *uuid.UUID
-	VersionID        *uuid.UUID
-	UploadID         *uuid.UUID
+	// SourceType 是来源类型（version/ref/upload）。
+	SourceType string
+	// Kind 是资产类别。
+	Kind string
+	// ContentHash 是内容哈希。
+	ContentHash string
+	// AssetID 是资产标识（可为空）。
+	AssetID *uuid.UUID
+	// VersionID 是版本标识（可为空）。
+	VersionID *uuid.UUID
+	// UploadID 是上传标识（可为空）。
+	UploadID *uuid.UUID
+	// RequestedRefType 是请求的引用类型（可为空）。
 	RequestedRefType *string
-	RequestedRef     *string
+	// RequestedRef 是请求的引用（可为空）。
+	RequestedRef *string
 }
 
-// DiffOutcome is the result of running one diff.
+// DiffOutcome 是运行一次差异的结果。
 type DiffOutcome struct {
-	Kind       string
-	Left       ResolvedDocRef
-	Right      ResolvedDocRef
+	// Kind 是资产类别。
+	Kind string
+	// Left 是左侧文档引用。
+	Left ResolvedDocRef
+	// Right 是右侧文档引用。
+	Right ResolvedDocRef
+	// SnapshotID 是快照标识（可为空）。
 	SnapshotID *uuid.UUID
-	Summary    DiffCountsSummary
-	Changes    []DiffChangeKind
+	// Summary 是变更计数摘要。
+	Summary DiffCountsSummary
+	// Changes 是变更明细列表。
+	Changes []DiffChangeKind
+	// GeneratedAt 是生成时间。
 	GeneratedAt time.Time
 }
 
-// DiffSelector is one resolved diff input (version, ref, or upload).
+// DiffSelector 是一个已解析的差异输入（版本、引用或上传）。
 type DiffSelector struct {
-	Type      string // version | ref | upload
+	// Type 是选择器类型（version | ref | upload）。
+	Type string
+	// VersionID 是版本标识（可为空）。
 	VersionID *uuid.UUID
-	AssetID   *uuid.UUID
-	RefType   *string
-	RefName   *string
-	UploadID  *uuid.UUID
-	Kind      string
+	// AssetID 是资产标识（可为空）。
+	AssetID *uuid.UUID
+	// RefType 是引用类型（可为空）。
+	RefType *string
+	// RefName 是引用名（可为空）。
+	RefName *string
+	// UploadID 是上传标识（可为空）。
+	UploadID *uuid.UUID
+	// Kind 是资产类别。
+	Kind string
 }
 
-// DiffRunInput carries one runDiff request.
+// DiffRunInput 承载一次 runDiff 请求。
 type DiffRunInput struct {
-	Left      DiffSelector
-	Right     DiffSelector
+	// Left 是左侧选择器。
+	Left DiffSelector
+	// Right 是右侧选择器。
+	Right DiffSelector
+	// RuleSetID 是规则集标识（可为空）。
 	RuleSetID *uuid.UUID
-	Persist   bool
+	// Persist 表示是否持久化快照。
+	Persist bool
 }
 
-// ShareLinkCreatedResult is the create-share-link response projection.
+// ShareLinkCreatedResult 是创建分享链接的响应投影。
 type ShareLinkCreatedResult struct {
-	ID              uuid.UUID
-	Token           string
-	ResourceType    string
-	ResourceID      *uuid.UUID
-	DescriptorDigest string
-	URL             string
-	ExpiresAt       time.Time
-	RevokedAt       *time.Time
-	CreatedAt       time.Time
-}
-
-// SharedViewResult is the anonymous shared view resolution.
-type SharedViewResult struct {
+	// ID 是分享链接标识。
+	ID uuid.UUID
+	// Token 是签名分享令牌。
+	Token string
+	// ResourceType 是资源类型。
 	ResourceType string
-	ExpiresAt    time.Time
-	SnapshotID   uuid.UUID
-	CreatedBy    uuid.UUID
-	CreatedAt    time.Time
-	Snapshot     DiffOutcome
+	// ResourceID 是资源标识（可为空）。
+	ResourceID *uuid.UUID
+	// DescriptorDigest 是描述符摘要。
+	DescriptorDigest string
+	// URL 是公开分享 URL。
+	URL string
+	// ExpiresAt 是过期时间。
+	ExpiresAt time.Time
+	// RevokedAt 是撤销时间（可为空）。
+	RevokedAt *time.Time
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
 }
 
-// TodoRecord is one breaking-change todo projection.
+// SharedViewResult 是匿名分享视图的解析结果。
+type SharedViewResult struct {
+	// ResourceType 是资源类型。
+	ResourceType string
+	// ExpiresAt 是过期时间。
+	ExpiresAt time.Time
+	// SnapshotID 是快照标识。
+	SnapshotID uuid.UUID
+	// CreatedBy 是创建者标识。
+	CreatedBy uuid.UUID
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
+	// Snapshot 是冻结的差异结果。
+	Snapshot DiffOutcome
+}
+
+// TodoRecord 是一条破坏性变更待办投影。
 type TodoRecord struct {
-	ID            uuid.UUID
+	// ID 是待办的标识。
+	ID uuid.UUID
+	// AssetVersionID 是关联版本标识。
 	AssetVersionID uuid.UUID
-	ServiceID     uuid.UUID
-	Status        string
-	AckedBy       *uuid.UUID
-	AckedAt       *time.Time
-	Comment       *string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	// ServiceID 是关联服务标识。
+	ServiceID uuid.UUID
+	// Status 是待办状态。
+	Status string
+	// AckedBy 是确认人标识（可为空）。
+	AckedBy *uuid.UUID
+	// AckedAt 是确认时间（可为空）。
+	AckedAt *time.Time
+	// Comment 是备注（可为空）。
+	Comment *string
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
+	// UpdatedAt 是最近更新时间。
+	UpdatedAt time.Time
 }
 
-// PushRevisionInput carries one pushAssetRevision request.
+// PushRevisionInput 承载一次 pushAssetRevision 请求。
 type PushRevisionInput struct {
-	ServiceSlug     string
-	Kind            string
-	Name            string
-	RefType         string
-	Ref             string
-	SourceSystem    string
+	// ServiceSlug 是目标服务 slug。
+	ServiceSlug string
+	// Kind 是资产类别。
+	Kind string
+	// Name 是资产名。
+	Name string
+	// RefType 是引用类型。
+	RefType string
+	// Ref 是引用名。
+	Ref string
+	// SourceSystem 是来源系统标识。
+	SourceSystem string
+	// CreateIfMissing 表示缺失时是否创建。
 	CreateIfMissing bool
-	Content         string
-	ContentType     string
-	Role            string
-	Dialect         *string
-	SourceCommit    *string
-	IdempotencyKey  uuid.UUID
-	PrincipalType   string
-	PrincipalID     uuid.UUID
-	RequestHash     []byte
+	// Content 是推送的文档内容。
+	Content string
+	// ContentType 是内容媒体类型。
+	ContentType string
+	// Role 是层角色。
+	Role string
+	// Dialect 是方言（可为空）。
+	Dialect *string
+	// SourceCommit 是来源提交（可为空）。
+	SourceCommit *string
+	// IdempotencyKey 是幂等键。
+	IdempotencyKey uuid.UUID
+	// PrincipalType 是重放主体类型。
+	PrincipalType string
+	// PrincipalID 是重放主体标识。
+	PrincipalID uuid.UUID
+	// RequestHash 是请求摘要。
+	RequestHash []byte
 }
 
-// PushRevisionResult is the pushAssetRevision response projection.
+// PushRevisionResult 是 pushAssetRevision 的响应投影。
 type PushRevisionResult struct {
-	AssetID      uuid.UUID
-	LayerID      uuid.UUID
-	RevisionID   uuid.UUID
-	JobID        uuid.UUID
+	// AssetID 是资产标识。
+	AssetID uuid.UUID
+	// LayerID 是层标识。
+	LayerID uuid.UUID
+	// RevisionID 是修订标识。
+	RevisionID uuid.UUID
+	// JobID 是任务标识。
+	JobID uuid.UUID
+	// Deduplicated 表示是否被语义合并去重。
 	Deduplicated bool
 }
 
-// DiffStore is the persistence boundary for diff, share, todo, upload, and push.
+// DiffStore 是差异、分享、待办、上传与推送的持久化边界。
 type DiffStore interface {
 	AssetStore
-	// GetServiceBySlug returns one active service by slug.
+	// GetServiceBySlug 按 slug 返回一个活跃服务。
 	GetServiceBySlug(context.Context, uuid.UUID, string) (ServiceRecord, error)
-	// GetLayerRevision returns one immutable layer revision.
+	// GetLayerRevision 返回一个不可变的层修订。
 	GetLayerRevision(context.Context, uuid.UUID, uuid.UUID) (LayerRevisionRecord, error)
-	// CreateSourceSpec inserts one push source spec.
+	// CreateSourceSpec 插入一个推送源配置。
 	CreateSourceSpec(context.Context, NewSourceSpec) (SourceSpecRecord, error)
-	// CreateUpload persists one diff upload.
+	// CreateUpload 持久化一个差异上传。
 	CreateUpload(context.Context, NewUpload) (UploadRecord, error)
-	// GetUpload returns one unexpired upload.
+	// GetUpload 返回一个未过期的上传。
 	GetUpload(context.Context, uuid.UUID, uuid.UUID) (UploadRecord, error)
-	// CreateDiffSnapshot persists one frozen diff result.
+	// CreateDiffSnapshot 持久化一个冻结的差异结果。
 	CreateDiffSnapshot(context.Context, NewDiffSnapshot) (DiffSnapshotRecord, error)
-	// GetDiffSnapshot returns one snapshot.
+	// GetDiffSnapshot 返回一个快照。
 	GetDiffSnapshot(context.Context, uuid.UUID, uuid.UUID) (DiffSnapshotRecord, error)
-	// CreateShareLink persists one share link.
+	// CreateShareLink 持久化一个分享链接。
 	CreateShareLink(context.Context, NewShareLink) (ShareLinkRecord, error)
-	// GetShareLinkByTokenHash returns one active share link.
+	// GetShareLinkByTokenHash 返回一个活跃分享链接。
 	GetShareLinkByTokenHash(context.Context, []byte) (ShareLinkRecord, error)
-	// CreateBreakingTodoIfAbsent creates one todo keyed by version+service.
+	// CreateBreakingTodoIfAbsent 按版本 + 服务创建一条待办（不存在时）。
 	CreateBreakingTodoIfAbsent(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) (TodoRecord, error)
-	// ListBreakingTodos pages todos by status.
+	// ListBreakingTodos 按状态分页列出待办。
 	ListBreakingTodos(context.Context, uuid.UUID, string, int32, int32) ([]TodoRecord, int64, error)
-	// AckBreakingTodo acknowledges one open todo.
+	// AckBreakingTodo 确认一条未完成待办。
 	AckBreakingTodo(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, time.Time, *string) (TodoRecord, error)
-	// GetSourceLayerByPushKey returns the push layer of an asset by the stable
-	// push identity (kind + name), so repeated pushes reuse one overlay layer.
+	// GetSourceLayerByPushKey 通过稳定推送标识（kind + name）返回资产的推送层，
+	// 使重复推送复用同一 overlay 层。
 	GetSourceLayerByPushKey(context.Context, uuid.UUID, uuid.UUID) (LayerRecord, error)
-	// ListServicesByRepositoryOwners returns the service ids owning an asset.
+	// ListServicesByRepositoryOwners 返回拥有某资产的服务 ID。
 	ListServicesByRepositoryOwners(context.Context, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)
 }
 
-// UploadRecord is one diff upload projection.
+// UploadRecord 是一个差异上传投影。
 type UploadRecord struct {
-	ID          uuid.UUID
-	BlobDigest  string
-	Kind        string
+	// ID 是上传的标识。
+	ID uuid.UUID
+	// BlobDigest 是内容 blob 摘要。
+	BlobDigest string
+	// Kind 是资产类别。
+	Kind string
+	// ContentType 是内容媒体类型。
 	ContentType string
-	SizeBytes   int64
-	ExpiresAt   time.Time
-	CreatedBy   *uuid.UUID
-	CreatedAt   time.Time
+	// SizeBytes 是内容大小（字节）。
+	SizeBytes int64
+	// ExpiresAt 是过期时间。
+	ExpiresAt time.Time
+	// CreatedBy 是创建者标识（可为空）。
+	CreatedBy *uuid.UUID
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
 }
 
-// NewUpload carries one upload insert.
+// NewUpload 承载一次上传插入。
 type NewUpload struct {
-	TenantID    uuid.UUID
-	ID          uuid.UUID
-	BlobDigest  string
-	Kind        string
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// ID 是上传的标识。
+	ID uuid.UUID
+	// BlobDigest 是内容 blob 摘要。
+	BlobDigest string
+	// Kind 是资产类别。
+	Kind string
+	// ContentType 是内容媒体类型。
 	ContentType string
-	SizeBytes   int64
-	ExpiresAt   time.Time
-	CreatedBy   *uuid.UUID
+	// SizeBytes 是内容大小（字节）。
+	SizeBytes int64
+	// ExpiresAt 是过期时间。
+	ExpiresAt time.Time
+	// CreatedBy 是创建者标识（可为空）。
+	CreatedBy *uuid.UUID
 }
 
-// DiffSnapshotRecord is one frozen diff snapshot projection.
+// DiffSnapshotRecord 是一个冻结的差异快照投影。
 type DiffSnapshotRecord struct {
-	ID               uuid.UUID
-	LeftSelector     []byte
-	RightSelector    []byte
-	LeftArtifactRef  string
+	// ID 是快照的标识。
+	ID uuid.UUID
+	// LeftSelector 是左侧选择器序列化字节。
+	LeftSelector []byte
+	// RightSelector 是右侧选择器序列化字节。
+	RightSelector []byte
+	// LeftArtifactRef 是左侧产物 blob 引用。
+	LeftArtifactRef string
+	// RightArtifactRef 是右侧产物 blob 引用。
 	RightArtifactRef string
-	RuleSetID        *uuid.UUID
-	ResultRef        string
-	Summary          []byte
-	CreatedBy        uuid.UUID
-	CreatedAt        time.Time
+	// RuleSetID 是规则集标识（可为空）。
+	RuleSetID *uuid.UUID
+	// ResultRef 是结果 blob 引用。
+	ResultRef string
+	// Summary 是摘要序列化字节。
+	Summary []byte
+	// CreatedBy 是创建者标识。
+	CreatedBy uuid.UUID
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
 }
 
-// NewDiffSnapshot carries one snapshot insert.
+// NewDiffSnapshot 承载一次快照插入。
 type NewDiffSnapshot struct {
-	TenantID         uuid.UUID
-	ID               uuid.UUID
-	LeftSelector     []byte
-	RightSelector    []byte
-	LeftArtifactRef  string
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// ID 是快照的标识。
+	ID uuid.UUID
+	// LeftSelector 是左侧选择器序列化字节。
+	LeftSelector []byte
+	// RightSelector 是右侧选择器序列化字节。
+	RightSelector []byte
+	// LeftArtifactRef 是左侧产物 blob 引用。
+	LeftArtifactRef string
+	// RightArtifactRef 是右侧产物 blob 引用。
 	RightArtifactRef string
-	RuleSetID        *uuid.UUID
-	ResultRef        string
-	Summary          []byte
-	CreatedBy        uuid.UUID
+	// RuleSetID 是规则集标识（可为空）。
+	RuleSetID *uuid.UUID
+	// ResultRef 是结果 blob 引用。
+	ResultRef string
+	// Summary 是摘要序列化字节。
+	Summary []byte
+	// CreatedBy 是创建者标识。
+	CreatedBy uuid.UUID
 }
 
-// ShareLinkRecord is one share link projection.
+// ShareLinkRecord 是一个分享链接投影。
 type ShareLinkRecord struct {
-	TenantID          uuid.UUID
-	ID                uuid.UUID
-	TokenHash         []byte
-	CreatorID         uuid.UUID
-	ResourceType      string
-	ResourceID        *uuid.UUID
-	Descriptor        []byte
-	ViewID            *string
-	Options           []byte
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// ID 是分享链接的标识。
+	ID uuid.UUID
+	// TokenHash 是令牌哈希。
+	TokenHash []byte
+	// CreatorID 是创建者标识。
+	CreatorID uuid.UUID
+	// ResourceType 是资源类型。
+	ResourceType string
+	// ResourceID 是资源标识（可为空）。
+	ResourceID *uuid.UUID
+	// Descriptor 是描述符序列化字节。
+	Descriptor []byte
+	// ViewID 是视图标识（可为空）。
+	ViewID *string
+	// Options 是选项序列化字节。
+	Options []byte
+	// ArtifactAllowlist 是产物白名单序列化字节。
 	ArtifactAllowlist []byte
-	ExpiresAt         time.Time
-	RevokedAt         *time.Time
-	CreatedAt         time.Time
+	// ExpiresAt 是过期时间。
+	ExpiresAt time.Time
+	// RevokedAt 是撤销时间（可为空）。
+	RevokedAt *time.Time
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
 }
 
-// NewShareLink carries one share link insert.
+// NewShareLink 承载一次分享链接插入。
 type NewShareLink struct {
-	TenantID          uuid.UUID
-	ID                uuid.UUID
-	TokenHash         []byte
-	CreatorID         uuid.UUID
-	ResourceType      string
-	ResourceID        *uuid.UUID
-	Descriptor        []byte
-	ViewID            *string
-	Options           []byte
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// ID 是分享链接的标识。
+	ID uuid.UUID
+	// TokenHash 是令牌哈希。
+	TokenHash []byte
+	// CreatorID 是创建者标识。
+	CreatorID uuid.UUID
+	// ResourceType 是资源类型。
+	ResourceType string
+	// ResourceID 是资源标识（可为空）。
+	ResourceID *uuid.UUID
+	// Descriptor 是描述符序列化字节。
+	Descriptor []byte
+	// ViewID 是视图标识（可为空）。
+	ViewID *string
+	// Options 是选项序列化字节。
+	Options []byte
+	// ArtifactAllowlist 是产物白名单序列化字节。
 	ArtifactAllowlist []byte
-	ExpiresAt         time.Time
+	// ExpiresAt 是过期时间。
+	ExpiresAt time.Time
 }

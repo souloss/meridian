@@ -16,27 +16,25 @@ import (
 	"github.com/riverqueue/river"
 )
 
-// LayerStore implements the M2 layer editing persistence boundary on top of the
-// generated repository queries. It embeds AssetStore to reuse the asset/track/
-// version read path and keeps the tenant predicate on every read.
+// LayerStore 在生成的 repository 查询之上实现 M2 层编辑持久化边界。
+// 它内嵌 AssetStore 复用 asset/track/version 读取路径，并在每次读取时保留租户谓词。
 type LayerStore struct {
 	*AssetStore
 	queries     *generated.Queries
 	riverClient *river.Client[pgx.Tx]
 }
 
-// NewLayerStore binds layer editing persistence to a native pgx pool.
+// NewLayerStore 将层编辑持久化绑定到原生 pgx 连接池。
 func NewLayerStore(pool *pgxpool.Pool) *LayerStore {
 	return &LayerStore{AssetStore: NewAssetStore(pool), queries: generated.New(pool)}
 }
 
-// BindRiver attaches the process River client so merge jobs can be enqueued
-// transactionally with their domain rows.
+// BindRiver 挂接进程 River 客户端，使合并任务可与领域行在同一事务内入队。
 func (store *LayerStore) BindRiver(riverClient *river.Client[pgx.Tx]) {
 	store.riverClient = riverClient
 }
 
-// GetLayer returns one active layer within the tenant boundary.
+// GetLayer 返回租户边界内的一条活跃层。
 func (store *LayerStore) GetLayer(ctx context.Context, tenantID, id uuid.UUID) (service.LayerRecord, error) {
 	row, err := store.queries.GetLayer(ctx, generated.GetLayerParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -45,7 +43,7 @@ func (store *LayerStore) GetLayer(ctx context.Context, tenantID, id uuid.UUID) (
 	return layerFromRow(row), nil
 }
 
-// ListLayersForAsset returns every active layer of one asset ordered by ord.
+// ListLayersForAsset 返回按 ord 排序的某一资产的全部活跃层。
 func (store *LayerStore) ListLayersForAsset(ctx context.Context, tenantID, assetID uuid.UUID) ([]service.LayerRecord, error) {
 	rows, err := store.queries.ListLayersForAsset(ctx, generated.ListLayersForAssetParams{TenantID: tenantID, AssetID: assetID})
 	if err != nil {
@@ -58,8 +56,7 @@ func (store *LayerStore) ListLayersForAsset(ctx context.Context, tenantID, asset
 	return items, nil
 }
 
-// UpdateLayerOrd moves one layer to a new ord under its revision, incrementing
-// the revision on success.
+// UpdateLayerOrd 在其修订号下将一层移动到新的 ord，成功后递增修订号。
 func (store *LayerStore) UpdateLayerOrd(ctx context.Context, tenantID, id uuid.UUID, expectedRevision int64, ord int) (service.LayerRecord, error) {
 	row, err := store.queries.UpdateLayerOrd(ctx, generated.UpdateLayerOrdParams{
 		TenantID: tenantID, ID: id, ExpectedRevision: expectedRevision, Ord: int32(ord),
@@ -70,7 +67,7 @@ func (store *LayerStore) UpdateLayerOrd(ctx context.Context, tenantID, id uuid.U
 	return layerFromRow(row), nil
 }
 
-// GetLayerRevision returns one immutable layer revision within the tenant.
+// GetLayerRevision 返回租户内的一条不可变层修订。
 func (store *LayerStore) GetLayerRevision(ctx context.Context, tenantID, id uuid.UUID) (service.LayerRevisionRecord, error) {
 	row, err := store.queries.GetLayerRevision(ctx, generated.GetLayerRevisionParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -79,7 +76,7 @@ func (store *LayerStore) GetLayerRevision(ctx context.Context, tenantID, id uuid
 	return layerRevisionFromRow(row), nil
 }
 
-// GetLayerHead returns one layer head pointer within the tenant boundary.
+// GetLayerHead 返回租户边界内的一条层头指针。
 func (store *LayerStore) GetLayerHead(ctx context.Context, tenantID, layerID uuid.UUID, scopeType, scopeKey string) (service.LayerHeadRecord, error) {
 	row, err := store.queries.GetLayerHead(ctx, generated.GetLayerHeadParams{
 		TenantID: tenantID, LayerID: layerID, ScopeType: scopeType, ScopeKey: scopeKey,
@@ -90,7 +87,7 @@ func (store *LayerStore) GetLayerHead(ctx context.Context, tenantID, layerID uui
 	return layerHeadFromRow(row), nil
 }
 
-// GetAssetRefTrackByID returns one asset ref track by its id.
+// GetAssetRefTrackByID 按其 id 返回一条资产 ref track。
 func (store *LayerStore) GetAssetRefTrackByID(ctx context.Context, tenantID, id uuid.UUID) (service.AssetRefTrackRecord, error) {
 	row, err := store.queries.GetAssetRefTrackByID(ctx, generated.GetAssetRefTrackByIDParams{TenantID: tenantID, ID: id})
 	if err != nil {
@@ -99,7 +96,7 @@ func (store *LayerStore) GetAssetRefTrackByID(ctx context.Context, tenantID, id 
 	return service.AssetRefTrackRecord{ID: row.ID, AssetID: row.AssetID, RefType: row.RefType, RefName: row.RefName, LatestVersionID: row.LatestVersionID, CurrentVersionID: row.CurrentVersionID, Health: row.Health}, nil
 }
 
-// UpdateLayerHeadPointers updates the head pointers and increments generation.
+// UpdateLayerHeadPointers 更新层头指针并递增代次。
 func (store *LayerStore) UpdateLayerHeadPointers(ctx context.Context, input service.NewLayerHead) (service.LayerHeadRecord, error) {
 	row, err := store.queries.UpdateLayerHeadPointers(ctx, generated.UpdateLayerHeadPointersParams{
 		TenantID: input.TenantID, LayerID: input.LayerID, ScopeType: input.ScopeType, ScopeKey: input.ScopeKey,
@@ -111,7 +108,7 @@ func (store *LayerStore) UpdateLayerHeadPointers(ctx context.Context, input serv
 	return layerHeadFromRow(row), nil
 }
 
-// EnqueueMergeJob records one asset.merge job and its River work atomically.
+// EnqueueMergeJob 原子地记录一条 asset.merge 任务及其 River 工作。
 func (store *LayerStore) EnqueueMergeJob(ctx context.Context, input service.MergeJobInput) (service.JobAccepted, error) {
 	dedupeKey := mergeDedupeKey(input.TrackID)
 	jobInput, err := json.Marshal(struct {
@@ -129,9 +126,9 @@ func (store *LayerStore) EnqueueMergeJob(ctx context.Context, input service.Merg
 
 	for {
 		latest, err := queries.LockLatestDiscoveryJob(ctx, generated.LockLatestDiscoveryJobParams{TenantID: input.TenantID, DedupeKey: dedupeKey})
-		generation := int64(1)
+		generation := jobGenerationInitial
 		if err == nil {
-			if latest.Status == "pending" || latest.Status == "running" {
+			if latest.Status == service.JobStatusPending || latest.Status == service.JobStatusRunning {
 				return service.JobAccepted{JobID: latest.ID, Deduplicated: true}, nil
 			}
 			generation = latest.ActiveGeneration + 1
@@ -156,7 +153,7 @@ func (store *LayerStore) EnqueueMergeJob(ctx context.Context, input service.Merg
 					TenantID: input.TenantID, ID: row.ID, RiverJobID: new(inserted.Job.ID), UpdatedAt: timestamp(time.Now().UTC()),
 				}); err != nil {
 					return service.JobAccepted{}, normalizeError(err)
-				} else if changed != 1 {
+				} else if changed != rowsAffectedOne {
 					return service.JobAccepted{}, fmt.Errorf("attach River job %d to domain job %s: %w", inserted.Job.ID, row.ID, service.ErrPrecondition)
 				}
 			}
@@ -172,7 +169,7 @@ func (store *LayerStore) EnqueueMergeJob(ctx context.Context, input service.Merg
 }
 
 func mergeDedupeKey(trackID uuid.UUID) string {
-	return "merge:" + trackID.String()
+	return dedupeKeyPrefixMerge + trackID.String()
 }
 
 func layerRevisionFromRow(row generated.LayerRevision) service.LayerRevisionRecord {

@@ -8,36 +8,36 @@ import (
 	rootapi "github.com/meridian-labs/meridian/internal/generated/api"
 )
 
-// UnimplementedStrictServer provides explicit defaults for every generated strict operation.
-// Embed it by value and override only the operations owned by the current milestone.
+// UnimplementedStrictServer 为每个生成的严格操作提供显式默认实现。
+// 以值方式嵌入，并只覆写当前里程碑拥有的操作。
 type UnimplementedStrictServer struct{}
 
-// Login returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// Login 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) Login(ctx context.Context, request LoginRequestObject) (LoginResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// Logout returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// Logout 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) Logout(ctx context.Context, request LogoutRequestObject) (LogoutResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetMe returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetMe 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetMe(ctx context.Context, request GetMeRequestObject) (GetMeResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// GetMyPreferences returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// GetMyPreferences 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) GetMyPreferences(ctx context.Context, request GetMyPreferencesRequestObject) (GetMyPreferencesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// UpdateMyPreferences returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// UpdateMyPreferences 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) UpdateMyPreferences(ctx context.Context, request UpdateMyPreferencesRequestObject) (UpdateMyPreferencesResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }
 
-// Refresh returns ErrStrictOperationNotImplemented until its milestone is implemented.
+// Refresh 在其里程碑实现之前返回 ErrStrictOperationNotImplemented。
 func (UnimplementedStrictServer) Refresh(ctx context.Context, request RefreshRequestObject) (RefreshResponseObject, error) {
 	return nil, rootapi.ErrStrictOperationNotImplemented
 }

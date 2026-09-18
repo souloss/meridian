@@ -23,17 +23,17 @@ WHERE tenant_id = $1
   AND deleted_at IS NULL
 `
 
-// ArchiveAiBaseForServiceParams contains the strongly typed arguments for the ArchiveAiBaseForService query.
+// ArchiveAiBaseForServiceParams 包含 ArchiveAiBaseForService 查询的强类型参数。
 type ArchiveAiBaseForServiceParams struct {
-	// TenantID is the tenant id value supplied to the ArchiveAiBaseForService query.
+	// TenantID 是提供给 ArchiveAiBaseForService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the ArchiveAiBaseForService query.
+	// ServiceID 是提供给 ArchiveAiBaseForService 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the ArchiveAiBaseForService query.
+	// Kind 是提供给 ArchiveAiBaseForService 查询的 Kind 值。
 	Kind string `json:"kind"`
 }
 
-// ArchiveAiBaseForService executes the generated ArchiveAiBaseForService database query.
+// ArchiveAiBaseForService 执行生成的 ArchiveAiBaseForService 数据库查询。
 // 将某服务某 kind 的 AI 生成 base 源配置及其层软删除（历史保留）。
 func (q *Queries) ArchiveAiBaseForService(ctx context.Context, arg ArchiveAiBaseForServiceParams) (int64, error) {
 	result, err := q.db.Exec(ctx, archiveAiBaseForService, arg.TenantID, arg.ServiceID, arg.Kind)
@@ -57,17 +57,17 @@ WHERE layers.tenant_id = ss.tenant_id
   AND layers.deleted_at IS NULL
 `
 
-// ArchiveAiBaseLayersForServiceParams contains the strongly typed arguments for the ArchiveAiBaseLayersForService query.
+// ArchiveAiBaseLayersForServiceParams 包含 ArchiveAiBaseLayersForService 查询的强类型参数。
 type ArchiveAiBaseLayersForServiceParams struct {
-	// TenantID is the tenant id value supplied to the ArchiveAiBaseLayersForService query.
+	// TenantID 是提供给 ArchiveAiBaseLayersForService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the ArchiveAiBaseLayersForService query.
+	// ServiceID 是提供给 ArchiveAiBaseLayersForService 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the ArchiveAiBaseLayersForService query.
+	// Kind 是提供给 ArchiveAiBaseLayersForService 查询的 Kind 值。
 	Kind string `json:"kind"`
 }
 
-// ArchiveAiBaseLayersForService executes the generated ArchiveAiBaseLayersForService database query.
+// ArchiveAiBaseLayersForService 执行生成的 ArchiveAiBaseLayersForService 数据库查询。
 // 将某服务某 kind 的 AI 生成 base 层软删除（历史保留）。
 func (q *Queries) ArchiveAiBaseLayersForService(ctx context.Context, arg ArchiveAiBaseLayersForServiceParams) (int64, error) {
 	result, err := q.db.Exec(ctx, archiveAiBaseLayersForService, arg.TenantID, arg.ServiceID, arg.Kind)
@@ -85,15 +85,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// BumpAssetRefTrackGenerationParams contains the strongly typed arguments for the BumpAssetRefTrackGeneration query.
+// BumpAssetRefTrackGenerationParams 包含 BumpAssetRefTrackGeneration 查询的强类型参数。
 type BumpAssetRefTrackGenerationParams struct {
-	// TenantID is the tenant id value supplied to the BumpAssetRefTrackGeneration query.
+	// TenantID 是提供给 BumpAssetRefTrackGeneration 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the BumpAssetRefTrackGeneration query.
+	// ID 是提供给 BumpAssetRefTrackGeneration 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// BumpAssetRefTrackGeneration executes the generated BumpAssetRefTrackGeneration database query.
+// BumpAssetRefTrackGeneration 执行生成的 BumpAssetRefTrackGeneration 数据库查询。
 // 更新轨迹的 desired_generation，表示一次发布（或历史回退）影响了该轨迹。
 func (q *Queries) BumpAssetRefTrackGeneration(ctx context.Context, arg BumpAssetRefTrackGenerationParams) (int64, error) {
 	result, err := q.db.Exec(ctx, bumpAssetRefTrackGeneration, arg.TenantID, arg.ID)
@@ -113,23 +113,23 @@ INSERT INTO idempotency_records (
 )
 `
 
-// CreateAiGenerationIdempotencyParams contains the strongly typed arguments for the CreateAiGenerationIdempotency query.
+// CreateAiGenerationIdempotencyParams 包含 CreateAiGenerationIdempotency 查询的强类型参数。
 type CreateAiGenerationIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the CreateAiGenerationIdempotency query.
+	// TenantID 是提供给 CreateAiGenerationIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the CreateAiGenerationIdempotency query.
+	// PrincipalType 是提供给 CreateAiGenerationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the CreateAiGenerationIdempotency query.
+	// PrincipalID 是提供给 CreateAiGenerationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the CreateAiGenerationIdempotency query.
+	// IdempotencyKey 是提供给 CreateAiGenerationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
-	// RequestHash is the request hash value supplied to the CreateAiGenerationIdempotency query.
+	// RequestHash 是提供给 CreateAiGenerationIdempotency 查询的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value supplied to the CreateAiGenerationIdempotency query.
+	// ResponseBody 是提供给 CreateAiGenerationIdempotency 查询的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
 }
 
-// CreateAiGenerationIdempotency executes the generated CreateAiGenerationIdempotency database query.
+// CreateAiGenerationIdempotency 执行生成的 CreateAiGenerationIdempotency 数据库查询。
 // 保存可重放 24 小时的准确、非敏感 202 响应。
 func (q *Queries) CreateAiGenerationIdempotency(ctx context.Context, arg CreateAiGenerationIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, createAiGenerationIdempotency,
@@ -156,27 +156,27 @@ ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// CreateAiGenerationJobParams contains the strongly typed arguments for the CreateAiGenerationJob query.
+// CreateAiGenerationJobParams 包含 CreateAiGenerationJob 查询的强类型参数。
 type CreateAiGenerationJobParams struct {
-	// TenantID is the tenant id value supplied to the CreateAiGenerationJob query.
+	// TenantID 是提供给 CreateAiGenerationJob 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the CreateAiGenerationJob query.
+	// ID 是提供给 CreateAiGenerationJob 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// AssetID is the asset id value supplied to the CreateAiGenerationJob query.
+	// AssetID 是提供给 CreateAiGenerationJob 查询的 AssetID 值。
 	AssetID *uuid.UUID `json:"asset_id"`
-	// RefType is the ref type value supplied to the CreateAiGenerationJob query.
+	// RefType 是提供给 CreateAiGenerationJob 查询的 RefType 值。
 	RefType *string `json:"ref_type"`
-	// RefName is the ref name value supplied to the CreateAiGenerationJob query.
+	// RefName 是提供给 CreateAiGenerationJob 查询的 RefName 值。
 	RefName *string `json:"ref_name"`
-	// JobInput is the job input value supplied to the CreateAiGenerationJob query.
+	// JobInput 是提供给 CreateAiGenerationJob 查询的 JobInput 值。
 	JobInput []byte `json:"job_input"`
-	// DedupeKey is the dedupe key value supplied to the CreateAiGenerationJob query.
+	// DedupeKey 是提供给 CreateAiGenerationJob 查询的 DedupeKey 值。
 	DedupeKey string `json:"dedupe_key"`
-	// ActiveGeneration is the active generation value supplied to the CreateAiGenerationJob query.
+	// ActiveGeneration 是提供给 CreateAiGenerationJob 查询的 ActiveGeneration 值。
 	ActiveGeneration int64 `json:"active_generation"`
 }
 
-// CreateAiGenerationJob executes the generated CreateAiGenerationJob database query.
+// CreateAiGenerationJob 执行生成的 CreateAiGenerationJob 数据库查询。
 // 记录一条资产 AI 生成任务。
 func (q *Queries) CreateAiGenerationJob(ctx context.Context, arg CreateAiGenerationJobParams) (Job, error) {
 	row := q.db.QueryRow(ctx, createAiGenerationJob,
@@ -230,19 +230,19 @@ WHERE tenant_id = $1
   AND idempotency_key = $4
 `
 
-// DeleteAiGenerationIdempotencyParams contains the strongly typed arguments for the DeleteAiGenerationIdempotency query.
+// DeleteAiGenerationIdempotencyParams 包含 DeleteAiGenerationIdempotency 查询的强类型参数。
 type DeleteAiGenerationIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the DeleteAiGenerationIdempotency query.
+	// TenantID 是提供给 DeleteAiGenerationIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the DeleteAiGenerationIdempotency query.
+	// PrincipalType 是提供给 DeleteAiGenerationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the DeleteAiGenerationIdempotency query.
+	// PrincipalID 是提供给 DeleteAiGenerationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the DeleteAiGenerationIdempotency query.
+	// IdempotencyKey 是提供给 DeleteAiGenerationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// DeleteAiGenerationIdempotency executes the generated DeleteAiGenerationIdempotency database query.
+// DeleteAiGenerationIdempotency 执行生成的 DeleteAiGenerationIdempotency 数据库查询。
 // 在重新使用幂等键前删除已过期的 generateMissingAssetWithAi 重放记录。
 func (q *Queries) DeleteAiGenerationIdempotency(ctx context.Context, arg DeleteAiGenerationIdempotencyParams) error {
 	_, err := q.db.Exec(ctx, deleteAiGenerationIdempotency,
@@ -266,17 +266,17 @@ WHERE ss.tenant_id = $1
 LIMIT 1
 `
 
-// GetAiBaseForServiceParams contains the strongly typed arguments for the GetAiBaseForService query.
+// GetAiBaseForServiceParams 包含 GetAiBaseForService 查询的强类型参数。
 type GetAiBaseForServiceParams struct {
-	// TenantID is the tenant id value supplied to the GetAiBaseForService query.
+	// TenantID 是提供给 GetAiBaseForService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the GetAiBaseForService query.
+	// ServiceID 是提供给 GetAiBaseForService 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the GetAiBaseForService query.
+	// Kind 是提供给 GetAiBaseForService 查询的 Kind 值。
 	Kind string `json:"kind"`
 }
 
-// GetAiBaseForService executes the generated GetAiBaseForService database query.
+// GetAiBaseForService 执行生成的 GetAiBaseForService 数据库查询。
 // 返回某服务某 kind 下启用且未删除的 AI 生成 base 源配置。
 func (q *Queries) GetAiBaseForService(ctx context.Context, arg GetAiBaseForServiceParams) (SourceSpec, error) {
 	row := q.db.QueryRow(ctx, getAiBaseForService, arg.TenantID, arg.ServiceID, arg.Kind)
@@ -318,29 +318,29 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// GetAiGenerationIdempotencyParams contains the strongly typed arguments for the GetAiGenerationIdempotency query.
+// GetAiGenerationIdempotencyParams 包含 GetAiGenerationIdempotency 查询的强类型参数。
 type GetAiGenerationIdempotencyParams struct {
-	// TenantID is the tenant id value supplied to the GetAiGenerationIdempotency query.
+	// TenantID 是提供给 GetAiGenerationIdempotency 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// PrincipalType is the principal type value supplied to the GetAiGenerationIdempotency query.
+	// PrincipalType 是提供给 GetAiGenerationIdempotency 查询的 PrincipalType 值。
 	PrincipalType string `json:"principal_type"`
-	// PrincipalID is the principal id value supplied to the GetAiGenerationIdempotency query.
+	// PrincipalID 是提供给 GetAiGenerationIdempotency 查询的 PrincipalID 值。
 	PrincipalID uuid.UUID `json:"principal_id"`
-	// IdempotencyKey is the idempotency key value supplied to the GetAiGenerationIdempotency query.
+	// IdempotencyKey 是提供给 GetAiGenerationIdempotency 查询的 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID `json:"idempotency_key"`
 }
 
-// GetAiGenerationIdempotencyRow contains the columns returned by the GetAiGenerationIdempotency query.
+// GetAiGenerationIdempotencyRow 包含 GetAiGenerationIdempotency 查询返回的列。
 type GetAiGenerationIdempotencyRow struct {
-	// RequestHash is the request hash value returned by the GetAiGenerationIdempotency query.
+	// RequestHash 是 GetAiGenerationIdempotency 查询返回的 RequestHash 值。
 	RequestHash []byte `json:"request_hash"`
-	// ResponseBody is the response body value returned by the GetAiGenerationIdempotency query.
+	// ResponseBody 是 GetAiGenerationIdempotency 查询返回的 ResponseBody 值。
 	ResponseBody []byte `json:"response_body"`
-	// ExpiresAt is the expires at value returned by the GetAiGenerationIdempotency query.
+	// ExpiresAt 是 GetAiGenerationIdempotency 查询返回的 ExpiresAt 值。
 	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
-// GetAiGenerationIdempotency executes the generated GetAiGenerationIdempotency database query.
+// GetAiGenerationIdempotency 执行生成的 GetAiGenerationIdempotency 数据库查询。
 // 返回 generateMissingAssetWithAi 请求保留的准确响应。
 func (q *Queries) GetAiGenerationIdempotency(ctx context.Context, arg GetAiGenerationIdempotencyParams) (GetAiGenerationIdempotencyRow, error) {
 	row := q.db.QueryRow(ctx, getAiGenerationIdempotency,
@@ -361,15 +361,15 @@ WHERE tenant_id = $1
   AND job_id = $2
 `
 
-// GetAiGenerationResultParams contains the strongly typed arguments for the GetAiGenerationResult query.
+// GetAiGenerationResultParams 包含 GetAiGenerationResult 查询的强类型参数。
 type GetAiGenerationResultParams struct {
-	// TenantID is the tenant id value supplied to the GetAiGenerationResult query.
+	// TenantID 是提供给 GetAiGenerationResult 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// JobID is the job id value supplied to the GetAiGenerationResult query.
+	// JobID 是提供给 GetAiGenerationResult 查询的 JobID 值。
 	JobID uuid.UUID `json:"job_id"`
 }
 
-// GetAiGenerationResult executes the generated GetAiGenerationResult database query.
+// GetAiGenerationResult 执行生成的 GetAiGenerationResult 数据库查询。
 // 返回一次 AI 资产生成结果快照，供终态读取与重放。
 func (q *Queries) GetAiGenerationResult(ctx context.Context, arg GetAiGenerationResultParams) (AiGenerationResult, error) {
 	row := q.db.QueryRow(ctx, getAiGenerationResult, arg.TenantID, arg.JobID)
@@ -398,15 +398,15 @@ WHERE tenant_id = $1
   AND id = $2
 `
 
-// GetJobInputParams contains the strongly typed arguments for the GetJobInput query.
+// GetJobInputParams 包含 GetJobInput 查询的强类型参数。
 type GetJobInputParams struct {
-	// TenantID is the tenant id value supplied to the GetJobInput query.
+	// TenantID 是提供给 GetJobInput 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetJobInput query.
+	// ID 是提供给 GetJobInput 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetJobInput executes the generated GetJobInput database query.
+// GetJobInput 执行生成的 GetJobInput 数据库查询。
 // 返回一条任务不可变、非敏感的输入 JSON，供 worker 恢复执行上下文。
 func (q *Queries) GetJobInput(ctx context.Context, arg GetJobInputParams) ([]byte, error) {
 	row := q.db.QueryRow(ctx, getJobInput, arg.TenantID, arg.ID)
@@ -424,61 +424,61 @@ WHERE r.tenant_id = $1
   AND l.deleted_at IS NULL
 `
 
-// GetLayerRevisionForReviewParams contains the strongly typed arguments for the GetLayerRevisionForReview query.
+// GetLayerRevisionForReviewParams 包含 GetLayerRevisionForReview 查询的强类型参数。
 type GetLayerRevisionForReviewParams struct {
-	// TenantID is the tenant id value supplied to the GetLayerRevisionForReview query.
+	// TenantID 是提供给 GetLayerRevisionForReview 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the GetLayerRevisionForReview query.
+	// ID 是提供给 GetLayerRevisionForReview 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// GetLayerRevisionForReviewRow contains the columns returned by the GetLayerRevisionForReview query.
+// GetLayerRevisionForReviewRow 包含 GetLayerRevisionForReview 查询返回的列。
 type GetLayerRevisionForReviewRow struct {
-	// TenantID is the tenant id value returned by the GetLayerRevisionForReview query.
+	// TenantID 是 GetLayerRevisionForReview 查询返回的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value returned by the GetLayerRevisionForReview query.
+	// ID 是 GetLayerRevisionForReview 查询返回的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// LayerID is the layer id value returned by the GetLayerRevisionForReview query.
+	// LayerID 是 GetLayerRevisionForReview 查询返回的 LayerID 值。
 	LayerID uuid.UUID `json:"layer_id"`
-	// ScopeType is the scope type value returned by the GetLayerRevisionForReview query.
+	// ScopeType 是 GetLayerRevisionForReview 查询返回的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value returned by the GetLayerRevisionForReview query.
+	// ScopeKey 是 GetLayerRevisionForReview 查询返回的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
-	// ContentHash is the content hash value returned by the GetLayerRevisionForReview query.
+	// ContentHash 是 GetLayerRevisionForReview 查询返回的 ContentHash 值。
 	ContentHash string `json:"content_hash"`
-	// ContentRef is the content ref value returned by the GetLayerRevisionForReview query.
+	// ContentRef 是 GetLayerRevisionForReview 查询返回的 ContentRef 值。
 	ContentRef string `json:"content_ref"`
-	// ContentType is the content type value returned by the GetLayerRevisionForReview query.
+	// ContentType 是 GetLayerRevisionForReview 查询返回的 ContentType 值。
 	ContentType string `json:"content_type"`
-	// Dialect is the dialect value returned by the GetLayerRevisionForReview query.
+	// Dialect 是 GetLayerRevisionForReview 查询返回的 Dialect 值。
 	Dialect *string `json:"dialect"`
-	// SourceBranch is the source branch value returned by the GetLayerRevisionForReview query.
+	// SourceBranch 是 GetLayerRevisionForReview 查询返回的 SourceBranch 值。
 	SourceBranch *string `json:"source_branch"`
-	// ReviewStatus is the review status value returned by the GetLayerRevisionForReview query.
+	// ReviewStatus 是 GetLayerRevisionForReview 查询返回的 ReviewStatus 值。
 	ReviewStatus string `json:"review_status"`
-	// ReviewComment is the review comment value returned by the GetLayerRevisionForReview query.
+	// ReviewComment 是 GetLayerRevisionForReview 查询返回的 ReviewComment 值。
 	ReviewComment *string `json:"review_comment"`
-	// GitCommit is the git commit value returned by the GetLayerRevisionForReview query.
+	// GitCommit 是 GetLayerRevisionForReview 查询返回的 GitCommit 值。
 	GitCommit *string `json:"git_commit"`
-	// CreatedBy is the created by value returned by the GetLayerRevisionForReview query.
+	// CreatedBy 是 GetLayerRevisionForReview 查询返回的 CreatedBy 值。
 	CreatedBy *uuid.UUID `json:"created_by"`
-	// ProducerRunID is the producer run id value returned by the GetLayerRevisionForReview query.
+	// ProducerRunID 是 GetLayerRevisionForReview 查询返回的 ProducerRunID 值。
 	ProducerRunID *uuid.UUID `json:"producer_run_id"`
-	// AiMeta is the ai meta value returned by the GetLayerRevisionForReview query.
+	// AiMeta 是 GetLayerRevisionForReview 查询返回的 AiMeta 值。
 	AiMeta []byte `json:"ai_meta"`
-	// Review is the review value returned by the GetLayerRevisionForReview query.
+	// Review 是 GetLayerRevisionForReview 查询返回的 Review 值。
 	Review []byte `json:"review"`
-	// CreatedAt is the created at value returned by the GetLayerRevisionForReview query.
+	// CreatedAt 是 GetLayerRevisionForReview 查询返回的 CreatedAt 值。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	// AssetID is the asset id value returned by the GetLayerRevisionForReview query.
+	// AssetID 是 GetLayerRevisionForReview 查询返回的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// Role is the role value returned by the GetLayerRevisionForReview query.
+	// Role 是 GetLayerRevisionForReview 查询返回的 Role 值。
 	Role string `json:"role"`
-	// Origin is the origin value returned by the GetLayerRevisionForReview query.
+	// Origin 是 GetLayerRevisionForReview 查询返回的 Origin 值。
 	Origin string `json:"origin"`
 }
 
-// GetLayerRevisionForReview executes the generated GetLayerRevisionForReview database query.
+// GetLayerRevisionForReview 执行生成的 GetLayerRevisionForReview 数据库查询。
 // 返回待审核修订及其层的行，供评审事务使用。
 func (q *Queries) GetLayerRevisionForReview(ctx context.Context, arg GetLayerRevisionForReviewParams) (GetLayerRevisionForReviewRow, error) {
 	row := q.db.QueryRow(ctx, getLayerRevisionForReview, arg.TenantID, arg.ID)
@@ -515,7 +515,7 @@ FROM tenants
 WHERE id = $1
 `
 
-// GetTenantSettings executes the generated GetTenantSettings database query.
+// GetTenantSettings 执行生成的 GetTenantSettings 数据库查询。
 // 返回租户的设置 JSON 快照，供 trust 模式与自动发布判定。
 func (q *Queries) GetTenantSettings(ctx context.Context, id uuid.UUID) ([]byte, error) {
 	row := q.db.QueryRow(ctx, getTenantSettings, id)
@@ -536,17 +536,17 @@ WHERE ss.tenant_id = $1
   AND l.deleted_at IS NULL
 `
 
-// ListAiBaseLayersForServiceParams contains the strongly typed arguments for the ListAiBaseLayersForService query.
+// ListAiBaseLayersForServiceParams 包含 ListAiBaseLayersForService 查询的强类型参数。
 type ListAiBaseLayersForServiceParams struct {
-	// TenantID is the tenant id value supplied to the ListAiBaseLayersForService query.
+	// TenantID 是提供给 ListAiBaseLayersForService 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ServiceID is the service id value supplied to the ListAiBaseLayersForService query.
+	// ServiceID 是提供给 ListAiBaseLayersForService 查询的 ServiceID 值。
 	ServiceID uuid.UUID `json:"service_id"`
-	// Kind is the kind value supplied to the ListAiBaseLayersForService query.
+	// Kind 是提供给 ListAiBaseLayersForService 查询的 Kind 值。
 	Kind string `json:"kind"`
 }
 
-// ListAiBaseLayersForService executes the generated ListAiBaseLayersForService database query.
+// ListAiBaseLayersForService 执行生成的 ListAiBaseLayersForService 数据库查询。
 // 返回某服务某 kind 的 AI 生成 base 层（含资产标识），供替换事务复用资产。
 func (q *Queries) ListAiBaseLayersForService(ctx context.Context, arg ListAiBaseLayersForServiceParams) ([]Layer, error) {
 	rows, err := q.db.Query(ctx, listAiBaseLayersForService, arg.TenantID, arg.ServiceID, arg.Kind)
@@ -596,19 +596,19 @@ WHERE lh.tenant_id = $1
   AND l.deleted_at IS NULL
 `
 
-// ListEnabledLayerHeadsForAssetScopeParams contains the strongly typed arguments for the ListEnabledLayerHeadsForAssetScope query.
+// ListEnabledLayerHeadsForAssetScopeParams 包含 ListEnabledLayerHeadsForAssetScope 查询的强类型参数。
 type ListEnabledLayerHeadsForAssetScopeParams struct {
-	// TenantID is the tenant id value supplied to the ListEnabledLayerHeadsForAssetScope query.
+	// TenantID 是提供给 ListEnabledLayerHeadsForAssetScope 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// AssetID is the asset id value supplied to the ListEnabledLayerHeadsForAssetScope query.
+	// AssetID 是提供给 ListEnabledLayerHeadsForAssetScope 查询的 AssetID 值。
 	AssetID uuid.UUID `json:"asset_id"`
-	// ScopeType is the scope type value supplied to the ListEnabledLayerHeadsForAssetScope query.
+	// ScopeType 是提供给 ListEnabledLayerHeadsForAssetScope 查询的 ScopeType 值。
 	ScopeType string `json:"scope_type"`
-	// ScopeKey is the scope key value supplied to the ListEnabledLayerHeadsForAssetScope query.
+	// ScopeKey 是提供给 ListEnabledLayerHeadsForAssetScope 查询的 ScopeKey 值。
 	ScopeKey string `json:"scope_key"`
 }
 
-// ListEnabledLayerHeadsForAssetScope executes the generated ListEnabledLayerHeadsForAssetScope database query.
+// ListEnabledLayerHeadsForAssetScope 执行生成的 ListEnabledLayerHeadsForAssetScope 数据库查询。
 // 列出某资产某作用域内启用层的头指针，供评审前置校验（无候选）。
 func (q *Queries) ListEnabledLayerHeadsForAssetScope(ctx context.Context, arg ListEnabledLayerHeadsForAssetScopeParams) ([]LayerHead, error) {
 	rows, err := q.db.Query(ctx, listEnabledLayerHeadsForAssetScope,
@@ -649,7 +649,7 @@ const lockAiGenerationIdempotency = `-- name: LockAiGenerationIdempotency :exec
 SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
 `
 
-// LockAiGenerationIdempotency executes the generated LockAiGenerationIdempotency database query.
+// LockAiGenerationIdempotency 执行生成的 LockAiGenerationIdempotency 数据库查询。
 // 为已认证的租户主体串行化一个 generateMissingAssetWithAi 幂等键。
 func (q *Queries) LockAiGenerationIdempotency(ctx context.Context, lockKey string) error {
 	_, err := q.db.Exec(ctx, lockAiGenerationIdempotency, lockKey)
@@ -664,15 +664,15 @@ WHERE tenant_id = $1
 FOR UPDATE
 `
 
-// LockAssetRefTrackParams contains the strongly typed arguments for the LockAssetRefTrack query.
+// LockAssetRefTrackParams 包含 LockAssetRefTrack 查询的强类型参数。
 type LockAssetRefTrackParams struct {
-	// TenantID is the tenant id value supplied to the LockAssetRefTrack query.
+	// TenantID 是提供给 LockAssetRefTrack 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the LockAssetRefTrack query.
+	// ID 是提供给 LockAssetRefTrack 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// LockAssetRefTrack executes the generated LockAssetRefTrack database query.
+// LockAssetRefTrack 执行生成的 LockAssetRefTrack 数据库查询。
 // 锁定轨迹行，供发布事务串行化与递增 desired_generation。
 func (q *Queries) LockAssetRefTrack(ctx context.Context, arg LockAssetRefTrackParams) (AssetRefTrack, error) {
 	row := q.db.QueryRow(ctx, lockAssetRefTrack, arg.TenantID, arg.ID)
@@ -703,15 +703,15 @@ WHERE tenant_id = $1
   AND review_status = 'pending_review'
 `
 
-// SupersedeLayerRevisionParams contains the strongly typed arguments for the SupersedeLayerRevision query.
+// SupersedeLayerRevisionParams 包含 SupersedeLayerRevision 查询的强类型参数。
 type SupersedeLayerRevisionParams struct {
-	// TenantID is the tenant id value supplied to the SupersedeLayerRevision query.
+	// TenantID 是提供给 SupersedeLayerRevision 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the SupersedeLayerRevision query.
+	// ID 是提供给 SupersedeLayerRevision 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// SupersedeLayerRevision executes the generated SupersedeLayerRevision database query.
+// SupersedeLayerRevision 执行生成的 SupersedeLayerRevision 数据库查询。
 // 将一条修订标记为 superseded（新候选替换旧候选）。
 func (q *Queries) SupersedeLayerRevision(ctx context.Context, arg SupersedeLayerRevisionParams) (int64, error) {
 	result, err := q.db.Exec(ctx, supersedeLayerRevision, arg.TenantID, arg.ID)
@@ -729,15 +729,15 @@ WHERE tenant_id = $1
   AND lifecycle = 'published'
 `
 
-// UnpublishAssetVersionParams contains the strongly typed arguments for the UnpublishAssetVersion query.
+// UnpublishAssetVersionParams 包含 UnpublishAssetVersion 查询的强类型参数。
 type UnpublishAssetVersionParams struct {
-	// TenantID is the tenant id value supplied to the UnpublishAssetVersion query.
+	// TenantID 是提供给 UnpublishAssetVersion 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UnpublishAssetVersion query.
+	// ID 是提供给 UnpublishAssetVersion 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// UnpublishAssetVersion executes the generated UnpublishAssetVersion database query.
+// UnpublishAssetVersion 执行生成的 UnpublishAssetVersion 数据库查询。
 // 将一条已发布版本置为 draft，供历史输入回退时解除既有 published 状态。
 func (q *Queries) UnpublishAssetVersion(ctx context.Context, arg UnpublishAssetVersionParams) (int64, error) {
 	result, err := q.db.Exec(ctx, unpublishAssetVersion, arg.TenantID, arg.ID)
@@ -759,19 +759,19 @@ WHERE tenant_id = $2
 RETURNING tenant_id, id, asset_id, track_id, sequence_no, version, lifecycle, revision, quality_score, merge_request_id, input_fingerprint, merge_engine_version, overlay_compiler_version, overlay_mode, normalizer_version, kind_plugin_version, layer_manifest, merged_hash, merged_ref, normalized_ref, bundled_ref, provenance_ref, source_commit, baseline_version_id, diff_summary, labels, index_complete, created_at, updated_at
 `
 
-// UpdateAssetVersionPublishParams contains the strongly typed arguments for the UpdateAssetVersionPublish query.
+// UpdateAssetVersionPublishParams 包含 UpdateAssetVersionPublish 查询的强类型参数。
 type UpdateAssetVersionPublishParams struct {
-	// Version is the version value supplied to the UpdateAssetVersionPublish query.
+	// Version 是提供给 UpdateAssetVersionPublish 查询的 Version 值。
 	Version string `json:"version"`
-	// TenantID is the tenant id value supplied to the UpdateAssetVersionPublish query.
+	// TenantID 是提供给 UpdateAssetVersionPublish 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateAssetVersionPublish query.
+	// ID 是提供给 UpdateAssetVersionPublish 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedRevision is the expected revision value supplied to the UpdateAssetVersionPublish query.
+	// ExpectedRevision 是提供给 UpdateAssetVersionPublish 查询的 ExpectedRevision 值。
 	ExpectedRevision int64 `json:"expected_revision"`
 }
 
-// UpdateAssetVersionPublish executes the generated UpdateAssetVersionPublish database query.
+// UpdateAssetVersionPublish 执行生成的 UpdateAssetVersionPublish 数据库查询。
 // 更新一条资产版本的生命周期与版本标签并递增 revision。
 func (q *Queries) UpdateAssetVersionPublish(ctx context.Context, arg UpdateAssetVersionPublishParams) (AssetVersion, error) {
 	row := q.db.QueryRow(ctx, updateAssetVersionPublish,
@@ -826,19 +826,19 @@ WHERE tenant_id = $3
 RETURNING tenant_id, id, layer_id, scope_type, scope_key, content_hash, content_ref, content_type, dialect, source_branch, review_status, review_comment, git_commit, created_by, producer_run_id, ai_meta, review, created_at
 `
 
-// UpdateLayerRevisionReviewParams contains the strongly typed arguments for the UpdateLayerRevisionReview query.
+// UpdateLayerRevisionReviewParams 包含 UpdateLayerRevisionReview 查询的强类型参数。
 type UpdateLayerRevisionReviewParams struct {
-	// ReviewStatus is the review status value supplied to the UpdateLayerRevisionReview query.
+	// ReviewStatus 是提供给 UpdateLayerRevisionReview 查询的 ReviewStatus 值。
 	ReviewStatus string `json:"review_status"`
-	// ReviewComment is the review comment value supplied to the UpdateLayerRevisionReview query.
+	// ReviewComment 是提供给 UpdateLayerRevisionReview 查询的 ReviewComment 值。
 	ReviewComment *string `json:"review_comment"`
-	// TenantID is the tenant id value supplied to the UpdateLayerRevisionReview query.
+	// TenantID 是提供给 UpdateLayerRevisionReview 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpdateLayerRevisionReview query.
+	// ID 是提供给 UpdateLayerRevisionReview 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// UpdateLayerRevisionReview executes the generated UpdateLayerRevisionReview database query.
+// UpdateLayerRevisionReview 执行生成的 UpdateLayerRevisionReview 数据库查询。
 // 将一条待审核修订置为 approved 或 rejected 并写入审核备注。
 func (q *Queries) UpdateLayerRevisionReview(ctx context.Context, arg UpdateLayerRevisionReviewParams) (LayerRevision, error) {
 	row := q.db.QueryRow(ctx, updateLayerRevisionReview,
@@ -893,33 +893,33 @@ ON CONFLICT (tenant_id, job_id) DO UPDATE SET
 RETURNING tenant_id, id, job_id, stage, status, error_code, content_ref, content_hash, content_type, manifest, revision_id, created_at
 `
 
-// UpsertAiGenerationResultParams contains the strongly typed arguments for the UpsertAiGenerationResult query.
+// UpsertAiGenerationResultParams 包含 UpsertAiGenerationResult 查询的强类型参数。
 type UpsertAiGenerationResultParams struct {
-	// TenantID is the tenant id value supplied to the UpsertAiGenerationResult query.
+	// TenantID 是提供给 UpsertAiGenerationResult 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the UpsertAiGenerationResult query.
+	// ID 是提供给 UpsertAiGenerationResult 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// JobID is the job id value supplied to the UpsertAiGenerationResult query.
+	// JobID 是提供给 UpsertAiGenerationResult 查询的 JobID 值。
 	JobID uuid.UUID `json:"job_id"`
-	// Stage is the stage value supplied to the UpsertAiGenerationResult query.
+	// Stage 是提供给 UpsertAiGenerationResult 查询的 Stage 值。
 	Stage string `json:"stage"`
-	// Status is the status value supplied to the UpsertAiGenerationResult query.
+	// Status 是提供给 UpsertAiGenerationResult 查询的 Status 值。
 	Status string `json:"status"`
-	// ErrorCode is the error code value supplied to the UpsertAiGenerationResult query.
+	// ErrorCode 是提供给 UpsertAiGenerationResult 查询的 ErrorCode 值。
 	ErrorCode string `json:"error_code"`
-	// ContentRef is the content ref value supplied to the UpsertAiGenerationResult query.
+	// ContentRef 是提供给 UpsertAiGenerationResult 查询的 ContentRef 值。
 	ContentRef *string `json:"content_ref"`
-	// ContentHash is the content hash value supplied to the UpsertAiGenerationResult query.
+	// ContentHash 是提供给 UpsertAiGenerationResult 查询的 ContentHash 值。
 	ContentHash *string `json:"content_hash"`
-	// ContentType is the content type value supplied to the UpsertAiGenerationResult query.
+	// ContentType 是提供给 UpsertAiGenerationResult 查询的 ContentType 值。
 	ContentType *string `json:"content_type"`
-	// Manifest is the manifest value supplied to the UpsertAiGenerationResult query.
+	// Manifest 是提供给 UpsertAiGenerationResult 查询的 Manifest 值。
 	Manifest []byte `json:"manifest"`
-	// RevisionID is the revision id value supplied to the UpsertAiGenerationResult query.
+	// RevisionID 是提供给 UpsertAiGenerationResult 查询的 RevisionID 值。
 	RevisionID *uuid.UUID `json:"revision_id"`
 }
 
-// UpsertAiGenerationResult executes the generated UpsertAiGenerationResult database query.
+// UpsertAiGenerationResult 执行生成的 UpsertAiGenerationResult 数据库查询。
 // M3 AI 评审与发布的持久化查询。
 // 全部查询保留 tenant_id 谓词；涉及层头（评审事务）的查询带 FOR UPDATE 锁。
 // 幂等保存一次 AI 资产生成结果快照。

@@ -12,14 +12,13 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-// RepositoryConfig is the normalized projection of one .asset-platform.yaml
-// document after validation and root-dot normalization.
+// RepositoryConfig 是 .asset-platform.yaml 文档在校验与根点号规范化后的规范化投影。
 type RepositoryConfig struct {
 	Version  int             `json:"version"`
 	Services []ConfigService `json:"services"`
 }
 
-// ConfigService is one normalized service declaration.
+// ConfigService 是一个规范化服务声明。
 type ConfigService struct {
 	Name        string        `json:"name"`
 	DisplayName string        `json:"displayName,omitempty"`
@@ -29,7 +28,7 @@ type ConfigService struct {
 	Assets      []ConfigAsset `json:"assets"`
 }
 
-// ConfigAsset is one normalized asset declaration.
+// ConfigAsset 是一个规范化资产声明。
 type ConfigAsset struct {
 	Kind           string         `json:"kind"`
 	Name           string         `json:"name,omitempty"`
@@ -38,7 +37,7 @@ type ConfigAsset struct {
 	Overlays       []ConfigSource `json:"overlays,omitempty"`
 }
 
-// ConfigSource is one normalized source declaration.
+// ConfigSource 是一个规范化源声明。
 type ConfigSource struct {
 	Mode            string   `json:"mode"`
 	Origin          string   `json:"origin,omitempty"`
@@ -50,9 +49,8 @@ type ConfigSource struct {
 	Enabled         *bool    `json:"enabled,omitempty"`
 }
 
-// ParseRepositoryConfig validates and normalizes one repository configuration
-// document. The `.` service root is normalized to the empty string, and the
-// service-root uniqueness / name-uniqueness invariants are enforced.
+// ParseRepositoryConfig 校验并规范化一个仓库配置文档。`.` 服务根规范化为空字符串，并强制
+// 服务根唯一 / 名称唯一不变式。
 func ParseRepositoryConfig(content []byte) (RepositoryConfig, error) {
 	var root yaml.Node
 	if err := yaml.Unmarshal(content, &root); err != nil {
@@ -162,8 +160,8 @@ func normalizeConfigSource(raw configSourceRaw, isOverlay bool) (ConfigSource, e
 		Order: raw.Order, TimeoutSec: raw.TimeoutSec, BranchPatterns: raw.BranchPatterns, Enabled: raw.Enabled,
 	}
 	switch raw.Mode {
-	case "builtin":
-		if raw.Origin != "" && raw.Origin != "repo" {
+	case sourceModeBuiltin:
+		if raw.Origin != "" && raw.Origin != layerOriginRepo {
 			return ConfigSource{}, ErrValidation
 		}
 		if raw.Path == nil || *raw.Path == "" {
@@ -172,9 +170,9 @@ func normalizeConfigSource(raw configSourceRaw, isOverlay bool) (ConfigSource, e
 		if raw.ProducerProfile != nil {
 			return ConfigSource{}, ErrValidation
 		}
-		source.Origin = "repo"
-	case "command":
-		if raw.Origin != "" && raw.Origin != "repo" {
+		source.Origin = layerOriginRepo
+	case sourceModeCommand:
+		if raw.Origin != "" && raw.Origin != layerOriginRepo {
 			return ConfigSource{}, ErrValidation
 		}
 		if raw.ProducerProfile == nil || *raw.ProducerProfile == "" {
@@ -183,25 +181,25 @@ func normalizeConfigSource(raw configSourceRaw, isOverlay bool) (ConfigSource, e
 		if raw.Path != nil {
 			return ConfigSource{}, ErrValidation
 		}
-		source.Origin = "repo"
-	case "push":
-		if raw.Origin != "" && raw.Origin != "third_party" {
+		source.Origin = layerOriginRepo
+	case sourceModePush:
+		if raw.Origin != "" && raw.Origin != layerOriginThirdParty {
 			return ConfigSource{}, ErrValidation
 		}
 		if raw.Path != nil || raw.ProducerProfile != nil {
 			return ConfigSource{}, ErrValidation
 		}
-		source.Origin = "third_party"
-	case "manual":
-		if raw.Origin != "" && raw.Origin != "manual" {
+		source.Origin = layerOriginThirdParty
+	case sourceModeManual:
+		if raw.Origin != "" && raw.Origin != layerOriginManual {
 			return ConfigSource{}, ErrValidation
 		}
 		if raw.Path != nil || raw.ProducerProfile != nil {
 			return ConfigSource{}, ErrValidation
 		}
-		source.Origin = "manual"
-	case "ai":
-		if raw.Origin != "" && raw.Origin != "ai_generated" {
+		source.Origin = layerOriginManual
+	case aiMode:
+		if raw.Origin != "" && raw.Origin != aiOrigin {
 			return ConfigSource{}, ErrValidation
 		}
 		if raw.ProducerProfile == nil || *raw.ProducerProfile == "" {
@@ -210,24 +208,23 @@ func normalizeConfigSource(raw configSourceRaw, isOverlay bool) (ConfigSource, e
 		if raw.Path != nil {
 			return ConfigSource{}, ErrValidation
 		}
-		source.Origin = "ai_generated"
+		source.Origin = aiOrigin
 	default:
 		return ConfigSource{}, ErrValidation
 	}
 	if source.TimeoutSec == 0 {
 		source.TimeoutSec = defaultSourceTimeoutByMode(source.Mode)
 	}
-	if source.TimeoutSec < 10 || source.TimeoutSec > 3600 {
+	if source.TimeoutSec < sourceTimeoutMinSec || source.TimeoutSec > sourceTimeoutMaxSec {
 		return ConfigSource{}, ErrValidation
 	}
 	if len(source.BranchPatterns) == 0 {
-		source.BranchPatterns = []string{"**"}
+		source.BranchPatterns = []string{sourceBranchPatternAll}
 	}
 	return source, nil
 }
 
-// ConfigDigest computes the lowercase SHA-256 digest of the canonical JSON form
-// of a normalized repository configuration. Apply must receive the same digest.
+// ConfigDigest 计算规范化仓库配置的规范 JSON 形式的小写 SHA-256 摘要。Apply 必须收到相同摘要。
 func ConfigDigest(config RepositoryConfig) (string, error) {
 	encoded, err := CanonicalJSON(config)
 	if err != nil {
@@ -237,7 +234,7 @@ func ConfigDigest(config RepositoryConfig) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// ConfigDigestFromBytes parses, normalizes, and digests one configuration document.
+// ConfigDigestFromBytes 解析、规范化并摘要一个配置文档。
 func ConfigDigestFromBytes(content []byte) (string, RepositoryConfig, error) {
 	config, err := ParseRepositoryConfig(content)
 	if err != nil {

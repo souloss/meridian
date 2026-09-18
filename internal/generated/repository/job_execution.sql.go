@@ -21,27 +21,27 @@ VALUES (
 RETURNING tenant_id, job_id, sequence, stage, level, message, occurred_at, attempt
 `
 
-// AppendJobStageLogParams contains the strongly typed arguments for the AppendJobStageLog query.
+// AppendJobStageLogParams 包含 AppendJobStageLog 查询的强类型参数。
 type AppendJobStageLogParams struct {
-	// TenantID is the tenant id value supplied to the AppendJobStageLog query.
+	// TenantID 是提供给 AppendJobStageLog 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// JobID is the job id value supplied to the AppendJobStageLog query.
+	// JobID 是提供给 AppendJobStageLog 查询的 JobID 值。
 	JobID uuid.UUID `json:"job_id"`
-	// Sequence is the sequence value supplied to the AppendJobStageLog query.
+	// Sequence 是提供给 AppendJobStageLog 查询的 Sequence 值。
 	Sequence int64 `json:"sequence"`
-	// Attempt is the attempt value supplied to the AppendJobStageLog query.
+	// Attempt 是提供给 AppendJobStageLog 查询的 Attempt 值。
 	Attempt int32 `json:"attempt"`
-	// Stage is the stage value supplied to the AppendJobStageLog query.
+	// Stage 是提供给 AppendJobStageLog 查询的 Stage 值。
 	Stage string `json:"stage"`
-	// Level is the level value supplied to the AppendJobStageLog query.
+	// Level 是提供给 AppendJobStageLog 查询的 Level 值。
 	Level string `json:"level"`
-	// Message is the message value supplied to the AppendJobStageLog query.
+	// Message 是提供给 AppendJobStageLog 查询的 Message 值。
 	Message string `json:"message"`
-	// OccurredAt is the occurred at value supplied to the AppendJobStageLog query.
+	// OccurredAt 是提供给 AppendJobStageLog 查询的 OccurredAt 值。
 	OccurredAt pgtype.Timestamptz `json:"occurred_at"`
 }
 
-// AppendJobStageLog executes the generated AppendJobStageLog database query.
+// AppendJobStageLog 执行生成的 AppendJobStageLog 数据库查询。
 // 使用调用方提供的游标持久化一条脱敏阶段事件。
 func (q *Queries) AppendJobStageLog(ctx context.Context, arg AppendJobStageLogParams) (JobStageLog, error) {
 	row := q.db.QueryRow(ctx, appendJobStageLog,
@@ -77,19 +77,19 @@ WHERE tenant_id = $3
   AND river_job_id IS NULL
 `
 
-// AttachRiverJobIDParams contains the strongly typed arguments for the AttachRiverJobID query.
+// AttachRiverJobIDParams 包含 AttachRiverJobID 查询的强类型参数。
 type AttachRiverJobIDParams struct {
-	// RiverJobID is the river job id value supplied to the AttachRiverJobID query.
+	// RiverJobID 是提供给 AttachRiverJobID 查询的 RiverJobID 值。
 	RiverJobID *int64 `json:"river_job_id"`
-	// UpdatedAt is the updated at value supplied to the AttachRiverJobID query.
+	// UpdatedAt 是提供给 AttachRiverJobID 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the AttachRiverJobID query.
+	// TenantID 是提供给 AttachRiverJobID 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the AttachRiverJobID query.
+	// ID 是提供给 AttachRiverJobID 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// AttachRiverJobID executes the generated AttachRiverJobID database query.
+// AttachRiverJobID 执行生成的 AttachRiverJobID 数据库查询。
 // 在插入两行的同一事务中，将应用 UUID 任务关联到内部 River 序号。
 func (q *Queries) AttachRiverJobID(ctx context.Context, arg AttachRiverJobIDParams) (int64, error) {
 	result, err := q.db.Exec(ctx, attachRiverJobID,
@@ -118,29 +118,29 @@ WHERE tenant_id = $7
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// FinishJobExecutionParams contains the strongly typed arguments for the FinishJobExecution query.
+// FinishJobExecutionParams 包含 FinishJobExecution 查询的强类型参数。
 type FinishJobExecutionParams struct {
-	// Status is the status value supplied to the FinishJobExecution query.
+	// Status 是提供给 FinishJobExecution 查询的 Status 值。
 	Status string `json:"status"`
-	// Result is the result value supplied to the FinishJobExecution query.
+	// Result 是提供给 FinishJobExecution 查询的 Result 值。
 	Result []byte `json:"result"`
-	// Error is the error value supplied to the FinishJobExecution query.
+	// Error 是提供给 FinishJobExecution 查询的 Error 值。
 	Error []byte `json:"error"`
-	// Terminal is the terminal value supplied to the FinishJobExecution query.
+	// Terminal 是提供给 FinishJobExecution 查询的 Terminal 值。
 	Terminal bool `json:"terminal"`
-	// FinishedAt is the finished at value supplied to the FinishJobExecution query.
+	// FinishedAt 是提供给 FinishJobExecution 查询的 FinishedAt 值。
 	FinishedAt pgtype.Timestamptz `json:"finished_at"`
-	// UpdatedAt is the updated at value supplied to the FinishJobExecution query.
+	// UpdatedAt 是提供给 FinishJobExecution 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the FinishJobExecution query.
+	// TenantID 是提供给 FinishJobExecution 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the FinishJobExecution query.
+	// ID 是提供给 FinishJobExecution 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedAttempt is the expected attempt value supplied to the FinishJobExecution query.
+	// ExpectedAttempt 是提供给 FinishJobExecution 查询的 ExpectedAttempt 值。
 	ExpectedAttempt int32 `json:"expected_attempt"`
 }
 
-// FinishJobExecution executes the generated FinishJobExecution database query.
+// FinishJobExecution 执行生成的 FinishJobExecution 数据库查询。
 // 记录终态结果或可重试失败。
 // 可重试失败保持 pending，等待 River 下一次尝试；终态失败会写入完成时间和 failed 状态。
 func (q *Queries) FinishJobExecution(ctx context.Context, arg FinishJobExecutionParams) (Job, error) {
@@ -191,7 +191,7 @@ const lockJobStageSequence = `-- name: LockJobStageSequence :exec
 SELECT pg_advisory_xact_lock(hashtextextended($1, 0))
 `
 
-// LockJobStageSequence executes the generated LockJobStageSequence database query.
+// LockJobStageSequence 执行生成的 LockJobStageSequence 数据库查询。
 // 在调用方事务内串行化单个任务的日志游标。
 // 锁键由租户和任务 UUID 派生，不包含用户内容。
 func (q *Queries) LockJobStageSequence(ctx context.Context, lockKey string) error {
@@ -206,15 +206,15 @@ WHERE tenant_id = $1
   AND job_id = $2
 `
 
-// NextJobStageSequenceParams contains the strongly typed arguments for the NextJobStageSequence query.
+// NextJobStageSequenceParams 包含 NextJobStageSequence 查询的强类型参数。
 type NextJobStageSequenceParams struct {
-	// TenantID is the tenant id value supplied to the NextJobStageSequence query.
+	// TenantID 是提供给 NextJobStageSequence 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// JobID is the job id value supplied to the NextJobStageSequence query.
+	// JobID 是提供给 NextJobStageSequence 查询的 JobID 值。
 	JobID uuid.UUID `json:"job_id"`
 }
 
-// NextJobStageSequence executes the generated NextJobStageSequence database query.
+// NextJobStageSequence 执行生成的 NextJobStageSequence 数据库查询。
 // 调用方取得任务专属事务 advisory lock 后，返回下一个回放游标。
 func (q *Queries) NextJobStageSequence(ctx context.Context, arg NextJobStageSequenceParams) (int64, error) {
 	row := q.db.QueryRow(ctx, nextJobStageSequence, arg.TenantID, arg.JobID)
@@ -233,21 +233,21 @@ WHERE tenant_id = $3
   AND attempt = $5::integer
 `
 
-// SetJobExecutionStageParams contains the strongly typed arguments for the SetJobExecutionStage query.
+// SetJobExecutionStageParams 包含 SetJobExecutionStage 查询的强类型参数。
 type SetJobExecutionStageParams struct {
-	// Stage is the stage value supplied to the SetJobExecutionStage query.
+	// Stage 是提供给 SetJobExecutionStage 查询的 Stage 值。
 	Stage string `json:"stage"`
-	// UpdatedAt is the updated at value supplied to the SetJobExecutionStage query.
+	// UpdatedAt 是提供给 SetJobExecutionStage 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the SetJobExecutionStage query.
+	// TenantID 是提供给 SetJobExecutionStage 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the SetJobExecutionStage query.
+	// ID 是提供给 SetJobExecutionStage 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
-	// ExpectedAttempt is the expected attempt value supplied to the SetJobExecutionStage query.
+	// ExpectedAttempt 是提供给 SetJobExecutionStage 查询的 ExpectedAttempt 值。
 	ExpectedAttempt int32 `json:"expected_attempt"`
 }
 
-// SetJobExecutionStage executes the generated SetJobExecutionStage database query.
+// SetJobExecutionStage 执行生成的 SetJobExecutionStage 数据库查询。
 // 记录当前流水线阶段，不改变持久化生命周期状态。
 // 阶段取值受应用 DDL 约束。
 func (q *Queries) SetJobExecutionStage(ctx context.Context, arg SetJobExecutionStageParams) (int64, error) {
@@ -281,23 +281,23 @@ WHERE tenant_id = $5
 RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
 `
 
-// StartJobExecutionParams contains the strongly typed arguments for the StartJobExecution query.
+// StartJobExecutionParams 包含 StartJobExecution 查询的强类型参数。
 type StartJobExecutionParams struct {
-	// Stage is the stage value supplied to the StartJobExecution query.
+	// Stage 是提供给 StartJobExecution 查询的 Stage 值。
 	Stage string `json:"stage"`
-	// ExpectedAttempt is the expected attempt value supplied to the StartJobExecution query.
+	// ExpectedAttempt 是提供给 StartJobExecution 查询的 ExpectedAttempt 值。
 	ExpectedAttempt int32 `json:"expected_attempt"`
-	// StartedAt is the started at value supplied to the StartJobExecution query.
+	// StartedAt 是提供给 StartJobExecution 查询的 StartedAt 值。
 	StartedAt pgtype.Timestamptz `json:"started_at"`
-	// UpdatedAt is the updated at value supplied to the StartJobExecution query.
+	// UpdatedAt 是提供给 StartJobExecution 查询的 UpdatedAt 值。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	// TenantID is the tenant id value supplied to the StartJobExecution query.
+	// TenantID 是提供给 StartJobExecution 查询的 TenantID 值。
 	TenantID uuid.UUID `json:"tenant_id"`
-	// ID is the id value supplied to the StartJobExecution query.
+	// ID 是提供给 StartJobExecution 查询的 ID 值。
 	ID uuid.UUID `json:"id"`
 }
 
-// StartJobExecution executes the generated StartJobExecution database query.
+// StartJobExecution 执行生成的 StartJobExecution 数据库查询。
 // 为一次 River 尝试领取持久化 Meridian 任务。
 // 终态领域记录不会再次领取，因此 worker 已提交终态后发生 River 重试也不会产生副作用。
 func (q *Queries) StartJobExecution(ctx context.Context, arg StartJobExecutionParams) (Job, error) {

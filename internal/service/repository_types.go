@@ -6,161 +6,170 @@ import (
 	"uuid"
 )
 
-// RepositoryError is the redacted health error recorded after a repository operation.
+// RepositoryError 是仓库操作后记录的脱敏健康错误。
 type RepositoryError struct {
-	// Class is the stable non-secret error category used by health projections.
+	// Class 是健康投影使用的稳定非秘密错误类别。
 	Class string `json:"class"`
-	// Message is the redacted operator-facing diagnostic.
+	// Message 是面向运营人员的脱敏诊断信息。
 	Message string `json:"message"`
 }
 
-// RepositoryHealth is the durable, non-secret synchronization summary.
+// RepositoryHealth 是持久化、非秘密的同步摘要。
 type RepositoryHealth struct {
-	// LastSyncAt is the UTC instant of the latest completed repository operation.
+	// LastSyncAt 是最近一次完成仓库操作的 UTC 时刻。
 	LastSyncAt *time.Time
-	// LastCommit is the latest fetched commit SHA, when available.
+	// LastCommit 是最近拉取到的提交 SHA（可用时）。
 	LastCommit *string
-	// LastError is the latest redacted failure, when an operation failed.
+	// LastError 是最近一次脱敏失败（操作失败时）。
 	LastError *RepositoryError
-	// FailStreak is the number of consecutive failed operations.
+	// FailStreak 是连续失败操作次数。
 	FailStreak int
-	// DurationMS is the elapsed duration of the latest completed operation.
+	// DurationMS 是最近一次完成操作的耗时。
 	DurationMS *int
 }
 
-// RepositoryBranchPolicy controls which branch and tag refs are eligible for synchronization.
+// RepositoryBranchPolicy 控制哪些 branch 与 tag 引用有资格同步。
 type RepositoryBranchPolicy struct {
+	// BranchPatterns 是分支匹配模式列表。
 	BranchPatterns []string `json:"branchPatterns"`
-	TagPatterns    []string `json:"tagPatterns"`
+	// TagPatterns 是标签匹配模式列表。
+	TagPatterns []string `json:"tagPatterns"`
 }
 
-// RepositoryFetchConfig controls checkout depth, paths, submodules, proxy, and SSH trust policy.
+// RepositoryFetchConfig 控制检出深度、路径、子模块、代理与 SSH 信任策略。
 type RepositoryFetchConfig struct {
-	Shallow         bool     `json:"shallow"`
-	Depth           *int     `json:"depth,omitempty"`
-	Submodules      bool     `json:"submodules"`
-	Proxy           *string  `json:"proxy,omitempty"`
-	PathAllow       []string `json:"pathAllow"`
-	PathIgnore      []string `json:"pathIgnore"`
-	KnownHostPolicy string   `json:"knownHostPolicy"`
+	// Shallow 表示是否浅克隆。
+	Shallow bool `json:"shallow"`
+	// Depth 是浅克隆深度（可为空）。
+	Depth *int `json:"depth,omitempty"`
+	// Submodules 表示是否拉取子模块。
+	Submodules bool `json:"submodules"`
+	// Proxy 是代理地址（可为空）。
+	Proxy *string `json:"proxy,omitempty"`
+	// PathAllow 是允许的路径模式列表。
+	PathAllow []string `json:"pathAllow"`
+	// PathIgnore 是忽略的路径模式列表。
+	PathIgnore []string `json:"pathIgnore"`
+	// KnownHostPolicy 是 SSH 主机信任策略（strict/accept_new）。
+	KnownHostPolicy string `json:"knownHostPolicy"`
 }
 
-// RepositoryRecord is the tenant-scoped repository metadata projection.
-// It never contains decrypted credential material.
+// RepositoryRecord 是租户作用域的仓库元数据投影。
+// 它绝不包含解密的凭据材料。
 type RepositoryRecord struct {
-	// TenantID is the tenant boundary for this repository.
+	// TenantID 是该仓库的租户边界。
 	TenantID uuid.UUID
-	// ID is the application-generated repository identifier.
+	// ID 是应用生成的仓库标识。
 	ID uuid.UUID
-	// URL is the credential-free URL submitted by the operator.
+	// URL 是运营人员提交的不含凭据的 URL。
 	URL string
-	// CanonicalURL is the normalized URL used for uniqueness checks.
+	// CanonicalURL 是用于唯一性检查的规范化 URL。
 	CanonicalURL string
-	// CredentialID is the tenant or global credential selected for fetching.
+	// CredentialID 是为拉取选定的租户或全局凭据。
 	CredentialID *uuid.UUID
-	// GlobalCredentialID is populated when CredentialID resolves to a platform credential.
+	// GlobalCredentialID 在 CredentialID 解析为平台凭据时填充。
 	GlobalCredentialID *uuid.UUID
-	// DefaultBranch is the default Git ref used when a request omits one.
+	// DefaultBranch 是请求省略引用时使用的默认 Git 引用。
 	DefaultBranch string
-	// BranchPolicy controls eligible branch and tag patterns.
+	// BranchPolicy 控制有资格的分支与标签模式。
 	BranchPolicy RepositoryBranchPolicy
-	// FetchConfig controls checkout and SSH trust behavior.
+	// FetchConfig 控制检出与 SSH 信任行为。
 	FetchConfig RepositoryFetchConfig
-	// SyncCron is the optional five-field UTC schedule.
+	// SyncCron 是可选的五字段 UTC 调度。
 	SyncCron *string
-	// Note is the optional operator note.
+	// Note 是可选的运营人员备注。
 	Note *string
-	// Health is the durable non-secret synchronization summary.
+	// Health 是持久化非秘密同步摘要。
 	Health RepositoryHealth
-	// Capabilities lists actions available to the authenticated principal.
+	// Capabilities 列出认证主体可用的操作。
 	Capabilities []string
-	// Revision is the optimistic-concurrency version.
+	// Revision 是乐观并发版本号。
 	Revision int64
-	// CreatedAt is the UTC creation instant.
+	// CreatedAt 是 UTC 创建时刻。
 	CreatedAt time.Time
-	// UpdatedAt is the UTC metadata update instant.
+	// UpdatedAt 是 UTC 元数据更新时刻。
 	UpdatedAt time.Time
 }
 
-// NewRepository contains validated values ready for an atomic repository insert.
+// NewRepository 包含校验后的值，用于一次原子仓库插入。
 type NewRepository struct {
-	// TenantID identifies the owning tenant.
+	// TenantID 标识所属租户。
 	TenantID uuid.UUID
-	// ID identifies the new repository.
+	// ID 标识新仓库。
 	ID uuid.UUID
-	// URL is the display URL without credential material.
+	// URL 是不含凭据材料的展示 URL。
 	URL string
-	// CanonicalURL is the normalized uniqueness key.
+	// CanonicalURL 是规范化唯一键。
 	CanonicalURL string
-	// CredentialID is an optional same-tenant credential reference.
+	// CredentialID 是可选的同租户凭据引用。
 	CredentialID *uuid.UUID
-	// GlobalCredID is an optional platform credential reference.
+	// GlobalCredID 是可选的平台凭据引用。
 	GlobalCredID *uuid.UUID
-	// DefaultBranch is the selected default Git ref.
+	// DefaultBranch 是选定的默认 Git 引用。
 	DefaultBranch string
-	// BranchPolicy is the validated ref inclusion policy.
+	// BranchPolicy 是校验后的引用纳入策略。
 	BranchPolicy RepositoryBranchPolicy
-	// FetchConfig is the validated checkout configuration.
+	// FetchConfig 是校验后的检出配置。
 	FetchConfig RepositoryFetchConfig
-	// SyncCron is the optional schedule.
+	// SyncCron 是可选的调度。
 	SyncCron *string
-	// Note is the optional operator note.
+	// Note 是可选的运营人员备注。
 	Note *string
 }
 
-// RepositoryPatch contains fields explicitly supplied by a PATCH request.
-// Pointer-to-pointer fields distinguish omitted from explicit JSON null.
+// RepositoryPatch 包含 PATCH 请求显式提供的字段。
+// 指针到指针的字段区分「省略」与显式 JSON null。
 type RepositoryPatch struct {
-	// CredentialID distinguishes omitted from explicit null or a UUID.
+	// CredentialID 区分省略、显式 null 或 UUID。
 	CredentialID **uuid.UUID
-	// DefaultBranch is an optional replacement default ref.
+	// DefaultBranch 是可选的替换默认引用。
 	DefaultBranch *string
-	// BranchPolicy is an optional complete policy replacement.
+	// BranchPolicy 是可选的完整策略替换。
 	BranchPolicy *RepositoryBranchPolicy
-	// FetchConfig is an optional complete fetch configuration replacement.
+	// FetchConfig 是可选的完整检出配置替换。
 	FetchConfig *RepositoryFetchConfig
-	// SyncCron distinguishes omitted from explicit null or a cron string.
+	// SyncCron 区分省略、显式 null 或 cron 字符串。
 	SyncCron **string
-	// Note distinguishes omitted from explicit null or a note string.
+	// Note 区分省略、显式 null 或备注字符串。
 	Note **string
 }
 
-// UpdateRepository contains one optimistic-concurrency repository mutation.
+// UpdateRepository 包含一次乐观并发仓库变更。
 type UpdateRepository struct {
-	// TenantID identifies the owning tenant.
+	// TenantID 标识所属租户。
 	TenantID uuid.UUID
-	// ID identifies the repository being changed.
+	// ID 标识被变更的仓库。
 	ID uuid.UUID
-	// ExpectedRevision is the ETag revision required by the mutation.
+	// ExpectedRevision 是变更所需的 ETag 版本号。
 	ExpectedRevision int64
-	// CredentialID distinguishes omitted from explicit null or a UUID.
+	// CredentialID 区分省略、显式 null 或 UUID。
 	CredentialID **uuid.UUID
-	// GlobalCredID distinguishes omitted from explicit null or a UUID.
+	// GlobalCredID 区分省略、显式 null 或 UUID。
 	GlobalCredID **uuid.UUID
-	// DefaultBranch is an optional replacement default ref.
+	// DefaultBranch 是可选的替换默认引用。
 	DefaultBranch *string
-	// BranchPolicy is an optional complete policy replacement.
+	// BranchPolicy 是可选的完整策略替换。
 	BranchPolicy *RepositoryBranchPolicy
-	// FetchConfig is an optional complete fetch configuration replacement.
+	// FetchConfig 是可选的完整检出配置替换。
 	FetchConfig *RepositoryFetchConfig
-	// SyncCron distinguishes omitted from explicit null or a cron string.
+	// SyncCron 区分省略、显式 null 或 cron 字符串。
 	SyncCron **string
-	// Note distinguishes omitted from explicit null or a note string.
+	// Note 区分省略、显式 null 或备注字符串。
 	Note **string
-	// UpdatedAt is the UTC mutation timestamp.
+	// UpdatedAt 是 UTC 变更时间戳。
 	UpdatedAt time.Time
 }
 
-// CredentialReference identifies which encrypted credential table owns a UUID.
+// CredentialReference 标识哪个加密凭据表拥有一个 UUID。
 type CredentialReference struct {
-	// ID is the resolved credential identifier.
+	// ID 是解析出的凭据标识。
 	ID uuid.UUID
-	// IsGlobal indicates the platform-owned credential table.
+	// IsGlobal 表示平台持有的凭据表。
 	IsGlobal bool
 }
 
-// RepositoryStore is the persistence boundary for tenant repository configuration.
-// Every implementation must retain tenant predicates and never return soft-deleted rows.
+// RepositoryStore 是租户仓库配置的持久化边界。
+// 每个实现都必须保留租户谓词，且绝不返回软删除行。
 type RepositoryStore interface {
 	ResolveCredentialReference(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) (CredentialReference, bool, error)
 	CountRepositories(context.Context, uuid.UUID) (int64, int64, error)

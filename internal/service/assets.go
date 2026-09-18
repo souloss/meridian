@@ -2,27 +2,27 @@ package service
 
 import (
 	"context"
-	"sort"
 	"slices"
+	"sort"
 	"time"
 	"uuid"
 )
 
-// Assets coordinates asset, version, and item read use cases for tenant members.
+// Assets 协调租户成员的资产、版本与条目读取用例。
 type Assets struct {
 	store      AssetStore
 	identities IdentityStore
 	now        func() time.Time
 }
 
-// NewAssets constructs asset read use cases with caller-owned persistence.
+// NewAssets 构造由调用方持有持久化的资产读取用例。
 func NewAssets(store AssetStore, identities IdentityStore) *Assets {
 	return &Assets{store: store, identities: identities, now: time.Now}
 }
 
-// GetAsset returns one asset projected onto the selected ref track.
+// GetAsset 返回投影到所选引用轨道的资产。
 func (assets *Assets) GetAsset(ctx context.Context, actor Principal, tenantSlug string, assetID uuid.UUID, refType, refName string) (AssetRecord, AssetTrackProjection, error) {
-	membership, err := assets.tenantMembership(ctx, actor, tenantSlug, "asset:read")
+	membership, err := assets.tenantMembership(ctx, actor, tenantSlug, scopeAssetRead)
 	if err != nil {
 		return AssetRecord{}, AssetTrackProjection{}, err
 	}
@@ -30,14 +30,14 @@ func (assets *Assets) GetAsset(ctx context.Context, actor Principal, tenantSlug 
 	if err != nil {
 		return AssetRecord{}, AssetTrackProjection{}, err
 	}
-	projection := AssetTrackProjection{Lifecycle: "draft"}
+	projection := AssetTrackProjection{Lifecycle: lifecycleDraft}
 	if refName == "" {
 		if defaultBranch, err := assets.store.GetAssetRepositoryDefaultBranch(ctx, membership.TenantID, assetID); err == nil && defaultBranch != "" {
 			refName = defaultBranch
 		}
 	}
 	if refType == "" {
-		refType = "branch"
+		refType = refTypeBranch
 	}
 	track, err := assets.store.GetAssetRefTrack(ctx, membership.TenantID, asset.ID, refType, refName)
 	if err == nil {
@@ -46,18 +46,18 @@ func (assets *Assets) GetAsset(ctx context.Context, actor Principal, tenantSlug 
 	return asset, projection, nil
 }
 
-// GetAssetVersion returns one asset version with its layer manifest.
+// GetAssetVersion 返回一个带层清单的资产版本。
 func (assets *Assets) GetAssetVersion(ctx context.Context, actor Principal, tenantSlug string, versionID uuid.UUID) (AssetVersionRecord, error) {
-	membership, err := assets.tenantMembership(ctx, actor, tenantSlug, "asset:read")
+	membership, err := assets.tenantMembership(ctx, actor, tenantSlug, scopeAssetRead)
 	if err != nil {
 		return AssetVersionRecord{}, err
 	}
 	return assets.store.GetAssetVersion(ctx, membership.TenantID, versionID)
 }
 
-// ListAssetVersionItems returns one page of indexed items for a version.
+// ListAssetVersionItems 返回某版本一页已索引条目。
 func (assets *Assets) ListAssetVersionItems(ctx context.Context, actor Principal, tenantSlug string, versionID uuid.UUID, query string, page, pageSize int) ([]AssetItemRecord, int64, error) {
-	membership, err := assets.tenantMembership(ctx, actor, tenantSlug, "asset:read")
+	membership, err := assets.tenantMembership(ctx, actor, tenantSlug, scopeAssetRead)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -70,10 +70,8 @@ func (assets *Assets) ListAssetVersionItems(ctx context.Context, actor Principal
 	return assets.store.ListAssetVersionItems(ctx, membership.TenantID, versionID, query, int32(pageSize), int32((page-1)*pageSize))
 }
 
-// AssetSummaries returns the service-level asset summary list and the missing
-// kind list for a service. Every registered kind without an asset is reported
-// as a missing kind, deterministically ordered by kind id. Each summary is
-// projected onto the repository default branch track.
+// AssetSummaries 返回服务级资产摘要列表与缺失类别列表。每个未持有资产的已注册类别都按
+// 类别 id 确定性排序后报告为缺失类别。每个摘要投影到仓库默认分支轨道。
 func (assets *Assets) AssetSummaries(ctx context.Context, tenantID uuid.UUID, serviceID uuid.UUID) ([]AssetSummaryRecord, []MissingKindRecord, error) {
 	records, err := assets.store.ListAssetsForService(ctx, tenantID, serviceID)
 	if err != nil {
@@ -89,10 +87,10 @@ func (assets *Assets) AssetSummaries(ctx context.Context, tenantID uuid.UUID, se
 	}
 	summaries := make([]AssetSummaryRecord, 0, len(records))
 	for _, record := range records {
-		summary := AssetSummaryRecord{ID: record.ID, Kind: record.Kind, Name: record.Name, Lifecycle: "draft", Health: "ok", RefType: "branch"}
+		summary := AssetSummaryRecord{ID: record.ID, Kind: record.Kind, Name: record.Name, Lifecycle: lifecycleDraft, Health: assetHealthOK, RefType: refTypeBranch}
 		if defaultBranch, err := assets.store.GetAssetRepositoryDefaultBranch(ctx, tenantID, record.ID); err == nil && defaultBranch != "" {
 			summary.RefName = defaultBranch
-			if track, trackErr := assets.store.GetAssetRefTrack(ctx, tenantID, record.ID, "branch", defaultBranch); trackErr == nil {
+			if track, trackErr := assets.store.GetAssetRefTrack(ctx, tenantID, record.ID, refTypeBranch, defaultBranch); trackErr == nil {
 				summary.Health = track.Health
 				if track.LatestVersionID != nil {
 					if version, versionErr := assets.store.GetAssetVersion(ctx, tenantID, *track.LatestVersionID); versionErr == nil {
@@ -121,7 +119,7 @@ func (assets *Assets) AssetSummaries(ctx context.Context, tenantID uuid.UUID, se
 	return summaries, missing, nil
 }
 
-// AssetTrackProjection carries the derived asset-level fields from a ref track.
+// AssetTrackProjection 承载从引用轨道推导出的资产级字段。
 type AssetTrackProjection struct {
 	Lifecycle        string
 	QualityScore     *int32
@@ -131,9 +129,9 @@ type AssetTrackProjection struct {
 }
 
 func (assets *Assets) trackProjection(ctx context.Context, tenantID uuid.UUID, track AssetRefTrackRecord) AssetTrackProjection {
-	projection := AssetTrackProjection{LatestVersionID: track.LatestVersionID, CurrentVersionID: track.CurrentVersionID, Lifecycle: "draft", Health: track.Health}
+	projection := AssetTrackProjection{LatestVersionID: track.LatestVersionID, CurrentVersionID: track.CurrentVersionID, Lifecycle: lifecycleDraft, Health: track.Health}
 	if projection.Health == "" {
-		projection.Health = "ok"
+		projection.Health = assetHealthOK
 	}
 	if track.LatestVersionID != nil {
 		latest, err := assets.store.GetAssetVersion(ctx, tenantID, *track.LatestVersionID)
@@ -154,16 +152,15 @@ func (assets *Assets) trackProjection(ctx context.Context, tenantID uuid.UUID, t
 	return projection
 }
 
-// assetRepository is intentionally unused; the default branch is resolved
-// directly via the store query, keeping the asset service free of repository
-// graph traversal. Kept as a no-op seam for future multi-repo assets.
+// assetRepository 有意未使用；默认分支直接通过 store 查询解析，使资产服务免于仓库图遍历。
+// 保留为面向未来多仓库资产的无操作接缝。
 func assetRepository(ctx context.Context, store AssetStore, tenantID uuid.UUID, asset AssetRecord) uuid.UUID {
 	return uuid.Nil()
 }
 
 func (assets *Assets) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, "*")) {
+		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
 			return Membership{}, ErrNotFound
 		}
 		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil

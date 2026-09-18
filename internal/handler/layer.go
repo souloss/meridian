@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"strings"
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
@@ -12,7 +11,7 @@ import (
 	"github.com/oapi-codegen/nullable"
 )
 
-// PreviewMerge runs the merge engine over an asset's layers without persisting.
+// PreviewMerge 在资产的层集合上运行合并引擎（不持久化）。
 func (s *Server) PreviewMerge(ctx context.Context, request asset.PreviewMergeRequestObject) (asset.PreviewMergeResponseObject, error) {
 	if s.layerEdit == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -43,7 +42,7 @@ func (s *Server) PreviewMerge(ctx context.Context, request asset.PreviewMergeReq
 	return asset.PreviewMerge200JSONResponse(mergePreviewResponse(result)), nil
 }
 
-// CreateLayerRevision validates and persists one manual overlay revision.
+// CreateLayerRevision 校验并持久化一次手动 overlay 修订。
 func (s *Server) CreateLayerRevision(ctx context.Context, request layer.CreateLayerRevisionRequestObject) (layer.CreateLayerRevisionResponseObject, error) {
 	if s.layerEdit == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -79,7 +78,7 @@ func (s *Server) CreateLayerRevision(ctx context.Context, request layer.CreateLa
 	return layer.CreateLayerRevision201JSONResponse(body), nil
 }
 
-// GetAssetVersionProvenance returns the last-writing provenance for a version.
+// GetAssetVersionProvenance 返回一个版本的最后写入来源信息。
 func (s *Server) GetAssetVersionProvenance(ctx context.Context, request asset.GetAssetVersionProvenanceRequestObject) (asset.GetAssetVersionProvenanceResponseObject, error) {
 	if s.layerEdit == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -101,7 +100,7 @@ func (s *Server) GetAssetVersionProvenance(ctx context.Context, request asset.Ge
 	return asset.GetAssetVersionProvenance200JSONResponse(api.ProvenanceList{Items: items}), nil
 }
 
-// ReorderAssetLayers persists a new overlay order under optimistic concurrency.
+// ReorderAssetLayers 在乐观并发下持久化新的 overlay 顺序。
 func (s *Server) ReorderAssetLayers(ctx context.Context, request layer.ReorderAssetLayersRequestObject) (layer.ReorderAssetLayersResponseObject, error) {
 	if s.layerEdit == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -126,14 +125,14 @@ func (s *Server) ReorderAssetLayers(ctx context.Context, request layer.ReorderAs
 			maxRevision = record.Revision
 		}
 	}
-	etag := revisionETag("asset-layers", serviceUUID(request.AssetId).String(), maxRevision)
+	etag := revisionETag(etagKindAssetLayers, serviceUUID(request.AssetId).String(), maxRevision)
 	return layer.ReorderAssetLayers200JSONResponse{
 		Body:    api.LayerList{Items: items, Etag: api.ETag(etag)},
 		Headers: layer.ReorderAssetLayers200ResponseHeaders{Etag: new(api.ETag(etag))},
 	}, nil
 }
 
-// RollbackLayer moves a layer's effective head to a historical revision.
+// RollbackLayer 将层的有效头回退到一个历史修订。
 func (s *Server) RollbackLayer(ctx context.Context, request layer.RollbackLayerRequestObject) (layer.RollbackLayerResponseObject, error) {
 	if s.layerEdit == nil || request.Body == nil {
 		return nil, api.ErrStrictOperationNotImplemented
@@ -160,6 +159,7 @@ func (s *Server) RollbackLayer(ctx context.Context, request layer.RollbackLayerR
 	}), nil
 }
 
+// mergePreviewResponse 将合并预览结果投影为 API 形状。
 func mergePreviewResponse(result service.MergePreviewResult) api.MergePreview {
 	issues := make([]api.ValidationIssue, 0, len(result.Validation))
 	for _, issue := range result.Validation {
@@ -183,6 +183,7 @@ func mergePreviewResponse(result service.MergePreviewResult) api.MergePreview {
 	}
 }
 
+// layerRevisionResponse 将层修订记录投影为 API 形状。
 func layerRevisionResponse(record service.LayerRevisionRecord) api.LayerRevision {
 	dialect := nullable.NewNullNullable[string]()
 	if record.Dialect != nil {
@@ -208,6 +209,7 @@ func layerRevisionResponse(record service.LayerRevisionRecord) api.LayerRevision
 	}
 }
 
+// layerResponse 将层记录投影为 API 形状。
 func layerResponse(record service.LayerRecord) api.Layer {
 	sourceSpec := nullable.NewNullNullable[api.Uuid]()
 	if record.SourceSpecID != nil {
@@ -218,7 +220,7 @@ func layerResponse(record service.LayerRecord) api.Layer {
 		dialect = nullable.NewNullableWithValue(*record.Dialect)
 	}
 	return api.Layer{
-		Id: api.Uuid(record.ID), Etag: revisionETag("layer", record.ID.String(), record.Revision),
+		Id: api.Uuid(record.ID), Etag: revisionETag(etagKindLayer, record.ID.String(), record.Revision),
 		AssetId: api.Uuid(record.AssetID), SourceSpecId: sourceSpec,
 		Role: api.LayerRole(record.Role), Origin: api.LayerOrigin(record.Origin), Ord: record.Ord,
 		Dialect: dialect, Enabled: record.Enabled, Heads: []api.LayerHead{}, Capabilities: api.CapabilityList{},
@@ -226,4 +228,9 @@ func layerResponse(record service.LayerRecord) api.Layer {
 	}
 }
 
-var _ = strings.TrimSpace
+const (
+	// etagKindLayer 是层 ETag 的实体类型令牌。
+	etagKindLayer = "layer"
+	// etagKindAssetLayers 是资产层排序 ETag 的实体类型令牌。
+	etagKindAssetLayers = "asset-layers"
+)

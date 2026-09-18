@@ -9,235 +9,331 @@ import (
 )
 
 var (
-	// ErrUnauthenticated means no active principal could be established.
+	// ErrUnauthenticated 表示未能建立有效主体上下文。
+	// 对外映射：ErrorCodeUnauthenticated（HTTP 401）。
 	ErrUnauthenticated = errors.New("principal is not authenticated")
-	// ErrNotFound intentionally combines absent and unauthorized resources.
+	// ErrNotFound 有意合并「资源不存在」与「无权访问」两类情况。
+	// 对外映射：ErrorCodeNotFound（HTTP 404）。
 	ErrNotFound = errors.New("resource is absent or unauthorized")
-	// ErrDuplicate means a contract-defined unique identity already exists.
+	// ErrDuplicate 表示契约定义的唯一标识已存在。
+	// 对外映射：ErrorCodeDuplicate（HTTP 409）。
 	ErrDuplicate = errors.New("resource already exists")
-	// ErrValidation means use-case input violates a frozen domain rule.
+	// ErrValidation 表示用例输入违反冻结的领域规则。
+	// 对外映射：ErrorCodeValidation（HTTP 422）。
 	ErrValidation = errors.New("input violates a domain rule")
-	// ErrPrecondition means an If-Match token is missing or no longer matches the row revision.
+	// ErrPrecondition 表示 If-Match 令牌缺失或不再匹配行版本。
+	// 对外映射：ErrorCodePreconditionFailed（HTTP 412）。
 	ErrPrecondition = errors.New("resource precondition failed")
-	// ErrCredentialInUse means deletion would leave a repository without an explicit credential policy.
+	// ErrCredentialInUse 表示删除会使仓库失去显式凭据策略。
+	// 对外映射：ErrorCodeCredentialInUse（HTTP 409）。
 	ErrCredentialInUse = errors.New("credential is still referenced")
-	// ErrIdempotencyConflict means one idempotency key was reused with a different request digest.
+	// ErrIdempotencyConflict 表示一个幂等键被不同请求摘要复用。
+	// 对外映射：ErrorCodeIdempotencyConflict（HTTP 409）。
 	ErrIdempotencyConflict = errors.New("idempotency key was reused for a different request")
-	// ErrQuotaExceeded means a tenant resource ceiling would be exceeded by the operation.
+	// ErrQuotaExceeded 表示操作将使租户资源上限超出。
+	// 对外映射：ErrorCodeQuotaExceeded（HTTP 409）。
 	ErrQuotaExceeded = errors.New("tenant quota would be exceeded")
-	// ErrInvalidState means the resource lifecycle forbids the requested transition.
+	// ErrInvalidState 表示资源生命周期禁止所请求的状态迁移。
+	// 对外映射：ErrorCodeInvalidState（HTTP 409）。
 	ErrInvalidState = errors.New("resource lifecycle forbids the requested transition")
-	// ErrBaseLayerExists means a repo base would replace an AI-generated base
-	// without the explicit replaceAiBase flag.
+	// ErrBaseLayerExists 表示仓库 base 会在未显式传入 replaceAiBase 标志时
+	// 替换一个已存在的 AI 生成 base。
+	// 对外映射：ErrorCodeBaseLayerExists（HTTP 409）。
 	ErrBaseLayerExists = errors.New("an AI-generated base layer already exists")
 )
 
-// QuotaExceededError preserves the safe resource counters needed by a quota response.
+// QuotaExceededError 保留配额响应所需的安全资源计数。
 type QuotaExceededError struct {
-	// Resource identifies the quota dimension, such as repositories.
+	// Resource 标识配额维度，如 repositories。
 	Resource string
-	// Current is the active resource count before the rejected operation.
+	// Current 是被拒绝操作前的活跃资源数。
 	Current int64
-	// Limit is the tenant's configured maximum for the resource.
+	// Limit 是租户为该资源配置的最大值。
 	Limit int64
 }
 
-// Error implements error without including tenant identifiers or request secrets.
+// Error 实现 error 接口，且不包含租户标识或请求秘密。
 func (err *QuotaExceededError) Error() string {
 	return fmt.Sprintf("tenant quota exceeded for %s", err.Resource)
 }
 
-// Unwrap allows errors.Is to match ErrQuotaExceeded.
+// Unwrap 使 errors.Is 能匹配 ErrQuotaExceeded。
 func (err *QuotaExceededError) Unwrap() error { return ErrQuotaExceeded }
 
-// User is a local identity without password or session secret material.
+// User 是不含密码或会话秘密材料的本地身份。
 type User struct {
-	ID              uuid.UUID
-	Username        string
-	DisplayName     string
-	Email           *string
-	Status          string
-	IsPlatformAdmin bool
-	Revision        int64
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-}
-
-// Quota is the tenant resource ceiling copied from platform defaults or supplied explicitly.
-type Quota struct {
-	MaxRepositories       int `json:"maxRepositories"`
-	MaxServices           int `json:"maxServices"`
-	MaxStorageBytes       int `json:"maxStorageBytes"`
-	MaxCollectConcurrency int `json:"maxCollectConcurrency"`
-}
-
-// Tenant is the tenant control-plane record returned by M0 use cases.
-type Tenant struct {
-	ID          uuid.UUID
-	Slug        string
+	// ID 是用户的标识。
+	ID uuid.UUID
+	// Username 是登录用户名。
+	Username string
+	// DisplayName 是展示名。
 	DisplayName string
-	Status      string
-	Quota       Quota
-	Revision    int64
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
-// Membership grants one role in one active tenant.
-type Membership struct {
-	TenantID          uuid.UUID
-	TenantSlug        string
-	TenantDisplayName string
-	UserID            uuid.UUID
-	Role              string
-	JoinedAt          time.Time
-}
-
-// PrincipalKind identifies whether authentication used a browser JWT or PAT.
-type PrincipalKind string
-
-const (
-	// PrincipalJWT is a browser subject authenticated with a short-lived access token.
-	PrincipalJWT PrincipalKind = "jwt"
-	// PrincipalPAT is a tenant-bound personal access token.
-	PrincipalPAT PrincipalKind = "pat"
-)
-
-// Principal is the authenticated identity and credential-specific authorization boundary.
-type Principal struct {
-	Kind       PrincipalKind
-	User       User
-	TokenID    uuid.UUID
-	TenantID   uuid.UUID
-	TenantSlug string
-	Role       string
-	Scopes     []string
-}
-
-// LoginResult contains the one-time browser credentials and identity projection.
-type LoginResult struct {
-	AccessToken      string
-	ExpiresInSeconds int
-	RefreshToken     string
-	RefreshExpiresAt time.Time
-	Principal        Principal
-	Memberships      []Membership
-}
-
-// Token is PAT metadata that never includes plaintext bearer material.
-type Token struct {
-	TenantID   uuid.UUID
-	ID         uuid.UUID
-	UserID     uuid.UUID
-	Name       string
-	Scopes     []string
-	ExpiresAt  *time.Time
-	LastUsedAt *time.Time
-	RevokedAt  *time.Time
-	CreatedAt  time.Time
-}
-
-// CreatedToken contains PAT metadata and plaintext exactly once at creation.
-type CreatedToken struct {
-	Token
-	Plaintext string
-}
-
-// NewUser contains validated identity creation inputs.
-type NewUser struct {
-	ID              uuid.UUID
-	Username        string
-	PasswordHash    string
-	DisplayName     string
-	Email           *string
+	// Email 是邮箱（可为空）。
+	Email *string
+	// Status 是用户状态。
+	Status string
+	// IsPlatformAdmin 表示是否为平台管理员。
 	IsPlatformAdmin bool
-}
-
-// NewRefreshToken contains digest-only browser refresh token persistence inputs.
-type NewRefreshToken struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	TokenHash []byte
-	FamilyID  uuid.UUID
-	ExpiresAt time.Time
-}
-
-// RefreshTokenPrincipal resolves one refresh token to its user and rotation family.
-type RefreshTokenPrincipal struct {
-	Principal Principal
-	FamilyID  uuid.UUID
-	Revoked   bool
-}
-
-// NewTenant contains tenant values ready for atomic default resolution and insertion.
-type NewTenant struct {
-	ID          uuid.UUID
-	Slug        string
-	DisplayName string
-	Quota       *Quota
-}
-
-// TenantPatchInput contains the platform-controlled fields that may be changed on a tenant.
-// A nil field is omitted from the mutation and therefore retains its current value.
-type TenantPatchInput struct {
-	// DisplayName replaces the tenant display name when supplied.
-	DisplayName *string
-	// Status replaces the tenant lifecycle status when supplied.
-	Status *string
-	// Quota replaces the complete tenant quota when supplied.
-	Quota *Quota
-}
-
-// UpdateTenant contains one optimistic-concurrency tenant mutation.
-type UpdateTenant struct {
-	// Slug identifies the tenant being changed.
-	Slug string
-	// ExpectedRevision is the ETag revision required by the mutation.
-	ExpectedRevision int64
-	// DisplayName is an optional replacement display name.
-	DisplayName *string
-	// Status is an optional replacement lifecycle status.
-	Status *string
-	// Quota is an optional complete replacement quota.
-	Quota *Quota
-	// UpdatedAt is the UTC mutation timestamp.
+	// Revision 是乐观并发版本号。
+	Revision int64
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
+	// UpdatedAt 是最近更新时间。
 	UpdatedAt time.Time
 }
 
-// NewToken contains digest-only PAT persistence inputs.
-type NewToken struct {
-	TenantID  uuid.UUID
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	Name      string
+// Quota 是从平台默认值复制或显式提供的租户资源上限。
+type Quota struct {
+	// MaxRepositories 是仓库数上限。
+	MaxRepositories int `json:"maxRepositories"`
+	// MaxServices 是服务数上限。
+	MaxServices int `json:"maxServices"`
+	// MaxStorageBytes 是存储字节上限。
+	MaxStorageBytes int `json:"maxStorageBytes"`
+	// MaxCollectConcurrency 是采集并发上限。
+	MaxCollectConcurrency int `json:"maxCollectConcurrency"`
+}
+
+// Tenant 是 M0 用例返回的租户控制面记录。
+type Tenant struct {
+	// ID 是租户的标识。
+	ID uuid.UUID
+	// Slug 是租户的 URL 标识。
+	Slug string
+	// DisplayName 是展示名。
+	DisplayName string
+	// Status 是租户状态。
+	Status string
+	// Quota 是租户配额。
+	Quota Quota
+	// Revision 是乐观并发版本号。
+	Revision int64
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
+	// UpdatedAt 是最近更新时间。
+	UpdatedAt time.Time
+}
+
+// Membership 授予一个活跃租户中的一个角色。
+type Membership struct {
+	// TenantID 是租户标识。
+	TenantID uuid.UUID
+	// TenantSlug 是租户 slug。
+	TenantSlug string
+	// TenantDisplayName 是租户展示名。
+	TenantDisplayName string
+	// UserID 是用户标识。
+	UserID uuid.UUID
+	// Role 是成员角色。
+	Role string
+	// JoinedAt 是加入时间。
+	JoinedAt time.Time
+}
+
+// PrincipalKind 标识认证是使用浏览器 JWT 还是 PAT。
+type PrincipalKind string
+
+const (
+	// PrincipalJWT 是使用短时访问令牌认证的浏览器主体。
+	PrincipalJWT PrincipalKind = "jwt"
+	// PrincipalPAT 是绑定租户的个人访问令牌主体。
+	PrincipalPAT PrincipalKind = "pat"
+)
+
+// Principal 是认证后的身份及凭据特定的授权边界。
+type Principal struct {
+	// Kind 是主体类型（jwt/pat）。
+	Kind PrincipalKind
+	// User 是底层用户。
+	User User
+	// TokenID 是 PAT 的令牌标识。
+	TokenID uuid.UUID
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// TenantSlug 是所属租户 slug。
+	TenantSlug string
+	// Role 是租户成员角色。
+	Role string
+	// Scopes 是 PAT 的授权作用域。
+	Scopes []string
+}
+
+// LoginResult 包含一次性浏览器凭据与身份投影。
+type LoginResult struct {
+	// AccessToken 是访问令牌。
+	AccessToken string
+	// ExpiresInSeconds 是访问令牌剩余有效秒数。
+	ExpiresInSeconds int
+	// RefreshToken 是刷新令牌。
+	RefreshToken string
+	// RefreshExpiresAt 是刷新令牌过期时间。
+	RefreshExpiresAt time.Time
+	// Principal 是认证后的主体。
+	Principal Principal
+	// Memberships 是主体的活跃成员关系。
+	Memberships []Membership
+}
+
+// Token 是 PAT 元数据，绝不包含明文承载材料。
+type Token struct {
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// ID 是令牌的标识。
+	ID uuid.UUID
+	// UserID 是所属用户的标识。
+	UserID uuid.UUID
+	// Name 是令牌名。
+	Name string
+	// Scopes 是授权作用域。
+	Scopes []string
+	// ExpiresAt 是过期时间（可为空）。
+	ExpiresAt *time.Time
+	// LastUsedAt 是最近使用时间（可为空）。
+	LastUsedAt *time.Time
+	// RevokedAt 是撤销时间（可为空）。
+	RevokedAt *time.Time
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
+}
+
+// CreatedToken 在创建时恰好一次包含 PAT 元数据与明文。
+type CreatedToken struct {
+	// Token 是令牌元数据。
+	Token
+	// Plaintext 是明文令牌值。
+	Plaintext string
+}
+
+// NewUser 包含校验后的身份创建输入。
+type NewUser struct {
+	// ID 是用户的标识。
+	ID uuid.UUID
+	// Username 是登录用户名。
+	Username string
+	// PasswordHash 是密码哈希。
+	PasswordHash string
+	// DisplayName 是展示名。
+	DisplayName string
+	// Email 是邮箱（可为空）。
+	Email *string
+	// IsPlatformAdmin 表示是否为平台管理员。
+	IsPlatformAdmin bool
+}
+
+// NewRefreshToken 包含仅摘要的浏览器刷新令牌持久化输入。
+type NewRefreshToken struct {
+	// ID 是刷新令牌的标识。
+	ID uuid.UUID
+	// UserID 是所属用户的标识。
+	UserID uuid.UUID
+	// TokenHash 是令牌摘要。
 	TokenHash []byte
-	Scopes    []string
+	// FamilyID 是旋转族标识。
+	FamilyID uuid.UUID
+	// ExpiresAt 是过期时间。
+	ExpiresAt time.Time
+}
+
+// RefreshTokenPrincipal 将一个刷新令牌解析到其用户与旋转族。
+type RefreshTokenPrincipal struct {
+	// Principal 是认证后的主体。
+	Principal Principal
+	// FamilyID 是旋转族标识。
+	FamilyID uuid.UUID
+	// Revoked 表示令牌是否已撤销。
+	Revoked bool
+}
+
+// NewTenant 包含准备好做原子默认解析与插入的租户值。
+type NewTenant struct {
+	// ID 是租户的标识。
+	ID uuid.UUID
+	// Slug 是租户的 URL 标识。
+	Slug string
+	// DisplayName 是展示名。
+	DisplayName string
+	// Quota 是租户配额（可为空，为空走平台默认）。
+	Quota *Quota
+}
+
+// TenantPatchInput 包含租户上可由平台控制的字段。
+// 为 nil 的字段从变更中省略，因此保留当前值。
+type TenantPatchInput struct {
+	// DisplayName 在提供时替换租户展示名。
+	DisplayName *string
+	// Status 在提供时替换租户生命周期状态。
+	Status *string
+	// Quota 在提供时替换完整租户配额。
+	Quota *Quota
+}
+
+// UpdateTenant 包含一次乐观并发租户变更。
+type UpdateTenant struct {
+	// Slug 标识被变更的租户。
+	Slug string
+	// ExpectedRevision 是变更所需的 ETag 版本号。
+	ExpectedRevision int64
+	// DisplayName 是可选的替换展示名。
+	DisplayName *string
+	// Status 是可选的替换生命周期状态。
+	Status *string
+	// Quota 是可选的完整替换配额。
+	Quota *Quota
+	// UpdatedAt 是 UTC 变更时间戳。
+	UpdatedAt time.Time
+}
+
+// NewToken 包含仅摘要的 PAT 持久化输入。
+type NewToken struct {
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// ID 是令牌的标识。
+	ID uuid.UUID
+	// UserID 是所属用户的标识。
+	UserID uuid.UUID
+	// Name 是令牌名。
+	Name string
+	// TokenHash 是令牌摘要。
+	TokenHash []byte
+	// Scopes 是授权作用域。
+	Scopes []string
+	// ExpiresAt 是过期时间（可为空）。
 	ExpiresAt *time.Time
 }
 
-// CreateUserInput contains plaintext identity input accepted by platform administration.
+// CreateUserInput 包含平台管理接受的明文身份输入。
 type CreateUserInput struct {
-	Username    string
-	Password    string
+	// Username 是登录用户名。
+	Username string
+	// Password 是明文密码。
+	Password string
+	// DisplayName 是展示名。
 	DisplayName string
-	Email       *string
+	// Email 是邮箱（可为空）。
+	Email *string
 }
 
-// CreateTenantInput contains platform-authorized tenant creation values.
+// CreateTenantInput 包含平台授权的租户创建值。
 type CreateTenantInput struct {
-	Slug        string
+	// Slug 是租户的 URL 标识。
+	Slug string
+	// DisplayName 是展示名。
 	DisplayName string
-	Quota       *Quota
+	// Quota 是租户配额（可为空）。
+	Quota *Quota
 }
 
-// CreateTokenInput contains the requested name, scopes, and optional expiry for a PAT.
+// CreateTokenInput 包含 PAT 请求的名称、作用域与可选过期时间。
 type CreateTokenInput struct {
-	Name      string
-	Scopes    []string
+	// Name 是令牌名。
+	Name string
+	// Scopes 是授权作用域。
+	Scopes []string
+	// ExpiresAt 是过期时间（可为空）。
 	ExpiresAt *time.Time
 }
 
-// IdentityStore is the persistence boundary required by identity use cases.
+// IdentityStore 是身份用例所需的持久化边界。
 type IdentityStore interface {
 	CreateUser(context.Context, NewUser) (User, error)
 	UserByUsername(context.Context, string) (User, string, error)
