@@ -1,0 +1,35 @@
+$ go build ./...
+(no output; exit 0)
+
+$ go vet ./...
+(no output; exit 0)
+
+$ go tool sqlc vet
+(no output; exit 0)
+
+$ go test ./...
+ok  github.com/meridian-labs/meridian/internal/command
+ok  github.com/meridian-labs/meridian/internal/contracttest
+ok  github.com/meridian-labs/meridian/internal/handler
+ok  github.com/meridian-labs/meridian/internal/service
+ok  github.com/meridian-labs/meridian/internal/storage
+ok  github.com/meridian-labs/meridian/internal/task
+
+$ make smoke-m3-diff-cli ITEM=M3-AGENT-002
+SMK-018: pass; artifacts/smoke/2026-09-18T02-05-03-107ZtZMrN7/SMK-018.json
+SMK-019: pass; artifacts/smoke/2026-09-18T02-05-03-107ZtZMrN7/SMK-019.json
+SMK-020: pass; artifacts/smoke/2026-09-18T02-05-03-107ZtZMrN7/SMK-020.json
+SMK-021: pass; artifacts/smoke/2026-09-18T02-05-03-107ZtZMrN7/SMK-021.json
+SMK-026: pass; artifacts/smoke/2026-09-18T02-05-03-107ZtZMrN7/SMK-026.json
+
+$ make cli-contract-tests ITEM=M3-AGENT-002
+ok  github.com/meridian-labs/meridian/internal/command
+
+$ go test ./internal/contracttest -run 'TestAgentQueueReferencesAndMilestoneCheckpoints|TestSmokeCatalogMatchesAcceptance|TestAgentGateAvailability' -count=1
+ok  github.com/meridian-labs/meridian/internal/contracttest
+
+$ go test ./internal/contracttest -count=1
+ok  github.com/meridian-labs/meridian/internal/contracttest
+
+$ git diff --check
+(no output; exit 0)
