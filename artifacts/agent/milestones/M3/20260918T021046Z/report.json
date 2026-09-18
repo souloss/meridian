@@ -1,0 +1,65 @@
+{
+  "milestone": "M3",
+  "status": "completed",
+  "commit": "65aafd31684bea6f625bce8899caab56cd886d87",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "reportPath": "artifacts/agent/milestones/M3/20260918T021046Z/report.json",
+  "completedBy": "coding-agent",
+  "completedAt": "2026-09-18T02:10:46Z",
+  "workItems": [
+    {
+      "id": "M3-AGENT-001",
+      "status": "passed",
+      "evidence": "artifacts/agent/M3-AGENT-001/20260917T232800Z/report.json"
+    },
+    {
+      "id": "M3-AGENT-002",
+      "status": "passed",
+      "evidence": "artifacts/agent/M3-AGENT-002/20260918T020657Z/report.json"
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-05",
+      "status": "passed",
+      "evidence": ["SMK-015", "SMK-016", "SMK-017", "SMK-033"]
+    },
+    {
+      "id": "US-06",
+      "status": "passed",
+      "evidence": ["SMK-018", "SMK-019", "SMK-026"]
+    },
+    {
+      "id": "US-09",
+      "status": "passed",
+      "evidence": ["SMK-020", "SMK-021"]
+    }
+  ],
+  "assertions": [
+    {"id": "SMK-015", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-13-51-235ZZ2PBgP/SMK-015.json"},
+    {"id": "SMK-016", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-13-51-235ZZ2PBgP/SMK-016.json"},
+    {"id": "SMK-017", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-13-51-235ZZ2PBgP/SMK-017.json"},
+    {"id": "SMK-018", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-15-20-284Z5vczD6/SMK-018.json"},
+    {"id": "SMK-019", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-15-20-284Z5vczD6/SMK-019.json"},
+    {"id": "SMK-020", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-15-20-284Z5vczD6/SMK-020.json"},
+    {"id": "SMK-021", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-15-20-284Z5vczD6/SMK-021.json"},
+    {"id": "SMK-026", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-15-20-284Z5vczD6/SMK-026.json"},
+    {"id": "SMK-033", "status": "passed", "evidence": "artifacts/smoke/2026-09-18T02-13-51-235ZZ2PBgP/SMK-033.json"}
+  ],
+  "deferred": [],
+  "risks": [
+    "M2 overlay remove action was a silent no-op (applyOverlayRemove discarded removeNode's returned root); fixed as part of M3 diff verification, which depends on removals actually mutating the merged document"
+  ],
+  "nextAction": "claim M4-AGENT-001",
+  "commands": [
+    {"command": "make smoke-m3-ai ITEM=M3-AGENT-001", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M3/20260918T021046Z/commands.log"},
+    {"command": "make ai-quality-gate ITEM=M3-AGENT-001", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M3/20260918T021046Z/commands.log"},
+    {"command": "make smoke-m3-diff-cli ITEM=M3-AGENT-002", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M3/20260918T021046Z/commands.log"},
+    {"command": "make cli-contract-tests ITEM=M3-AGENT-002", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M3/20260918T021046Z/commands.log"},
+    {"command": "go test ./...", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M3/20260918T021046Z/commands.log"},
+    {"command": "go vet ./...", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M3/20260918T021046Z/commands.log"},
+    {"command": "go tool sqlc vet", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M3/20260918T021046Z/commands.log"},
+    {"command": "go test ./internal/contracttest", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M3/20260918T021046Z/commands.log"}
+  ],
+  "failures": []
+}

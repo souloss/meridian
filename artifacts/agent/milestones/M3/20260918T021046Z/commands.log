@@ -1,0 +1,36 @@
+$ make smoke-m3-ai ITEM=M3-AGENT-001
+SMK-015: pass
+SMK-016: pass
+SMK-017: pass
+SMK-033: pass
+
+$ make ai-quality-gate ITEM=M3-AGENT-001
+ok  github.com/meridian-labs/meridian/internal/service
+ok  github.com/meridian-labs/meridian/internal/task
+
+$ make smoke-m3-diff-cli ITEM=M3-AGENT-002
+SMK-018: pass
+SMK-019: pass
+SMK-020: pass
+SMK-021: pass
+SMK-026: pass
+
+$ make cli-contract-tests ITEM=M3-AGENT-002
+ok  github.com/meridian-labs/meridian/internal/command
+
+$ go test ./...
+ok  github.com/meridian-labs/meridian/internal/command
+ok  github.com/meridian-labs/meridian/internal/contracttest
+ok  github.com/meridian-labs/meridian/internal/handler
+ok  github.com/meridian-labs/meridian/internal/service
+ok  github.com/meridian-labs/meridian/internal/storage
+ok  github.com/meridian-labs/meridian/internal/task
+
+$ go vet ./...
+(no output)
+
+$ go tool sqlc vet
+(no output)
+
+$ go test ./internal/contracttest
+ok  github.com/meridian-labs/meridian/internal/contracttest
