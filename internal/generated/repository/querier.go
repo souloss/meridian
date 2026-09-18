@@ -15,6 +15,9 @@ type Querier interface {
 	// AcceptDiscoveryCandidate exposes the corresponding strongly typed database operation.
 	// 将候选标记为已接受；仅在 pending 状态时生效。
 	AcceptDiscoveryCandidate(ctx context.Context, arg AcceptDiscoveryCandidateParams) (int64, error)
+	// AckBreakingTodo exposes the corresponding strongly typed database operation.
+	// 确认一条待办（任意授权服务成员确认即关闭）。
+	AckBreakingTodo(ctx context.Context, arg AckBreakingTodoParams) (BreakingTodo, error)
 	// AddCredentialTeamShare exposes the corresponding strongly typed database operation.
 	// 授予一条同租户团队可见性关系。
 	AddCredentialTeamShare(ctx context.Context, arg AddCredentialTeamShareParams) error
@@ -64,6 +67,9 @@ type Querier interface {
 	// CountAssetVersionItems exposes the corresponding strongly typed database operation.
 	// 统计资产版本条目总数。
 	CountAssetVersionItems(ctx context.Context, arg CountAssetVersionItemsParams) (int64, error)
+	// CountBreakingTodos exposes the corresponding strongly typed database operation.
+	// 统计破坏性变更待办总数。
+	CountBreakingTodos(ctx context.Context, arg CountBreakingTodosParams) (int64, error)
 	// CountCredentialRepositories exposes the corresponding strongly typed database operation.
 	// 统计引用某条租户凭据的有效仓库数量。
 	CountCredentialRepositories(ctx context.Context, arg CountCredentialRepositoriesParams) (int64, error)
@@ -144,6 +150,9 @@ type Querier interface {
 	// CreateBlobMetadata exposes the corresponding strongly typed database operation.
 	// 写入不可变的内容寻址元数据；其他租户或请求已登记相同摘要时不返回记录。
 	CreateBlobMetadata(ctx context.Context, arg CreateBlobMetadataParams) (Blob, error)
+	// CreateBreakingTodoIfAbsent exposes the corresponding strongly typed database operation.
+	// 幂等创建一条破坏性变更待办（唯一键 asset_version_id + service_id）。
+	CreateBreakingTodoIfAbsent(ctx context.Context, arg CreateBreakingTodoIfAbsentParams) (BreakingTodo, error)
 	// CreateConfigImportPreview exposes the corresponding strongly typed database operation.
 	// M2 gitops 配置导入的持久化查询。
 	// 全部查询保留 tenant_id 谓词。
@@ -164,6 +173,9 @@ type Querier interface {
 	// CreateDefaultUserPreferences exposes the corresponding strongly typed database operation.
 	// 为新身份创建语言、主题和默认视图偏好。
 	CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
+	// CreateDiffSnapshot exposes the corresponding strongly typed database operation.
+	// 创建一条差异快照，冻结解析后的选择器与产物。
+	CreateDiffSnapshot(ctx context.Context, arg CreateDiffSnapshotParams) (DiffSnapshot, error)
 	// CreateDiscoveryJob exposes the corresponding strongly typed database operation.
 	// 记录一条持久化的仓库发现请求。
 	CreateDiscoveryJob(ctx context.Context, arg CreateDiscoveryJobParams) (Job, error)
@@ -209,6 +221,9 @@ type Querier interface {
 	// CreateService exposes the corresponding strongly typed database operation.
 	// 持久化一个候选接受后新建的服务，冲突时静默跳过。
 	CreateService(ctx context.Context, arg CreateServiceParams) (Service, error)
+	// CreateShareLink exposes the corresponding strongly typed database operation.
+	// 创建一条分享链接，令牌哈希全局唯一。
+	CreateShareLink(ctx context.Context, arg CreateShareLinkParams) (ShareLink, error)
 	// CreateSourceSpec exposes the corresponding strongly typed database operation.
 	// 持久化源配置。
 	CreateSourceSpec(ctx context.Context, arg CreateSourceSpecParams) (SourceSpec, error)
@@ -221,6 +236,9 @@ type Querier interface {
 	// CreateTenant exposes the corresponding strongly typed database operation.
 	// 使用明确的配额和设置快照创建租户，快照来自平台默认配置。
 	CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error)
+	// CreateUpload exposes the corresponding strongly typed database operation.
+	// 创建一条上传。
+	CreateUpload(ctx context.Context, arg CreateUploadParams) (Upload, error)
 	// CreateUser exposes the corresponding strongly typed database operation.
 	// 创建一个全局身份，保存 Argon2id PHC 校验值，不保存密码明文。
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
@@ -336,6 +354,9 @@ type Querier interface {
 	// GetCurrentVersionInTrack exposes the corresponding strongly typed database operation.
 	// 返回轨迹内当前已发布的版本。
 	GetCurrentVersionInTrack(ctx context.Context, arg GetCurrentVersionInTrackParams) (AssetVersion, error)
+	// GetDiffSnapshot exposes the corresponding strongly typed database operation.
+	// 返回一条差异快照，供分享描述符冻结。
+	GetDiffSnapshot(ctx context.Context, arg GetDiffSnapshotParams) (DiffSnapshot, error)
 	// GetDiscoveryCandidate exposes the corresponding strongly typed database operation.
 	// 返回一个候选，供接受前校验。
 	GetDiscoveryCandidate(ctx context.Context, arg GetDiscoveryCandidateParams) (DiscoveryCandidate, error)
@@ -409,6 +430,12 @@ type Querier interface {
 	// 全部查询保留 tenant_id 谓词；公开读取按 tenant_slug + service_slug 跨表解析。
 	// 锁定一条活跃服务行，供条件更新与删除前校验 revision。
 	GetServiceForUpdate(ctx context.Context, arg GetServiceForUpdateParams) (Service, error)
+	// GetShareLinkByTokenHash exposes the corresponding strongly typed database operation.
+	// 按令牌哈希返回一条未撤销且未过期的分享链接。
+	GetShareLinkByTokenHash(ctx context.Context, tokenHash []byte) (ShareLink, error)
+	// GetSourceLayerByPushKey exposes the corresponding strongly typed database operation.
+	// 返回资产下按推送身份（kind + 资产名模板）匹配的推送层，供重复推送复用同一 overlay 层。
+	GetSourceLayerByPushKey(ctx context.Context, arg GetSourceLayerByPushKeyParams) (Layer, error)
 	// GetSourceSpec exposes the corresponding strongly typed database operation.
 	// 返回一个活跃源配置。
 	GetSourceSpec(ctx context.Context, arg GetSourceSpecParams) (SourceSpec, error)
@@ -447,6 +474,11 @@ type Querier interface {
 	// GetTenantSlugForEvent exposes the corresponding strongly typed database operation.
 	// 解析领域事件信封中使用的稳定租户标识。
 	GetTenantSlugForEvent(ctx context.Context, tenantID uuid.UUID) (string, error)
+	// GetUpload exposes the corresponding strongly typed database operation.
+	// M3 差异、分享与待办的持久化查询。
+	// 全部查询保留 tenant_id 谓词。
+	// 返回一条上传，供文件选择器解析。
+	GetUpload(ctx context.Context, arg GetUploadParams) (Upload, error)
 	// GetUserByID exposes the corresponding strongly typed database operation.
 	// 按传入 UUID 返回对应的全局身份。
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
@@ -477,6 +509,9 @@ type Querier interface {
 	// ListAvailableProducerProfiles exposes the corresponding strongly typed database operation.
 	// 列出可被租户选择的可用生产者配置；可选按 kind 过滤。
 	ListAvailableProducerProfiles(ctx context.Context, kindFilter string) ([]ProducerProfile, error)
+	// ListBreakingTodos exposes the corresponding strongly typed database operation.
+	// 列出破坏性变更待办，按状态过滤并分页。
+	ListBreakingTodos(ctx context.Context, arg ListBreakingTodosParams) ([]BreakingTodo, error)
 	// ListCredentialTeamShares exposes the corresponding strongly typed database operation.
 	// 返回一条租户凭据完整且有序的团队共享集合。
 	ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error)

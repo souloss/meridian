@@ -30,8 +30,15 @@ type AssetVersionRecord struct {
 	MergeEngineVersion string
 	LayerManifest      []LayerManifestEntry
 	SourceCommit       *string
+	MergedRef          *string
 	IndexComplete      bool
 	CreatedAt          time.Time
+}
+
+// MergedHashOrFingerprint returns the content identity used for diff resolution:
+// the merged hash when present, otherwise the input fingerprint.
+func (record AssetVersionRecord) MergedHashOrFingerprint() string {
+	return record.InputFingerprint
 }
 
 // LayerManifestEntry identifies one layer revision in a version manifest.

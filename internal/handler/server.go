@@ -37,6 +37,7 @@ type Server struct {
 	layerEdit        *service.LayerEdit
 	configImport     *service.ConfigImport
 	aiWorkflow       *service.AiWorkflow
+	diffService      *service.DiffService
 	secureCookies    bool
 }
 
@@ -68,6 +69,8 @@ type Dependencies struct {
 	ConfigImport *service.ConfigImport
 	// AiWorkflow provides AI generation, revision review, and version publish.
 	AiWorkflow *service.AiWorkflow
+	// DiffService provides diff, snapshot share, breaking todos, uploads, and push.
+	DiffService *service.DiffService
 }
 
 func New() *Server {
@@ -108,6 +111,7 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.layerEdit = dependencies.LayerEdit
 	s.configImport = dependencies.ConfigImport
 	s.aiWorkflow = dependencies.AiWorkflow
+	s.diffService = dependencies.DiffService
 	s.secureCookies = secureCookies
 	return s
 }

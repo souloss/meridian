@@ -25,10 +25,13 @@ var expectedM0Tables = []string{
 	"assets",
 	"audit_logs",
 	"blobs",
+	"breaking_todos",
 	"config_import_previews",
 	"credential_team_shares",
 	"credentials",
 	"discovery_candidates",
+	"diff_rule_sets",
+	"diff_snapshots",
 	"global_credentials",
 	"global_idempotency_records",
 	"idempotency_records",
@@ -46,6 +49,7 @@ var expectedM0Tables = []string{
 	"refresh_tokens",
 	"repositories",
 	"services",
+	"share_links",
 	"source_bindings",
 	"source_specs",
 	"team_members",
@@ -54,11 +58,12 @@ var expectedM0Tables = []string{
 	"tenant_kind_overrides",
 	"tenant_members",
 	"tenants",
+	"uploads",
 	"user_preferences",
 	"users",
 }
 
-const expectedApplicationMigrationVersion = 8
+const expectedApplicationMigrationVersion = 9
 
 func TestMigrationLifecycle(t *testing.T) {
 	databaseURL := os.Getenv("MERIDIAN_TEST_DATABASE_URL")

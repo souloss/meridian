@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json/v2"
 	"errors"
 	"fmt"
@@ -91,9 +92,15 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	assetStore := repository.NewAssetStore(db.Pool)
 	layerStore := repository.NewLayerStore(db.Pool)
 	aiStore := repository.NewAIStore(db.Pool)
+	diffStore := repository.NewDiffStore(db.Pool)
 	syncRunner := service.NewPipelineRunner(assetStore, blobStore, workspaceRoot)
 	layerEdit := service.NewLayerEdit(layerStore, blobStore, identityStore)
 	aiWorkflow := service.NewAiWorkflow(aiStore, blobStore, identityStore)
+	shareKey, _ := base64.RawURLEncoding.DecodeString(strings.TrimSpace(os.Getenv("MERIDIAN_SHARE_SIGNING_KEY")))
+	if len(shareKey) == 0 {
+		shareKey = []byte("meridian-dev-share-signing-key-fixed-32")
+	}
+	diffService := service.NewDiffService(diffStore, blobStore, identityStore, shareKey)
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
 		Executions:       repositoryStore,
 		SyncRunner:       syncRunner,
@@ -109,6 +116,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	serviceLifecycleStore.BindRiver(runtime.Client())
 	layerStore.BindRiver(runtime.Client())
 	aiStore.BindRiver(runtime.Client())
+	diffStore.BindRiver(runtime.Client())
 	credentials := service.NewCredentials(repository.NewCredentialStoreWithRiver(db.Pool, runtime.Client()), identityStore, keyring)
 	repositories := service.NewRepositories(repositoryStore, identityStore)
 	jobs := service.NewJobs(repository.NewJobControlStore(db.Pool, runtime.Client()), identityStore)
@@ -125,7 +133,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		Handler: handler.NewWithRuntimeServices(handler.Dependencies{
 			Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
 			Producers: producers, Discovery: discovery, Assets: assets, Views: views, ServiceLifecycle: serviceLifecycle,
-			LayerEdit: layerEdit, ConfigImport: configImport, AiWorkflow: aiWorkflow,
+			LayerEdit: layerEdit, ConfigImport: configImport, AiWorkflow: aiWorkflow, DiffService: diffService,
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,

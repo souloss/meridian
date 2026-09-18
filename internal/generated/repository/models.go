@@ -386,6 +386,41 @@ type Blob struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
+// BreakingTodo is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 按资产版本与服务的破坏性变更待办。
+type BreakingTodo struct {
+	// TenantID is the generated tenant id database value for BreakingTodo.
+	// 拥有该待办的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for BreakingTodo.
+	// 应用生成的 UUID v7 待办标识。
+	ID uuid.UUID `json:"id"`
+	// AssetVersionID is the generated asset version id database value for BreakingTodo.
+	// 触发该待办的资产版本。
+	AssetVersionID uuid.UUID `json:"asset_version_id"`
+	// ServiceID is the generated service id database value for BreakingTodo.
+	// 该待办归属的服务。
+	ServiceID uuid.UUID `json:"service_id"`
+	// Status is the generated status database value for BreakingTodo.
+	// 待办状态：open 或 acked。
+	Status string `json:"status"`
+	// AckedBy is the generated acked by database value for BreakingTodo.
+	// 确认该待办的用户，可为空。
+	AckedBy *uuid.UUID `json:"acked_by"`
+	// AckedAt is the generated acked at database value for BreakingTodo.
+	// 确认该待办的 UTC 时间，可为空。
+	AckedAt pgtype.Timestamptz `json:"acked_at"`
+	// Comment is the generated comment database value for BreakingTodo.
+	// 确认备注，可为空。
+	Comment *string `json:"comment"`
+	// CreatedAt is the generated created at database value for BreakingTodo.
+	// 创建待办时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for BreakingTodo.
+	// 最近一次更新待办时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
 // ConfigImportPreview is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 仓库配置导入的一次可应用预览快照。
 type ConfigImportPreview struct {
@@ -482,6 +517,79 @@ type CredentialTeamShare struct {
 	TeamID uuid.UUID `json:"team_id"`
 	// CreatedAt is the generated created at database value for CredentialTeamShare.
 	// 授予共享关系时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+// DiffRuleSet is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 资产类别差异规则的版本化集合。
+type DiffRuleSet struct {
+	// TenantID is the generated tenant id database value for DiffRuleSet.
+	// 拥有该规则集的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for DiffRuleSet.
+	// 应用生成的 UUID v7 规则集标识。
+	ID uuid.UUID `json:"id"`
+	// Kind is the generated kind database value for DiffRuleSet.
+	// 该规则集适用的资产类别。
+	Kind string `json:"kind"`
+	// Name is the generated name database value for DiffRuleSet.
+	// 规则集名称。
+	Name string `json:"name"`
+	// Version is the generated version database value for DiffRuleSet.
+	// 规则集的版本号。
+	Version int32 `json:"version"`
+	// Rules is the generated rules database value for DiffRuleSet.
+	// 规则列表 JSON 投影。
+	Rules []byte `json:"rules"`
+	// Enabled is the generated enabled database value for DiffRuleSet.
+	// 规则集是否启用。
+	Enabled bool `json:"enabled"`
+	// Revision is the generated revision database value for DiffRuleSet.
+	// 用于生成 HTTP ETag 的单调递增并发版本号。
+	Revision int64 `json:"revision"`
+	// CreatedAt is the generated created at database value for DiffRuleSet.
+	// 创建规则集时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt is the generated updated at database value for DiffRuleSet.
+	// 最近一次更新规则集时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// DiffSnapshot is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 一次持久化差异结果，冻结了解析后的选择器与产物。
+type DiffSnapshot struct {
+	// TenantID is the generated tenant id database value for DiffSnapshot.
+	// 拥有该快照的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for DiffSnapshot.
+	// 应用生成的 UUID v7 快照标识。
+	ID uuid.UUID `json:"id"`
+	// LeftSelector is the generated left selector database value for DiffSnapshot.
+	// 冻结的左侧已解析选择器 JSON。
+	LeftSelector []byte `json:"left_selector"`
+	// RightSelector is the generated right selector database value for DiffSnapshot.
+	// 冻结的右侧已解析选择器 JSON。
+	RightSelector []byte `json:"right_selector"`
+	// LeftArtifactRef is the generated left artifact ref database value for DiffSnapshot.
+	// 左侧产物的不可变内容引用。
+	LeftArtifactRef string `json:"left_artifact_ref"`
+	// RightArtifactRef is the generated right artifact ref database value for DiffSnapshot.
+	// 右侧产物的不可变内容引用。
+	RightArtifactRef string `json:"right_artifact_ref"`
+	// RuleSetID is the generated rule set id database value for DiffSnapshot.
+	// 使用的差异规则集，可为空。
+	RuleSetID *uuid.UUID `json:"rule_set_id"`
+	// ResultRef is the generated result ref database value for DiffSnapshot.
+	// 差异结果 JSON 的内容引用。
+	ResultRef string `json:"result_ref"`
+	// Summary is the generated summary database value for DiffSnapshot.
+	// 差异统计摘要 JSON。
+	Summary []byte `json:"summary"`
+	// CreatedBy is the generated created by database value for DiffSnapshot.
+	// 创建快照的用户。
+	CreatedBy uuid.UUID `json:"created_by"`
+	// CreatedAt is the generated created at database value for DiffSnapshot.
+	// 创建快照时的 UTC 事务时间。
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
@@ -1241,6 +1349,50 @@ type Service struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+// ShareLink is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 视图或差异快照的匿名只读分享链接。
+type ShareLink struct {
+	// TenantID is the generated tenant id database value for ShareLink.
+	// 拥有该分享链接的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for ShareLink.
+	// 应用生成的 UUID v7 分享链接标识。
+	ID uuid.UUID `json:"id"`
+	// TokenHash is the generated token hash database value for ShareLink.
+	// 分享令牌的哈希，令牌明文仅在创建响应返回。
+	TokenHash []byte `json:"token_hash"`
+	// CreatorID is the generated creator id database value for ShareLink.
+	// 创建分享链接的用户。
+	CreatorID uuid.UUID `json:"creator_id"`
+	// ResourceType is the generated resource type database value for ShareLink.
+	// 分享资源类别：view 或 diff_snapshot。
+	ResourceType string `json:"resource_type"`
+	// ResourceID is the generated resource id database value for ShareLink.
+	// 分享资源标识；view 时可为空。
+	ResourceID *uuid.UUID `json:"resource_id"`
+	// Descriptor is the generated descriptor database value for ShareLink.
+	// 创建时冻结的资源描述符 JSON。
+	Descriptor []byte `json:"descriptor"`
+	// ViewID is the generated view id database value for ShareLink.
+	// view 资源对应的视图标识。
+	ViewID *string `json:"view_id"`
+	// Options is the generated options database value for ShareLink.
+	// 创建时冻结的视图选项 JSON。
+	Options []byte `json:"options"`
+	// ArtifactAllowlist is the generated artifact allowlist database value for ShareLink.
+	// 不可变的内容引用允许列表。
+	ArtifactAllowlist []byte `json:"artifact_allowlist"`
+	// ExpiresAt is the generated expires at database value for ShareLink.
+	// 分享失效后的 UTC 时间。
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	// RevokedAt is the generated revoked at database value for ShareLink.
+	// 分享被撤销的 UTC 时间，可为空。
+	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
+	// CreatedAt is the generated created at database value for ShareLink.
+	// 创建分享链接时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
 // SourceBinding is the generated PostgreSQL representation of the corresponding Meridian table row.
 // 源配置物化出的绑定，指向具体资产与层。
 type SourceBinding struct {
@@ -1489,6 +1641,38 @@ type TenantMember struct {
 	// UpdatedAt is the generated updated at database value for TenantMember.
 	// 最近一次变更成员角色时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// Upload is the generated PostgreSQL representation of the corresponding Meridian table row.
+// 用于 CLI 文件选择器做差异比较的一次性上传内容。
+type Upload struct {
+	// TenantID is the generated tenant id database value for Upload.
+	// 拥有该上传的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID is the generated id database value for Upload.
+	// 应用生成的 UUID v7 上传标识。
+	ID uuid.UUID `json:"id"`
+	// BlobDigest is the generated blob digest database value for Upload.
+	// 上传内容的内容寻址 blob 摘要。
+	BlobDigest string `json:"blob_digest"`
+	// Kind is the generated kind database value for Upload.
+	// 上传内容的资产类别。
+	Kind string `json:"kind"`
+	// ContentType is the generated content type database value for Upload.
+	// 上传内容的 IANA 媒体类型。
+	ContentType string `json:"content_type"`
+	// SizeBytes is the generated size bytes database value for Upload.
+	// 上传内容的字节长度。
+	SizeBytes int64 `json:"size_bytes"`
+	// ExpiresAt is the generated expires at database value for Upload.
+	// 上传失效后的 UTC 时间。
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	// CreatedBy is the generated created by database value for Upload.
+	// 发起上传的用户，可为空。
+	CreatedBy *uuid.UUID `json:"created_by"`
+	// CreatedAt is the generated created at database value for Upload.
+	// 创建上传时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 // User is the generated PostgreSQL representation of the corresponding Meridian table row.

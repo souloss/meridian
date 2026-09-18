@@ -487,7 +487,7 @@ func assetVersionFromRow(row generated.AssetVersion) service.AssetVersionRecord 
 		ID: row.ID, AssetID: row.AssetID, TrackID: row.TrackID, SequenceNo: row.SequenceNo, Version: row.Version,
 		Lifecycle: row.Lifecycle, Revision: row.Revision, InputFingerprint: row.InputFingerprint,
 		MergeEngineVersion: row.MergeEngineVersion, LayerManifest: manifest, SourceCommit: row.SourceCommit,
-		IndexComplete: row.IndexComplete, CreatedAt: row.CreatedAt.Time,
+		MergedRef: row.MergedRef, IndexComplete: row.IndexComplete, CreatedAt: row.CreatedAt.Time,
 	}
 }
 

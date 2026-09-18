@@ -6,7 +6,7 @@ MERIDIAN_DEV_MASTER_KEY_VERSION ?= 1
 MERIDIAN_DEV_CREDENTIAL_FINGERPRINT_KEY ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 MILESTONE ?= $(if $(ITEM),$(firstword $(subst -, ,$(ITEM))),M5)
 
-.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-m1-golden-path smoke-m1-service-lifecycle smoke-m1-concurrency smoke-m2-overlay smoke-m2-gitops smoke-m3-ai ai-quality-gate overlay-property-tests smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 perf-openapi-pipeline e2e-viewer job-recovery-tests quality-gate
+.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-m1-golden-path smoke-m1-service-lifecycle smoke-m1-concurrency smoke-m2-overlay smoke-m2-gitops smoke-m3-ai smoke-m3-diff-cli cli-contract-tests ai-quality-gate overlay-property-tests smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 perf-openapi-pipeline e2e-viewer job-recovery-tests quality-gate
 
 all: build
 
@@ -118,6 +118,14 @@ smoke-m2-gitops:
 # M3 AI: cold-start generation, review, publish gate, failure modes, base replacement.
 smoke-m3-ai:
 	sh ./scripts/smoke.sh --m3-ai
+
+# M3 diff/share/todo + CLI: breaking diff, snapshot share, breaking todos, push, CLI exit codes.
+smoke-m3-diff-cli:
+	sh ./scripts/smoke.sh --m3-diff-cli
+
+# M3 CLI exit-code contract tests.
+cli-contract-tests:
+	vfox exec golang@1.27.1 -- go test -count=1 ./internal/command -run '^TestCli|^TestDiffExitCodes|^TestHTTPExitCodes'
 
 # M1 job recovery: worker crash recovery mutex and SSE reconnect.
 job-recovery-tests:

@@ -116,7 +116,16 @@ func ApplyPlatformOverlay(base map[string]any, raw map[string]any) (merged map[s
 	written := map[string]bool{}
 	order := make([]string, 0)
 	for _, action := range overlay.Actions {
-		touched, actionWarnings, actionErr := applyOverlayAction(result, action, mode)
+		var touched []string
+		var actionWarnings []OverlayIssue
+		var actionErr error
+		if action.Op == "remove" {
+			var updated map[string]any
+			updated, touched, actionWarnings, actionErr = applyOverlayRemoveInPlace(result, action, mode)
+			result = updated
+		} else {
+			touched, actionWarnings, actionErr = applyOverlayAction(result, action, mode)
+		}
 		warnings = append(warnings, actionWarnings...)
 		if actionErr != nil {
 			return nil, nil, warnings, actionErr
@@ -276,8 +285,6 @@ func applyOverlayAction(document map[string]any, action overlayAction, mode stri
 	switch action.Op {
 	case "merge":
 		return applyOverlayMerge(document, action, mode)
-	case "remove":
-		return applyOverlayRemove(document, action, mode)
 	case "patch":
 		return applyOverlayPatch(document, action)
 	}
@@ -315,30 +322,35 @@ func applyOverlayMerge(document map[string]any, action overlayAction, mode strin
 	return []string{action.Target}, nil, nil
 }
 
-func applyOverlayRemove(document map[string]any, action overlayAction, mode string) ([]string, []OverlayIssue, error) {
+// applyOverlayRemoveInPlace removes the selected nodes and returns the new root
+// document so the removal is persisted into the merge result.
+func applyOverlayRemoveInPlace(document map[string]any, action overlayAction, mode string) (map[string]any, []string, []OverlayIssue, error) {
 	paths, err := expandSelector(document, action.Target)
 	if err != nil {
-		return nil, nil, err
+		return document, nil, nil, err
 	}
 	if len(paths) == 0 {
 		if mode == overlayTargetMissStrict {
-			return nil, nil, overlayInvalidAt(fmt.Sprintf("remove target %q not found", action.Target), action.Line, action.Column)
+			return document, nil, nil, overlayInvalidAt(fmt.Sprintf("remove target %q not found", action.Target), action.Line, action.Column)
 		}
-		return nil, []OverlayIssue{{Severity: "warning", Code: "target_miss", Message: fmt.Sprintf("remove target %q not found", action.Target), Line: action.Line, Column: action.Column}}, nil
+		return document, nil, []OverlayIssue{{Severity: "warning", Code: "target_miss", Message: fmt.Sprintf("remove target %q not found", action.Target), Line: action.Line, Column: action.Column}}, nil
 	}
 	// Array deletions run in reverse document order so indices stay valid.
 	sort.SliceStable(paths, func(i, j int) bool {
 		return len(paths[i]) > len(paths[j]) || (len(paths[i]) == len(paths[j]) && paths[i][len(paths[i])-1] > paths[j][len(paths[j])-1])
 	})
+	updated := document
 	for _, path := range paths {
-		if _, removed, removeErr := removeNode(document, path); removeErr != nil || !removed {
+		next, removed, removeErr := removeNode(updated, path)
+		if removeErr != nil || !removed {
 			if mode == overlayTargetMissStrict {
-				return nil, nil, overlayInvalidAt(fmt.Sprintf("remove target %q not found", action.Target), action.Line, action.Column)
+				return updated, nil, nil, overlayInvalidAt(fmt.Sprintf("remove target %q not found", action.Target), action.Line, action.Column)
 			}
 			continue
 		}
+		updated = next.(map[string]any)
 	}
-	return []string{action.Target}, nil, nil
+	return updated, []string{action.Target}, nil, nil
 }
 
 func applyOverlayPatch(document map[string]any, action overlayAction) ([]string, []OverlayIssue, error) {

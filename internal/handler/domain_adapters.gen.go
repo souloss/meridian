@@ -65,6 +65,10 @@ func (adapter assetServer) PublishAssetVersion(ctx context.Context, request asse
 	return adapter.server.PublishAssetVersion(ctx, request)
 }
 
+func (adapter assetServer) PushAssetRevision(ctx context.Context, request asset.PushAssetRevisionRequestObject) (asset.PushAssetRevisionResponseObject, error) {
+	return adapter.server.PushAssetRevision(ctx, request)
+}
+
 func (adapter assetServer) UpdateSourceSpec(ctx context.Context, request asset.UpdateSourceSpecRequestObject) (asset.UpdateSourceSpecResponseObject, error) {
 	return adapter.server.UpdateSourceSpec(ctx, request)
 }
@@ -95,13 +99,29 @@ type collaborationServer struct {
 	server *Server
 }
 
+func (adapter collaborationServer) AcknowledgeBreakingTodo(ctx context.Context, request collaboration.AcknowledgeBreakingTodoRequestObject) (collaboration.AcknowledgeBreakingTodoResponseObject, error) {
+	return adapter.server.AcknowledgeBreakingTodo(ctx, request)
+}
+
 func (adapter collaborationServer) ListAuditLogs(ctx context.Context, request collaboration.ListAuditLogsRequestObject) (collaboration.ListAuditLogsResponseObject, error) {
 	return adapter.server.ListAuditLogs(ctx, request)
+}
+
+func (adapter collaborationServer) ListBreakingTodos(ctx context.Context, request collaboration.ListBreakingTodosRequestObject) (collaboration.ListBreakingTodosResponseObject, error) {
+	return adapter.server.ListBreakingTodos(ctx, request)
 }
 
 type diffServer struct {
 	diff.UnimplementedStrictServer
 	server *Server
+}
+
+func (adapter diffServer) CreateDiffSnapshotShareLink(ctx context.Context, request diff.CreateDiffSnapshotShareLinkRequestObject) (diff.CreateDiffSnapshotShareLinkResponseObject, error) {
+	return adapter.server.CreateDiffSnapshotShareLink(ctx, request)
+}
+
+func (adapter diffServer) RunDiff(ctx context.Context, request diff.RunDiffRequestObject) (diff.RunDiffResponseObject, error) {
+	return adapter.server.RunDiff(ctx, request)
 }
 
 type jobServer struct {
@@ -386,6 +406,10 @@ func (adapter tenantServer) UpdateCredential(ctx context.Context, request tenant
 type viewServer struct {
 	view.UnimplementedStrictServer
 	server *Server
+}
+
+func (adapter viewServer) GetSharedView(ctx context.Context, request view.GetSharedViewRequestObject) (view.GetSharedViewResponseObject, error) {
+	return adapter.server.GetSharedView(ctx, request)
 }
 
 func (adapter viewServer) ResolveView(ctx context.Context, request view.ResolveViewRequestObject) (view.ResolveViewResponseObject, error) {

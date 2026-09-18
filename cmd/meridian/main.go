@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -15,7 +16,12 @@ func main() {
 	defer stop()
 
 	if err := command.Execute(ctx, os.Stdout, os.Stderr); err != nil {
+		var cliErr *command.CliError
+		if errors.As(err, &cliErr) {
+			_, _ = fmt.Fprintln(os.Stderr, cliErr)
+			os.Exit(cliErr.ExitCode())
+		}
 		_, _ = fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		os.Exit(2)
 	}
 }

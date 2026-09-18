@@ -552,6 +552,16 @@ func (editor *LayerEdit) materialize(ctx context.Context, tenantID uuid.UUID, as
 	mergedHash := sha256.Sum256(mergedBytes)
 	mergedHashText := hex.EncodeToString(mergedHash[:])
 
+	// Persist the merged document to the blob store and record its content ref
+	// so downstream consumers (diff, provenance) can read the merged document.
+	mergedRef := new(string(""))
+	if editor.blobs != nil {
+		blob, putErr := editor.blobs.Put(ctx, strings.NewReader(string(mergedBytes)))
+		if putErr == nil {
+			mergedRef = new(blob.Digest)
+		}
+	}
+
 	fingerprint, err := editor.buildFingerprint(selected)
 	if err != nil {
 		return AssetVersionRecord{}, false, err
@@ -584,7 +594,7 @@ func (editor *LayerEdit) materialize(ctx context.Context, tenantID uuid.UUID, as
 		Version: nextVersionLabel(latest, sequence), Lifecycle: "draft", Revision: 1,
 		InputFingerprint: fingerprint, MergeEngineVersion: mergeEngineVersion,
 		KindPluginVersion: new(openapiPluginVersion), LayerManifest: manifestBytes,
-		MergedHash: new(mergedHashText), SourceCommit: nil, BaselineVersionID: nil,
+		MergedHash: new(mergedHashText), MergedRef: mergedRef, SourceCommit: nil, BaselineVersionID: nil,
 		Labels: labels, IndexComplete: false,
 	})
 	if err != nil {
