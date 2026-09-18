@@ -1,0 +1,31 @@
+$ go build ./...
+(no output; exit 0)
+
+$ go vet ./...
+(no output; exit 0)
+
+$ go tool sqlc vet
+(no output; exit 0)
+
+$ go test ./...
+ok  github.com/meridian-labs/meridian/internal/command
+ok  github.com/meridian-labs/meridian/internal/contracttest
+ok  github.com/meridian-labs/meridian/internal/handler
+ok  github.com/meridian-labs/meridian/internal/i18n
+ok  github.com/meridian-labs/meridian/internal/service
+ok  github.com/meridian-labs/meridian/internal/storage
+ok  github.com/meridian-labs/meridian/internal/task
+
+$ make smoke-m4-global-views ITEM=M4-AGENT-001
+SMK-022: pass; artifacts/smoke/2026-09-18T12-25-16-449ZSIm7NC/SMK-022.json
+SMK-023: pass; artifacts/smoke/2026-09-18T12-25-16-449ZSIm7NC/SMK-023.json
+SMK-024: pass; artifacts/smoke/2026-09-18T12-25-16-449ZSIm7NC/SMK-024.json
+
+$ make perf-search-graph ITEM=M4-AGENT-001
+status: passed
+items: 10000
+elapsedMs: 65
+budgetMs: 10000
+
+$ git diff --check
+(no output; exit 0)

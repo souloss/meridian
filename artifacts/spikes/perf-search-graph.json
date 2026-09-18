@@ -1,0 +1,21 @@
+assertions:
+    - actual: 10000
+      id: items-extracted-exactly
+      status: passed
+      threshold: 10000
+    - actual: 65
+      id: extract-under-budget
+      status: passed
+      threshold: <10000ms
+    - actual: 50d927ea86264c1578d9d466dbe2d1d83fc5670551f19094cd8855ac55716c53
+      id: deterministic-keys
+      status: passed
+budgetMs: 10000
+elapsedMs: 65
+expectedItems: 10000
+firstKey: table_000000
+id: perf-search-graph
+items: 10000
+keysDigest: 50d927ea86264c1578d9d466dbe2d1d83fc5670551f19094cd8855ac55716c53
+lastKey: table_009999
+status: passed

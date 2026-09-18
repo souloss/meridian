@@ -438,14 +438,22 @@ items:
   - id: M4-AGENT-001
     milestone: M4
     priority: P1
-    status: ready
+    status: passed
     title: dbschema-dependency-search-and-global-views
     dependsOn: [M3-AGENT-002]
     operationIds: [createSystemGroup, putSystemGroupMembers, search, resolveView]
     stories: [US-08]
     assertions: [SMK-022, SMK-023, SMK-024]
     verify: [smoke-m4-global-views, perf-search-graph]
-    reportPath: null
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    startedAt: '2026-09-18T03:16:00Z'
+    baseCommit: 4a1b4a4ce573a29fa5745a110d47176f8a902423
+    contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
+    reportPath: artifacts/agent/M4-AGENT-001/20260918T123141Z/report.json
+    lastEvidence: artifacts/agent/M4-AGENT-001/20260918T123141Z/report.json
+    nextAction: complete the M4 milestone checkpoint
 
   - id: M5-AGENT-001
     milestone: M5
