@@ -1,0 +1,94 @@
+{
+  "milestone": "M4",
+  "status": "completed",
+  "commit": "67ca25de8894f100138217a6ee265c08fb3d26a1",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "reportPath": "artifacts/agent/milestones/M4/20260918T123935Z/report.json",
+  "completedBy": "coding-agent",
+  "completedAt": "2026-09-18T12:39:35Z",
+  "workItems": [
+    {
+      "id": "M4-AGENT-001",
+      "status": "passed",
+      "evidence": "artifacts/agent/M4-AGENT-001/20260918T123141Z/report.json"
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-08",
+      "status": "passed",
+      "evidence": [
+        "SMK-022",
+        "SMK-023",
+        "SMK-024"
+      ]
+    }
+  ],
+  "assertions": [
+    {
+      "id": "SMK-022",
+      "status": "passed",
+      "evidence": "artifacts/smoke/2026-09-18T12-25-16-449ZSIm7NC/SMK-022.json"
+    },
+    {
+      "id": "SMK-023",
+      "status": "passed",
+      "evidence": "artifacts/smoke/2026-09-18T12-25-16-449ZSIm7NC/SMK-023.json"
+    },
+    {
+      "id": "SMK-024",
+      "status": "passed",
+      "evidence": "artifacts/smoke/2026-09-18T12-25-16-449ZSIm7NC/SMK-024.json"
+    }
+  ],
+  "deferred": [],
+  "risks": [
+    "M4 系统分组依赖图与跨类别搜索（dbschema/dependency generic kinds）首次落地：dbschema 表/列条目与 meridian-dependency-1 边解析复用同一条目索引路径，perf-search-graph 证明 10000 条目抽取 65ms 且键稳定。"
+  ],
+  "nextAction": "claim M5-AGENT-001",
+  "commands": [
+    {
+      "command": "go build ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M4/20260918T123935Z/commands.log"
+    },
+    {
+      "command": "go vet ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M4/20260918T123935Z/commands.log"
+    },
+    {
+      "command": "go tool sqlc vet",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M4/20260918T123935Z/commands.log"
+    },
+    {
+      "command": "go test ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M4/20260918T123935Z/commands.log"
+    },
+    {
+      "command": "make smoke-m4-global-views ITEM=M4-AGENT-001",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M4/20260918T123935Z/commands.log"
+    },
+    {
+      "command": "make perf-search-graph ITEM=M4-AGENT-001",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M4/20260918T123935Z/commands.log"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M4/20260918T123935Z/commands.log"
+    }
+  ],
+  "failures": []
+}
