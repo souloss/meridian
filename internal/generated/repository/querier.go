@@ -96,6 +96,7 @@ type Querier interface {
 	CountListedServices(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountNotifications 暴露相应的强类型数据库操作。
 	// 统计某用户的通知总数与未读数（独立于分页，未读数不受 unread_only 影响）。
+	// 仅当 ListNotifications 分页为空时调用，作为 total/unread 的空页兜底。
 	CountNotifications(ctx context.Context, arg CountNotificationsParams) (CountNotificationsRow, error)
 	// CountPlatformAuditLogs 暴露相应的强类型数据库操作。
 	// 按照 ListPlatformAuditLogs 的跨租户条件和全部可选过滤条件返回准确总数。
@@ -112,7 +113,7 @@ type Querier interface {
 	// 配额读取租户快照，不读取可变的平台默认值。
 	CountRepositories(ctx context.Context, tenantID uuid.UUID) (CountRepositoriesRow, error)
 	// CountSearchableAssetItems 暴露相应的强类型数据库操作。
-	// 统计租户内全部活跃资产条目数量，供跨 kind 搜索分页。
+	// 统计租户内全部活跃资产条目数量，供跨 kind 搜索分页（过滤口径与上一致）。
 	CountSearchableAssetItems(ctx context.Context, arg CountSearchableAssetItemsParams) (int64, error)
 	// CountServices 暴露相应的强类型数据库操作。
 	// 返回有效服务数量与租户固定的服务配额。
@@ -563,6 +564,7 @@ type Querier interface {
 	// ListEventRoutes 暴露相应的强类型数据库操作。
 	// 返回匹配某一作用域与事件类型的启用订阅及通道（供事件路由）。
 	// tenant 作用域匹配一切；service/asset/asset_kind/system_group 按对应目标匹配。
+	// DISTINCT 去重：一个服务同时属于多个匹配分组时，同一 (user, subscription, channel) 只返回一次。
 	ListEventRoutes(ctx context.Context, arg ListEventRoutesParams) ([]ListEventRoutesRow, error)
 	// ListGlobalCredentials 暴露相应的强类型数据库操作。
 	// 返回平台凭据的稳定分页结果。
@@ -583,8 +585,8 @@ type Querier interface {
 	// 列出租户内全部通知通道。
 	ListNotificationChannels(ctx context.Context, tenantID uuid.UUID) ([]NotificationChannel, error)
 	// ListNotifications 暴露相应的强类型数据库操作。
-	// 分页列出某用户的站内通知（按可选未读过滤）。
-	ListNotifications(ctx context.Context, arg ListNotificationsParams) ([]Notification, error)
+	// 分页列出某用户的站内通知（按可选未读过滤），并在单次往返内统计全量 total/unread。
+	ListNotifications(ctx context.Context, arg ListNotificationsParams) ([]ListNotificationsRow, error)
 	// ListPlatformAuditLogs 暴露相应的强类型数据库操作。
 	// 为平台控制面返回一页按最新时间优先排列的跨租户审计元数据。
 	// 平台级记录的可空租户归属会保留在结果中。
@@ -615,6 +617,7 @@ type Querier interface {
 	ListRepositoriesForGlobalCredential(ctx context.Context, credentialID *uuid.UUID) ([]ListRepositoriesForGlobalCredentialRow, error)
 	// ListSearchableAssetItems 暴露相应的强类型数据库操作。
 	// 返回租户内全部活跃资产条目，供跨 kind 搜索（不绑定特定版本）。
+	// 过滤子句统一口径：数组过滤用空数组哨兵跳过，布尔过滤用 NULL 哨兵跳过三态。
 	ListSearchableAssetItems(ctx context.Context, arg ListSearchableAssetItemsParams) ([]AssetItem, error)
 	// ListServices 暴露相应的强类型数据库操作。
 	// 列出活跃服务的确定顺序分页。
@@ -674,9 +677,6 @@ type Querier interface {
 	// 为平台管理员返回稳定分页的身份元数据，不包含密码或会话秘密。
 	// 可选搜索值只匹配 username 和 display_name。
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
-	// ListVersionAiLayerRevisions 暴露相应的强类型数据库操作。
-	// 返回资产版本清单中的 AI 生成层修订标识，供 hasAiLayer 过滤判定。
-	ListVersionAiLayerRevisions(ctx context.Context, tenantID uuid.UUID) ([]ListVersionAiLayerRevisionsRow, error)
 	// ListVisibleChannelIDs 暴露相应的强类型数据库操作。
 	// 校验一组通道 ID 在租户内可见并返回其有效子集。
 	ListVisibleChannelIDs(ctx context.Context, arg ListVisibleChannelIDsParams) ([]uuid.UUID, error)
@@ -794,6 +794,23 @@ type Querier interface {
 	// RotateRefreshToken 暴露相应的强类型数据库操作。
 	// 原子轮换一个刷新令牌：撤销旧令牌并记录替换的新令牌，返回是否有记录发生变化。
 	RotateRefreshToken(ctx context.Context, arg RotateRefreshTokenParams) (int64, error)
+	// SearchFacetGroups 暴露相应的强类型数据库操作。
+	SearchFacetGroups(ctx context.Context, arg SearchFacetGroupsParams) ([]SearchFacetGroupsRow, error)
+	// SearchFacetHasAiLayer 暴露相应的强类型数据库操作。
+	SearchFacetHasAiLayer(ctx context.Context, arg SearchFacetHasAiLayerParams) ([]SearchFacetHasAiLayerRow, error)
+	// SearchFacetHasBreakingChanges 暴露相应的强类型数据库操作。
+	SearchFacetHasBreakingChanges(ctx context.Context, arg SearchFacetHasBreakingChangesParams) ([]SearchFacetHasBreakingChangesRow, error)
+	// SearchFacetItemTypes 暴露相应的强类型数据库操作。
+	SearchFacetItemTypes(ctx context.Context, arg SearchFacetItemTypesParams) ([]SearchFacetItemTypesRow, error)
+	// SearchFacetKinds 暴露相应的强类型数据库操作。
+	// 以下 facet 查询共享同一过滤口径，各自剔除自身维度的过滤后按值分组计数。
+	SearchFacetKinds(ctx context.Context, arg SearchFacetKindsParams) ([]SearchFacetKindsRow, error)
+	// SearchFacetLanguages 暴露相应的强类型数据库操作。
+	SearchFacetLanguages(ctx context.Context, arg SearchFacetLanguagesParams) ([]SearchFacetLanguagesRow, error)
+	// SearchFacetLifecycles 暴露相应的强类型数据库操作。
+	SearchFacetLifecycles(ctx context.Context, arg SearchFacetLifecyclesParams) ([]SearchFacetLifecyclesRow, error)
+	// SearchFacetRepositories 暴露相应的强类型数据库操作。
+	SearchFacetRepositories(ctx context.Context, arg SearchFacetRepositoriesParams) ([]SearchFacetRepositoriesRow, error)
 	// SetJobExecutionStage 暴露相应的强类型数据库操作。
 	// 记录当前流水线阶段，不改变持久化生命周期状态。
 	// 阶段取值受应用 DDL 约束。

@@ -165,10 +165,12 @@ type SearchResultRecord struct {
 }
 
 // SearchFacetSet 聚合一次搜索结果的 facet 桶。
+// Teams 与 Tags 对应冻结契约字段，但当前数据模型无团队-服务关系与标签实体，
+// 后端恒返回空桶，保留以维持契约形状（见 contracts/openapi.yaml SearchFacetSet）。
 type SearchFacetSet struct {
 	// Repositories 是仓库 facet 桶。
 	Repositories []SearchFacetBucket
-	// Teams 是团队 facet 桶。
+	// Teams 是团队 facet 桶（无数据模型支撑，恒空）。
 	Teams []SearchFacetBucket
 	// Groups 是分组 facet 桶。
 	Groups []SearchFacetBucket
@@ -176,7 +178,7 @@ type SearchFacetSet struct {
 	Kinds []SearchFacetBucket
 	// Lifecycles 是生命周期 facet 桶。
 	Lifecycles []SearchFacetBucket
-	// Tags 是标签 facet 桶。
+	// Tags 是标签 facet 桶（无数据模型支撑，恒空）。
 	Tags []SearchFacetBucket
 	// Languages 是语言 facet 桶。
 	Languages []SearchFacetBucket
@@ -185,5 +187,26 @@ type SearchFacetSet struct {
 	// HasAiLayer 是是否有 AI 层 facet 桶。
 	HasAiLayer []SearchFacetBucket
 	// HasBreakingChanges 是是否有破坏性变更 facet 桶。
+	HasBreakingChanges []SearchFacetBucket
+}
+
+// SearchFacetCounts 是一次搜索各维度 facet 桶的持久化聚合结果。
+// 仅包含有命中的桶；类别维度由服务层叠加全量启用类别作为零计数基线。
+type SearchFacetCounts struct {
+	// Kinds 是类别计数。
+	Kinds []SearchFacetBucket
+	// Lifecycles 是生命周期计数。
+	Lifecycles []SearchFacetBucket
+	// Languages 是语言计数。
+	Languages []SearchFacetBucket
+	// ItemTypes 是条目类型计数。
+	ItemTypes []SearchFacetBucket
+	// Repositories 是仓库计数。
+	Repositories []SearchFacetBucket
+	// Groups 是系统分组计数。
+	Groups []SearchFacetBucket
+	// HasAiLayer 是有 AI 层的条目计数。
+	HasAiLayer []SearchFacetBucket
+	// HasBreakingChanges 是有破坏性变更的条目计数。
 	HasBreakingChanges []SearchFacetBucket
 }

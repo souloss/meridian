@@ -118,9 +118,6 @@ const (
 	dedupeKeyRepositoryBranch = "repository:"
 )
 
-// searchKindFilterCount 是搜索支持单 kind 过滤所需传入的 kind 个数。
-const searchKindFilterCount = 1
-
 // 幂等/控制锁键的作用域或前缀：值必须与各自 Postgres advisory/row 锁键的拼接口径一致。
 const (
 	// aiGenerationIdempotencyLockPrefix 是 AI 生成幂等锁键的前缀。

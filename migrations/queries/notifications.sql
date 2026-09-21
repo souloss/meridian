@@ -48,8 +48,9 @@ ORDER BY subscription_id, channel_id;
 
 -- 返回匹配某一作用域与事件类型的启用订阅及通道（供事件路由）。
 -- tenant 作用域匹配一切；service/asset/asset_kind/system_group 按对应目标匹配。
+-- DISTINCT 去重：一个服务同时属于多个匹配分组时，同一 (user, subscription, channel) 只返回一次。
 -- name: ListEventRoutes :many
-SELECT s.user_id AS user_id, s.id AS subscription_id, c.id AS channel_id, c.type AS channel_type
+SELECT DISTINCT s.user_id AS user_id, s.id AS subscription_id, c.id AS channel_id, c.type AS channel_type
 FROM subscriptions AS s
 JOIN subscription_channels AS sc ON sc.tenant_id = s.tenant_id AND sc.subscription_id = s.id
 JOIN notification_channels AS c ON c.tenant_id = sc.tenant_id AND c.id = sc.channel_id AND c.enabled = true
@@ -118,18 +119,27 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = ANY(sqlc.arg(ids)::uuid[])
 ORDER BY id;
 
--- 分页列出某用户的站内通知（按可选未读过滤）。
+-- 分页列出某用户的站内通知（按可选未读过滤），并在单次往返内统计全量 total/unread。
 -- name: ListNotifications :many
-SELECT *
-FROM notifications
-WHERE tenant_id = sqlc.arg(tenant_id)
-  AND user_id = sqlc.arg(user_id)
-  AND (NOT sqlc.arg(unread_only)::boolean OR read_at IS NULL)
-ORDER BY created_at DESC, id DESC
+WITH counts AS (
+  SELECT count(*)::bigint AS total,
+         count(*) FILTER (WHERE read_at IS NULL)::bigint AS unread
+  FROM notifications
+  WHERE tenant_id = sqlc.arg(tenant_id)
+    AND user_id = sqlc.arg(user_id)
+)
+SELECT n.*, counts.total, counts.unread
+FROM notifications AS n
+CROSS JOIN counts
+WHERE n.tenant_id = sqlc.arg(tenant_id)
+  AND n.user_id = sqlc.arg(user_id)
+  AND (NOT sqlc.arg(unread_only)::boolean OR n.read_at IS NULL)
+ORDER BY n.created_at DESC, n.id DESC
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
 -- 统计某用户的通知总数与未读数（独立于分页，未读数不受 unread_only 影响）。
+-- 仅当 ListNotifications 分页为空时调用，作为 total/unread 的空页兜底。
 -- name: CountNotifications :one
 SELECT count(*)::bigint AS total,
        count(*) FILTER (WHERE read_at IS NULL)::bigint AS unread

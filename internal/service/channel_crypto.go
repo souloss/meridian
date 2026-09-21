@@ -1,11 +1,6 @@
 package service
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/hkdf"
-	"crypto/rand"
-	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -16,9 +11,9 @@ import (
 // 通道配置加密常量（值来源 domain.yaml credential.derivation 同族；info 独立避免跨用途键复用）。
 const (
 	// channelConfigKeyBytes 是通道配置加密密钥的字节长度。
-	channelConfigKeyBytes = 32
+	channelConfigKeyBytes = aesGCMKeyBytes
 	// channelConfigNonceBytes 是通道配置 AES-GCM nonce 的字节长度。
-	channelConfigNonceBytes = 12
+	channelConfigNonceBytes = aesGCMNonceBytes
 	// channelConfigHKDFInfo 是通道配置 HKDF 派生 info 常量。
 	channelConfigHKDFInfo = "meridian-channel-config-v1"
 )
@@ -35,23 +30,14 @@ func (keyring CredentialKeyring) sealChannelConfig(tenantID uuid.UUID, channelID
 	if err != nil {
 		return nil, err
 	}
-	block, err := aes.NewCipher(key[:])
-	if err != nil {
-		return nil, fmt.Errorf("create channel cipher: %w", err)
-	}
-	aead, err := cipher.NewGCMWithNonceSize(block, channelConfigNonceBytes)
-	if err != nil {
-		return nil, fmt.Errorf("create channel AEAD: %w", err)
-	}
-	nonce := make([]byte, channelConfigNonceBytes)
-	if _, err := rand.Read(nonce); err != nil {
-		return nil, fmt.Errorf("read channel nonce randomness: %w", err)
-	}
 	payload, err := json.Marshal(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("encode channel config: %w", err)
 	}
-	ciphertext := aead.Seal(nil, nonce, payload, channelConfigAAD(tenantID, channelID, keyring.activeVersion))
+	nonce, ciphertext, err := sealAESGCM(key, payload, channelConfigAAD(tenantID, channelID, keyring.activeVersion))
+	if err != nil {
+		return nil, fmt.Errorf("seal channel config: %w", err)
+	}
 	return append(append([]byte{byte(keyring.activeVersion)}, nonce...), ciphertext...), nil
 }
 
@@ -67,15 +53,7 @@ func (keyring CredentialKeyring) openChannelConfig(tenantID uuid.UUID, channelID
 	if err != nil {
 		return notificationChannelConfig{}, err
 	}
-	block, err := aes.NewCipher(key[:])
-	if err != nil {
-		return notificationChannelConfig{}, fmt.Errorf("create channel cipher: %w", err)
-	}
-	aead, err := cipher.NewGCMWithNonceSize(block, channelConfigNonceBytes)
-	if err != nil {
-		return notificationChannelConfig{}, fmt.Errorf("create channel AEAD: %w", err)
-	}
-	payload, err := aead.Open(nil, nonce, ciphertext, channelConfigAAD(tenantID, channelID, version))
+	payload, err := openAESGCM(key, nonce, ciphertext, channelConfigAAD(tenantID, channelID, version))
 	if err != nil {
 		return notificationChannelConfig{}, fmt.Errorf("%w: decrypt channel config", ErrCredentialSecretInvalid)
 	}
@@ -91,12 +69,10 @@ func (keyring CredentialKeyring) channelRowKey(tenantID uuid.UUID, channelID uui
 	if !ok {
 		return [channelConfigKeyBytes]byte{}, fmt.Errorf("%w: %d", ErrCredentialKeyUnavailable, version)
 	}
-	derived, err := hkdf.Key(sha256.New, master[:], []byte(tenantID.String()+"\x00"+channelID.String()), channelConfigHKDFInfo, channelConfigKeyBytes)
+	key, err := deriveRowKey(master[:], []byte(tenantID.String()+"\x00"+channelID.String()), channelConfigHKDFInfo)
 	if err != nil {
 		return [channelConfigKeyBytes]byte{}, fmt.Errorf("derive channel config key: %w", err)
 	}
-	var key [channelConfigKeyBytes]byte
-	copy(key[:], derived)
 	return key, nil
 }
 

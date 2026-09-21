@@ -355,21 +355,22 @@ func (store *AssetStore) ListAssetVersionItems(ctx context.Context, tenantID, ve
 	return items, total, nil
 }
 
-// SearchItems 按搜索查询分页检索跨 kind 的已索引资产条目，并可附带单个 kind 过滤。
-// 多 kind 与布尔面过滤在 SQL 分页取出后由 Search 服务层应用。
+// SearchItems 按搜索查询与全部过滤条件分页检索跨 kind 的已索引资产条目。
 func (store *AssetStore) SearchItems(ctx context.Context, tenantID uuid.UUID, query string, filter service.SearchFilter, limit, offset int32) ([]service.AssetItemRecord, int64, error) {
-	kindFilter := ""
-	if len(filter.Kinds) == searchKindFilterCount {
-		kindFilter = filter.Kinds[0]
-	}
+	common := buildSearchCommonParams(tenantID, query, filter)
 	total, err := store.queries.CountSearchableAssetItems(ctx, generated.CountSearchableAssetItemsParams{
-		TenantID: tenantID, SearchQuery: query, KindFilter: kindFilter,
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, ServiceIds: common.serviceIDs,
+		RepositoryIds: common.repositoryIDs, ItemTypes: common.itemTypes, Languages: common.languages,
+		Lifecycles: common.lifecycles, HasAiLayer: common.hasAiLayer, HasBreakingChanges: common.hasBreakingChanges,
 	})
 	if err != nil {
 		return nil, 0, normalizeError(err)
 	}
 	rows, err := store.queries.ListSearchableAssetItems(ctx, generated.ListSearchableAssetItemsParams{
-		TenantID: tenantID, SearchQuery: query, KindFilter: kindFilter, PageLimit: limit, PageOffset: offset,
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, ServiceIds: common.serviceIDs,
+		RepositoryIds: common.repositoryIDs, ItemTypes: common.itemTypes, Languages: common.languages,
+		Lifecycles: common.lifecycles, HasAiLayer: common.hasAiLayer, HasBreakingChanges: common.hasBreakingChanges,
+		PageLimit: limit, PageOffset: offset,
 	})
 	if err != nil {
 		return nil, 0, normalizeError(err)
@@ -379,6 +380,157 @@ func (store *AssetStore) SearchItems(ctx context.Context, tenantID uuid.UUID, qu
 		items = append(items, assetItemFromRow(row))
 	}
 	return items, total, nil
+}
+
+// SearchFacets 一次返回各维度 facet 桶计数（不含零计数基线）。
+// 每个维度剔除自身过滤后按值分组，口径与 SearchItems 的过滤一致。
+func (store *AssetStore) SearchFacets(ctx context.Context, tenantID uuid.UUID, query string, filter service.SearchFilter) (service.SearchFacetCounts, error) {
+	common := buildSearchCommonParams(tenantID, query, filter)
+	kinds, err := store.queries.SearchFacetKinds(ctx, generated.SearchFacetKindsParams{
+		TenantID: common.tenantID, SearchQuery: common.query, ServiceIds: common.serviceIDs, RepositoryIds: common.repositoryIDs,
+		ItemTypes: common.itemTypes, Languages: common.languages, Lifecycles: common.lifecycles,
+		HasAiLayer: common.hasAiLayer, HasBreakingChanges: common.hasBreakingChanges,
+	})
+	if err != nil {
+		return service.SearchFacetCounts{}, normalizeError(err)
+	}
+	lifecycles, err := store.queries.SearchFacetLifecycles(ctx, generated.SearchFacetLifecyclesParams{
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, ServiceIds: common.serviceIDs,
+		RepositoryIds: common.repositoryIDs, ItemTypes: common.itemTypes, Languages: common.languages,
+		HasAiLayer: common.hasAiLayer, HasBreakingChanges: common.hasBreakingChanges,
+	})
+	if err != nil {
+		return service.SearchFacetCounts{}, normalizeError(err)
+	}
+	languages, err := store.queries.SearchFacetLanguages(ctx, generated.SearchFacetLanguagesParams{
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, ServiceIds: common.serviceIDs,
+		RepositoryIds: common.repositoryIDs, ItemTypes: common.itemTypes, Lifecycles: common.lifecycles,
+		HasAiLayer: common.hasAiLayer, HasBreakingChanges: common.hasBreakingChanges,
+	})
+	if err != nil {
+		return service.SearchFacetCounts{}, normalizeError(err)
+	}
+	itemTypes, err := store.queries.SearchFacetItemTypes(ctx, generated.SearchFacetItemTypesParams{
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, ServiceIds: common.serviceIDs,
+		RepositoryIds: common.repositoryIDs, Languages: common.languages, Lifecycles: common.lifecycles,
+		HasAiLayer: common.hasAiLayer, HasBreakingChanges: common.hasBreakingChanges,
+	})
+	if err != nil {
+		return service.SearchFacetCounts{}, normalizeError(err)
+	}
+	repositories, err := store.queries.SearchFacetRepositories(ctx, generated.SearchFacetRepositoriesParams{
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, ServiceIds: common.serviceIDs,
+		ItemTypes: common.itemTypes, Languages: common.languages, Lifecycles: common.lifecycles,
+		HasAiLayer: common.hasAiLayer, HasBreakingChanges: common.hasBreakingChanges,
+	})
+	if err != nil {
+		return service.SearchFacetCounts{}, normalizeError(err)
+	}
+	groups, err := store.queries.SearchFacetGroups(ctx, generated.SearchFacetGroupsParams{
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, RepositoryIds: common.repositoryIDs,
+		ItemTypes: common.itemTypes, Languages: common.languages, Lifecycles: common.lifecycles,
+		HasAiLayer: common.hasAiLayer, HasBreakingChanges: common.hasBreakingChanges,
+	})
+	if err != nil {
+		return service.SearchFacetCounts{}, normalizeError(err)
+	}
+	hasAiLayer, err := store.queries.SearchFacetHasAiLayer(ctx, generated.SearchFacetHasAiLayerParams{
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, ServiceIds: common.serviceIDs,
+		RepositoryIds: common.repositoryIDs, ItemTypes: common.itemTypes, Languages: common.languages,
+		Lifecycles: common.lifecycles, HasBreakingChanges: common.hasBreakingChanges,
+	})
+	if err != nil {
+		return service.SearchFacetCounts{}, normalizeError(err)
+	}
+	hasBreakingChanges, err := store.queries.SearchFacetHasBreakingChanges(ctx, generated.SearchFacetHasBreakingChangesParams{
+		TenantID: common.tenantID, SearchQuery: common.query, Kinds: common.kinds, ServiceIds: common.serviceIDs,
+		RepositoryIds: common.repositoryIDs, ItemTypes: common.itemTypes, Languages: common.languages,
+		Lifecycles: common.lifecycles, HasAiLayer: common.hasAiLayer,
+	})
+	if err != nil {
+		return service.SearchFacetCounts{}, normalizeError(err)
+	}
+	return service.SearchFacetCounts{
+		Kinds: facetBuckets(kinds, func(row generated.SearchFacetKindsRow) service.SearchFacetBucket {
+			return service.SearchFacetBucket{Value: row.Value, Count: int(row.Count)}
+		}),
+		Lifecycles: facetBuckets(lifecycles, func(row generated.SearchFacetLifecyclesRow) service.SearchFacetBucket {
+			return service.SearchFacetBucket{Value: row.Value, Count: int(row.Count)}
+		}),
+		Languages: facetBuckets(languages, func(row generated.SearchFacetLanguagesRow) service.SearchFacetBucket {
+			value := ""
+			if row.Value != nil {
+				value = *row.Value
+			}
+			return service.SearchFacetBucket{Value: value, Count: int(row.Count)}
+		}),
+		ItemTypes: facetBuckets(itemTypes, func(row generated.SearchFacetItemTypesRow) service.SearchFacetBucket {
+			return service.SearchFacetBucket{Value: row.Value, Count: int(row.Count)}
+		}),
+		Repositories: facetBuckets(repositories, func(row generated.SearchFacetRepositoriesRow) service.SearchFacetBucket {
+			return service.SearchFacetBucket{Value: row.Value, Count: int(row.Count)}
+		}),
+		Groups: facetBuckets(groups, func(row generated.SearchFacetGroupsRow) service.SearchFacetBucket {
+			return service.SearchFacetBucket{Value: row.Value, Count: int(row.Count)}
+		}),
+		HasAiLayer: facetBuckets(hasAiLayer, func(row generated.SearchFacetHasAiLayerRow) service.SearchFacetBucket {
+			return service.SearchFacetBucket{Value: row.Value, Count: int(row.Count)}
+		}),
+		HasBreakingChanges: facetBuckets(hasBreakingChanges, func(row generated.SearchFacetHasBreakingChangesRow) service.SearchFacetBucket {
+			return service.SearchFacetBucket{Value: row.Value, Count: int(row.Count)}
+		}),
+	}, nil
+}
+
+// searchCommonParams 收敛一次搜索在各查询间复用的标量过滤参数。
+type searchCommonParams struct {
+	tenantID           uuid.UUID
+	query              string
+	kinds              []string
+	serviceIDs         []uuid.UUID
+	repositoryIDs      []uuid.UUID
+	itemTypes          []string
+	languages          []string
+	lifecycles         []string
+	hasAiLayer         *bool
+	hasBreakingChanges *bool
+}
+
+func buildSearchCommonParams(tenantID uuid.UUID, query string, filter service.SearchFilter) searchCommonParams {
+	return searchCommonParams{
+		tenantID: tenantID, query: query, kinds: nonNilStrings(filter.Kinds), serviceIDs: nonNilUUIDs(filter.ServiceIDs),
+		repositoryIDs: nonNilUUIDs(filter.RepositoryIDs), itemTypes: nonNilStrings(filter.ItemTypes),
+		languages: nonNilStrings(filter.Languages), lifecycles: nonNilStrings(filter.Lifecycles),
+		hasAiLayer: filter.HasAiLayer, hasBreakingChanges: filter.HasBreakingChanges,
+	}
+}
+
+// nonNilStrings 将 nil 切片归一为长度零的空切片。
+// 数组过滤子句依赖 cardinality(...)=0 判定「不过滤」，nil 经 pgx 会编码为 SQL NULL，
+// cardinality(NULL) 返回 NULL 而非 0，导致整条谓词判空、命中归零，故必须在入库前归一。
+func nonNilStrings(values []string) []string {
+	if values == nil {
+		return []string{}
+	}
+	return values
+}
+
+// nonNilUUIDs 将 nil UUID 切片归一为长度零的空切片（理由同 nonNilStrings）。
+func nonNilUUIDs(values []uuid.UUID) []uuid.UUID {
+	if values == nil {
+		return []uuid.UUID{}
+	}
+	return values
+}
+
+// facetBuckets 将任一 facet 维度查询行投影为通用桶。各维度行字段一致（Value/Count），
+// 通过投影函数避免为 8 个同形生成类型各写一套转换。
+func facetBuckets[T any](rows []T, project func(T) service.SearchFacetBucket) []service.SearchFacetBucket {
+	buckets := make([]service.SearchFacetBucket, 0, len(rows))
+	for _, row := range rows {
+		buckets = append(buckets, project(row))
+	}
+	return buckets
 }
 
 // GetServiceByID 在租户内按 id 返回一条服务。

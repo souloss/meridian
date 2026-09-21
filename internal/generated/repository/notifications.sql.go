@@ -8,6 +8,7 @@ package repository
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"uuid"
 )
 
@@ -37,6 +38,7 @@ type CountNotificationsRow struct {
 
 // CountNotifications 执行生成的 CountNotifications 数据库查询。
 // 统计某用户的通知总数与未读数（独立于分页，未读数不受 unread_only 影响）。
+// 仅当 ListNotifications 分页为空时调用，作为 total/unread 的空页兜底。
 func (q *Queries) CountNotifications(ctx context.Context, arg CountNotificationsParams) (CountNotificationsRow, error) {
 	row := q.db.QueryRow(ctx, countNotifications, arg.TenantID, arg.UserID)
 	var i CountNotificationsRow
@@ -235,7 +237,7 @@ func (q *Queries) InsertSubscriptionChannel(ctx context.Context, arg InsertSubsc
 }
 
 const listEventRoutes = `-- name: ListEventRoutes :many
-SELECT s.user_id AS user_id, s.id AS subscription_id, c.id AS channel_id, c.type AS channel_type
+SELECT DISTINCT s.user_id AS user_id, s.id AS subscription_id, c.id AS channel_id, c.type AS channel_type
 FROM subscriptions AS s
 JOIN subscription_channels AS sc ON sc.tenant_id = s.tenant_id AND sc.subscription_id = s.id
 JOIN notification_channels AS c ON c.tenant_id = sc.tenant_id AND c.id = sc.channel_id AND c.enabled = true
@@ -283,6 +285,7 @@ type ListEventRoutesRow struct {
 // ListEventRoutes 执行生成的 ListEventRoutes 数据库查询。
 // 返回匹配某一作用域与事件类型的启用订阅及通道（供事件路由）。
 // tenant 作用域匹配一切；service/asset/asset_kind/system_group 按对应目标匹配。
+// DISTINCT 去重：一个服务同时属于多个匹配分组时，同一 (user, subscription, channel) 只返回一次。
 func (q *Queries) ListEventRoutes(ctx context.Context, arg ListEventRoutesParams) ([]ListEventRoutesRow, error) {
 	rows, err := q.db.Query(ctx, listEventRoutes,
 		arg.TenantID,
@@ -354,12 +357,20 @@ func (q *Queries) ListNotificationChannels(ctx context.Context, tenantID uuid.UU
 }
 
 const listNotifications = `-- name: ListNotifications :many
-SELECT tenant_id, id, user_id, event_id, event_type, title_key, body_args, link, read_at, created_at
-FROM notifications
-WHERE tenant_id = $1
-  AND user_id = $2
-  AND (NOT $3::boolean OR read_at IS NULL)
-ORDER BY created_at DESC, id DESC
+WITH counts AS (
+  SELECT count(*)::bigint AS total,
+         count(*) FILTER (WHERE read_at IS NULL)::bigint AS unread
+  FROM notifications
+  WHERE tenant_id = $1
+    AND user_id = $2
+)
+SELECT n.tenant_id, n.id, n.user_id, n.event_id, n.event_type, n.title_key, n.body_args, n.link, n.read_at, n.created_at, counts.total, counts.unread
+FROM notifications AS n
+CROSS JOIN counts
+WHERE n.tenant_id = $1
+  AND n.user_id = $2
+  AND (NOT $3::boolean OR n.read_at IS NULL)
+ORDER BY n.created_at DESC, n.id DESC
 LIMIT $5
 OFFSET $4
 `
@@ -378,9 +389,37 @@ type ListNotificationsParams struct {
 	PageLimit int32 `json:"page_limit"`
 }
 
+// ListNotificationsRow 包含 ListNotifications 查询返回的列。
+type ListNotificationsRow struct {
+	// TenantID 是 ListNotifications 查询返回的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是 ListNotifications 查询返回的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// UserID 是 ListNotifications 查询返回的 UserID 值。
+	UserID uuid.UUID `json:"user_id"`
+	// EventID 是 ListNotifications 查询返回的 EventID 值。
+	EventID uuid.UUID `json:"event_id"`
+	// EventType 是 ListNotifications 查询返回的 EventType 值。
+	EventType string `json:"event_type"`
+	// TitleKey 是 ListNotifications 查询返回的 TitleKey 值。
+	TitleKey string `json:"title_key"`
+	// BodyArgs 是 ListNotifications 查询返回的 BodyArgs 值。
+	BodyArgs []byte `json:"body_args"`
+	// Link 是 ListNotifications 查询返回的 Link 值。
+	Link *string `json:"link"`
+	// ReadAt 是 ListNotifications 查询返回的 ReadAt 值。
+	ReadAt pgtype.Timestamptz `json:"read_at"`
+	// CreatedAt 是 ListNotifications 查询返回的 CreatedAt 值。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// Total 是 ListNotifications 查询返回的 Total 值。
+	Total int64 `json:"total"`
+	// Unread 是 ListNotifications 查询返回的 Unread 值。
+	Unread int64 `json:"unread"`
+}
+
 // ListNotifications 执行生成的 ListNotifications 数据库查询。
-// 分页列出某用户的站内通知（按可选未读过滤）。
-func (q *Queries) ListNotifications(ctx context.Context, arg ListNotificationsParams) ([]Notification, error) {
+// 分页列出某用户的站内通知（按可选未读过滤），并在单次往返内统计全量 total/unread。
+func (q *Queries) ListNotifications(ctx context.Context, arg ListNotificationsParams) ([]ListNotificationsRow, error) {
 	rows, err := q.db.Query(ctx, listNotifications,
 		arg.TenantID,
 		arg.UserID,
@@ -392,9 +431,9 @@ func (q *Queries) ListNotifications(ctx context.Context, arg ListNotificationsPa
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Notification{}
+	items := []ListNotificationsRow{}
 	for rows.Next() {
-		var i Notification
+		var i ListNotificationsRow
 		if err := rows.Scan(
 			&i.TenantID,
 			&i.ID,
@@ -406,6 +445,8 @@ func (q *Queries) ListNotifications(ctx context.Context, arg ListNotificationsPa
 			&i.Link,
 			&i.ReadAt,
 			&i.CreatedAt,
+			&i.Total,
+			&i.Unread,
 		); err != nil {
 			return nil, err
 		}

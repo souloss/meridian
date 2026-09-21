@@ -171,7 +171,9 @@ func (store *NotificationStore) ListVisibleChannelIDs(ctx context.Context, tenan
 	return store.queries.ListVisibleChannelIDs(ctx, generated.ListVisibleChannelIDsParams{TenantID: tenantID, Ids: ids})
 }
 
-// ListNotifications 分页返回某用户的站内通知。
+// ListNotifications 分页返回某用户的站内通知及全量 total/unread。
+// 非空页由单条窗口查询一并携带计数；空页回落到 CountNotifications 兜底，
+// 保证无匹配条目时 total/unread 仍正确返回。
 func (store *NotificationStore) ListNotifications(ctx context.Context, tenantID, userID uuid.UUID, unreadOnly bool, pageSize, pageOffset int32) ([]service.NotificationRecord, int64, int64, error) {
 	rows, err := store.queries.ListNotifications(ctx, generated.ListNotificationsParams{
 		TenantID: tenantID, UserID: userID, UnreadOnly: unreadOnly, PageLimit: pageSize, PageOffset: pageOffset,
@@ -179,15 +181,25 @@ func (store *NotificationStore) ListNotifications(ctx context.Context, tenantID,
 	if err != nil {
 		return nil, 0, 0, normalizeError(err)
 	}
-	counts, err := store.queries.CountNotifications(ctx, generated.CountNotificationsParams{TenantID: tenantID, UserID: userID})
-	if err != nil {
-		return nil, 0, 0, normalizeError(err)
+	var total, unread int64
+	if len(rows) > 0 {
+		total, unread = rows[0].Total, rows[0].Unread
+	} else {
+		counts, countErr := store.queries.CountNotifications(ctx, generated.CountNotificationsParams{TenantID: tenantID, UserID: userID})
+		if countErr != nil {
+			return nil, 0, 0, normalizeError(countErr)
+		}
+		total, unread = counts.Total, counts.Unread
 	}
 	records := make([]service.NotificationRecord, 0, len(rows))
 	for _, row := range rows {
-		records = append(records, notificationFromRow(row))
+		records = append(records, notificationFromRow(generated.Notification{
+			TenantID: row.TenantID, ID: row.ID, UserID: row.UserID, EventID: row.EventID,
+			EventType: row.EventType, TitleKey: row.TitleKey, BodyArgs: row.BodyArgs, Link: row.Link,
+			ReadAt: row.ReadAt, CreatedAt: row.CreatedAt,
+		}))
 	}
-	return records, counts.Total, counts.Unread, nil
+	return records, total, unread, nil
 }
 
 // MarkNotificationRead 将一条通知标记为已读。

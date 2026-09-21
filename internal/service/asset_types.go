@@ -408,6 +408,8 @@ type AssetStore interface {
 	ListAssetVersionItems(context.Context, uuid.UUID, uuid.UUID, string, int32, int32) ([]AssetItemRecord, int64, error)
 	// SearchItems 按搜索查询与 facet 分页返回已索引的资产条目。
 	SearchItems(context.Context, uuid.UUID, string, SearchFilter, int32, int32) ([]AssetItemRecord, int64, error)
+	// SearchFacets 一次返回各维度 facet 桶计数（不含零计数基线）。
+	SearchFacets(context.Context, uuid.UUID, string, SearchFilter) (SearchFacetCounts, error)
 	// GetServiceByID 返回租户内指定 ID 的服务。
 	GetServiceByID(context.Context, uuid.UUID, uuid.UUID) (ServiceRecord, error)
 	// ListServicesByIDs 批量返回租户内指定 ID 的活跃服务，供搜索命中去 N+1。

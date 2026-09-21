@@ -2,11 +2,7 @@ package service
 
 import (
 	"bytes"
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/hkdf"
 	"crypto/hmac"
-	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
@@ -21,8 +17,8 @@ import (
 )
 
 const (
-	credentialKeyBytes   = 32
-	credentialNonceBytes = 12
+	credentialKeyBytes   = aesGCMKeyBytes
+	credentialNonceBytes = aesGCMNonceBytes
 	credentialHKDFInfo   = "meridian-credential-v1"
 	// credentialUsernameMaxBytes 是 HTTP 凭据用户名的最大字节长度。
 	credentialUsernameMaxBytes = 128
@@ -126,23 +122,14 @@ func (keyring CredentialKeyring) Encrypt(scopeID string, credentialID uuid.UUID,
 	if err != nil {
 		return EncryptedCredential{}, err
 	}
-	block, err := aes.NewCipher(key[:])
-	if err != nil {
-		return EncryptedCredential{}, fmt.Errorf("create credential cipher: %w", err)
-	}
-	aead, err := cipher.NewGCMWithNonceSize(block, credentialNonceBytes)
-	if err != nil {
-		return EncryptedCredential{}, fmt.Errorf("create credential AEAD: %w", err)
-	}
-	nonce := make([]byte, credentialNonceBytes)
-	if _, err := rand.Read(nonce); err != nil {
-		return EncryptedCredential{}, fmt.Errorf("read credential nonce randomness: %w", err)
-	}
 	payload, err := json.Marshal(secretEnvelope(secret))
 	if err != nil {
 		return EncryptedCredential{}, fmt.Errorf("encode credential secret: %w", err)
 	}
-	ciphertext := aead.Seal(nil, nonce, payload, credentialAAD(scopeID, credentialID, secret.Kind, keyring.activeVersion))
+	nonce, ciphertext, err := sealAESGCM(key, payload, credentialAAD(scopeID, credentialID, secret.Kind, keyring.activeVersion))
+	if err != nil {
+		return EncryptedCredential{}, fmt.Errorf("seal credential secret: %w", err)
+	}
 	fingerprint, err := keyring.Fingerprint(secret)
 	if err != nil {
 		return EncryptedCredential{}, err
@@ -159,15 +146,7 @@ func (keyring CredentialKeyring) Decrypt(scopeID string, credentialID uuid.UUID,
 	if err != nil {
 		return CredentialSecret{}, err
 	}
-	block, err := aes.NewCipher(key[:])
-	if err != nil {
-		return CredentialSecret{}, fmt.Errorf("create credential cipher: %w", err)
-	}
-	aead, err := cipher.NewGCMWithNonceSize(block, credentialNonceBytes)
-	if err != nil {
-		return CredentialSecret{}, fmt.Errorf("create credential AEAD: %w", err)
-	}
-	payload, err := aead.Open(nil, encrypted.Nonce, encrypted.Ciphertext, credentialAAD(scopeID, credentialID, kind, encrypted.KeyVersion))
+	payload, err := openAESGCM(key, encrypted.Nonce, encrypted.Ciphertext, credentialAAD(scopeID, credentialID, kind, encrypted.KeyVersion))
 	if err != nil {
 		return CredentialSecret{}, fmt.Errorf("%w: decrypt credential secret", ErrCredentialSecretInvalid)
 	}
@@ -229,12 +208,10 @@ func (keyring CredentialKeyring) rowKey(scopeID string, credentialID uuid.UUID, 
 	if !ok {
 		return [credentialKeyBytes]byte{}, fmt.Errorf("%w: %d", ErrCredentialKeyUnavailable, version)
 	}
-	derived, err := hkdf.Key(sha256.New, master[:], []byte(scopeID+"\x00"+credentialID.String()), credentialHKDFInfo, credentialKeyBytes)
+	key, err := deriveRowKey(master[:], []byte(scopeID+"\x00"+credentialID.String()), credentialHKDFInfo)
 	if err != nil {
 		return [credentialKeyBytes]byte{}, fmt.Errorf("derive credential row key: %w", err)
 	}
-	var key [credentialKeyBytes]byte
-	copy(key[:], derived)
 	_ = kind
 	return key, nil
 }

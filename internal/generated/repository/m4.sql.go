@@ -45,10 +45,22 @@ SELECT count(*)::bigint
 FROM asset_items AS ai
 JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
 JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
 WHERE ai.tenant_id = $1
   AND asset.deleted_at IS NULL
   AND ai.search_text ILIKE '%' || $2::text || '%'
-  AND ($3::text = '' OR ai.kind = $3::text)
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR ai.service_id = ANY($4::uuid[]))
+  AND (cardinality($5::uuid[]) = 0 OR s.repository_id = ANY($5::uuid[]))
+  AND (cardinality($6::text[]) = 0 OR ai.item_type = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.language = ANY($7::text[]))
+  AND (cardinality($8::text[]) = 0 OR s.lifecycle = ANY($8::text[]))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $9::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND ($10::boolean IS NULL
+       OR ($10::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $10::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
 `
 
 // CountSearchableAssetItemsParams 包含 CountSearchableAssetItems 查询的强类型参数。
@@ -57,14 +69,39 @@ type CountSearchableAssetItemsParams struct {
 	TenantID uuid.UUID `json:"tenant_id"`
 	// SearchQuery 是提供给 CountSearchableAssetItems 查询的 SearchQuery 值。
 	SearchQuery string `json:"search_query"`
-	// KindFilter 是提供给 CountSearchableAssetItems 查询的 KindFilter 值。
-	KindFilter string `json:"kind_filter"`
+	// Kinds 是提供给 CountSearchableAssetItems 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// ServiceIds 是提供给 CountSearchableAssetItems 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// RepositoryIds 是提供给 CountSearchableAssetItems 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// ItemTypes 是提供给 CountSearchableAssetItems 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Languages 是提供给 CountSearchableAssetItems 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// Lifecycles 是提供给 CountSearchableAssetItems 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasAiLayer 是提供给 CountSearchableAssetItems 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+	// HasBreakingChanges 是提供给 CountSearchableAssetItems 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
 }
 
 // CountSearchableAssetItems 执行生成的 CountSearchableAssetItems 数据库查询。
-// 统计租户内全部活跃资产条目数量，供跨 kind 搜索分页。
+// 统计租户内全部活跃资产条目数量，供跨 kind 搜索分页（过滤口径与上一致）。
 func (q *Queries) CountSearchableAssetItems(ctx context.Context, arg CountSearchableAssetItemsParams) (int64, error) {
-	row := q.db.QueryRow(ctx, countSearchableAssetItems, arg.TenantID, arg.SearchQuery, arg.KindFilter)
+	row := q.db.QueryRow(ctx, countSearchableAssetItems,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.Kinds,
+		arg.ServiceIds,
+		arg.RepositoryIds,
+		arg.ItemTypes,
+		arg.Languages,
+		arg.Lifecycles,
+		arg.HasAiLayer,
+		arg.HasBreakingChanges,
+	)
 	var column_1 int64
 	err := row.Scan(&column_1)
 	return column_1, err
@@ -323,13 +360,25 @@ SELECT ai.tenant_id, ai.id, ai.asset_version_id, ai.asset_id, ai.service_id, ai.
 FROM asset_items AS ai
 JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
 JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
 WHERE ai.tenant_id = $1
   AND asset.deleted_at IS NULL
   AND ai.search_text ILIKE '%' || $2::text || '%'
-  AND ($3::text = '' OR ai.kind = $3::text)
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR ai.service_id = ANY($4::uuid[]))
+  AND (cardinality($5::uuid[]) = 0 OR s.repository_id = ANY($5::uuid[]))
+  AND (cardinality($6::text[]) = 0 OR ai.item_type = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.language = ANY($7::text[]))
+  AND (cardinality($8::text[]) = 0 OR s.lifecycle = ANY($8::text[]))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $9::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND ($10::boolean IS NULL
+       OR ($10::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $10::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
 ORDER BY ai.key, ai.id
-LIMIT $5
-OFFSET $4
+LIMIT $12
+OFFSET $11
 `
 
 // ListSearchableAssetItemsParams 包含 ListSearchableAssetItems 查询的强类型参数。
@@ -338,8 +387,22 @@ type ListSearchableAssetItemsParams struct {
 	TenantID uuid.UUID `json:"tenant_id"`
 	// SearchQuery 是提供给 ListSearchableAssetItems 查询的 SearchQuery 值。
 	SearchQuery string `json:"search_query"`
-	// KindFilter 是提供给 ListSearchableAssetItems 查询的 KindFilter 值。
-	KindFilter string `json:"kind_filter"`
+	// Kinds 是提供给 ListSearchableAssetItems 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// ServiceIds 是提供给 ListSearchableAssetItems 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// RepositoryIds 是提供给 ListSearchableAssetItems 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// ItemTypes 是提供给 ListSearchableAssetItems 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Languages 是提供给 ListSearchableAssetItems 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// Lifecycles 是提供给 ListSearchableAssetItems 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasAiLayer 是提供给 ListSearchableAssetItems 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+	// HasBreakingChanges 是提供给 ListSearchableAssetItems 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
 	// PageOffset 是提供给 ListSearchableAssetItems 查询的 PageOffset 值。
 	PageOffset int32 `json:"page_offset"`
 	// PageLimit 是提供给 ListSearchableAssetItems 查询的 PageLimit 值。
@@ -348,11 +411,19 @@ type ListSearchableAssetItemsParams struct {
 
 // ListSearchableAssetItems 执行生成的 ListSearchableAssetItems 数据库查询。
 // 返回租户内全部活跃资产条目，供跨 kind 搜索（不绑定特定版本）。
+// 过滤子句统一口径：数组过滤用空数组哨兵跳过，布尔过滤用 NULL 哨兵跳过三态。
 func (q *Queries) ListSearchableAssetItems(ctx context.Context, arg ListSearchableAssetItemsParams) ([]AssetItem, error) {
 	rows, err := q.db.Query(ctx, listSearchableAssetItems,
 		arg.TenantID,
 		arg.SearchQuery,
-		arg.KindFilter,
+		arg.Kinds,
+		arg.ServiceIds,
+		arg.RepositoryIds,
+		arg.ItemTypes,
+		arg.Languages,
+		arg.Lifecycles,
+		arg.HasAiLayer,
+		arg.HasBreakingChanges,
 		arg.PageOffset,
 		arg.PageLimit,
 	)
@@ -570,45 +641,6 @@ func (q *Queries) ListSystemGroups(ctx context.Context, tenantID uuid.UUID) ([]S
 	return items, nil
 }
 
-const listVersionAiLayerRevisions = `-- name: ListVersionAiLayerRevisions :many
-SELECT av.id AS asset_version_id, layers.id AS layer_id
-FROM asset_versions AS av
-JOIN layers ON layers.tenant_id = av.tenant_id AND layers.asset_id = av.asset_id
-WHERE av.tenant_id = $1
-  AND layers.origin = 'ai_generated'
-  AND layers.deleted_at IS NULL
-`
-
-// ListVersionAiLayerRevisionsRow 包含 ListVersionAiLayerRevisions 查询返回的列。
-type ListVersionAiLayerRevisionsRow struct {
-	// AssetVersionID 是 ListVersionAiLayerRevisions 查询返回的 AssetVersionID 值。
-	AssetVersionID uuid.UUID `json:"asset_version_id"`
-	// LayerID 是 ListVersionAiLayerRevisions 查询返回的 LayerID 值。
-	LayerID uuid.UUID `json:"layer_id"`
-}
-
-// ListVersionAiLayerRevisions 执行生成的 ListVersionAiLayerRevisions 数据库查询。
-// 返回资产版本清单中的 AI 生成层修订标识，供 hasAiLayer 过滤判定。
-func (q *Queries) ListVersionAiLayerRevisions(ctx context.Context, tenantID uuid.UUID) ([]ListVersionAiLayerRevisionsRow, error) {
-	rows, err := q.db.Query(ctx, listVersionAiLayerRevisions, tenantID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []ListVersionAiLayerRevisionsRow{}
-	for rows.Next() {
-		var i ListVersionAiLayerRevisionsRow
-		if err := rows.Scan(&i.AssetVersionID, &i.LayerID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const replaceSystemGroupMembers = `-- name: ReplaceSystemGroupMembers :execrows
 WITH deleted AS (
   DELETE FROM system_group_members
@@ -634,4 +666,685 @@ func (q *Queries) ReplaceSystemGroupMembers(ctx context.Context, arg ReplaceSyst
 		return 0, err
 	}
 	return result.RowsAffected(), nil
+}
+
+const searchFacetGroups = `-- name: SearchFacetGroups :many
+SELECT sg.group_id::text AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+JOIN system_group_members AS sg ON sg.tenant_id = ai.tenant_id AND sg.service_id = ai.service_id
+WHERE ai.tenant_id = $1
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || $2::text || '%'
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR s.repository_id = ANY($4::uuid[]))
+  AND (cardinality($5::text[]) = 0 OR ai.item_type = ANY($5::text[]))
+  AND (cardinality($6::text[]) = 0 OR s.language = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.lifecycle = ANY($7::text[]))
+  AND ($8::boolean IS NULL
+       OR ($8::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $8::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $9::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY sg.group_id
+ORDER BY count DESC, value
+`
+
+// SearchFacetGroupsParams 包含 SearchFacetGroups 查询的强类型参数。
+type SearchFacetGroupsParams struct {
+	// TenantID 是提供给 SearchFacetGroups 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SearchQuery 是提供给 SearchFacetGroups 查询的 SearchQuery 值。
+	SearchQuery string `json:"search_query"`
+	// Kinds 是提供给 SearchFacetGroups 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// RepositoryIds 是提供给 SearchFacetGroups 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// ItemTypes 是提供给 SearchFacetGroups 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Languages 是提供给 SearchFacetGroups 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// Lifecycles 是提供给 SearchFacetGroups 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasAiLayer 是提供给 SearchFacetGroups 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+	// HasBreakingChanges 是提供给 SearchFacetGroups 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
+}
+
+// SearchFacetGroupsRow 包含 SearchFacetGroups 查询返回的列。
+type SearchFacetGroupsRow struct {
+	// Value 是 SearchFacetGroups 查询返回的 Value 值。
+	Value string `json:"value"`
+	// Count 是 SearchFacetGroups 查询返回的 Count 值。
+	Count int64 `json:"count"`
+}
+
+// SearchFacetGroups 执行生成的 SearchFacetGroups 数据库查询。
+func (q *Queries) SearchFacetGroups(ctx context.Context, arg SearchFacetGroupsParams) ([]SearchFacetGroupsRow, error) {
+	rows, err := q.db.Query(ctx, searchFacetGroups,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.Kinds,
+		arg.RepositoryIds,
+		arg.ItemTypes,
+		arg.Languages,
+		arg.Lifecycles,
+		arg.HasAiLayer,
+		arg.HasBreakingChanges,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchFacetGroupsRow{}
+	for rows.Next() {
+		var i SearchFacetGroupsRow
+		if err := rows.Scan(&i.Value, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchFacetHasAiLayer = `-- name: SearchFacetHasAiLayer :many
+SELECT (ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))::text AS value,
+       count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = $1
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || $2::text || '%'
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR ai.service_id = ANY($4::uuid[]))
+  AND (cardinality($5::uuid[]) = 0 OR s.repository_id = ANY($5::uuid[]))
+  AND (cardinality($6::text[]) = 0 OR ai.item_type = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.language = ANY($7::text[]))
+  AND (cardinality($8::text[]) = 0 OR s.lifecycle = ANY($8::text[]))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $9::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY 1
+ORDER BY count DESC, value
+`
+
+// SearchFacetHasAiLayerParams 包含 SearchFacetHasAiLayer 查询的强类型参数。
+type SearchFacetHasAiLayerParams struct {
+	// TenantID 是提供给 SearchFacetHasAiLayer 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SearchQuery 是提供给 SearchFacetHasAiLayer 查询的 SearchQuery 值。
+	SearchQuery string `json:"search_query"`
+	// Kinds 是提供给 SearchFacetHasAiLayer 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// ServiceIds 是提供给 SearchFacetHasAiLayer 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// RepositoryIds 是提供给 SearchFacetHasAiLayer 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// ItemTypes 是提供给 SearchFacetHasAiLayer 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Languages 是提供给 SearchFacetHasAiLayer 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// Lifecycles 是提供给 SearchFacetHasAiLayer 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasBreakingChanges 是提供给 SearchFacetHasAiLayer 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
+}
+
+// SearchFacetHasAiLayerRow 包含 SearchFacetHasAiLayer 查询返回的列。
+type SearchFacetHasAiLayerRow struct {
+	// Value 是 SearchFacetHasAiLayer 查询返回的 Value 值。
+	Value string `json:"value"`
+	// Count 是 SearchFacetHasAiLayer 查询返回的 Count 值。
+	Count int64 `json:"count"`
+}
+
+// SearchFacetHasAiLayer 执行生成的 SearchFacetHasAiLayer 数据库查询。
+func (q *Queries) SearchFacetHasAiLayer(ctx context.Context, arg SearchFacetHasAiLayerParams) ([]SearchFacetHasAiLayerRow, error) {
+	rows, err := q.db.Query(ctx, searchFacetHasAiLayer,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.Kinds,
+		arg.ServiceIds,
+		arg.RepositoryIds,
+		arg.ItemTypes,
+		arg.Languages,
+		arg.Lifecycles,
+		arg.HasBreakingChanges,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchFacetHasAiLayerRow{}
+	for rows.Next() {
+		var i SearchFacetHasAiLayerRow
+		if err := rows.Scan(&i.Value, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchFacetHasBreakingChanges = `-- name: SearchFacetHasBreakingChanges :many
+SELECT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)::text AS value,
+       count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = $1
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || $2::text || '%'
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR ai.service_id = ANY($4::uuid[]))
+  AND (cardinality($5::uuid[]) = 0 OR s.repository_id = ANY($5::uuid[]))
+  AND (cardinality($6::text[]) = 0 OR ai.item_type = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.language = ANY($7::text[]))
+  AND (cardinality($8::text[]) = 0 OR s.lifecycle = ANY($8::text[]))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $9::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+GROUP BY 1
+ORDER BY count DESC, value
+`
+
+// SearchFacetHasBreakingChangesParams 包含 SearchFacetHasBreakingChanges 查询的强类型参数。
+type SearchFacetHasBreakingChangesParams struct {
+	// TenantID 是提供给 SearchFacetHasBreakingChanges 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SearchQuery 是提供给 SearchFacetHasBreakingChanges 查询的 SearchQuery 值。
+	SearchQuery string `json:"search_query"`
+	// Kinds 是提供给 SearchFacetHasBreakingChanges 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// ServiceIds 是提供给 SearchFacetHasBreakingChanges 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// RepositoryIds 是提供给 SearchFacetHasBreakingChanges 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// ItemTypes 是提供给 SearchFacetHasBreakingChanges 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Languages 是提供给 SearchFacetHasBreakingChanges 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// Lifecycles 是提供给 SearchFacetHasBreakingChanges 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasAiLayer 是提供给 SearchFacetHasBreakingChanges 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+}
+
+// SearchFacetHasBreakingChangesRow 包含 SearchFacetHasBreakingChanges 查询返回的列。
+type SearchFacetHasBreakingChangesRow struct {
+	// Value 是 SearchFacetHasBreakingChanges 查询返回的 Value 值。
+	Value string `json:"value"`
+	// Count 是 SearchFacetHasBreakingChanges 查询返回的 Count 值。
+	Count int64 `json:"count"`
+}
+
+// SearchFacetHasBreakingChanges 执行生成的 SearchFacetHasBreakingChanges 数据库查询。
+func (q *Queries) SearchFacetHasBreakingChanges(ctx context.Context, arg SearchFacetHasBreakingChangesParams) ([]SearchFacetHasBreakingChangesRow, error) {
+	rows, err := q.db.Query(ctx, searchFacetHasBreakingChanges,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.Kinds,
+		arg.ServiceIds,
+		arg.RepositoryIds,
+		arg.ItemTypes,
+		arg.Languages,
+		arg.Lifecycles,
+		arg.HasAiLayer,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchFacetHasBreakingChangesRow{}
+	for rows.Next() {
+		var i SearchFacetHasBreakingChangesRow
+		if err := rows.Scan(&i.Value, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchFacetItemTypes = `-- name: SearchFacetItemTypes :many
+SELECT ai.item_type AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = $1
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || $2::text || '%'
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR ai.service_id = ANY($4::uuid[]))
+  AND (cardinality($5::uuid[]) = 0 OR s.repository_id = ANY($5::uuid[]))
+  AND (cardinality($6::text[]) = 0 OR s.language = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.lifecycle = ANY($7::text[]))
+  AND ($8::boolean IS NULL
+       OR ($8::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $8::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $9::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY ai.item_type
+ORDER BY count DESC, value
+`
+
+// SearchFacetItemTypesParams 包含 SearchFacetItemTypes 查询的强类型参数。
+type SearchFacetItemTypesParams struct {
+	// TenantID 是提供给 SearchFacetItemTypes 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SearchQuery 是提供给 SearchFacetItemTypes 查询的 SearchQuery 值。
+	SearchQuery string `json:"search_query"`
+	// Kinds 是提供给 SearchFacetItemTypes 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// ServiceIds 是提供给 SearchFacetItemTypes 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// RepositoryIds 是提供给 SearchFacetItemTypes 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// Languages 是提供给 SearchFacetItemTypes 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// Lifecycles 是提供给 SearchFacetItemTypes 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasAiLayer 是提供给 SearchFacetItemTypes 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+	// HasBreakingChanges 是提供给 SearchFacetItemTypes 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
+}
+
+// SearchFacetItemTypesRow 包含 SearchFacetItemTypes 查询返回的列。
+type SearchFacetItemTypesRow struct {
+	// Value 是 SearchFacetItemTypes 查询返回的 Value 值。
+	Value string `json:"value"`
+	// Count 是 SearchFacetItemTypes 查询返回的 Count 值。
+	Count int64 `json:"count"`
+}
+
+// SearchFacetItemTypes 执行生成的 SearchFacetItemTypes 数据库查询。
+func (q *Queries) SearchFacetItemTypes(ctx context.Context, arg SearchFacetItemTypesParams) ([]SearchFacetItemTypesRow, error) {
+	rows, err := q.db.Query(ctx, searchFacetItemTypes,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.Kinds,
+		arg.ServiceIds,
+		arg.RepositoryIds,
+		arg.Languages,
+		arg.Lifecycles,
+		arg.HasAiLayer,
+		arg.HasBreakingChanges,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchFacetItemTypesRow{}
+	for rows.Next() {
+		var i SearchFacetItemTypesRow
+		if err := rows.Scan(&i.Value, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchFacetKinds = `-- name: SearchFacetKinds :many
+SELECT ai.kind AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = $1
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || $2::text || '%'
+  AND (cardinality($3::uuid[]) = 0 OR ai.service_id = ANY($3::uuid[]))
+  AND (cardinality($4::uuid[]) = 0 OR s.repository_id = ANY($4::uuid[]))
+  AND (cardinality($5::text[]) = 0 OR ai.item_type = ANY($5::text[]))
+  AND (cardinality($6::text[]) = 0 OR s.language = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.lifecycle = ANY($7::text[]))
+  AND ($8::boolean IS NULL
+       OR ($8::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $8::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $9::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY ai.kind
+ORDER BY count DESC, value
+`
+
+// SearchFacetKindsParams 包含 SearchFacetKinds 查询的强类型参数。
+type SearchFacetKindsParams struct {
+	// TenantID 是提供给 SearchFacetKinds 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SearchQuery 是提供给 SearchFacetKinds 查询的 SearchQuery 值。
+	SearchQuery string `json:"search_query"`
+	// ServiceIds 是提供给 SearchFacetKinds 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// RepositoryIds 是提供给 SearchFacetKinds 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// ItemTypes 是提供给 SearchFacetKinds 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Languages 是提供给 SearchFacetKinds 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// Lifecycles 是提供给 SearchFacetKinds 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasAiLayer 是提供给 SearchFacetKinds 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+	// HasBreakingChanges 是提供给 SearchFacetKinds 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
+}
+
+// SearchFacetKindsRow 包含 SearchFacetKinds 查询返回的列。
+type SearchFacetKindsRow struct {
+	// Value 是 SearchFacetKinds 查询返回的 Value 值。
+	Value string `json:"value"`
+	// Count 是 SearchFacetKinds 查询返回的 Count 值。
+	Count int64 `json:"count"`
+}
+
+// SearchFacetKinds 执行生成的 SearchFacetKinds 数据库查询。
+// 以下 facet 查询共享同一过滤口径，各自剔除自身维度的过滤后按值分组计数。
+func (q *Queries) SearchFacetKinds(ctx context.Context, arg SearchFacetKindsParams) ([]SearchFacetKindsRow, error) {
+	rows, err := q.db.Query(ctx, searchFacetKinds,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.ServiceIds,
+		arg.RepositoryIds,
+		arg.ItemTypes,
+		arg.Languages,
+		arg.Lifecycles,
+		arg.HasAiLayer,
+		arg.HasBreakingChanges,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchFacetKindsRow{}
+	for rows.Next() {
+		var i SearchFacetKindsRow
+		if err := rows.Scan(&i.Value, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchFacetLanguages = `-- name: SearchFacetLanguages :many
+SELECT s.language AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = $1
+  AND asset.deleted_at IS NULL
+  AND s.language IS NOT NULL
+  AND ai.search_text ILIKE '%' || $2::text || '%'
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR ai.service_id = ANY($4::uuid[]))
+  AND (cardinality($5::uuid[]) = 0 OR s.repository_id = ANY($5::uuid[]))
+  AND (cardinality($6::text[]) = 0 OR ai.item_type = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.lifecycle = ANY($7::text[]))
+  AND ($8::boolean IS NULL
+       OR ($8::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $8::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $9::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY s.language
+ORDER BY count DESC, value
+`
+
+// SearchFacetLanguagesParams 包含 SearchFacetLanguages 查询的强类型参数。
+type SearchFacetLanguagesParams struct {
+	// TenantID 是提供给 SearchFacetLanguages 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SearchQuery 是提供给 SearchFacetLanguages 查询的 SearchQuery 值。
+	SearchQuery string `json:"search_query"`
+	// Kinds 是提供给 SearchFacetLanguages 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// ServiceIds 是提供给 SearchFacetLanguages 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// RepositoryIds 是提供给 SearchFacetLanguages 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// ItemTypes 是提供给 SearchFacetLanguages 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Lifecycles 是提供给 SearchFacetLanguages 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasAiLayer 是提供给 SearchFacetLanguages 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+	// HasBreakingChanges 是提供给 SearchFacetLanguages 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
+}
+
+// SearchFacetLanguagesRow 包含 SearchFacetLanguages 查询返回的列。
+type SearchFacetLanguagesRow struct {
+	// Value 是 SearchFacetLanguages 查询返回的 Value 值。
+	Value *string `json:"value"`
+	// Count 是 SearchFacetLanguages 查询返回的 Count 值。
+	Count int64 `json:"count"`
+}
+
+// SearchFacetLanguages 执行生成的 SearchFacetLanguages 数据库查询。
+func (q *Queries) SearchFacetLanguages(ctx context.Context, arg SearchFacetLanguagesParams) ([]SearchFacetLanguagesRow, error) {
+	rows, err := q.db.Query(ctx, searchFacetLanguages,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.Kinds,
+		arg.ServiceIds,
+		arg.RepositoryIds,
+		arg.ItemTypes,
+		arg.Lifecycles,
+		arg.HasAiLayer,
+		arg.HasBreakingChanges,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchFacetLanguagesRow{}
+	for rows.Next() {
+		var i SearchFacetLanguagesRow
+		if err := rows.Scan(&i.Value, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchFacetLifecycles = `-- name: SearchFacetLifecycles :many
+SELECT s.lifecycle AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = $1
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || $2::text || '%'
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR ai.service_id = ANY($4::uuid[]))
+  AND (cardinality($5::uuid[]) = 0 OR s.repository_id = ANY($5::uuid[]))
+  AND (cardinality($6::text[]) = 0 OR ai.item_type = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.language = ANY($7::text[]))
+  AND ($8::boolean IS NULL
+       OR ($8::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $8::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $9::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY s.lifecycle
+ORDER BY count DESC, value
+`
+
+// SearchFacetLifecyclesParams 包含 SearchFacetLifecycles 查询的强类型参数。
+type SearchFacetLifecyclesParams struct {
+	// TenantID 是提供给 SearchFacetLifecycles 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SearchQuery 是提供给 SearchFacetLifecycles 查询的 SearchQuery 值。
+	SearchQuery string `json:"search_query"`
+	// Kinds 是提供给 SearchFacetLifecycles 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// ServiceIds 是提供给 SearchFacetLifecycles 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// RepositoryIds 是提供给 SearchFacetLifecycles 查询的 RepositoryIds 值。
+	RepositoryIds []uuid.UUID `json:"repository_ids"`
+	// ItemTypes 是提供给 SearchFacetLifecycles 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Languages 是提供给 SearchFacetLifecycles 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// HasAiLayer 是提供给 SearchFacetLifecycles 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+	// HasBreakingChanges 是提供给 SearchFacetLifecycles 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
+}
+
+// SearchFacetLifecyclesRow 包含 SearchFacetLifecycles 查询返回的列。
+type SearchFacetLifecyclesRow struct {
+	// Value 是 SearchFacetLifecycles 查询返回的 Value 值。
+	Value string `json:"value"`
+	// Count 是 SearchFacetLifecycles 查询返回的 Count 值。
+	Count int64 `json:"count"`
+}
+
+// SearchFacetLifecycles 执行生成的 SearchFacetLifecycles 数据库查询。
+func (q *Queries) SearchFacetLifecycles(ctx context.Context, arg SearchFacetLifecyclesParams) ([]SearchFacetLifecyclesRow, error) {
+	rows, err := q.db.Query(ctx, searchFacetLifecycles,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.Kinds,
+		arg.ServiceIds,
+		arg.RepositoryIds,
+		arg.ItemTypes,
+		arg.Languages,
+		arg.HasAiLayer,
+		arg.HasBreakingChanges,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchFacetLifecyclesRow{}
+	for rows.Next() {
+		var i SearchFacetLifecyclesRow
+		if err := rows.Scan(&i.Value, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchFacetRepositories = `-- name: SearchFacetRepositories :many
+SELECT s.repository_id::text AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = $1
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || $2::text || '%'
+  AND (cardinality($3::text[]) = 0 OR ai.kind = ANY($3::text[]))
+  AND (cardinality($4::uuid[]) = 0 OR ai.service_id = ANY($4::uuid[]))
+  AND (cardinality($5::text[]) = 0 OR ai.item_type = ANY($5::text[]))
+  AND (cardinality($6::text[]) = 0 OR s.language = ANY($6::text[]))
+  AND (cardinality($7::text[]) = 0 OR s.lifecycle = ANY($7::text[]))
+  AND ($8::boolean IS NULL
+       OR ($8::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT $8::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND ($9::boolean IS NULL
+       OR ($9::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT $9::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY s.repository_id
+ORDER BY count DESC, value
+`
+
+// SearchFacetRepositoriesParams 包含 SearchFacetRepositories 查询的强类型参数。
+type SearchFacetRepositoriesParams struct {
+	// TenantID 是提供给 SearchFacetRepositories 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SearchQuery 是提供给 SearchFacetRepositories 查询的 SearchQuery 值。
+	SearchQuery string `json:"search_query"`
+	// Kinds 是提供给 SearchFacetRepositories 查询的 Kinds 值。
+	Kinds []string `json:"kinds"`
+	// ServiceIds 是提供给 SearchFacetRepositories 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+	// ItemTypes 是提供给 SearchFacetRepositories 查询的 ItemTypes 值。
+	ItemTypes []string `json:"item_types"`
+	// Languages 是提供给 SearchFacetRepositories 查询的 Languages 值。
+	Languages []string `json:"languages"`
+	// Lifecycles 是提供给 SearchFacetRepositories 查询的 Lifecycles 值。
+	Lifecycles []string `json:"lifecycles"`
+	// HasAiLayer 是提供给 SearchFacetRepositories 查询的 HasAiLayer 值。
+	HasAiLayer *bool `json:"has_ai_layer"`
+	// HasBreakingChanges 是提供给 SearchFacetRepositories 查询的 HasBreakingChanges 值。
+	HasBreakingChanges *bool `json:"has_breaking_changes"`
+}
+
+// SearchFacetRepositoriesRow 包含 SearchFacetRepositories 查询返回的列。
+type SearchFacetRepositoriesRow struct {
+	// Value 是 SearchFacetRepositories 查询返回的 Value 值。
+	Value string `json:"value"`
+	// Count 是 SearchFacetRepositories 查询返回的 Count 值。
+	Count int64 `json:"count"`
+}
+
+// SearchFacetRepositories 执行生成的 SearchFacetRepositories 数据库查询。
+func (q *Queries) SearchFacetRepositories(ctx context.Context, arg SearchFacetRepositoriesParams) ([]SearchFacetRepositoriesRow, error) {
+	rows, err := q.db.Query(ctx, searchFacetRepositories,
+		arg.TenantID,
+		arg.SearchQuery,
+		arg.Kinds,
+		arg.ServiceIds,
+		arg.ItemTypes,
+		arg.Languages,
+		arg.Lifecycles,
+		arg.HasAiLayer,
+		arg.HasBreakingChanges,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchFacetRepositoriesRow{}
+	for rows.Next() {
+		var i SearchFacetRepositoriesRow
+		if err := rows.Scan(&i.Value, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

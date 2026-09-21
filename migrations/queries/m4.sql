@@ -60,38 +60,239 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND revision = sqlc.arg(expected_revision);
 
 -- 返回租户内全部活跃资产条目，供跨 kind 搜索（不绑定特定版本）。
+-- 过滤子句统一口径：数组过滤用空数组哨兵跳过，布尔过滤用 NULL 哨兵跳过三态。
 -- name: ListSearchableAssetItems :many
 SELECT ai.*
 FROM asset_items AS ai
 JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
 JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
 WHERE ai.tenant_id = sqlc.arg(tenant_id)
   AND asset.deleted_at IS NULL
   AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
-  AND (sqlc.arg(kind_filter)::text = '' OR ai.kind = sqlc.arg(kind_filter)::text)
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
 ORDER BY ai.key, ai.id
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- 统计租户内全部活跃资产条目数量，供跨 kind 搜索分页。
+-- 统计租户内全部活跃资产条目数量，供跨 kind 搜索分页（过滤口径与上一致）。
 -- name: CountSearchableAssetItems :one
 SELECT count(*)::bigint
 FROM asset_items AS ai
 JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
 JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
 WHERE ai.tenant_id = sqlc.arg(tenant_id)
   AND asset.deleted_at IS NULL
   AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
-  AND (sqlc.arg(kind_filter)::text = '' OR ai.kind = sqlc.arg(kind_filter)::text);
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)));
 
--- 返回资产版本清单中的 AI 生成层修订标识，供 hasAiLayer 过滤判定。
--- name: ListVersionAiLayerRevisions :many
-SELECT av.id AS asset_version_id, layers.id AS layer_id
-FROM asset_versions AS av
-JOIN layers ON layers.tenant_id = av.tenant_id AND layers.asset_id = av.asset_id
-WHERE av.tenant_id = sqlc.arg(tenant_id)
-  AND layers.origin = 'ai_generated'
-  AND layers.deleted_at IS NULL;
+-- 以下 facet 查询共享同一过滤口径，各自剔除自身维度的过滤后按值分组计数。
+-- name: SearchFacetKinds :many
+SELECT ai.kind AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = sqlc.arg(tenant_id)
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY ai.kind
+ORDER BY count DESC, value;
+
+-- name: SearchFacetLifecycles :many
+SELECT s.lifecycle AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = sqlc.arg(tenant_id)
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY s.lifecycle
+ORDER BY count DESC, value;
+
+-- name: SearchFacetLanguages :many
+SELECT s.language AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = sqlc.arg(tenant_id)
+  AND asset.deleted_at IS NULL
+  AND s.language IS NOT NULL
+  AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY s.language
+ORDER BY count DESC, value;
+
+-- name: SearchFacetItemTypes :many
+SELECT ai.item_type AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = sqlc.arg(tenant_id)
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY ai.item_type
+ORDER BY count DESC, value;
+
+-- name: SearchFacetRepositories :many
+SELECT s.repository_id::text AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = sqlc.arg(tenant_id)
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY s.repository_id
+ORDER BY count DESC, value;
+
+-- name: SearchFacetGroups :many
+SELECT sg.group_id::text AS value, count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+JOIN system_group_members AS sg ON sg.tenant_id = ai.tenant_id AND sg.service_id = ai.service_id
+WHERE ai.tenant_id = sqlc.arg(tenant_id)
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY sg.group_id
+ORDER BY count DESC, value;
+
+-- name: SearchFacetHasAiLayer :many
+SELECT (ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))::text AS value,
+       count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = sqlc.arg(tenant_id)
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_breaking_changes)::boolean IS NULL
+       OR (sqlc.narg(has_breaking_changes)::boolean AND EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id))
+       OR (NOT sqlc.narg(has_breaking_changes)::boolean AND NOT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)))
+GROUP BY 1
+ORDER BY count DESC, value;
+
+-- name: SearchFacetHasBreakingChanges :many
+SELECT EXISTS (SELECT 1 FROM breaking_todos AS bt WHERE bt.tenant_id = ai.tenant_id AND bt.asset_version_id = ai.asset_version_id)::text AS value,
+       count(*)::bigint AS count
+FROM asset_items AS ai
+JOIN asset_versions AS av ON av.tenant_id = ai.tenant_id AND av.id = ai.asset_version_id
+JOIN assets AS asset ON asset.tenant_id = ai.tenant_id AND asset.id = ai.asset_id
+JOIN services AS s ON s.tenant_id = ai.tenant_id AND s.id = ai.service_id
+WHERE ai.tenant_id = sqlc.arg(tenant_id)
+  AND asset.deleted_at IS NULL
+  AND ai.search_text ILIKE '%' || sqlc.arg(search_query)::text || '%'
+  AND (cardinality(sqlc.arg(kinds)::text[]) = 0 OR ai.kind = ANY(sqlc.arg(kinds)::text[]))
+  AND (cardinality(sqlc.arg(service_ids)::uuid[]) = 0 OR ai.service_id = ANY(sqlc.arg(service_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(repository_ids)::uuid[]) = 0 OR s.repository_id = ANY(sqlc.arg(repository_ids)::uuid[]))
+  AND (cardinality(sqlc.arg(item_types)::text[]) = 0 OR ai.item_type = ANY(sqlc.arg(item_types)::text[]))
+  AND (cardinality(sqlc.arg(languages)::text[]) = 0 OR s.language = ANY(sqlc.arg(languages)::text[]))
+  AND (cardinality(sqlc.arg(lifecycles)::text[]) = 0 OR s.lifecycle = ANY(sqlc.arg(lifecycles)::text[]))
+  AND (sqlc.narg(has_ai_layer)::boolean IS NULL
+       OR (sqlc.narg(has_ai_layer)::boolean AND ai.asset_id IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL))
+       OR (NOT sqlc.narg(has_ai_layer)::boolean AND ai.asset_id NOT IN (SELECT l.asset_id FROM layers AS l WHERE l.tenant_id = ai.tenant_id AND l.origin = 'ai_generated' AND l.deleted_at IS NULL)))
+GROUP BY 1
+ORDER BY count DESC, value;
 
 -- 返回服务所属的仓库，供搜索命中投影 owning repository。
 -- name: GetRepositoryByService :one

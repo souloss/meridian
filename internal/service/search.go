@@ -71,7 +71,7 @@ func (search *Search) Run(ctx context.Context, actor Principal, tenantSlug strin
 		}
 		hits = append(hits, hit)
 	}
-	facets := search.facets(ctx, membership.TenantID, input.Filter)
+	facets := search.facets(ctx, membership.TenantID, input.Query, input.Filter)
 	return SearchResultRecord{
 		Total: int(total), Page: input.Page, PageSize: input.PageSize, Items: hits, Facets: facets,
 	}, nil
@@ -126,22 +126,40 @@ func (search *Search) highlights(item AssetItemRecord) map[string][]string {
 	return highlights
 }
 
-func (search *Search) facets(ctx context.Context, tenantID uuid.UUID, filter SearchFilter) SearchFacetSet {
+func (search *Search) facets(ctx context.Context, tenantID uuid.UUID, query string, filter SearchFilter) SearchFacetSet {
 	facets := SearchFacetSet{
 		Repositories: []SearchFacetBucket{}, Teams: []SearchFacetBucket{}, Groups: []SearchFacetBucket{},
 		Kinds: []SearchFacetBucket{}, Lifecycles: []SearchFacetBucket{}, Tags: []SearchFacetBucket{},
 		Languages: []SearchFacetBucket{}, ItemTypes: []SearchFacetBucket{},
 		HasAiLayer: []SearchFacetBucket{}, HasBreakingChanges: []SearchFacetBucket{},
 	}
-	kinds, err := search.store.ListAssetKinds(ctx)
+	counts, err := search.store.SearchFacets(ctx, tenantID, query, filter)
 	if err != nil {
 		return facets
 	}
-	for _, kind := range kinds {
-		if kind.Enabled {
-			facets.Kinds = append(facets.Kinds, SearchFacetBucket{Value: kind.ID, Count: 0})
+	// 类别维度叠加全量启用类别作为零计数基线，其余维度直接采用命中计数。
+	allKinds, err := search.store.ListAssetKinds(ctx)
+	if err != nil {
+		facets.Kinds = counts.Kinds
+	} else {
+		kindCounts := make(map[string]int, len(counts.Kinds))
+		for _, bucket := range counts.Kinds {
+			kindCounts[bucket.Value] = bucket.Count
+		}
+		for _, kind := range allKinds {
+			if !kind.Enabled {
+				continue
+			}
+			facets.Kinds = append(facets.Kinds, SearchFacetBucket{Value: kind.ID, Count: kindCounts[kind.ID]})
 		}
 	}
+	facets.Lifecycles = counts.Lifecycles
+	facets.Languages = counts.Languages
+	facets.ItemTypes = counts.ItemTypes
+	facets.Repositories = counts.Repositories
+	facets.Groups = counts.Groups
+	facets.HasAiLayer = counts.HasAiLayer
+	facets.HasBreakingChanges = counts.HasBreakingChanges
 	return facets
 }
 
