@@ -36,3 +36,8 @@ func localize(code string, lang string, data map[string]any) string {
 	}
 	return bundle.T(lang, errorMsgID(code), data, nil)
 }
+
+// errorMsgID 返回错误码对应的 i18n 消息键（统一前缀 error.）。
+func errorMsgID(code string) string {
+	return "error." + code
+}

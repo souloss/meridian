@@ -410,8 +410,12 @@ type AssetStore interface {
 	SearchItems(context.Context, uuid.UUID, string, SearchFilter, int32, int32) ([]AssetItemRecord, int64, error)
 	// GetServiceByID 返回租户内指定 ID 的服务。
 	GetServiceByID(context.Context, uuid.UUID, uuid.UUID) (ServiceRecord, error)
+	// ListServicesByIDs 批量返回租户内指定 ID 的活跃服务，供搜索命中去 N+1。
+	ListServicesByIDs(context.Context, uuid.UUID, []uuid.UUID) ([]ServiceRecord, error)
 	// GetRepositoryByService 返回拥有某服务的仓库。
 	GetRepositoryByService(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
+	// ListRepositoriesByServices 批量返回拥有指定服务的仓库，供搜索命中去 N+1。
+	ListRepositoriesByServices(context.Context, uuid.UUID, []uuid.UUID) (map[uuid.UUID]RepositoryRecord, error)
 	// ListSystemGroupMembers 返回某系统分组的成员服务 ID。
 	ListSystemGroupMembers(context.Context, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)
 	// ListServicesForTenant 分页返回租户内每个活跃服务。

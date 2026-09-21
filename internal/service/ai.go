@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 	"uuid"
@@ -75,7 +76,7 @@ func (workflow *AiWorkflow) GenerateMissingAsset(ctx context.Context, actor Prin
 	if profile.Kind != producerKindAI || !profile.Enabled || profile.DependencyStatus == dependencyStatusUnavailable {
 		return AiGenerateAccepted{}, &ProducerUnavailableError{Kind: input.Kind}
 	}
-	if !containsString(profile.SupportedKinds, input.Kind) {
+	if !slices.Contains(profile.SupportedKinds, input.Kind) {
 		return AiGenerateAccepted{}, ErrValidation
 	}
 
@@ -509,23 +510,7 @@ func (workflow *AiWorkflow) tenantAISettings(ctx context.Context, tenantID uuid.
 }
 
 func (workflow *AiWorkflow) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!containsString(actor.Scopes, permission) && !containsString(actor.Scopes, scopeWildcard)) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || workflow.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := workflow.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil || !roleAllows(membership.Role, permission) {
-		if err != nil {
-			return Membership{}, err
-		}
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, workflow.identities)
 }
 
 func producerEnvironment(jobContext AiGenerationJobContext) []string {
@@ -545,15 +530,6 @@ func sha256Hex(content string) string {
 
 func yamlUnmarshal(raw []byte, target *map[string]any) error {
 	return yaml.Unmarshal(raw, target)
-}
-
-func containsString(values []string, target string) bool {
-	for _, value := range values {
-		if value == target {
-			return true
-		}
-	}
-	return false
 }
 
 var _ = task.StageResolve

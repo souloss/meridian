@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"slices"
 	"sort"
 	"time"
 	"uuid"
@@ -159,21 +158,5 @@ func assetRepository(ctx context.Context, store AssetStore, tenantID uuid.UUID, 
 }
 
 func (assets *Assets) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || assets.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := assets.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil || !roleAllows(membership.Role, permission) {
-		if err != nil {
-			return Membership{}, err
-		}
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, assets.identities)
 }

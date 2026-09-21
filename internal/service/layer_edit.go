@@ -670,23 +670,7 @@ func (editor *LayerEdit) blobContent(ctx context.Context, contentRef string) (st
 }
 
 func (editor *LayerEdit) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || editor.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := editor.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil || !roleAllows(membership.Role, permission) {
-		if err != nil {
-			return Membership{}, err
-		}
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, editor.identities)
 }
 
 // splitBaseAndOverlays 排序资产层：base 在前，随后按 ord 排 overlay。缺失 base 是校验错误；

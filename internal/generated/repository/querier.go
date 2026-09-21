@@ -95,7 +95,7 @@ type Querier interface {
 	// 返回匹配一次租户搜索的有效服务数量。
 	CountListedServices(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountNotifications 暴露相应的强类型数据库操作。
-	// 统计某用户的通知总数与未读数。
+	// 统计某用户的通知总数与未读数（独立于分页，未读数不受 unread_only 影响）。
 	CountNotifications(ctx context.Context, arg CountNotificationsParams) (CountNotificationsRow, error)
 	// CountPlatformAuditLogs 暴露相应的强类型数据库操作。
 	// 按照 ListPlatformAuditLogs 的跨租户条件和全部可选过滤条件返回准确总数。
@@ -468,9 +468,6 @@ type Querier interface {
 	// GetSourceSpec 暴露相应的强类型数据库操作。
 	// 返回一个活跃源配置。
 	GetSourceSpec(ctx context.Context, arg GetSourceSpecParams) (SourceSpec, error)
-	// GetSubscription 暴露相应的强类型数据库操作。
-	// 返回一条订阅（按 id）。
-	GetSubscription(ctx context.Context, arg GetSubscriptionParams) (Subscription, error)
 	// GetSyncIdempotency 暴露相应的强类型数据库操作。
 	// 返回 syncRepository 请求保留的准确响应。
 	GetSyncIdempotency(ctx context.Context, arg GetSyncIdempotencyParams) (GetSyncIdempotencyRow, error)
@@ -480,9 +477,6 @@ type Querier interface {
 	// GetSystemGroup 暴露相应的强类型数据库操作。
 	// 返回一条系统分组。
 	GetSystemGroup(ctx context.Context, arg GetSystemGroupParams) (SystemGroup, error)
-	// GetSystemGroupBySlug 暴露相应的强类型数据库操作。
-	// 按 slug 返回一条系统分组。
-	GetSystemGroupBySlug(ctx context.Context, arg GetSystemGroupBySlugParams) (SystemGroup, error)
 	// GetTenantBlobReference 暴露相应的强类型数据库操作。
 	// 调用方锁定租户配额行后，返回当前对象引用数。
 	GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error)
@@ -610,6 +604,9 @@ type Querier interface {
 	// 按规范化 URL 和 UUID 的确定顺序返回有效仓库。
 	// 即使搜索字符串为空，查询及全部谓词仍保留租户边界。
 	ListRepositories(ctx context.Context, arg ListRepositoriesParams) ([]Repository, error)
+	// ListRepositoriesByServices 暴露相应的强类型数据库操作。
+	// 批量返回拥有指定服务的仓库，供搜索命中投影 owning repository 去 N+1。
+	ListRepositoriesByServices(ctx context.Context, arg ListRepositoriesByServicesParams) ([]ListRepositoriesByServicesRow, error)
 	// ListRepositoriesForCredential 暴露相应的强类型数据库操作。
 	// 按契约响应顺序返回未删除仓库对该凭据的引用。
 	ListRepositoriesForCredential(ctx context.Context, arg ListRepositoriesForCredentialParams) ([]ListRepositoriesForCredentialRow, error)
@@ -622,6 +619,9 @@ type Querier interface {
 	// ListServices 暴露相应的强类型数据库操作。
 	// 列出活跃服务的确定顺序分页。
 	ListServices(ctx context.Context, arg ListServicesParams) ([]Service, error)
+	// ListServicesByIDs 暴露相应的强类型数据库操作。
+	// 批量返回租户内指定 id 的活跃服务，供搜索命中与服务校验去 N+1。
+	ListServicesByIDs(ctx context.Context, arg ListServicesByIDsParams) ([]Service, error)
 	// ListServicesByRepository 暴露相应的强类型数据库操作。
 	// 返回一个仓库下全部活跃服务。
 	ListServicesByRepository(ctx context.Context, arg ListServicesByRepositoryParams) ([]Service, error)
@@ -633,12 +633,18 @@ type Querier interface {
 	ListSourceSpecsForService(ctx context.Context, arg ListSourceSpecsForServiceParams) ([]SourceSpec, error)
 	// ListSubscriptionChannels 暴露相应的强类型数据库操作。
 	ListSubscriptionChannels(ctx context.Context, arg ListSubscriptionChannelsParams) ([]uuid.UUID, error)
+	// ListSubscriptionChannelsForSubscriptions 暴露相应的强类型数据库操作。
+	// 批量返回多个订阅的通道关联，供列表场景去 N+1。
+	ListSubscriptionChannelsForSubscriptions(ctx context.Context, arg ListSubscriptionChannelsForSubscriptionsParams) ([]ListSubscriptionChannelsForSubscriptionsRow, error)
 	// ListSubscriptions 暴露相应的强类型数据库操作。
 	// 列出用户的全部订阅。
 	ListSubscriptions(ctx context.Context, arg ListSubscriptionsParams) ([]Subscription, error)
 	// ListSystemGroupMembers 暴露相应的强类型数据库操作。
 	// 返回一条系统分组的成员服务。
 	ListSystemGroupMembers(ctx context.Context, arg ListSystemGroupMembersParams) ([]SystemGroupMember, error)
+	// ListSystemGroupMembersForGroups 暴露相应的强类型数据库操作。
+	// 批量返回多个分组的成员，供列表场景去 N+1。
+	ListSystemGroupMembersForGroups(ctx context.Context, arg ListSystemGroupMembersForGroupsParams) ([]SystemGroupMember, error)
 	// ListSystemGroups 暴露相应的强类型数据库操作。
 	// 列出租户内全部系统分组。
 	ListSystemGroups(ctx context.Context, tenantID uuid.UUID) ([]SystemGroup, error)

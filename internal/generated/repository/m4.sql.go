@@ -8,6 +8,7 @@ package repository
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"uuid"
 )
 
@@ -193,39 +194,6 @@ func (q *Queries) GetSystemGroup(ctx context.Context, arg GetSystemGroupParams) 
 	return i, err
 }
 
-const getSystemGroupBySlug = `-- name: GetSystemGroupBySlug :one
-SELECT tenant_id, id, slug, display_name, description, revision, created_at, updated_at
-FROM system_groups
-WHERE tenant_id = $1
-  AND slug = $2
-`
-
-// GetSystemGroupBySlugParams 包含 GetSystemGroupBySlug 查询的强类型参数。
-type GetSystemGroupBySlugParams struct {
-	// TenantID 是提供给 GetSystemGroupBySlug 查询的 TenantID 值。
-	TenantID uuid.UUID `json:"tenant_id"`
-	// Slug 是提供给 GetSystemGroupBySlug 查询的 Slug 值。
-	Slug string `json:"slug"`
-}
-
-// GetSystemGroupBySlug 执行生成的 GetSystemGroupBySlug 数据库查询。
-// 按 slug 返回一条系统分组。
-func (q *Queries) GetSystemGroupBySlug(ctx context.Context, arg GetSystemGroupBySlugParams) (SystemGroup, error) {
-	row := q.db.QueryRow(ctx, getSystemGroupBySlug, arg.TenantID, arg.Slug)
-	var i SystemGroup
-	err := row.Scan(
-		&i.TenantID,
-		&i.ID,
-		&i.Slug,
-		&i.DisplayName,
-		&i.Description,
-		&i.Revision,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const insertSystemGroupMember = `-- name: InsertSystemGroupMember :execrows
 INSERT INTO system_group_members (tenant_id, group_id, service_id)
 VALUES ($1, $2, $3)
@@ -249,6 +217,105 @@ func (q *Queries) InsertSystemGroupMember(ctx context.Context, arg InsertSystemG
 		return 0, err
 	}
 	return result.RowsAffected(), nil
+}
+
+const listRepositoriesByServices = `-- name: ListRepositoriesByServices :many
+SELECT DISTINCT ON (services.id)
+       services.id AS service_id, repositories.tenant_id, repositories.id, repositories.url, repositories.canonical_url, repositories.credential_id, repositories.global_credential_id, repositories.default_branch, repositories.branch_policy, repositories.fetch_config, repositories.sync_cron, repositories.note, repositories.webhook_secret_hash, repositories.health, repositories.revision, repositories.deleted_at, repositories.created_at, repositories.updated_at
+FROM repositories
+JOIN services ON services.tenant_id = repositories.tenant_id AND services.repository_id = repositories.id
+WHERE repositories.tenant_id = $1
+  AND services.id = ANY($2::uuid[])
+ORDER BY services.id
+`
+
+// ListRepositoriesByServicesParams 包含 ListRepositoriesByServices 查询的强类型参数。
+type ListRepositoriesByServicesParams struct {
+	// TenantID 是提供给 ListRepositoriesByServices 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ServiceIds 是提供给 ListRepositoriesByServices 查询的 ServiceIds 值。
+	ServiceIds []uuid.UUID `json:"service_ids"`
+}
+
+// ListRepositoriesByServicesRow 包含 ListRepositoriesByServices 查询返回的列。
+type ListRepositoriesByServicesRow struct {
+	// ServiceID 是 ListRepositoriesByServices 查询返回的 ServiceID 值。
+	ServiceID uuid.UUID `json:"service_id"`
+	// TenantID 是 ListRepositoriesByServices 查询返回的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是 ListRepositoriesByServices 查询返回的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// Url 是 ListRepositoriesByServices 查询返回的 Url 值。
+	Url string `json:"url"`
+	// CanonicalUrl 是 ListRepositoriesByServices 查询返回的 CanonicalUrl 值。
+	CanonicalUrl string `json:"canonical_url"`
+	// CredentialID 是 ListRepositoriesByServices 查询返回的 CredentialID 值。
+	CredentialID *uuid.UUID `json:"credential_id"`
+	// GlobalCredentialID 是 ListRepositoriesByServices 查询返回的 GlobalCredentialID 值。
+	GlobalCredentialID *uuid.UUID `json:"global_credential_id"`
+	// DefaultBranch 是 ListRepositoriesByServices 查询返回的 DefaultBranch 值。
+	DefaultBranch string `json:"default_branch"`
+	// BranchPolicy 是 ListRepositoriesByServices 查询返回的 BranchPolicy 值。
+	BranchPolicy []byte `json:"branch_policy"`
+	// FetchConfig 是 ListRepositoriesByServices 查询返回的 FetchConfig 值。
+	FetchConfig []byte `json:"fetch_config"`
+	// SyncCron 是 ListRepositoriesByServices 查询返回的 SyncCron 值。
+	SyncCron *string `json:"sync_cron"`
+	// Note 是 ListRepositoriesByServices 查询返回的 Note 值。
+	Note *string `json:"note"`
+	// WebhookSecretHash 是 ListRepositoriesByServices 查询返回的 WebhookSecretHash 值。
+	WebhookSecretHash []byte `json:"webhook_secret_hash"`
+	// Health 是 ListRepositoriesByServices 查询返回的 Health 值。
+	Health []byte `json:"health"`
+	// Revision 是 ListRepositoriesByServices 查询返回的 Revision 值。
+	Revision int64 `json:"revision"`
+	// DeletedAt 是 ListRepositoriesByServices 查询返回的 DeletedAt 值。
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	// CreatedAt 是 ListRepositoriesByServices 查询返回的 CreatedAt 值。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt 是 ListRepositoriesByServices 查询返回的 UpdatedAt 值。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// ListRepositoriesByServices 执行生成的 ListRepositoriesByServices 数据库查询。
+// 批量返回拥有指定服务的仓库，供搜索命中投影 owning repository 去 N+1。
+func (q *Queries) ListRepositoriesByServices(ctx context.Context, arg ListRepositoriesByServicesParams) ([]ListRepositoriesByServicesRow, error) {
+	rows, err := q.db.Query(ctx, listRepositoriesByServices, arg.TenantID, arg.ServiceIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListRepositoriesByServicesRow{}
+	for rows.Next() {
+		var i ListRepositoriesByServicesRow
+		if err := rows.Scan(
+			&i.ServiceID,
+			&i.TenantID,
+			&i.ID,
+			&i.Url,
+			&i.CanonicalUrl,
+			&i.CredentialID,
+			&i.GlobalCredentialID,
+			&i.DefaultBranch,
+			&i.BranchPolicy,
+			&i.FetchConfig,
+			&i.SyncCron,
+			&i.Note,
+			&i.WebhookSecretHash,
+			&i.Health,
+			&i.Revision,
+			&i.DeletedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listSearchableAssetItems = `-- name: ListSearchableAssetItems :many
@@ -322,6 +389,63 @@ func (q *Queries) ListSearchableAssetItems(ctx context.Context, arg ListSearchab
 	return items, nil
 }
 
+const listServicesByIDs = `-- name: ListServicesByIDs :many
+SELECT tenant_id, id, repository_id, slug, display_name, description, root_dir, language, framework, owners, maintainers, lifecycle, visibility, revision, deleted_at, created_at, updated_at
+FROM services
+WHERE tenant_id = $1
+  AND id = ANY($2::uuid[])
+  AND deleted_at IS NULL
+ORDER BY id
+`
+
+// ListServicesByIDsParams 包含 ListServicesByIDs 查询的强类型参数。
+type ListServicesByIDsParams struct {
+	// TenantID 是提供给 ListServicesByIDs 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// Ids 是提供给 ListServicesByIDs 查询的 Ids 值。
+	Ids []uuid.UUID `json:"ids"`
+}
+
+// ListServicesByIDs 执行生成的 ListServicesByIDs 数据库查询。
+// 批量返回租户内指定 id 的活跃服务，供搜索命中与服务校验去 N+1。
+func (q *Queries) ListServicesByIDs(ctx context.Context, arg ListServicesByIDsParams) ([]Service, error) {
+	rows, err := q.db.Query(ctx, listServicesByIDs, arg.TenantID, arg.Ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Service{}
+	for rows.Next() {
+		var i Service
+		if err := rows.Scan(
+			&i.TenantID,
+			&i.ID,
+			&i.RepositoryID,
+			&i.Slug,
+			&i.DisplayName,
+			&i.Description,
+			&i.RootDir,
+			&i.Language,
+			&i.Framework,
+			&i.Owners,
+			&i.Maintainers,
+			&i.Lifecycle,
+			&i.Visibility,
+			&i.Revision,
+			&i.DeletedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listSystemGroupMembers = `-- name: ListSystemGroupMembers :many
 SELECT tenant_id, group_id, service_id, created_at
 FROM system_group_members
@@ -342,6 +466,49 @@ type ListSystemGroupMembersParams struct {
 // 返回一条系统分组的成员服务。
 func (q *Queries) ListSystemGroupMembers(ctx context.Context, arg ListSystemGroupMembersParams) ([]SystemGroupMember, error) {
 	rows, err := q.db.Query(ctx, listSystemGroupMembers, arg.TenantID, arg.GroupID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SystemGroupMember{}
+	for rows.Next() {
+		var i SystemGroupMember
+		if err := rows.Scan(
+			&i.TenantID,
+			&i.GroupID,
+			&i.ServiceID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listSystemGroupMembersForGroups = `-- name: ListSystemGroupMembersForGroups :many
+SELECT tenant_id, group_id, service_id, created_at
+FROM system_group_members
+WHERE tenant_id = $1
+  AND group_id = ANY($2::uuid[])
+ORDER BY group_id, service_id
+`
+
+// ListSystemGroupMembersForGroupsParams 包含 ListSystemGroupMembersForGroups 查询的强类型参数。
+type ListSystemGroupMembersForGroupsParams struct {
+	// TenantID 是提供给 ListSystemGroupMembersForGroups 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// GroupIds 是提供给 ListSystemGroupMembersForGroups 查询的 GroupIds 值。
+	GroupIds []uuid.UUID `json:"group_ids"`
+}
+
+// ListSystemGroupMembersForGroups 执行生成的 ListSystemGroupMembersForGroups 数据库查询。
+// 批量返回多个分组的成员，供列表场景去 N+1。
+func (q *Queries) ListSystemGroupMembersForGroups(ctx context.Context, arg ListSystemGroupMembersForGroupsParams) ([]SystemGroupMember, error) {
+	rows, err := q.db.Query(ctx, listSystemGroupMembersForGroups, arg.TenantID, arg.GroupIds)
 	if err != nil {
 		return nil, err
 	}

@@ -46,9 +46,10 @@ type NewSystemGroup struct {
 type SystemGroupStore interface {
 	CreateSystemGroup(context.Context, NewSystemGroup) (SystemGroupRecord, error)
 	GetSystemGroup(context.Context, uuid.UUID, uuid.UUID) (SystemGroupRecord, error)
-	GetSystemGroupBySlug(context.Context, uuid.UUID, string) (SystemGroupRecord, error)
 	ListSystemGroups(context.Context, uuid.UUID) ([]SystemGroupRecord, error)
 	ListSystemGroupMembers(context.Context, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)
+	// ListSystemGroupMembersForGroups 一次批量返回多个分组的成员，供列表/搜索去 N+1。
+	ListSystemGroupMembersForGroups(context.Context, uuid.UUID, []uuid.UUID) (map[uuid.UUID][]uuid.UUID, error)
 	ReplaceSystemGroupMembers(context.Context, uuid.UUID, uuid.UUID, []uuid.UUID) error
 	BumpSystemGroupRevision(context.Context, uuid.UUID, uuid.UUID, int64) error
 	// ListServicesByIDs 按 ID 返回租户内服务，按 ID 排序。

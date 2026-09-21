@@ -40,15 +40,6 @@ func (store *SystemGroupStore) GetSystemGroup(ctx context.Context, tenantID, id 
 	return systemGroupFromRow(row), nil
 }
 
-// GetSystemGroupBySlug 按 slug 返回一条系统分组。
-func (store *SystemGroupStore) GetSystemGroupBySlug(ctx context.Context, tenantID uuid.UUID, slug string) (service.SystemGroupRecord, error) {
-	row, err := store.queries.GetSystemGroupBySlug(ctx, generated.GetSystemGroupBySlugParams{TenantID: tenantID, Slug: slug})
-	if err != nil {
-		return service.SystemGroupRecord{}, normalizeError(err)
-	}
-	return systemGroupFromRow(row), nil
-}
-
 // ListSystemGroups 列出租户内的全部系统分组。
 func (store *SystemGroupStore) ListSystemGroups(ctx context.Context, tenantID uuid.UUID) ([]service.SystemGroupRecord, error) {
 	rows, err := store.queries.ListSystemGroups(ctx, tenantID)
@@ -73,6 +64,19 @@ func (store *SystemGroupStore) ListSystemGroupMembers(ctx context.Context, tenan
 		ids = append(ids, row.ServiceID)
 	}
 	return ids, nil
+}
+
+// ListSystemGroupMembersForGroups 一次批量返回多个分组的成员，避免逐组查询的 N+1 往返。
+func (store *SystemGroupStore) ListSystemGroupMembersForGroups(ctx context.Context, tenantID uuid.UUID, groupIDs []uuid.UUID) (map[uuid.UUID][]uuid.UUID, error) {
+	rows, err := store.queries.ListSystemGroupMembersForGroups(ctx, generated.ListSystemGroupMembersForGroupsParams{TenantID: tenantID, GroupIds: groupIDs})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	members := make(map[uuid.UUID][]uuid.UUID, len(groupIDs))
+	for _, row := range rows {
+		members[row.GroupID] = append(members[row.GroupID], row.ServiceID)
+	}
+	return members, nil
 }
 
 // ReplaceSystemGroupMembers 原子地替换某一分组的成员。
@@ -111,14 +115,14 @@ func (store *SystemGroupStore) BumpSystemGroupRevision(ctx context.Context, tena
 	return nil
 }
 
-// ListServicesByIDs 在租户内按 id 返回服务，按 id 排序。
+// ListServicesByIDs 在租户内按 id 批量返回服务（单条查询，避免逐 id 的 N+1）。
 func (store *SystemGroupStore) ListServicesByIDs(ctx context.Context, tenantID uuid.UUID, ids []uuid.UUID) ([]service.ServiceRecord, error) {
-	services := make([]service.ServiceRecord, 0, len(ids))
-	for _, id := range ids {
-		row, err := store.queries.GetServiceByID(ctx, generated.GetServiceByIDParams{TenantID: tenantID, ID: id})
-		if err != nil {
-			return nil, normalizeError(err)
-		}
+	rows, err := store.queries.ListServicesByIDs(ctx, generated.ListServicesByIDsParams{TenantID: tenantID, Ids: ids})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	services := make([]service.ServiceRecord, 0, len(rows))
+	for _, row := range rows {
 		services = append(services, serviceRecordFromRow(row))
 	}
 	return services, nil

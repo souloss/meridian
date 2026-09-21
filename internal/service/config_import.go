@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"slices"
 	"strings"
 	"time"
 	"uuid"
@@ -335,23 +334,7 @@ func assetNameTemplateOrDefault(asset ConfigAsset) string {
 }
 
 func (imports *ConfigImport) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || imports.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := imports.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil || !roleAllows(membership.Role, permission) {
-		if err != nil {
-			return Membership{}, err
-		}
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, imports.identities)
 }
 
 var _ = io.Discard

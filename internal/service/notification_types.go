@@ -147,10 +147,11 @@ type NotificationPageRecord struct {
 // NotificationStore 是 M5 订阅、通知通道与站内通知的持久化边界。
 type NotificationStore interface {
 	UpsertSubscription(context.Context, PutSubscriptionInput) (SubscriptionRecord, error)
-	GetSubscription(context.Context, uuid.UUID, uuid.UUID) (SubscriptionRecord, error)
 	ListSubscriptions(context.Context, uuid.UUID, uuid.UUID) ([]SubscriptionRecord, error)
 	ReplaceSubscriptionChannels(context.Context, uuid.UUID, uuid.UUID, []uuid.UUID) error
 	ListSubscriptionChannels(context.Context, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)
+	// ListSubscriptionChannelsForSubscriptions 批量返回多个订阅的通道关联，供列表去 N+1。
+	ListSubscriptionChannelsForSubscriptions(context.Context, uuid.UUID, []uuid.UUID) (map[uuid.UUID][]uuid.UUID, error)
 	ListNotificationChannels(context.Context, uuid.UUID) ([]NotificationChannelRecord, error)
 	CreateNotificationChannel(context.Context, NewNotificationChannel) (NotificationChannelRecord, error)
 	GetNotificationChannel(context.Context, uuid.UUID, uuid.UUID) (NotificationChannelRecord, error)

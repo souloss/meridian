@@ -9,8 +9,8 @@ package service
 const (
 	// notificationChannelKindInApp 是站内通知通道。
 	notificationChannelKindInApp = "in_app"
-	// notificationChannelKindWebhook 是外发 Webhook 通道。
-	notificationChannelKindWebhook = "webhook"
+	// NotificationChannelKindWebhook 是外发 Webhook 通道（导出供 repository 复用列值）。
+	NotificationChannelKindWebhook = "webhook"
 	// notificationChannelKindEmail 是邮件通道（部署管理 SMTP）。
 	notificationChannelKindEmail = "email"
 )
@@ -37,16 +37,6 @@ const (
 	notificationNameMaxRunes = 64
 	// notificationWebhookSecretMinBytes 是 Webhook 通道秘密的最小字节长度。
 	notificationWebhookSecretMinBytes = 32
-	// notificationEndpointMaxRunes 是通道端点字符串的最大长度。
-	notificationEndpointMaxRunes = 2048
-)
-
-// 站内通知正文键（i18n 消息键，按通知类型区分）。
-const (
-	// notificationTitleVersionPublished 是版本发布通知的标题键。
-	notificationTitleVersionPublished = "notification.version_published.title"
-	// notificationTitleVersionBreaking 是版本破坏性变更通知的标题键。
-	notificationTitleVersionBreaking = "notification.version_breaking.title"
 )
 
 // 领域事件类型枚举（contracts/events.yaml channels 注册的七类事件）。
@@ -57,6 +47,8 @@ const (
 	domainEventVersionBreaking = "version.breaking"
 	// domainEventCollectFailed 是采集失败事件（collect.failed）。
 	domainEventCollectFailed = "collect.failed"
+	// DomainEventCollectFailed 是采集失败事件的导出别名（供 repository 复用列值）。
+	DomainEventCollectFailed = domainEventCollectFailed
 	// domainEventServiceDeprecated 是服务弃用事件（service.deprecated）。
 	domainEventServiceDeprecated = "service.deprecated"
 	// domainEventAiLayerGenerated 是 AI 层生成事件（ai_layer.generated）。

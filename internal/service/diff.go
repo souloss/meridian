@@ -342,23 +342,7 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 }
 
 func (diff *DiffService) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!containsString(actor.Scopes, permission) && !containsString(actor.Scopes, scopeWildcard)) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || diff.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := diff.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil || !roleAllows(membership.Role, permission) {
-		if err != nil {
-			return Membership{}, err
-		}
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, diff.identities)
 }
 
 func (diff *DiffService) storeBlob(ctx context.Context, outcome DiffOutcome) (string, error) {

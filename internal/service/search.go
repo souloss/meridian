@@ -48,6 +48,9 @@ func (search *Search) Run(ctx context.Context, actor Principal, tenantSlug strin
 	if err != nil {
 		return SearchResultRecord{}, err
 	}
+	// 批量预取命中条目的服务与仓库，避免逐命中 GetServiceByID/GetRepositoryByService 的 N+1 往返。
+	serviceRefs := search.serviceRefs(ctx, membership.TenantID, items)
+	repositoryRefs := search.repositoryRefs(ctx, membership.TenantID, serviceRefs)
 	hits := make([]SearchHitRecord, 0, len(items))
 	for _, item := range items {
 		hit := SearchHitRecord{
@@ -59,12 +62,10 @@ func (search *Search) Run(ctx context.Context, actor Principal, tenantSlug strin
 			},
 			Highlights: search.highlights(item),
 		}
-		serviceRef, serviceErr := search.serviceRef(ctx, membership.TenantID, item.ServiceID)
-		if serviceErr == nil {
+		if serviceRef, ok := serviceRefs[item.ServiceID]; ok {
 			hit.Service = &serviceRef
-			repo, repoErr := search.repositoryRef(ctx, membership.TenantID, serviceRef.ID)
-			if repoErr == nil {
-				hit.Repository = repo
+			if repository, repoOK := repositoryRefs[item.ServiceID]; repoOK {
+				hit.Repository = repository
 			}
 			hit.Subtitle = stringPtrOrNil(serviceRef.Slug)
 		}
@@ -76,20 +77,42 @@ func (search *Search) Run(ctx context.Context, actor Principal, tenantSlug strin
 	}, nil
 }
 
-func (search *Search) serviceRef(ctx context.Context, tenantID, serviceID uuid.UUID) (ServiceRef, error) {
-	service, err := search.store.GetServiceByID(ctx, tenantID, serviceID)
-	if err != nil {
-		return ServiceRef{}, err
+// serviceRefs 一次查询返回全部命中条目所属服务的引用，按服务 ID 索引。
+func (search *Search) serviceRefs(ctx context.Context, tenantID uuid.UUID, items []AssetItemRecord) map[uuid.UUID]ServiceRef {
+	serviceIDs := make([]uuid.UUID, 0, len(items))
+	seen := make(map[uuid.UUID]bool, len(items))
+	for _, item := range items {
+		if !seen[item.ServiceID] {
+			seen[item.ServiceID] = true
+			serviceIDs = append(serviceIDs, item.ServiceID)
+		}
 	}
-	return ServiceRef{ID: service.ID, Slug: service.Slug, DisplayName: service.DisplayName}, nil
+	services, err := search.store.ListServicesByIDs(ctx, tenantID, serviceIDs)
+	if err != nil {
+		return map[uuid.UUID]ServiceRef{}
+	}
+	refs := make(map[uuid.UUID]ServiceRef, len(services))
+	for _, service := range services {
+		refs[service.ID] = ServiceRef{ID: service.ID, Slug: service.Slug, DisplayName: service.DisplayName}
+	}
+	return refs
 }
 
-func (search *Search) repositoryRef(ctx context.Context, tenantID, serviceID uuid.UUID) (RepositoryRef, error) {
-	repository, err := search.store.GetRepositoryByService(ctx, tenantID, serviceID)
-	if err != nil {
-		return RepositoryRef{}, err
+// repositoryRefs 一次查询返回全部命中服务所属仓库的引用，按服务 ID 索引。
+func (search *Search) repositoryRefs(ctx context.Context, tenantID uuid.UUID, serviceRefs map[uuid.UUID]ServiceRef) map[uuid.UUID]RepositoryRef {
+	serviceIDs := make([]uuid.UUID, 0, len(serviceRefs))
+	for serviceID := range serviceRefs {
+		serviceIDs = append(serviceIDs, serviceID)
 	}
-	return RepositoryRef{ID: repository.ID, DefaultBranch: repository.DefaultBranch}, nil
+	repositories, err := search.store.ListRepositoriesByServices(ctx, tenantID, serviceIDs)
+	if err != nil {
+		return map[uuid.UUID]RepositoryRef{}
+	}
+	refs := make(map[uuid.UUID]RepositoryRef, len(repositories))
+	for serviceID, repository := range repositories {
+		refs[serviceID] = RepositoryRef{ID: repository.ID, DefaultBranch: repository.DefaultBranch}
+	}
+	return refs
 }
 
 func (search *Search) highlights(item AssetItemRecord) map[string][]string {
@@ -123,23 +146,7 @@ func (search *Search) facets(ctx context.Context, tenantID uuid.UUID, filter Sea
 }
 
 func (search *Search) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!containsString(actor.Scopes, permission) && !containsString(actor.Scopes, scopeWildcard)) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || search.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := search.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil || !roleAllows(membership.Role, permission) {
-		if err != nil {
-			return Membership{}, err
-		}
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, search.identities)
 }
 
 func mapKeys(values map[uuid.UUID]bool) []uuid.UUID {

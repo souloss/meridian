@@ -48,14 +48,14 @@ func (s *Server) CreateNotificationChannel(ctx context.Context, request collabor
 		Kind:     string(request.Body.Kind),
 		Name:     request.Body.Name,
 		Endpoint: optionalString(request.Body.Endpoint),
-		Secret:   optionalStringValue(request.Body.Secret),
+		Secret:   stringValue(optionalString(request.Body.Secret)),
 		Enabled:  request.Body.Enabled,
 	})
 	if err != nil {
 		return nil, err
 	}
 	body := notificationChannelResponse(record)
-	etag := api.ETag(revisionETag(etagKindNotificationChannel, record.ID.String(), record.Revision))
+	etag := notificationChannelETag(record)
 	return collaboration.CreateNotificationChannel201JSONResponse{
 		Body:    body,
 		Headers: collaboration.CreateNotificationChannel201ResponseHeaders{Etag: &etag},
@@ -105,7 +105,7 @@ func (s *Server) UpdateNotificationChannel(ctx context.Context, request collabor
 		return nil, err
 	}
 	body := notificationChannelResponse(record)
-	etag := api.ETag(revisionETag(etagKindNotificationChannel, record.ID.String(), record.Revision))
+	etag := notificationChannelETag(record)
 	return collaboration.UpdateNotificationChannel200JSONResponse{
 		Body:    body,
 		Headers: collaboration.UpdateNotificationChannel200ResponseHeaders{Etag: &etag},
@@ -130,7 +130,7 @@ func (s *Server) RotateNotificationChannelSecret(ctx context.Context, request co
 		return nil, err
 	}
 	body := notificationChannelResponse(record)
-	etag := api.ETag(revisionETag(etagKindNotificationChannel, record.ID.String(), record.Revision))
+	etag := notificationChannelETag(record)
 	return collaboration.RotateNotificationChannelSecret200JSONResponse{
 		Body:    body,
 		Headers: collaboration.RotateNotificationChannelSecret200ResponseHeaders{Etag: &etag},
@@ -283,7 +283,7 @@ func notificationChannelResponse(record service.NotificationChannelRecord) api.N
 	}
 	return api.NotificationChannel{
 		Id:               api.Uuid(record.ID),
-		Etag:             api.ETag(revisionETag(etagKindNotificationChannel, record.ID.String(), record.Revision)),
+		Etag:             notificationChannelETag(record),
 		Name:             record.Name,
 		Kind:             api.NotificationChannelKind(record.Kind),
 		Enabled:          record.Enabled,
@@ -292,6 +292,11 @@ func notificationChannelResponse(record service.NotificationChannelRecord) api.N
 		CreatedAt:        api.Timestamp(record.CreatedAt),
 		UpdatedAt:        api.Timestamp(record.UpdatedAt),
 	}
+}
+
+// notificationChannelETag 构造一条通知通道的弱 ETag（实体类型 + ID + revision）。
+func notificationChannelETag(record service.NotificationChannelRecord) api.ETag {
+	return api.ETag(revisionETag(etagKindNotificationChannel, record.ID.String(), record.Revision))
 }
 
 // notificationResponse 将通知记录投影为 API 形状并渲染本地化标题/正文。
@@ -361,13 +366,6 @@ func parseChannelETag(etag string, channelID uuid.UUID) (int64, error) {
 		return 0, service.ErrPrecondition
 	}
 	return revision, nil
-}
-
-func optionalStringValue(value nullable.Nullable[string]) string {
-	if !value.IsSpecified() || value.IsNull() {
-		return ""
-	}
-	return value.MustGet()
 }
 
 func serviceUUIDValue(text string) uuid.UUID {

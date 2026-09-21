@@ -390,6 +390,19 @@ func (store *AssetStore) GetServiceByID(ctx context.Context, tenantID, id uuid.U
 	return serviceRecordFromRow(row), nil
 }
 
+// ListServicesByIDs 在租户内按 id 批量返回活跃服务，供搜索命中去 N+1。
+func (store *AssetStore) ListServicesByIDs(ctx context.Context, tenantID uuid.UUID, ids []uuid.UUID) ([]service.ServiceRecord, error) {
+	rows, err := store.queries.ListServicesByIDs(ctx, generated.ListServicesByIDsParams{TenantID: tenantID, Ids: ids})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	services := make([]service.ServiceRecord, 0, len(rows))
+	for _, row := range rows {
+		services = append(services, serviceRecordFromRow(row))
+	}
+	return services, nil
+}
+
 // GetRepositoryByService 返回拥有某一服务的仓库。
 func (store *AssetStore) GetRepositoryByService(ctx context.Context, tenantID, serviceID uuid.UUID) (service.RepositoryRecord, error) {
 	row, err := store.queries.GetRepositoryByService(ctx, generated.GetRepositoryByServiceParams{TenantID: tenantID, ServiceID: serviceID})
@@ -397,6 +410,30 @@ func (store *AssetStore) GetRepositoryByService(ctx context.Context, tenantID, s
 		return service.RepositoryRecord{}, normalizeError(err)
 	}
 	return repositoryFromRow(row)
+}
+
+// ListRepositoriesByServices 批量返回拥有指定服务的仓库，供搜索命中去 N+1。
+// 单行配置解码失败时跳过该行，与逐条 GetRepositoryByService 的容错口径一致。
+func (store *AssetStore) ListRepositoriesByServices(ctx context.Context, tenantID uuid.UUID, serviceIDs []uuid.UUID) (map[uuid.UUID]service.RepositoryRecord, error) {
+	rows, err := store.queries.ListRepositoriesByServices(ctx, generated.ListRepositoriesByServicesParams{TenantID: tenantID, ServiceIds: serviceIDs})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	repositories := make(map[uuid.UUID]service.RepositoryRecord, len(rows))
+	for _, row := range rows {
+		record, decodeErr := repositoryFromRow(generated.Repository{
+			TenantID: row.TenantID, ID: row.ID, Url: row.Url, CanonicalUrl: row.CanonicalUrl,
+			CredentialID: row.CredentialID, GlobalCredentialID: row.GlobalCredentialID, DefaultBranch: row.DefaultBranch,
+			BranchPolicy: row.BranchPolicy, FetchConfig: row.FetchConfig, SyncCron: row.SyncCron, Note: row.Note,
+			WebhookSecretHash: row.WebhookSecretHash, Health: row.Health, Revision: row.Revision,
+			DeletedAt: row.DeletedAt, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt,
+		})
+		if decodeErr != nil {
+			continue
+		}
+		repositories[row.ServiceID] = record
+	}
+	return repositories, nil
 }
 
 // ListSystemGroupMembers 返回某一系统分组的成员服务 id。

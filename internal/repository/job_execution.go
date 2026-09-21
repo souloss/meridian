@@ -165,7 +165,7 @@ func appendJobFailureFacts(ctx context.Context, queries *generated.Queries, inpu
 	}
 	eventID := uuid.NewV7()
 	payload, err := json.Marshal(collectFailedEnvelope{
-		EventID: eventID, EventType: collectFailedEventType, OccurredAt: input.FinishedAt.UTC(),
+		EventID: eventID, EventType: service.DomainEventCollectFailed, OccurredAt: input.FinishedAt.UTC(),
 		TenantSlug: tenantSlug, AggregateType: collectFailedAggregateType, AggregateID: input.JobID,
 		AggregateVersion: input.ExpectedAttempt,
 		Payload: collectFailedPayload{
@@ -177,7 +177,7 @@ func appendJobFailureFacts(ctx context.Context, queries *generated.Queries, inpu
 	}
 	for _, channelID := range channelIDs {
 		if _, err := queries.CreateNotifyOutbox(ctx, generated.CreateNotifyOutboxParams{
-			TenantID: input.TenantID, ID: uuid.NewV7(), EventID: eventID, EventType: collectFailedEventType,
+			TenantID: input.TenantID, ID: uuid.NewV7(), EventID: eventID, EventType: service.DomainEventCollectFailed,
 			AggregateID: input.JobID, AggregateVersion: int64(input.ExpectedAttempt), Payload: payload,
 			ChannelID: channelID,
 		}); err != nil {

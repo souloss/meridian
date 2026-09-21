@@ -9,13 +9,6 @@ ON CONFLICT (tenant_id, user_id, target_type, target_id)
 DO UPDATE SET events = EXCLUDED.events, enabled = EXCLUDED.enabled, updated_at = now()
 RETURNING *;
 
--- 返回一条订阅（按 id）。
--- name: GetSubscription :one
-SELECT *
-FROM subscriptions
-WHERE tenant_id = sqlc.arg(tenant_id)
-  AND id = sqlc.arg(id);
-
 -- 替换一条订阅的通道关联：先删除再按序重建。
 -- name: ReplaceSubscriptionChannels :execrows
 WITH deleted AS (
@@ -44,6 +37,14 @@ FROM subscription_channels
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND subscription_id = sqlc.arg(subscription_id)
 ORDER BY channel_id;
+
+-- 批量返回多个订阅的通道关联，供列表场景去 N+1。
+-- name: ListSubscriptionChannelsForSubscriptions :many
+SELECT subscription_id, channel_id
+FROM subscription_channels
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND subscription_id = ANY(sqlc.arg(subscription_ids)::uuid[])
+ORDER BY subscription_id, channel_id;
 
 -- 返回匹配某一作用域与事件类型的启用订阅及通道（供事件路由）。
 -- tenant 作用域匹配一切；service/asset/asset_kind/system_group 按对应目标匹配。
@@ -128,7 +129,7 @@ ORDER BY created_at DESC, id DESC
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
--- 统计某用户的通知总数与未读数。
+-- 统计某用户的通知总数与未读数（独立于分页，未读数不受 unread_only 影响）。
 -- name: CountNotifications :one
 SELECT count(*)::bigint AS total,
        count(*) FILTER (WHERE read_at IS NULL)::bigint AS unread

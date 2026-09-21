@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"slices"
 	"strings"
-	"time"
 	"unicode/utf8"
 	"uuid"
 )
@@ -15,12 +14,11 @@ type Notifications struct {
 	store      NotificationStore
 	identities IdentityStore
 	keyring    CredentialKeyring
-	now        func() time.Time
 }
 
 // NewNotifications 构造由调用方持有持久化与密钥材料的通知用例。
 func NewNotifications(store NotificationStore, identities IdentityStore, keyring CredentialKeyring) *Notifications {
-	return &Notifications{store: store, identities: identities, keyring: keyring, now: time.Now}
+	return &Notifications{store: store, identities: identities, keyring: keyring}
 }
 
 // PutSubscription 创建或替换一条订阅，校验作用域目标与可见启用通道。
@@ -74,22 +72,49 @@ func (notifications *Notifications) ListSubscriptions(ctx context.Context, actor
 	if err != nil {
 		return nil, err
 	}
+	subscriptionIDs := make([]uuid.UUID, 0, len(records))
+	for _, record := range records {
+		subscriptionIDs = append(subscriptionIDs, record.ID)
+	}
+	channels, err := notifications.store.ListSubscriptionChannelsForSubscriptions(ctx, membership.TenantID, subscriptionIDs)
+	if err != nil {
+		return nil, err
+	}
 	for index := range records {
-		channels, channelErr := notifications.store.ListSubscriptionChannels(ctx, membership.TenantID, records[index].ID)
-		if channelErr == nil {
-			records[index].ChannelIDs = channels
-		}
+		records[index].ChannelIDs = channels[records[index].ID]
 	}
 	return records, nil
 }
 
-// ListNotificationChannels 返回租户内全部通知通道（不含秘密）。
+// ListNotificationChannels 返回租户内全部通知通道，并从加密配置派生端点与秘密状态。
 func (notifications *Notifications) ListNotificationChannels(ctx context.Context, actor Principal, tenantSlug string) ([]NotificationChannelRecord, error) {
 	membership, err := notifications.tenantMembership(ctx, actor, tenantSlug, scopeTenantSettingsRead)
 	if err != nil {
 		return nil, err
 	}
-	return notifications.store.ListNotificationChannels(ctx, membership.TenantID)
+	records, err := notifications.store.ListNotificationChannels(ctx, membership.TenantID)
+	if err != nil {
+		return nil, err
+	}
+	for index := range records {
+		notifications.decryptChannelProjection(membership.TenantID, &records[index])
+	}
+	return records, nil
+}
+
+// decryptChannelProjection 从加密配置派生端点与秘密状态，作为通道投影的唯一事实来源。
+func (notifications *Notifications) decryptChannelProjection(tenantID uuid.UUID, record *NotificationChannelRecord) {
+	if len(record.EncryptedConfig) == 0 {
+		return
+	}
+	cfg, err := notifications.keyring.openChannelConfig(tenantID, record.ID, record.EncryptedConfig)
+	if err != nil {
+		return
+	}
+	if cfg.Endpoint != "" {
+		record.Endpoint = &cfg.Endpoint
+	}
+	record.SecretConfigured = cfg.Secret != ""
 }
 
 // CreateNotificationChannel 校验通道类别与配置并加密后持久化。
@@ -112,7 +137,7 @@ func (notifications *Notifications) CreateNotificationChannel(ctx context.Contex
 	if err != nil {
 		return NotificationChannelRecord{}, err
 	}
-	record.SecretConfigured = cfg.Secret != ""
+	notifications.decryptChannelProjection(membership.TenantID, &record)
 	return record, nil
 }
 
@@ -140,9 +165,14 @@ func (notifications *Notifications) UpdateNotificationChannel(ctx context.Contex
 	if err := validateChannelName(name); err != nil {
 		return NotificationChannelRecord{}, err
 	}
-	return notifications.store.UpdateNotificationChannel(ctx, NotificationChannelPatch{
+	record, err := notifications.store.UpdateNotificationChannel(ctx, NotificationChannelPatch{
 		TenantID: membership.TenantID, ID: patch.ID, ExpectedRevision: patch.ExpectedRevision, Name: &name, Enabled: &enabled,
 	})
+	if err != nil {
+		return NotificationChannelRecord{}, err
+	}
+	notifications.decryptChannelProjection(membership.TenantID, &record)
+	return record, nil
 }
 
 // RotateNotificationChannelSecret 轮换 Webhook 通道秘密（仅 webhook 类别允许）。
@@ -155,7 +185,7 @@ func (notifications *Notifications) RotateNotificationChannelSecret(ctx context.
 	if err != nil {
 		return NotificationChannelRecord{}, err
 	}
-	if current.Kind != notificationChannelKindWebhook {
+	if current.Kind != NotificationChannelKindWebhook {
 		return NotificationChannelRecord{}, ErrInvalidState
 	}
 	if expectedRevision != current.Revision {
@@ -164,12 +194,19 @@ func (notifications *Notifications) RotateNotificationChannelSecret(ctx context.
 	if len([]byte(secret)) < notificationWebhookSecretMinBytes {
 		return NotificationChannelRecord{}, ErrValidation
 	}
+	// 复用既有端点：端点随加密配置存储，轮换仅替换秘密。
+	notifications.decryptChannelProjection(membership.TenantID, &current)
 	cfg := notificationChannelConfig{Endpoint: endpointOrEmpty(current.Endpoint), Secret: secret}
 	encrypted, err := notifications.keyring.sealChannelConfig(membership.TenantID, channelID, cfg)
 	if err != nil {
 		return NotificationChannelRecord{}, err
 	}
-	return notifications.store.RotateNotificationChannelSecret(ctx, membership.TenantID, channelID, expectedRevision, encrypted)
+	record, err := notifications.store.RotateNotificationChannelSecret(ctx, membership.TenantID, channelID, expectedRevision, encrypted)
+	if err != nil {
+		return NotificationChannelRecord{}, err
+	}
+	notifications.decryptChannelProjection(membership.TenantID, &record)
+	return record, nil
 }
 
 // ListNotifications 分页返回认证用户的站内通知。
@@ -252,7 +289,7 @@ func validateChannelInput(kind, name string, endpoint *string, secret string) (n
 		if endpoint != nil || secret != "" {
 			return notificationChannelConfig{}, ErrValidation
 		}
-	case notificationChannelKindWebhook:
+	case NotificationChannelKindWebhook:
 		if endpoint == nil || *endpoint == "" {
 			return notificationChannelConfig{}, ErrValidation
 		}
@@ -333,26 +370,7 @@ func validDomainEventType(eventType string) bool {
 }
 
 func (notifications *Notifications) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) {
-			return Membership{}, ErrNotFound
-		}
-		if !slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || notifications.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := notifications.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil {
-		return Membership{}, err
-	}
-	if !roleAllows(membership.Role, permission) {
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, notifications.identities)
 }
 
 func endpointOrEmpty(endpoint *string) string {

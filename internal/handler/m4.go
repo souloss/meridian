@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
 	"github.com/meridian-labs/meridian/internal/generated/api/diff"
@@ -51,7 +50,7 @@ func (s *Server) CreateSystemGroup(ctx context.Context, request view.CreateSyste
 	}
 	record, err := s.systemGroups.CreateSystemGroup(ctx, principal, string(request.TenantSlug), service.SystemGroupCreateInput{
 		Slug: string(request.Body.Slug), DisplayName: request.Body.DisplayName,
-		Description: nullableStringValue(request.Body.Description), ServiceIDs: uuidSlice(request.Body.ServiceIds),
+		Description: nullableStringValue(request.Body.Description), ServiceIDs: apiUUIDs(request.Body.ServiceIds),
 	})
 	if err != nil {
 		return nil, err
@@ -73,7 +72,7 @@ func (s *Server) PutSystemGroupMembers(ctx context.Context, request view.PutSyst
 	}
 	record, err := s.systemGroups.PutSystemGroupMembers(
 		ctx, principal, string(request.TenantSlug), serviceUUID(request.GroupId),
-		request.Params.IfMatch, uuidSlice(&request.Body.ServiceIds),
+		request.Params.IfMatch, apiUUIDs(&request.Body.ServiceIds),
 	)
 	if err != nil {
 		return nil, err
@@ -87,13 +86,13 @@ func (s *Server) PutSystemGroupMembers(ctx context.Context, request view.PutSyst
 func searchFilterInput(filter api.SearchFilter) service.SearchFilter {
 	out := service.SearchFilter{}
 	if filter.RepositoryIds != nil {
-		out.RepositoryIDs = uuidSlice(filter.RepositoryIds)
+		out.RepositoryIDs = apiUUIDs(filter.RepositoryIds)
 	}
 	if filter.ServiceIds != nil {
-		out.ServiceIDs = uuidSlice(filter.ServiceIds)
+		out.ServiceIDs = apiUUIDs(filter.ServiceIds)
 	}
 	if filter.GroupIds != nil {
-		out.GroupIDs = uuidSlice(filter.GroupIds)
+		out.GroupIDs = apiUUIDs(filter.GroupIds)
 	}
 	if filter.Kinds != nil {
 		for _, kind := range *filter.Kinds {
@@ -184,15 +183,4 @@ func systemGroupResponse(record service.SystemGroupRecord) api.SystemGroup {
 		Slug: api.Slug(record.Slug), DisplayName: record.DisplayName, Description: description,
 		ServiceIds: serviceIDs, Capabilities: api.CapabilityList{}, CreatedAt: record.CreatedAt, UpdatedAt: record.UpdatedAt,
 	}
-}
-
-func uuidSlice(values *[]api.Uuid) []uuid.UUID {
-	if values == nil {
-		return nil
-	}
-	out := make([]uuid.UUID, 0, len(*values))
-	for _, value := range *values {
-		out = append(out, serviceUUID(value))
-	}
-	return out
 }

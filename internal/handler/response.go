@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/meridian-labs/meridian/internal/i18n"
+	"github.com/meridian-labs/meridian/internal/service"
 )
 
 // requestIDHeader 把 chi 请求中间件生成的请求 ID 写入响应头。
@@ -18,7 +19,7 @@ func requestIDHeader(next http.Handler) http.Handler {
 
 // notFound 返回统一的 404 错误响应（资源不存在或无权访问）。
 func (s *Server) notFound(w http.ResponseWriter, r *http.Request) {
-	writeError(w, r, http.StatusNotFound, errorCodeNotFound, nil)
+	writeError(w, r, http.StatusNotFound, service.ErrorCodeNotFound, nil)
 }
 
 // writeError 按请求语言渲染错误码对应的消息并返回错误响应。

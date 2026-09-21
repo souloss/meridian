@@ -36,7 +36,7 @@ type CountNotificationsRow struct {
 }
 
 // CountNotifications 执行生成的 CountNotifications 数据库查询。
-// 统计某用户的通知总数与未读数。
+// 统计某用户的通知总数与未读数（独立于分页，未读数不受 unread_only 影响）。
 func (q *Queries) CountNotifications(ctx context.Context, arg CountNotificationsParams) (CountNotificationsRow, error) {
 	row := q.db.QueryRow(ctx, countNotifications, arg.TenantID, arg.UserID)
 	var i CountNotificationsRow
@@ -203,40 +203,6 @@ func (q *Queries) GetNotificationChannel(ctx context.Context, arg GetNotificatio
 		&i.EncryptedConfig,
 		&i.Enabled,
 		&i.Revision,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const getSubscription = `-- name: GetSubscription :one
-SELECT tenant_id, id, user_id, target_type, target_id, events, enabled, created_at, updated_at
-FROM subscriptions
-WHERE tenant_id = $1
-  AND id = $2
-`
-
-// GetSubscriptionParams 包含 GetSubscription 查询的强类型参数。
-type GetSubscriptionParams struct {
-	// TenantID 是提供给 GetSubscription 查询的 TenantID 值。
-	TenantID uuid.UUID `json:"tenant_id"`
-	// ID 是提供给 GetSubscription 查询的 ID 值。
-	ID uuid.UUID `json:"id"`
-}
-
-// GetSubscription 执行生成的 GetSubscription 数据库查询。
-// 返回一条订阅（按 id）。
-func (q *Queries) GetSubscription(ctx context.Context, arg GetSubscriptionParams) (Subscription, error) {
-	row := q.db.QueryRow(ctx, getSubscription, arg.TenantID, arg.ID)
-	var i Subscription
-	err := row.Scan(
-		&i.TenantID,
-		&i.ID,
-		&i.UserID,
-		&i.TargetType,
-		&i.TargetID,
-		&i.Events,
-		&i.Enabled,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -481,6 +447,52 @@ func (q *Queries) ListSubscriptionChannels(ctx context.Context, arg ListSubscrip
 			return nil, err
 		}
 		items = append(items, channel_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listSubscriptionChannelsForSubscriptions = `-- name: ListSubscriptionChannelsForSubscriptions :many
+SELECT subscription_id, channel_id
+FROM subscription_channels
+WHERE tenant_id = $1
+  AND subscription_id = ANY($2::uuid[])
+ORDER BY subscription_id, channel_id
+`
+
+// ListSubscriptionChannelsForSubscriptionsParams 包含 ListSubscriptionChannelsForSubscriptions 查询的强类型参数。
+type ListSubscriptionChannelsForSubscriptionsParams struct {
+	// TenantID 是提供给 ListSubscriptionChannelsForSubscriptions 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SubscriptionIds 是提供给 ListSubscriptionChannelsForSubscriptions 查询的 SubscriptionIds 值。
+	SubscriptionIds []uuid.UUID `json:"subscription_ids"`
+}
+
+// ListSubscriptionChannelsForSubscriptionsRow 包含 ListSubscriptionChannelsForSubscriptions 查询返回的列。
+type ListSubscriptionChannelsForSubscriptionsRow struct {
+	// SubscriptionID 是 ListSubscriptionChannelsForSubscriptions 查询返回的 SubscriptionID 值。
+	SubscriptionID uuid.UUID `json:"subscription_id"`
+	// ChannelID 是 ListSubscriptionChannelsForSubscriptions 查询返回的 ChannelID 值。
+	ChannelID uuid.UUID `json:"channel_id"`
+}
+
+// ListSubscriptionChannelsForSubscriptions 执行生成的 ListSubscriptionChannelsForSubscriptions 数据库查询。
+// 批量返回多个订阅的通道关联，供列表场景去 N+1。
+func (q *Queries) ListSubscriptionChannelsForSubscriptions(ctx context.Context, arg ListSubscriptionChannelsForSubscriptionsParams) ([]ListSubscriptionChannelsForSubscriptionsRow, error) {
+	rows, err := q.db.Query(ctx, listSubscriptionChannelsForSubscriptions, arg.TenantID, arg.SubscriptionIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListSubscriptionChannelsForSubscriptionsRow{}
+	for rows.Next() {
+		var i ListSubscriptionChannelsForSubscriptionsRow
+		if err := rows.Scan(&i.SubscriptionID, &i.ChannelID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

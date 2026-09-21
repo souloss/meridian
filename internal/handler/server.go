@@ -142,74 +142,74 @@ func (s *Server) Handler() http.Handler {
 }
 
 func requestErrorHandler(w http.ResponseWriter, r *http.Request, _ error) {
-	writeError(w, r, http.StatusBadRequest, errorCodeValidation, nil)
+	writeError(w, r, http.StatusBadRequest, service.ErrorCodeValidation, nil)
 }
 
 func responseErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 	var overlayErr *service.OverlayInvalidError
 	if quotaErr, ok := errors.AsType[*service.QuotaExceededError](err); ok {
-		writeErrorDetails(w, r, http.StatusConflict, errorCodeQuotaExceeded, map[string]any{
+		writeErrorDetails(w, r, http.StatusConflict, service.ErrorCodeQuotaExceeded, map[string]any{
 			"quota": quotaErr.Resource, "current": quotaErr.Current, "limit": quotaErr.Limit,
 		}, map[string]any{"Current": quotaErr.Current, "Limit": quotaErr.Limit})
 		return
 	}
 	switch {
 	case errors.Is(err, service.ErrUnauthenticated):
-		writeError(w, r, http.StatusUnauthorized, errorCodeUnauthenticated, nil)
+		writeError(w, r, http.StatusUnauthorized, service.ErrorCodeUnauthenticated, nil)
 		return
 	case errors.Is(err, service.ErrNotFound):
-		writeError(w, r, http.StatusNotFound, errorCodeNotFound, nil)
+		writeError(w, r, http.StatusNotFound, service.ErrorCodeNotFound, nil)
 		return
 	case errors.Is(err, service.ErrDuplicate):
-		writeError(w, r, http.StatusConflict, errorCodeDuplicate, nil)
+		writeError(w, r, http.StatusConflict, service.ErrorCodeDuplicate, nil)
 		return
 	case errors.As(err, &overlayErr):
-		writeErrorDetails(w, r, http.StatusUnprocessableEntity, errorCodeOverlayInvalid, overlayErrorDetails(overlayErr), nil)
+		writeErrorDetails(w, r, http.StatusUnprocessableEntity, service.ErrorCodeOverlayInvalid, overlayErrorDetails(overlayErr), nil)
 		return
 	case errors.Is(err, service.ErrValidation):
-		writeError(w, r, http.StatusUnprocessableEntity, errorCodeValidation, nil)
+		writeError(w, r, http.StatusUnprocessableEntity, service.ErrorCodeValidation, nil)
 		return
 	case errors.Is(err, service.ErrPrecondition):
-		writeError(w, r, http.StatusPreconditionFailed, errorCodePreconditionFailed, nil)
+		writeError(w, r, http.StatusPreconditionFailed, service.ErrorCodePreconditionFailed, nil)
 		return
 	case errors.Is(err, service.ErrCredentialInUse):
-		writeError(w, r, http.StatusConflict, errorCodeCredentialInUse, nil)
+		writeError(w, r, http.StatusConflict, service.ErrorCodeCredentialInUse, nil)
 		return
 	case errors.Is(err, service.ErrIdempotencyConflict):
-		writeError(w, r, http.StatusConflict, errorCodeIdempotencyConflict, nil)
+		writeError(w, r, http.StatusConflict, service.ErrorCodeIdempotencyConflict, nil)
 		return
 	case errors.Is(err, service.ErrJobNotCancellable):
-		writeError(w, r, http.StatusConflict, errorCodeJobNotCancellable, nil)
+		writeError(w, r, http.StatusConflict, service.ErrorCodeJobNotCancellable, nil)
 		return
 	case errors.Is(err, service.ErrJobNotRetryable):
-		writeError(w, r, http.StatusConflict, errorCodeInvalidState, nil)
+		writeError(w, r, http.StatusConflict, service.ErrorCodeInvalidState, nil)
 		return
 	case errors.Is(err, service.ErrViewInputMismatch):
-		writeError(w, r, http.StatusUnprocessableEntity, errorCodeInputSpecMismatch, nil)
+		writeError(w, r, http.StatusUnprocessableEntity, service.ErrorCodeInputSpecMismatch, nil)
 		return
 	case errors.Is(err, service.ErrBranchNotIndexed):
-		writeError(w, r, http.StatusUnprocessableEntity, errorCodeBranchNotIndexed, nil)
+		writeError(w, r, http.StatusUnprocessableEntity, service.ErrorCodeBranchNotIndexed, nil)
 		return
 	case errors.Is(err, service.ErrInvalidState):
-		writeError(w, r, http.StatusConflict, errorCodeInvalidState, nil)
+		writeError(w, r, http.StatusConflict, service.ErrorCodeInvalidState, nil)
 		return
 	case errors.Is(err, service.ErrBaseLayerExists):
-		writeError(w, r, http.StatusConflict, errorCodeBaseLayerExists, nil)
+		writeError(w, r, http.StatusConflict, service.ErrorCodeBaseLayerExists, nil)
 		return
 	case func() bool { _, ok := errors.AsType[*service.VersionNotPublishableError](err); return ok }():
-		writeErrorDetails(w, r, http.StatusConflict, errorCodeVersionNotPublishable, map[string]any{
+		writeErrorDetails(w, r, http.StatusConflict, service.ErrorCodeVersionNotPublishable, map[string]any{
 			"blockingRevisions": []any{}, "layerId": nil, "revisionId": nil, "reviewStatus": nil,
 		}, nil)
 		return
 	case errors.Is(err, api.ErrStrictOperationNotImplemented):
-		writeError(w, r, http.StatusNotImplemented, errorCodeInternal, nil)
+		writeError(w, r, http.StatusNotImplemented, service.ErrorCodeInternal, nil)
 		return
 	}
 	if _, ok := errors.AsType[*service.ProducerUnavailableError](err); ok {
-		writeError(w, r, http.StatusUnprocessableEntity, errorCodeProducerUnavailable, nil)
+		writeError(w, r, http.StatusUnprocessableEntity, service.ErrorCodeProducerUnavailable, nil)
 		return
 	}
-	writeError(w, r, http.StatusInternalServerError, errorCodeInternal, nil)
+	writeError(w, r, http.StatusInternalServerError, service.ErrorCodeInternal, nil)
 	slog.Error("unhandled response error", "error", err)
 }
 
@@ -222,7 +222,7 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 		Options: openapi3filter.Options{AuthenticationFunc: openapi3filter.NoopAuthenticationFunc},
 		ErrorHandlerWithOpts: func(_ context.Context, _ error, w http.ResponseWriter, r *http.Request, options nethttpmiddleware.ErrorHandlerOpts) {
 			if options.MatchedRoute == nil {
-				writeError(w, r, http.StatusNotFound, errorCodeNotFound, nil)
+				writeError(w, r, http.StatusNotFound, service.ErrorCodeNotFound, nil)
 				return
 			}
 			status := http.StatusBadRequest
@@ -230,7 +230,7 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 			if route := options.MatchedRoute.Route; route != nil && route.Method == http.MethodPost && route.Path == "/api/v1/t/{tenantSlug}/known-hosts" {
 				status = http.StatusUnprocessableEntity
 			}
-			writeError(w, r, status, errorCodeValidation, nil)
+			writeError(w, r, status, service.ErrorCodeValidation, nil)
 		},
 		DoNotValidateServers: true,
 		Skipper: func(r *http.Request) bool {
@@ -241,7 +241,7 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 		validated := validator(next)
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if isKnownHostCreateRequest(r) && hasDerivedKnownHostFields(r) {
-				writeError(w, r, http.StatusUnprocessableEntity, errorCodeValidation, nil)
+				writeError(w, r, http.StatusUnprocessableEntity, service.ErrorCodeValidation, nil)
 				return
 			}
 			validated.ServeHTTP(w, r)

@@ -14,13 +14,6 @@ FROM system_groups
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id);
 
--- 按 slug 返回一条系统分组。
--- name: GetSystemGroupBySlug :one
-SELECT *
-FROM system_groups
-WHERE tenant_id = sqlc.arg(tenant_id)
-  AND slug = sqlc.arg(slug);
-
 -- 列出租户内全部系统分组。
 -- name: ListSystemGroups :many
 SELECT *
@@ -35,6 +28,14 @@ FROM system_group_members
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND group_id = sqlc.arg(group_id)
 ORDER BY service_id;
+
+-- 批量返回多个分组的成员，供列表场景去 N+1。
+-- name: ListSystemGroupMembersForGroups :many
+SELECT *
+FROM system_group_members
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND group_id = ANY(sqlc.arg(group_ids)::uuid[])
+ORDER BY group_id, service_id;
 
 -- 替换一条系统分组的成员：先删除再按序重建。
 -- name: ReplaceSystemGroupMembers :execrows
@@ -100,3 +101,22 @@ JOIN services ON services.tenant_id = repositories.tenant_id AND services.reposi
 WHERE repositories.tenant_id = sqlc.arg(tenant_id)
   AND services.id = sqlc.arg(service_id)
 LIMIT 1;
+
+-- 批量返回租户内指定 id 的活跃服务，供搜索命中与服务校验去 N+1。
+-- name: ListServicesByIDs :many
+SELECT *
+FROM services
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = ANY(sqlc.arg(ids)::uuid[])
+  AND deleted_at IS NULL
+ORDER BY id;
+
+-- 批量返回拥有指定服务的仓库，供搜索命中投影 owning repository 去 N+1。
+-- name: ListRepositoriesByServices :many
+SELECT DISTINCT ON (services.id)
+       services.id AS service_id, repositories.*
+FROM repositories
+JOIN services ON services.tenant_id = repositories.tenant_id AND services.repository_id = repositories.id
+WHERE repositories.tenant_id = sqlc.arg(tenant_id)
+  AND services.id = ANY(sqlc.arg(service_ids)::uuid[])
+ORDER BY services.id;

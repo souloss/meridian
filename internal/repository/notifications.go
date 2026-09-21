@@ -37,15 +37,6 @@ func (store *NotificationStore) UpsertSubscription(ctx context.Context, input se
 	return subscriptionFromRow(row), nil
 }
 
-// GetSubscription 按 id 返回一条订阅。
-func (store *NotificationStore) GetSubscription(ctx context.Context, tenantID, id uuid.UUID) (service.SubscriptionRecord, error) {
-	row, err := store.queries.GetSubscription(ctx, generated.GetSubscriptionParams{TenantID: tenantID, ID: id})
-	if err != nil {
-		return service.SubscriptionRecord{}, normalizeError(err)
-	}
-	return subscriptionFromRow(row), nil
-}
-
 // ListSubscriptions 返回某用户的全部订阅。
 func (store *NotificationStore) ListSubscriptions(ctx context.Context, tenantID, userID uuid.UUID) ([]service.SubscriptionRecord, error) {
 	rows, err := store.queries.ListSubscriptions(ctx, generated.ListSubscriptionsParams{TenantID: tenantID, UserID: userID})
@@ -84,6 +75,19 @@ func (store *NotificationStore) ReplaceSubscriptionChannels(ctx context.Context,
 // ListSubscriptionChannels 返回一条订阅的通道标识。
 func (store *NotificationStore) ListSubscriptionChannels(ctx context.Context, tenantID, subscriptionID uuid.UUID) ([]uuid.UUID, error) {
 	return store.queries.ListSubscriptionChannels(ctx, generated.ListSubscriptionChannelsParams{TenantID: tenantID, SubscriptionID: subscriptionID})
+}
+
+// ListSubscriptionChannelsForSubscriptions 批量返回多个订阅的通道标识，供列表去 N+1。
+func (store *NotificationStore) ListSubscriptionChannelsForSubscriptions(ctx context.Context, tenantID uuid.UUID, subscriptionIDs []uuid.UUID) (map[uuid.UUID][]uuid.UUID, error) {
+	rows, err := store.queries.ListSubscriptionChannelsForSubscriptions(ctx, generated.ListSubscriptionChannelsForSubscriptionsParams{TenantID: tenantID, SubscriptionIds: subscriptionIDs})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	channels := make(map[uuid.UUID][]uuid.UUID, len(subscriptionIDs))
+	for _, row := range rows {
+		channels[row.SubscriptionID] = append(channels[row.SubscriptionID], row.ChannelID)
+	}
+	return channels, nil
 }
 
 // ListNotificationChannels 返回租户内全部通知通道。
@@ -245,16 +249,11 @@ func subscriptionFromRow(row generated.Subscription) service.SubscriptionRecord 
 	}
 }
 
-// notificationChannelTypeWebhook 是 Webhook 通知通道的列值（notification_channels.type）。
-// 仅 webhook 通道允许配置秘密，故用它推导 SecretConfigured 投影。
-const notificationChannelTypeWebhook = "webhook"
-
 func notificationChannelFromRow(row generated.NotificationChannel) service.NotificationChannelRecord {
 	return service.NotificationChannelRecord{
 		TenantID: row.TenantID, ID: row.ID, Kind: row.Type, Name: row.Name, Enabled: row.Enabled,
 		EncryptedConfig: row.EncryptedConfig, Revision: row.Revision,
-		SecretConfigured: row.Type == notificationChannelTypeWebhook,
-		CreatedAt:        row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
+		CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
 	}
 }
 

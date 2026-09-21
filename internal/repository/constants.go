@@ -27,8 +27,6 @@ const (
 	// jobErrorCodeWorkerFailed 是任务错误码的旧值（worker_failed），解析时统一归一为 internal_error。
 	jobErrorCodeWorkerFailed = "worker_failed"
 
-	// collectFailedEventType 是任务失败通知事件的 AsyncAPI 事件名（collect.failed）。
-	collectFailedEventType = "collect.failed"
 	// collectFailedAggregateType 是任务失败通知事件的聚合类别（job）。
 	collectFailedAggregateType = "job"
 

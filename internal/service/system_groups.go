@@ -89,11 +89,16 @@ func (groups *SystemGroups) ListSystemGroups(ctx context.Context, actor Principa
 	if err != nil {
 		return nil, err
 	}
+	groupIDs := make([]uuid.UUID, 0, len(records))
+	for _, record := range records {
+		groupIDs = append(groupIDs, record.ID)
+	}
+	members, err := groups.store.ListSystemGroupMembersForGroups(ctx, membership.TenantID, groupIDs)
+	if err != nil {
+		return nil, err
+	}
 	for index := range records {
-		members, memberErr := groups.store.ListSystemGroupMembers(ctx, membership.TenantID, records[index].ID)
-		if memberErr == nil {
-			records[index].ServiceIDs = members
-		}
+		records[index].ServiceIDs = members[records[index].ID]
 	}
 	return records, nil
 }
@@ -107,21 +112,5 @@ type SystemGroupCreateInput struct {
 }
 
 func (groups *SystemGroups) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!containsString(actor.Scopes, permission) && !containsString(actor.Scopes, scopeWildcard)) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || groups.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := groups.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil || !roleAllows(membership.Role, permission) {
-		if err != nil {
-			return Membership{}, err
-		}
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, groups.identities)
 }

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"slices"
 	"time"
 	"unicode/utf8"
 	"uuid"
@@ -155,23 +154,7 @@ func (lifecycle *ServiceLifecycle) appendServiceDeprecatedEvent(ctx context.Cont
 }
 
 func (lifecycle *ServiceLifecycle) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
-	if actor.Kind == PrincipalPAT {
-		if actor.TenantSlug != tenantSlug || !roleAllows(actor.Role, permission) || (!slices.Contains(actor.Scopes, permission) && !slices.Contains(actor.Scopes, scopeWildcard)) {
-			return Membership{}, ErrNotFound
-		}
-		return Membership{TenantID: actor.TenantID, TenantSlug: actor.TenantSlug, UserID: actor.User.ID, Role: actor.Role}, nil
-	}
-	if actor.Kind != PrincipalJWT || lifecycle.identities == nil {
-		return Membership{}, ErrNotFound
-	}
-	membership, err := lifecycle.identities.ActiveMembership(ctx, actor.User.ID, tenantSlug)
-	if err != nil || !roleAllows(membership.Role, permission) {
-		if err != nil {
-			return Membership{}, err
-		}
-		return Membership{}, ErrNotFound
-	}
-	return membership, nil
+	return resolveTenantMembership(ctx, actor, tenantSlug, permission, lifecycle.identities)
 }
 
 // ServicePatchInput 承载一次服务更新的显式 PATCH 字段。

@@ -20,7 +20,6 @@ import (
 type WebhookDeliverer struct {
 	keyring CredentialKeyring
 	client  *http.Client
-	now     func() time.Time
 }
 
 // NewWebhookDeliverer 构造使用活跃主密钥解密通道配置的投递器。
@@ -28,7 +27,6 @@ func NewWebhookDeliverer(keyring CredentialKeyring) *WebhookDeliverer {
 	return &WebhookDeliverer{
 		keyring: keyring,
 		client:  &http.Client{Timeout: webhookRequestTimeout},
-		now:     time.Now,
 	}
 }
 
@@ -38,7 +36,7 @@ func (deliverer *WebhookDeliverer) Deliver(ctx context.Context, delivery task.Ou
 	switch delivery.ChannelType {
 	case notificationChannelKindInApp:
 		return nil
-	case notificationChannelKindWebhook:
+	case NotificationChannelKindWebhook:
 		return deliverer.deliverWebhook(ctx, delivery)
 	default:
 		return ErrNotificationDeliveryUnsupported
