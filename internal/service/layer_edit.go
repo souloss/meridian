@@ -12,6 +12,9 @@ import (
 	"time"
 	"uuid"
 
+	"github.com/meridian-labs/meridian/internal/kinds"
+	"github.com/meridian-labs/meridian/internal/kinds/builtin"
+	"github.com/meridian-labs/meridian/internal/plugin"
 	"github.com/meridian-labs/meridian/internal/task"
 	"go.yaml.in/yaml/v3"
 )
@@ -54,11 +57,16 @@ type LayerEdit struct {
 	blobs      BlobStore
 	identities IdentityStore
 	now        func() time.Time
+	kinds      *kinds.Registry
 }
 
 // NewLayerEdit 构造 M2 层编辑用例。
-func NewLayerEdit(store LayerEditStore, blobs BlobStore, identities IdentityStore) *LayerEdit {
-	return &LayerEdit{store: store, blobs: blobs, identities: identities, now: time.Now}
+func NewLayerEdit(store LayerEditStore, blobs BlobStore, identities IdentityStore, registries ...*kinds.Registry) *LayerEdit {
+	registry := builtin.NewRegistry()
+	if len(registries) > 0 && registries[0] != nil {
+		registry = registries[0]
+	}
+	return &LayerEdit{store: store, blobs: blobs, identities: identities, now: time.Now, kinds: registry}
 }
 
 // PreviewMerge 对资产的生效层运行真实合并引擎而不持久化任何内容。结果携带合并内容、
@@ -605,13 +613,34 @@ func (editor *LayerEdit) indexGenericItems(ctx context.Context, tenantID uuid.UU
 	if assetErr != nil {
 		return assetErr
 	}
-	items, err := indexGenericKindItems(assetRecord.Kind, content)
+	if assetRecord.Kind == assetKindOpenapi {
+		return nil
+	}
+	descriptor, endpoint, err := editor.kinds.LookupEndpoint(assetRecord.Kind)
+	if err != nil {
+		// Kinds that are not yet shipped (for example asyncapi in a later
+		// milestone) keep the historical no-index behavior until their plugin
+		// is installed; they must not make an otherwise valid merge fail.
+		if assetRecord.Kind != kindDbschema && assetRecord.Kind != kindDependency {
+			return nil
+		}
+		return err
+	}
+	contentBytes, err := json.Marshal(content)
 	if err != nil {
 		return err
 	}
-	if items == nil {
-		return nil
+	result, err := endpoint.Invoke(ctx, plugin.Call{Capability: "kind/" + descriptor.Kind, Method: "extract", ContentType: "application/json", Payload: contentBytes, Metadata: map[string]string{"canonical-version": descriptor.PluginVersion}})
+	if err != nil {
+		return err
 	}
+	var response struct {
+		Items []kinds.Item `json:"items"`
+	}
+	if err := json.Unmarshal(result.Payload, &response); err != nil {
+		return err
+	}
+	items := response.Items
 	serviceID := assetRecord.ServiceID
 	for _, item := range items {
 		displayBytes, _ := json.Marshal(item.Display)

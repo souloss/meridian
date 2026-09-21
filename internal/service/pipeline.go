@@ -17,6 +17,9 @@ import (
 	"time"
 	"uuid"
 
+	"github.com/meridian-labs/meridian/internal/kinds"
+	"github.com/meridian-labs/meridian/internal/kinds/builtin"
+	"github.com/meridian-labs/meridian/internal/plugin"
 	"github.com/meridian-labs/meridian/internal/storage"
 	"github.com/meridian-labs/meridian/internal/task"
 	"go.yaml.in/yaml/v3"
@@ -43,11 +46,16 @@ type PipelineRunner struct {
 	workspace string
 	gitBinary string
 	now       func() time.Time
+	kinds     *kinds.Registry
 }
 
 // NewPipelineRunner 构造 M1 仓库同步管线。
-func NewPipelineRunner(store AssetStore, blobs BlobStore, workspace string) *PipelineRunner {
-	return &PipelineRunner{store: store, blobs: blobs, workspace: workspace, gitBinary: "git", now: time.Now}
+func NewPipelineRunner(store AssetStore, blobs BlobStore, workspace string, registries ...*kinds.Registry) *PipelineRunner {
+	registry := builtin.NewRegistry()
+	if len(registries) > 0 && registries[0] != nil {
+		registry = registries[0]
+	}
+	return &PipelineRunner{store: store, blobs: blobs, workspace: workspace, gitBinary: "git", now: time.Now, kinds: registry}
 }
 
 // Run 跨六个管线阶段执行一次仓库同步。
@@ -448,21 +456,38 @@ func (runner *PipelineRunner) indexOpenAPIItems(ctx context.Context, tenantID uu
 	if err != nil {
 		return fmt.Errorf("read openapi source %s: %w", relative, err)
 	}
-	operations, err := parseOpenAPIOperations(content)
+	descriptor, endpoint, err := runner.kinds.LookupEndpoint(asset.Kind)
 	if err != nil {
 		return err
 	}
-	for _, operation := range operations {
-		display := map[string]any{
-			"method": operation.Method, "path": operation.Path,
-			"summary": operation.Summary, "tags": operation.Tags, "deprecated": operation.Deprecated,
-		}
+	result, err := endpoint.Invoke(ctx, plugin.Call{
+		Capability: "kind/" + descriptor.Kind, Method: "extract", ContentType: "application/yaml", Payload: content,
+		Metadata: map[string]string{"canonical-version": descriptor.PluginVersion},
+	})
+	if err != nil {
+		return err
+	}
+	var response struct {
+		Items []kinds.Item `json:"items"`
+	}
+	if err := json.Unmarshal(result.Payload, &response); err != nil {
+		return err
+	}
+	items := response.Items
+	for _, item := range items {
+		display := item.Display
 		displayBytes, _ := json.Marshal(display)
 		rawBytes, _ := json.Marshal(display)
+		provenance := []byte(`{}`)
+		if item.Provenance != nil {
+			if encoded, marshalErr := json.Marshal(item.Provenance); marshalErr == nil {
+				provenance = encoded
+			}
+		}
 		if _, err := runner.store.CreateAssetItem(ctx, NewAssetItem{
 			TenantID: tenantID, ID: uuid.NewV7(), AssetVersionID: version.ID, AssetID: asset.ID, ServiceID: service.ID,
-			Kind: asset.Kind, ItemType: "operation", Key: operation.Method + " " + normalizePath(operation.Path), Display: displayBytes,
-			SearchText: operation.Method + " " + operation.Path + " " + operation.Summary, SearchRaw: rawBytes, Provenance: []byte("{}"),
+			Kind: asset.Kind, ItemType: item.ItemType, Key: item.Key, Display: displayBytes,
+			SearchText: item.SearchText, SearchRaw: rawBytes, Provenance: provenance,
 		}); err != nil {
 			return err
 		}

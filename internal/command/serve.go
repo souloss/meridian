@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/meridian-labs/meridian/internal/handler"
+	"github.com/meridian-labs/meridian/internal/plugins"
 	"github.com/meridian-labs/meridian/internal/repository"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/meridian-labs/meridian/internal/storage"
@@ -154,14 +155,28 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	diffStore := repository.NewDiffStore(db.Pool)
 	systemGroupStore := repository.NewSystemGroupStore(db.Pool)
 	notificationStore := repository.NewNotificationStore(db.Pool)
-	syncRunner := service.NewPipelineRunner(assetStore, blobStore, workspaceRoot)
-	layerEdit := service.NewLayerEdit(layerStore, blobStore, identityStore)
-	aiWorkflow := service.NewAiWorkflow(aiStore, blobStore, identityStore)
+	pluginRuntime, err := plugins.New(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		closeContext, cancel := context.WithTimeout(context.Background(), runtimeShutdownTimeout)
+		defer cancel()
+		if closeErr := pluginRuntime.Close(closeContext); closeErr != nil && err == nil {
+			err = fmt.Errorf("plugin host shutdown failed: %w", closeErr)
+		}
+	}()
+	syncRunner := service.NewPipelineRunner(assetStore, blobStore, workspaceRoot, pluginRuntime.Kinds)
+	layerEdit := service.NewLayerEdit(layerStore, blobStore, identityStore, pluginRuntime.Kinds)
+	aiWorkflow := service.NewAiWorkflow(aiStore, blobStore, identityStore, pluginRuntime.AI)
+	if err := pluginRuntime.RegisterAIProvider(ctx, aiWorkflow.Provider()); err != nil {
+		return fmt.Errorf("install builtin AI provider: %w", err)
+	}
 	shareKey, _ := base64.RawURLEncoding.DecodeString(strings.TrimSpace(os.Getenv(envShareSigningKey)))
 	if len(shareKey) == 0 {
 		shareKey = []byte(defaultShareSigningKey)
 	}
-	diffService := service.NewDiffService(diffStore, blobStore, identityStore, shareKey)
+	diffService := service.NewDiffService(diffStore, blobStore, identityStore, shareKey, pluginRuntime.Kinds)
 	searchService := service.NewSearch(assetStore, systemGroupStore, identityStore)
 	systemGroups := service.NewSystemGroups(systemGroupStore, identityStore)
 	notifications := service.NewNotifications(notificationStore, identityStore, keyring)

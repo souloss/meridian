@@ -14,6 +14,7 @@ import (
 	"time"
 	"uuid"
 
+	"github.com/meridian-labs/meridian/internal/ai"
 	"github.com/meridian-labs/meridian/internal/task"
 	"go.yaml.in/yaml/v3"
 )
@@ -25,11 +26,27 @@ type AiWorkflow struct {
 	blobs      BlobStore
 	identities IdentityStore
 	now        func() time.Time
+	providers  *ai.Registry
 }
 
 // NewAiWorkflow 构造 M3 AI 生成/审核/发布用例。
-func NewAiWorkflow(store AiGenerationStore, blobs BlobStore, identities IdentityStore) *AiWorkflow {
-	return &AiWorkflow{store: store, blobs: blobs, identities: identities, now: time.Now}
+func NewAiWorkflow(store AiGenerationStore, blobs BlobStore, identities IdentityStore, registries ...*ai.Registry) *AiWorkflow {
+	workflow := &AiWorkflow{store: store, blobs: blobs, identities: identities, now: time.Now}
+	registry := ai.NewRegistry()
+	if len(registries) > 0 && registries[0] != nil {
+		registry = registries[0]
+	}
+	if _, err := registry.Lookup(commandAIProviderID); err != nil {
+		_ = registry.Register(commandAIProvider{workflow: workflow})
+	}
+	workflow.providers = registry
+	return workflow
+}
+
+// Provider returns the workflow's built-in producer capability so the
+// composition root can install it in the common transport-neutral Host.
+func (workflow *AiWorkflow) Provider() ai.Provider {
+	return commandAIProvider{workflow: workflow}
 }
 
 // GenerateMissingAsset 为某服务的缺失资产入队一次 AI 生成。它解析生产者配置（请求指定或
@@ -334,7 +351,26 @@ func (workflow *AiWorkflow) RunAiGeneration(ctx context.Context, args task.AiGen
 		return workflow.failGeneration(ctx, args, StageExtract, ErrorCodeProducerUnavailable)
 	}
 
-	content, manifest, stage, code, err := workflow.runProducer(ctx, profile, jobContext)
+	provider, providerErr := workflow.providers.Lookup(commandAIProviderID)
+	if providerErr != nil {
+		return workflow.failGeneration(ctx, args, StageExtract, ErrorCodeProducerUnavailable)
+	}
+	providerResult, err := provider.Generate(ctx, ai.Request{
+		Kind: jobContext.Kind, Name: jobContext.Name, Hint: jobContext.Hint,
+		RefType: jobContext.RefType, Ref: jobContext.RefName,
+		Config:   commandProviderConfig(profile),
+		Metadata: map[string]string{"serviceRoot": jobContext.ServiceRoot, "scopeType": jobContext.ScopeType, "scopeKey": jobContext.ScopeKey},
+	})
+	content, manifest, stage, code := string(providerResult.Content), providerResult.Manifest, providerResult.Stage, providerResult.ErrorCode
+	if stage == "" {
+		stage = StageNormalize
+		if err != nil {
+			stage = StageExtract
+		}
+	}
+	if code == "" && err != nil {
+		code = ErrorCodeProducerUnavailable
+	}
 	if err != nil || stage != StageNormalize {
 		outcome := AiGenerationOutcome{JobID: args.JobID, Stage: stage, Status: JobStatusFailed, ErrorCode: code, Manifest: manifest}
 		_ = workflow.store.UpsertAiGenerationResult(ctx, args.TenantID, outcome)

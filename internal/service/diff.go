@@ -17,6 +17,9 @@ import (
 	"unicode/utf8"
 	"uuid"
 
+	"github.com/meridian-labs/meridian/internal/kinds"
+	"github.com/meridian-labs/meridian/internal/kinds/builtin"
+	"github.com/meridian-labs/meridian/internal/plugin"
 	"go.yaml.in/yaml/v3"
 )
 
@@ -56,12 +59,17 @@ type DiffService struct {
 	identities IdentityStore
 	now        func() time.Time
 	shareKey   []byte
+	kinds      *kinds.Registry
 }
 
 // NewDiffService 构造 M3 差异/分享/待办/推送用例。shareKey 是分享令牌的 HMAC 签名密钥
 // （测试中传 nil 禁用签名）。
-func NewDiffService(store DiffStore, blobs BlobStore, identities IdentityStore, shareKey []byte) *DiffService {
-	return &DiffService{store: store, blobs: blobs, identities: identities, now: time.Now, shareKey: shareKey}
+func NewDiffService(store DiffStore, blobs BlobStore, identities IdentityStore, shareKey []byte, registries ...*kinds.Registry) *DiffService {
+	registry := builtin.NewRegistry()
+	if len(registries) > 0 && registries[0] != nil {
+		registry = registries[0]
+	}
+	return &DiffService{store: store, blobs: blobs, identities: identities, now: time.Now, shareKey: shareKey, kinds: registry}
 }
 
 // RunDiff 解析两个文档选择器，计算结构化差异，并可选地持久化快照。当摘要至少含一条
@@ -238,8 +246,9 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 	if name == "" {
 		return PushRevisionResult{}, ErrValidation
 	}
-	// 通用类别在修订被接受前必须满足其规范内容模式（dbschema / dependency）。
-	if err := validateGenericKindContent(input.Kind, input.Content); err != nil {
+	// 内容校验由 Kind capability 承担；未知的未来 Kind 保留历史兼容行为，
+	// 等对应插件安装后再启用其校验。
+	if err := diff.validateKindContent(ctx, input.Kind, input.Content); err != nil {
 		return PushRevisionResult{}, err
 	}
 
@@ -339,6 +348,27 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 	return PushRevisionResult{
 		AssetID: assetID, LayerID: layerID, RevisionID: revision.ID, JobID: uuid.NewV7(), Deduplicated: false,
 	}, nil
+}
+
+func (diff *DiffService) validateKindContent(ctx context.Context, kind, content string) error {
+	descriptor, endpoint, err := diff.kinds.LookupEndpoint(kind)
+	if err != nil {
+		if kind != assetKindOpenapi && kind != kindDbschema && kind != kindDependency {
+			return nil
+		}
+		return err
+	}
+	result, err := endpoint.Invoke(ctx, plugin.Call{
+		Capability: "kind/" + descriptor.Kind, Method: "validate", ContentType: "application/yaml", Payload: []byte(content),
+	})
+	if err != nil {
+		return ErrValidation
+	}
+	var report kinds.ValidationReport
+	if err := json.Unmarshal(result.Payload, &report); err != nil || !report.Valid {
+		return ErrValidation
+	}
+	return nil
 }
 
 func (diff *DiffService) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {

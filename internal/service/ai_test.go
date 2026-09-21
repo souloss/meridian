@@ -3,6 +3,7 @@ package service
 import (
 	"testing"
 
+	"github.com/meridian-labs/meridian/internal/ai"
 	"github.com/meridian-labs/meridian/internal/task"
 )
 
@@ -34,5 +35,17 @@ func TestAiGenerateArgsKind(t *testing.T) {
 	args := task.AiGenerateArgs{}
 	if args.Kind() != "meridian_asset_ai_generate" {
 		t.Fatalf("unexpected AI generation River kind")
+	}
+}
+
+func TestCommandAIProviderPreservesProducerFailureMetadata(t *testing.T) {
+	t.Parallel()
+	provider := commandAIProvider{workflow: &AiWorkflow{}}
+	result, err := provider.Generate(t.Context(), ai.Request{
+		Kind: "openapi", Name: "orders-timeout", RefType: "branch", Ref: "main",
+		Config: commandProviderConfig(ProducerProfile{Name: "fake-ai-timeout"}),
+	})
+	if err == nil || result.Stage != StageExtract || result.ErrorCode != errProducerTimedOutCode {
+		t.Fatalf("unexpected provider failure metadata: %#v %v", result, err)
 	}
 }
