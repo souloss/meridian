@@ -76,3 +76,11 @@ var (
 	// 对外映射：ErrorCodeInternal。
 	ErrManifestFilePathMissing = errors.New("manifest file path missing")
 )
+
+var (
+	// ErrNotificationDeliveryUnsupported 表示所选通道类别尚无外发适配器。
+	// 对外映射：ErrorCodeInternal（HTTP 500）。
+	ErrNotificationDeliveryUnsupported = errors.New("notification channel kind has no delivery adapter")
+	// ErrNotificationDeliveryFailed 表示一次外发投递失败（可重试）。
+	ErrNotificationDeliveryFailed = errors.New("notification delivery failed")
+)

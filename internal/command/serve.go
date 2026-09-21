@@ -153,6 +153,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	aiStore := repository.NewAIStore(db.Pool)
 	diffStore := repository.NewDiffStore(db.Pool)
 	systemGroupStore := repository.NewSystemGroupStore(db.Pool)
+	notificationStore := repository.NewNotificationStore(db.Pool)
 	syncRunner := service.NewPipelineRunner(assetStore, blobStore, workspaceRoot)
 	layerEdit := service.NewLayerEdit(layerStore, blobStore, identityStore)
 	aiWorkflow := service.NewAiWorkflow(aiStore, blobStore, identityStore)
@@ -163,6 +164,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	diffService := service.NewDiffService(diffStore, blobStore, identityStore, shareKey)
 	searchService := service.NewSearch(assetStore, systemGroupStore, identityStore)
 	systemGroups := service.NewSystemGroups(systemGroupStore, identityStore)
+	notifications := service.NewNotifications(notificationStore, identityStore, keyring)
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
 		Executions:       repositoryStore,
 		SyncRunner:       syncRunner,
@@ -170,6 +172,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 		MergeRunner:      layerEdit,
 		AiGenerateRunner: aiWorkflow,
 		Outbox:           repositoryStore,
+		OutboxDeliverer:  service.NewWebhookDeliverer(keyring),
 	}, logger)
 	if err != nil {
 		return fmt.Errorf("configure River runtime: %w", err)
@@ -196,7 +199,7 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 			Identity: identity, Credentials: credentials, Repositories: repositories, Jobs: jobs, Audits: audits,
 			Producers: producers, Discovery: discovery, Assets: assets, Views: views, ServiceLifecycle: serviceLifecycle,
 			LayerEdit: layerEdit, ConfigImport: configImport, AiWorkflow: aiWorkflow, DiffService: diffService,
-			Search: searchService, SystemGroups: systemGroups,
+			Search: searchService, SystemGroups: systemGroups, Notifications: notifications,
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: serverReadHeaderTimeout,
 		ReadTimeout:       serverReadTimeout,

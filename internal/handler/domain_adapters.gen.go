@@ -120,6 +120,16 @@ func (adapter collaborationServer) AcknowledgeBreakingTodo(ctx context.Context, 
 	return adapter.server.AcknowledgeBreakingTodo(ctx, request)
 }
 
+// CreateNotificationChannel 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) CreateNotificationChannel(ctx context.Context, request collaboration.CreateNotificationChannelRequestObject) (collaboration.CreateNotificationChannelResponseObject, error) {
+	return adapter.server.CreateNotificationChannel(ctx, request)
+}
+
+// DeleteNotificationChannel 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) DeleteNotificationChannel(ctx context.Context, request collaboration.DeleteNotificationChannelRequestObject) (collaboration.DeleteNotificationChannelResponseObject, error) {
+	return adapter.server.DeleteNotificationChannel(ctx, request)
+}
+
 // ListAuditLogs 将 collaboration 的严格操作委托给对应的 Handler 实现。
 func (adapter collaborationServer) ListAuditLogs(ctx context.Context, request collaboration.ListAuditLogsRequestObject) (collaboration.ListAuditLogsResponseObject, error) {
 	return adapter.server.ListAuditLogs(ctx, request)
@@ -128,6 +138,51 @@ func (adapter collaborationServer) ListAuditLogs(ctx context.Context, request co
 // ListBreakingTodos 将 collaboration 的严格操作委托给对应的 Handler 实现。
 func (adapter collaborationServer) ListBreakingTodos(ctx context.Context, request collaboration.ListBreakingTodosRequestObject) (collaboration.ListBreakingTodosResponseObject, error) {
 	return adapter.server.ListBreakingTodos(ctx, request)
+}
+
+// ListNotificationChannels 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) ListNotificationChannels(ctx context.Context, request collaboration.ListNotificationChannelsRequestObject) (collaboration.ListNotificationChannelsResponseObject, error) {
+	return adapter.server.ListNotificationChannels(ctx, request)
+}
+
+// ListNotifications 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) ListNotifications(ctx context.Context, request collaboration.ListNotificationsRequestObject) (collaboration.ListNotificationsResponseObject, error) {
+	return adapter.server.ListNotifications(ctx, request)
+}
+
+// ListSubscriptions 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) ListSubscriptions(ctx context.Context, request collaboration.ListSubscriptionsRequestObject) (collaboration.ListSubscriptionsResponseObject, error) {
+	return adapter.server.ListSubscriptions(ctx, request)
+}
+
+// MarkAllNotificationsRead 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) MarkAllNotificationsRead(ctx context.Context, request collaboration.MarkAllNotificationsReadRequestObject) (collaboration.MarkAllNotificationsReadResponseObject, error) {
+	return adapter.server.MarkAllNotificationsRead(ctx, request)
+}
+
+// MarkNotificationRead 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) MarkNotificationRead(ctx context.Context, request collaboration.MarkNotificationReadRequestObject) (collaboration.MarkNotificationReadResponseObject, error) {
+	return adapter.server.MarkNotificationRead(ctx, request)
+}
+
+// PutSubscription 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) PutSubscription(ctx context.Context, request collaboration.PutSubscriptionRequestObject) (collaboration.PutSubscriptionResponseObject, error) {
+	return adapter.server.PutSubscription(ctx, request)
+}
+
+// RotateNotificationChannelSecret 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) RotateNotificationChannelSecret(ctx context.Context, request collaboration.RotateNotificationChannelSecretRequestObject) (collaboration.RotateNotificationChannelSecretResponseObject, error) {
+	return adapter.server.RotateNotificationChannelSecret(ctx, request)
+}
+
+// TestNotificationChannel 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) TestNotificationChannel(ctx context.Context, request collaboration.TestNotificationChannelRequestObject) (collaboration.TestNotificationChannelResponseObject, error) {
+	return adapter.server.TestNotificationChannel(ctx, request)
+}
+
+// UpdateNotificationChannel 将 collaboration 的严格操作委托给对应的 Handler 实现。
+func (adapter collaborationServer) UpdateNotificationChannel(ctx context.Context, request collaboration.UpdateNotificationChannelRequestObject) (collaboration.UpdateNotificationChannelResponseObject, error) {
+	return adapter.server.UpdateNotificationChannel(ctx, request)
 }
 
 type diffServer struct {

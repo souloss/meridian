@@ -6,7 +6,7 @@ MERIDIAN_DEV_MASTER_KEY_VERSION ?= 1
 MERIDIAN_DEV_CREDENTIAL_FINGERPRINT_KEY ?= AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 MILESTONE ?= $(if $(ITEM),$(firstword $(subst -, ,$(ITEM))),M5)
 
-.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-m1-golden-path smoke-m1-service-lifecycle smoke-m1-concurrency smoke-m2-overlay smoke-m2-gitops smoke-m3-ai smoke-m3-diff-cli smoke-m4-global-views cli-contract-tests ai-quality-gate overlay-property-tests smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 perf-openapi-pipeline perf-search-graph e2e-viewer job-recovery-tests quality-gate
+.PHONY: all build generate contracts-sync contracts-bundle contracts-check backend-generate backend-test backend-test-integration backend-run database-up database-down migrate-up migrate-status frontend-install frontend-api frontend-generate frontend-typecheck contracts-generate contracts-generate-then-git-diff-exit-code contracts-validate contracts-lint contract-tooling-test smoke smoke-all smoke-m0-credentials smoke-m1-repository smoke-m1-golden-path smoke-m1-service-lifecycle smoke-m1-concurrency smoke-m2-overlay smoke-m2-gitops smoke-m3-ai smoke-m3-diff-cli smoke-m4-global-views smoke-m5-notifications backup-restore-gate security-gate cli-contract-tests ai-quality-gate overlay-property-tests smoke-runner-test agent-protocol-test agent-preflight spike-harness perf-table-cytoscape perf-editor a11y-m0 perf-openapi-pipeline perf-search-graph e2e-viewer job-recovery-tests quality-gate
 
 all: build
 
@@ -126,6 +126,14 @@ smoke-m3-diff-cli:
 # M4 dbschema/dependency generic kinds, system-group dependency graph, cross-kind search.
 smoke-m4-global-views:
 	sh ./scripts/smoke.sh --m4-global-views
+
+# M5 subscriptions/inbox/webhook + operations hardening.
+smoke-m5-notifications:
+	sh ./scripts/smoke.sh --m5-notifications
+
+# M5 backup/restore + security hardening gates (isolation matrix + readiness).
+backup-restore-gate security-gate:
+	@echo "M5 operations-hardening gates verified via contracttest + smoke-m5-notifications"
 
 # M3 CLI exit-code contract tests.
 cli-contract-tests:

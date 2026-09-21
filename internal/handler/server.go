@@ -40,6 +40,7 @@ type Server struct {
 	diffService      *service.DiffService
 	searchService    *service.Search
 	systemGroups     *service.SystemGroups
+	notifications    *service.Notifications
 	secureCookies    bool
 }
 
@@ -77,6 +78,8 @@ type Dependencies struct {
 	Search *service.Search
 	// SystemGroups 提供系统分组创建与成员替换。
 	SystemGroups *service.SystemGroups
+	// Notifications 提供订阅、通知通道与站内通知用例。
+	Notifications *service.Notifications
 }
 
 func New() *Server {
@@ -120,6 +123,7 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.diffService = dependencies.DiffService
 	s.searchService = dependencies.Search
 	s.systemGroups = dependencies.SystemGroups
+	s.notifications = dependencies.Notifications
 	s.secureCookies = secureCookies
 	return s
 }

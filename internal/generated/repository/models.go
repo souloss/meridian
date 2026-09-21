@@ -1027,6 +1027,41 @@ type LayerRevision struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
+// Notification 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 租户内用户可见的站内通知收件箱。
+type Notification struct {
+	// TenantID 是 Notification 的生成 TenantID 数据库值。
+	// 拥有该通知的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是 Notification 的生成 ID 数据库值。
+	// 应用生成的 UUID v7 通知标识。
+	ID uuid.UUID `json:"id"`
+	// UserID 是 Notification 的生成 UserID 数据库值。
+	// 接收该通知的用户。
+	UserID uuid.UUID `json:"user_id"`
+	// EventID 是 Notification 的生成 EventID 数据库值。
+	// 产生该通知的领域事件标识，用于按用户去重。
+	EventID uuid.UUID `json:"event_id"`
+	// EventType 是 Notification 的生成 EventType 数据库值。
+	// 领域事件类型。
+	EventType string `json:"event_type"`
+	// TitleKey 是 Notification 的生成 TitleKey 数据库值。
+	// 渲染通知标题的 i18n 消息键。
+	TitleKey string `json:"title_key"`
+	// BodyArgs 是 Notification 的生成 BodyArgs 数据库值。
+	// 渲染通知正文的模板变量 JSON 对象。
+	BodyArgs []byte `json:"body_args"`
+	// Link 是 Notification 的生成 Link 数据库值。
+	// 可选的资源定位链接。
+	Link *string `json:"link"`
+	// ReadAt 是 Notification 的生成 ReadAt 数据库值。
+	// 用户标记已读时间；未读为空。
+	ReadAt pgtype.Timestamptz `json:"read_at"`
+	// CreatedAt 是 Notification 的生成 CreatedAt 数据库值。
+	// 创建通知时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
 // NotificationChannel 是相应 Meridian 表行的生成 PostgreSQL 表示。
 // 租户拥有的通知投递通道配置，webhook 秘密使用加密值。
 type NotificationChannel struct {
@@ -1506,6 +1541,55 @@ type SourceSpec struct {
 	// UpdatedAt 是 SourceSpec 的生成 UpdatedAt 数据库值。
 	// 最近一次更新源配置时的 UTC 事务时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// Subscription 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 用户按作用域订阅领域事件的通知路由规则。
+type Subscription struct {
+	// TenantID 是 Subscription 的生成 TenantID 数据库值。
+	// 拥有该订阅的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是 Subscription 的生成 ID 数据库值。
+	// 应用生成的 UUID v7 订阅标识。
+	ID uuid.UUID `json:"id"`
+	// UserID 是 Subscription 的生成 UserID 数据库值。
+	// 接收站内通知的订阅用户。
+	UserID uuid.UUID `json:"user_id"`
+	// TargetType 是 Subscription 的生成 TargetType 数据库值。
+	// 订阅作用域类型：tenant、service、asset、system_group 或 asset_kind。
+	TargetType string `json:"target_type"`
+	// TargetID 是 Subscription 的生成 TargetID 数据库值。
+	// 订阅作用域目标标识；tenant 作用域为空。
+	TargetID *string `json:"target_id"`
+	// Events 是 Subscription 的生成 Events 数据库值。
+	// 该订阅匹配的领域事件类型列表。
+	Events []string `json:"events"`
+	// Enabled 是 Subscription 的生成 Enabled 数据库值。
+	// 是否仅为未来事件生成通知；禁用保留历史通知。
+	Enabled bool `json:"enabled"`
+	// CreatedAt 是 Subscription 的生成 CreatedAt 数据库值。
+	// 创建订阅时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt 是 Subscription 的生成 UpdatedAt 数据库值。
+	// 最近一次更新订阅时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// SubscriptionChannel 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 订阅与其通知投递通道的多对多关系。
+type SubscriptionChannel struct {
+	// TenantID 是 SubscriptionChannel 的生成 TenantID 数据库值。
+	// 拥有该关联的租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// SubscriptionID 是 SubscriptionChannel 的生成 SubscriptionID 数据库值。
+	// 所属订阅标识。
+	SubscriptionID uuid.UUID `json:"subscription_id"`
+	// ChannelID 是 SubscriptionChannel 的生成 ChannelID 数据库值。
+	// 所选通知通道标识。
+	ChannelID uuid.UUID `json:"channel_id"`
+	// CreatedAt 是 SubscriptionChannel 的生成 CreatedAt 数据库值。
+	// 建立通道关联时的 UTC 事务时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 // SystemGroup 是相应 Meridian 表行的生成 PostgreSQL 表示。
