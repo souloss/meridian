@@ -1,0 +1,118 @@
+{
+  "workItem": "M5-AGENT-001",
+  "status": "passed",
+  "commit": "2b7855cbce7e7abd7cd2bd09db8a793d8b8ab0f5",
+  "baseCommit": "f75bbdb0ad6d291f13fbf23df864f586ba2a0540",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "startedAt": "2026-09-21T02:20:00Z",
+  "finishedAt": "2026-09-21T02:41:16Z",
+  "reportPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/report.json",
+  "stories": [
+    "US-02",
+    "US-10",
+    "US-11"
+  ],
+  "assertions": [
+    {
+      "id": "SMK-025",
+      "status": "passed",
+      "evidence": "artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-025.json"
+    },
+    {
+      "id": "SMK-030",
+      "status": "passed",
+      "evidence": "artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-030.json"
+    },
+    {
+      "id": "SMK-039",
+      "status": "passed",
+      "evidence": "artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-039.json"
+    }
+  ],
+  "commands": [
+    {
+      "command": "go build ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "stdoutPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log",
+      "stderrPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log"
+    },
+    {
+      "command": "go vet ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "stdoutPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log",
+      "stderrPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log"
+    },
+    {
+      "command": "go tool sqlc vet",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "stdoutPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log",
+      "stderrPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log"
+    },
+    {
+      "command": "go test ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "stdoutPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log",
+      "stderrPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log"
+    },
+    {
+      "command": "make smoke-m5-notifications ITEM=M5-AGENT-001",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "stdoutPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log",
+      "stderrPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log"
+    },
+    {
+      "command": "make smoke-m4-global-views ITEM=M5-AGENT-001",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "stdoutPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log",
+      "stderrPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log"
+    },
+    {
+      "command": "make backup-restore-gate security-gate ITEM=M5-AGENT-001",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "stdoutPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log",
+      "stderrPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "stdoutPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log",
+      "stderrPath": "artifacts/agent/M5-AGENT-001/20260921T024116Z/commands.log"
+    }
+  ],
+  "failures": [],
+  "changedFiles": [
+    "Makefile",
+    "contracts/work-items.yaml",
+    "internal/command/serve.go",
+    "internal/database/database_integration_test.go",
+    "internal/generated/repository/models.go",
+    "internal/generated/repository/notifications.sql.go",
+    "internal/generated/repository/querier.go",
+    "internal/handler/domain_adapters.gen.go",
+    "internal/handler/m5_notifications_smoke_integration_test.go",
+    "internal/handler/notifications.go",
+    "internal/handler/server.go",
+    "internal/repository/notifications.go",
+    "internal/service/channel_crypto.go",
+    "internal/service/notification_constants.go",
+    "internal/service/notification_types.go",
+    "internal/service/notifications.go",
+    "internal/service/sentinels.go",
+    "internal/service/webhook_deliverer.go",
+    "migrations/00011_m5_notifications.sql",
+    "migrations/queries/notifications.sql",
+    "scripts/smoke-cases.json",
+    "scripts/smoke.mjs"
+  ],
+  "deferred": [],
+  "failureKind": null,
+  "nextAction": "complete the M5 milestone checkpoint"
+}

@@ -458,11 +458,19 @@ items:
   - id: M5-AGENT-001
     milestone: M5
     priority: P1
-    status: ready
+    status: passed
     title: subscriptions-inbox-webhook-and-operations-hardening
     dependsOn: [M4-AGENT-001]
     operationIds: [putSubscription, markNotificationRead, testNotificationChannel, rotateNotificationChannelSecret, healthz, readyz]
     stories: [US-02, US-10, US-11]
     assertions: [SMK-025, SMK-030, SMK-039]
     verify: [smoke-m5-notifications, backup-restore-gate, security-gate]
-    reportPath: null
+    owner: coding-agent
+    attempt: 1
+    maxAttempts: 3
+    startedAt: '2026-09-21T02:20:00Z'
+    baseCommit: f75bbdb0ad6d291f13fbf23df864f586ba2a0540
+    contractDigest: sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c
+    reportPath: artifacts/agent/M5-AGENT-001/20260921T024116Z/report.json
+    lastEvidence: artifacts/agent/M5-AGENT-001/20260921T024116Z/report.json
+    nextAction: complete the M5 milestone checkpoint
