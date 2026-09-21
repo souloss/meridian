@@ -1,0 +1,37 @@
+{
+  "milestone": "M5",
+  "status": "completed",
+  "commit": "2b7855cbce7e7abd7cd2bd09db8a793d8b8ab0f5",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "reportPath": "artifacts/agent/milestones/M5/20260921T024357Z/report.json",
+  "completedBy": "coding-agent",
+  "completedAt": "2026-09-21T02:43:57Z",
+  "workItems": [
+    {"id": "M5-AGENT-001", "status": "passed", "evidence": "artifacts/agent/M5-AGENT-001/20260921T024116Z/report.json"}
+  ],
+  "stories": [
+    {"id": "US-02", "status": "passed", "evidence": ["SMK-030"]},
+    {"id": "US-10", "status": "passed", "evidence": ["SMK-025"]},
+    {"id": "US-11", "status": "passed", "evidence": ["SMK-039"]}
+  ],
+  "assertions": [
+    {"id": "SMK-025", "status": "passed", "evidence": "artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-025.json"},
+    {"id": "SMK-030", "status": "passed", "evidence": "artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-030.json"},
+    {"id": "SMK-039", "status": "passed", "evidence": "artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-039.json"}
+  ],
+  "deferred": [],
+  "risks": [
+    "M5 订阅/收件箱/通知通道首次落地：webhook 外发适配器已接线到 River outbox 派发器，站内通知收件箱表与订阅路由查询落库；email 通道留待部署管理 SMTP（契约允许 deployment-managed-smtp）。"
+  ],
+  "nextAction": null,
+  "commands": [
+    {"command": "go build ./...", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M5/20260921T024357Z/commands.log"},
+    {"command": "go vet ./...", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M5/20260921T024357Z/commands.log"},
+    {"command": "go tool sqlc vet", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M5/20260921T024357Z/commands.log"},
+    {"command": "go test ./...", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M5/20260921T024357Z/commands.log"},
+    {"command": "make smoke-m5-notifications ITEM=M5-AGENT-001", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M5/20260921T024357Z/commands.log"},
+    {"command": "make smoke-m4-global-views ITEM=M5-AGENT-001", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M5/20260921T024357Z/commands.log"},
+    {"command": "git diff --check", "exitCode": 0, "durationSeconds": 0, "evidence": "artifacts/agent/milestones/M5/20260921T024357Z/commands.log"}
+  ],
+  "failures": []
+}

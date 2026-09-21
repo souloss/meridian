@@ -67,7 +67,7 @@ milestoneCheckpoints:
   M2: {status: completed, reportPath: artifacts/agent/milestones/M2/20260918T054500Z/report.json, completedBy: coding-agent, completedAt: '2026-09-18T05:45:00Z', completedCommit: 001bb4b00cb840a859d74f40b86abfba38783752, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
   M3: {status: completed, reportPath: artifacts/agent/milestones/M3/20260918T021046Z/report.json, completedBy: coding-agent, completedAt: '2026-09-18T02:10:46Z', completedCommit: 65aafd31684bea6f625bce8899caab56cd886d87, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
   M4: {status: completed, reportPath: artifacts/agent/milestones/M4/20260918T123935Z/report.json, completedBy: coding-agent, completedAt: '2026-09-18T12:39:35Z', completedCommit: 67ca25de8894f100138217a6ee265c08fb3d26a1, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
-  M5: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
+  M5: {status: completed, reportPath: artifacts/agent/milestones/M5/20260921T024357Z/report.json, completedBy: coding-agent, completedAt: '2026-09-21T02:43:57Z', completedCommit: 2b7855cbce7e7abd7cd2bd09db8a793d8b8ab0f5, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
 
 defaults:
   owner: coding-agent

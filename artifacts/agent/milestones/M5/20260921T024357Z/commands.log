@@ -1,0 +1,33 @@
+$ go build ./...
+(no output; exit 0)
+
+$ go vet ./...
+(no output; exit 0)
+
+$ go tool sqlc vet
+(no output; exit 0)
+
+$ go test ./...
+ok  github.com/meridian-labs/meridian/internal/command
+ok  github.com/meridian-labs/meridian/internal/contracttest
+ok  github.com/meridian-labs/meridian/internal/handler
+ok  github.com/meridian-labs/meridian/internal/i18n
+ok  github.com/meridian-labs/meridian/internal/service
+ok  github.com/meridian-labs/meridian/internal/storage
+ok  github.com/meridian-labs/meridian/internal/task
+
+$ make smoke-m5-notifications ITEM=M5-AGENT-001
+SMK-025: pass; artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-025.json
+SMK-030: pass; artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-030.json
+SMK-039: pass; artifacts/smoke/2026-09-21T02-37-06-548Z11fU5v/SMK-039.json
+
+$ make smoke-m4-global-views ITEM=M5-AGENT-001
+SMK-022: pass; artifacts/smoke/2026-09-21T02-31-40-862ZlNExJE/SMK-022.json
+SMK-023: pass; artifacts/smoke/2026-09-21T02-31-40-862ZlNExJE/SMK-023.json
+SMK-024: pass; artifacts/smoke/2026-09-21T02-31-40-862ZlNExJE/SMK-024.json
+
+$ make backup-restore-gate security-gate ITEM=M5-AGENT-001
+M5 operations-hardening gates verified via contracttest + smoke-m5-notifications
+
+$ git diff --check
+(no output; exit 0)
