@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"encoding/json/v2"
 	"testing"
 
 	"github.com/meridian-labs/meridian/internal/kinds"
@@ -40,5 +41,47 @@ func TestPluginEndpointCanBeInvokedThroughGenericContract(t *testing.T) {
 	}
 	if len(result.Payload) == 0 || result.ContentType != "application/json" {
 		t.Fatalf("unexpected endpoint response: %#v", result)
+	}
+}
+
+func TestPluginDiffReportsRemovedOperations(t *testing.T) {
+	t.Parallel()
+	endpoint, err := NewPlugin().Open(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+	left := `openapi: 3.1.0
+paths:
+  /a:
+    get: {}
+  /b:
+    post: {}
+`
+	right := `openapi: 3.1.0
+paths:
+  /a:
+    get: {}
+`
+	payload, err := json.Marshal(struct {
+		Left  kinds.CanonicalDocument `json:"left"`
+		Right kinds.CanonicalDocument `json:"right"`
+		Rules kinds.RuleSet           `json:"rules"`
+	}{
+		Left:  kinds.CanonicalDocument{Document: kinds.Document{Content: []byte(left), MediaType: "application/yaml"}, Version: "openapi-3.1"},
+		Right: kinds.CanonicalDocument{Document: kinds.Document{Content: []byte(right), MediaType: "application/yaml"}, Version: "openapi-3.1"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := endpoint.Invoke(t.Context(), plugin.Call{Capability: "kind/openapi", Method: "diff", ContentType: "application/json", Payload: payload})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var diff kinds.DiffResult
+	if err := json.Unmarshal(result.Payload, &diff); err != nil {
+		t.Fatal(err)
+	}
+	if !diff.Breaking || len(diff.Changes) != 1 || diff.Changes[0][kinds.DiffChangePath] != "POST /b" {
+		t.Fatalf("unexpected diff result: %#v", diff)
 	}
 }

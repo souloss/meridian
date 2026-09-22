@@ -18,7 +18,6 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/kinds"
-	"github.com/meridian-labs/meridian/internal/kinds/builtin"
 	"github.com/meridian-labs/meridian/internal/plugin"
 	"github.com/meridian-labs/meridian/internal/storage"
 	"github.com/meridian-labs/meridian/internal/task"
@@ -49,12 +48,9 @@ type PipelineRunner struct {
 	kinds     *kinds.Registry
 }
 
-// NewPipelineRunner 构造 M1 仓库同步管线。
-func NewPipelineRunner(store AssetStore, blobs BlobStore, workspace string, registries ...*kinds.Registry) *PipelineRunner {
-	registry := builtin.NewRegistry()
-	if len(registries) > 0 && registries[0] != nil {
-		registry = registries[0]
-	}
+// NewPipelineRunner 构造 M1 仓库同步管线。registry 是插件主机注入的 kind 能力端点注册表；
+// 未注入（nil）时，任何 kind 能力调用都返回明确的装配错误，而不是回退到进程内直连实现。
+func NewPipelineRunner(store AssetStore, blobs BlobStore, workspace string, registry *kinds.Registry) *PipelineRunner {
 	return &PipelineRunner{store: store, blobs: blobs, workspace: workspace, gitBinary: "git", now: time.Now, kinds: registry}
 }
 
@@ -456,7 +452,7 @@ func (runner *PipelineRunner) indexOpenAPIItems(ctx context.Context, tenantID uu
 	if err != nil {
 		return fmt.Errorf("read openapi source %s: %w", relative, err)
 	}
-	descriptor, endpoint, err := runner.kinds.LookupEndpoint(asset.Kind)
+	descriptor, endpoint, err := lookupKindEndpoint(runner.kinds, asset.Kind)
 	if err != nil {
 		return err
 	}

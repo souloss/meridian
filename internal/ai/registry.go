@@ -15,7 +15,6 @@ import (
 
 var (
 	ErrInvalidProvider     = errors.New("invalid AI provider")
-	ErrDuplicateProvider   = errors.New("duplicate AI provider")
 	ErrProviderUnavailable = errors.New("AI provider unavailable")
 )
 
@@ -98,23 +97,6 @@ func NewRegistry() *Registry {
 	return &Registry{providers: make(map[string]Provider)}
 }
 
-func (registry *Registry) Register(provider Provider) error {
-	if provider == nil {
-		return ErrInvalidProvider
-	}
-	descriptor := provider.Descriptor()
-	if descriptor.ID == "" || descriptor.Version == "" {
-		return ErrInvalidProvider
-	}
-	registry.mu.Lock()
-	defer registry.mu.Unlock()
-	if _, exists := registry.providers[descriptor.ID]; exists {
-		return fmt.Errorf("%w: %s", ErrDuplicateProvider, descriptor.ID)
-	}
-	registry.providers[descriptor.ID] = provider
-	return nil
-}
-
 // Replace binds a provider ID to a new implementation. It is used when a
 // typed in-process provider is upgraded to an endpoint-backed runtime proxy;
 // callers observe one atomic provider selection.
@@ -142,6 +124,7 @@ func (registry *Registry) Lookup(id string) (Provider, error) {
 	return provider, nil
 }
 
+// Descriptors returns the descriptors of every installed provider.
 func (registry *Registry) Descriptors() []Descriptor {
 	registry.mu.RLock()
 	descriptors := make([]Descriptor, 0, len(registry.providers))

@@ -17,6 +17,7 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/database"
+	"github.com/meridian-labs/meridian/internal/plugins"
 	"github.com/meridian-labs/meridian/internal/repository"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/meridian-labs/meridian/internal/storage"
@@ -107,14 +108,26 @@ func newM4Fixture(t *testing.T) *m4Fixture {
 	if err != nil {
 		t.Fatalf("create blob store: %v", err)
 	}
-	layerEdit := service.NewLayerEdit(layerStore, blobs, identityStore)
-	aiWorkflow := service.NewAiWorkflow(aiStore, blobs, identityStore)
-	diffService := service.NewDiffService(diffStore, blobs, identityStore, []byte("smoke-share-signing-key-fixed-32-bytes"))
+	pluginRuntime, err := plugins.New(t.Context())
+	if err != nil {
+		t.Fatalf("create plugin runtime: %v", err)
+	}
+	t.Cleanup(func() {
+		closeContext, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = pluginRuntime.Close(closeContext)
+	})
+	layerEdit := service.NewLayerEdit(layerStore, blobs, identityStore, pluginRuntime.Kinds)
+	aiWorkflow := service.NewAiWorkflow(aiStore, blobs, identityStore, pluginRuntime.AI)
+	if err := pluginRuntime.RegisterAIProvider(t.Context(), aiWorkflow.Provider()); err != nil {
+		t.Fatalf("install builtin AI provider: %v", err)
+	}
+	diffService := service.NewDiffService(diffStore, blobs, identityStore, []byte("smoke-share-signing-key-fixed-32-bytes"), pluginRuntime.Kinds)
 	searchService := service.NewSearch(assetStore, systemGroupStore, identityStore)
 	systemGroups := service.NewSystemGroups(systemGroupStore, identityStore)
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
 		Executions:       repositoryStore,
-		SyncRunner:       service.NewPipelineRunner(assetStore, blobs, workspace),
+		SyncRunner:       service.NewPipelineRunner(assetStore, blobs, workspace, pluginRuntime.Kinds),
 		DiscoverRunner:   service.NewDiscoveryRunner(discoveryStore, workspace),
 		MergeRunner:      layerEdit,
 		AiGenerateRunner: aiWorkflow,

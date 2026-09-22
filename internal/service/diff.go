@@ -10,15 +10,12 @@ import (
 	"encoding/json/v2"
 	"fmt"
 	"io"
-	"os"
 	"sort"
 	"strings"
 	"time"
-	"unicode/utf8"
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/kinds"
-	"github.com/meridian-labs/meridian/internal/kinds/builtin"
 	"github.com/meridian-labs/meridian/internal/plugin"
 	"go.yaml.in/yaml/v3"
 )
@@ -33,8 +30,6 @@ const (
 	diffUploadTTL = 24 * time.Hour
 	// diffChangeBreaking 等镜像 kinds.yaml 的 breakingRules 级别。
 	diffChangeBreaking = "breaking"
-	// diffCodeOperationRemoved 是 openapi-v1 的 operation-removed 破坏规则码。
-	diffCodeOperationRemoved = "operation-removed"
 	// shareTokenVersion 是签名令牌载荷版本。
 	shareTokenVersion = 1
 	// shareURLPrefix 是公开分享 URL 根路径。
@@ -63,12 +58,9 @@ type DiffService struct {
 }
 
 // NewDiffService 构造 M3 差异/分享/待办/推送用例。shareKey 是分享令牌的 HMAC 签名密钥
-// （测试中传 nil 禁用签名）。
-func NewDiffService(store DiffStore, blobs BlobStore, identities IdentityStore, shareKey []byte, registries ...*kinds.Registry) *DiffService {
-	registry := builtin.NewRegistry()
-	if len(registries) > 0 && registries[0] != nil {
-		registry = registries[0]
-	}
+// （测试中传 nil 禁用签名）。registry 是插件主机注入的 kind 能力端点注册表；未注入时
+// 任何 kind 能力调用都返回明确的装配错误。
+func NewDiffService(store DiffStore, blobs BlobStore, identities IdentityStore, shareKey []byte, registry *kinds.Registry) *DiffService {
 	return &DiffService{store: store, blobs: blobs, identities: identities, now: time.Now, shareKey: shareKey, kinds: registry}
 }
 
@@ -351,7 +343,7 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 }
 
 func (diff *DiffService) validateKindContent(ctx context.Context, kind, content string) error {
-	descriptor, endpoint, err := diff.kinds.LookupEndpoint(kind)
+	descriptor, endpoint, err := lookupKindEndpoint(diff.kinds, kind)
 	if err != nil {
 		if kind != assetKindOpenapi && kind != kindDbschema && kind != kindDependency {
 			return nil
@@ -526,20 +518,24 @@ func (diff *DiffService) resolveSelectorKeys(ctx context.Context, tenantID uuid.
 			return ResolvedDocRef{}, nil, err
 		}
 		content := diff.blobContent(ctx, upload.BlobDigest)
-		return ResolvedDocRef{SourceType: diffSourceTypeUpload, Kind: upload.Kind, ContentHash: upload.BlobDigest, UploadID: new(upload.ID)}, extractOperationKeys(content), nil
+		keys, err := diff.documentItemKeys(ctx, upload.Kind, content)
+		if err != nil {
+			return ResolvedDocRef{}, nil, err
+		}
+		return ResolvedDocRef{SourceType: diffSourceTypeUpload, Kind: upload.Kind, ContentHash: upload.BlobDigest, UploadID: new(upload.ID)}, keys, nil
 	default:
 		return ResolvedDocRef{}, nil, ErrValidation
 	}
 }
 
-// versionItemKeys 返回版本的已索引操作键。当版本未索引（如合并物化）时，从合并文档
+// versionItemKeys 返回版本的已索引条目键。当版本未索引（如合并物化）时，从合并文档
 // blob 派生键。
 func (diff *DiffService) versionItemKeys(ctx context.Context, tenantID, versionID uuid.UUID) map[string]bool {
 	items, _, err := diff.store.ListAssetVersionItems(ctx, tenantID, versionID, "", itemsFetchBatchSize, 0)
 	if err == nil && len(items) > 0 {
 		keys := make(map[string]bool, len(items))
 		for _, item := range items {
-			if item.ItemType == "operation" {
+			if item.ItemType == itemTypeOperation {
 				keys[item.Key] = true
 			}
 		}
@@ -552,18 +548,73 @@ func (diff *DiffService) versionItemKeys(ctx context.Context, tenantID, versionI
 	if version.MergedRef == nil {
 		return map[string]bool{}
 	}
-	return extractOperationKeys(diff.blobContent(ctx, *version.MergedRef))
+	keys, keysErr := diff.documentItemKeys(ctx, diff.diffKind(ctx, tenantID, version), diff.blobContent(ctx, *version.MergedRef))
+	if keysErr != nil {
+		return map[string]bool{}
+	}
+	return keys
 }
 
-// computeKeysDiff 对已索引操作键派生结构化差异。
+// diffKind 解析版本所属资产类别；不可解析时回退为 openapi。
+func (diff *DiffService) diffKind(ctx context.Context, tenantID uuid.UUID, version AssetVersionRecord) string {
+	if asset, err := diff.store.GetAsset(ctx, tenantID, version.AssetID); err == nil && asset.Kind != "" {
+		return asset.Kind
+	}
+	return assetKindOpenapi
+}
+
+// documentItemKeys 派生某文档的操作/条目键：优先通过已安装的 kind 端点索引文档得到键，
+// 端点缺失时回退为宿主的 openapi 操作键解析。这是历史 openapi 直连语义的统一替代，
+// 使 openapi 与通用 kind 走同一条端点路由。
+func (diff *DiffService) documentItemKeys(ctx context.Context, kind, content string) (map[string]bool, error) {
+	descriptor, endpoint, err := lookupKindEndpoint(diff.kinds, kind)
+	if err == nil {
+		return diff.extractKeysViaEndpoint(ctx, descriptor, endpoint, content)
+	}
+	if kind != assetKindOpenapi && kind != kindDbschema && kind != kindDependency {
+		// 未安装的未来 kind：保留历史 openapi 直连回退语义，等插件安装后再启用。
+		return extractOperationKeys(content), nil
+	}
+	return nil, err
+}
+
+// extractKeysViaEndpoint 通过 kind 端点的 extract 能力索引文档并收集条目键。
+func (diff *DiffService) extractKeysViaEndpoint(ctx context.Context, descriptor kinds.Descriptor, endpoint plugin.Endpoint, content string) (map[string]bool, error) {
+	result, err := endpoint.Invoke(ctx, plugin.Call{
+		Capability: "kind/" + descriptor.Kind, Method: "extract",
+		ContentType: "application/yaml", Payload: []byte(content),
+		Metadata: map[string]string{"canonical-version": descriptor.PluginVersion},
+	})
+	if err != nil {
+		return nil, err
+	}
+	var response struct {
+		Items []kinds.Item `json:"items"`
+	}
+	if err := json.Unmarshal(result.Payload, &response); err != nil {
+		return nil, err
+	}
+	keys := make(map[string]bool, len(response.Items))
+	for _, item := range response.Items {
+		keys[item.Key] = true
+	}
+	return keys, nil
+}
+
+// computeKeysDiff 对已索引条目键派生结构化差异。变更码按类别选择：openapi 用
+// operation-removed，其余 kind 用 item-removed。
 func computeKeysDiff(left, right ResolvedDocRef, generatedAt time.Time, leftKeys, rightKeys map[string]bool) DiffOutcome {
+	removedCode := kinds.DiffCodeItemRemoved
+	if left.Kind == assetKindOpenapi {
+		removedCode = kinds.DiffCodeOperationRemoved
+	}
 	changes := make([]DiffChangeKind, 0)
 	summary := DiffCountsSummary{}
 	for key := range leftKeys {
 		if !rightKeys[key] {
 			changes = append(changes, DiffChangeKind{
-				ID: "removed:" + key, Level: diffChangeBreaking, Code: diffCodeOperationRemoved,
-				Path: key, Summary: key, Before: map[string]any{"operation": key}, After: nil,
+				ID: "removed:" + key, Level: diffChangeBreaking, Code: removedCode,
+				Path: key, Summary: key, Before: map[string]any{"key": key}, After: nil,
 			})
 			summary.Removed++
 			summary.Breaking++
@@ -576,7 +627,7 @@ func computeKeysDiff(left, right ResolvedDocRef, generatedAt time.Time, leftKeys
 		}
 	}
 	sort.Slice(changes, func(i, j int) bool { return changes[i].Path < changes[j].Path })
-	return DiffOutcome{Kind: "openapi", Left: left, Right: right, Summary: summary, Changes: changes, GeneratedAt: generatedAt}
+	return DiffOutcome{Kind: left.Kind, Left: left, Right: right, Summary: summary, Changes: changes, GeneratedAt: generatedAt}
 }
 
 // versionContent 从版本的 base 修订 blob 重建其合并文档内容（openapi 差异读取合并文档）。
@@ -655,48 +706,8 @@ func (diff *DiffService) verifyToken(token string) (uuid.UUID, error) {
 	return uuid.Parse(claim.ShareLinkID)
 }
 
-// computeDiff 对 OpenAPI 操作派生结构化差异。
-func computeDiff(left, right ResolvedDocRef, generatedAt time.Time) DiffOutcome {
-	leftOps := map[string]bool{}
-	rightOps := map[string]bool{}
-	// 真实实现读取所引用文档；M3 冒烟中夹具比较已索引条目键。确定性回退将每个
-	// 左侧存在而右侧缺失的键标记为已移除操作。
-	_ = left
-	_ = right
-	changes := []DiffChangeKind{}
-	summary := DiffCountsSummary{}
-	outcome := DiffOutcome{Kind: "openapi", Left: left, Right: right, Summary: summary, Changes: changes, GeneratedAt: generatedAt}
-	_ = leftOps
-	_ = rightOps
-	return outcome
-}
-
-// computeOpenAPIDiff 读取两个 openapi 文档并报告已移除操作。
-func computeOpenAPIDiff(left, right ResolvedDocRef, generatedAt time.Time, leftContent, rightContent string) DiffOutcome {
-	leftOps := extractOperationKeys(leftContent)
-	rightOps := extractOperationKeys(rightContent)
-	changes := make([]DiffChangeKind, 0)
-	summary := DiffCountsSummary{}
-	for key := range leftOps {
-		if !rightOps[key] {
-			changes = append(changes, DiffChangeKind{
-				ID: "removed:" + key, Level: diffChangeBreaking, Code: diffCodeOperationRemoved,
-				Path: key, Summary: key, Before: map[string]any{"operation": key}, After: nil,
-			})
-			summary.Removed++
-			summary.Breaking++
-		}
-	}
-	for key := range rightOps {
-		if !leftOps[key] {
-			summary.Added++
-			summary.NonBreaking++
-		}
-	}
-	sort.Slice(changes, func(i, j int) bool { return changes[i].Path < changes[j].Path })
-	return DiffOutcome{Kind: "openapi", Left: left, Right: right, Summary: summary, Changes: changes, GeneratedAt: generatedAt}
-}
-
+// extractOperationKeys 是未安装未来 kind 时的 openapi 直连回退：从文档提取
+// 'UPPER(method) normalizedPath' 操作键。与 openapi kind 的 operationKeys 语义一致。
 func extractOperationKeys(content string) map[string]bool {
 	var document map[string]any
 	if err := yaml.Unmarshal([]byte(content), &document); err != nil {
@@ -718,9 +729,3 @@ func extractOperationKeys(content string) map[string]bool {
 	}
 	return keys
 }
-
-var (
-	_ = os.ReadFile
-	_ = utf8.RuneCountInString
-	_ = fmt.Sprintf
-)

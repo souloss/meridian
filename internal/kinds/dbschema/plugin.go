@@ -89,8 +89,53 @@ func (Plugin) Extract(ctx context.Context, input kinds.CanonicalDocument, _ kind
 	return items, nil
 }
 
-func (Plugin) Diff(context.Context, kinds.CanonicalDocument, kinds.CanonicalDocument, kinds.RuleSet) (kinds.DiffResult, error) {
-	return kinds.DiffResult{}, nil
+// Diff 对两侧文档的条目键派生「移除即破坏」的差异：左有右无的表/列键视为移除。
+func (Plugin) Diff(_ context.Context, left, right kinds.CanonicalDocument, _ kinds.RuleSet) (kinds.DiffResult, error) {
+	leftKeys, leftErr := itemKeys(left.Document.Content)
+	if leftErr != nil {
+		return kinds.DiffResult{}, leftErr
+	}
+	rightKeys, rightErr := itemKeys(right.Document.Content)
+	if rightErr != nil {
+		return kinds.DiffResult{}, rightErr
+	}
+	return kinds.RemovedItemKeys(leftKeys, rightKeys, kinds.DiffCodeItemRemoved), nil
+}
+
+// itemKeys 提取 dbschema 文档的表与列条目键集合。
+func itemKeys(content []byte) (map[string]bool, error) {
+	var document map[string]any
+	if err := yaml.Unmarshal(content, &document); err != nil {
+		return nil, err
+	}
+	if document["schemaVersion"] != SchemaVersion {
+		return nil, errors.New("invalid dbschema schemaVersion")
+	}
+	keys := make(map[string]bool)
+	tables, _ := document["tables"].([]any)
+	for _, entry := range tables {
+		table, ok := entry.(map[string]any)
+		if !ok {
+			continue
+		}
+		name, _ := table["name"].(string)
+		if name == "" {
+			continue
+		}
+		keys[name] = true
+		columns, _ := table["columns"].([]any)
+		for _, columnEntry := range columns {
+			column, ok := columnEntry.(map[string]any)
+			if !ok {
+				continue
+			}
+			columnName, _ := column["name"].(string)
+			if columnName != "" {
+				keys[name+"."+columnName] = true
+			}
+		}
+	}
+	return keys, nil
 }
 
 func (Plugin) CompileOverlay(context.Context, string, []byte) ([]kinds.OverlayAction, error) {

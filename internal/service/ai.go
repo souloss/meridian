@@ -29,17 +29,10 @@ type AiWorkflow struct {
 	providers  *ai.Registry
 }
 
-// NewAiWorkflow 构造 M3 AI 生成/审核/发布用例。
-func NewAiWorkflow(store AiGenerationStore, blobs BlobStore, identities IdentityStore, registries ...*ai.Registry) *AiWorkflow {
-	workflow := &AiWorkflow{store: store, blobs: blobs, identities: identities, now: time.Now}
-	registry := ai.NewRegistry()
-	if len(registries) > 0 && registries[0] != nil {
-		registry = registries[0]
-	}
-	if _, err := registry.Lookup(commandAIProviderID); err != nil {
-		_ = registry.Register(commandAIProvider{workflow: workflow})
-	}
-	workflow.providers = registry
+// NewAiWorkflow 构造 M3 AI 生成/审核/发布用例。registry 是插件主机注入的 AI provider
+// 端点注册表；未注入（nil）时，provider 选择返回明确的装配错误而不是回退到进程内直连实现。
+func NewAiWorkflow(store AiGenerationStore, blobs BlobStore, identities IdentityStore, registry *ai.Registry) *AiWorkflow {
+	workflow := &AiWorkflow{store: store, blobs: blobs, identities: identities, now: time.Now, providers: registry}
 	return workflow
 }
 

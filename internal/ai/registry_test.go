@@ -38,15 +38,19 @@ func TestProviderCanUseGenericPluginEndpoint(t *testing.T) {
 	}
 }
 
-func TestRegistryRejectsDuplicateProvider(t *testing.T) {
+func TestRegistryReplacesProvider(t *testing.T) {
 	t.Parallel()
 	registry := NewRegistry()
 	provider := testProvider{}
-	if err := registry.Register(provider); err != nil {
+	if err := registry.Replace(provider); err != nil {
 		t.Fatal(err)
 	}
-	if err := registry.Register(provider); err == nil {
-		t.Fatal("expected duplicate provider error")
+	lookedUp, err := registry.Lookup("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if lookedUp.Descriptor().ID != "test" {
+		t.Fatalf("unexpected provider: %#v", lookedUp.Descriptor())
 	}
 }
 

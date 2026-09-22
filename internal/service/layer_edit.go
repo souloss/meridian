@@ -13,7 +13,6 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/kinds"
-	"github.com/meridian-labs/meridian/internal/kinds/builtin"
 	"github.com/meridian-labs/meridian/internal/plugin"
 	"github.com/meridian-labs/meridian/internal/task"
 	"go.yaml.in/yaml/v3"
@@ -60,12 +59,9 @@ type LayerEdit struct {
 	kinds      *kinds.Registry
 }
 
-// NewLayerEdit 构造 M2 层编辑用例。
-func NewLayerEdit(store LayerEditStore, blobs BlobStore, identities IdentityStore, registries ...*kinds.Registry) *LayerEdit {
-	registry := builtin.NewRegistry()
-	if len(registries) > 0 && registries[0] != nil {
-		registry = registries[0]
-	}
+// NewLayerEdit 构造 M2 层编辑用例。registry 是插件主机注入的 kind 能力端点注册表；
+// 未注入（nil）时，任何 kind 能力调用都返回明确的装配错误。
+func NewLayerEdit(store LayerEditStore, blobs BlobStore, identities IdentityStore, registry *kinds.Registry) *LayerEdit {
 	return &LayerEdit{store: store, blobs: blobs, identities: identities, now: time.Now, kinds: registry}
 }
 
@@ -616,7 +612,7 @@ func (editor *LayerEdit) indexGenericItems(ctx context.Context, tenantID uuid.UU
 	if assetRecord.Kind == assetKindOpenapi {
 		return nil
 	}
-	descriptor, endpoint, err := editor.kinds.LookupEndpoint(assetRecord.Kind)
+	descriptor, endpoint, err := lookupKindEndpoint(editor.kinds, assetRecord.Kind)
 	if err != nil {
 		// Kinds that are not yet shipped (for example asyncapi in a later
 		// milestone) keep the historical no-index behavior until their plugin

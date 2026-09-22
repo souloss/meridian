@@ -19,6 +19,7 @@ import (
 	"uuid"
 
 	"github.com/meridian-labs/meridian/internal/database"
+	"github.com/meridian-labs/meridian/internal/plugins"
 	"github.com/meridian-labs/meridian/internal/repository"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/meridian-labs/meridian/internal/storage"
@@ -107,11 +108,23 @@ func newM3AiFixture(t *testing.T) *m3AiFixture {
 	if err != nil {
 		t.Fatalf("create blob store: %v", err)
 	}
-	layerEdit := service.NewLayerEdit(layerStore, blobs, identityStore)
-	aiWorkflow := service.NewAiWorkflow(aiStore, blobs, identityStore)
+	pluginRuntime, err := plugins.New(t.Context())
+	if err != nil {
+		t.Fatalf("create plugin runtime: %v", err)
+	}
+	t.Cleanup(func() {
+		closeContext, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = pluginRuntime.Close(closeContext)
+	})
+	layerEdit := service.NewLayerEdit(layerStore, blobs, identityStore, pluginRuntime.Kinds)
+	aiWorkflow := service.NewAiWorkflow(aiStore, blobs, identityStore, pluginRuntime.AI)
+	if err := pluginRuntime.RegisterAIProvider(t.Context(), aiWorkflow.Provider()); err != nil {
+		t.Fatalf("install builtin AI provider: %v", err)
+	}
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
 		Executions:       repositoryStore,
-		SyncRunner:       service.NewPipelineRunner(assetStore, blobs, workspace),
+		SyncRunner:       service.NewPipelineRunner(assetStore, blobs, workspace, pluginRuntime.Kinds),
 		DiscoverRunner:   service.NewDiscoveryRunner(discoveryStore, workspace),
 		MergeRunner:      layerEdit,
 		AiGenerateRunner: aiWorkflow,

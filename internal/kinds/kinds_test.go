@@ -31,9 +31,6 @@ func TestRegistryAcceptsTransportNeutralEndpoint(t *testing.T) {
 	if got.Kind != descriptor.Kind || got.PluginVersion != descriptor.PluginVersion || got.ContractVersion != descriptor.ContractVersion || !slices.Equal(got.Capabilities, descriptor.Capabilities) || endpoint == nil {
 		t.Fatalf("unexpected endpoint binding: %#v %v", got, endpoint)
 	}
-	if typed, err := registry.Lookup("custom"); err != nil || typed.Descriptor().Kind != "custom" {
-		t.Fatalf("expected endpoint-backed typed proxy, got %v", err)
-	}
 }
 
 type contractPlugin struct {

@@ -86,8 +86,23 @@ func (Plugin) Extract(ctx context.Context, input kinds.CanonicalDocument, _ kind
 	return items, nil
 }
 
-func (Plugin) Diff(context.Context, kinds.CanonicalDocument, kinds.CanonicalDocument, kinds.RuleSet) (kinds.DiffResult, error) {
-	return kinds.DiffResult{}, nil
+// Diff 对两侧文档的操作条目键派生「移除即破坏」的差异：左有右无的 operation 键视为
+// 移除操作并标记 breaking。与宿主的 OpenAPI diff 语义保持一致（operation-removed）。
+func (Plugin) Diff(_ context.Context, left, right kinds.CanonicalDocument, _ kinds.RuleSet) (kinds.DiffResult, error) {
+	return kinds.RemovedItemKeys(operationKeys(left.Document.Content), operationKeys(right.Document.Content), kinds.DiffCodeOperationRemoved), nil
+}
+
+// operationKeys 从 OpenAPI 文档提取 'UPPER(method) normalizedPath' 键集合。
+func operationKeys(content []byte) map[string]bool {
+	operations, err := parseOperations(content)
+	if err != nil {
+		return map[string]bool{}
+	}
+	keys := make(map[string]bool, len(operations))
+	for _, operation := range operations {
+		keys[operation.Method+" "+operation.Path] = true
+	}
+	return keys
 }
 
 func (Plugin) CompileOverlay(context.Context, string, []byte) ([]kinds.OverlayAction, error) {

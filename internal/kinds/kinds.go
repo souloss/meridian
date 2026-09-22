@@ -75,14 +75,64 @@ type DiffResult struct {
 	Changes  []map[string]any `json:"changes,omitempty"`
 }
 
+// 差异变更码，供 kind 的 Diff 实现与宿主消费者共用，避免同值常量多份漂移。
+const (
+	// DiffCodeOperationRemoved 是 openapi-v1 的 operation-removed 破坏规则码。
+	DiffCodeOperationRemoved = "operation-removed"
+	// DiffCodeItemRemoved 是通用 kind（dbschema / dependency 等）的条目移除码。
+	DiffCodeItemRemoved = "item-removed"
+)
+
+// 差异变更条目在 Changes []map[string]any 中使用的一致键名，供消费者映射为强类型变更。
+// 这是 wire contract 的一部分，外部插件与宿主共享同一份字段语义。
+const (
+	// DiffChangeLevel 是变更级别（breaking / non_breaking / …）。
+	DiffChangeLevel = "level"
+	// DiffChangeCode 是变更码（如 operation-removed、item-removed）。
+	DiffChangeCode = "code"
+	// DiffChangePath 定位被变更的条目。
+	DiffChangePath = "path"
+	// DiffChangeSummary 是人类可读的变更描述。
+	DiffChangeSummary = "summary"
+	// DiffChangeBefore 与 DiffChangeAfter 携带两侧原始值（缺失时为 nil）。
+	DiffChangeBefore = "before"
+	DiffChangeAfter  = "after"
+)
+
+// RemovedItemKeys 派生「移除即破坏」的通用差异：左有右无的条目键视为被移除并标记为
+// breaking。code 是变更码（openapi 用 operation-removed，其余 kind 用 item-removed）。
+// 它是内置 kind 的 Diff 实现共用的确定性逻辑，使 external runtime 与内置实现返回同构结果。
+func RemovedItemKeys(left, right map[string]bool, code string) DiffResult {
+	removed := make([]string, 0, len(left))
+	for key := range left {
+		if !right[key] {
+			removed = append(removed, key)
+		}
+	}
+	slices.Sort(removed)
+	changes := make([]map[string]any, 0, len(removed))
+	for _, key := range removed {
+		changes = append(changes, map[string]any{
+			DiffChangeLevel:   "breaking",
+			DiffChangeCode:    code,
+			DiffChangePath:    key,
+			DiffChangeSummary: key,
+			DiffChangeBefore:  map[string]any{"key": key},
+			DiffChangeAfter:   nil,
+		})
+	}
+	return DiffResult{Breaking: len(changes) > 0, Changes: changes}
+}
+
 type OverlayAction struct {
 	Operation string `json:"operation"`
 	Target    string `json:"target,omitempty"`
 	Value     any    `json:"value,omitempty"`
 }
 
-// Plugin is the typed host contract for a kind capability. Its methods are
-// pure domain operations; lifecycle and transport are owned by plugin.Host.
+// Plugin is the typed domain contract a kind implementation is written against.
+// Built-in kinds implement it and are bridged into the transport-neutral host
+// by NewLocalEndpoint; the interface does not itself cross any process boundary.
 type Plugin interface {
 	Descriptor() Descriptor
 	Validate(context.Context, Document) (ValidatedDocument, ValidationReport, error)
@@ -92,145 +142,26 @@ type Plugin interface {
 	CompileOverlay(context.Context, string, []byte) ([]OverlayAction, error)
 }
 
-// EndpointPlugin is a transport-neutral endpoint binding. A process-local
-// implementation and an RPC proxy both satisfy the same registry entry.
-type EndpointPlugin struct {
-	descriptor Descriptor
-	endpoint   plugin.Endpoint
-}
-
-func NewEndpointPlugin(descriptor Descriptor, endpoint plugin.Endpoint) (*EndpointPlugin, error) {
-	if endpoint == nil || descriptor.Kind == "" || descriptor.PluginVersion == "" || descriptor.ContractVersion == "" {
-		return nil, ErrInvalidKindPlugin
-	}
-	return &EndpointPlugin{descriptor: descriptor, endpoint: endpoint}, nil
-}
-
-func (binding *EndpointPlugin) Descriptor() Descriptor { return binding.descriptor }
-
-func (binding *EndpointPlugin) Validate(ctx context.Context, input Document) (ValidatedDocument, ValidationReport, error) {
-	result, err := binding.endpoint.Invoke(ctx, plugin.Call{Capability: capabilityID(binding.descriptor), Method: "validate", ContentType: input.MediaType, Payload: input.Content})
-	if err != nil {
-		return ValidatedDocument{}, ValidationReport{}, err
-	}
-	var report ValidationReport
-	if err := json.Unmarshal(result.Payload, &report); err != nil {
-		return ValidatedDocument{}, ValidationReport{}, err
-	}
-	if !report.Valid {
-		return ValidatedDocument{}, report, errors.New("kind validation failed")
-	}
-	return ValidatedDocument{Document: input}, report, nil
-}
-
-func (binding *EndpointPlugin) Normalize(ctx context.Context, input ValidatedDocument) (CanonicalDocument, ArtifactSet, error) {
-	result, err := binding.endpoint.Invoke(ctx, plugin.Call{Capability: capabilityID(binding.descriptor), Method: "normalize", ContentType: input.Document.MediaType, Payload: input.Document.Content})
-	if err != nil {
-		return CanonicalDocument{}, nil, err
-	}
-	var response struct {
-		Document  Document    `json:"document"`
-		Version   string      `json:"version"`
-		Artifacts ArtifactSet `json:"artifacts"`
-	}
-	if err := json.Unmarshal(result.Payload, &response); err != nil {
-		return CanonicalDocument{}, nil, err
-	}
-	return CanonicalDocument{Document: response.Document, Version: response.Version}, response.Artifacts, nil
-}
-
-func (binding *EndpointPlugin) Extract(ctx context.Context, input CanonicalDocument, provenance ProvenanceMap) ([]Item, error) {
-	metadata := map[string]string{"canonical-version": input.Version}
-	if provenance != nil {
-		encoded, err := json.Marshal(provenance)
-		if err != nil {
-			return nil, err
-		}
-		metadata["provenance"] = string(encoded)
-	}
-	result, err := binding.endpoint.Invoke(ctx, plugin.Call{Capability: capabilityID(binding.descriptor), Method: "extract", ContentType: input.Document.MediaType, Payload: input.Document.Content, Metadata: metadata})
-	if err != nil {
-		return nil, err
-	}
-	var response struct {
-		Items []Item `json:"items"`
-	}
-	if err := json.Unmarshal(result.Payload, &response); err != nil {
-		return nil, err
-	}
-	return response.Items, nil
-}
-
-func (binding *EndpointPlugin) Diff(ctx context.Context, left CanonicalDocument, right CanonicalDocument, rules RuleSet) (DiffResult, error) {
-	payload, err := json.Marshal(struct {
-		Left  CanonicalDocument `json:"left"`
-		Right CanonicalDocument `json:"right"`
-		Rules RuleSet           `json:"rules"`
-	}{left, right, rules})
-	if err != nil {
-		return DiffResult{}, err
-	}
-	result, err := binding.endpoint.Invoke(ctx, plugin.Call{Capability: capabilityID(binding.descriptor), Method: "diff", ContentType: "application/json", Payload: payload})
-	if err != nil {
-		return DiffResult{}, err
-	}
-	var response DiffResult
-	if err := json.Unmarshal(result.Payload, &response); err != nil {
-		return DiffResult{}, err
-	}
-	return response, nil
-}
-
-func (binding *EndpointPlugin) CompileOverlay(ctx context.Context, dialect string, content []byte) ([]OverlayAction, error) {
-	result, err := binding.endpoint.Invoke(ctx, plugin.Call{Capability: capabilityID(binding.descriptor), Method: "overlay", ContentType: "application/octet-stream", Payload: content, Metadata: map[string]string{"dialect": dialect}})
-	if err != nil {
-		return nil, err
-	}
-	var response []OverlayAction
-	if err := json.Unmarshal(result.Payload, &response); err != nil {
-		return nil, err
-	}
-	return response, nil
-}
-
 func capabilityID(descriptor Descriptor) string { return "kind/" + descriptor.Kind }
 
 // NewLocalEndpoint adapts a typed Kind plugin to the transport-neutral
-// endpoint. It is useful for built-in adapters; external runtimes provide
-// their own plugin.Endpoint implementation instead.
+// endpoint. It is the in-process endpoint implementation used by built-in
+// adapters; external runtimes provide their own plugin.Endpoint instead.
 func NewLocalEndpoint(kindPlugin Plugin) plugin.Endpoint {
 	return localEndpoint{plugin: kindPlugin, capability: capabilityID(kindPlugin.Descriptor())}
 }
 
+// Registry indexes installed kind capabilities by kind. Every entry is an
+// endpoint owned by the plugin host; there is no path that stores or returns a
+// typed plugin outside the host lifecycle.
 type Registry struct {
 	mu          sync.RWMutex
-	plugins     map[string]Plugin
 	endpoints   map[string]plugin.Endpoint
 	descriptors map[string]Descriptor
 }
 
 func NewRegistry() *Registry {
-	return &Registry{plugins: make(map[string]Plugin), endpoints: make(map[string]plugin.Endpoint), descriptors: make(map[string]Descriptor)}
-}
-
-func (registry *Registry) Register(plugin Plugin) error {
-	if plugin == nil {
-		return ErrInvalidKindPlugin
-	}
-	descriptor := plugin.Descriptor()
-	if descriptor.Kind == "" || descriptor.PluginVersion == "" || descriptor.ContractVersion == "" {
-		return ErrInvalidKindPlugin
-	}
-	registry.mu.Lock()
-	defer registry.mu.Unlock()
-	if _, exists := registry.endpoints[descriptor.Kind]; exists {
-		return fmt.Errorf("%w: %s", ErrDuplicateKind, descriptor.Kind)
-	}
-	registry.plugins[descriptor.Kind] = plugin
-	registry.endpoints[descriptor.Kind] = localEndpoint{plugin: plugin, capability: capabilityID(descriptor)}
-	descriptor.Capabilities = slices.Clone(descriptor.Capabilities)
-	registry.descriptors[descriptor.Kind] = descriptor
-	return nil
+	return &Registry{endpoints: make(map[string]plugin.Endpoint), descriptors: make(map[string]Descriptor)}
 }
 
 // RegisterEndpoint binds a descriptor to any runtime endpoint, including a
@@ -240,30 +171,15 @@ func (registry *Registry) RegisterEndpoint(descriptor Descriptor, endpoint plugi
 	if endpoint == nil || descriptor.Kind == "" || descriptor.PluginVersion == "" || descriptor.ContractVersion == "" {
 		return ErrInvalidKindPlugin
 	}
-	binding, err := NewEndpointPlugin(descriptor, endpoint)
-	if err != nil {
-		return err
-	}
 	registry.mu.Lock()
 	defer registry.mu.Unlock()
 	if _, exists := registry.endpoints[descriptor.Kind]; exists {
 		return fmt.Errorf("%w: %s", ErrDuplicateKind, descriptor.Kind)
 	}
-	registry.plugins[descriptor.Kind] = binding
 	registry.endpoints[descriptor.Kind] = endpoint
 	descriptor.Capabilities = slices.Clone(descriptor.Capabilities)
 	registry.descriptors[descriptor.Kind] = descriptor
 	return nil
-}
-
-func (registry *Registry) Lookup(kind string) (Plugin, error) {
-	registry.mu.RLock()
-	plugin, ok := registry.plugins[kind]
-	registry.mu.RUnlock()
-	if !ok {
-		return nil, fmt.Errorf("%w: %s", ErrKindUnavailable, kind)
-	}
-	return plugin, nil
 }
 
 func (registry *Registry) LookupEndpoint(kind string) (Descriptor, plugin.Endpoint, error) {

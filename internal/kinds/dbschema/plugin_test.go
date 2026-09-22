@@ -27,6 +27,22 @@ func TestPluginExtractsTablesAndColumns(t *testing.T) {
 	}
 }
 
+func TestPluginDiffReportsRemovedItems(t *testing.T) {
+	t.Parallel()
+	plugin := NewPlugin()
+	left := document([]byte("schemaVersion: meridian-dbschema-1\ntables:\n  - name: users\n    columns:\n      - name: id\n        dataType: uuid\n  - name: orders\n    columns:\n      - name: id\n        dataType: uuid\n"))
+	right := document([]byte("schemaVersion: meridian-dbschema-1\ntables:\n  - name: users\n    columns:\n      - name: id\n        dataType: uuid\n"))
+	leftCanonical := kinds.CanonicalDocument{Document: left, Version: SchemaVersion}
+	rightCanonical := kinds.CanonicalDocument{Document: right, Version: SchemaVersion}
+	diff, err := plugin.Diff(t.Context(), leftCanonical, rightCanonical, kinds.RuleSet{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !diff.Breaking || len(diff.Changes) != 2 {
+		t.Fatalf("expected breaking diff with 2 removed items, got %#v", diff)
+	}
+}
+
 func document(content []byte) kinds.Document {
 	return kinds.Document{Content: content, MediaType: "application/yaml"}
 }
