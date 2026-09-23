@@ -63,4 +63,18 @@ const (
 	scopeTodoReadSelf = "todo:read_self"
 	// scopeTenantAuditRead 是读取租户审计的权限点。
 	scopeTenantAuditRead = "tenant:audit:read"
+	// scopeTenantMemberRead 是读取团队目录的权限点。
+	scopeTenantMemberRead = "tenant:member:read"
+	// scopeTenantMemberWrite 是写入团队的权限点。
+	scopeTenantMemberWrite = "tenant:member:write"
+	// scopeTenantMemberManage 是管理租户成员关系的权限点。
+	scopeTenantMemberManage = "tenant:member:manage"
+	// scopeTenantSettingsManage 是读取与写入租户设置的权限点。
+	scopeTenantSettingsManage = "tenant:settings:manage"
+	// scopePlatformUserManage 是平台侧更新用户身份的权限点。
+	scopePlatformUserManage = "platform:user:manage"
+	// scopePlatformSettingsManage 是平台侧读取与写入平台设置的权限点。
+	scopePlatformSettingsManage = "platform:settings:manage"
+	// scopeAssetKindManage 是租户级启停资产类别的权限点。
+	scopeAssetKindManage = "assetkind:manage"
 )

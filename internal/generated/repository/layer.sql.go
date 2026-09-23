@@ -8,8 +8,27 @@ package repository
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"uuid"
 )
+
+const countPendingReviews = `-- name: CountPendingReviews :one
+SELECT count(*)::bigint
+FROM layer_revisions AS revisions
+JOIN layers ON layers.tenant_id = revisions.tenant_id AND layers.id = revisions.layer_id
+WHERE revisions.tenant_id = $1
+  AND revisions.review_status = 'pending_review'
+  AND layers.deleted_at IS NULL
+`
+
+// CountPendingReviews 执行生成的 CountPendingReviews 数据库查询。
+// 返回租户内待审核修订总数。
+func (q *Queries) CountPendingReviews(ctx context.Context, tenantID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countPendingReviews, tenantID)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
 
 const getAssetVersionForProvenance = `-- name: GetAssetVersionForProvenance :one
 SELECT tenant_id, id, asset_id, track_id, sequence_no, version, lifecycle, revision, quality_score, merge_request_id, input_fingerprint, merge_engine_version, overlay_compiler_version, overlay_mode, normalizer_version, kind_plugin_version, layer_manifest, merged_hash, merged_ref, normalized_ref, bundled_ref, provenance_ref, source_commit, baseline_version_id, diff_summary, labels, index_complete, created_at, updated_at
@@ -194,6 +213,74 @@ func (q *Queries) GetLayerRevision(ctx context.Context, arg GetLayerRevisionPara
 	return i, err
 }
 
+const listAllLayerRevisions = `-- name: ListAllLayerRevisions :many
+SELECT tenant_id, id, layer_id, scope_type, scope_key, content_hash, content_ref, content_type, dialect, source_branch, review_status, review_comment, git_commit, created_by, producer_run_id, ai_meta, review, created_at
+FROM layer_revisions
+WHERE tenant_id = $1
+  AND layer_id = $2
+ORDER BY created_at DESC, id DESC
+LIMIT $4
+OFFSET $3
+`
+
+// ListAllLayerRevisionsParams 包含 ListAllLayerRevisions 查询的强类型参数。
+type ListAllLayerRevisionsParams struct {
+	// TenantID 是提供给 ListAllLayerRevisions 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// LayerID 是提供给 ListAllLayerRevisions 查询的 LayerID 值。
+	LayerID uuid.UUID `json:"layer_id"`
+	// PageOffset 是提供给 ListAllLayerRevisions 查询的 PageOffset 值。
+	PageOffset int32 `json:"page_offset"`
+	// PageLimit 是提供给 ListAllLayerRevisions 查询的 PageLimit 值。
+	PageLimit int32 `json:"page_limit"`
+}
+
+// ListAllLayerRevisions 执行生成的 ListAllLayerRevisions 数据库查询。
+// 返回某层全部作用域的修订（无作用域过滤），供未传 ref 的调用方列出全部历史。
+func (q *Queries) ListAllLayerRevisions(ctx context.Context, arg ListAllLayerRevisionsParams) ([]LayerRevision, error) {
+	rows, err := q.db.Query(ctx, listAllLayerRevisions,
+		arg.TenantID,
+		arg.LayerID,
+		arg.PageOffset,
+		arg.PageLimit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []LayerRevision{}
+	for rows.Next() {
+		var i LayerRevision
+		if err := rows.Scan(
+			&i.TenantID,
+			&i.ID,
+			&i.LayerID,
+			&i.ScopeType,
+			&i.ScopeKey,
+			&i.ContentHash,
+			&i.ContentRef,
+			&i.ContentType,
+			&i.Dialect,
+			&i.SourceBranch,
+			&i.ReviewStatus,
+			&i.ReviewComment,
+			&i.GitCommit,
+			&i.CreatedBy,
+			&i.ProducerRunID,
+			&i.AiMeta,
+			&i.Review,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listLayerHeadsForAsset = `-- name: ListLayerHeadsForAsset :many
 SELECT layer_heads.tenant_id, layer_heads.layer_id, layer_heads.scope_type, layer_heads.scope_key, layer_heads.latest_revision_id, layer_heads.effective_revision_id, layer_heads.candidate_revision_id, layer_heads.generation, layer_heads.updated_at
 FROM layer_heads
@@ -372,6 +459,178 @@ func (q *Queries) ListLayersForAsset(ctx context.Context, arg ListLayersForAsset
 		return nil, err
 	}
 	return items, nil
+}
+
+const listPendingReviews = `-- name: ListPendingReviews :many
+SELECT revisions.tenant_id, revisions.id, revisions.layer_id, revisions.scope_type, revisions.scope_key, revisions.content_hash, revisions.content_ref, revisions.content_type, revisions.dialect, revisions.source_branch, revisions.review_status, revisions.review_comment, revisions.git_commit, revisions.created_by, revisions.producer_run_id, revisions.ai_meta, revisions.review, revisions.created_at, layers.asset_id
+FROM layer_revisions AS revisions
+JOIN layers ON layers.tenant_id = revisions.tenant_id AND layers.id = revisions.layer_id
+WHERE revisions.tenant_id = $1
+  AND revisions.review_status = 'pending_review'
+  AND layers.deleted_at IS NULL
+ORDER BY revisions.created_at DESC, revisions.id DESC
+LIMIT $3
+OFFSET $2
+`
+
+// ListPendingReviewsParams 包含 ListPendingReviews 查询的强类型参数。
+type ListPendingReviewsParams struct {
+	// TenantID 是提供给 ListPendingReviews 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// PageOffset 是提供给 ListPendingReviews 查询的 PageOffset 值。
+	PageOffset int32 `json:"page_offset"`
+	// PageLimit 是提供给 ListPendingReviews 查询的 PageLimit 值。
+	PageLimit int32 `json:"page_limit"`
+}
+
+// ListPendingReviewsRow 包含 ListPendingReviews 查询返回的列。
+type ListPendingReviewsRow struct {
+	// TenantID 是 ListPendingReviews 查询返回的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是 ListPendingReviews 查询返回的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// LayerID 是 ListPendingReviews 查询返回的 LayerID 值。
+	LayerID uuid.UUID `json:"layer_id"`
+	// ScopeType 是 ListPendingReviews 查询返回的 ScopeType 值。
+	ScopeType string `json:"scope_type"`
+	// ScopeKey 是 ListPendingReviews 查询返回的 ScopeKey 值。
+	ScopeKey string `json:"scope_key"`
+	// ContentHash 是 ListPendingReviews 查询返回的 ContentHash 值。
+	ContentHash string `json:"content_hash"`
+	// ContentRef 是 ListPendingReviews 查询返回的 ContentRef 值。
+	ContentRef string `json:"content_ref"`
+	// ContentType 是 ListPendingReviews 查询返回的 ContentType 值。
+	ContentType string `json:"content_type"`
+	// Dialect 是 ListPendingReviews 查询返回的 Dialect 值。
+	Dialect *string `json:"dialect"`
+	// SourceBranch 是 ListPendingReviews 查询返回的 SourceBranch 值。
+	SourceBranch *string `json:"source_branch"`
+	// ReviewStatus 是 ListPendingReviews 查询返回的 ReviewStatus 值。
+	ReviewStatus string `json:"review_status"`
+	// ReviewComment 是 ListPendingReviews 查询返回的 ReviewComment 值。
+	ReviewComment *string `json:"review_comment"`
+	// GitCommit 是 ListPendingReviews 查询返回的 GitCommit 值。
+	GitCommit *string `json:"git_commit"`
+	// CreatedBy 是 ListPendingReviews 查询返回的 CreatedBy 值。
+	CreatedBy *uuid.UUID `json:"created_by"`
+	// ProducerRunID 是 ListPendingReviews 查询返回的 ProducerRunID 值。
+	ProducerRunID *uuid.UUID `json:"producer_run_id"`
+	// AiMeta 是 ListPendingReviews 查询返回的 AiMeta 值。
+	AiMeta []byte `json:"ai_meta"`
+	// Review 是 ListPendingReviews 查询返回的 Review 值。
+	Review []byte `json:"review"`
+	// CreatedAt 是 ListPendingReviews 查询返回的 CreatedAt 值。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// AssetID 是 ListPendingReviews 查询返回的 AssetID 值。
+	AssetID uuid.UUID `json:"asset_id"`
+}
+
+// ListPendingReviews 执行生成的 ListPendingReviews 数据库查询。
+// 返回租户内全部待审核修订分页（供审批列表）。
+func (q *Queries) ListPendingReviews(ctx context.Context, arg ListPendingReviewsParams) ([]ListPendingReviewsRow, error) {
+	rows, err := q.db.Query(ctx, listPendingReviews, arg.TenantID, arg.PageOffset, arg.PageLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListPendingReviewsRow{}
+	for rows.Next() {
+		var i ListPendingReviewsRow
+		if err := rows.Scan(
+			&i.TenantID,
+			&i.ID,
+			&i.LayerID,
+			&i.ScopeType,
+			&i.ScopeKey,
+			&i.ContentHash,
+			&i.ContentRef,
+			&i.ContentType,
+			&i.Dialect,
+			&i.SourceBranch,
+			&i.ReviewStatus,
+			&i.ReviewComment,
+			&i.GitCommit,
+			&i.CreatedBy,
+			&i.ProducerRunID,
+			&i.AiMeta,
+			&i.Review,
+			&i.CreatedAt,
+			&i.AssetID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateLayer = `-- name: UpdateLayer :one
+UPDATE layers
+SET
+  role = COALESCE($1, role),
+  dialect = CASE WHEN $2::boolean THEN $3 ELSE dialect END,
+  enabled = COALESCE($4, enabled),
+  revision = revision + 1,
+  updated_at = now()
+WHERE tenant_id = $5
+  AND id = $6
+  AND deleted_at IS NULL
+  AND revision = $7
+RETURNING tenant_id, id, asset_id, source_spec_id, role, origin, ord, dialect, enabled, branch_patterns, display_name, revision, deleted_at, created_at, updated_at
+`
+
+// UpdateLayerParams 包含 UpdateLayer 查询的强类型参数。
+type UpdateLayerParams struct {
+	// Role 是提供给 UpdateLayer 查询的 Role 值。
+	Role *string `json:"role"`
+	// SetDialect 是提供给 UpdateLayer 查询的 SetDialect 值。
+	SetDialect bool `json:"set_dialect"`
+	// Dialect 是提供给 UpdateLayer 查询的 Dialect 值。
+	Dialect *string `json:"dialect"`
+	// Enabled 是提供给 UpdateLayer 查询的 Enabled 值。
+	Enabled *bool `json:"enabled"`
+	// TenantID 是提供给 UpdateLayer 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 UpdateLayer 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 UpdateLayer 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// UpdateLayer 执行生成的 UpdateLayer 数据库查询。
+// 更新一条层的可编辑字段（角色/方言/启停）并递增 revision。
+func (q *Queries) UpdateLayer(ctx context.Context, arg UpdateLayerParams) (Layer, error) {
+	row := q.db.QueryRow(ctx, updateLayer,
+		arg.Role,
+		arg.SetDialect,
+		arg.Dialect,
+		arg.Enabled,
+		arg.TenantID,
+		arg.ID,
+		arg.ExpectedRevision,
+	)
+	var i Layer
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.AssetID,
+		&i.SourceSpecID,
+		&i.Role,
+		&i.Origin,
+		&i.Ord,
+		&i.Dialect,
+		&i.Enabled,
+		&i.BranchPatterns,
+		&i.DisplayName,
+		&i.Revision,
+		&i.DeletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const updateLayerHeadPointers = `-- name: UpdateLayerHeadPointers :one

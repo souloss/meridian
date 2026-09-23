@@ -180,6 +180,12 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 	searchService := service.NewSearch(assetStore, systemGroupStore, identityStore)
 	systemGroups := service.NewSystemGroups(systemGroupStore, identityStore)
 	notifications := service.NewNotifications(notificationStore, identityStore, keyring)
+	coverageStore := repository.NewCoverageStore(db.Pool)
+	coverageService := service.NewCoverage(coverageStore, identityStore)
+	webhooks := service.NewWebhooks(discoveryStore)
+	teams := service.NewTeams(repository.NewTeamStore(db.Pool), identityStore)
+	settings := service.NewSettings(repository.NewSettingsStore(db.Pool), identityStore)
+	assetKinds := service.NewAssetKinds(repository.NewKindStore(db.Pool), identityStore)
 	runtime, err := task.NewRuntime(db.Pool, task.RuntimeDependencies{
 		Executions:       repositoryStore,
 		SyncRunner:       syncRunner,
@@ -215,6 +221,8 @@ func runServer(ctx context.Context, addr, databaseURL, encodedPepper string, sec
 			Producers: producers, Discovery: discovery, Assets: assets, Views: views, ServiceLifecycle: serviceLifecycle,
 			LayerEdit: layerEdit, ConfigImport: configImport, AiWorkflow: aiWorkflow, DiffService: diffService,
 			Search: searchService, SystemGroups: systemGroups, Notifications: notifications,
+			Coverage: coverageService, Webhooks: webhooks,
+			Teams: teams, Settings: settings, AssetKinds: assetKinds,
 		}, secureCookies).Handler(),
 		ReadHeaderTimeout: serverReadHeaderTimeout,
 		ReadTimeout:       serverReadTimeout,

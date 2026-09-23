@@ -37,25 +37,37 @@ var (
 
 // CredentialSecret 是凭据用例接受的仅写入材料。根据 Kind 恰好填充 SSH 或 HTTP 之一。
 type CredentialSecret struct {
-	Kind         string
-	PrivateKey   string
-	Passphrase   *string
+	// Kind 承载 CredentialSecret 的生成 Kind 值。
+	Kind string
+	// PrivateKey 承载 CredentialSecret 的生成 PrivateKey 值。
+	PrivateKey string
+	// Passphrase 承载 CredentialSecret 的生成 Passphrase 值。
+	Passphrase *string
+	// HTTPUsername 承载 CredentialSecret 的生成 HTTPUsername 值。
 	HTTPUsername string
-	HTTPToken    string
+	// HTTPToken 承载 CredentialSecret 的生成 HTTPToken 值。
+	HTTPToken string
 }
 
 // EncryptedCredential 是一个加密秘密的存储投影。
 type EncryptedCredential struct {
-	Ciphertext  []byte
-	Nonce       []byte
-	KeyVersion  int32
+	// Ciphertext 承载 EncryptedCredential 的生成 Ciphertext 值。
+	Ciphertext []byte
+	// Nonce 承载 EncryptedCredential 的生成 Nonce 值。
+	Nonce []byte
+	// KeyVersion 承载 EncryptedCredential 的生成 KeyVersion 值。
+	KeyVersion int32
+	// Fingerprint 承载 EncryptedCredential 的生成 Fingerprint 值。
 	Fingerprint string
 }
 
 // KnownHostIdentity 是由服务器派生的 RFC 4253 公钥 blob 身份。
 type KnownHostIdentity struct {
-	KeyType     string
-	PublicKey   []byte
+	// KeyType 承载 KnownHostIdentity 的生成 KeyType 值。
+	KeyType string
+	// PublicKey 承载 KnownHostIdentity 的生成 PublicKey 值。
+	PublicKey []byte
+	// Fingerprint 承载 KnownHostIdentity 的生成 Fingerprint 值。
 	Fingerprint string
 }
 
@@ -232,11 +244,16 @@ func decodeBase64Key(encoded string, encoding *base64.Encoding) ([]byte, error) 
 }
 
 type credentialSecretEnvelope struct {
-	Kind         string  `json:"kind"`
-	PrivateKey   string  `json:"privateKey,omitempty"`
-	Passphrase   *string `json:"passphrase,omitempty"`
-	HTTPUsername string  `json:"httpUsername,omitempty"`
-	HTTPToken    string  `json:"httpToken,omitempty"`
+	// Kind 承载 credentialSecretEnvelope 的生成 Kind 值。
+	Kind string `json:"kind"`
+	// PrivateKey 承载 credentialSecretEnvelope 的生成 PrivateKey 值。
+	PrivateKey string `json:"privateKey,omitempty"`
+	// Passphrase 承载 credentialSecretEnvelope 的生成 Passphrase 值。
+	Passphrase *string `json:"passphrase,omitempty"`
+	// HTTPUsername 承载 credentialSecretEnvelope 的生成 HTTPUsername 值。
+	HTTPUsername string `json:"httpUsername,omitempty"`
+	// HTTPToken 承载 credentialSecretEnvelope 的生成 HTTPToken 值。
+	HTTPToken string `json:"httpToken,omitempty"`
 }
 
 func secretEnvelope(secret CredentialSecret) credentialSecretEnvelope {

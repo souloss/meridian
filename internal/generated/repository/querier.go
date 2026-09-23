@@ -67,15 +67,24 @@ type Querier interface {
 	// CountActiveBindings 暴露相应的强类型数据库操作。
 	// 统计一个源配置当前活跃的绑定数量。
 	CountActiveBindings(ctx context.Context, arg CountActiveBindingsParams) (int64, error)
+	// CountAllProducerProfiles 暴露相应的强类型数据库操作。
+	// 返回平台生产者配置文件总数。
+	CountAllProducerProfiles(ctx context.Context) (int64, error)
 	// CountAssetVersionItems 暴露相应的强类型数据库操作。
 	// 统计资产版本条目总数。
 	CountAssetVersionItems(ctx context.Context, arg CountAssetVersionItemsParams) (int64, error)
+	// CountAssetVersions 暴露相应的强类型数据库操作。
+	// 返回一个资产下版本总数。
+	CountAssetVersions(ctx context.Context, arg CountAssetVersionsParams) (int64, error)
 	// CountBreakingTodos 暴露相应的强类型数据库操作。
 	// 统计破坏性变更待办总数。
 	CountBreakingTodos(ctx context.Context, arg CountBreakingTodosParams) (int64, error)
 	// CountCredentialRepositories 暴露相应的强类型数据库操作。
 	// 统计引用某条租户凭据的有效仓库数量。
 	CountCredentialRepositories(ctx context.Context, arg CountCredentialRepositoriesParams) (int64, error)
+	// CountDiffSnapshots 暴露相应的强类型数据库操作。
+	// 返回租户内差异快照总数。
+	CountDiffSnapshots(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountDiscoveryCandidates 暴露相应的强类型数据库操作。
 	// 返回匹配一次仓库的候选总数。
 	CountDiscoveryCandidates(ctx context.Context, arg CountDiscoveryCandidatesParams) (int64, error)
@@ -98,6 +107,9 @@ type Querier interface {
 	// 统计某用户的通知总数与未读数（独立于分页，未读数不受 unread_only 影响）。
 	// 仅当 ListNotifications 分页为空时调用，作为 total/unread 的空页兜底。
 	CountNotifications(ctx context.Context, arg CountNotificationsParams) (CountNotificationsRow, error)
+	// CountPendingReviews 暴露相应的强类型数据库操作。
+	// 返回租户内待审核修订总数。
+	CountPendingReviews(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountPlatformAuditLogs 暴露相应的强类型数据库操作。
 	// 按照 ListPlatformAuditLogs 的跨租户条件和全部可选过滤条件返回准确总数。
 	CountPlatformAuditLogs(ctx context.Context, arg CountPlatformAuditLogsParams) (int64, error)
@@ -115,12 +127,21 @@ type Querier interface {
 	// CountSearchableAssetItems 暴露相应的强类型数据库操作。
 	// 统计租户内全部活跃资产条目数量，供跨 kind 搜索分页（过滤口径与上一致）。
 	CountSearchableAssetItems(ctx context.Context, arg CountSearchableAssetItemsParams) (int64, error)
+	// CountServiceComments 暴露相应的强类型数据库操作。
+	// 返回一个服务下的评论总数。
+	CountServiceComments(ctx context.Context, arg CountServiceCommentsParams) (int64, error)
 	// CountServices 暴露相应的强类型数据库操作。
 	// 返回有效服务数量与租户固定的服务配额。
 	CountServices(ctx context.Context, tenantID uuid.UUID) (CountServicesRow, error)
+	// CountShareLinks 暴露相应的强类型数据库操作。
+	// 返回租户内分享链接总数。
+	CountShareLinks(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountSourceBindings 暴露相应的强类型数据库操作。
 	// 统计一个源配置当前的绑定数量。
 	CountSourceBindings(ctx context.Context, arg CountSourceBindingsParams) (int64, error)
+	// CountTeams 暴露相应的强类型数据库操作。
+	// 返回租户内团队总数。
+	CountTeams(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountTenantAuditLogs 暴露相应的强类型数据库操作。
 	// 按照 ListTenantAuditLogs 的租户条件和全部可选过滤条件返回准确总数。
 	CountTenantAuditLogs(ctx context.Context, arg CountTenantAuditLogsParams) (int64, error)
@@ -130,9 +151,15 @@ type Querier interface {
 	// CountTenantJobs 暴露相应的强类型数据库操作。
 	// 返回 ListTenantJobs 所用谓词对应的准确总数。
 	CountTenantJobs(ctx context.Context, arg CountTenantJobsParams) (int64, error)
+	// CountTenantMembers 暴露相应的强类型数据库操作。
+	// 返回租户内成员总数。
+	CountTenantMembers(ctx context.Context, tenantID uuid.UUID) (int64, error)
 	// CountTenantUniqueBlobBytes 暴露相应的强类型数据库操作。
 	// 每个有正引用的全局对象只计入一次，避免相同内容的重复版本重复消耗配额。
 	CountTenantUniqueBlobBytes(ctx context.Context, tenantID uuid.UUID) (int64, error)
+	// CountTenantUserSearch 暴露相应的强类型数据库操作。
+	// 返回匹配一次租户目录搜索的成员总数。
+	CountTenantUserSearch(ctx context.Context, arg CountTenantUserSearchParams) (int64, error)
 	// CountTenants 暴露相应的强类型数据库操作。
 	// 返回平台管理可见的租户生命周期记录数量。
 	CountTenants(ctx context.Context) (int64, error)
@@ -183,6 +210,9 @@ type Querier interface {
 	// CreateDefaultUserPreferences 暴露相应的强类型数据库操作。
 	// 为新身份创建语言、主题和默认视图偏好。
 	CreateDefaultUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
+	// CreateDiffRuleSet 暴露相应的强类型数据库操作。
+	// 创建一条差异规则集。
+	CreateDiffRuleSet(ctx context.Context, arg CreateDiffRuleSetParams) (DiffRuleSet, error)
 	// CreateDiffSnapshot 暴露相应的强类型数据库操作。
 	// 创建一条差异快照，冻结解析后的选择器与产物。
 	CreateDiffSnapshot(ctx context.Context, arg CreateDiffSnapshotParams) (DiffSnapshot, error)
@@ -217,6 +247,9 @@ type Querier interface {
 	// CreateNotifyOutbox 暴露相应的强类型数据库操作。
 	// 写入一条通道专属投递记录，并保留接收方用于至少一次去重的共享事件标识。
 	CreateNotifyOutbox(ctx context.Context, arg CreateNotifyOutboxParams) (NotifyOutbox, error)
+	// CreateProduceJob 暴露相应的强类型数据库操作。
+	// 为一次源物化请求记录一条 asset.produce 任务。
+	CreateProduceJob(ctx context.Context, arg CreateProduceJobParams) (Job, error)
 	// CreateProducerProfile 暴露相应的强类型数据库操作。
 	// 平台侧持久化生产者配置文件。
 	CreateProducerProfile(ctx context.Context, arg CreateProducerProfileParams) (ProducerProfile, error)
@@ -237,6 +270,9 @@ type Querier interface {
 	// CreateService 暴露相应的强类型数据库操作。
 	// 持久化一个候选接受后新建的服务，冲突时静默跳过。
 	CreateService(ctx context.Context, arg CreateServiceParams) (Service, error)
+	// CreateServiceComment 暴露相应的强类型数据库操作。
+	// 创建一条服务评论。
+	CreateServiceComment(ctx context.Context, arg CreateServiceCommentParams) (ServiceComment, error)
 	// CreateShareLink 暴露相应的强类型数据库操作。
 	// 创建一条分享链接，令牌哈希全局唯一。
 	CreateShareLink(ctx context.Context, arg CreateShareLinkParams) (ShareLink, error)
@@ -254,15 +290,33 @@ type Querier interface {
 	// 全部查询保留 tenant_id 谓词。
 	// 幂等创建一条系统分组（唯一键 tenant_id + slug）。
 	CreateSystemGroup(ctx context.Context, arg CreateSystemGroupParams) (SystemGroup, error)
+	// CreateTag 暴露相应的强类型数据库操作。
+	// 创建一条标签。颜色由服务层缺省填充（见 service.Coverage.CreateTag 的 tagColorDefault），
+	// 此处按非空列值直接落库；SQL 侧不再依赖列 DEFAULT 兜底 NULL。
+	CreateTag(ctx context.Context, arg CreateTagParams) (TagDefinition, error)
+	// CreateTeam 暴露相应的强类型数据库操作。
+	// 团队、成员关系与租户设置的持久化查询。
+	// 全部查询保留 tenant_id 谓词；团队成员要求用户先具备同租户成员关系（外键强制）。
+	// 创建一条租户内团队。
+	CreateTeam(ctx context.Context, arg CreateTeamParams) (Team, error)
 	// CreateTenant 暴露相应的强类型数据库操作。
 	// 使用明确的配额和设置快照创建租户，快照来自平台默认配置。
 	CreateTenant(ctx context.Context, arg CreateTenantParams) (Tenant, error)
+	// CreateTenantDeleteJob 暴露相应的强类型数据库操作。
+	// 为租户删除记录一条 tenant.delete 任务。
+	CreateTenantDeleteJob(ctx context.Context, arg CreateTenantDeleteJobParams) (Job, error)
+	// CreateTenantExport 暴露相应的强类型数据库操作。
+	// 创建一条租户导出任务记录（pending）。
+	CreateTenantExport(ctx context.Context, arg CreateTenantExportParams) (TenantExport, error)
 	// CreateUpload 暴露相应的强类型数据库操作。
 	// 创建一条上传。
 	CreateUpload(ctx context.Context, arg CreateUploadParams) (Upload, error)
 	// CreateUser 暴露相应的强类型数据库操作。
 	// 创建一个全局身份，保存 Argon2id PHC 校验值，不保存密码明文。
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	// CreateWebhookSyncJob 暴露相应的强类型数据库操作。
+	// 为入站 webhook 记录一条 repo.sync 任务（trigger=webhook，scope=repository）。
+	CreateWebhookSyncJob(ctx context.Context, arg CreateWebhookSyncJobParams) (Job, error)
 	// DeactivateServiceTracks 暴露相应的强类型数据库操作。
 	// 停用一个服务下全部引用轨迹并递增期望代次。
 	DeactivateServiceTracks(ctx context.Context, arg DeactivateServiceTracksParams) (int64, error)
@@ -275,6 +329,12 @@ type Querier interface {
 	// DeleteCredentialRotationIdempotency 暴露相应的强类型数据库操作。
 	// 在重新使用前删除已过期的租户凭据轮换重放记录。
 	DeleteCredentialRotationIdempotency(ctx context.Context, arg DeleteCredentialRotationIdempotencyParams) error
+	// DeleteDiffRuleSet 暴露相应的强类型数据库操作。
+	// 删除一条差异规则集。
+	DeleteDiffRuleSet(ctx context.Context, arg DeleteDiffRuleSetParams) (int64, error)
+	// DeleteDiffSnapshot 暴露相应的强类型数据库操作。
+	// 删除一条差异快照。
+	DeleteDiffSnapshot(ctx context.Context, arg DeleteDiffSnapshotParams) (int64, error)
 	// DeleteGlobalCredential 暴露相应的强类型数据库操作。
 	// 完成引用和 ETag 检查后，删除一条平台凭据。
 	DeleteGlobalCredential(ctx context.Context, arg DeleteGlobalCredentialParams) (int64, error)
@@ -284,6 +344,9 @@ type Querier interface {
 	// DeleteNotificationChannel 暴露相应的强类型数据库操作。
 	// 删除一条通知通道（If-Match 乐观并发）。
 	DeleteNotificationChannel(ctx context.Context, arg DeleteNotificationChannelParams) (int64, error)
+	// DeleteProducerProfile 暴露相应的强类型数据库操作。
+	// 软删除一个平台生产者配置。
+	DeleteProducerProfile(ctx context.Context, id uuid.UUID) (int64, error)
 	// DeleteRecentServicesForService 暴露相应的强类型数据库操作。
 	// 移除一个服务对应的最近访问记录。
 	DeleteRecentServicesForService(ctx context.Context, arg DeleteRecentServicesForServiceParams) (int64, error)
@@ -306,9 +369,42 @@ type Querier interface {
 	// DeleteServiceSourceSpecs 暴露相应的强类型数据库操作。
 	// 软删除一个服务下全部活跃源配置。
 	DeleteServiceSourceSpecs(ctx context.Context, arg DeleteServiceSourceSpecsParams) (int64, error)
+	// DeleteServiceStar 暴露相应的强类型数据库操作。
+	// 取消收藏一个服务。
+	DeleteServiceStar(ctx context.Context, arg DeleteServiceStarParams) (int64, error)
+	// DeleteSourceSpec 暴露相应的强类型数据库操作。
+	// 软删除一条源配置。
+	DeleteSourceSpec(ctx context.Context, arg DeleteSourceSpecParams) (int64, error)
 	// DeleteSyncIdempotency 暴露相应的强类型数据库操作。
 	// 在重新使用幂等键前删除已过期的 syncRepository 重放记录。
 	DeleteSyncIdempotency(ctx context.Context, arg DeleteSyncIdempotencyParams) error
+	// DeleteSystemGroup 暴露相应的强类型数据库操作。
+	// 在 If-Match 下删除一条系统分组；成员由外键级联清理。
+	DeleteSystemGroup(ctx context.Context, arg DeleteSystemGroupParams) (int64, error)
+	// DeleteTag 暴露相应的强类型数据库操作。
+	// 删除一条标签（关联由外键级联清理）。
+	DeleteTag(ctx context.Context, arg DeleteTagParams) (int64, error)
+	// DeleteTeam 暴露相应的强类型数据库操作。
+	// 删除一条团队；关联成员关系由外键级联清理。
+	DeleteTeam(ctx context.Context, arg DeleteTeamParams) (int64, error)
+	// DeleteTeamMembers 暴露相应的强类型数据库操作。
+	// 清空一个团队的成员关系。
+	DeleteTeamMembers(ctx context.Context, arg DeleteTeamMembersParams) (int64, error)
+	// DeleteTenantMember 暴露相应的强类型数据库操作。
+	// 删除一条租户成员关系。
+	DeleteTenantMember(ctx context.Context, arg DeleteTenantMemberParams) (int64, error)
+	// DeleteViewOverride 暴露相应的强类型数据库操作。
+	// 删除一条视图覆盖。
+	DeleteViewOverride(ctx context.Context, arg DeleteViewOverrideParams) (int64, error)
+	// DeprecateAssetVersion 暴露相应的强类型数据库操作。
+	// 在 If-Match 下将一个资产版本置为 deprecated 并递增 revision。
+	DeprecateAssetVersion(ctx context.Context, arg DeprecateAssetVersionParams) (AssetVersion, error)
+	// DisableTenant 暴露相应的强类型数据库操作。
+	// 在 If-Match 下将租户置为 disabled（删除流程的第一步）。
+	DisableTenant(ctx context.Context, arg DisableTenantParams) (Tenant, error)
+	// DismissDiscoveryCandidate 暴露相应的强类型数据库操作。
+	// 将候选标记为已驳回；仅在 pending 状态时生效。
+	DismissDiscoveryCandidate(ctx context.Context, arg DismissDiscoveryCandidateParams) (int64, error)
 	// FinishJobExecution 暴露相应的强类型数据库操作。
 	// 记录终态结果或可重试失败。
 	// 可重试失败保持 pending，等待 River 下一次尝试；终态失败会写入完成时间和 failed 状态。
@@ -378,6 +474,9 @@ type Querier interface {
 	// GetCurrentVersionInTrack 暴露相应的强类型数据库操作。
 	// 返回轨迹内当前已发布的版本。
 	GetCurrentVersionInTrack(ctx context.Context, arg GetCurrentVersionInTrackParams) (AssetVersion, error)
+	// GetDiffRuleSet 暴露相应的强类型数据库操作。
+	// 返回一条差异规则集。
+	GetDiffRuleSet(ctx context.Context, arg GetDiffRuleSetParams) (DiffRuleSet, error)
 	// GetDiffSnapshot 暴露相应的强类型数据库操作。
 	// 返回一条差异快照，供分享描述符冻结。
 	GetDiffSnapshot(ctx context.Context, arg GetDiffSnapshotParams) (DiffSnapshot, error)
@@ -423,6 +522,11 @@ type Querier interface {
 	// 返回一条脱敏平台任务，不包含租户拥有的负载或执行详情。
 	// 保留租户和仓库范围的作用域标识，与公开 PlatformJob 契约一致。
 	GetPlatformJob(ctx context.Context, id uuid.UUID) (GetPlatformJobRow, error)
+	// GetPlatformSettings 暴露相应的强类型数据库操作。
+	// 平台设置与租户设置、用户偏好的读取与写入查询。
+	// platform_settings 为单例 global 行；tenant settings 存于 tenants.settings（jsonb）；user_preferences 全局按 user_id。
+	// 返回平台默认配置单例（含 revision 与时间戳）。
+	GetPlatformSettings(ctx context.Context) (PlatformSetting, error)
 	// GetPlatformSettingsForTenantCreate 暴露相应的强类型数据库操作。
 	// 返回创建租户时原子复制到新租户的单例 JSON 默认配置。
 	GetPlatformSettingsForTenantCreate(ctx context.Context) ([]byte, error)
@@ -432,6 +536,18 @@ type Querier interface {
 	// GetProducerProfileByName 暴露相应的强类型数据库操作。
 	// 按全局唯一名称返回一个未删除的生产者配置文件，供配置导入解析名称引用。
 	GetProducerProfileByName(ctx context.Context, name string) (ProducerProfile, error)
+	// GetPublicAssetByName 暴露相应的强类型数据库操作。
+	// 在不提供 serviceSlug 的匿名上下文中，按租户 + 类别 + 名称定位公开资产的
+	// 当前版本指针（resolvePublicView 契约不含 serviceSlug）。
+	// 资产名在 (tenant, service, kind, name) 上唯一，但公开可见性仍由服务门控，
+	// 因此本查询同时要求其服务 visibility=public 且 lifecycle 允许公开读取。
+	GetPublicAssetByName(ctx context.Context, arg GetPublicAssetByNameParams) (GetPublicAssetByNameRow, error)
+	// GetPublicAssetBySlug 暴露相应的强类型数据库操作。
+	// 按 slug 返回一个公开可见服务及其当前资产（匿名公开读取）。
+	GetPublicAssetBySlug(ctx context.Context, arg GetPublicAssetBySlugParams) (GetPublicAssetBySlugRow, error)
+	// GetPublicAssetVersion 暴露相应的强类型数据库操作。
+	// 返回一个公开可见资产的当前版本内容引用。
+	GetPublicAssetVersion(ctx context.Context, arg GetPublicAssetVersionParams) (GetPublicAssetVersionRow, error)
 	// GetPublicServiceBySlug 暴露相应的强类型数据库操作。
 	// 按 tenant_slug + service_slug 返回一条活跃服务，供匿名公开读取解析。
 	GetPublicServiceBySlug(ctx context.Context, arg GetPublicServiceBySlugParams) (Service, error)
@@ -444,6 +560,12 @@ type Querier interface {
 	// GetRepositoryByService 暴露相应的强类型数据库操作。
 	// 返回服务所属的仓库，供搜索命中投影 owning repository。
 	GetRepositoryByService(ctx context.Context, arg GetRepositoryByServiceParams) (Repository, error)
+	// GetRepositoryTenantByID 暴露相应的强类型数据库操作。
+	// 跨租户按 id 定位仓库所属租户（入站 webhook 仅携带 repositoryId）。
+	GetRepositoryTenantByID(ctx context.Context, id uuid.UUID) (GetRepositoryTenantByIDRow, error)
+	// GetRepositoryWebhookSecretHash 暴露相应的强类型数据库操作。
+	// 返回仓库的 webhook 校验秘密摘要（不含凭据），供入站 webhook 签名校验。
+	GetRepositoryWebhookSecretHash(ctx context.Context, arg GetRepositoryWebhookSecretHashParams) ([]byte, error)
 	// GetRetryJobIdempotency 暴露相应的强类型数据库操作。
 	// 返回 retryJob 请求保留的准确响应。
 	GetRetryJobIdempotency(ctx context.Context, arg GetRetryJobIdempotencyParams) (GetRetryJobIdempotencyRow, error)
@@ -460,6 +582,9 @@ type Querier interface {
 	// 全部查询保留 tenant_id 谓词；公开读取按 tenant_slug + service_slug 跨表解析。
 	// 锁定一条活跃服务行，供条件更新与删除前校验 revision。
 	GetServiceForUpdate(ctx context.Context, arg GetServiceForUpdateParams) (Service, error)
+	// GetServiceStar 暴露相应的强类型数据库操作。
+	// 返回一个服务是否被当前用户收藏。
+	GetServiceStar(ctx context.Context, arg GetServiceStarParams) (uuid.UUID, error)
 	// GetShareLinkByTokenHash 暴露相应的强类型数据库操作。
 	// 按令牌哈希返回一条未撤销且未过期的分享链接。
 	GetShareLinkByTokenHash(ctx context.Context, tokenHash []byte) (ShareLink, error)
@@ -478,6 +603,12 @@ type Querier interface {
 	// GetSystemGroup 暴露相应的强类型数据库操作。
 	// 返回一条系统分组。
 	GetSystemGroup(ctx context.Context, arg GetSystemGroupParams) (SystemGroup, error)
+	// GetTag 暴露相应的强类型数据库操作。
+	// 返回一条标签。
+	GetTag(ctx context.Context, arg GetTagParams) (TagDefinition, error)
+	// GetTeam 暴露相应的强类型数据库操作。
+	// 按 id 返回一条团队。
+	GetTeam(ctx context.Context, arg GetTeamParams) (Team, error)
 	// GetTenantBlobReference 暴露相应的强类型数据库操作。
 	// 调用方锁定租户配额行后，返回当前对象引用数。
 	GetTenantBlobReference(ctx context.Context, arg GetTenantBlobReferenceParams) (TenantBlobRef, error)
@@ -504,6 +635,9 @@ type Querier interface {
 	// GetTenantSettings 暴露相应的强类型数据库操作。
 	// 返回租户的设置 JSON 快照，供 trust 模式与自动发布判定。
 	GetTenantSettings(ctx context.Context, id uuid.UUID) ([]byte, error)
+	// GetTenantSettingsForRead 暴露相应的强类型数据库操作。
+	// 返回一个租户的 settings 快照与 revision。
+	GetTenantSettingsForRead(ctx context.Context, tenantID uuid.UUID) (GetTenantSettingsForReadRow, error)
 	// GetTenantSlugForEvent 暴露相应的强类型数据库操作。
 	// 解析领域事件信封中使用的稳定租户标识。
 	GetTenantSlugForEvent(ctx context.Context, tenantID uuid.UUID) (string, error)
@@ -518,10 +652,22 @@ type Querier interface {
 	// GetUserByUsername 暴露相应的强类型数据库操作。
 	// 按准确且唯一的登录名返回全局身份。
 	GetUserByUsername(ctx context.Context, username string) (User, error)
+	// GetUserPasswordHash 暴露相应的强类型数据库操作。
+	// 返回一个平台身份当前密码哈希，供密码轮换校验。
+	GetUserPasswordHash(ctx context.Context, id uuid.UUID) (string, error)
+	// GetUserPreferences 暴露相应的强类型数据库操作。
+	// 返回一个用户的偏好，供读取。
+	GetUserPreferences(ctx context.Context, userID uuid.UUID) (UserPreference, error)
+	// GetViewOverride 暴露相应的强类型数据库操作。
+	// 返回一条视图覆盖。
+	GetViewOverride(ctx context.Context, arg GetViewOverrideParams) (ViewOverride, error)
 	// InsertSubscriptionChannel 暴露相应的强类型数据库操作。
 	InsertSubscriptionChannel(ctx context.Context, arg InsertSubscriptionChannelParams) (int64, error)
 	// InsertSystemGroupMember 暴露相应的强类型数据库操作。
 	InsertSystemGroupMember(ctx context.Context, arg InsertSystemGroupMemberParams) (int64, error)
+	// InsertTeamMember 暴露相应的强类型数据库操作。
+	// 为团队插入一条成员关系。
+	InsertTeamMember(ctx context.Context, arg InsertTeamMemberParams) (int64, error)
 	// ListAPITokensByUser 暴露相应的强类型数据库操作。
 	// 在明确的租户边界内，返回一个用户的稳定分页 PAT 元数据。
 	ListAPITokensByUser(ctx context.Context, arg ListAPITokensByUserParams) ([]ApiToken, error)
@@ -534,12 +680,21 @@ type Querier interface {
 	// ListAiBaseLayersForService 暴露相应的强类型数据库操作。
 	// 返回某服务某 kind 的 AI 生成 base 层（含资产标识），供替换事务复用资产。
 	ListAiBaseLayersForService(ctx context.Context, arg ListAiBaseLayersForServiceParams) ([]Layer, error)
+	// ListAllLayerRevisions 暴露相应的强类型数据库操作。
+	// 返回某层全部作用域的修订（无作用域过滤），供未传 ref 的调用方列出全部历史。
+	ListAllLayerRevisions(ctx context.Context, arg ListAllLayerRevisionsParams) ([]LayerRevision, error)
+	// ListAllProducerProfiles 暴露相应的强类型数据库操作。
+	// 返回平台生产者配置文件分页（含软删除过滤，供平台管理列表）。
+	ListAllProducerProfiles(ctx context.Context, arg ListAllProducerProfilesParams) ([]ProducerProfile, error)
 	// ListAssetKinds 暴露相应的强类型数据库操作。
 	// 返回全部启用的资产 kind 注册。
 	ListAssetKinds(ctx context.Context) ([]AssetKind, error)
 	// ListAssetVersionItems 暴露相应的强类型数据库操作。
 	// 列出资产版本条目分页。
 	ListAssetVersionItems(ctx context.Context, arg ListAssetVersionItemsParams) ([]AssetItem, error)
+	// ListAssetVersions 暴露相应的强类型数据库操作。
+	// 返回一个资产下全部版本分页（含生命周期状态），供版本历史读取。
+	ListAssetVersions(ctx context.Context, arg ListAssetVersionsParams) ([]AssetVersion, error)
 	// ListAssetsForService 暴露相应的强类型数据库操作。
 	// 返回一个服务下全部活跃资产。
 	ListAssetsForService(ctx context.Context, arg ListAssetsForServiceParams) ([]Asset, error)
@@ -552,6 +707,13 @@ type Querier interface {
 	// ListCredentialTeamShares 暴露相应的强类型数据库操作。
 	// 返回一条租户凭据完整且有序的团队共享集合。
 	ListCredentialTeamShares(ctx context.Context, arg ListCredentialTeamSharesParams) ([]uuid.UUID, error)
+	// ListDiffRuleSets 暴露相应的强类型数据库操作。
+	// Diff 规则集、快照、分享链接与上传的补齐查询。
+	// 返回租户内全部差异规则集，按 kind + name 排序。
+	ListDiffRuleSets(ctx context.Context, tenantID uuid.UUID) ([]DiffRuleSet, error)
+	// ListDiffSnapshots 暴露相应的强类型数据库操作。
+	// 返回租户内全部差异快照分页。
+	ListDiffSnapshots(ctx context.Context, arg ListDiffSnapshotsParams) ([]DiffSnapshot, error)
 	// ListDiscoveryCandidates 暴露相应的强类型数据库操作。
 	// 列出候选，按 rootDir 逐字节升序并分页。
 	ListDiscoveryCandidates(ctx context.Context, arg ListDiscoveryCandidatesParams) ([]DiscoveryCandidate, error)
@@ -587,6 +749,9 @@ type Querier interface {
 	// ListNotifications 暴露相应的强类型数据库操作。
 	// 分页列出某用户的站内通知（按可选未读过滤），并在单次往返内统计全量 total/unread。
 	ListNotifications(ctx context.Context, arg ListNotificationsParams) ([]ListNotificationsRow, error)
+	// ListPendingReviews 暴露相应的强类型数据库操作。
+	// 返回租户内全部待审核修订分页（供审批列表）。
+	ListPendingReviews(ctx context.Context, arg ListPendingReviewsParams) ([]ListPendingReviewsRow, error)
 	// ListPlatformAuditLogs 暴露相应的强类型数据库操作。
 	// 为平台控制面返回一页按最新时间优先排列的跨租户审计元数据。
 	// 平台级记录的可空租户归属会保留在结果中。
@@ -619,6 +784,9 @@ type Querier interface {
 	// 返回租户内全部活跃资产条目，供跨 kind 搜索（不绑定特定版本）。
 	// 过滤子句统一口径：数组过滤用空数组哨兵跳过，布尔过滤用 NULL 哨兵跳过三态。
 	ListSearchableAssetItems(ctx context.Context, arg ListSearchableAssetItemsParams) ([]AssetItem, error)
+	// ListServiceComments 暴露相应的强类型数据库操作。
+	// 返回一个服务下的评论分页。
+	ListServiceComments(ctx context.Context, arg ListServiceCommentsParams) ([]ListServiceCommentsRow, error)
 	// ListServices 暴露相应的强类型数据库操作。
 	// 列出活跃服务的确定顺序分页。
 	ListServices(ctx context.Context, arg ListServicesParams) ([]Service, error)
@@ -628,6 +796,9 @@ type Querier interface {
 	// ListServicesByRepository 暴露相应的强类型数据库操作。
 	// 返回一个仓库下全部活跃服务。
 	ListServicesByRepository(ctx context.Context, arg ListServicesByRepositoryParams) ([]Service, error)
+	// ListShareLinks 暴露相应的强类型数据库操作。
+	// 返回租户内全部分享链接分页。
+	ListShareLinks(ctx context.Context, arg ListShareLinksParams) ([]ShareLink, error)
 	// ListSourceBindings 暴露相应的强类型数据库操作。
 	// 列出源配置物化出的绑定，按创建顺序。
 	ListSourceBindings(ctx context.Context, arg ListSourceBindingsParams) ([]SourceBinding, error)
@@ -651,6 +822,18 @@ type Querier interface {
 	// ListSystemGroups 暴露相应的强类型数据库操作。
 	// 列出租户内全部系统分组。
 	ListSystemGroups(ctx context.Context, tenantID uuid.UUID) ([]SystemGroup, error)
+	// ListTags 暴露相应的强类型数据库操作。
+	// 返回租户内全部标签，按名称排序。
+	ListTags(ctx context.Context, tenantID uuid.UUID) ([]TagDefinition, error)
+	// ListTeamMembers 暴露相应的强类型数据库操作。
+	// 返回一个团队的成员用户 id。
+	ListTeamMembers(ctx context.Context, arg ListTeamMembersParams) ([]uuid.UUID, error)
+	// ListTeamMembersForTeams 暴露相应的强类型数据库操作。
+	// 一次批量返回多个团队的成员，避免逐团队查询的 N+1 往返。
+	ListTeamMembersForTeams(ctx context.Context, arg ListTeamMembersForTeamsParams) ([]ListTeamMembersForTeamsRow, error)
+	// ListTeams 暴露相应的强类型数据库操作。
+	// 列出租户内全部团队。
+	ListTeams(ctx context.Context, arg ListTeamsParams) ([]Team, error)
 	// ListTenantAuditLogs 暴露相应的强类型数据库操作。
 	// 返回租户范围内按最新时间优先排列的一页追加式审计元数据。
 	// 查询始终受 tenant_id 限制，结果不包含业务内容或携带秘密的字段。
@@ -670,6 +853,15 @@ type Querier interface {
 	// 在一个租户标识边界内按最新时间优先返回任务分页。
 	// 空过滤数组和空字符串表示不限制；执行输入和 River 标识仍为内部字段。
 	ListTenantJobs(ctx context.Context, arg ListTenantJobsParams) ([]Job, error)
+	// ListTenantKindOverrides 暴露相应的强类型数据库操作。
+	// 列出全部租户级 kind 覆盖（含未覆盖时由平台默认派生启用状态的左连接）。
+	ListTenantKindOverrides(ctx context.Context, tenantID uuid.UUID) ([]ListTenantKindOverridesRow, error)
+	// ListTenantMembers 暴露相应的强类型数据库操作。
+	// 返回租户内成员（用户 × 角色）的分页投影。
+	ListTenantMembers(ctx context.Context, arg ListTenantMembersParams) ([]ListTenantMembersRow, error)
+	// ListTenantMembersByIDs 暴露相应的强类型数据库操作。
+	// 校验替换成员是否都属于同一租户；任一所给 id 缺失即返回空集合以触发 404。
+	ListTenantMembersByIDs(ctx context.Context, arg ListTenantMembersByIDsParams) ([]uuid.UUID, error)
 	// ListTenants 暴露相应的强类型数据库操作。
 	// 按稳定 slug 和 UUID 顺序返回全部租户生命周期记录，供平台管理使用。
 	ListTenants(ctx context.Context, arg ListTenantsParams) ([]ListTenantsRow, error)
@@ -677,6 +869,9 @@ type Querier interface {
 	// 为平台管理员返回稳定分页的身份元数据，不包含密码或会话秘密。
 	// 可选搜索值只匹配 username 和 display_name。
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
+	// ListViewOverrides 暴露相应的强类型数据库操作。
+	// 返回租户内全部视图覆盖。
+	ListViewOverrides(ctx context.Context, tenantID uuid.UUID) ([]ViewOverride, error)
 	// ListVisibleChannelIDs 暴露相应的强类型数据库操作。
 	// 校验一组通道 ID 在租户内可见并返回其有效子集。
 	ListVisibleChannelIDs(ctx context.Context, arg ListVisibleChannelIDsParams) ([]uuid.UUID, error)
@@ -775,6 +970,9 @@ type Querier interface {
 	// 将一个租户可见的凭据 UUID 解析到唯一的所属表。
 	// 租户凭据使用与凭据列表相同的可见性条件；平台凭据可被有效成员选择，但仍由平台管理员管理。
 	ResolveRepositoryCredential(ctx context.Context, arg ResolveRepositoryCredentialParams) (ResolveRepositoryCredentialRow, error)
+	// RetireAssetVersion 暴露相应的强类型数据库操作。
+	// 在 If-Match 下将一个资产版本置为 retired 并递增 revision。
+	RetireAssetVersion(ctx context.Context, arg RetireAssetVersionParams) (AssetVersion, error)
 	// RevokeAPIToken 暴露相应的强类型数据库操作。
 	// 幂等撤销一个租户内用户拥有的 PAT，并返回其标识。
 	// 返回已经撤销的匹配记录以保持幂等；不存在或属于其他主体的记录仍视为未找到。
@@ -782,6 +980,9 @@ type Querier interface {
 	// RevokeRefreshTokenFamily 暴露相应的强类型数据库操作。
 	// 撤销一个刷新令牌家族的全部有效令牌，用于登出或重放检测。
 	RevokeRefreshTokenFamily(ctx context.Context, arg RevokeRefreshTokenFamilyParams) (int64, error)
+	// RevokeShareLink 暴露相应的强类型数据库操作。
+	// 幂等撤销一条分享链接。
+	RevokeShareLink(ctx context.Context, arg RevokeShareLinkParams) (int64, error)
 	// RotateCredentialSecret 暴露相应的强类型数据库操作。
 	// 有条件地替换加密秘密材料并递增凭据版本号。
 	RotateCredentialSecret(ctx context.Context, arg RotateCredentialSecretParams) (Credential, error)
@@ -811,6 +1012,9 @@ type Querier interface {
 	SearchFacetLifecycles(ctx context.Context, arg SearchFacetLifecyclesParams) ([]SearchFacetLifecyclesRow, error)
 	// SearchFacetRepositories 暴露相应的强类型数据库操作。
 	SearchFacetRepositories(ctx context.Context, arg SearchFacetRepositoriesParams) ([]SearchFacetRepositoriesRow, error)
+	// SearchTenantUsers 暴露相应的强类型数据库操作。
+	// 返回租户内匹配查询的成员用户元数据，供成员选择目录使用。
+	SearchTenantUsers(ctx context.Context, arg SearchTenantUsersParams) ([]SearchTenantUsersRow, error)
 	// SetJobExecutionStage 暴露相应的强类型数据库操作。
 	// 记录当前流水线阶段，不改变持久化生命周期状态。
 	// 阶段取值受应用 DDL 约束。
@@ -854,9 +1058,15 @@ type Querier interface {
 	// UpdateCredentialMetadata 暴露相应的强类型数据库操作。
 	// 有条件地更新租户凭据元数据并递增版本号。
 	UpdateCredentialMetadata(ctx context.Context, arg UpdateCredentialMetadataParams) (Credential, error)
+	// UpdateDiffRuleSet 暴露相应的强类型数据库操作。
+	// 在 If-Match 下更新一条差异规则集并递增 revision。
+	UpdateDiffRuleSet(ctx context.Context, arg UpdateDiffRuleSetParams) (DiffRuleSet, error)
 	// UpdateGlobalCredentialMetadata 暴露相应的强类型数据库操作。
 	// 有条件地更新平台凭据名称并递增版本号。
 	UpdateGlobalCredentialMetadata(ctx context.Context, arg UpdateGlobalCredentialMetadataParams) (GlobalCredential, error)
+	// UpdateLayer 暴露相应的强类型数据库操作。
+	// 更新一条层的可编辑字段（角色/方言/启停）并递增 revision。
+	UpdateLayer(ctx context.Context, arg UpdateLayerParams) (Layer, error)
 	// UpdateLayerHeadPointers 暴露相应的强类型数据库操作。
 	// 更新或创建（upsert）一个层头的最新/生效/候选修订指针并递增代次。
 	// 首次提交插入 generation=1；后续提交在既有行上递增 generation。
@@ -870,6 +1080,12 @@ type Querier interface {
 	// UpdateNotificationChannel 暴露相应的强类型数据库操作。
 	// 更新一条通知通道的可变字段并递增 revision。
 	UpdateNotificationChannel(ctx context.Context, arg UpdateNotificationChannelParams) (NotificationChannel, error)
+	// UpdatePlatformSettings 暴露相应的强类型数据库操作。
+	// 在 If-Match 下替换平台默认配置并递增 revision。
+	UpdatePlatformSettings(ctx context.Context, arg UpdatePlatformSettingsParams) (PlatformSetting, error)
+	// UpdateProducerProfile 暴露相应的强类型数据库操作。
+	// 在 If-Match 下更新一个平台生产者配置的非结构字段并递增 revision。
+	UpdateProducerProfile(ctx context.Context, arg UpdateProducerProfileParams) (ProducerProfile, error)
 	// UpdateProducerProfileDependencyStatus 暴露相应的强类型数据库操作。
 	// 启动时全量重扫并刷新依赖状态。
 	UpdateProducerProfileDependencyStatus(ctx context.Context, arg UpdateProducerProfileDependencyStatusParams) (int64, error)
@@ -884,10 +1100,32 @@ type Querier interface {
 	// UpdateSourceSpec 暴露相应的强类型数据库操作。
 	// 更新一条源配置，应用明确提供的 PATCH 字段并递增版本。
 	UpdateSourceSpec(ctx context.Context, arg UpdateSourceSpecParams) (SourceSpec, error)
+	// UpdateSystemGroup 暴露相应的强类型数据库操作。
+	// 在 If-Match 下更新一条系统分组的展示名与描述并递增 revision。
+	UpdateSystemGroup(ctx context.Context, arg UpdateSystemGroupParams) (SystemGroup, error)
+	// UpdateTag 暴露相应的强类型数据库操作。
+	// 在 If-Match 下更新一条标签并递增 revision。
+	UpdateTag(ctx context.Context, arg UpdateTagParams) (TagDefinition, error)
+	// UpdateTeam 暴露相应的强类型数据库操作。
+	// 在 If-Match 下更新团队展示名并递增 revision。
+	UpdateTeam(ctx context.Context, arg UpdateTeamParams) (Team, error)
 	// UpdateTenant 暴露相应的强类型数据库操作。
 	// 有条件地更新平台控制的租户字段并递增版本号。
 	// 字段 set 标志保留 PATCH 字段省略状态，同时允许完整替换配额。
 	UpdateTenant(ctx context.Context, arg UpdateTenantParams) (Tenant, error)
+	// UpdateTenantSettingsForWrite 暴露相应的强类型数据库操作。
+	// 在 If-Match 下替换租户 settings 并递增 revision。
+	UpdateTenantSettingsForWrite(ctx context.Context, arg UpdateTenantSettingsForWriteParams) (UpdateTenantSettingsForWriteRow, error)
+	// UpdateUserPassword 暴露相应的强类型数据库操作。
+	// 更新一个平台身份的密码哈希并递增 revision。
+	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (User, error)
+	// UpdateUserPreferences 暴露相应的强类型数据库操作。
+	// 在 If-Match 下更新用户偏好并递增 revision。
+	UpdateUserPreferences(ctx context.Context, arg UpdateUserPreferencesParams) (UserPreference, error)
+	// UpdateUserProfile 暴露相应的强类型数据库操作。
+	// 在 If-Match 下更新一个平台身份的非秘密字段并递增 revision。
+	// display_name/status 使用 set 标志保留「未提供」语义；email 可为空以支持显式清除。
+	UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (User, error)
 	// UpsertAiGenerationResult 暴露相应的强类型数据库操作。
 	// M3 AI 评审与发布的持久化查询。
 	// 全部查询保留 tenant_id 谓词；涉及层头（评审事务）的查询带 FOR UPDATE 锁。
@@ -905,6 +1143,11 @@ type Querier interface {
 	// UpsertRecentService 暴露相应的强类型数据库操作。
 	// 幂等记录一次用户对服务的成功访问。
 	UpsertRecentService(ctx context.Context, arg UpsertRecentServiceParams) (int64, error)
+	// UpsertServiceStar 暴露相应的强类型数据库操作。
+	// 服务收藏、用户偏好、视图覆盖、标签与轻量评论的持久化查询。
+	// 全部查询保留 tenant_id 谓词；user_preferences 为全局按 user_id。
+	// 收藏一个服务（幂等）。
+	UpsertServiceStar(ctx context.Context, arg UpsertServiceStarParams) (int64, error)
 	// UpsertSourceBinding 暴露相应的强类型数据库操作。
 	// 幂等创建源绑定。
 	UpsertSourceBinding(ctx context.Context, arg UpsertSourceBindingParams) (SourceBinding, error)
@@ -913,9 +1156,15 @@ type Querier interface {
 	// 全部查询保留 tenant_id 谓词，事件路由按订阅匹配后写入 notify_outbox 或 notifications。
 	// 幂等创建或替换一条订阅（自然身份 tenant_id + user_id + target_type + target_id）。
 	UpsertSubscription(ctx context.Context, arg UpsertSubscriptionParams) (Subscription, error)
+	// UpsertTenantKindOverride 暴露相应的强类型数据库操作。
+	// 为租户插入一个 kind 开关覆盖，冲突时更新并递增 revision。
+	UpsertTenantKindOverride(ctx context.Context, arg UpsertTenantKindOverrideParams) (TenantKindOverride, error)
 	// UpsertTenantMember 暴露相应的强类型数据库操作。
 	// 创建或替换租户角色关系，并记录调用方提供的更新时间。
 	UpsertTenantMember(ctx context.Context, arg UpsertTenantMemberParams) (TenantMember, error)
+	// UpsertViewOverride 暴露相应的强类型数据库操作。
+	// 幂等设置一条视图覆盖（创建或替换并递增 revision）。
+	UpsertViewOverride(ctx context.Context, arg UpsertViewOverrideParams) (ViewOverride, error)
 }
 
 var _ Querier = (*Queries)(nil)

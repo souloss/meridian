@@ -105,10 +105,97 @@ func (groups *SystemGroups) ListSystemGroups(ctx context.Context, actor Principa
 
 // SystemGroupCreateInput 承载一次创建系统分组请求。
 type SystemGroupCreateInput struct {
-	Slug        string
+	// Slug 承载 SystemGroupCreateInput 的生成 Slug 值。
+	Slug string
+	// DisplayName 承载 SystemGroupCreateInput 的生成 DisplayName 值。
 	DisplayName string
+	// Description 承载 SystemGroupCreateInput 的生成 Description 值。
 	Description *string
-	ServiceIDs  []uuid.UUID
+	// ServiceIDs 承载 SystemGroupCreateInput 的生成 ServiceIDs 值。
+	ServiceIDs []uuid.UUID
+}
+
+// SystemGroupPatchInput 承载一次系统分组 PATCH 的显式字段。
+type SystemGroupPatchInput struct {
+	// DisplayName 是替换展示名（可为空）。
+	DisplayName *string
+	// Description 是替换描述（可为空）。
+	Description *string
+	// SetDescription 表示是否显式提供 Description（区分省略与置空）。
+	SetDescription bool
+}
+
+// GetSystemGroup 返回一个系统分组及其成员服务。
+func (groups *SystemGroups) GetSystemGroup(ctx context.Context, actor Principal, tenantSlug string, groupID uuid.UUID) (SystemGroupRecord, error) {
+	membership, err := groups.tenantMembership(ctx, actor, tenantSlug, scopeServiceRead)
+	if err != nil {
+		return SystemGroupRecord{}, err
+	}
+	record, err := groups.store.GetSystemGroup(ctx, membership.TenantID, groupID)
+	if err != nil {
+		return SystemGroupRecord{}, err
+	}
+	members, err := groups.store.ListSystemGroupMembers(ctx, membership.TenantID, groupID)
+	if err != nil {
+		return SystemGroupRecord{}, err
+	}
+	record.ServiceIDs = members
+	return record, nil
+}
+
+// UpdateSystemGroup 在 If-Match 下更新一个系统分组的展示名与描述。
+func (groups *SystemGroups) UpdateSystemGroup(ctx context.Context, actor Principal, tenantSlug string, groupID uuid.UUID, etag string, patch SystemGroupPatchInput) (SystemGroupRecord, error) {
+	membership, err := groups.tenantMembership(ctx, actor, tenantSlug, groupPermissionManage)
+	if err != nil {
+		return SystemGroupRecord{}, err
+	}
+	if patch.DisplayName == nil && !patch.SetDescription {
+		return SystemGroupRecord{}, ErrValidation
+	}
+	if patch.DisplayName != nil && (strings.TrimSpace(*patch.DisplayName) == "" || utf8.RuneCountInString(*patch.DisplayName) > maxDisplayNameRunes) {
+		return SystemGroupRecord{}, ErrValidation
+	}
+	current, err := groups.store.GetSystemGroup(ctx, membership.TenantID, groupID)
+	if err != nil {
+		return SystemGroupRecord{}, err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "system-group", groupID)
+	if err != nil {
+		return SystemGroupRecord{}, ErrPrecondition
+	}
+	if expectedRevision != current.Revision {
+		return SystemGroupRecord{}, ErrPrecondition
+	}
+	record, err := groups.store.UpdateSystemGroup(ctx, membership.TenantID, groupID, expectedRevision, patch)
+	if err != nil {
+		return SystemGroupRecord{}, err
+	}
+	members, err := groups.store.ListSystemGroupMembers(ctx, membership.TenantID, groupID)
+	if err != nil {
+		return SystemGroupRecord{}, err
+	}
+	record.ServiceIDs = members
+	return record, nil
+}
+
+// DeleteSystemGroup 在 If-Match 下删除一个系统分组。
+func (groups *SystemGroups) DeleteSystemGroup(ctx context.Context, actor Principal, tenantSlug string, groupID uuid.UUID, etag string) error {
+	membership, err := groups.tenantMembership(ctx, actor, tenantSlug, groupPermissionManage)
+	if err != nil {
+		return err
+	}
+	current, err := groups.store.GetSystemGroup(ctx, membership.TenantID, groupID)
+	if err != nil {
+		return err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "system-group", groupID)
+	if err != nil {
+		return ErrPrecondition
+	}
+	if expectedRevision != current.Revision {
+		return ErrPrecondition
+	}
+	return groups.store.DeleteSystemGroup(ctx, membership.TenantID, groupID, expectedRevision)
 }
 
 func (groups *SystemGroups) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {

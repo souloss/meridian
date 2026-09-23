@@ -491,6 +491,21 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	return i, err
 }
 
+const getUserPasswordHash = `-- name: GetUserPasswordHash :one
+SELECT password_hash
+FROM users
+WHERE id = $1
+`
+
+// GetUserPasswordHash 执行生成的 GetUserPasswordHash 数据库查询。
+// 返回一个平台身份当前密码哈希，供密码轮换校验。
+func (q *Queries) GetUserPasswordHash(ctx context.Context, id uuid.UUID) (string, error) {
+	row := q.db.QueryRow(ctx, getUserPasswordHash, id)
+	var password_hash string
+	err := row.Scan(&password_hash)
+	return password_hash, err
+}
+
 const listAPITokensByUser = `-- name: ListAPITokensByUser :many
 SELECT tenant_id, id, user_id, name, token_hash, scopes, expires_at, last_used_at, revoked_at, created_at, updated_at
 FROM api_tokens
@@ -786,4 +801,108 @@ type TouchAPITokenParams struct {
 func (q *Queries) TouchAPIToken(ctx context.Context, arg TouchAPITokenParams) error {
 	_, err := q.db.Exec(ctx, touchAPIToken, arg.UsedAt, arg.TenantID, arg.ID)
 	return err
+}
+
+const updateUserPassword = `-- name: UpdateUserPassword :one
+UPDATE users
+SET
+  password_hash = $1,
+  revision = revision + 1,
+  updated_at = now()
+WHERE id = $2
+  AND revision = $3
+RETURNING id, username, password_hash, display_name, email, status, is_platform_admin, revision, created_at, updated_at
+`
+
+// UpdateUserPasswordParams 包含 UpdateUserPassword 查询的强类型参数。
+type UpdateUserPasswordParams struct {
+	// PasswordHash 是提供给 UpdateUserPassword 查询的 PasswordHash 值。
+	PasswordHash string `json:"password_hash"`
+	// ID 是提供给 UpdateUserPassword 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 UpdateUserPassword 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// UpdateUserPassword 执行生成的 UpdateUserPassword 数据库查询。
+// 更新一个平台身份的密码哈希并递增 revision。
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserPassword, arg.PasswordHash, arg.ID, arg.ExpectedRevision)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PasswordHash,
+		&i.DisplayName,
+		&i.Email,
+		&i.Status,
+		&i.IsPlatformAdmin,
+		&i.Revision,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateUserProfile = `-- name: UpdateUserProfile :one
+UPDATE users
+SET
+  display_name = CASE WHEN $1::boolean THEN $2 ELSE display_name END,
+  email = CASE WHEN $3::boolean THEN $4 ELSE email END,
+  status = CASE WHEN $5::boolean THEN $6 ELSE status END,
+  revision = revision + 1,
+  updated_at = now()
+WHERE id = $7
+  AND revision = $8
+RETURNING id, username, password_hash, display_name, email, status, is_platform_admin, revision, created_at, updated_at
+`
+
+// UpdateUserProfileParams 包含 UpdateUserProfile 查询的强类型参数。
+type UpdateUserProfileParams struct {
+	// SetDisplayName 是提供给 UpdateUserProfile 查询的 SetDisplayName 值。
+	SetDisplayName bool `json:"set_display_name"`
+	// DisplayName 是提供给 UpdateUserProfile 查询的 DisplayName 值。
+	DisplayName string `json:"display_name"`
+	// SetEmail 是提供给 UpdateUserProfile 查询的 SetEmail 值。
+	SetEmail bool `json:"set_email"`
+	// Email 是提供给 UpdateUserProfile 查询的 Email 值。
+	Email *string `json:"email"`
+	// SetStatus 是提供给 UpdateUserProfile 查询的 SetStatus 值。
+	SetStatus bool `json:"set_status"`
+	// Status 是提供给 UpdateUserProfile 查询的 Status 值。
+	Status string `json:"status"`
+	// ID 是提供给 UpdateUserProfile 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 UpdateUserProfile 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// UpdateUserProfile 执行生成的 UpdateUserProfile 数据库查询。
+// 在 If-Match 下更新一个平台身份的非秘密字段并递增 revision。
+// display_name/status 使用 set 标志保留「未提供」语义；email 可为空以支持显式清除。
+func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserProfile,
+		arg.SetDisplayName,
+		arg.DisplayName,
+		arg.SetEmail,
+		arg.Email,
+		arg.SetStatus,
+		arg.Status,
+		arg.ID,
+		arg.ExpectedRevision,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PasswordHash,
+		&i.DisplayName,
+		&i.Email,
+		&i.Status,
+		&i.IsPlatformAdmin,
+		&i.Revision,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

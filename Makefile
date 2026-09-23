@@ -147,7 +147,7 @@ smoke-runner-test:
 	vfox exec nodejs@24.20.0 -- node --test scripts/smoke-runner.test.mjs
 
 agent-protocol-test:
-	vfox exec golang@1.27.1 -- go test ./internal/contracttest -run 'TestAgentQueue|TestSmokeCatalog'
+	vfox exec golang@1.27.1 -- go test ./internal/contracttest -run 'TestAgentQueue|TestSmokeCatalog|TestEveryOpenAPIOperationIsOwnedByAWorkItem'
 
 agent-preflight:
 	ITEM="$(ITEM)" vfox exec golang@1.27.1 -- go test -count=1 -v ./internal/contracttest -run '^TestAgentGateAvailability$$'

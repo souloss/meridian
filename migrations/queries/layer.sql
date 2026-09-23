@@ -56,6 +56,16 @@ ORDER BY created_at DESC, id DESC
 LIMIT sqlc.arg(page_limit)
 OFFSET sqlc.arg(page_offset);
 
+-- 返回某层全部作用域的修订（无作用域过滤），供未传 ref 的调用方列出全部历史。
+-- name: ListAllLayerRevisions :many
+SELECT *
+FROM layer_revisions
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND layer_id = sqlc.arg(layer_id)
+ORDER BY created_at DESC, id DESC
+LIMIT sqlc.arg(page_limit)
+OFFSET sqlc.arg(page_offset);
+
 -- 返回一个资产下全部层的头指针（用于合并选择有效修订）。
 -- name: ListLayerHeadsForAsset :many
 SELECT layer_heads.*
@@ -84,3 +94,39 @@ SELECT *
 FROM asset_versions
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id);
+
+-- 更新一条层的可编辑字段（角色/方言/启停）并递增 revision。
+-- name: UpdateLayer :one
+UPDATE layers
+SET
+  role = COALESCE(sqlc.narg(role), role),
+  dialect = CASE WHEN sqlc.arg(set_dialect)::boolean THEN sqlc.narg(dialect) ELSE dialect END,
+  enabled = COALESCE(sqlc.narg(enabled), enabled),
+  revision = revision + 1,
+  updated_at = now()
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id)
+  AND deleted_at IS NULL
+  AND revision = sqlc.arg(expected_revision)
+RETURNING *;
+
+-- 返回租户内全部待审核修订分页（供审批列表）。
+-- name: ListPendingReviews :many
+SELECT revisions.*, layers.asset_id
+FROM layer_revisions AS revisions
+JOIN layers ON layers.tenant_id = revisions.tenant_id AND layers.id = revisions.layer_id
+WHERE revisions.tenant_id = sqlc.arg(tenant_id)
+  AND revisions.review_status = 'pending_review'
+  AND layers.deleted_at IS NULL
+ORDER BY revisions.created_at DESC, revisions.id DESC
+LIMIT sqlc.arg(page_limit)
+OFFSET sqlc.arg(page_offset);
+
+-- 返回租户内待审核修订总数。
+-- name: CountPendingReviews :one
+SELECT count(*)::bigint
+FROM layer_revisions AS revisions
+JOIN layers ON layers.tenant_id = revisions.tenant_id AND layers.id = revisions.layer_id
+WHERE revisions.tenant_id = sqlc.arg(tenant_id)
+  AND revisions.review_status = 'pending_review'
+  AND layers.deleted_at IS NULL;

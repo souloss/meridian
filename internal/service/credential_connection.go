@@ -56,6 +56,7 @@ type ConnectionHostKeyCandidate struct {
 
 // ConnectionProbe 执行凭据感知、有界的 Git 远端探测。当 URL 含用户控制数据时，实现不得记录它。
 type ConnectionProbe interface {
+	// Probe 承载 ConnectionProbe 的生成 Probe 值。
 	Probe(context.Context, string, *CredentialSecret) (ConnectionTestResult, error)
 }
 
@@ -291,6 +292,7 @@ func probeMessage(errorClass string) string {
 	}
 }
 
+// TestTenant 实现 Meridian OpenAPI 契约的生成传输行为。
 func (credentials *Credentials) TestTenant(ctx context.Context, actor Principal, tenantSlug string, id uuid.UUID, remote string) (ConnectionTestResult, error) {
 	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeCredentialRead)
 	if err != nil {
@@ -310,6 +312,7 @@ func (credentials *Credentials) TestTenant(ctx context.Context, actor Principal,
 	return credentials.probeRecord(ctx, remote, membership.TenantID.String(), record.ID, record.Kind, record.Encrypted)
 }
 
+// TestGlobal 实现 Meridian OpenAPI 契约的生成传输行为。
 func (credentials *Credentials) TestGlobal(ctx context.Context, actor Principal, id uuid.UUID, remote string) (ConnectionTestResult, error) {
 	if !isPlatformAdministrator(actor) {
 		return ConnectionTestResult{}, ErrNotFound
@@ -321,6 +324,7 @@ func (credentials *Credentials) TestGlobal(ctx context.Context, actor Principal,
 	return credentials.probeRecord(ctx, remote, credentialScopeGlobal, record.ID, record.Kind, record.Encrypted)
 }
 
+// CheckRepositoryConnection 实现 Meridian OpenAPI 契约的生成传输行为。
 func (credentials *Credentials) CheckRepositoryConnection(ctx context.Context, actor Principal, tenantSlug, remote string, credentialID *uuid.UUID) (ConnectionTestResult, error) {
 	membership, err := credentials.tenantMembership(ctx, actor, tenantSlug, scopeRepositoryWrite)
 	if err != nil {

@@ -14,18 +14,25 @@ import (
 
 // OverlayIssue 是一个合并或校验问题，当问题源于 overlay 文档时携带基于 1 的行列坐标。
 type OverlayIssue struct {
+	// Severity 承载 OverlayIssue 的生成 Severity 值。
 	Severity string
-	Code     string
-	Message  string
-	Pointer  *string
-	Line     int
-	Column   int
+	// Code 承载 OverlayIssue 的生成 Code 值。
+	Code string
+	// Message 承载 OverlayIssue 的生成 Message 值。
+	Message string
+	// Pointer 承载 OverlayIssue 的生成 Pointer 值。
+	Pointer *string
+	// Line 承载 OverlayIssue 的生成 Line 值。
+	Line int
+	// Column 承载 OverlayIssue 的生成 Column 值。
+	Column int
 }
 
 // OverlayInvalidError 报告一个校验失败或严格模式目标未命中的 overlay 文档。
 // 处理器将其映射为带问题列表的 422。
 // 对外映射：ErrorCodeOverlayInvalid（HTTP 422）。
 type OverlayInvalidError struct {
+	// Errors 承载 OverlayInvalidError 的生成 Errors 值。
 	Errors []OverlayIssue
 }
 
@@ -73,28 +80,42 @@ const (
 
 // platformOverlay 是解码后的 platform-v1 overlay 文档。
 type platformOverlay struct {
+	// TargetKind 承载 platformOverlay 的生成 TargetKind 值。
 	TargetKind string
-	Mode       string
-	Actions    []overlayAction
+	// Mode 承载 platformOverlay 的生成 Mode 值。
+	Mode string
+	// Actions 承载 platformOverlay 的生成 Actions 值。
+	Actions []overlayAction
 }
 
 // overlayAction 是按文档顺序编译的一个 platform-v1 动作。
 type overlayAction struct {
+	// Target 承载 overlayAction 的生成 Target 值。
 	Target string
-	Op     string // merge | remove | patch
-	Merge  map[string]any
-	Patch  []patchOp
-	Line   int
+	Op     string /* Op 承载 overlayAction 的生成 Op 值。 */ // merge | remove | patch
+	// Merge 承载 overlayAction 的生成 Merge 值。
+	Merge map[string]any
+	// Patch 承载 overlayAction 的生成 Patch 值。
+	Patch []patchOp
+	// Line 承载 overlayAction 的生成 Line 值。
+	Line int
+	// Column 承载 overlayAction 的生成 Column 值。
 	Column int
 }
 
 // patchOp 是 patch 动作携带的一个 RFC 6902 操作。
 type patchOp struct {
-	Op     string
-	Path   string
-	From   string
-	Value  any
-	Line   int
+	// Op 承载 patchOp 的生成 Op 值。
+	Op string
+	// Path 承载 patchOp 的生成 Path 值。
+	Path string
+	// From 承载 patchOp 的生成 From 值。
+	From string
+	// Value 承载 patchOp 的生成 Value 值。
+	Value any
+	// Line 承载 patchOp 的生成 Line 值。
+	Line int
+	// Column 承载 patchOp 的生成 Column 值。
 	Column int
 }
 

@@ -321,3 +321,23 @@ JOIN services ON services.tenant_id = repositories.tenant_id AND services.reposi
 WHERE repositories.tenant_id = sqlc.arg(tenant_id)
   AND services.id = ANY(sqlc.arg(service_ids)::uuid[])
 ORDER BY services.id;
+
+-- 在 If-Match 下更新一条系统分组的展示名与描述并递增 revision。
+-- name: UpdateSystemGroup :one
+UPDATE system_groups
+SET
+  display_name = COALESCE(sqlc.narg(display_name), display_name),
+  description = CASE WHEN sqlc.arg(set_description)::boolean THEN sqlc.narg(description) ELSE description END,
+  revision = revision + 1,
+  updated_at = now()
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id)
+  AND revision = sqlc.arg(expected_revision)
+RETURNING *;
+
+-- 在 If-Match 下删除一条系统分组；成员由外键级联清理。
+-- name: DeleteSystemGroup :execrows
+DELETE FROM system_groups
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id)
+  AND revision = sqlc.arg(expected_revision);

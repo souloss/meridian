@@ -20,8 +20,10 @@ const (
 
 // notificationChannelConfig 是通道加密配置的明文载荷（webhook 端点 + 秘密，email 邮箱）。
 type notificationChannelConfig struct {
+	// Endpoint 承载 notificationChannelConfig 的生成 Endpoint 值。
 	Endpoint string `json:"endpoint,omitempty"`
-	Secret   string `json:"secret,omitempty"`
+	// Secret 承载 notificationChannelConfig 的生成 Secret 值。
+	Secret string `json:"secret,omitempty"`
 }
 
 // sealChannelConfig 使用活跃主密钥按行身份加密通道配置。

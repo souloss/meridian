@@ -103,3 +103,23 @@ JOIN tenants ON tenants.id = tenant_members.tenant_id
 WHERE tenant_members.user_id = sqlc.arg(user_id)
   AND tenants.status = 'active'
 ORDER BY tenants.slug, tenants.id;
+
+-- 在 If-Match 下将租户置为 disabled（删除流程的第一步）。
+-- name: DisableTenant :one
+UPDATE tenants
+SET status = 'disabled', revision = revision + 1, updated_at = now()
+WHERE id = sqlc.arg(tenant_id)
+  AND status = 'active'
+  AND revision = sqlc.arg(expected_revision)
+RETURNING id, slug, display_name, status, quota, settings, revision, created_at, updated_at;
+
+-- 为租户删除记录一条 tenant.delete 任务。
+-- name: CreateTenantDeleteJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  sqlc.arg(tenant_id), sqlc.arg(id), 'tenant.delete', 'tenant', sqlc.arg(tenant_id), 'api',
+  '{}'::jsonb, 'pending', 3, sqlc.arg(dedupe_key), 1, true
+)
+RETURNING *;

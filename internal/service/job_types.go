@@ -134,8 +134,11 @@ type JobStateEvent struct {
 
 // JobEventSink 接收有序的流状态、日志与心跳事件。
 type JobEventSink interface {
+	// State 承载 JobEventSink 的生成 State 值。
 	State(JobStateEvent) error
+	// Log 承载 JobEventSink 的生成 Log 值。
 	Log(JobLogRecord) error
+	// Heartbeat 承载 JobEventSink 的生成 Heartbeat 值。
 	Heartbeat() error
 }
 
@@ -208,12 +211,20 @@ type PlatformJobFilter struct {
 
 // JobStore 是租户控制与脱敏平台查询的持久化边界。
 type JobStore interface {
+	// ListPlatformJobs 承载 JobStore 的生成 ListPlatformJobs 值。
 	ListPlatformJobs(context.Context, PlatformJobFilter, int32, int32) ([]PlatformJobRecord, int64, error)
+	// GetPlatformJob 承载 JobStore 的生成 GetPlatformJob 值。
 	GetPlatformJob(context.Context, uuid.UUID) (PlatformJobRecord, error)
+	// ListTenantJobs 承载 JobStore 的生成 ListTenantJobs 值。
 	ListTenantJobs(context.Context, uuid.UUID, JobFilter, int32, int32) ([]JobRecord, int64, error)
+	// GetTenantJob 承载 JobStore 的生成 GetTenantJob 值。
 	GetTenantJob(context.Context, uuid.UUID, uuid.UUID) (JobRecord, error)
+	// GetTenantJobStreamState 承载 JobStore 的生成 GetTenantJobStreamState 值。
 	GetTenantJobStreamState(context.Context, uuid.UUID, uuid.UUID) (JobRecord, int64, error)
+	// ListTenantJobLogsAfter 承载 JobStore 的生成 ListTenantJobLogsAfter 值。
 	ListTenantJobLogsAfter(context.Context, uuid.UUID, uuid.UUID, int64, int32) ([]JobLogRecord, error)
+	// CancelTenantJob 承载 JobStore 的生成 CancelTenantJob 值。
 	CancelTenantJob(context.Context, uuid.UUID, uuid.UUID, time.Time) (JobAccepted, error)
+	// RetryTenantJob 承载 JobStore 的生成 RetryTenantJob 值。
 	RetryTenantJob(context.Context, RetryJobRequest) (JobAccepted, error)
 }

@@ -28,7 +28,8 @@ type AiGenerateInput struct {
 	Name string
 	// RefType 默认是 branch；Ref 是请求的引用（可为空）。
 	RefType string
-	Ref     string
+	// Ref 承载 AiGenerateInput 的生成 Ref 值。
+	Ref string
 	// Hint 是转发给生产者的可选自由文本提示。
 	Hint string
 	// ProducerProfileID 是解析出的生产者配置（请求指定或租户默认）。
@@ -37,7 +38,8 @@ type AiGenerateInput struct {
 	IdempotencyKey uuid.UUID
 	// PrincipalType 与 PrincipalID 绑定重放身份。
 	PrincipalType string
-	PrincipalID   uuid.UUID
+	// PrincipalID 承载 AiGenerateInput 的生成 PrincipalID 值。
+	PrincipalID uuid.UUID
 	// RequestHash 是 32 字节 RFC 8785 摘要，用于重放比较。
 	RequestHash []byte
 }

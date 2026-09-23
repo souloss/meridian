@@ -434,6 +434,88 @@ func (store *IdentityStore) RevokeToken(ctx context.Context, tenantID, tokenID, 
 	return normalizeError(err)
 }
 
+// UpdateUserProfile 在 If-Match 下更新一个平台身份的非秘密字段。
+func (store *IdentityStore) UpdateUserProfile(ctx context.Context, userID uuid.UUID, expectedRevision int64, input service.UpdateUserProfileInput) (service.User, error) {
+	var displayName, status string
+	if input.DisplayName != nil {
+		displayName = *input.DisplayName
+	}
+	if input.Status != nil {
+		status = *input.Status
+	}
+	row, err := store.queries.UpdateUserProfile(ctx, generated.UpdateUserProfileParams{
+		SetDisplayName:   input.DisplayName != nil,
+		DisplayName:      displayName,
+		SetEmail:         input.SetEmail,
+		Email:            input.Email,
+		SetStatus:        input.Status != nil,
+		Status:           status,
+		ID:               userID,
+		ExpectedRevision: expectedRevision,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return service.User{}, service.ErrPrecondition
+		}
+		return service.User{}, normalizeError(err)
+	}
+	return userFromRow(row), nil
+}
+
+// UpdateUserPassword 在 If-Match 下轮换一个平台身份的密码。
+func (store *IdentityStore) UpdateUserPassword(ctx context.Context, userID uuid.UUID, expectedRevision int64, passwordHash string) (service.User, error) {
+	row, err := store.queries.UpdateUserPassword(ctx, generated.UpdateUserPasswordParams{
+		PasswordHash: passwordHash, ID: userID, ExpectedRevision: expectedRevision,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return service.User{}, service.ErrPrecondition
+		}
+		return service.User{}, normalizeError(err)
+	}
+	return userFromRow(row), nil
+}
+
+// UserPasswordHash 返回一个平台身份当前的密码哈希，供密码轮换。
+func (store *IdentityStore) UserPasswordHash(ctx context.Context, userID uuid.UUID) (string, error) {
+	hash, err := store.queries.GetUserPasswordHash(ctx, userID)
+	if err != nil {
+		return "", normalizeError(err)
+	}
+	return hash, nil
+}
+
+// DeleteTenant 在 If-Match 下禁用租户并记录一条 tenant.delete 任务。
+func (store *IdentityStore) DeleteTenant(ctx context.Context, tenantID uuid.UUID, expectedRevision int64) (service.TenantDeletionAccepted, error) {
+	tx, err := store.pool.Begin(ctx)
+	if err != nil {
+		return service.TenantDeletionAccepted{}, normalizeError(err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	queries := generated.New(tx)
+	tenant, err := queries.DisableTenant(ctx, generated.DisableTenantParams{TenantID: tenantID, ExpectedRevision: expectedRevision})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return service.TenantDeletionAccepted{}, service.ErrPrecondition
+		}
+		return service.TenantDeletionAccepted{}, normalizeError(err)
+	}
+	_ = tenant
+	jobID := uuid.NewV7()
+	job, err := queries.CreateTenantDeleteJob(ctx, generated.CreateTenantDeleteJobParams{
+		TenantID: tenantID, ID: jobID, DedupeKey: dedupeKeyTenantDelete + tenantID.String(),
+	})
+	if err != nil {
+		return service.TenantDeletionAccepted{}, normalizeError(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return service.TenantDeletionAccepted{}, normalizeError(err)
+	}
+	return service.TenantDeletionAccepted{JobID: job.ID, Deduplicated: false}, nil
+}
+
+const dedupeKeyTenantDelete = "tenant-delete:"
+
 func userFromRow(row generated.User) service.User {
 	return service.User{
 		ID:              row.ID,

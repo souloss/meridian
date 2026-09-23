@@ -37,6 +37,21 @@ func (q *Queries) AcceptDiscoveryCandidate(ctx context.Context, arg AcceptDiscov
 	return result.RowsAffected(), nil
 }
 
+const countAllProducerProfiles = `-- name: CountAllProducerProfiles :one
+SELECT count(*)::bigint
+FROM producer_profiles
+WHERE deleted_at IS NULL
+`
+
+// CountAllProducerProfiles 执行生成的 CountAllProducerProfiles 数据库查询。
+// 返回平台生产者配置文件总数。
+func (q *Queries) CountAllProducerProfiles(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAllProducerProfiles)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const countDiscoveryCandidates = `-- name: CountDiscoveryCandidates :one
 SELECT count(*)::bigint
 FROM discovery_candidates
@@ -169,6 +184,84 @@ func (q *Queries) CreateDiscoveryJob(ctx context.Context, arg CreateDiscoveryJob
 		arg.TenantID,
 		arg.ID,
 		arg.RepositoryID,
+		arg.RefType,
+		arg.RefName,
+		arg.JobInput,
+		arg.DedupeKey,
+		arg.ActiveGeneration,
+	)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const createProduceJob = `-- name: CreateProduceJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  $1, $2, 'asset.produce', 'source', $3,
+  $4, $5, 'manual', $6::jsonb,
+  'pending', 3, $7, $8, true
+)
+ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
+RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+`
+
+// CreateProduceJobParams 包含 CreateProduceJob 查询的强类型参数。
+type CreateProduceJobParams struct {
+	// TenantID 是提供给 CreateProduceJob 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 CreateProduceJob 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// SourceID 是提供给 CreateProduceJob 查询的 SourceID 值。
+	SourceID *uuid.UUID `json:"source_id"`
+	// RefType 是提供给 CreateProduceJob 查询的 RefType 值。
+	RefType *string `json:"ref_type"`
+	// RefName 是提供给 CreateProduceJob 查询的 RefName 值。
+	RefName *string `json:"ref_name"`
+	// JobInput 是提供给 CreateProduceJob 查询的 JobInput 值。
+	JobInput []byte `json:"job_input"`
+	// DedupeKey 是提供给 CreateProduceJob 查询的 DedupeKey 值。
+	DedupeKey string `json:"dedupe_key"`
+	// ActiveGeneration 是提供给 CreateProduceJob 查询的 ActiveGeneration 值。
+	ActiveGeneration int64 `json:"active_generation"`
+}
+
+// CreateProduceJob 执行生成的 CreateProduceJob 数据库查询。
+// 为一次源物化请求记录一条 asset.produce 任务。
+func (q *Queries) CreateProduceJob(ctx context.Context, arg CreateProduceJobParams) (Job, error) {
+	row := q.db.QueryRow(ctx, createProduceJob,
+		arg.TenantID,
+		arg.ID,
+		arg.SourceID,
 		arg.RefType,
 		arg.RefName,
 		arg.JobInput,
@@ -481,6 +574,78 @@ func (q *Queries) CreateSourceSpec(ctx context.Context, arg CreateSourceSpecPara
 	return i, err
 }
 
+const deleteProducerProfile = `-- name: DeleteProducerProfile :execrows
+UPDATE producer_profiles
+SET deleted_at = now(), updated_at = now()
+WHERE id = $1
+  AND deleted_at IS NULL
+`
+
+// DeleteProducerProfile 执行生成的 DeleteProducerProfile 数据库查询。
+// 软删除一个平台生产者配置。
+func (q *Queries) DeleteProducerProfile(ctx context.Context, id uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteProducerProfile, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const deleteSourceSpec = `-- name: DeleteSourceSpec :execrows
+UPDATE source_specs
+SET deleted_at = now(), updated_at = now()
+WHERE tenant_id = $1
+  AND id = $2
+  AND deleted_at IS NULL
+  AND revision = $3
+`
+
+// DeleteSourceSpecParams 包含 DeleteSourceSpec 查询的强类型参数。
+type DeleteSourceSpecParams struct {
+	// TenantID 是提供给 DeleteSourceSpec 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 DeleteSourceSpec 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 DeleteSourceSpec 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// DeleteSourceSpec 执行生成的 DeleteSourceSpec 数据库查询。
+// 软删除一条源配置。
+func (q *Queries) DeleteSourceSpec(ctx context.Context, arg DeleteSourceSpecParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteSourceSpec, arg.TenantID, arg.ID, arg.ExpectedRevision)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const dismissDiscoveryCandidate = `-- name: DismissDiscoveryCandidate :execrows
+UPDATE discovery_candidates
+SET status = 'dismissed', updated_at = now()
+WHERE tenant_id = $1
+  AND id = $2
+  AND status = 'pending'
+`
+
+// DismissDiscoveryCandidateParams 包含 DismissDiscoveryCandidate 查询的强类型参数。
+type DismissDiscoveryCandidateParams struct {
+	// TenantID 是提供给 DismissDiscoveryCandidate 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 DismissDiscoveryCandidate 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+}
+
+// DismissDiscoveryCandidate 执行生成的 DismissDiscoveryCandidate 数据库查询。
+// 将候选标记为已驳回；仅在 pending 状态时生效。
+func (q *Queries) DismissDiscoveryCandidate(ctx context.Context, arg DismissDiscoveryCandidateParams) (int64, error) {
+	result, err := q.db.Exec(ctx, dismissDiscoveryCandidate, arg.TenantID, arg.ID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const getAssetForSourceSpec = `-- name: GetAssetForSourceSpec :one
 SELECT tenant_id, id, service_id, kind, name, revision, deleted_at, created_at, updated_at
 FROM assets
@@ -769,6 +934,66 @@ func (q *Queries) GetSourceSpec(ctx context.Context, arg GetSourceSpecParams) (S
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const listAllProducerProfiles = `-- name: ListAllProducerProfiles :many
+SELECT id, name, kind, executable, args, env_allowlist, supported_kinds, replay_safe, network, timeout_sec, memory_mib, cpu_seconds, pids, enabled, dependency_status, unavailable_reason, revision, deleted_at, created_at, updated_at
+FROM producer_profiles
+WHERE deleted_at IS NULL
+ORDER BY name, id
+LIMIT $2
+OFFSET $1
+`
+
+// ListAllProducerProfilesParams 包含 ListAllProducerProfiles 查询的强类型参数。
+type ListAllProducerProfilesParams struct {
+	// PageOffset 是提供给 ListAllProducerProfiles 查询的 PageOffset 值。
+	PageOffset int32 `json:"page_offset"`
+	// PageLimit 是提供给 ListAllProducerProfiles 查询的 PageLimit 值。
+	PageLimit int32 `json:"page_limit"`
+}
+
+// ListAllProducerProfiles 执行生成的 ListAllProducerProfiles 数据库查询。
+// 返回平台生产者配置文件分页（含软删除过滤，供平台管理列表）。
+func (q *Queries) ListAllProducerProfiles(ctx context.Context, arg ListAllProducerProfilesParams) ([]ProducerProfile, error) {
+	rows, err := q.db.Query(ctx, listAllProducerProfiles, arg.PageOffset, arg.PageLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ProducerProfile{}
+	for rows.Next() {
+		var i ProducerProfile
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Kind,
+			&i.Executable,
+			&i.Args,
+			&i.EnvAllowlist,
+			&i.SupportedKinds,
+			&i.ReplaySafe,
+			&i.Network,
+			&i.TimeoutSec,
+			&i.MemoryMib,
+			&i.CpuSeconds,
+			&i.Pids,
+			&i.Enabled,
+			&i.DependencyStatus,
+			&i.UnavailableReason,
+			&i.Revision,
+			&i.DeletedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listAvailableProducerProfiles = `-- name: ListAvailableProducerProfiles :many
@@ -1100,6 +1325,106 @@ func (q *Queries) LockLatestDiscoveryJob(ctx context.Context, arg LockLatestDisc
 		&i.TenantID,
 		&i.Status,
 		&i.ActiveGeneration,
+	)
+	return i, err
+}
+
+const updateProducerProfile = `-- name: UpdateProducerProfile :one
+UPDATE producer_profiles
+SET
+  name = COALESCE($1, name),
+  executable = COALESCE($2, executable),
+  args = COALESCE($3, args),
+  env_allowlist = COALESCE($4, env_allowlist),
+  supported_kinds = COALESCE($5, supported_kinds),
+  replay_safe = COALESCE($6, replay_safe),
+  network = COALESCE($7, network),
+  timeout_sec = COALESCE($8, timeout_sec),
+  memory_mib = COALESCE($9, memory_mib),
+  cpu_seconds = COALESCE($10, cpu_seconds),
+  pids = COALESCE($11, pids),
+  enabled = COALESCE($12, enabled),
+  revision = revision + 1,
+  updated_at = now()
+WHERE id = $13
+  AND deleted_at IS NULL
+  AND revision = $14
+RETURNING id, name, kind, executable, args, env_allowlist, supported_kinds, replay_safe, network, timeout_sec, memory_mib, cpu_seconds, pids, enabled, dependency_status, unavailable_reason, revision, deleted_at, created_at, updated_at
+`
+
+// UpdateProducerProfileParams 包含 UpdateProducerProfile 查询的强类型参数。
+type UpdateProducerProfileParams struct {
+	// Name 是提供给 UpdateProducerProfile 查询的 Name 值。
+	Name *string `json:"name"`
+	// Executable 是提供给 UpdateProducerProfile 查询的 Executable 值。
+	Executable *string `json:"executable"`
+	// Args 是提供给 UpdateProducerProfile 查询的 Args 值。
+	Args []byte `json:"args"`
+	// EnvAllowlist 是提供给 UpdateProducerProfile 查询的 EnvAllowlist 值。
+	EnvAllowlist []string `json:"env_allowlist"`
+	// SupportedKinds 是提供给 UpdateProducerProfile 查询的 SupportedKinds 值。
+	SupportedKinds []string `json:"supported_kinds"`
+	// ReplaySafe 是提供给 UpdateProducerProfile 查询的 ReplaySafe 值。
+	ReplaySafe *bool `json:"replay_safe"`
+	// Network 是提供给 UpdateProducerProfile 查询的 Network 值。
+	Network *string `json:"network"`
+	// TimeoutSec 是提供给 UpdateProducerProfile 查询的 TimeoutSec 值。
+	TimeoutSec *int32 `json:"timeout_sec"`
+	// MemoryMib 是提供给 UpdateProducerProfile 查询的 MemoryMib 值。
+	MemoryMib *int32 `json:"memory_mib"`
+	// CpuSeconds 是提供给 UpdateProducerProfile 查询的 CpuSeconds 值。
+	CpuSeconds *int32 `json:"cpu_seconds"`
+	// Pids 是提供给 UpdateProducerProfile 查询的 Pids 值。
+	Pids *int32 `json:"pids"`
+	// Enabled 是提供给 UpdateProducerProfile 查询的 Enabled 值。
+	Enabled *bool `json:"enabled"`
+	// ID 是提供给 UpdateProducerProfile 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 UpdateProducerProfile 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// UpdateProducerProfile 执行生成的 UpdateProducerProfile 数据库查询。
+// 在 If-Match 下更新一个平台生产者配置的非结构字段并递增 revision。
+func (q *Queries) UpdateProducerProfile(ctx context.Context, arg UpdateProducerProfileParams) (ProducerProfile, error) {
+	row := q.db.QueryRow(ctx, updateProducerProfile,
+		arg.Name,
+		arg.Executable,
+		arg.Args,
+		arg.EnvAllowlist,
+		arg.SupportedKinds,
+		arg.ReplaySafe,
+		arg.Network,
+		arg.TimeoutSec,
+		arg.MemoryMib,
+		arg.CpuSeconds,
+		arg.Pids,
+		arg.Enabled,
+		arg.ID,
+		arg.ExpectedRevision,
+	)
+	var i ProducerProfile
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Kind,
+		&i.Executable,
+		&i.Args,
+		&i.EnvAllowlist,
+		&i.SupportedKinds,
+		&i.ReplaySafe,
+		&i.Network,
+		&i.TimeoutSec,
+		&i.MemoryMib,
+		&i.CpuSeconds,
+		&i.Pids,
+		&i.Enabled,
+		&i.DependencyStatus,
+		&i.UnavailableReason,
+		&i.Revision,
+		&i.DeletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }

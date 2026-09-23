@@ -146,21 +146,36 @@ type NotificationPageRecord struct {
 
 // NotificationStore 是 M5 订阅、通知通道与站内通知的持久化边界。
 type NotificationStore interface {
+	// UpsertSubscription 承载 NotificationStore 的生成 UpsertSubscription 值。
 	UpsertSubscription(context.Context, PutSubscriptionInput) (SubscriptionRecord, error)
+	// ListSubscriptions 承载 NotificationStore 的生成 ListSubscriptions 值。
 	ListSubscriptions(context.Context, uuid.UUID, uuid.UUID) ([]SubscriptionRecord, error)
+	// ReplaceSubscriptionChannels 承载 NotificationStore 的生成 ReplaceSubscriptionChannels 值。
 	ReplaceSubscriptionChannels(context.Context, uuid.UUID, uuid.UUID, []uuid.UUID) error
+	// ListSubscriptionChannels 承载 NotificationStore 的生成 ListSubscriptionChannels 值。
 	ListSubscriptionChannels(context.Context, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)
 	// ListSubscriptionChannelsForSubscriptions 批量返回多个订阅的通道关联，供列表去 N+1。
 	ListSubscriptionChannelsForSubscriptions(context.Context, uuid.UUID, []uuid.UUID) (map[uuid.UUID][]uuid.UUID, error)
+	// ListNotificationChannels 承载 NotificationStore 的生成 ListNotificationChannels 值。
 	ListNotificationChannels(context.Context, uuid.UUID) ([]NotificationChannelRecord, error)
+	// CreateNotificationChannel 承载 NotificationStore 的生成 CreateNotificationChannel 值。
 	CreateNotificationChannel(context.Context, NewNotificationChannel) (NotificationChannelRecord, error)
+	// GetNotificationChannel 承载 NotificationStore 的生成 GetNotificationChannel 值。
 	GetNotificationChannel(context.Context, uuid.UUID, uuid.UUID) (NotificationChannelRecord, error)
+	// UpdateNotificationChannel 承载 NotificationStore 的生成 UpdateNotificationChannel 值。
 	UpdateNotificationChannel(context.Context, NotificationChannelPatch) (NotificationChannelRecord, error)
+	// RotateNotificationChannelSecret 承载 NotificationStore 的生成 RotateNotificationChannelSecret 值。
 	RotateNotificationChannelSecret(context.Context, uuid.UUID, uuid.UUID, int64, []byte) (NotificationChannelRecord, error)
+	// DeleteNotificationChannel 承载 NotificationStore 的生成 DeleteNotificationChannel 值。
 	DeleteNotificationChannel(context.Context, uuid.UUID, uuid.UUID, int64) error
+	// ListVisibleChannelIDs 承载 NotificationStore 的生成 ListVisibleChannelIDs 值。
 	ListVisibleChannelIDs(context.Context, uuid.UUID, []uuid.UUID) ([]uuid.UUID, error)
+	// EnqueueNotificationTest 承载 NotificationStore 的生成 EnqueueNotificationTest 值。
 	EnqueueNotificationTest(context.Context, uuid.UUID, NotificationChannelRecord) (JobAccepted, error)
+	// ListNotifications 承载 NotificationStore 的生成 ListNotifications 值。
 	ListNotifications(context.Context, uuid.UUID, uuid.UUID, bool, int32, int32) ([]NotificationRecord, int64, int64, error)
+	// MarkNotificationRead 承载 NotificationStore 的生成 MarkNotificationRead 值。
 	MarkNotificationRead(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) error
+	// MarkAllNotificationsRead 承载 NotificationStore 的生成 MarkAllNotificationsRead 值。
 	MarkAllNotificationsRead(context.Context, uuid.UUID, uuid.UUID) error
 }

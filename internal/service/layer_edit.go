@@ -21,31 +21,63 @@ import (
 // LayerEditStore 是 M2 层编辑的持久化边界：overlay 修订、排序、回滚、合并预览与溯源读取。
 // 每个方法都保留租户谓词。
 type LayerEditStore interface {
+	// GetLayer 承载 LayerEditStore 的生成 GetLayer 值。
 	GetLayer(context.Context, uuid.UUID, uuid.UUID) (LayerRecord, error)
+	// ListLayersForAsset 承载 LayerEditStore 的生成 ListLayersForAsset 值。
 	ListLayersForAsset(context.Context, uuid.UUID, uuid.UUID) ([]LayerRecord, error)
+	// UpdateLayer 承载 LayerEditStore 的生成 UpdateLayer 值。
+	UpdateLayer(context.Context, uuid.UUID, uuid.UUID, int64, LayerPatchRecord) (LayerRecord, error)
+	// UpdateLayerOrd 承载 LayerEditStore 的生成 UpdateLayerOrd 值。
 	UpdateLayerOrd(context.Context, uuid.UUID, uuid.UUID, int64, int) (LayerRecord, error)
+	// CreateLayerRevision 承载 LayerEditStore 的生成 CreateLayerRevision 值。
 	CreateLayerRevision(context.Context, NewLayerRevision) (LayerRevisionRecord, error)
+	// GetLayerRevision 承载 LayerEditStore 的生成 GetLayerRevision 值。
 	GetLayerRevision(context.Context, uuid.UUID, uuid.UUID) (LayerRevisionRecord, error)
+	// GetLayerHead 承载 LayerEditStore 的生成 GetLayerHead 值。
 	GetLayerHead(context.Context, uuid.UUID, uuid.UUID, string, string) (LayerHeadRecord, error)
+	// ListLayerHeadsForAsset 承载 LayerEditStore 的生成 ListLayerHeadsForAsset 值。
+	ListLayerHeadsForAsset(context.Context, uuid.UUID, uuid.UUID) ([]LayerHeadRecord, error)
+	// ListLayerRevisions 承载 LayerEditStore 的生成 ListLayerRevisions 值。
+	ListLayerRevisions(context.Context, uuid.UUID, uuid.UUID, string, string, int32, int32) ([]LayerRevisionRecord, int64, error)
+	// ListAllLayerRevisions 分页返回某层全部作用域的修订（无作用域过滤）。
+	ListAllLayerRevisions(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]LayerRevisionRecord, int64, error)
+	// ListPendingReviews 承载 LayerEditStore 的生成 ListPendingReviews 值。
+	ListPendingReviews(context.Context, uuid.UUID, int32, int32) ([]LayerRevisionRecord, int64, error)
+	// UpdateLayerHeadPointers 承载 LayerEditStore 的生成 UpdateLayerHeadPointers 值。
 	UpdateLayerHeadPointers(context.Context, NewLayerHead) (LayerHeadRecord, error)
+	// GetAssetVersion 承载 LayerEditStore 的生成 GetAssetVersion 值。
 	GetAssetVersion(context.Context, uuid.UUID, uuid.UUID) (AssetVersionRecord, error)
+	// GetAsset 承载 LayerEditStore 的生成 GetAsset 值。
 	GetAsset(context.Context, uuid.UUID, uuid.UUID) (AssetRecord, error)
+	// GetAssetRepositoryDefaultBranch 承载 LayerEditStore 的生成 GetAssetRepositoryDefaultBranch 值。
 	GetAssetRepositoryDefaultBranch(context.Context, uuid.UUID, uuid.UUID) (string, error)
+	// GetAssetRefTrack 承载 LayerEditStore 的生成 GetAssetRefTrack 值。
 	GetAssetRefTrack(context.Context, uuid.UUID, uuid.UUID, string, string) (AssetRefTrackRecord, error)
+	// GetAssetRefTrackByID 承载 LayerEditStore 的生成 GetAssetRefTrackByID 值。
 	GetAssetRefTrackByID(context.Context, uuid.UUID, uuid.UUID) (AssetRefTrackRecord, error)
+	// CreateAssetRefTrack 承载 LayerEditStore 的生成 CreateAssetRefTrack 值。
 	CreateAssetRefTrack(context.Context, NewAssetRefTrack) (AssetRefTrackRecord, error)
+	// GetLatestVersionInTrack 承载 LayerEditStore 的生成 GetLatestVersionInTrack 值。
 	GetLatestVersionInTrack(context.Context, uuid.UUID, uuid.UUID) (AssetVersionRecord, error)
+	// CreateAssetVersion 承载 LayerEditStore 的生成 CreateAssetVersion 值。
 	CreateAssetVersion(context.Context, NewAssetVersion) (AssetVersionRecord, error)
+	// UpdateAssetRefTrackHead 承载 LayerEditStore 的生成 UpdateAssetRefTrackHead 值。
 	UpdateAssetRefTrackHead(context.Context, uuid.UUID, uuid.UUID, *uuid.UUID, *uuid.UUID, int64) error
+	// CreateAssetItem 承载 LayerEditStore 的生成 CreateAssetItem 值。
 	CreateAssetItem(context.Context, NewAssetItem) (AssetItemRecord, error)
+	// MarkAssetVersionIndexed 承载 LayerEditStore 的生成 MarkAssetVersionIndexed 值。
 	MarkAssetVersionIndexed(context.Context, uuid.UUID, uuid.UUID) error
+	// EnqueueMergeJob 承载 LayerEditStore 的生成 EnqueueMergeJob 值。
 	EnqueueMergeJob(context.Context, MergeJobInput) (JobAccepted, error)
 }
 
 // MergeJobInput 描述某轨道的一次幂等 asset.merge 请求。
 type MergeJobInput struct {
-	TenantID       uuid.UUID
-	TrackID        uuid.UUID
+	// TenantID 承载 MergeJobInput 的生成 TenantID 值。
+	TenantID uuid.UUID
+	// TrackID 承载 MergeJobInput 的生成 TrackID 值。
+	TrackID uuid.UUID
+	// IdempotencyKey 承载 MergeJobInput 的生成 IdempotencyKey 值。
 	IdempotencyKey uuid.UUID
 }
 
@@ -217,8 +249,11 @@ func (editor *LayerEdit) CreateLayerRevision(ctx context.Context, actor Principa
 
 // LayerRevisionResult 承载一个已持久化的 overlay 修订，以及为物化它而入队的合并任务。
 type LayerRevisionResult struct {
-	Revision     LayerRevisionRecord
-	JobID        uuid.UUID
+	// Revision 承载 LayerRevisionResult 的生成 Revision 值。
+	Revision LayerRevisionRecord
+	// JobID 承载 LayerRevisionResult 的生成 JobID 值。
+	JobID uuid.UUID
+	// Deduplicated 承载 LayerRevisionResult 的生成 Deduplicated 值。
 	Deduplicated bool
 }
 
@@ -375,16 +410,26 @@ func (editor *LayerEdit) buildFingerprint(selected []selectedLayer) (string, err
 
 // selectedLayer 是为合并选中的一个层修订。
 type selectedLayer struct {
-	LayerID      uuid.UUID
-	RevisionID   uuid.UUID
-	Role         string
-	Origin       string
-	Ord          int
-	ScopeType    string
-	ScopeKey     string
+	// LayerID 承载 selectedLayer 的生成 LayerID 值。
+	LayerID uuid.UUID
+	// RevisionID 承载 selectedLayer 的生成 RevisionID 值。
+	RevisionID uuid.UUID
+	// Role 承载 selectedLayer 的生成 Role 值。
+	Role string
+	// Origin 承载 selectedLayer 的生成 Origin 值。
+	Origin string
+	// Ord 承载 selectedLayer 的生成 Ord 值。
+	Ord int
+	// ScopeType 承载 selectedLayer 的生成 ScopeType 值。
+	ScopeType string
+	// ScopeKey 承载 selectedLayer 的生成 ScopeKey 值。
+	ScopeKey string
+	// ReviewStatus 承载 selectedLayer 的生成 ReviewStatus 值。
 	ReviewStatus string
-	ContentHash  string
-	Content      string
+	// ContentHash 承载 selectedLayer 的生成 ContentHash 值。
+	ContentHash string
+	// Content 承载 selectedLayer 的生成 Content 值。
+	Content string
 }
 
 // effectiveRevision 解析层作用域的生效头修订，在精确分支头缺失时回退到全局头。
@@ -775,52 +820,177 @@ func parseAssetLayersETag(etag string, assetID uuid.UUID) error {
 
 // MergePreviewInput 描述一次非持久化合并预览请求。
 type MergePreviewInput struct {
+	// AssetID 承载 MergePreviewInput 的生成 AssetID 值。
 	AssetID uuid.UUID
+	// RefType 承载 MergePreviewInput 的生成 RefType 值。
 	RefType string
+	// RefName 承载 MergePreviewInput 的生成 RefName 值。
 	RefName string
-	Layers  []MergeLayerSelector
+	// Layers 承载 MergePreviewInput 的生成 Layers 值。
+	Layers []MergeLayerSelector
 }
 
 // MergeLayerSelector 为预览选择一个层修订。
 type MergeLayerSelector struct {
-	LayerID    uuid.UUID
+	// LayerID 承载 MergeLayerSelector 的生成 LayerID 值。
+	LayerID uuid.UUID
+	// RevisionID 承载 MergeLayerSelector 的生成 RevisionID 值。
 	RevisionID uuid.UUID
 }
 
 // MergePreviewResult 承载非持久化的合并输出。
 type MergePreviewResult struct {
+	// InputFingerprint 承载 MergePreviewResult 的生成 InputFingerprint 值。
 	InputFingerprint string
-	Content          string
-	ContentType      string
-	Validation       []OverlayIssue
-	Provenance       []ProvenanceEntryRecord
+	// Content 承载 MergePreviewResult 的生成 Content 值。
+	Content string
+	// ContentType 是请求或响应体的媒体类型。
+	ContentType string
+	// Validation 承载 MergePreviewResult 的生成 Validation 值。
+	Validation []OverlayIssue
+	// Provenance 承载 MergePreviewResult 的生成 Provenance 值。
+	Provenance []ProvenanceEntryRecord
 }
 
 // LayerRevisionInput 描述一次手动 overlay 修订提交。
 type LayerRevisionInput struct {
-	ScopeType       string
-	ScopeKey        string
-	Content         string
-	ContentType     string
-	Dialect         *string
+	// ScopeType 承载 LayerRevisionInput 的生成 ScopeType 值。
+	ScopeType string
+	// ScopeKey 承载 LayerRevisionInput 的生成 ScopeKey 值。
+	ScopeKey string
+	// Content 承载 LayerRevisionInput 的生成 Content 值。
+	Content string
+	// ContentType 是请求或响应体的媒体类型。
+	ContentType string
+	// Dialect 承载 LayerRevisionInput 的生成 Dialect 值。
+	Dialect *string
+	// SubmitForReview 承载 LayerRevisionInput 的生成 SubmitForReview 值。
 	SubmitForReview bool
 }
 
 // LayerRollbackInput 描述一次回滚请求。
 type LayerRollbackInput struct {
-	ScopeType                   string
-	ScopeKey                    string
+	// ScopeType 承载 LayerRollbackInput 的生成 ScopeType 值。
+	ScopeType string
+	// ScopeKey 承载 LayerRollbackInput 的生成 ScopeKey 值。
+	ScopeKey string
+	// ExpectedEffectiveRevisionID 承载 LayerRollbackInput 的生成 ExpectedEffectiveRevisionID 值。
 	ExpectedEffectiveRevisionID *uuid.UUID
-	TargetRevisionID            uuid.UUID
+	// TargetRevisionID 承载 LayerRollbackInput 的生成 TargetRevisionID 值。
+	TargetRevisionID uuid.UUID
 }
 
 // ProvenanceEntryRecord 是指针到最后写入层的溯源条目。
 type ProvenanceEntryRecord struct {
-	Pointer    string
-	LayerID    uuid.UUID
+	// Pointer 承载 ProvenanceEntryRecord 的生成 Pointer 值。
+	Pointer string
+	// LayerID 承载 ProvenanceEntryRecord 的生成 LayerID 值。
+	LayerID uuid.UUID
+	// RevisionID 承载 ProvenanceEntryRecord 的生成 RevisionID 值。
 	RevisionID uuid.UUID
 }
 
 func isNotFound(err error) bool {
 	return err != nil && errors.Is(err, ErrNotFound)
+}
+
+// LayerPatchRecord 承载一次层 PATCH 的显式字段。
+type LayerPatchRecord struct {
+	// Role 承载 LayerPatchRecord 的生成 Role 值。
+	Role *string
+	// Dialect 承载 LayerPatchRecord 的生成 Dialect 值。
+	Dialect *string
+	// Enabled 承载 LayerPatchRecord 的生成 Enabled 值。
+	Enabled *bool
+}
+
+// GetLayer 返回一个层及其头指针。
+func (editor *LayerEdit) GetLayer(ctx context.Context, actor Principal, tenantSlug string, layerID uuid.UUID, refType, refName string) (LayerRecord, []LayerHeadRecord, error) {
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerRead)
+	if err != nil {
+		return LayerRecord{}, nil, err
+	}
+	layer, err := editor.store.GetLayer(ctx, membership.TenantID, layerID)
+	if err != nil {
+		return LayerRecord{}, nil, err
+	}
+	heads, err := editor.store.ListLayerHeadsForAsset(ctx, membership.TenantID, layer.AssetID)
+	if err != nil {
+		return LayerRecord{}, nil, err
+	}
+	filtered := make([]LayerHeadRecord, 0, len(heads))
+	for _, head := range heads {
+		if head.LayerID == layerID {
+			filtered = append(filtered, head)
+		}
+	}
+	return layer, filtered, nil
+}
+
+// UpdateLayer 在 If-Match 下更新一个层的角色、方言与启停。
+func (editor *LayerEdit) UpdateLayer(ctx context.Context, actor Principal, tenantSlug string, layerID uuid.UUID, etag string, patch LayerPatchRecord) (LayerRecord, error) {
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
+	if err != nil {
+		return LayerRecord{}, err
+	}
+	if patch.Role == nil && patch.Dialect == nil && patch.Enabled == nil {
+		return LayerRecord{}, ErrValidation
+	}
+	current, err := editor.store.GetLayer(ctx, membership.TenantID, layerID)
+	if err != nil {
+		return LayerRecord{}, err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "layer", layerID)
+	if err != nil {
+		return LayerRecord{}, ErrPrecondition
+	}
+	if expectedRevision != current.Revision {
+		return LayerRecord{}, ErrPrecondition
+	}
+	if patch.Role != nil && *patch.Role != layerRoleBase && *patch.Role != layerRoleOverlay {
+		return LayerRecord{}, ErrValidation
+	}
+	return editor.store.UpdateLayer(ctx, membership.TenantID, layerID, expectedRevision, patch)
+}
+
+// GetLayerRevision 返回一条不可变层修订。
+func (editor *LayerEdit) GetLayerRevision(ctx context.Context, actor Principal, tenantSlug string, revisionID uuid.UUID) (LayerRevisionRecord, error) {
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerRead)
+	if err != nil {
+		return LayerRevisionRecord{}, err
+	}
+	return editor.store.GetLayerRevision(ctx, membership.TenantID, revisionID)
+}
+
+// ListLayerRevisions 返回某层某作用域内一页修订。
+func (editor *LayerEdit) ListLayerRevisions(ctx context.Context, actor Principal, tenantSlug string, layerID uuid.UUID, refType, refName string, page, pageSize int) ([]LayerRevisionRecord, int64, error) {
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerRead)
+	if err != nil {
+		return nil, 0, err
+	}
+	if err := validatePagination(page, pageSize); err != nil {
+		return nil, 0, err
+	}
+	if _, err := editor.store.GetLayer(ctx, membership.TenantID, layerID); err != nil {
+		return nil, 0, err
+	}
+	// 未提供 ref 时列出该层全部作用域的修订；提供 ref 时按 ref/branch:<name> 组合
+	// 出精确作用域（仓库同步修订的作用域即 ref 作用域，scope_key 形如 branch:main）。
+	if refName == "" {
+		return editor.store.ListAllLayerRevisions(ctx, membership.TenantID, layerID, int32(pageSize), int32((page-1)*pageSize))
+	}
+	scopeType, scopeKey := previewScope(refType, refName)
+	return editor.store.ListLayerRevisions(ctx, membership.TenantID, layerID, scopeType, scopeKey, int32(pageSize), int32((page-1)*pageSize))
+}
+
+// ListReviews 返回租户内一页待审核修订。
+func (editor *LayerEdit) ListReviews(ctx context.Context, actor Principal, tenantSlug string, page, pageSize int) ([]LayerRevisionRecord, int64, error) {
+	membership, err := editor.tenantMembership(ctx, actor, tenantSlug, scopeLayerApprove)
+	if err != nil {
+		return nil, 0, err
+	}
+	if err := validatePagination(page, pageSize); err != nil {
+		return nil, 0, err
+	}
+	return editor.store.ListPendingReviews(ctx, membership.TenantID, int32(pageSize), int32((page-1)*pageSize))
 }

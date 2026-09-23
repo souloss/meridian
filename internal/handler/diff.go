@@ -85,8 +85,14 @@ func (s *Server) GetSharedView(ctx context.Context, request view.GetSharedViewRe
 		return nil, err
 	}
 	var resolution api.SharedView_Resolution
-	if err := resolution.FromDiffSnapshot(diffSnapshotResponse(result)); err != nil {
-		return nil, err
+	if result.Resolution != nil {
+		if err := resolution.FromViewResolution(viewResolutionResponse(*result.Resolution)); err != nil {
+			return nil, err
+		}
+	} else {
+		if err := resolution.FromDiffSnapshot(diffSnapshotResponse(result)); err != nil {
+			return nil, err
+		}
 	}
 	return view.GetSharedView200JSONResponse(api.SharedView{
 		ResourceType: api.SharedViewResourceType(result.ResourceType),

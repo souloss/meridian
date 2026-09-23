@@ -14,39 +14,60 @@ import (
 
 // RepositoryConfig 是 .asset-platform.yaml 文档在校验与根点号规范化后的规范化投影。
 type RepositoryConfig struct {
-	Version  int             `json:"version"`
+	// Version 承载 RepositoryConfig 的生成 Version 值。
+	Version int `json:"version"`
+	// Services 承载 RepositoryConfig 的生成 Services 值。
 	Services []ConfigService `json:"services"`
 }
 
 // ConfigService 是一个规范化服务声明。
 type ConfigService struct {
-	Name        string        `json:"name"`
-	DisplayName string        `json:"displayName,omitempty"`
-	Root        string        `json:"root"`
-	Language    *string       `json:"language,omitempty"`
-	Framework   *string       `json:"framework,omitempty"`
-	Assets      []ConfigAsset `json:"assets"`
+	// Name 承载 ConfigService 的生成 Name 值。
+	Name string `json:"name"`
+	// DisplayName 承载 ConfigService 的生成 DisplayName 值。
+	DisplayName string `json:"displayName,omitempty"`
+	// Root 承载 ConfigService 的生成 Root 值。
+	Root string `json:"root"`
+	// Language 承载 ConfigService 的生成 Language 值。
+	Language *string `json:"language,omitempty"`
+	// Framework 承载 ConfigService 的生成 Framework 值。
+	Framework *string `json:"framework,omitempty"`
+	// Assets 承载 ConfigService 的生成 Assets 值。
+	Assets []ConfigAsset `json:"assets"`
 }
 
 // ConfigAsset 是一个规范化资产声明。
 type ConfigAsset struct {
-	Kind           string         `json:"kind"`
-	Name           string         `json:"name,omitempty"`
-	NamingTemplate string         `json:"namingTemplate,omitempty"`
-	Base           *ConfigSource  `json:"base,omitempty"`
-	Overlays       []ConfigSource `json:"overlays,omitempty"`
+	// Kind 承载 ConfigAsset 的生成 Kind 值。
+	Kind string `json:"kind"`
+	// Name 承载 ConfigAsset 的生成 Name 值。
+	Name string `json:"name,omitempty"`
+	// NamingTemplate 承载 ConfigAsset 的生成 NamingTemplate 值。
+	NamingTemplate string `json:"namingTemplate,omitempty"`
+	// Base 承载 ConfigAsset 的生成 Base 值。
+	Base *ConfigSource `json:"base,omitempty"`
+	// Overlays 承载 ConfigAsset 的生成 Overlays 值。
+	Overlays []ConfigSource `json:"overlays,omitempty"`
 }
 
 // ConfigSource 是一个规范化源声明。
 type ConfigSource struct {
-	Mode            string   `json:"mode"`
-	Origin          string   `json:"origin,omitempty"`
-	Path            *string  `json:"path,omitempty"`
-	ProducerProfile *string  `json:"producerProfile,omitempty"`
-	Order           int      `json:"order,omitempty"`
-	TimeoutSec      int      `json:"timeoutSec,omitempty"`
-	BranchPatterns  []string `json:"branchPatterns,omitempty"`
-	Enabled         *bool    `json:"enabled,omitempty"`
+	// Mode 承载 ConfigSource 的生成 Mode 值。
+	Mode string `json:"mode"`
+	// Origin 承载 ConfigSource 的生成 Origin 值。
+	Origin string `json:"origin,omitempty"`
+	// Path 承载 ConfigSource 的生成 Path 值。
+	Path *string `json:"path,omitempty"`
+	// ProducerProfile 承载 ConfigSource 的生成 ProducerProfile 值。
+	ProducerProfile *string `json:"producerProfile,omitempty"`
+	// Order 承载 ConfigSource 的生成 Order 值。
+	Order int `json:"order,omitempty"`
+	// TimeoutSec 承载 ConfigSource 的生成 TimeoutSec 值。
+	TimeoutSec int `json:"timeoutSec,omitempty"`
+	// BranchPatterns 承载 ConfigSource 的生成 BranchPatterns 值。
+	BranchPatterns []string `json:"branchPatterns,omitempty"`
+	// Enabled 承载 ConfigSource 的生成 Enabled 值。
+	Enabled *bool `json:"enabled,omitempty"`
 }
 
 // ParseRepositoryConfig 校验并规范化一个仓库配置文档。`.` 服务根规范化为空字符串，并强制
@@ -144,14 +165,22 @@ func ParseRepositoryConfig(content []byte) (RepositoryConfig, error) {
 }
 
 type configSourceRaw struct {
-	Mode            string   `yaml:"mode"`
-	Origin          string   `yaml:"origin"`
-	Path            *string  `yaml:"path"`
-	ProducerProfile *string  `yaml:"producerProfile"`
-	Order           int      `yaml:"order"`
-	TimeoutSec      int      `yaml:"timeoutSec"`
-	BranchPatterns  []string `yaml:"branchPatterns"`
-	Enabled         *bool    `yaml:"enabled"`
+	// Mode 承载 configSourceRaw 的生成 Mode 值。
+	Mode string `yaml:"mode"`
+	// Origin 承载 configSourceRaw 的生成 Origin 值。
+	Origin string `yaml:"origin"`
+	// Path 承载 configSourceRaw 的生成 Path 值。
+	Path *string `yaml:"path"`
+	// ProducerProfile 承载 configSourceRaw 的生成 ProducerProfile 值。
+	ProducerProfile *string `yaml:"producerProfile"`
+	// Order 承载 configSourceRaw 的生成 Order 值。
+	Order int `yaml:"order"`
+	// TimeoutSec 承载 configSourceRaw 的生成 TimeoutSec 值。
+	TimeoutSec int `yaml:"timeoutSec"`
+	// BranchPatterns 承载 configSourceRaw 的生成 BranchPatterns 值。
+	BranchPatterns []string `yaml:"branchPatterns"`
+	// Enabled 承载 configSourceRaw 的生成 Enabled 值。
+	Enabled *bool `yaml:"enabled"`
 }
 
 func normalizeConfigSource(raw configSourceRaw, isOverlay bool) (ConfigSource, error) {

@@ -171,11 +171,30 @@ type CredentialReference struct {
 // RepositoryStore 是租户仓库配置的持久化边界。
 // 每个实现都必须保留租户谓词，且绝不返回软删除行。
 type RepositoryStore interface {
+	// ResolveCredentialReference 承载 RepositoryStore 的生成 ResolveCredentialReference 值。
 	ResolveCredentialReference(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) (CredentialReference, bool, error)
+	// CountRepositories 承载 RepositoryStore 的生成 CountRepositories 值。
 	CountRepositories(context.Context, uuid.UUID) (int64, int64, error)
+	// ListRepositories 承载 RepositoryStore 的生成 ListRepositories 值。
 	ListRepositories(context.Context, uuid.UUID, string, int32, int32) ([]RepositoryRecord, int64, error)
+	// GetRepository 承载 RepositoryStore 的生成 GetRepository 值。
 	GetRepository(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
+	// CreateRepository 承载 RepositoryStore 的生成 CreateRepository 值。
 	CreateRepository(context.Context, NewRepository) (RepositoryRecord, error)
+	// UpdateRepository 承载 RepositoryStore 的生成 UpdateRepository 值。
 	UpdateRepository(context.Context, UpdateRepository) (RepositoryRecord, error)
+	// DeleteRepository 承载 RepositoryStore 的生成 DeleteRepository 值。
 	DeleteRepository(context.Context, uuid.UUID, uuid.UUID, int64, time.Time) error
+	// GetRepositoryWebhookSecretHash 返回仓库的 webhook 校验秘密摘要。
+	GetRepositoryWebhookSecretHash(context.Context, uuid.UUID, uuid.UUID) ([]byte, error)
+	// GetRepositoryTenantByID 跨租户按 id 定位仓库所属租户（入站 webhook）。
+	GetRepositoryTenantByID(context.Context, uuid.UUID) (RepositoryTenantRef, error)
+}
+
+// RepositoryTenantRef 是仓库的租户与默认分支引用，供入站 webhook 定位。
+type RepositoryTenantRef struct {
+	// TenantID 是仓库所属租户的标识。
+	TenantID uuid.UUID
+	// DefaultBranch 是仓库默认分支。
+	DefaultBranch string
 }

@@ -94,7 +94,8 @@ type CredentialRotation struct {
 	RequestHash []byte
 	// PrincipalType 与 PrincipalID 标识认证后的重放边界。
 	PrincipalType string
-	PrincipalID   uuid.UUID
+	// PrincipalID 承载 CredentialRotation 的生成 PrincipalID 值。
+	PrincipalID uuid.UUID
 }
 
 // CredentialSyncJob 是凭据轮换入队仓库工作后返回的最小元数据。
@@ -270,22 +271,38 @@ type KnownHostRecord struct {
 // CredentialStore 是凭据与已知主机用例的持久化边界。
 // 实现必须在每个查询中强制租户谓词，并让加密秘密远离日志。
 type CredentialStore interface {
+	// CreateCredential 承载 CredentialStore 的生成 CreateCredential 值。
 	CreateCredential(context.Context, NewCredential) (CredentialRecord, error)
+	// ListCredentials 承载 CredentialStore 的生成 ListCredentials 值。
 	ListCredentials(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]CredentialRecord, int64, error)
+	// GetCredential 承载 CredentialStore 的生成 GetCredential 值。
 	GetCredential(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) (CredentialRecord, error)
+	// UpdateCredential 承载 CredentialStore 的生成 UpdateCredential 值。
 	UpdateCredential(context.Context, UpdateCredential) (CredentialRecord, error)
+	// DeleteCredential 承载 CredentialStore 的生成 DeleteCredential 值。
 	DeleteCredential(context.Context, uuid.UUID, uuid.UUID, int64, bool, time.Time) error
+	// LookupCredentialRotation 承载 CredentialStore 的生成 LookupCredentialRotation 值。
 	LookupCredentialRotation(context.Context, uuid.UUID, string, uuid.UUID, uuid.UUID, []byte) (CredentialRecord, []CredentialSyncJob, bool, error)
+	// RotateCredential 承载 CredentialStore 的生成 RotateCredential 值。
 	RotateCredential(context.Context, RotateCredential) (CredentialRecord, []CredentialSyncJob, error)
 
+	// ListGlobalCredentials 承载 CredentialStore 的生成 ListGlobalCredentials 值。
 	ListGlobalCredentials(context.Context, int32, int32) ([]GlobalCredentialRecord, int64, error)
+	// CreateGlobalCredential 承载 CredentialStore 的生成 CreateGlobalCredential 值。
 	CreateGlobalCredential(context.Context, NewGlobalCredential) (GlobalCredentialRecord, error)
+	// GetGlobalCredential 承载 CredentialStore 的生成 GetGlobalCredential 值。
 	GetGlobalCredential(context.Context, uuid.UUID) (GlobalCredentialRecord, error)
+	// UpdateGlobalCredential 承载 CredentialStore 的生成 UpdateGlobalCredential 值。
 	UpdateGlobalCredential(context.Context, UpdateGlobalCredential) (GlobalCredentialRecord, error)
+	// DeleteGlobalCredential 承载 CredentialStore 的生成 DeleteGlobalCredential 值。
 	DeleteGlobalCredential(context.Context, uuid.UUID, int64, bool, time.Time) error
+	// LookupGlobalCredentialRotation 承载 CredentialStore 的生成 LookupGlobalCredentialRotation 值。
 	LookupGlobalCredentialRotation(context.Context, string, uuid.UUID, uuid.UUID, []byte) (GlobalCredentialRecord, []CredentialSyncJob, bool, error)
+	// RotateGlobalCredential 承载 CredentialStore 的生成 RotateGlobalCredential 值。
 	RotateGlobalCredential(context.Context, RotateGlobalCredential) (GlobalCredentialRecord, []CredentialSyncJob, error)
 
+	// ListKnownHosts 承载 CredentialStore 的生成 ListKnownHosts 值。
 	ListKnownHosts(context.Context, uuid.UUID, int32, int32) ([]KnownHostRecord, int64, error)
+	// CreateKnownHost 承载 CredentialStore 的生成 CreateKnownHost 值。
 	CreateKnownHost(context.Context, NewKnownHost) (KnownHostRecord, error)
 }

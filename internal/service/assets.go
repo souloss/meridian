@@ -120,10 +120,15 @@ func (assets *Assets) AssetSummaries(ctx context.Context, tenantID uuid.UUID, se
 
 // AssetTrackProjection 承载从引用轨道推导出的资产级字段。
 type AssetTrackProjection struct {
-	Lifecycle        string
-	QualityScore     *int32
-	Health           string
-	LatestVersionID  *uuid.UUID
+	// Lifecycle 承载 AssetTrackProjection 的生成 Lifecycle 值。
+	Lifecycle string
+	// QualityScore 承载 AssetTrackProjection 的生成 QualityScore 值。
+	QualityScore *int32
+	// Health 承载 AssetTrackProjection 的生成 Health 值。
+	Health string
+	// LatestVersionID 承载 AssetTrackProjection 的生成 LatestVersionID 值。
+	LatestVersionID *uuid.UUID
+	// CurrentVersionID 承载 AssetTrackProjection 的生成 CurrentVersionID 值。
 	CurrentVersionID *uuid.UUID
 }
 

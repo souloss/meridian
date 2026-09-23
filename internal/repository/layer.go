@@ -172,6 +172,91 @@ func mergeDedupeKey(trackID uuid.UUID) string {
 	return dedupeKeyPrefixMerge + trackID.String()
 }
 
+// ListLayerHeadsForAsset 返回某资产全部层的头指针。
+func (store *LayerStore) ListLayerHeadsForAsset(ctx context.Context, tenantID, assetID uuid.UUID) ([]service.LayerHeadRecord, error) {
+	rows, err := store.queries.ListLayerHeadsForAsset(ctx, generated.ListLayerHeadsForAssetParams{TenantID: tenantID, AssetID: assetID})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	heads := make([]service.LayerHeadRecord, 0, len(rows))
+	for _, row := range rows {
+		heads = append(heads, layerHeadFromRow(row))
+	}
+	return heads, nil
+}
+
+// UpdateLayer 在 If-Match 下更新一条层的可编辑字段。
+func (store *LayerStore) UpdateLayer(ctx context.Context, tenantID, layerID uuid.UUID, expectedRevision int64, patch service.LayerPatchRecord) (service.LayerRecord, error) {
+	row, err := store.queries.UpdateLayer(ctx, generated.UpdateLayerParams{
+		TenantID: tenantID, ID: layerID, ExpectedRevision: expectedRevision,
+		Role: patch.Role, SetDialect: patch.Dialect != nil, Dialect: patch.Dialect, Enabled: patch.Enabled,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return service.LayerRecord{}, service.ErrPrecondition
+		}
+		return service.LayerRecord{}, normalizeError(err)
+	}
+	return layerFromRow(row), nil
+}
+
+// ListLayerRevisions 返回某层某作用域内一页修订。
+func (store *LayerStore) ListLayerRevisions(ctx context.Context, tenantID, layerID uuid.UUID, scopeType, scopeKey string, limit, offset int32) ([]service.LayerRevisionRecord, int64, error) {
+	rows, err := store.queries.ListLayerRevisions(ctx, generated.ListLayerRevisionsParams{
+		TenantID: tenantID, LayerID: layerID, ScopeType: scopeType, ScopeKey: scopeKey, PageLimit: limit, PageOffset: offset,
+	})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	revisions := make([]service.LayerRevisionRecord, 0, len(rows))
+	for _, row := range rows {
+		revisions = append(revisions, layerRevisionFromRow(row))
+	}
+	return revisions, int64(len(rows)), nil
+}
+
+// ListAllLayerRevisions 返回某层全部作用域内的一页修订（无作用域过滤）。
+func (store *LayerStore) ListAllLayerRevisions(ctx context.Context, tenantID, layerID uuid.UUID, limit, offset int32) ([]service.LayerRevisionRecord, int64, error) {
+	rows, err := store.queries.ListAllLayerRevisions(ctx, generated.ListAllLayerRevisionsParams{
+		TenantID: tenantID, LayerID: layerID, PageLimit: limit, PageOffset: offset,
+	})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	revisions := make([]service.LayerRevisionRecord, 0, len(rows))
+	for _, row := range rows {
+		revisions = append(revisions, layerRevisionFromRow(row))
+	}
+	return revisions, int64(len(rows)), nil
+}
+
+// ListPendingReviews 返回租户内一页待审核修订。
+func (store *LayerStore) ListPendingReviews(ctx context.Context, tenantID uuid.UUID, limit, offset int32) ([]service.LayerRevisionRecord, int64, error) {
+	total, err := store.queries.CountPendingReviews(ctx, tenantID)
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	rows, err := store.queries.ListPendingReviews(ctx, generated.ListPendingReviewsParams{TenantID: tenantID, PageLimit: limit, PageOffset: offset})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	revisions := make([]service.LayerRevisionRecord, 0, len(rows))
+	for _, row := range rows {
+		revisions = append(revisions, pendingReviewFromRow(row))
+	}
+	return revisions, total, nil
+}
+
+// pendingReviewFromRow 将待审核修订查询行投影为层修订记录。
+func pendingReviewFromRow(row generated.ListPendingReviewsRow) service.LayerRevisionRecord {
+	return service.LayerRevisionRecord{
+		ID: row.ID, LayerID: row.LayerID, ScopeType: row.ScopeType, ScopeKey: row.ScopeKey,
+		ContentHash: row.ContentHash, ContentRef: row.ContentRef, ContentType: row.ContentType, Dialect: row.Dialect,
+		ReviewStatus: row.ReviewStatus, GitCommit: row.GitCommit, SourceBranch: row.SourceBranch,
+		CreatedBy: row.CreatedBy, CreatedAt: row.CreatedAt.Time,
+	}
+}
+
 func layerRevisionFromRow(row generated.LayerRevision) service.LayerRevisionRecord {
 	return service.LayerRevisionRecord{
 		ID: row.ID, LayerID: row.LayerID, ScopeType: row.ScopeType, ScopeKey: row.ScopeKey,

@@ -1384,6 +1384,72 @@ type Service struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+// ServiceComment 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 服务页轻量评论/备注，不做完整讨论区。
+type ServiceComment struct {
+	// TenantID 是 ServiceComment 的生成 TenantID 数据库值。
+	// 评论所属租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是 ServiceComment 的生成 ID 数据库值。
+	// 应用生成的 UUID v7 评论标识。
+	ID uuid.UUID `json:"id"`
+	// ServiceID 是 ServiceComment 的生成 ServiceID 数据库值。
+	// 被评论的服务。
+	ServiceID uuid.UUID `json:"service_id"`
+	// AuthorID 是 ServiceComment 的生成 AuthorID 数据库值。
+	// 评论作者。
+	AuthorID uuid.UUID `json:"author_id"`
+	// Body 是 ServiceComment 的生成 Body 数据库值。
+	// 评论正文。
+	Body string `json:"body"`
+	// Revision 是 ServiceComment 的生成 Revision 数据库值。
+	// 并发版本号。
+	Revision int64 `json:"revision"`
+	// DeletedAt 是 ServiceComment 的生成 DeletedAt 数据库值。
+	// 软删除时间（可为空）。
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	// CreatedAt 是 ServiceComment 的生成 CreatedAt 数据库值。
+	// 创建时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt 是 ServiceComment 的生成 UpdatedAt 数据库值。
+	// 最近更新时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// ServiceStar 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 租户内用户对服务的收藏，用于目录筛选与个人主页。
+type ServiceStar struct {
+	// TenantID 是 ServiceStar 的生成 TenantID 数据库值。
+	// 收藏所属租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ServiceID 是 ServiceStar 的生成 ServiceID 数据库值。
+	// 被收藏的服务。
+	ServiceID uuid.UUID `json:"service_id"`
+	// UserID 是 ServiceStar 的生成 UserID 数据库值。
+	// 收藏的用户。
+	UserID uuid.UUID `json:"user_id"`
+	// CreatedAt 是 ServiceStar 的生成 CreatedAt 数据库值。
+	// 收藏创建时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+// ServiceTag 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 服务与标签的多对多关联。
+type ServiceTag struct {
+	// TenantID 是 ServiceTag 的生成 TenantID 数据库值。
+	// 关联所属租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ServiceID 是 ServiceTag 的生成 ServiceID 数据库值。
+	// 被标记的服务。
+	ServiceID uuid.UUID `json:"service_id"`
+	// TagID 是 ServiceTag 的生成 TagID 数据库值。
+	// 关联的标签。
+	TagID uuid.UUID `json:"tag_id"`
+	// CreatedAt 是 ServiceTag 的生成 CreatedAt 数据库值。
+	// 关联创建时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
 // ShareLink 是相应 Meridian 表行的生成 PostgreSQL 表示。
 // 视图或差异快照的匿名只读分享链接。
 type ShareLink struct {
@@ -1638,6 +1704,35 @@ type SystemGroupMember struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
+// TagDefinition 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 租户维护的标签字典，供服务筛选与分面。
+type TagDefinition struct {
+	// TenantID 是 TagDefinition 的生成 TenantID 数据库值。
+	// 标签所属租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是 TagDefinition 的生成 ID 数据库值。
+	// 应用生成的 UUID v7 标签标识。
+	ID uuid.UUID `json:"id"`
+	// Name 是 TagDefinition 的生成 Name 数据库值。
+	// 租户内唯一的标签名称。
+	Name string `json:"name"`
+	// Color 是 TagDefinition 的生成 Color 数据库值。
+	// 标签展示颜色。
+	Color string `json:"color"`
+	// Description 是 TagDefinition 的生成 Description 数据库值。
+	// 标签描述（可为空）。
+	Description *string `json:"description"`
+	// Revision 是 TagDefinition 的生成 Revision 数据库值。
+	// 用于生成 HTTP ETag 的并发版本号。
+	Revision int64 `json:"revision"`
+	// CreatedAt 是 TagDefinition 的生成 CreatedAt 数据库值。
+	// 创建时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt 是 TagDefinition 的生成 UpdatedAt 数据库值。
+	// 最近更新时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
 // Team 是相应 Meridian 表行的生成 PostgreSQL 表示。
 // 租户内用于授权和凭据共享的团队。
 type Team struct {
@@ -1728,6 +1823,38 @@ type TenantBlobRef struct {
 	// LastReferencedAt 是 TenantBlobRef 的生成 LastReferencedAt 数据库值。
 	// 租户最近新增或刷新引用时的 UTC 时间。
 	LastReferencedAt pgtype.Timestamptz `json:"last_referenced_at"`
+}
+
+// TenantExport 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 租户全量数据导出任务记录。
+type TenantExport struct {
+	// TenantID 是 TenantExport 的生成 TenantID 数据库值。
+	// 导出所属租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是 TenantExport 的生成 ID 数据库值。
+	// 应用生成的 UUID v7 导出标识。
+	ID uuid.UUID `json:"id"`
+	// RequestedBy 是 TenantExport 的生成 RequestedBy 数据库值。
+	// 发起导出的用户。
+	RequestedBy uuid.UUID `json:"requested_by"`
+	// Status 是 TenantExport 的生成 Status 数据库值。
+	// 导出状态：pending/running/succeeded/failed。
+	Status string `json:"status"`
+	// ArtifactRef 是 TenantExport 的生成 ArtifactRef 数据库值。
+	// 导出产物的 blob 引用（可为空）。
+	ArtifactRef *string `json:"artifact_ref"`
+	// ExpiresAt 是 TenantExport 的生成 ExpiresAt 数据库值。
+	// 导出产物有效期（可为空）。
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	// Error 是 TenantExport 的生成 Error 数据库值。
+	// 失败原因（可为空）。
+	Error *string `json:"error"`
+	// CreatedAt 是 TenantExport 的生成 CreatedAt 数据库值。
+	// 创建时间。
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	// UpdatedAt 是 TenantExport 的生成 UpdatedAt 数据库值。
+	// 最近更新时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 // TenantKindOverride 是相应 Meridian 表行的生成 PostgreSQL 表示。
@@ -1863,5 +1990,31 @@ type UserPreference struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	// UpdatedAt 是 UserPreference 的生成 UpdatedAt 数据库值。
 	// 最近一次更新用户偏好时的 UTC 事务时间。
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+// ViewOverride 是相应 Meridian 表行的生成 PostgreSQL 表示。
+// 租户级视图开关、排序与默认参数覆盖。
+type ViewOverride struct {
+	// TenantID 是 ViewOverride 的生成 TenantID 数据库值。
+	// 覆盖所属租户。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ViewID 是 ViewOverride 的生成 ViewID 数据库值。
+	// 被覆盖的内置视图标识。
+	ViewID string `json:"view_id"`
+	// Enabled 是 ViewOverride 的生成 Enabled 数据库值。
+	// 该租户是否启用该视图。
+	Enabled bool `json:"enabled"`
+	// Ord 是 ViewOverride 的生成 Ord 数据库值。
+	// 视图在租户内的展示排序。
+	Ord int32 `json:"ord"`
+	// DefaultOptions 是 ViewOverride 的生成 DefaultOptions 数据库值。
+	// 租户级默认参数覆盖 JSON。
+	DefaultOptions []byte `json:"default_options"`
+	// Revision 是 ViewOverride 的生成 Revision 数据库值。
+	// 用于生成 HTTP ETag 的并发版本号。
+	Revision int64 `json:"revision"`
+	// UpdatedAt 是 ViewOverride 的生成 UpdatedAt 数据库值。
+	// 最近更新时间。
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }

@@ -213,3 +213,34 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND user_id = sqlc.arg(user_id)
 RETURNING id;
+
+-- 在 If-Match 下更新一个平台身份的非秘密字段并递增 revision。
+-- display_name/status 使用 set 标志保留「未提供」语义；email 可为空以支持显式清除。
+-- name: UpdateUserProfile :one
+UPDATE users
+SET
+  display_name = CASE WHEN sqlc.arg(set_display_name)::boolean THEN sqlc.arg(display_name) ELSE display_name END,
+  email = CASE WHEN sqlc.arg(set_email)::boolean THEN sqlc.narg(email) ELSE email END,
+  status = CASE WHEN sqlc.arg(set_status)::boolean THEN sqlc.arg(status) ELSE status END,
+  revision = revision + 1,
+  updated_at = now()
+WHERE id = sqlc.arg(id)
+  AND revision = sqlc.arg(expected_revision)
+RETURNING *;
+
+-- 更新一个平台身份的密码哈希并递增 revision。
+-- name: UpdateUserPassword :one
+UPDATE users
+SET
+  password_hash = sqlc.arg(password_hash),
+  revision = revision + 1,
+  updated_at = now()
+WHERE id = sqlc.arg(id)
+  AND revision = sqlc.arg(expected_revision)
+RETURNING *;
+
+-- 返回一个平台身份当前密码哈希，供密码轮换校验。
+-- name: GetUserPasswordHash :one
+SELECT password_hash
+FROM users
+WHERE id = sqlc.arg(id);

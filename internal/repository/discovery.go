@@ -159,6 +159,18 @@ func (store *DiscoveryStore) AcceptDiscoveryCandidate(ctx context.Context, tenan
 	return nil
 }
 
+// DismissDiscoveryCandidate 将一条待处理候选标记为已驳回。
+func (store *DiscoveryStore) DismissDiscoveryCandidate(ctx context.Context, tenantID, id uuid.UUID) error {
+	changed, err := store.queries.DismissDiscoveryCandidate(ctx, generated.DismissDiscoveryCandidateParams{TenantID: tenantID, ID: id})
+	if err != nil {
+		return normalizeError(err)
+	}
+	if changed != rowsAffectedOne {
+		return service.ErrPrecondition
+	}
+	return nil
+}
+
 // CreateService 将一条已接受候选插入为服务。
 func (store *DiscoveryStore) CreateService(ctx context.Context, input service.NewService) (service.ServiceRecord, error) {
 	row, err := store.queries.CreateService(ctx, generated.CreateServiceParams{
@@ -188,6 +200,23 @@ func (store *DiscoveryStore) CountServices(ctx context.Context, tenantID uuid.UU
 		return 0, 0, normalizeError(err)
 	}
 	return row.CurrentCount, row.LimitCount, nil
+}
+
+// ListServices 分页返回租户内活跃服务目录。
+func (store *DiscoveryStore) ListServices(ctx context.Context, tenantID uuid.UUID, limit, offset int32) ([]service.ServiceRecord, int64, error) {
+	total, err := store.queries.CountListedServices(ctx, tenantID)
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	rows, err := store.queries.ListServices(ctx, generated.ListServicesParams{TenantID: tenantID, PageLimit: limit, PageOffset: offset})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	services := make([]service.ServiceRecord, 0, len(rows))
+	for _, row := range rows {
+		services = append(services, serviceRecordFromRow(row))
+	}
+	return services, total, nil
 }
 
 // CreateProducerProfile 插入一条平台生产者配置。
@@ -241,6 +270,167 @@ func (store *DiscoveryStore) GetProducerProfile(ctx context.Context, id uuid.UUI
 		return service.ProducerProfile{}, normalizeError(err)
 	}
 	return producerProfileFromRow(row), nil
+}
+
+// ListProducerProfiles 返回平台生产者配置分页。
+func (store *DiscoveryStore) ListProducerProfiles(ctx context.Context, limit, offset int32) ([]service.ProducerProfile, int64, error) {
+	total, err := store.queries.CountAllProducerProfiles(ctx)
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	rows, err := store.queries.ListAllProducerProfiles(ctx, generated.ListAllProducerProfilesParams{PageLimit: limit, PageOffset: offset})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	items := make([]service.ProducerProfile, 0, len(rows))
+	for _, row := range rows {
+		items = append(items, producerProfileFromRow(row))
+	}
+	return items, total, nil
+}
+
+// UpdateProducerProfile 在 If-Match 下更新一个平台生产者配置。
+func (store *DiscoveryStore) UpdateProducerProfile(ctx context.Context, id uuid.UUID, expectedRevision int64, patch service.ProducerProfilePatch) (service.ProducerProfile, error) {
+	args, err := optionalJSONText(patch.Args)
+	if err != nil {
+		return service.ProducerProfile{}, err
+	}
+	var envAllowlist, supportedKinds []string
+	if patch.EnvAllowlist != nil {
+		envAllowlist = *patch.EnvAllowlist
+	}
+	if patch.SupportedKinds != nil {
+		supportedKinds = *patch.SupportedKinds
+	}
+	var network *string
+	if patch.Network != nil {
+		network = patch.Network
+	}
+	var timeout, memory, cpu, pids *int32
+	if patch.TimeoutSec != nil {
+		timeout = new(int32(*patch.TimeoutSec))
+	}
+	if patch.MemoryMiB != nil {
+		memory = new(int32(*patch.MemoryMiB))
+	}
+	if patch.CPUSeconds != nil {
+		cpu = new(int32(*patch.CPUSeconds))
+	}
+	if patch.Pids != nil {
+		pids = new(int32(*patch.Pids))
+	}
+	row, err := store.queries.UpdateProducerProfile(ctx, generated.UpdateProducerProfileParams{
+		ID: id, ExpectedRevision: expectedRevision, Name: patch.Name, Executable: patch.Executable,
+		Args: args, EnvAllowlist: envAllowlist, SupportedKinds: supportedKinds,
+		ReplaySafe: patch.ReplaySafe, Network: network, TimeoutSec: timeout,
+		MemoryMib: memory, CpuSeconds: cpu, Pids: pids, Enabled: patch.Enabled,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return service.ProducerProfile{}, service.ErrPrecondition
+		}
+		return service.ProducerProfile{}, normalizeError(err)
+	}
+	return producerProfileFromRow(row), nil
+}
+
+// DeleteProducerProfile 软删除一个平台生产者配置。
+func (store *DiscoveryStore) DeleteProducerProfile(ctx context.Context, id uuid.UUID) error {
+	changed, err := store.queries.DeleteProducerProfile(ctx, id)
+	if err != nil {
+		return normalizeError(err)
+	}
+	if changed == 0 {
+		return service.ErrNotFound
+	}
+	return nil
+}
+
+// optionalJSONText 将字符串切片指针编码为 JSONB 字节（nil 保持 NULL）。
+func optionalJSONText(value *[]string) ([]byte, error) {
+	if value == nil {
+		return nil, nil
+	}
+	return json.Marshal(*value)
+}
+
+// DeleteSourceSpec 在 If-Match 下软删除一条源配置。
+func (store *DiscoveryStore) DeleteSourceSpec(ctx context.Context, tenantID, id uuid.UUID, expectedRevision int64) error {
+	changed, err := store.queries.DeleteSourceSpec(ctx, generated.DeleteSourceSpecParams{
+		TenantID: tenantID, ID: id, ExpectedRevision: expectedRevision,
+	})
+	if err != nil {
+		return normalizeError(err)
+	}
+	if changed != rowsAffectedOne {
+		return service.ErrPrecondition
+	}
+	return nil
+}
+
+// EnqueueProduceJob 原子地记录一条 asset.produce 任务（无 River 工作，worker 由运行时后续补充）。
+func (store *DiscoveryStore) EnqueueProduceJob(ctx context.Context, input service.ProduceJobInput) (service.JobAccepted, error) {
+	dedupeKey := produceDedupeKey(input.SourceID)
+	jobInput, err := json.Marshal(struct {
+		Force *bool `json:"force,omitempty"`
+	}{Force: boolPtr(input.Force)})
+	if err != nil {
+		return service.JobAccepted{}, fmt.Errorf("encode produce job input: %w", err)
+	}
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return service.JobAccepted{}, fmt.Errorf("begin produce job transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	queries := generated.New(tx)
+
+	for {
+		latest, err := queries.LockLatestDiscoveryJob(ctx, generated.LockLatestDiscoveryJobParams{TenantID: input.TenantID, DedupeKey: dedupeKey})
+		generation := jobGenerationInitial
+		if err == nil {
+			if latest.Status == service.JobStatusPending || latest.Status == service.JobStatusRunning {
+				return service.JobAccepted{JobID: latest.ID, Deduplicated: true}, nil
+			}
+			generation = latest.ActiveGeneration + 1
+		} else if !errors.Is(err, pgx.ErrNoRows) {
+			return service.JobAccepted{}, normalizeError(err)
+		}
+
+		jobID := uuid.NewV7()
+		refType := input.RefType
+		refName := input.RefName
+		row, err := queries.CreateProduceJob(ctx, generated.CreateProduceJobParams{
+			TenantID: input.TenantID, ID: jobID, SourceID: new(input.SourceID),
+			RefType: nullableString(refType), RefName: nullableString(refName), JobInput: jobInput,
+			DedupeKey: dedupeKey, ActiveGeneration: generation,
+		})
+		if err == nil {
+			if err := tx.Commit(ctx); err != nil {
+				return service.JobAccepted{}, normalizeError(err)
+			}
+			return service.JobAccepted{JobID: row.ID, Deduplicated: false}, nil
+		}
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return service.JobAccepted{}, normalizeError(err)
+		}
+	}
+}
+
+func produceDedupeKey(sourceID uuid.UUID) string {
+	return dedupeKeyPrefixProduce + sourceID.String()
+}
+
+// boolPtr 返回布尔值的指针；空布尔视为 nil。
+func boolPtr(value bool) *bool {
+	return &value
+}
+
+// nullableString 将空字符串视为 NULL（引用可选）。
+func nullableString(value string) *string {
+	if value == "" {
+		return nil
+	}
+	return &value
 }
 
 // CreateSourceSpec 插入一条经过校验的源配置。手动模式还会在同一事务内

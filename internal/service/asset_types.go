@@ -346,17 +346,23 @@ type SyncJobInput struct {
 	Force *bool
 	// PrincipalType 与 PrincipalID 将重放身份绑定到调用方。
 	PrincipalType string
-	PrincipalID   uuid.UUID
+	// PrincipalID 承载 SyncJobInput 的生成 PrincipalID 值。
+	PrincipalID uuid.UUID
 	// RequestHash 是 32 字节 RFC 8785 请求摘要，用于重放比较。
 	RequestHash []byte
 }
 
 // SyncStore 是仓库同步入队的持久化边界。
 type SyncStore interface {
+	// GetRepository 承载 SyncStore 的生成 GetRepository 值。
 	GetRepository(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
+	// EnqueueSyncJob 承载 SyncStore 的生成 EnqueueSyncJob 值。
 	EnqueueSyncJob(context.Context, SyncJobInput) (JobAccepted, error)
+	// MarkSyncJobDirty 承载 SyncStore 的生成 MarkSyncJobDirty 值。
 	MarkSyncJobDirty(context.Context, uuid.UUID, string, int64) error
+	// GetSyncJobForSuccessor 承载 SyncStore 的生成 GetSyncJobForSuccessor 值。
 	GetSyncJobForSuccessor(context.Context, uuid.UUID, uuid.UUID) (SyncJobSuccessorState, error)
+	// ClearSyncJobDirty 承载 SyncStore 的生成 ClearSyncJobDirty 值。
 	ClearSyncJobDirty(context.Context, uuid.UUID, uuid.UUID) error
 }
 
@@ -380,32 +386,66 @@ type SyncJobSuccessorState struct {
 
 // AssetStore 是 M1 资产管线的持久化边界。
 type AssetStore interface {
+	// GetRepository 承载 AssetStore 的生成 GetRepository 值。
 	GetRepository(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
+	// GetAssetRepositoryDefaultBranch 承载 AssetStore 的生成 GetAssetRepositoryDefaultBranch 值。
 	GetAssetRepositoryDefaultBranch(context.Context, uuid.UUID, uuid.UUID) (string, error)
+	// GetAssetKind 承载 AssetStore 的生成 GetAssetKind 值。
 	GetAssetKind(context.Context, string) (AssetKindRecord, error)
+	// ListAssetKinds 承载 AssetStore 的生成 ListAssetKinds 值。
 	ListAssetKinds(context.Context) ([]AssetKindRecord, error)
+	// ListServicesByRepository 承载 AssetStore 的生成 ListServicesByRepository 值。
 	ListServicesByRepository(context.Context, uuid.UUID, uuid.UUID) ([]ServiceRecord, error)
+	// ListAssetsForService 承载 AssetStore 的生成 ListAssetsForService 值。
 	ListAssetsForService(context.Context, uuid.UUID, uuid.UUID) ([]AssetRecord, error)
+	// ListSourceSpecsForService 承载 AssetStore 的生成 ListSourceSpecsForService 值。
 	ListSourceSpecsForService(context.Context, uuid.UUID, uuid.UUID) ([]SourceSpecRecord, error)
+	// UpsertAsset 承载 AssetStore 的生成 UpsertAsset 值。
 	UpsertAsset(context.Context, NewAsset) (AssetRecord, error)
+	// GetAssetByName 承载 AssetStore 的生成 GetAssetByName 值。
 	GetAssetByName(context.Context, uuid.UUID, uuid.UUID, string, string) (AssetRecord, error)
+	// GetAsset 承载 AssetStore 的生成 GetAsset 值。
 	GetAsset(context.Context, uuid.UUID, uuid.UUID) (AssetRecord, error)
+	// CreateAssetRefTrack 承载 AssetStore 的生成 CreateAssetRefTrack 值。
 	CreateAssetRefTrack(context.Context, NewAssetRefTrack) (AssetRefTrackRecord, error)
+	// GetAssetRefTrack 承载 AssetStore 的生成 GetAssetRefTrack 值。
 	GetAssetRefTrack(context.Context, uuid.UUID, uuid.UUID, string, string) (AssetRefTrackRecord, error)
+	// CreateLayer 承载 AssetStore 的生成 CreateLayer 值。
 	CreateLayer(context.Context, NewLayer) (LayerRecord, error)
+	// GetBaseLayerForAsset 承载 AssetStore 的生成 GetBaseLayerForAsset 值。
 	GetBaseLayerForAsset(context.Context, uuid.UUID, uuid.UUID) (LayerRecord, error)
+	// CreateLayerRevision 承载 AssetStore 的生成 CreateLayerRevision 值。
 	CreateLayerRevision(context.Context, NewLayerRevision) (LayerRevisionRecord, error)
+	// GetLatestLayerRevision 承载 AssetStore 的生成 GetLatestLayerRevision 值。
 	GetLatestLayerRevision(context.Context, uuid.UUID, uuid.UUID, string, string) (LayerRevisionRecord, error)
+	// UpsertLayerHead 承载 AssetStore 的生成 UpsertLayerHead 值。
 	UpsertLayerHead(context.Context, NewLayerHead) (LayerHeadRecord, error)
+	// CreateAssetVersion 承载 AssetStore 的生成 CreateAssetVersion 值。
 	CreateAssetVersion(context.Context, NewAssetVersion) (AssetVersionRecord, error)
+	// GetAssetVersion 承载 AssetStore 的生成 GetAssetVersion 值。
 	GetAssetVersion(context.Context, uuid.UUID, uuid.UUID) (AssetVersionRecord, error)
+	// MarkAssetVersionIndexed 承载 AssetStore 的生成 MarkAssetVersionIndexed 值。
 	MarkAssetVersionIndexed(context.Context, uuid.UUID, uuid.UUID) error
+	// GetLatestVersionInTrack 承载 AssetStore 的生成 GetLatestVersionInTrack 值。
 	GetLatestVersionInTrack(context.Context, uuid.UUID, uuid.UUID) (AssetVersionRecord, error)
+	// GetCurrentVersionInTrack 承载 AssetStore 的生成 GetCurrentVersionInTrack 值。
 	GetCurrentVersionInTrack(context.Context, uuid.UUID, uuid.UUID) (AssetVersionRecord, error)
+	// UpdateAssetRefTrackHead 承载 AssetStore 的生成 UpdateAssetRefTrackHead 值。
 	UpdateAssetRefTrackHead(context.Context, uuid.UUID, uuid.UUID, *uuid.UUID, *uuid.UUID, int64) error
+	// CreateAssetItem 承载 AssetStore 的生成 CreateAssetItem 值。
 	CreateAssetItem(context.Context, NewAssetItem) (AssetItemRecord, error)
+	// UpdateAssetItemSearchVector 承载 AssetStore 的生成 UpdateAssetItemSearchVector 值。
 	UpdateAssetItemSearchVector(context.Context, uuid.UUID, uuid.UUID, string) error
+	// ListAssetVersionItems 承载 AssetStore 的生成 ListAssetVersionItems 值。
 	ListAssetVersionItems(context.Context, uuid.UUID, uuid.UUID, string, int32, int32) ([]AssetItemRecord, int64, error)
+	// ListAssetVersions 承载 AssetStore 的生成 ListAssetVersions 值。
+	ListAssetVersions(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]AssetVersionRecord, int64, error)
+	// DeprecateAssetVersion 承载 AssetStore 的生成 DeprecateAssetVersion 值。
+	DeprecateAssetVersion(context.Context, uuid.UUID, uuid.UUID, int64) (AssetVersionRecord, error)
+	// RetireAssetVersion 承载 AssetStore 的生成 RetireAssetVersion 值。
+	RetireAssetVersion(context.Context, uuid.UUID, uuid.UUID, int64) (AssetVersionRecord, error)
+	// GetPublicAsset 承载 AssetStore 的生成 GetPublicAsset 值。
+	GetPublicAsset(context.Context, string, string, string, string) (PublicAssetRecord, error)
 	// SearchItems 按搜索查询与 facet 分页返回已索引的资产条目。
 	SearchItems(context.Context, uuid.UUID, string, SearchFilter, int32, int32) ([]AssetItemRecord, int64, error)
 	// SearchFacets 一次返回各维度 facet 桶计数（不含零计数基线）。
@@ -422,16 +462,27 @@ type AssetStore interface {
 	ListSystemGroupMembers(context.Context, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)
 	// ListServicesForTenant 分页返回租户内每个活跃服务。
 	ListServicesForTenant(context.Context, uuid.UUID, int32, int32) ([]ServiceRecord, int64, error)
+	// UpdateSourceSpec 承载 AssetStore 的生成 UpdateSourceSpec 值。
 	UpdateSourceSpec(context.Context, SourceSpecPatch) (SourceSpecRecord, error)
+	// UpsertSourceBinding 承载 AssetStore 的生成 UpsertSourceBinding 值。
 	UpsertSourceBinding(context.Context, NewSourceBinding) (SourceBindingRecord, error)
+	// ListActiveBindingsForScope 承载 AssetStore 的生成 ListActiveBindingsForScope 值。
 	ListActiveBindingsForScope(context.Context, uuid.UUID, uuid.UUID, string, string) ([]SourceBindingRecord, error)
+	// MarkBindingsStaleInScope 承载 AssetStore 的生成 MarkBindingsStaleInScope 值。
 	MarkBindingsStaleInScope(context.Context, uuid.UUID, uuid.UUID, string, string, []uuid.UUID) error
+	// CountActiveBindings 承载 AssetStore 的生成 CountActiveBindings 值。
 	CountActiveBindings(context.Context, uuid.UUID, uuid.UUID) (int64, error)
+	// SetSourceLastError 承载 AssetStore 的生成 SetSourceLastError 值。
 	SetSourceLastError(context.Context, uuid.UUID, uuid.UUID, string) error
+	// ClearSourceLastError 承载 AssetStore 的生成 ClearSourceLastError 值。
 	ClearSourceLastError(context.Context, uuid.UUID, uuid.UUID) error
+	// MarkTracksStaleForSourceSpec 承载 AssetStore 的生成 MarkTracksStaleForSourceSpec 值。
 	MarkTracksStaleForSourceSpec(context.Context, uuid.UUID, uuid.UUID) error
+	// MarkTracksHealthyForSourceSpec 承载 AssetStore 的生成 MarkTracksHealthyForSourceSpec 值。
 	MarkTracksHealthyForSourceSpec(context.Context, uuid.UUID, uuid.UUID) error
+	// UpsertRecentService 承载 AssetStore 的生成 UpsertRecentService 值。
 	UpsertRecentService(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, time.Time) error
+	// ListRecentServices 承载 AssetStore 的生成 ListRecentServices 值。
 	ListRecentServices(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]ServiceRecord, int64, error)
 }
 

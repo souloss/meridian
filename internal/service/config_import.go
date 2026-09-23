@@ -24,62 +24,102 @@ const (
 // ConfigImportStore 是 M2 gitops 配置导入的持久化边界：预览持久化，以及物化 apply 所需的
 // 服务/源/生产者配置读取。
 type ConfigImportStore interface {
+	// GetRepository 承载 ConfigImportStore 的生成 GetRepository 值。
 	GetRepository(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
+	// CreateConfigImportPreview 承载 ConfigImportStore 的生成 CreateConfigImportPreview 值。
 	CreateConfigImportPreview(context.Context, NewConfigImportPreview) (ConfigImportPreviewRecord, error)
+	// GetConfigImportPreview 承载 ConfigImportStore 的生成 GetConfigImportPreview 值。
 	GetConfigImportPreview(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) (ConfigImportPreviewRecord, error)
+	// GetConfigImportPreviewByID 承载 ConfigImportStore 的生成 GetConfigImportPreviewByID 值。
 	GetConfigImportPreviewByID(context.Context, uuid.UUID, uuid.UUID) (ConfigImportPreviewRecord, error)
+	// GetServiceBySlug 承载 ConfigImportStore 的生成 GetServiceBySlug 值。
 	GetServiceBySlug(context.Context, uuid.UUID, string) (ServiceRecord, error)
+	// CreateService 承载 ConfigImportStore 的生成 CreateService 值。
 	CreateService(context.Context, NewService) (ServiceRecord, error)
+	// ListServicesByRepository 承载 ConfigImportStore 的生成 ListServicesByRepository 值。
 	ListServicesByRepository(context.Context, uuid.UUID, uuid.UUID) ([]ServiceRecord, error)
+	// GetProducerProfileByName 承载 ConfigImportStore 的生成 GetProducerProfileByName 值。
 	GetProducerProfileByName(context.Context, string) (ProducerProfile, error)
+	// CreateSourceSpec 承载 ConfigImportStore 的生成 CreateSourceSpec 值。
 	CreateSourceSpec(context.Context, NewSourceSpec) (SourceSpecRecord, error)
+	// ListSourceSpecsForService 承载 ConfigImportStore 的生成 ListSourceSpecsForService 值。
 	ListSourceSpecsForService(context.Context, uuid.UUID, uuid.UUID) ([]SourceSpecRecord, error)
 }
 
 // NewConfigImportPreview 承载一次预览插入。
 type NewConfigImportPreview struct {
-	TenantID     uuid.UUID
-	ID           uuid.UUID
+	// TenantID 承载 NewConfigImportPreview 的生成 TenantID 值。
+	TenantID uuid.UUID
+	// ID 承载 NewConfigImportPreview 的生成 ID 值。
+	ID uuid.UUID
+	// RepositoryID 承载 NewConfigImportPreview 的生成 RepositoryID 值。
 	RepositoryID uuid.UUID
-	RefType      string
-	RefName      string
-	Commit       string
+	// RefType 承载 NewConfigImportPreview 的生成 RefType 值。
+	RefType string
+	// RefName 承载 NewConfigImportPreview 的生成 RefName 值。
+	RefName string
+	// Commit 承载 NewConfigImportPreview 的生成 Commit 值。
+	Commit string
+	// ConfigDigest 承载 NewConfigImportPreview 的生成 ConfigDigest 值。
 	ConfigDigest string
-	Preview      []byte
-	ExpiresAt    time.Time
+	// Preview 承载 NewConfigImportPreview 的生成 Preview 值。
+	Preview []byte
+	// ExpiresAt 承载 NewConfigImportPreview 的生成 ExpiresAt 值。
+	ExpiresAt time.Time
 }
 
 // ConfigImportPreviewRecord 是一个已持久化的预览快照。
 type ConfigImportPreviewRecord struct {
-	ID           uuid.UUID
+	// ID 承载 ConfigImportPreviewRecord 的生成 ID 值。
+	ID uuid.UUID
+	// RepositoryID 承载 ConfigImportPreviewRecord 的生成 RepositoryID 值。
 	RepositoryID uuid.UUID
-	RefType      string
-	RefName      string
-	Commit       string
+	// RefType 承载 ConfigImportPreviewRecord 的生成 RefType 值。
+	RefType string
+	// RefName 承载 ConfigImportPreviewRecord 的生成 RefName 值。
+	RefName string
+	// Commit 承载 ConfigImportPreviewRecord 的生成 Commit 值。
+	Commit string
+	// ConfigDigest 承载 ConfigImportPreviewRecord 的生成 ConfigDigest 值。
 	ConfigDigest string
-	Preview      []byte
-	ExpiresAt    time.Time
+	// Preview 承载 ConfigImportPreviewRecord 的生成 Preview 值。
+	Preview []byte
+	// ExpiresAt 承载 ConfigImportPreviewRecord 的生成 ExpiresAt 值。
+	ExpiresAt time.Time
 }
 
 // ConfigImportPreview 是一个预览的 API 投影。
 type ConfigImportPreview struct {
-	PreviewID    uuid.UUID
+	// PreviewID 承载 ConfigImportPreview 的生成 PreviewID 值。
+	PreviewID uuid.UUID
+	// RepositoryID 承载 ConfigImportPreview 的生成 RepositoryID 值。
 	RepositoryID uuid.UUID
-	Commit       string
+	// Commit 承载 ConfigImportPreview 的生成 Commit 值。
+	Commit string
+	// ConfigDigest 承载 ConfigImportPreview 的生成 ConfigDigest 值。
 	ConfigDigest string
-	Services     []ServiceRecord
-	Sources      []SourceSpecRecord
-	ExpiresAt    time.Time
+	// Services 承载 ConfigImportPreview 的生成 Services 值。
+	Services []ServiceRecord
+	// Sources 承载 ConfigImportPreview 的生成 Sources 值。
+	Sources []SourceSpecRecord
+	// ExpiresAt 承载 ConfigImportPreview 的生成 ExpiresAt 值。
+	ExpiresAt time.Time
 }
 
 // ConfigImportResult 报告一次 apply 的结局。
 type ConfigImportResult struct {
-	RepositoryID    uuid.UUID
-	Commit          string
-	ConfigDigest    string
+	// RepositoryID 承载 ConfigImportResult 的生成 RepositoryID 值。
+	RepositoryID uuid.UUID
+	// Commit 承载 ConfigImportResult 的生成 Commit 值。
+	Commit string
+	// ConfigDigest 承载 ConfigImportResult 的生成 ConfigDigest 值。
+	ConfigDigest string
+	// CreatedServices 承载 ConfigImportResult 的生成 CreatedServices 值。
 	CreatedServices []uuid.UUID
+	// UpdatedServices 承载 ConfigImportResult 的生成 UpdatedServices 值。
 	UpdatedServices []uuid.UUID
-	SourceSpecs     []uuid.UUID
+	// SourceSpecs 承载 ConfigImportResult 的生成 SourceSpecs 值。
+	SourceSpecs []uuid.UUID
 }
 
 // ConfigImport 协调仓库配置导入的 preview/apply 两阶段。数据库始终权威：apply 仅创建或更新

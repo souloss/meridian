@@ -68,6 +68,7 @@ milestoneCheckpoints:
   M3: {status: completed, reportPath: artifacts/agent/milestones/M3/20260918T021046Z/report.json, completedBy: coding-agent, completedAt: '2026-09-18T02:10:46Z', completedCommit: 65aafd31684bea6f625bce8899caab56cd886d87, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
   M4: {status: completed, reportPath: artifacts/agent/milestones/M4/20260918T123935Z/report.json, completedBy: coding-agent, completedAt: '2026-09-18T12:39:35Z', completedCommit: 67ca25de8894f100138217a6ee265c08fb3d26a1, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
   M5: {status: completed, reportPath: artifacts/agent/milestones/M5/20260921T024357Z/report.json, completedBy: coding-agent, completedAt: '2026-09-21T02:43:57Z', completedCommit: 2b7855cbce7e7abd7cd2bd09db8a793d8b8ab0f5, contractDigest: 'sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c'}
+  M6: {status: pending, reportPath: null, completedBy: null, completedAt: null, completedCommit: null, contractDigest: null}
 
 defaults:
   owner: coding-agent
@@ -474,3 +475,129 @@ items:
     reportPath: artifacts/agent/M5-AGENT-001/20260921T024116Z/report.json
     lastEvidence: artifacts/agent/M5-AGENT-001/20260921T024116Z/report.json
     nextAction: complete the M5 milestone checkpoint
+
+  - id: M6-AGENT-001
+    milestone: M6
+    priority: P2
+    status: ready
+    title: contract-coverage-closeout-m0-identity-tenant-team-settings-kind-and-crud
+    dependsOn: [M5-AGENT-001]
+    operationIds: [cancelJob, createServiceInRepository, createTeam, createToken, deleteCredential, deleteRepository, deleteTeam, deleteTenantMember, dismissDiscoveryCandidate, getMe, getOpenApiContract, getPlatformJob, getPlatformSettings, getRepository, getTeam, getTenantSettings, getVersion, listAssetKinds, listAuditLogs, listCredentials, listGlobalCredentials, listJobs, listKnownHosts, listPlatformAuditLogs, listPlatformJobs, listRepositories, listTeams, listTenantMembers, listTokens, login, logout, putTenantMember, refresh, replaceTeamMembers, revokeToken, searchTenantUsers, testCredential, testGlobalCredential, updateAssetKindState, updateCredential, updateGlobalCredential, updatePlatformSettings, updateRepository, updateTeam, updateTenantSettings, updateUser]
+    stories: []
+    assertions: []
+    verify: [contracts-validate, backend-test, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 0
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: null
+    baseCommit: null
+    contractDigest: null
+    reportPath: null
+    lastEvidence: null
+    nextAction: close the M0 operation coverage gap and claim the next M6 item
+
+  - id: M6-AGENT-002
+    milestone: M6
+    priority: P2
+    status: ready
+    title: contract-coverage-closeout-m1-producer-source-version-star-and-view-management
+    dependsOn: [M6-AGENT-001]
+    operationIds: [deleteProducerProfile, deleteSourceSpec, deleteViewOverride, deprecateAssetVersion, downloadSignedContent, getMyPreferences, getProducerProfile, getPublicAsset, listAssetVersions, listProducerProfiles, listServices, listSourceSpecs, listViewOverrides, listViews, produceSource, putViewOverride, receiveGitWebhook, resolvePublicView, retireAssetVersion, starService, unstarService, updateMyPreferences, updateProducerProfile]
+    stories: []
+    assertions: []
+    verify: [contracts-validate, backend-test, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 0
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: null
+    baseCommit: null
+    contractDigest: null
+    reportPath: null
+    lastEvidence: null
+    nextAction: close the M1 operation coverage gap and claim the next M6 item
+
+  - id: M6-AGENT-003
+    milestone: M6
+    priority: P2
+    status: ready
+    title: contract-coverage-closeout-m2-layer-revision-and-view-preview-read
+    dependsOn: [M6-AGENT-002]
+    operationIds: [getLayer, getLayerRevision, listAssetLayerContents, listLayerRevisions, previewAssetView, updateLayer]
+    stories: []
+    assertions: []
+    verify: [contracts-validate, backend-test, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 0
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: null
+    baseCommit: null
+    contractDigest: null
+    reportPath: null
+    lastEvidence: null
+    nextAction: close the M2 operation coverage gap and claim the next M6 item
+
+  - id: M6-AGENT-004
+    milestone: M6
+    priority: P2
+    status: ready
+    title: contract-coverage-closeout-m3-diff-snapshot-share-review-and-ai-generate
+    dependsOn: [M6-AGENT-003]
+    operationIds: [createDiffRuleSet, createDiffUpload, createShareLink, deleteDiffRuleSet, deleteDiffSnapshot, exportDiffSnapshot, generateAssetWithAi, getDiffSnapshot, listDiffRuleSets, listDiffSnapshots, listNotifications, listReviews, listShareLinks, markAllNotificationsRead, revokeShareLink, updateDiffRuleSet]
+    stories: []
+    assertions: []
+    verify: [contracts-validate, backend-test, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 0
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: null
+    baseCommit: null
+    contractDigest: null
+    reportPath: null
+    lastEvidence: null
+    nextAction: close the M3 operation coverage gap and claim the next M6 item
+
+  - id: M6-AGENT-005
+    milestone: M6
+    priority: P2
+    status: ready
+    title: contract-coverage-closeout-m4-tag-and-systemgroup-crud
+    dependsOn: [M6-AGENT-004]
+    operationIds: [createTag, deleteSystemGroup, deleteTag, getSystemGroup, listSystemGroups, listTags, updateSystemGroup, updateTag]
+    stories: []
+    assertions: []
+    verify: [contracts-validate, backend-test, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 0
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: null
+    baseCommit: null
+    contractDigest: null
+    reportPath: null
+    lastEvidence: null
+    nextAction: close the M4 operation coverage gap and claim the next M6 item
+
+  - id: M6-AGENT-006
+    milestone: M6
+    priority: P2
+    status: ready
+    title: contract-coverage-closeout-m5-comments-export-channel-and-tenant-delete
+    dependsOn: [M6-AGENT-005]
+    operationIds: [createNotificationChannel, createServiceComment, createTenantExport, deleteNotificationChannel, deleteTenant, listNotificationChannels, listServiceComments, listSubscriptions, metrics, updateNotificationChannel]
+    stories: []
+    assertions: []
+    verify: [contracts-validate, backend-test, contracts-generate-then-git-diff-exit-code]
+    owner: coding-agent
+    attempt: 0
+    maxAttempts: 3
+    leaseUntil: null
+    startedAt: null
+    baseCommit: null
+    contractDigest: null
+    reportPath: null
+    lastEvidence: null
+    nextAction: close the M5 operation coverage gap and claim the next M6 item

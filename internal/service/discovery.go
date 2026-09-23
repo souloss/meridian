@@ -202,6 +202,62 @@ func (discovery *Discovery) CreateSourceSpec(ctx context.Context, actor Principa
 	return record, nil
 }
 
+// DismissCandidate 将一条待处理发现候选标记为驳回。
+func (discovery *Discovery) DismissCandidate(ctx context.Context, actor Principal, tenantSlug string, repositoryID, candidateID uuid.UUID) error {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeServiceCreate)
+	if err != nil {
+		return err
+	}
+	candidate, err := discovery.store.GetDiscoveryCandidate(ctx, membership.TenantID, candidateID)
+	if err != nil {
+		return err
+	}
+	if candidate.RepositoryID != repositoryID {
+		return ErrNotFound
+	}
+	return discovery.store.DismissDiscoveryCandidate(ctx, membership.TenantID, candidateID)
+}
+
+// CreateServiceInRepository 在仓库内手动创建一个服务。
+func (discovery *Discovery) CreateServiceInRepository(ctx context.Context, actor Principal, tenantSlug string, repositoryID uuid.UUID, input NewService) (ServiceRecord, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeServiceCreate)
+	if err != nil {
+		return ServiceRecord{}, err
+	}
+	if _, err := discovery.store.GetRepository(ctx, membership.TenantID, repositoryID); err != nil {
+		return ServiceRecord{}, err
+	}
+	if !slugPattern.MatchString(input.Slug) || !validServiceDisplayName(input.DisplayName) {
+		return ServiceRecord{}, ErrValidation
+	}
+	if !validServiceVisibility(input.Visibility) {
+		return ServiceRecord{}, ErrValidation
+	}
+	if _, err := discovery.store.GetServiceBySlug(ctx, membership.TenantID, input.Slug); err == nil {
+		return ServiceRecord{}, ErrDuplicate
+	} else if !isNotFound(err) {
+		return ServiceRecord{}, err
+	}
+	input.TenantID = membership.TenantID
+	input.RepositoryID = repositoryID
+	if input.ID == uuid.Nil() {
+		input.ID = uuid.NewV7()
+	}
+	return discovery.store.CreateService(ctx, input)
+}
+
+// ListServices 分页返回租户内服务目录。
+func (discovery *Discovery) ListServices(ctx context.Context, actor Principal, tenantSlug string, page, pageSize int) ([]ServiceRecord, int64, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeServiceRead)
+	if err != nil {
+		return nil, 0, err
+	}
+	if page < 1 || pageSize < 1 || pageSize > defaultPageSizeMax {
+		return nil, 0, ErrValidation
+	}
+	return discovery.store.ListServices(ctx, membership.TenantID, int32(pageSize), int32((page-1)*pageSize))
+}
+
 // enforceRepoBaseReplacement 拒绝会替换 AI 生成 base 的隐式仓库 base，并在请求 replaceAiBase
 // 时归档 AI base。
 func (discovery *Discovery) enforceRepoBaseReplacement(ctx context.Context, tenantID, serviceID uuid.UUID, kind string, replace bool) error {
@@ -346,6 +402,60 @@ func (discovery *Discovery) UpdateSourceSpec(ctx context.Context, actor Principa
 	return discovery.store.UpdateSourceSpec(ctx, patch)
 }
 
+// DeleteSourceSpec 在 If-Match 下软删除一条源配置。
+func (discovery *Discovery) DeleteSourceSpec(ctx context.Context, actor Principal, tenantSlug string, sourceID uuid.UUID, etag string) error {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
+	if err != nil {
+		return err
+	}
+	current, err := discovery.store.GetSourceSpec(ctx, membership.TenantID, sourceID)
+	if err != nil {
+		return err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "source-spec", sourceID)
+	if err != nil {
+		return ErrPrecondition
+	}
+	if expectedRevision != current.Revision {
+		return ErrPrecondition
+	}
+	return discovery.store.DeleteSourceSpec(ctx, membership.TenantID, sourceID, expectedRevision)
+}
+
+// ProduceSource 为一次源物化请求入队一条 asset.produce 任务。
+func (discovery *Discovery) ProduceSource(ctx context.Context, actor Principal, tenantSlug string, sourceID, idempotencyKey uuid.UUID, refType, refName string, force bool) (JobAccepted, error) {
+	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeJobRun)
+	if err != nil {
+		return JobAccepted{}, err
+	}
+	if idempotencyKey == uuid.Nil() {
+		return JobAccepted{}, ErrValidation
+	}
+	if _, err := discovery.store.GetSourceSpec(ctx, membership.TenantID, sourceID); err != nil {
+		return JobAccepted{}, err
+	}
+	return discovery.store.EnqueueProduceJob(ctx, ProduceJobInput{
+		TenantID: membership.TenantID, SourceID: sourceID, IdempotencyKey: idempotencyKey,
+		RefType: refType, RefName: refName, Force: force,
+	})
+}
+
+// ProduceJobInput 描述一次幂等的源物化请求。
+type ProduceJobInput struct {
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// SourceID 是目标源配置的标识。
+	SourceID uuid.UUID
+	// IdempotencyKey 在 24 小时内去重该请求。
+	IdempotencyKey uuid.UUID
+	// RefType 是引用类型（branch/tag，可为空）。
+	RefType string
+	// RefName 是引用名（可为空）。
+	RefName string
+	// Force 表示是否强制重新物化。
+	Force bool
+}
+
 // GetService 返回一个服务详情并记录成功读取。
 func (discovery *Discovery) GetService(ctx context.Context, actor Principal, tenantSlug, serviceSlug string) (ServiceRecord, error) {
 	membership, err := discovery.tenantMembership(ctx, actor, tenantSlug, scopeServiceRead)
@@ -364,9 +474,12 @@ func (discovery *Discovery) GetService(ctx context.Context, actor Principal, ten
 
 // ServiceDetail 携带一个服务及其资产摘要与缺失类别。
 type ServiceDetail struct {
-	Service        ServiceRecord
+	// Service 承载 ServiceDetail 的生成 Service 值。
+	Service ServiceRecord
+	// AssetSummaries 承载 ServiceDetail 的生成 AssetSummaries 值。
 	AssetSummaries []AssetSummaryRecord
-	MissingKinds   []MissingKindRecord
+	// MissingKinds 承载 ServiceDetail 的生成 MissingKinds 值。
+	MissingKinds []MissingKindRecord
 }
 
 // GetServiceDetail 返回一个经资产摘要与缺失类别丰富的服务详情，并记录成功读取。
@@ -456,21 +569,28 @@ func validateMergedSourceSpec(spec SourceSpecRecord) error {
 // ProducerUnavailableError 报告所选生产者配置不可用。
 // 对外映射：ErrorCodeProducerUnavailable（HTTP 422）。
 type ProducerUnavailableError struct {
+	// Kind 承载 ProducerUnavailableError 的生成 Kind 值。
 	Kind string
 }
 
+// Error 实现 Meridian OpenAPI 契约的生成传输行为。
 func (err *ProducerUnavailableError) Error() string {
 	return "selected producer profile is unavailable for kind " + err.Kind
 }
 
 // CandidateOverride 在验收期间调整一个候选。
 type CandidateOverride struct {
+	// CandidateID 承载 CandidateOverride 的生成 CandidateID 值。
 	CandidateID uuid.UUID
-	Slug        *string
+	// Slug 承载 CandidateOverride 的生成 Slug 值。
+	Slug *string
+	// DisplayName 承载 CandidateOverride 的生成 DisplayName 值。
 	DisplayName *string
-	Visibility  *string
+	// Visibility 承载 CandidateOverride 的生成 Visibility 值。
+	Visibility *string
 }
 
+// DisplayName 实现 Meridian OpenAPI 契约的生成传输行为。
 func (candidate DiscoveryCandidateRecord) DisplayName() string {
 	displayName := strings.TrimSuffix(candidate.RootDir, "/")
 	if displayName == "" {
@@ -480,6 +600,11 @@ func (candidate DiscoveryCandidateRecord) DisplayName() string {
 		displayName = displayName[index+1:]
 	}
 	return displayName
+}
+
+// validServiceDisplayName 校验服务展示名非空且不超长。
+func validServiceDisplayName(name string) bool {
+	return strings.TrimSpace(name) != "" && utf8.RuneCountInString(name) <= maxServiceDisplayNameRunes
 }
 
 func serviceSlugFromCandidate(candidate DiscoveryCandidateRecord, override CandidateOverride) string {

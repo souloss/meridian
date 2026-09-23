@@ -152,34 +152,55 @@ func (repositories *Repositories) Delete(ctx context.Context, actor Principal, t
 
 // NewRepositoryInput 是 HTTP 处理器使用的校验后边界输入。
 type NewRepositoryInput struct {
-	URL           string
-	CredentialID  *uuid.UUID
+	// URL 承载 NewRepositoryInput 的生成 URL 值。
+	URL string
+	// CredentialID 承载 NewRepositoryInput 的生成 CredentialID 值。
+	CredentialID *uuid.UUID
+	// DefaultBranch 承载 NewRepositoryInput 的生成 DefaultBranch 值。
 	DefaultBranch string
-	BranchPolicy  *RepositoryBranchPolicy
-	FetchConfig   *RepositoryFetchConfig
-	SyncCron      *string
-	Note          *string
+	// BranchPolicy 承载 NewRepositoryInput 的生成 BranchPolicy 值。
+	BranchPolicy *RepositoryBranchPolicy
+	// FetchConfig 承载 NewRepositoryInput 的生成 FetchConfig 值。
+	FetchConfig *RepositoryFetchConfig
+	// SyncCron 承载 NewRepositoryInput 的生成 SyncCron 值。
+	SyncCron *string
+	// Note 承载 NewRepositoryInput 的生成 Note 值。
+	Note *string
 }
 
 // RepositoryPatchInput 保留 JSON 中「显式 null」与「省略字段」的区分。
 type RepositoryPatchInput struct {
-	CredentialID  **uuid.UUID
+	// CredentialID 承载 RepositoryPatchInput 的生成 CredentialID 值。
+	CredentialID **uuid.UUID
+	// DefaultBranch 承载 RepositoryPatchInput 的生成 DefaultBranch 值。
 	DefaultBranch *string
-	BranchPolicy  *RepositoryBranchPolicy
-	FetchConfig   *RepositoryFetchConfig
-	SyncCron      **string
-	Note          **string
+	// BranchPolicy 承载 RepositoryPatchInput 的生成 BranchPolicy 值。
+	BranchPolicy *RepositoryBranchPolicy
+	// FetchConfig 承载 RepositoryPatchInput 的生成 FetchConfig 值。
+	FetchConfig *RepositoryFetchConfig
+	// SyncCron 承载 RepositoryPatchInput 的生成 SyncCron 值。
+	SyncCron **string
+	// Note 承载 RepositoryPatchInput 的生成 Note 值。
+	Note **string
 }
 
 type validatedRepository struct {
-	URL           string
-	CanonicalURL  string
-	CredentialID  *uuid.UUID
+	// URL 承载 validatedRepository 的生成 URL 值。
+	URL string
+	// CanonicalURL 承载 validatedRepository 的生成 CanonicalURL 值。
+	CanonicalURL string
+	// CredentialID 承载 validatedRepository 的生成 CredentialID 值。
+	CredentialID *uuid.UUID
+	// DefaultBranch 承载 validatedRepository 的生成 DefaultBranch 值。
 	DefaultBranch string
-	BranchPolicy  RepositoryBranchPolicy
-	FetchConfig   RepositoryFetchConfig
-	SyncCron      *string
-	Note          *string
+	// BranchPolicy 承载 validatedRepository 的生成 BranchPolicy 值。
+	BranchPolicy RepositoryBranchPolicy
+	// FetchConfig 承载 validatedRepository 的生成 FetchConfig 值。
+	FetchConfig RepositoryFetchConfig
+	// SyncCron 承载 validatedRepository 的生成 SyncCron 值。
+	SyncCron *string
+	// Note 承载 validatedRepository 的生成 Note 值。
+	Note *string
 }
 
 func validateNewRepository(input NewRepositoryInput) (validatedRepository, error) {

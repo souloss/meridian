@@ -114,6 +114,8 @@ const (
 	dedupeKeyPrefixDiscover = "discover:"
 	// dedupeKeyPrefixSync 是仓库同步任务去重键的前缀。
 	dedupeKeyPrefixSync = "repo:"
+	// dedupeKeyPrefixProduce 是源物化任务去重键的前缀。
+	dedupeKeyPrefixProduce = "produce:"
 	// dedupeKeyRepositoryBranch 是凭据同步任务去重键的「repository:branch」段前缀。
 	dedupeKeyRepositoryBranch = "repository:"
 )

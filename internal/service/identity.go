@@ -308,6 +308,44 @@ func (identity *Identity) ListTenants(ctx context.Context, actor Principal, page
 	return identity.store.ListTenants(ctx, int32(pageSize), int32((page-1)*pageSize))
 }
 
+// DeleteTenant 在 If-Match 与密码确认下禁用租户并入队 tenant.delete 任务。
+func (identity *Identity) DeleteTenant(ctx context.Context, actor Principal, tenantSlug, etag, confirmationSlug, password string) (TenantDeletionAccepted, error) {
+	if !isPlatformAdministrator(actor) {
+		return TenantDeletionAccepted{}, ErrNotFound
+	}
+	if confirmationSlug != tenantSlug {
+		return TenantDeletionAccepted{}, ErrValidation
+	}
+	// 平台管理员删除必须回显其自身密码。
+	hash, err := identity.store.UserPasswordHash(ctx, actor.User.ID)
+	if err != nil {
+		return TenantDeletionAccepted{}, ErrNotFound
+	}
+	if !identity.password.Verify(password, hash) {
+		return TenantDeletionAccepted{}, ErrUnauthenticated
+	}
+	tenant, err := identity.store.TenantBySlug(ctx, tenantSlug)
+	if err != nil {
+		return TenantDeletionAccepted{}, err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "tenant", tenant.ID)
+	if err != nil {
+		return TenantDeletionAccepted{}, ErrPrecondition
+	}
+	if expectedRevision != tenant.Revision {
+		return TenantDeletionAccepted{}, ErrPrecondition
+	}
+	return identity.store.DeleteTenant(ctx, tenant.ID, expectedRevision)
+}
+
+// TenantDeletionAccepted 是 deleteTenant 的 202 响应投影。
+type TenantDeletionAccepted struct {
+	// JobID 是入队的 tenant.delete 任务标识。
+	JobID uuid.UUID
+	// Deduplicated 表示该请求是否被幂等去重。
+	Deduplicated bool
+}
+
 // UpdateTenant 在 If-Match ETag 下应用平台控制的租户元数据。
 func (identity *Identity) UpdateTenant(ctx context.Context, actor Principal, slug, etag string, patch TenantPatchInput) (Tenant, error) {
 	if !isPlatformAdministrator(actor) {
@@ -408,6 +446,45 @@ func (identity *Identity) RevokeToken(ctx context.Context, actor Principal, tena
 	return identity.store.RevokeToken(ctx, membership.TenantID, tokenID, actor.User.ID, identity.now().UTC())
 }
 
+// UpdateUser 在校验仅平台授权后更新一个身份的非秘密字段。
+func (identity *Identity) UpdateUser(ctx context.Context, actor Principal, userID uuid.UUID, etag string, input UpdateUserProfileInput) (User, error) {
+	if !isPlatformAdministrator(actor) {
+		return User{}, ErrNotFound
+	}
+	if input.DisplayName == nil && !input.SetEmail && input.Status == nil {
+		return User{}, ErrValidation
+	}
+	user, err := identity.store.UserByID(ctx, userID)
+	if err != nil {
+		return User{}, err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "user", userID)
+	if err != nil {
+		return User{}, ErrPrecondition
+	}
+	if expectedRevision != user.Revision {
+		return User{}, ErrPrecondition
+	}
+	if input.DisplayName != nil {
+		if strings.TrimSpace(*input.DisplayName) == "" || utf8.RuneCountInString(*input.DisplayName) > maxDisplayNameRunes {
+			return User{}, ErrValidation
+		}
+	}
+	if input.Email != nil && *input.Email != "" && !validEmail(*input.Email) {
+		return User{}, ErrValidation
+	}
+	if input.Status != nil && *input.Status != identityStatusActive && *input.Status != identityStatusDisabled {
+		return User{}, ErrValidation
+	}
+	return identity.store.UpdateUserProfile(ctx, userID, expectedRevision, input)
+}
+
+// validEmail 校验邮箱的基本形态（非空且含单个 @）。
+func validEmail(email string) bool {
+	at := strings.Index(email, "@")
+	return at > 0 && at == strings.LastIndex(email, "@") && strings.Index(email[at+1:], ".") > 0
+}
+
 func (identity *Identity) browserMembership(ctx context.Context, actor Principal, tenantSlug string) (Membership, error) {
 	if actor.Kind != PrincipalJWT {
 		return Membership{}, ErrNotFound
@@ -481,6 +558,13 @@ func roleAllows(role, permission string) bool {
 		return role == tenantRoleMaintainer || role == tenantRoleViewer
 	case scopeRepositoryWrite, scopeRepositorySync, scopeServiceWrite, scopeServiceCreate, scopeLayerEdit, scopeLayerApprove, scopeAssetPublish, scopeAssetPush, groupPermissionManage:
 		return role == tenantRoleMaintainer
+	case scopeTenantMemberRead:
+		return role == tenantRoleMaintainer || role == tenantRoleViewer
+	case scopeTenantMemberWrite, scopeTenantMemberManage, scopeTenantSettingsManage, scopeAssetKindManage:
+		return role == tenantRoleMaintainer
+	case scopePlatformUserManage, scopePlatformSettingsManage:
+		// 平台级权限点由 isPlatformAdministrator 判定，不经租户角色矩阵。
+		return false
 	case scopeJobRead, scopeJobRun:
 		return role == tenantRoleMaintainer
 	case scopeTodoReadSelf:

@@ -247,10 +247,14 @@ const channelTestEventType = "channel.test"
 
 // channelTestEnvelope 是测试通道投递的脱敏事件信封。
 type channelTestEnvelope struct {
-	EventID   uuid.UUID `json:"eventId"`
-	EventType string    `json:"eventType"`
+	// EventID 是 channelTestEnvelope 的生成 EventID 数据库值。
+	EventID uuid.UUID `json:"eventId"`
+	// EventType 是 channelTestEnvelope 的生成 EventType 数据库值。
+	EventType string `json:"eventType"`
+	// ChannelID 是 channelTestEnvelope 的生成 ChannelID 数据库值。
 	ChannelID uuid.UUID `json:"channelId"`
-	Kind      string    `json:"kind"`
+	// Kind 是 channelTestEnvelope 的生成 Kind 数据库值。
+	Kind string `json:"kind"`
 }
 
 func subscriptionFromRow(row generated.Subscription) service.SubscriptionRecord {

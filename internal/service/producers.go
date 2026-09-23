@@ -85,6 +85,134 @@ func (producers *Producers) Create(ctx context.Context, actor Principal, input N
 	return producers.store.CreateProducerProfile(ctx, validated)
 }
 
+// List 返回平台生产者配置全部分页（仅平台管理员）。
+func (producers *Producers) List(ctx context.Context, actor Principal, page, pageSize int) ([]ProducerProfile, int64, error) {
+	if !isPlatformAdministrator(actor) {
+		return nil, 0, ErrNotFound
+	}
+	if page < 1 || pageSize < 1 || pageSize > defaultPageSizeMax {
+		return nil, 0, ErrValidation
+	}
+	return producers.store.ListProducerProfiles(ctx, int32(pageSize), int32((page-1)*pageSize))
+}
+
+// Get 返回一个平台生产者配置（仅平台管理员）。
+func (producers *Producers) Get(ctx context.Context, actor Principal, id uuid.UUID) (ProducerProfile, error) {
+	if !isPlatformAdministrator(actor) {
+		return ProducerProfile{}, ErrNotFound
+	}
+	return producers.store.GetProducerProfile(ctx, id)
+}
+
+// Update 在 If-Match 下更新一个平台生产者配置。
+func (producers *Producers) Update(ctx context.Context, actor Principal, id uuid.UUID, etag string, patch ProducerProfilePatch) (ProducerProfile, error) {
+	if !isPlatformAdministrator(actor) {
+		return ProducerProfile{}, ErrNotFound
+	}
+	current, err := producers.store.GetProducerProfile(ctx, id)
+	if err != nil {
+		return ProducerProfile{}, err
+	}
+	expectedRevision, err := parseRevisionETag(etag, "producer-profile", id)
+	if err != nil {
+		return ProducerProfile{}, ErrPrecondition
+	}
+	if expectedRevision != current.Revision {
+		return ProducerProfile{}, ErrPrecondition
+	}
+	merged := mergeProducerProfile(current, patch)
+	validated, err := validateNewProducerProfile(NewProducerProfile{
+		Name: merged.Name, Kind: merged.Kind, Executable: merged.Executable, Args: merged.Args,
+		EnvAllowlist: merged.EnvAllowlist, SupportedKinds: merged.SupportedKinds,
+		ReplaySafe: merged.ReplaySafe, Network: merged.Network, TimeoutSec: merged.TimeoutSec,
+		MemoryMiB: merged.MemoryMiB, CPUSeconds: merged.CPUSeconds, Pids: merged.Pids,
+	})
+	if err != nil {
+		return ProducerProfile{}, err
+	}
+	_ = validated
+	return producers.store.UpdateProducerProfile(ctx, id, expectedRevision, patch)
+}
+
+// Delete 软删除一个平台生产者配置。
+func (producers *Producers) Delete(ctx context.Context, actor Principal, id uuid.UUID) error {
+	if !isPlatformAdministrator(actor) {
+		return ErrNotFound
+	}
+	if _, err := producers.store.GetProducerProfile(ctx, id); err != nil {
+		return err
+	}
+	return producers.store.DeleteProducerProfile(ctx, id)
+}
+
+// ProducerProfilePatch 承载一次生产者配置的显式 PATCH 字段。
+type ProducerProfilePatch struct {
+	// Name 承载 ProducerProfilePatch 的生成 Name 值。
+	Name *string
+	// Executable 承载 ProducerProfilePatch 的生成 Executable 值。
+	Executable *string
+	// Args 承载 ProducerProfilePatch 的生成 Args 值。
+	Args *[]string
+	// EnvAllowlist 承载 ProducerProfilePatch 的生成 EnvAllowlist 值。
+	EnvAllowlist *[]string
+	// SupportedKinds 承载 ProducerProfilePatch 的生成 SupportedKinds 值。
+	SupportedKinds *[]string
+	// ReplaySafe 承载 ProducerProfilePatch 的生成 ReplaySafe 值。
+	ReplaySafe *bool
+	// Network 承载 ProducerProfilePatch 的生成 Network 值。
+	Network *string
+	// TimeoutSec 承载 ProducerProfilePatch 的生成 TimeoutSec 值。
+	TimeoutSec *int
+	// MemoryMiB 承载 ProducerProfilePatch 的生成 MemoryMiB 值。
+	MemoryMiB *int
+	// CPUSeconds 承载 ProducerProfilePatch 的生成 CPUSeconds 值。
+	CPUSeconds *int
+	// Pids 承载 ProducerProfilePatch 的生成 Pids 值。
+	Pids *int
+	// Enabled 承载 ProducerProfilePatch 的生成 Enabled 值。
+	Enabled *bool
+}
+
+func mergeProducerProfile(current ProducerProfile, patch ProducerProfilePatch) ProducerProfile {
+	if patch.Name != nil {
+		current.Name = *patch.Name
+	}
+	if patch.Executable != nil {
+		current.Executable = *patch.Executable
+	}
+	if patch.Args != nil {
+		current.Args = slices.Clone(*patch.Args)
+	}
+	if patch.EnvAllowlist != nil {
+		current.EnvAllowlist = slices.Clone(*patch.EnvAllowlist)
+	}
+	if patch.SupportedKinds != nil {
+		current.SupportedKinds = slices.Clone(*patch.SupportedKinds)
+	}
+	if patch.ReplaySafe != nil {
+		current.ReplaySafe = *patch.ReplaySafe
+	}
+	if patch.Network != nil {
+		current.Network = *patch.Network
+	}
+	if patch.TimeoutSec != nil {
+		current.TimeoutSec = *patch.TimeoutSec
+	}
+	if patch.MemoryMiB != nil {
+		current.MemoryMiB = *patch.MemoryMiB
+	}
+	if patch.CPUSeconds != nil {
+		current.CPUSeconds = *patch.CPUSeconds
+	}
+	if patch.Pids != nil {
+		current.Pids = *patch.Pids
+	}
+	if patch.Enabled != nil {
+		current.Enabled = *patch.Enabled
+	}
+	return current
+}
+
 func (producers *Producers) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {
 	return resolveTenantMembership(ctx, actor, tenantSlug, permission, producers.identities)
 }

@@ -6,9 +6,75 @@ import (
 
 	"github.com/meridian-labs/meridian/internal/generated/api"
 	repository "github.com/meridian-labs/meridian/internal/generated/api/repository"
+	serviceapi "github.com/meridian-labs/meridian/internal/generated/api/service"
 	"github.com/meridian-labs/meridian/internal/service"
 	"github.com/oapi-codegen/nullable"
 )
+
+// DismissDiscoveryCandidate 将一条待处理发现候选标记为驳回。
+func (s *Server) DismissDiscoveryCandidate(ctx context.Context, request repository.DismissDiscoveryCandidateRequestObject) (repository.DismissDiscoveryCandidateResponseObject, error) {
+	if s.discovery == nil {
+		return nil, api.ErrStrictOperationNotImplemented
+	}
+	principal, err := principalFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.discovery.DismissCandidate(ctx, principal, string(request.TenantSlug), serviceUUID(request.RepositoryId), serviceUUID(request.CandidateId)); err != nil {
+		return nil, err
+	}
+	return repository.DismissDiscoveryCandidate200JSONResponse(api.DiscoveryCandidate{}), nil
+}
+
+// CreateServiceInRepository 在仓库内手动创建一个服务。
+func (s *Server) CreateServiceInRepository(ctx context.Context, request serviceapi.CreateServiceInRepositoryRequestObject) (serviceapi.CreateServiceInRepositoryResponseObject, error) {
+	if s.discovery == nil || request.Body == nil {
+		return nil, api.ErrStrictOperationNotImplemented
+	}
+	principal, err := principalFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	visibility := string(api.ServiceVisibilityPrivate)
+	if request.Body.Visibility != nil {
+		visibility = string(*request.Body.Visibility)
+	}
+	var rootDir string
+	if request.Body.Path.IsSpecified() && !request.Body.Path.IsNull() {
+		rootDir = request.Body.Path.MustGet()
+	}
+	record, err := s.discovery.CreateServiceInRepository(ctx, principal, string(request.TenantSlug), serviceUUID(request.RepositoryId), service.NewService{
+		Slug: string(request.Body.Slug), DisplayName: request.Body.DisplayName, RootDir: rootDir, Visibility: visibility,
+	})
+	if err != nil {
+		return nil, err
+	}
+	body := serviceResponse(record)
+	return serviceapi.CreateServiceInRepository201JSONResponse{
+		Body: body, Headers: serviceapi.CreateServiceInRepository201ResponseHeaders{Etag: new(body.Etag)},
+	}, nil
+}
+
+// ListServices 分页返回租户内服务目录。
+func (s *Server) ListServices(ctx context.Context, request serviceapi.ListServicesRequestObject) (serviceapi.ListServicesResponseObject, error) {
+	if s.discovery == nil {
+		return nil, api.ErrStrictOperationNotImplemented
+	}
+	principal, err := principalFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	page, pageSize := pagination(request.Params.Page, request.Params.PageSize)
+	records, total, err := s.discovery.ListServices(ctx, principal, string(request.TenantSlug), page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]api.Service, 0, len(records))
+	for _, record := range records {
+		items = append(items, serviceResponse(record))
+	}
+	return serviceapi.ListServices200JSONResponse(api.ServicePage{Items: items, Page: page, PageSize: pageSize, Total: int(total)}), nil
+}
 
 // ListRepositories 返回租户范围的仓库分页与逐项能力。
 func (s *Server) ListRepositories(ctx context.Context, request repository.ListRepositoriesRequestObject) (repository.ListRepositoriesResponseObject, error) {

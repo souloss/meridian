@@ -142,6 +142,14 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND status = 'pending';
 
+-- 将候选标记为已驳回；仅在 pending 状态时生效。
+-- name: DismissDiscoveryCandidate :execrows
+UPDATE discovery_candidates
+SET status = 'dismissed', updated_at = now()
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id)
+  AND status = 'pending';
+
 -- 平台侧持久化生产者配置文件。
 -- name: CreateProducerProfile :one
 INSERT INTO producer_profiles (
@@ -235,3 +243,70 @@ SELECT count(*)::bigint
 FROM source_bindings
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND source_spec_id = sqlc.arg(source_spec_id);
+
+-- 返回平台生产者配置文件分页（含软删除过滤，供平台管理列表）。
+-- name: ListAllProducerProfiles :many
+SELECT *
+FROM producer_profiles
+WHERE deleted_at IS NULL
+ORDER BY name, id
+LIMIT sqlc.arg(page_limit)
+OFFSET sqlc.arg(page_offset);
+
+-- 返回平台生产者配置文件总数。
+-- name: CountAllProducerProfiles :one
+SELECT count(*)::bigint
+FROM producer_profiles
+WHERE deleted_at IS NULL;
+
+-- 在 If-Match 下更新一个平台生产者配置的非结构字段并递增 revision。
+-- name: UpdateProducerProfile :one
+UPDATE producer_profiles
+SET
+  name = COALESCE(sqlc.narg(name), name),
+  executable = COALESCE(sqlc.narg(executable), executable),
+  args = COALESCE(sqlc.narg(args), args),
+  env_allowlist = COALESCE(sqlc.narg(env_allowlist), env_allowlist),
+  supported_kinds = COALESCE(sqlc.narg(supported_kinds), supported_kinds),
+  replay_safe = COALESCE(sqlc.narg(replay_safe), replay_safe),
+  network = COALESCE(sqlc.narg(network), network),
+  timeout_sec = COALESCE(sqlc.narg(timeout_sec), timeout_sec),
+  memory_mib = COALESCE(sqlc.narg(memory_mib), memory_mib),
+  cpu_seconds = COALESCE(sqlc.narg(cpu_seconds), cpu_seconds),
+  pids = COALESCE(sqlc.narg(pids), pids),
+  enabled = COALESCE(sqlc.narg(enabled), enabled),
+  revision = revision + 1,
+  updated_at = now()
+WHERE id = sqlc.arg(id)
+  AND deleted_at IS NULL
+  AND revision = sqlc.arg(expected_revision)
+RETURNING *;
+
+-- 软删除一个平台生产者配置。
+-- name: DeleteProducerProfile :execrows
+UPDATE producer_profiles
+SET deleted_at = now(), updated_at = now()
+WHERE id = sqlc.arg(id)
+  AND deleted_at IS NULL;
+
+-- 软删除一条源配置。
+-- name: DeleteSourceSpec :execrows
+UPDATE source_specs
+SET deleted_at = now(), updated_at = now()
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id)
+  AND deleted_at IS NULL
+  AND revision = sqlc.arg(expected_revision);
+
+-- 为一次源物化请求记录一条 asset.produce 任务。
+-- name: CreateProduceJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  sqlc.arg(tenant_id), sqlc.arg(id), 'asset.produce', 'source', sqlc.arg(source_id),
+  sqlc.narg(ref_type), sqlc.narg(ref_name), 'manual', sqlc.arg(job_input)::jsonb,
+  'pending', 3, sqlc.arg(dedupe_key), sqlc.arg(active_generation), true
+)
+ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
+RETURNING *;

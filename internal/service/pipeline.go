@@ -34,7 +34,9 @@ const (
 
 // BlobStore 持久化层修订的不可变内容寻址字节。
 type BlobStore interface {
+	// Put 承载 BlobStore 的生成 Put 值。
 	Put(context.Context, io.Reader) (storage.Blob, error)
+	// Open 承载 BlobStore 的生成 Open 值。
 	Open(string) (*os.File, storage.Blob, error)
 }
 
@@ -428,20 +430,28 @@ func (runner *PipelineRunner) recordSourceError(ctx context.Context, tenantID uu
 
 // SourceMaterializationError 是不含秘密的管线阶段失败。
 type SourceMaterializationError struct {
-	Code   string
+	// Code 承载 SourceMaterializationError 的生成 Code 值。
+	Code string
+	// Commit 承载 SourceMaterializationError 的生成 Commit 值。
 	Commit string
 }
 
+// Error 实现 Meridian OpenAPI 契约的生成传输行为。
 func (err *SourceMaterializationError) Error() string {
 	return "source materialization failed: " + err.Code
 }
 
 // openapiOperationItem 是从解析后的 OpenAPI 文档提取的一个操作。
 type openapiOperationItem struct {
-	Method     string
-	Path       string
-	Summary    string
-	Tags       []string
+	// Method 承载 openapiOperationItem 的生成 Method 值。
+	Method string
+	// Path 承载 openapiOperationItem 的生成 Path 值。
+	Path string
+	// Summary 承载 openapiOperationItem 的生成 Summary 值。
+	Summary string
+	// Tags 承载 openapiOperationItem 的生成 Tags 值。
+	Tags []string
+	// Deprecated 承载 openapiOperationItem 的生成 Deprecated 值。
 	Deprecated bool
 }
 

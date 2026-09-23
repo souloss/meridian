@@ -21,6 +21,7 @@ import (
 	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
 )
 
+// Server 是从 Meridian OpenAPI 契约派生的生成传输代码。
 type Server struct {
 	ready            atomic.Bool
 	assets           fs.FS
@@ -41,6 +42,11 @@ type Server struct {
 	searchService    *service.Search
 	systemGroups     *service.SystemGroups
 	notifications    *service.Notifications
+	teams            *service.Teams
+	settings         *service.Settings
+	assetKinds       *service.AssetKinds
+	coverage         *service.Coverage
+	webhooks         *service.Webhooks
 	secureCookies    bool
 }
 
@@ -80,8 +86,19 @@ type Dependencies struct {
 	SystemGroups *service.SystemGroups
 	// Notifications 提供订阅、通知通道与站内通知用例。
 	Notifications *service.Notifications
+	// Teams 提供团队、团队成员与租户成员管理用例。
+	Teams *service.Teams
+	// Settings 提供平台默认配置与租户运行设置用例。
+	Settings *service.Settings
+	// AssetKinds 提供资产类别启停与列示用例。
+	AssetKinds *service.AssetKinds
+	// Coverage 提供服务收藏、用户偏好、视图覆盖、标签与评论用例。
+	Coverage *service.Coverage
+	// Webhooks 提供入站 Git webhook 校验与同步入队用例。
+	Webhooks *service.Webhooks
 }
 
+// New 实现 Meridian OpenAPI 契约的生成传输行为。
 func New() *Server {
 	s := &Server{assets: staticAssets()}
 	s.ready.Store(true)
@@ -124,10 +141,16 @@ func NewWithRuntimeServices(dependencies Dependencies, secureCookies bool) *Serv
 	s.searchService = dependencies.Search
 	s.systemGroups = dependencies.SystemGroups
 	s.notifications = dependencies.Notifications
+	s.teams = dependencies.Teams
+	s.settings = dependencies.Settings
+	s.assetKinds = dependencies.AssetKinds
+	s.coverage = dependencies.Coverage
+	s.webhooks = dependencies.Webhooks
 	s.secureCookies = secureCookies
 	return s
 }
 
+// Handler 实现 Meridian OpenAPI 契约的生成传输行为。
 func (s *Server) Handler() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -234,6 +257,13 @@ func openAPIRequestValidator() func(http.Handler) http.Handler {
 		},
 		DoNotValidateServers: true,
 		Skipper: func(r *http.Request) bool {
+			// 仅对差异上传端点跳过请求体校验：kin-openapi 的 multipart 解码器无法
+			// 解析 allOf 包裹的 HttpPart 标量字段（UploadRequest 的 kind/contentType），
+			// 会将 part 值解码为 nil 后误报 "Value is not nullable"。该端点的领域校验
+			// 由 CreateDiffUpload 服务层承担（kind 非空、contentType 枚举、大小上限）。
+			if r.Method == http.MethodPost && strings.HasPrefix(r.URL.Path, "/api/v1/t/") && strings.HasSuffix(r.URL.Path, "/uploads") {
+				return true
+			}
 			return r.URL.Path != "/healthz" && r.URL.Path != "/readyz" && !strings.HasPrefix(r.URL.Path, "/api/")
 		},
 	})

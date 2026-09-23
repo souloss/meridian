@@ -130,6 +130,72 @@ func (workflow *AiWorkflow) GenerateMissingAsset(ctx context.Context, actor Prin
 	return workflow.store.EnqueueAiGeneration(ctx, enqueue)
 }
 
+// GenerateAssetWithAi 为已存在的资产入队一次 AI 生成（generateAssetWithAi）。
+// 与 GenerateMissingAsset 的区别在于目标资产已存在，仅需解析生产者与引用后入队生成任务。
+func (workflow *AiWorkflow) GenerateAssetWithAi(ctx context.Context, actor Principal, tenantSlug string, assetID uuid.UUID, input AiGenerateInput) (AiGenerateAccepted, error) {
+	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, scopeLayerEdit)
+	if err != nil {
+		return AiGenerateAccepted{}, err
+	}
+	if input.IdempotencyKey == uuid.Nil() {
+		return AiGenerateAccepted{}, ErrValidation
+	}
+	asset, err := workflow.store.GetAsset(ctx, membership.TenantID, assetID)
+	if err != nil {
+		return AiGenerateAccepted{}, err
+	}
+
+	// 生产者选择：请求指定配置，否则租户默认，否则校验错误。
+	profileID := input.ProducerProfileID
+	if profileID == uuid.Nil() {
+		settings, settingsErr := workflow.tenantAISettings(ctx, membership.TenantID)
+		if settingsErr == nil && settings.DefaultAiProducerProfileId != nil {
+			profileID = *settings.DefaultAiProducerProfileId
+		}
+	}
+	if profileID == uuid.Nil() {
+		return AiGenerateAccepted{}, ErrValidation
+	}
+	profile, err := workflow.store.GetProducerProfile(ctx, profileID)
+	if err != nil {
+		return AiGenerateAccepted{}, err
+	}
+	if profile.Kind != producerKindAI || !profile.Enabled || profile.DependencyStatus == dependencyStatusUnavailable {
+		return AiGenerateAccepted{}, &ProducerUnavailableError{Kind: asset.Kind}
+	}
+	if !slices.Contains(profile.SupportedKinds, asset.Kind) {
+		return AiGenerateAccepted{}, ErrValidation
+	}
+
+	// AI 角色：资产无生效 base 时为 base，否则为 overlay。
+	role := layerRoleOverlay
+	ord := 0
+	baseLayer, baseErr := workflow.store.GetBaseLayerForAsset(ctx, membership.TenantID, assetID)
+	if isNotFound(baseErr) {
+		role = layerRoleBase
+	} else if baseErr == nil {
+		ord = baseLayer.Ord + 1
+	} else {
+		return AiGenerateAccepted{}, baseErr
+	}
+
+	refType := input.RefType
+	if refType == "" {
+		refType = aiGenerationRefTypeDefault
+	}
+	scopeType, scopeKey := previewScope(refType, input.Ref)
+
+	enqueue := AiGenerateEnqueue{
+		TenantID: membership.TenantID, ServiceID: asset.ServiceID, Kind: asset.Kind, Name: asset.Name,
+		Hint: input.Hint, ProducerProfileID: profileID, AssetID: assetID,
+		SourceID: uuid.NewV7(), LayerID: uuid.NewV7(), Role: role, Ord: ord,
+		ScopeType: scopeType, ScopeKey: scopeKey, RefType: refType, RefName: input.Ref,
+		IdempotencyKey: input.IdempotencyKey, PrincipalType: input.PrincipalType, PrincipalID: input.PrincipalID,
+		RequestHash: input.RequestHash,
+	}
+	return workflow.store.EnqueueAiGeneration(ctx, enqueue)
+}
+
 // GetReviewContext 返回候选修订、当前生效修订（冷启动 base 时为 nil）与作者，供审核使用。
 func (workflow *AiWorkflow) GetReviewContext(ctx context.Context, actor Principal, tenantSlug string, revisionID uuid.UUID) (ReviewContextResult, error) {
 	membership, err := workflow.tenantMembership(ctx, actor, tenantSlug, scopeLayerApprove)
@@ -327,9 +393,11 @@ func errVersionNotPublishable(version AssetVersionRecord) error {
 
 // VersionNotPublishableError 报告一个被候选修订阻塞的版本。
 type VersionNotPublishableError struct {
+	// VersionID 承载 VersionNotPublishableError 的生成 VersionID 值。
 	VersionID uuid.UUID
 }
 
+// Error 实现 Meridian OpenAPI 契约的生成传输行为。
 func (err *VersionNotPublishableError) Error() string { return "version is not publishable" }
 
 // RunAiGeneration 执行一次 AI 生成任务：运行生产者，摄取完成清单或分类失败，并在成功时

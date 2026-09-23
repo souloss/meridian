@@ -283,6 +283,134 @@ func (store *DiffStore) GetSourceLayerByPushKey(ctx context.Context, tenantID, a
 	return layerFromRow(row), nil
 }
 
+// ListDiffRuleSets 返回租户内全部差异规则集。
+func (store *DiffStore) ListDiffRuleSets(ctx context.Context, tenantID uuid.UUID) ([]service.DiffRuleSetRecord, error) {
+	rows, err := store.queries.ListDiffRuleSets(ctx, tenantID)
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	records := make([]service.DiffRuleSetRecord, 0, len(rows))
+	for _, row := range rows {
+		records = append(records, diffRuleSetFromRow(row))
+	}
+	return records, nil
+}
+
+// GetDiffRuleSet 返回一条差异规则集。
+func (store *DiffStore) GetDiffRuleSet(ctx context.Context, tenantID, id uuid.UUID) (service.DiffRuleSetRecord, error) {
+	row, err := store.queries.GetDiffRuleSet(ctx, generated.GetDiffRuleSetParams{TenantID: tenantID, ID: id})
+	if err != nil {
+		return service.DiffRuleSetRecord{}, normalizeError(err)
+	}
+	return diffRuleSetFromRow(row), nil
+}
+
+// CreateDiffRuleSet 创建一条差异规则集。
+func (store *DiffStore) CreateDiffRuleSet(ctx context.Context, input service.NewDiffRuleSet) (service.DiffRuleSetRecord, error) {
+	row, err := store.queries.CreateDiffRuleSet(ctx, generated.CreateDiffRuleSetParams{
+		TenantID: input.TenantID, ID: input.ID, Kind: input.Kind, Name: input.Name,
+		Version: input.Version, Rules: input.Rules, Enabled: input.Enabled,
+	})
+	if err != nil {
+		return service.DiffRuleSetRecord{}, normalizeError(err)
+	}
+	return diffRuleSetFromRow(row), nil
+}
+
+// UpdateDiffRuleSet 在 If-Match 下更新一条差异规则集。
+func (store *DiffStore) UpdateDiffRuleSet(ctx context.Context, tenantID, id uuid.UUID, expectedRevision int64, patch service.DiffRuleSetPatch) (service.DiffRuleSetRecord, error) {
+	row, err := store.queries.UpdateDiffRuleSet(ctx, generated.UpdateDiffRuleSetParams{
+		Name: patch.Name, Rules: patch.Rules, Enabled: patch.Enabled,
+		TenantID: tenantID, ID: id, ExpectedRevision: expectedRevision,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return service.DiffRuleSetRecord{}, service.ErrPrecondition
+		}
+		return service.DiffRuleSetRecord{}, normalizeError(err)
+	}
+	return diffRuleSetFromRow(row), nil
+}
+
+// DeleteDiffRuleSet 在 If-Match 下删除一条差异规则集。
+func (store *DiffStore) DeleteDiffRuleSet(ctx context.Context, tenantID, id uuid.UUID, expectedRevision int64) error {
+	changed, err := store.queries.DeleteDiffRuleSet(ctx, generated.DeleteDiffRuleSetParams{
+		TenantID: tenantID, ID: id, ExpectedRevision: expectedRevision,
+	})
+	if err != nil {
+		return normalizeError(err)
+	}
+	if changed != rowsAffectedOne {
+		return service.ErrPrecondition
+	}
+	return nil
+}
+
+// ListDiffSnapshots 返回租户内一页差异快照。
+func (store *DiffStore) ListDiffSnapshots(ctx context.Context, tenantID uuid.UUID, limit, offset int32) ([]service.DiffSnapshotRecord, int64, error) {
+	rows, err := store.queries.ListDiffSnapshots(ctx, generated.ListDiffSnapshotsParams{
+		TenantID: tenantID, PageLimit: limit, PageOffset: offset,
+	})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	total, err := store.queries.CountDiffSnapshots(ctx, tenantID)
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	records := make([]service.DiffSnapshotRecord, 0, len(rows))
+	for _, row := range rows {
+		records = append(records, diffSnapshotFromRow(row))
+	}
+	return records, total, nil
+}
+
+// DeleteDiffSnapshot 删除一条差异快照。
+func (store *DiffStore) DeleteDiffSnapshot(ctx context.Context, tenantID, id uuid.UUID) error {
+	changed, err := store.queries.DeleteDiffSnapshot(ctx, generated.DeleteDiffSnapshotParams{TenantID: tenantID, ID: id})
+	if err != nil {
+		return normalizeError(err)
+	}
+	if changed != rowsAffectedOne {
+		return service.ErrNotFound
+	}
+	return nil
+}
+
+// ListShareLinks 返回租户内一页分享链接。
+func (store *DiffStore) ListShareLinks(ctx context.Context, tenantID uuid.UUID, limit, offset int32) ([]service.ShareLinkRecord, int64, error) {
+	rows, err := store.queries.ListShareLinks(ctx, generated.ListShareLinksParams{
+		TenantID: tenantID, PageLimit: limit, PageOffset: offset,
+	})
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	total, err := store.queries.CountShareLinks(ctx, tenantID)
+	if err != nil {
+		return nil, 0, normalizeError(err)
+	}
+	records := make([]service.ShareLinkRecord, 0, len(rows))
+	for _, row := range rows {
+		records = append(records, shareLinkFromRow(row))
+	}
+	return records, total, nil
+}
+
+// RevokeShareLink 幂等撤销一条分享链接。
+func (store *DiffStore) RevokeShareLink(ctx context.Context, tenantID, id uuid.UUID) error {
+	if _, err := store.queries.RevokeShareLink(ctx, generated.RevokeShareLinkParams{TenantID: tenantID, ID: id}); err != nil {
+		return normalizeError(err)
+	}
+	return nil
+}
+
+func diffRuleSetFromRow(row generated.DiffRuleSet) service.DiffRuleSetRecord {
+	return service.DiffRuleSetRecord{
+		ID: row.ID, Kind: row.Kind, Name: row.Name, Version: row.Version, Rules: row.Rules,
+		Enabled: row.Enabled, Revision: row.Revision, CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time,
+	}
+}
+
 func uploadFromRow(row generated.Upload) service.UploadRecord {
 	return service.UploadRecord{
 		ID: row.ID, BlobDigest: row.BlobDigest, Kind: row.Kind, ContentType: row.ContentType,

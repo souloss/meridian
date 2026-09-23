@@ -18,20 +18,34 @@ import (
 // credentialRotationReplay 是轮换回放保留的非敏感响应投影。
 // 加密密文、nonce、密钥版本以及所有只写敏感字段被刻意省略。
 type credentialRotationReplay struct {
-	TenantID    uuid.UUID                   `json:"tenantId"`
-	ID          uuid.UUID                   `json:"id"`
-	IsGlobal    bool                        `json:"isGlobal"`
-	Name        string                      `json:"name"`
-	Kind        string                      `json:"kind"`
-	Fingerprint string                      `json:"fingerprint"`
-	SharedScope string                      `json:"sharedScope"`
-	TeamIDs     []uuid.UUID                 `json:"teamIds"`
-	CreatedBy   uuid.UUID                   `json:"createdBy"`
-	LastUsedAt  *time.Time                  `json:"lastUsedAt,omitempty"`
-	Revision    int64                       `json:"revision"`
-	CreatedAt   time.Time                   `json:"createdAt"`
-	UpdatedAt   time.Time                   `json:"updatedAt"`
-	SyncJobs    []service.CredentialSyncJob `json:"syncJobs"`
+	// TenantID 是 credentialRotationReplay 的生成 TenantID 数据库值。
+	TenantID uuid.UUID `json:"tenantId"`
+	// ID 是 credentialRotationReplay 的生成 ID 数据库值。
+	ID uuid.UUID `json:"id"`
+	// IsGlobal 是 credentialRotationReplay 的生成 IsGlobal 数据库值。
+	IsGlobal bool `json:"isGlobal"`
+	// Name 是 credentialRotationReplay 的生成 Name 数据库值。
+	Name string `json:"name"`
+	// Kind 是 credentialRotationReplay 的生成 Kind 数据库值。
+	Kind string `json:"kind"`
+	// Fingerprint 是 credentialRotationReplay 的生成 Fingerprint 数据库值。
+	Fingerprint string `json:"fingerprint"`
+	// SharedScope 是 credentialRotationReplay 的生成 SharedScope 数据库值。
+	SharedScope string `json:"sharedScope"`
+	// TeamIDs 是 credentialRotationReplay 的生成 TeamIDs 数据库值。
+	TeamIDs []uuid.UUID `json:"teamIds"`
+	// CreatedBy 是 credentialRotationReplay 的生成 CreatedBy 数据库值。
+	CreatedBy uuid.UUID `json:"createdBy"`
+	// LastUsedAt 是 credentialRotationReplay 的生成 LastUsedAt 数据库值。
+	LastUsedAt *time.Time `json:"lastUsedAt,omitempty"`
+	// Revision 是 credentialRotationReplay 的生成 Revision 数据库值。
+	Revision int64 `json:"revision"`
+	// CreatedAt 是 credentialRotationReplay 的生成 CreatedAt 数据库值。
+	CreatedAt time.Time `json:"createdAt"`
+	// UpdatedAt 是 credentialRotationReplay 的生成 UpdatedAt 数据库值。
+	UpdatedAt time.Time `json:"updatedAt"`
+	// SyncJobs 是 credentialRotationReplay 的生成 SyncJobs 数据库值。
+	SyncJobs []service.CredentialSyncJob `json:"syncJobs"`
 }
 
 func rotationIdempotencyEnabled(key uuid.UUID) bool {

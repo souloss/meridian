@@ -89,6 +89,30 @@ func (q *Queries) CountAssetVersionItems(ctx context.Context, arg CountAssetVers
 	return column_1, err
 }
 
+const countAssetVersions = `-- name: CountAssetVersions :one
+SELECT count(*)::bigint
+FROM asset_versions
+WHERE tenant_id = $1
+  AND asset_id = $2
+`
+
+// CountAssetVersionsParams 包含 CountAssetVersions 查询的强类型参数。
+type CountAssetVersionsParams struct {
+	// TenantID 是提供给 CountAssetVersions 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// AssetID 是提供给 CountAssetVersions 查询的 AssetID 值。
+	AssetID uuid.UUID `json:"asset_id"`
+}
+
+// CountAssetVersions 执行生成的 CountAssetVersions 数据库查询。
+// 返回一个资产下版本总数。
+func (q *Queries) CountAssetVersions(ctx context.Context, arg CountAssetVersionsParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countAssetVersions, arg.TenantID, arg.AssetID)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const countRecentServices = `-- name: CountRecentServices :one
 SELECT count(*)::bigint
 FROM recent_services AS r
@@ -687,6 +711,65 @@ func (q *Queries) CreateSyncJob(ctx context.Context, arg CreateSyncJobParams) (J
 	return i, err
 }
 
+const deprecateAssetVersion = `-- name: DeprecateAssetVersion :one
+UPDATE asset_versions
+SET lifecycle = 'deprecated', revision = revision + 1, updated_at = now()
+WHERE tenant_id = $1
+  AND id = $2
+  AND lifecycle = 'published'
+  AND revision = $3
+RETURNING tenant_id, id, asset_id, track_id, sequence_no, version, lifecycle, revision, quality_score, merge_request_id, input_fingerprint, merge_engine_version, overlay_compiler_version, overlay_mode, normalizer_version, kind_plugin_version, layer_manifest, merged_hash, merged_ref, normalized_ref, bundled_ref, provenance_ref, source_commit, baseline_version_id, diff_summary, labels, index_complete, created_at, updated_at
+`
+
+// DeprecateAssetVersionParams 包含 DeprecateAssetVersion 查询的强类型参数。
+type DeprecateAssetVersionParams struct {
+	// TenantID 是提供给 DeprecateAssetVersion 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 DeprecateAssetVersion 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 DeprecateAssetVersion 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// DeprecateAssetVersion 执行生成的 DeprecateAssetVersion 数据库查询。
+// 在 If-Match 下将一个资产版本置为 deprecated 并递增 revision。
+func (q *Queries) DeprecateAssetVersion(ctx context.Context, arg DeprecateAssetVersionParams) (AssetVersion, error) {
+	row := q.db.QueryRow(ctx, deprecateAssetVersion, arg.TenantID, arg.ID, arg.ExpectedRevision)
+	var i AssetVersion
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.AssetID,
+		&i.TrackID,
+		&i.SequenceNo,
+		&i.Version,
+		&i.Lifecycle,
+		&i.Revision,
+		&i.QualityScore,
+		&i.MergeRequestID,
+		&i.InputFingerprint,
+		&i.MergeEngineVersion,
+		&i.OverlayCompilerVersion,
+		&i.OverlayMode,
+		&i.NormalizerVersion,
+		&i.KindPluginVersion,
+		&i.LayerManifest,
+		&i.MergedHash,
+		&i.MergedRef,
+		&i.NormalizedRef,
+		&i.BundledRef,
+		&i.ProvenanceRef,
+		&i.SourceCommit,
+		&i.BaselineVersionID,
+		&i.DiffSummary,
+		&i.Labels,
+		&i.IndexComplete,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getAsset = `-- name: GetAsset :one
 SELECT tenant_id, id, service_id, kind, name, revision, deleted_at, created_at, updated_at
 FROM assets
@@ -1217,6 +1300,179 @@ func (q *Queries) GetLayerHead(ctx context.Context, arg GetLayerHeadParams) (Lay
 	return i, err
 }
 
+const getPublicAssetByName = `-- name: GetPublicAssetByName :one
+SELECT
+  a.tenant_id, a.kind, a.name, a.created_at AS asset_created_at,
+  t.current_version_id, t.latest_version_id
+FROM assets AS a
+JOIN services AS s ON s.tenant_id = a.tenant_id AND s.id = a.service_id
+JOIN tenants AS tenant ON tenant.id = s.tenant_id
+JOIN asset_ref_tracks AS t ON t.asset_id = a.id AND t.tenant_id = a.tenant_id AND t.ref_type = 'branch'
+WHERE tenant.slug = $1
+  AND s.visibility = 'public'
+  AND s.lifecycle IN ('published', 'deprecated')
+  AND a.kind = $2
+  AND a.name = $3
+  AND a.deleted_at IS NULL
+  AND t.ref_name = (SELECT default_branch FROM repositories WHERE repositories.tenant_id = s.tenant_id AND repositories.id = s.repository_id)
+LIMIT 1
+`
+
+// GetPublicAssetByNameParams 包含 GetPublicAssetByName 查询的强类型参数。
+type GetPublicAssetByNameParams struct {
+	// TenantSlug 是提供给 GetPublicAssetByName 查询的 TenantSlug 值。
+	TenantSlug string `json:"tenant_slug"`
+	// Kind 是提供给 GetPublicAssetByName 查询的 Kind 值。
+	Kind string `json:"kind"`
+	// AssetName 是提供给 GetPublicAssetByName 查询的 AssetName 值。
+	AssetName string `json:"asset_name"`
+}
+
+// GetPublicAssetByNameRow 包含 GetPublicAssetByName 查询返回的列。
+type GetPublicAssetByNameRow struct {
+	// TenantID 是 GetPublicAssetByName 查询返回的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// Kind 是 GetPublicAssetByName 查询返回的 Kind 值。
+	Kind string `json:"kind"`
+	// Name 是 GetPublicAssetByName 查询返回的 Name 值。
+	Name string `json:"name"`
+	// AssetCreatedAt 是 GetPublicAssetByName 查询返回的 AssetCreatedAt 值。
+	AssetCreatedAt pgtype.Timestamptz `json:"asset_created_at"`
+	// CurrentVersionID 是 GetPublicAssetByName 查询返回的 CurrentVersionID 值。
+	CurrentVersionID *uuid.UUID `json:"current_version_id"`
+	// LatestVersionID 是 GetPublicAssetByName 查询返回的 LatestVersionID 值。
+	LatestVersionID *uuid.UUID `json:"latest_version_id"`
+}
+
+// GetPublicAssetByName 执行生成的 GetPublicAssetByName 数据库查询。
+// 在不提供 serviceSlug 的匿名上下文中，按租户 + 类别 + 名称定位公开资产的
+// 当前版本指针（resolvePublicView 契约不含 serviceSlug）。
+// 资产名在 (tenant, service, kind, name) 上唯一，但公开可见性仍由服务门控，
+// 因此本查询同时要求其服务 visibility=public 且 lifecycle 允许公开读取。
+func (q *Queries) GetPublicAssetByName(ctx context.Context, arg GetPublicAssetByNameParams) (GetPublicAssetByNameRow, error) {
+	row := q.db.QueryRow(ctx, getPublicAssetByName, arg.TenantSlug, arg.Kind, arg.AssetName)
+	var i GetPublicAssetByNameRow
+	err := row.Scan(
+		&i.TenantID,
+		&i.Kind,
+		&i.Name,
+		&i.AssetCreatedAt,
+		&i.CurrentVersionID,
+		&i.LatestVersionID,
+	)
+	return i, err
+}
+
+const getPublicAssetBySlug = `-- name: GetPublicAssetBySlug :one
+SELECT
+  a.tenant_id, a.kind, a.name, a.created_at AS asset_created_at,
+  t.current_version_id, t.latest_version_id
+FROM assets AS a
+JOIN services AS s ON s.tenant_id = a.tenant_id AND s.id = a.service_id
+JOIN tenants AS tenant ON tenant.id = s.tenant_id
+JOIN asset_ref_tracks AS t ON t.asset_id = a.id AND t.tenant_id = a.tenant_id AND t.ref_type = 'branch'
+WHERE tenant.slug = $1
+  AND s.slug = $2
+  AND s.visibility = 'public'
+  AND s.lifecycle IN ('published', 'deprecated')
+  AND a.kind = $3
+  AND a.name = $4
+  AND a.deleted_at IS NULL
+  AND t.ref_name = (SELECT default_branch FROM repositories WHERE repositories.tenant_id = s.tenant_id AND repositories.id = s.repository_id)
+LIMIT 1
+`
+
+// GetPublicAssetBySlugParams 包含 GetPublicAssetBySlug 查询的强类型参数。
+type GetPublicAssetBySlugParams struct {
+	// TenantSlug 是提供给 GetPublicAssetBySlug 查询的 TenantSlug 值。
+	TenantSlug string `json:"tenant_slug"`
+	// ServiceSlug 是提供给 GetPublicAssetBySlug 查询的 ServiceSlug 值。
+	ServiceSlug string `json:"service_slug"`
+	// Kind 是提供给 GetPublicAssetBySlug 查询的 Kind 值。
+	Kind string `json:"kind"`
+	// AssetName 是提供给 GetPublicAssetBySlug 查询的 AssetName 值。
+	AssetName string `json:"asset_name"`
+}
+
+// GetPublicAssetBySlugRow 包含 GetPublicAssetBySlug 查询返回的列。
+type GetPublicAssetBySlugRow struct {
+	// TenantID 是 GetPublicAssetBySlug 查询返回的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// Kind 是 GetPublicAssetBySlug 查询返回的 Kind 值。
+	Kind string `json:"kind"`
+	// Name 是 GetPublicAssetBySlug 查询返回的 Name 值。
+	Name string `json:"name"`
+	// AssetCreatedAt 是 GetPublicAssetBySlug 查询返回的 AssetCreatedAt 值。
+	AssetCreatedAt pgtype.Timestamptz `json:"asset_created_at"`
+	// CurrentVersionID 是 GetPublicAssetBySlug 查询返回的 CurrentVersionID 值。
+	CurrentVersionID *uuid.UUID `json:"current_version_id"`
+	// LatestVersionID 是 GetPublicAssetBySlug 查询返回的 LatestVersionID 值。
+	LatestVersionID *uuid.UUID `json:"latest_version_id"`
+}
+
+// GetPublicAssetBySlug 执行生成的 GetPublicAssetBySlug 数据库查询。
+// 按 slug 返回一个公开可见服务及其当前资产（匿名公开读取）。
+func (q *Queries) GetPublicAssetBySlug(ctx context.Context, arg GetPublicAssetBySlugParams) (GetPublicAssetBySlugRow, error) {
+	row := q.db.QueryRow(ctx, getPublicAssetBySlug,
+		arg.TenantSlug,
+		arg.ServiceSlug,
+		arg.Kind,
+		arg.AssetName,
+	)
+	var i GetPublicAssetBySlugRow
+	err := row.Scan(
+		&i.TenantID,
+		&i.Kind,
+		&i.Name,
+		&i.AssetCreatedAt,
+		&i.CurrentVersionID,
+		&i.LatestVersionID,
+	)
+	return i, err
+}
+
+const getPublicAssetVersion = `-- name: GetPublicAssetVersion :one
+SELECT v.id, v.version, v.lifecycle, v.merged_ref
+FROM asset_versions AS v
+WHERE v.tenant_id = $1
+  AND v.id = $2
+  AND v.lifecycle = 'published'
+`
+
+// GetPublicAssetVersionParams 包含 GetPublicAssetVersion 查询的强类型参数。
+type GetPublicAssetVersionParams struct {
+	// TenantID 是提供给 GetPublicAssetVersion 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// VersionID 是提供给 GetPublicAssetVersion 查询的 VersionID 值。
+	VersionID uuid.UUID `json:"version_id"`
+}
+
+// GetPublicAssetVersionRow 包含 GetPublicAssetVersion 查询返回的列。
+type GetPublicAssetVersionRow struct {
+	// ID 是 GetPublicAssetVersion 查询返回的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// Version 是 GetPublicAssetVersion 查询返回的 Version 值。
+	Version string `json:"version"`
+	// Lifecycle 是 GetPublicAssetVersion 查询返回的 Lifecycle 值。
+	Lifecycle string `json:"lifecycle"`
+	// MergedRef 是 GetPublicAssetVersion 查询返回的 MergedRef 值。
+	MergedRef *string `json:"merged_ref"`
+}
+
+// GetPublicAssetVersion 执行生成的 GetPublicAssetVersion 数据库查询。
+// 返回一个公开可见资产的当前版本内容引用。
+func (q *Queries) GetPublicAssetVersion(ctx context.Context, arg GetPublicAssetVersionParams) (GetPublicAssetVersionRow, error) {
+	row := q.db.QueryRow(ctx, getPublicAssetVersion, arg.TenantID, arg.VersionID)
+	var i GetPublicAssetVersionRow
+	err := row.Scan(
+		&i.ID,
+		&i.Version,
+		&i.Lifecycle,
+		&i.MergedRef,
+	)
+	return i, err
+}
+
 const getTenantKindOverride = `-- name: GetTenantKindOverride :one
 SELECT tenant_id, kind_id, enabled, revision, created_at, updated_at
 FROM tenant_kind_overrides
@@ -1408,6 +1664,85 @@ func (q *Queries) ListAssetVersionItems(ctx context.Context, arg ListAssetVersio
 			&i.SearchRaw,
 			&i.Provenance,
 			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAssetVersions = `-- name: ListAssetVersions :many
+SELECT tenant_id, id, asset_id, track_id, sequence_no, version, lifecycle, revision, quality_score, merge_request_id, input_fingerprint, merge_engine_version, overlay_compiler_version, overlay_mode, normalizer_version, kind_plugin_version, layer_manifest, merged_hash, merged_ref, normalized_ref, bundled_ref, provenance_ref, source_commit, baseline_version_id, diff_summary, labels, index_complete, created_at, updated_at
+FROM asset_versions
+WHERE tenant_id = $1
+  AND asset_id = $2
+ORDER BY sequence_no DESC
+LIMIT $4
+OFFSET $3
+`
+
+// ListAssetVersionsParams 包含 ListAssetVersions 查询的强类型参数。
+type ListAssetVersionsParams struct {
+	// TenantID 是提供给 ListAssetVersions 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// AssetID 是提供给 ListAssetVersions 查询的 AssetID 值。
+	AssetID uuid.UUID `json:"asset_id"`
+	// PageOffset 是提供给 ListAssetVersions 查询的 PageOffset 值。
+	PageOffset int32 `json:"page_offset"`
+	// PageLimit 是提供给 ListAssetVersions 查询的 PageLimit 值。
+	PageLimit int32 `json:"page_limit"`
+}
+
+// ListAssetVersions 执行生成的 ListAssetVersions 数据库查询。
+// 返回一个资产下全部版本分页（含生命周期状态），供版本历史读取。
+func (q *Queries) ListAssetVersions(ctx context.Context, arg ListAssetVersionsParams) ([]AssetVersion, error) {
+	rows, err := q.db.Query(ctx, listAssetVersions,
+		arg.TenantID,
+		arg.AssetID,
+		arg.PageOffset,
+		arg.PageLimit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []AssetVersion{}
+	for rows.Next() {
+		var i AssetVersion
+		if err := rows.Scan(
+			&i.TenantID,
+			&i.ID,
+			&i.AssetID,
+			&i.TrackID,
+			&i.SequenceNo,
+			&i.Version,
+			&i.Lifecycle,
+			&i.Revision,
+			&i.QualityScore,
+			&i.MergeRequestID,
+			&i.InputFingerprint,
+			&i.MergeEngineVersion,
+			&i.OverlayCompilerVersion,
+			&i.OverlayMode,
+			&i.NormalizerVersion,
+			&i.KindPluginVersion,
+			&i.LayerManifest,
+			&i.MergedHash,
+			&i.MergedRef,
+			&i.NormalizedRef,
+			&i.BundledRef,
+			&i.ProvenanceRef,
+			&i.SourceCommit,
+			&i.BaselineVersionID,
+			&i.DiffSummary,
+			&i.Labels,
+			&i.IndexComplete,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -1655,6 +1990,62 @@ func (q *Queries) ListSourceSpecsForService(ctx context.Context, arg ListSourceS
 	return items, nil
 }
 
+const listTenantKindOverrides = `-- name: ListTenantKindOverrides :many
+SELECT
+  kind.id AS kind_id,
+  kind.contract_version,
+  kind.plugin_version,
+  COALESCE(override.enabled, kind.enabled) AS enabled,
+  COALESCE(override.revision, 1) AS revision
+FROM asset_kinds AS kind
+LEFT JOIN tenant_kind_overrides AS override
+  ON override.kind_id = kind.id
+ AND override.tenant_id = $1
+ORDER BY kind.id
+`
+
+// ListTenantKindOverridesRow 包含 ListTenantKindOverrides 查询返回的列。
+type ListTenantKindOverridesRow struct {
+	// KindID 是 ListTenantKindOverrides 查询返回的 KindID 值。
+	KindID string `json:"kind_id"`
+	// ContractVersion 是 ListTenantKindOverrides 查询返回的 ContractVersion 值。
+	ContractVersion string `json:"contract_version"`
+	// PluginVersion 是 ListTenantKindOverrides 查询返回的 PluginVersion 值。
+	PluginVersion string `json:"plugin_version"`
+	// Enabled 是 ListTenantKindOverrides 查询返回的 Enabled 值。
+	Enabled bool `json:"enabled"`
+	// Revision 是 ListTenantKindOverrides 查询返回的 Revision 值。
+	Revision int64 `json:"revision"`
+}
+
+// ListTenantKindOverrides 执行生成的 ListTenantKindOverrides 数据库查询。
+// 列出全部租户级 kind 覆盖（含未覆盖时由平台默认派生启用状态的左连接）。
+func (q *Queries) ListTenantKindOverrides(ctx context.Context, tenantID uuid.UUID) ([]ListTenantKindOverridesRow, error) {
+	rows, err := q.db.Query(ctx, listTenantKindOverrides, tenantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListTenantKindOverridesRow{}
+	for rows.Next() {
+		var i ListTenantKindOverridesRow
+		if err := rows.Scan(
+			&i.KindID,
+			&i.ContractVersion,
+			&i.PluginVersion,
+			&i.Enabled,
+			&i.Revision,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const markAssetVersionIndexed = `-- name: MarkAssetVersionIndexed :execrows
 UPDATE asset_versions
 SET index_complete = true, updated_at = now()
@@ -1781,6 +2172,65 @@ func (q *Queries) MarkTracksStaleForSourceSpec(ctx context.Context, arg MarkTrac
 		return 0, err
 	}
 	return result.RowsAffected(), nil
+}
+
+const retireAssetVersion = `-- name: RetireAssetVersion :one
+UPDATE asset_versions
+SET lifecycle = 'retired', revision = revision + 1, updated_at = now()
+WHERE tenant_id = $1
+  AND id = $2
+  AND lifecycle = 'published'
+  AND revision = $3
+RETURNING tenant_id, id, asset_id, track_id, sequence_no, version, lifecycle, revision, quality_score, merge_request_id, input_fingerprint, merge_engine_version, overlay_compiler_version, overlay_mode, normalizer_version, kind_plugin_version, layer_manifest, merged_hash, merged_ref, normalized_ref, bundled_ref, provenance_ref, source_commit, baseline_version_id, diff_summary, labels, index_complete, created_at, updated_at
+`
+
+// RetireAssetVersionParams 包含 RetireAssetVersion 查询的强类型参数。
+type RetireAssetVersionParams struct {
+	// TenantID 是提供给 RetireAssetVersion 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 RetireAssetVersion 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 RetireAssetVersion 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// RetireAssetVersion 执行生成的 RetireAssetVersion 数据库查询。
+// 在 If-Match 下将一个资产版本置为 retired 并递增 revision。
+func (q *Queries) RetireAssetVersion(ctx context.Context, arg RetireAssetVersionParams) (AssetVersion, error) {
+	row := q.db.QueryRow(ctx, retireAssetVersion, arg.TenantID, arg.ID, arg.ExpectedRevision)
+	var i AssetVersion
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.AssetID,
+		&i.TrackID,
+		&i.SequenceNo,
+		&i.Version,
+		&i.Lifecycle,
+		&i.Revision,
+		&i.QualityScore,
+		&i.MergeRequestID,
+		&i.InputFingerprint,
+		&i.MergeEngineVersion,
+		&i.OverlayCompilerVersion,
+		&i.OverlayMode,
+		&i.NormalizerVersion,
+		&i.KindPluginVersion,
+		&i.LayerManifest,
+		&i.MergedHash,
+		&i.MergedRef,
+		&i.NormalizedRef,
+		&i.BundledRef,
+		&i.ProvenanceRef,
+		&i.SourceCommit,
+		&i.BaselineVersionID,
+		&i.DiffSummary,
+		&i.Labels,
+		&i.IndexComplete,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const setSourceLastError = `-- name: SetSourceLastError :execrows
@@ -2193,6 +2643,42 @@ func (q *Queries) UpsertSourceBinding(ctx context.Context, arg UpsertSourceBindi
 		&i.LayerID,
 		&i.State,
 		&i.LastSeenCommit,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const upsertTenantKindOverride = `-- name: UpsertTenantKindOverride :one
+INSERT INTO tenant_kind_overrides (tenant_id, kind_id, enabled, revision)
+VALUES ($1, $2, $3, 1)
+ON CONFLICT (tenant_id, kind_id) DO UPDATE SET
+  enabled = EXCLUDED.enabled,
+  revision = tenant_kind_overrides.revision + 1,
+  updated_at = now()
+RETURNING tenant_id, kind_id, enabled, revision, created_at, updated_at
+`
+
+// UpsertTenantKindOverrideParams 包含 UpsertTenantKindOverride 查询的强类型参数。
+type UpsertTenantKindOverrideParams struct {
+	// TenantID 是提供给 UpsertTenantKindOverride 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// KindID 是提供给 UpsertTenantKindOverride 查询的 KindID 值。
+	KindID string `json:"kind_id"`
+	// Enabled 是提供给 UpsertTenantKindOverride 查询的 Enabled 值。
+	Enabled bool `json:"enabled"`
+}
+
+// UpsertTenantKindOverride 执行生成的 UpsertTenantKindOverride 数据库查询。
+// 为租户插入一个 kind 开关覆盖，冲突时更新并递增 revision。
+func (q *Queries) UpsertTenantKindOverride(ctx context.Context, arg UpsertTenantKindOverrideParams) (TenantKindOverride, error) {
+	row := q.db.QueryRow(ctx, upsertTenantKindOverride, arg.TenantID, arg.KindID, arg.Enabled)
+	var i TenantKindOverride
+	err := row.Scan(
+		&i.TenantID,
+		&i.KindID,
+		&i.Enabled,
+		&i.Revision,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

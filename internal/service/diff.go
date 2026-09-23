@@ -36,6 +36,8 @@ const (
 	shareURLPrefix = "/api/v1/shared/"
 	// shareResourceTypeDiffSnapshot 是差异快照分享链接的资源类型。
 	shareResourceTypeDiffSnapshot = "diff_snapshot"
+	// shareResourceTypeView 是视图分享链接的资源类型。
+	shareResourceTypeView = "view"
 	// diffSelectorTypeVersion/Ref/Upload 是差异选择器的类别。
 	diffSelectorTypeVersion = "version"
 	diffSelectorTypeRef     = "ref"
@@ -45,6 +47,11 @@ const (
 	diffSourceTypeUpload  = "upload"
 	// shareTokenKeyBytes 是分享令牌 HMAC 签名密钥的字节长度（32 字节）。
 	shareTokenKeyBytes = 32
+	// diffExportFormatJSON/Markdown 是差异快照导出的格式。
+	diffExportFormatJSON     = "json"
+	diffExportFormatMarkdown = "markdown"
+	// diffExportTTL 是差异导出产物下载链接的有效期。
+	diffExportTTL = 15 * time.Minute
 )
 
 // DiffService 协调差异、快照分享、破坏性待办、上传与推送。
@@ -156,7 +163,8 @@ func (diff *DiffService) CreateDiffSnapshotShareLink(ctx context.Context, actor 
 	}, nil
 }
 
-// GetSharedView 校验签名分享令牌并返回冻结快照。
+// GetSharedView 校验签名分享令牌并解析冻结分享：视图链接走视图解析，
+// 差异快照链接走快照读取。两类链接共用同一匿名入口 getSharedView。
 func (diff *DiffService) GetSharedView(ctx context.Context, token string) (SharedViewResult, error) {
 	linkID, err := diff.verifyToken(token)
 	if err != nil {
@@ -169,6 +177,16 @@ func (diff *DiffService) GetSharedView(ctx context.Context, token string) (Share
 	}
 	if link.ID != linkID {
 		return SharedViewResult{}, ErrNotFound
+	}
+	// 视图分享链接：解析冻结描述符为视图解析结果。
+	if link.ResourceType == shareResourceTypeView {
+		resolution, err := diff.GetSharedViewResolution(ctx, token)
+		if err != nil {
+			return SharedViewResult{}, err
+		}
+		return SharedViewResult{
+			ResourceType: shareResourceTypeView, ExpiresAt: link.ExpiresAt, Resolution: &resolution,
+		}, nil
 	}
 	// 解析冻结的快照描述符。
 	var descriptor struct {

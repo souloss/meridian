@@ -251,3 +251,21 @@ func repositoryFromRow(row generated.Repository) (service.RepositoryRecord, erro
 }
 
 var _ service.RepositoryStore = (*RepositoryStore)(nil)
+
+// GetRepositoryWebhookSecretHash 返回仓库的 webhook 校验秘密摘要。
+func (store *RepositoryStore) GetRepositoryWebhookSecretHash(ctx context.Context, tenantID, id uuid.UUID) ([]byte, error) {
+	hash, err := store.queries.GetRepositoryWebhookSecretHash(ctx, generated.GetRepositoryWebhookSecretHashParams{TenantID: tenantID, ID: id})
+	if err != nil {
+		return nil, normalizeError(err)
+	}
+	return hash, nil
+}
+
+// GetRepositoryTenantByID 跨租户按 id 定位仓库所属租户。
+func (store *RepositoryStore) GetRepositoryTenantByID(ctx context.Context, id uuid.UUID) (service.RepositoryTenantRef, error) {
+	row, err := store.queries.GetRepositoryTenantByID(ctx, id)
+	if err != nil {
+		return service.RepositoryTenantRef{}, normalizeError(err)
+	}
+	return service.RepositoryTenantRef{TenantID: row.TenantID, DefaultBranch: row.DefaultBranch}, nil
+}

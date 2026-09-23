@@ -22,6 +22,7 @@ type agentWorkItem struct {
 	Status       string   `yaml:"status"`
 	DependsOn    []string `yaml:"dependsOn"`
 	OperationIDs []string `yaml:"operationIds"`
+	Stories      []string `yaml:"stories"`
 	Assertions   []string `yaml:"assertions"`
 	Verify       []string `yaml:"verify"`
 }
@@ -284,7 +285,7 @@ func TestAgentQueueReferencesAndMilestoneCheckpoints(t *testing.T) {
 			}
 		}
 	}
-	milestones := []string{"M0", "M1", "M2", "M3", "M4", "M5"}
+	milestones := []string{"M0", "M1", "M2", "M3", "M4", "M5", "M6"}
 	commitPattern := regexp.MustCompile(`^[0-9a-f]{40}$`)
 	digestPattern := regexp.MustCompile(`^sha256:[0-9a-f]{64}$`)
 	activeStatuses := []string{"claimed", "in_progress", "verifying"}
@@ -359,7 +360,15 @@ func TestAgentQueueReferencesAndMilestoneCheckpoints(t *testing.T) {
 
 func validateMilestoneCompletionEvidence(t *testing.T, queue agentQueue, smokes map[string]smokeRequirement, report milestoneCompletionReport, currentDigest string) {
 	t.Helper()
-	if len(report.Stories) == 0 || len(report.Commands) == 0 || report.Failures == nil || len(report.Failures) != 0 || report.Deferred == nil {
+	// 里程碑若在 acceptance.yaml 声明了 story，则完成报告必须为每个 story 提供通过证据；
+	// 无 story 的里程碑（如 M6 契约覆盖收口）不强制 story 列表，但仍须有命令证据且零失败。
+	hasStories := false
+	for _, item := range queue.Items {
+		if item.Milestone == report.Milestone && len(item.Stories) > 0 {
+			hasStories = true
+		}
+	}
+	if (hasStories && len(report.Stories) == 0) || len(report.Commands) == 0 || report.Failures == nil || len(report.Failures) != 0 || report.Deferred == nil {
 		t.Errorf("%s completion report must include passed stories and commands with no failures", report.Milestone)
 	}
 	workItemEvidence := make(map[string]evidenceReference)
@@ -465,6 +474,34 @@ func TestSmokeCatalogMatchesAcceptance(t *testing.T) {
 			if _, err := os.Stat(filepath.Join("../..", entry.Fixture)); err != nil {
 				t.Errorf("registered Smoke %s fixture: %v", id, err)
 			}
+		}
+	}
+}
+
+// TestEveryOpenAPIOperationIsOwnedByAWorkItem asserts that every operation declared
+// in contracts/openapi.yaml is referenced by at least one work item's operationIds.
+// This prevents the coverage gap where an operation ships as an unimplemented 501
+// stub because the work-item queue never dispatched it.
+func TestEveryOpenAPIOperationIsOwnedByAWorkItem(t *testing.T) {
+	operations := make(map[string]bool)
+	for _, pathValue := range mapping(t, readOpenAPI(t), "paths") {
+		for _, value := range asMapping(t, pathValue, "path") {
+			if operation, ok := value.(map[string]any); ok {
+				if id, ok := operation["operationId"].(string); ok {
+					operations[id] = true
+				}
+			}
+		}
+	}
+	owned := make(map[string]bool)
+	for _, item := range readAgentQueue(t).Items {
+		for _, operation := range item.OperationIDs {
+			owned[operation] = true
+		}
+	}
+	for operation := range operations {
+		if !owned[operation] {
+			t.Errorf("operation %s is declared in openapi.yaml but not owned by any work item", operation)
 		}
 	}
 }

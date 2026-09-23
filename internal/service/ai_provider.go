@@ -16,10 +16,12 @@ type commandAIProvider struct {
 	workflow *AiWorkflow
 }
 
+// Descriptor 实现 Meridian OpenAPI 契约的生成传输行为。
 func (provider commandAIProvider) Descriptor() ai.Descriptor {
 	return ai.Descriptor{ID: commandAIProviderID, Version: "1"}
 }
 
+// Generate 实现 Meridian OpenAPI 契约的生成传输行为。
 func (provider commandAIProvider) Generate(ctx context.Context, request ai.Request) (ai.Result, error) {
 	profile := producerProfileFromConfig(request.Config)
 	jobContext := AiGenerationJobContext{

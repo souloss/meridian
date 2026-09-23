@@ -21,6 +21,30 @@ FROM tenant_kind_overrides
 WHERE tenant_id = sqlc.arg(tenant_id)
   AND kind_id = sqlc.arg(kind_id);
 
+-- 列出全部租户级 kind 覆盖（含未覆盖时由平台默认派生启用状态的左连接）。
+-- name: ListTenantKindOverrides :many
+SELECT
+  kind.id AS kind_id,
+  kind.contract_version,
+  kind.plugin_version,
+  COALESCE(override.enabled, kind.enabled) AS enabled,
+  COALESCE(override.revision, 1) AS revision
+FROM asset_kinds AS kind
+LEFT JOIN tenant_kind_overrides AS override
+  ON override.kind_id = kind.id
+ AND override.tenant_id = sqlc.arg(tenant_id)
+ORDER BY kind.id;
+
+-- 为租户插入一个 kind 开关覆盖，冲突时更新并递增 revision。
+-- name: UpsertTenantKindOverride :one
+INSERT INTO tenant_kind_overrides (tenant_id, kind_id, enabled, revision)
+VALUES (sqlc.arg(tenant_id), sqlc.arg(kind_id), sqlc.arg(enabled), 1)
+ON CONFLICT (tenant_id, kind_id) DO UPDATE SET
+  enabled = EXCLUDED.enabled,
+  revision = tenant_kind_overrides.revision + 1,
+  updated_at = now()
+RETURNING *;
+
 -- 按服务、kind、名称返回一个活跃资产。
 -- name: GetAssetByName :one
 SELECT *
@@ -426,3 +450,88 @@ JOIN repositories AS r ON r.tenant_id = s.tenant_id AND r.id = s.repository_id
 WHERE a.tenant_id = sqlc.arg(tenant_id)
   AND a.id = sqlc.arg(asset_id)
   AND a.deleted_at IS NULL;
+
+-- 返回一个资产下全部版本分页（含生命周期状态），供版本历史读取。
+-- name: ListAssetVersions :many
+SELECT *
+FROM asset_versions
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND asset_id = sqlc.arg(asset_id)
+ORDER BY sequence_no DESC
+LIMIT sqlc.arg(page_limit)
+OFFSET sqlc.arg(page_offset);
+
+-- 返回一个资产下版本总数。
+-- name: CountAssetVersions :one
+SELECT count(*)::bigint
+FROM asset_versions
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND asset_id = sqlc.arg(asset_id);
+
+-- 在 If-Match 下将一个资产版本置为 deprecated 并递增 revision。
+-- name: DeprecateAssetVersion :one
+UPDATE asset_versions
+SET lifecycle = 'deprecated', revision = revision + 1, updated_at = now()
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id)
+  AND lifecycle = 'published'
+  AND revision = sqlc.arg(expected_revision)
+RETURNING *;
+
+-- 在 If-Match 下将一个资产版本置为 retired 并递增 revision。
+-- name: RetireAssetVersion :one
+UPDATE asset_versions
+SET lifecycle = 'retired', revision = revision + 1, updated_at = now()
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id)
+  AND lifecycle = 'published'
+  AND revision = sqlc.arg(expected_revision)
+RETURNING *;
+
+-- 按 slug 返回一个公开可见服务及其当前资产（匿名公开读取）。
+-- name: GetPublicAssetBySlug :one
+SELECT
+  a.tenant_id, a.kind, a.name, a.created_at AS asset_created_at,
+  t.current_version_id, t.latest_version_id
+FROM assets AS a
+JOIN services AS s ON s.tenant_id = a.tenant_id AND s.id = a.service_id
+JOIN tenants AS tenant ON tenant.id = s.tenant_id
+JOIN asset_ref_tracks AS t ON t.asset_id = a.id AND t.tenant_id = a.tenant_id AND t.ref_type = 'branch'
+WHERE tenant.slug = sqlc.arg(tenant_slug)
+  AND s.slug = sqlc.arg(service_slug)
+  AND s.visibility = 'public'
+  AND s.lifecycle IN ('published', 'deprecated')
+  AND a.kind = sqlc.arg(kind)
+  AND a.name = sqlc.arg(asset_name)
+  AND a.deleted_at IS NULL
+  AND t.ref_name = (SELECT default_branch FROM repositories WHERE repositories.tenant_id = s.tenant_id AND repositories.id = s.repository_id)
+LIMIT 1;
+
+-- 返回一个公开可见资产的当前版本内容引用。
+-- name: GetPublicAssetVersion :one
+SELECT v.id, v.version, v.lifecycle, v.merged_ref
+FROM asset_versions AS v
+WHERE v.tenant_id = sqlc.arg(tenant_id)
+  AND v.id = sqlc.arg(version_id)
+  AND v.lifecycle = 'published';
+
+-- 在不提供 serviceSlug 的匿名上下文中，按租户 + 类别 + 名称定位公开资产的
+-- 当前版本指针（resolvePublicView 契约不含 serviceSlug）。
+-- 资产名在 (tenant, service, kind, name) 上唯一，但公开可见性仍由服务门控，
+-- 因此本查询同时要求其服务 visibility=public 且 lifecycle 允许公开读取。
+-- name: GetPublicAssetByName :one
+SELECT
+  a.tenant_id, a.kind, a.name, a.created_at AS asset_created_at,
+  t.current_version_id, t.latest_version_id
+FROM assets AS a
+JOIN services AS s ON s.tenant_id = a.tenant_id AND s.id = a.service_id
+JOIN tenants AS tenant ON tenant.id = s.tenant_id
+JOIN asset_ref_tracks AS t ON t.asset_id = a.id AND t.tenant_id = a.tenant_id AND t.ref_type = 'branch'
+WHERE tenant.slug = sqlc.arg(tenant_slug)
+  AND s.visibility = 'public'
+  AND s.lifecycle IN ('published', 'deprecated')
+  AND a.kind = sqlc.arg(kind)
+  AND a.name = sqlc.arg(asset_name)
+  AND a.deleted_at IS NULL
+  AND t.ref_name = (SELECT default_branch FROM repositories WHERE repositories.tenant_id = s.tenant_id AND repositories.id = s.repository_id)
+LIMIT 1;

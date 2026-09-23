@@ -82,6 +82,99 @@ func (q *Queries) CreateTenant(ctx context.Context, arg CreateTenantParams) (Ten
 	return i, err
 }
 
+const createTenantDeleteJob = `-- name: CreateTenantDeleteJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  $1, $2, 'tenant.delete', 'tenant', $1, 'api',
+  '{}'::jsonb, 'pending', 3, $3, 1, true
+)
+RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+`
+
+// CreateTenantDeleteJobParams 包含 CreateTenantDeleteJob 查询的强类型参数。
+type CreateTenantDeleteJobParams struct {
+	// TenantID 是提供给 CreateTenantDeleteJob 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 CreateTenantDeleteJob 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// DedupeKey 是提供给 CreateTenantDeleteJob 查询的 DedupeKey 值。
+	DedupeKey string `json:"dedupe_key"`
+}
+
+// CreateTenantDeleteJob 执行生成的 CreateTenantDeleteJob 数据库查询。
+// 为租户删除记录一条 tenant.delete 任务。
+func (q *Queries) CreateTenantDeleteJob(ctx context.Context, arg CreateTenantDeleteJobParams) (Job, error) {
+	row := q.db.QueryRow(ctx, createTenantDeleteJob, arg.TenantID, arg.ID, arg.DedupeKey)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const disableTenant = `-- name: DisableTenant :one
+UPDATE tenants
+SET status = 'disabled', revision = revision + 1, updated_at = now()
+WHERE id = $1
+  AND status = 'active'
+  AND revision = $2
+RETURNING id, slug, display_name, status, quota, settings, revision, created_at, updated_at
+`
+
+// DisableTenantParams 包含 DisableTenant 查询的强类型参数。
+type DisableTenantParams struct {
+	// TenantID 是提供给 DisableTenant 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ExpectedRevision 是提供给 DisableTenant 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// DisableTenant 执行生成的 DisableTenant 数据库查询。
+// 在 If-Match 下将租户置为 disabled（删除流程的第一步）。
+func (q *Queries) DisableTenant(ctx context.Context, arg DisableTenantParams) (Tenant, error) {
+	row := q.db.QueryRow(ctx, disableTenant, arg.TenantID, arg.ExpectedRevision)
+	var i Tenant
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.DisplayName,
+		&i.Status,
+		&i.Quota,
+		&i.Settings,
+		&i.Revision,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getActiveTenantBySlug = `-- name: GetActiveTenantBySlug :one
 SELECT id, slug, display_name, status, quota, settings, revision, created_at, updated_at
 FROM tenants

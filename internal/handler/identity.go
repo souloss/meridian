@@ -291,6 +291,40 @@ func (s *Server) RevokeToken(ctx context.Context, request tenant.RevokeTokenRequ
 	return tenant.RevokeToken204Response{}, nil
 }
 
+// UpdateUser 在校验仅平台授权后更新一个身份的非秘密字段。
+func (s *Server) UpdateUser(ctx context.Context, request platform.UpdateUserRequestObject) (platform.UpdateUserResponseObject, error) {
+	if s.identity == nil || request.Body == nil {
+		return nil, api.ErrStrictOperationNotImplemented
+	}
+	principal, err := principalFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	input := service.UpdateUserProfileInput{
+		DisplayName: request.Body.DisplayName,
+		Status:      optionalStringEnum(request.Body.Status),
+	}
+	if request.Body.Email.IsSpecified() {
+		input.SetEmail = true
+		input.Email = optionalEmail(request.Body.Email)
+	}
+	user, err := s.identity.UpdateUser(ctx, principal, serviceUUID(request.UserId), request.Params.IfMatch, input)
+	if err != nil {
+		return nil, err
+	}
+	body := userResponse(user)
+	return platform.UpdateUser200JSONResponse{Body: body, Headers: platform.UpdateUser200ResponseHeaders{Etag: new(body.Etag)}}, nil
+}
+
+// optionalStringEnum 将可空枚举指针投影为字符串指针。
+func optionalStringEnum(value *api.UserPatchRequestStatus) *string {
+	if value == nil {
+		return nil
+	}
+	result := string(*value)
+	return &result
+}
+
 // refreshCookie 构造登录/刷新后的刷新令牌 Cookie。
 func refreshCookie(token string, expiresAt time.Time, secure bool) http.Cookie {
 	return http.Cookie{

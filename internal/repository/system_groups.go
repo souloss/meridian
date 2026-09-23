@@ -4,6 +4,7 @@ import (
 	"context"
 	"uuid"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	generated "github.com/meridian-labs/meridian/internal/generated/repository"
 	"github.com/meridian-labs/meridian/internal/service"
@@ -104,6 +105,36 @@ func (store *SystemGroupStore) ReplaceSystemGroupMembers(ctx context.Context, te
 // BumpSystemGroupRevision 在乐观并发下递增某一分组的修订号。
 func (store *SystemGroupStore) BumpSystemGroupRevision(ctx context.Context, tenantID, groupID uuid.UUID, expectedRevision int64) error {
 	changed, err := store.queries.BumpSystemGroupRevision(ctx, generated.BumpSystemGroupRevisionParams{
+		TenantID: tenantID, ID: groupID, ExpectedRevision: expectedRevision,
+	})
+	if err != nil {
+		return normalizeError(err)
+	}
+	if changed != rowsAffectedOne {
+		return service.ErrPrecondition
+	}
+	return nil
+}
+
+// UpdateSystemGroup 在 If-Match 下更新一条系统分组的展示名与描述。
+func (store *SystemGroupStore) UpdateSystemGroup(ctx context.Context, tenantID, groupID uuid.UUID, expectedRevision int64, patch service.SystemGroupPatchInput) (service.SystemGroupRecord, error) {
+	row, err := store.queries.UpdateSystemGroup(ctx, generated.UpdateSystemGroupParams{
+		DisplayName:    patch.DisplayName,
+		SetDescription: patch.SetDescription, Description: patch.Description,
+		TenantID: tenantID, ID: groupID, ExpectedRevision: expectedRevision,
+	})
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return service.SystemGroupRecord{}, service.ErrPrecondition
+		}
+		return service.SystemGroupRecord{}, normalizeError(err)
+	}
+	return systemGroupFromRow(row), nil
+}
+
+// DeleteSystemGroup 在 If-Match 下删除一条系统分组。
+func (store *SystemGroupStore) DeleteSystemGroup(ctx context.Context, tenantID, groupID uuid.UUID, expectedRevision int64) error {
+	changed, err := store.queries.DeleteSystemGroup(ctx, generated.DeleteSystemGroupParams{
 		TenantID: tenantID, ID: groupID, ExpectedRevision: expectedRevision,
 	})
 	if err != nil {

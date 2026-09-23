@@ -27,18 +27,31 @@ type PublicServiceRecord struct {
 // ServiceLifecycleStore 是服务生命周期、公开读取与软删除的持久化边界。
 // 每个方法都保留租户谓词，除按租户与服务 slug 解析的公开读取外。
 type ServiceLifecycleStore interface {
+	// GetServiceBySlug 承载 ServiceLifecycleStore 的生成 GetServiceBySlug 值。
 	GetServiceBySlug(context.Context, uuid.UUID, string) (ServiceRecord, error)
+	// GetServiceForUpdate 承载 ServiceLifecycleStore 的生成 GetServiceForUpdate 值。
 	GetServiceForUpdate(context.Context, uuid.UUID, uuid.UUID) (ServiceRecord, error)
+	// GetPublicServiceBySlug 承载 ServiceLifecycleStore 的生成 GetPublicServiceBySlug 值。
 	GetPublicServiceBySlug(context.Context, string, string) (ServiceRecord, error)
+	// UpdateService 承载 ServiceLifecycleStore 的生成 UpdateService 值。
 	UpdateService(context.Context, ServicePatch) (ServiceRecord, error)
+	// DeleteService 承载 ServiceLifecycleStore 的生成 DeleteService 值。
 	DeleteService(context.Context, uuid.UUID, uuid.UUID, int64) (ServiceRecord, error)
+	// DeleteServiceSourceSpecs 承载 ServiceLifecycleStore 的生成 DeleteServiceSourceSpecs 值。
 	DeleteServiceSourceSpecs(context.Context, uuid.UUID, uuid.UUID) error
+	// DeleteServiceAssets 承载 ServiceLifecycleStore 的生成 DeleteServiceAssets 值。
 	DeleteServiceAssets(context.Context, uuid.UUID, uuid.UUID) error
+	// DeleteServiceLayers 承载 ServiceLifecycleStore 的生成 DeleteServiceLayers 值。
 	DeleteServiceLayers(context.Context, uuid.UUID, uuid.UUID) error
+	// StaleServiceBindings 承载 ServiceLifecycleStore 的生成 StaleServiceBindings 值。
 	StaleServiceBindings(context.Context, uuid.UUID, uuid.UUID) error
+	// DeactivateServiceTracks 承载 ServiceLifecycleStore 的生成 DeactivateServiceTracks 值。
 	DeactivateServiceTracks(context.Context, uuid.UUID, uuid.UUID) error
+	// DeleteRecentServicesForService 承载 ServiceLifecycleStore 的生成 DeleteRecentServicesForService 值。
 	DeleteRecentServicesForService(context.Context, uuid.UUID, uuid.UUID) error
+	// LockPendingServiceJobs 承载 ServiceLifecycleStore 的生成 LockPendingServiceJobs 值。
 	LockPendingServiceJobs(context.Context, uuid.UUID, uuid.UUID) ([]PendingServiceJob, error)
+	// CancelServiceJob 承载 ServiceLifecycleStore 的生成 CancelServiceJob 值。
 	CancelServiceJob(context.Context, uuid.UUID, uuid.UUID) error
 }
 

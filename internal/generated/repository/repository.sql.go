@@ -148,6 +148,84 @@ func (q *Queries) CreateRepository(ctx context.Context, arg CreateRepositoryPara
 	return i, err
 }
 
+const createWebhookSyncJob = `-- name: CreateWebhookSyncJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  $1, $2, 'repo.sync', 'repository', $3,
+  $4, $5, 'webhook', $6::jsonb,
+  'pending', 3, $7, $8, true
+)
+ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
+RETURNING tenant_id, id, retry_of_job_id, river_job_id, type, scope_type, scope_id, ref_type, ref_name, trigger, input, result, status, stage, attempt, max_attempts, next_attempt_at, dedupe_key, active_generation, dirty, replay_safe, error, started_at, finished_at, created_at, updated_at
+`
+
+// CreateWebhookSyncJobParams 包含 CreateWebhookSyncJob 查询的强类型参数。
+type CreateWebhookSyncJobParams struct {
+	// TenantID 是提供给 CreateWebhookSyncJob 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 CreateWebhookSyncJob 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// RepositoryID 是提供给 CreateWebhookSyncJob 查询的 RepositoryID 值。
+	RepositoryID *uuid.UUID `json:"repository_id"`
+	// RefType 是提供给 CreateWebhookSyncJob 查询的 RefType 值。
+	RefType *string `json:"ref_type"`
+	// RefName 是提供给 CreateWebhookSyncJob 查询的 RefName 值。
+	RefName *string `json:"ref_name"`
+	// JobInput 是提供给 CreateWebhookSyncJob 查询的 JobInput 值。
+	JobInput []byte `json:"job_input"`
+	// DedupeKey 是提供给 CreateWebhookSyncJob 查询的 DedupeKey 值。
+	DedupeKey string `json:"dedupe_key"`
+	// ActiveGeneration 是提供给 CreateWebhookSyncJob 查询的 ActiveGeneration 值。
+	ActiveGeneration int64 `json:"active_generation"`
+}
+
+// CreateWebhookSyncJob 执行生成的 CreateWebhookSyncJob 数据库查询。
+// 为入站 webhook 记录一条 repo.sync 任务（trigger=webhook，scope=repository）。
+func (q *Queries) CreateWebhookSyncJob(ctx context.Context, arg CreateWebhookSyncJobParams) (Job, error) {
+	row := q.db.QueryRow(ctx, createWebhookSyncJob,
+		arg.TenantID,
+		arg.ID,
+		arg.RepositoryID,
+		arg.RefType,
+		arg.RefName,
+		arg.JobInput,
+		arg.DedupeKey,
+		arg.ActiveGeneration,
+	)
+	var i Job
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.RetryOfJobID,
+		&i.RiverJobID,
+		&i.Type,
+		&i.ScopeType,
+		&i.ScopeID,
+		&i.RefType,
+		&i.RefName,
+		&i.Trigger,
+		&i.Input,
+		&i.Result,
+		&i.Status,
+		&i.Stage,
+		&i.Attempt,
+		&i.MaxAttempts,
+		&i.NextAttemptAt,
+		&i.DedupeKey,
+		&i.ActiveGeneration,
+		&i.Dirty,
+		&i.ReplaySafe,
+		&i.Error,
+		&i.StartedAt,
+		&i.FinishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const deleteRepository = `-- name: DeleteRepository :execrows
 UPDATE repositories
 SET deleted_at = $1, revision = revision + 1, updated_at = $2
@@ -229,6 +307,56 @@ func (q *Queries) GetRepository(ctx context.Context, arg GetRepositoryParams) (R
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getRepositoryTenantByID = `-- name: GetRepositoryTenantByID :one
+SELECT tenant_id, default_branch
+FROM repositories
+WHERE id = $1
+  AND deleted_at IS NULL
+LIMIT 1
+`
+
+// GetRepositoryTenantByIDRow 包含 GetRepositoryTenantByID 查询返回的列。
+type GetRepositoryTenantByIDRow struct {
+	// TenantID 是 GetRepositoryTenantByID 查询返回的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// DefaultBranch 是 GetRepositoryTenantByID 查询返回的 DefaultBranch 值。
+	DefaultBranch string `json:"default_branch"`
+}
+
+// GetRepositoryTenantByID 执行生成的 GetRepositoryTenantByID 数据库查询。
+// 跨租户按 id 定位仓库所属租户（入站 webhook 仅携带 repositoryId）。
+func (q *Queries) GetRepositoryTenantByID(ctx context.Context, id uuid.UUID) (GetRepositoryTenantByIDRow, error) {
+	row := q.db.QueryRow(ctx, getRepositoryTenantByID, id)
+	var i GetRepositoryTenantByIDRow
+	err := row.Scan(&i.TenantID, &i.DefaultBranch)
+	return i, err
+}
+
+const getRepositoryWebhookSecretHash = `-- name: GetRepositoryWebhookSecretHash :one
+SELECT webhook_secret_hash
+FROM repositories
+WHERE tenant_id = $1
+  AND id = $2
+  AND deleted_at IS NULL
+`
+
+// GetRepositoryWebhookSecretHashParams 包含 GetRepositoryWebhookSecretHash 查询的强类型参数。
+type GetRepositoryWebhookSecretHashParams struct {
+	// TenantID 是提供给 GetRepositoryWebhookSecretHash 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 GetRepositoryWebhookSecretHash 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+}
+
+// GetRepositoryWebhookSecretHash 执行生成的 GetRepositoryWebhookSecretHash 数据库查询。
+// 返回仓库的 webhook 校验秘密摘要（不含凭据），供入站 webhook 签名校验。
+func (q *Queries) GetRepositoryWebhookSecretHash(ctx context.Context, arg GetRepositoryWebhookSecretHashParams) ([]byte, error) {
+	row := q.db.QueryRow(ctx, getRepositoryWebhookSecretHash, arg.TenantID, arg.ID)
+	var webhook_secret_hash []byte
+	err := row.Scan(&webhook_secret_hash)
+	return webhook_secret_hash, err
 }
 
 const listRepositories = `-- name: ListRepositories :many

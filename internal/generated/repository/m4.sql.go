@@ -154,6 +154,33 @@ func (q *Queries) CreateSystemGroup(ctx context.Context, arg CreateSystemGroupPa
 	return i, err
 }
 
+const deleteSystemGroup = `-- name: DeleteSystemGroup :execrows
+DELETE FROM system_groups
+WHERE tenant_id = $1
+  AND id = $2
+  AND revision = $3
+`
+
+// DeleteSystemGroupParams 包含 DeleteSystemGroup 查询的强类型参数。
+type DeleteSystemGroupParams struct {
+	// TenantID 是提供给 DeleteSystemGroup 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 DeleteSystemGroup 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 DeleteSystemGroup 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// DeleteSystemGroup 执行生成的 DeleteSystemGroup 数据库查询。
+// 在 If-Match 下删除一条系统分组；成员由外键级联清理。
+func (q *Queries) DeleteSystemGroup(ctx context.Context, arg DeleteSystemGroupParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteSystemGroup, arg.TenantID, arg.ID, arg.ExpectedRevision)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const getRepositoryByService = `-- name: GetRepositoryByService :one
 SELECT repositories.tenant_id, repositories.id, repositories.url, repositories.canonical_url, repositories.credential_id, repositories.global_credential_id, repositories.default_branch, repositories.branch_policy, repositories.fetch_config, repositories.sync_cron, repositories.note, repositories.webhook_secret_hash, repositories.health, repositories.revision, repositories.deleted_at, repositories.created_at, repositories.updated_at
 FROM repositories
@@ -1347,4 +1374,58 @@ func (q *Queries) SearchFacetRepositories(ctx context.Context, arg SearchFacetRe
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateSystemGroup = `-- name: UpdateSystemGroup :one
+UPDATE system_groups
+SET
+  display_name = COALESCE($1, display_name),
+  description = CASE WHEN $2::boolean THEN $3 ELSE description END,
+  revision = revision + 1,
+  updated_at = now()
+WHERE tenant_id = $4
+  AND id = $5
+  AND revision = $6
+RETURNING tenant_id, id, slug, display_name, description, revision, created_at, updated_at
+`
+
+// UpdateSystemGroupParams 包含 UpdateSystemGroup 查询的强类型参数。
+type UpdateSystemGroupParams struct {
+	// DisplayName 是提供给 UpdateSystemGroup 查询的 DisplayName 值。
+	DisplayName *string `json:"display_name"`
+	// SetDescription 是提供给 UpdateSystemGroup 查询的 SetDescription 值。
+	SetDescription bool `json:"set_description"`
+	// Description 是提供给 UpdateSystemGroup 查询的 Description 值。
+	Description *string `json:"description"`
+	// TenantID 是提供给 UpdateSystemGroup 查询的 TenantID 值。
+	TenantID uuid.UUID `json:"tenant_id"`
+	// ID 是提供给 UpdateSystemGroup 查询的 ID 值。
+	ID uuid.UUID `json:"id"`
+	// ExpectedRevision 是提供给 UpdateSystemGroup 查询的 ExpectedRevision 值。
+	ExpectedRevision int64 `json:"expected_revision"`
+}
+
+// UpdateSystemGroup 执行生成的 UpdateSystemGroup 数据库查询。
+// 在 If-Match 下更新一条系统分组的展示名与描述并递增 revision。
+func (q *Queries) UpdateSystemGroup(ctx context.Context, arg UpdateSystemGroupParams) (SystemGroup, error) {
+	row := q.db.QueryRow(ctx, updateSystemGroup,
+		arg.DisplayName,
+		arg.SetDescription,
+		arg.Description,
+		arg.TenantID,
+		arg.ID,
+		arg.ExpectedRevision,
+	)
+	var i SystemGroup
+	err := row.Scan(
+		&i.TenantID,
+		&i.ID,
+		&i.Slug,
+		&i.DisplayName,
+		&i.Description,
+		&i.Revision,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

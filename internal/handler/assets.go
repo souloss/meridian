@@ -207,6 +207,13 @@ func (s *Server) ResolveView(ctx context.Context, request view.ResolveViewReques
 	if err != nil {
 		return nil, err
 	}
+	body := viewResolutionResponse(resolution)
+	return view.ResolveView200JSONResponse(body), nil
+}
+
+// viewResolutionResponse 将服务层视图解析结果投影为 API 联合体形状，
+// 供 resolveView、resolvePublicView 与 getSharedView 复用同一映射逻辑。
+func viewResolutionResponse(resolution service.ViewResolution) api.ViewResolution {
 	var body api.ViewResolution
 	switch resolution.Kind {
 	case "document":
@@ -216,7 +223,7 @@ func (s *Server) ResolveView(ctx context.Context, request view.ResolveViewReques
 			View:     viewDefinitionResponse(resolution.View),
 		}
 		if err := body.FromDocumentViewResolution(document); err != nil {
-			return nil, err
+			return api.ViewResolution{}
 		}
 	case "items":
 		items := make([]api.AssetItem, 0, len(resolution.Items))
@@ -226,7 +233,7 @@ func (s *Server) ResolveView(ctx context.Context, request view.ResolveViewReques
 		if err := body.FromItemsViewResolution(api.ItemsViewResolution{
 			Items: items, Kind: api.ItemsViewResolutionKind("items"), View: viewDefinitionResponse(resolution.View),
 		}); err != nil {
-			return nil, err
+			return api.ViewResolution{}
 		}
 	case service.ViewKindDepGraph:
 		nodes := make([]api.GraphNode, 0, len(resolution.Nodes))
@@ -240,16 +247,16 @@ func (s *Server) ResolveView(ctx context.Context, request view.ResolveViewReques
 		if err := body.FromGraphViewResolution(api.GraphViewResolution{
 			Nodes: nodes, Edges: edges, Truncated: resolution.Truncated, Kind: api.GraphViewResolutionKind(service.ViewKindDepGraph), View: viewDefinitionResponse(resolution.View),
 		}); err != nil {
-			return nil, err
+			return api.ViewResolution{}
 		}
 	default:
 		if err := body.FromDashboardViewResolution(api.DashboardViewResolution{
 			Metrics: resolution.Metrics, Kind: api.DashboardViewResolutionKind("dashboard"), View: viewDefinitionResponse(resolution.View),
 		}); err != nil {
-			return nil, err
+			return api.ViewResolution{}
 		}
 	}
-	return view.ResolveView200JSONResponse(body), nil
+	return body
 }
 
 func repositorySyncInput(body api.RepositorySyncRequest) service.RepositorySyncInput {

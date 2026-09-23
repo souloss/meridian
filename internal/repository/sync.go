@@ -186,3 +186,49 @@ func saveSyncReplay(ctx context.Context, queries *generated.Queries, input servi
 		IdempotencyKey: input.IdempotencyKey, RequestHash: append([]byte(nil), input.RequestHash...), ResponseBody: body,
 	}))
 }
+
+// EnqueueWebhookSyncJob 为入站 webhook 记录一条 repo.sync 任务（trigger=webhook）。
+func (store *DiscoveryStore) EnqueueWebhookSyncJob(ctx context.Context, tenantID, repositoryID uuid.UUID, refType, refName string) (service.JobAccepted, error) {
+	dedupeKey := syncDedupeKey(repositoryID, refType, refName)
+	jobInput, err := json.Marshal(struct {
+		Source string `json:"source,omitempty"`
+	}{Source: "webhook"})
+	if err != nil {
+		return service.JobAccepted{}, fmt.Errorf("encode webhook sync job input: %w", err)
+	}
+	tx, err := store.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return service.JobAccepted{}, fmt.Errorf("begin webhook sync job transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	queries := generated.New(tx)
+
+	for {
+		latest, err := queries.LockLatestDiscoveryJob(ctx, generated.LockLatestDiscoveryJobParams{TenantID: tenantID, DedupeKey: dedupeKey})
+		generation := jobGenerationInitial
+		if err == nil {
+			if latest.Status == service.JobStatusPending || latest.Status == service.JobStatusRunning {
+				return service.JobAccepted{JobID: latest.ID, Deduplicated: true}, nil
+			}
+			generation = latest.ActiveGeneration + 1
+		} else if !errors.Is(err, pgx.ErrNoRows) {
+			return service.JobAccepted{}, normalizeError(err)
+		}
+
+		jobID := uuid.NewV7()
+		row, err := queries.CreateWebhookSyncJob(ctx, generated.CreateWebhookSyncJobParams{
+			TenantID: tenantID, ID: jobID, RepositoryID: new(repositoryID),
+			RefType: nullableString(refType), RefName: nullableString(refName), JobInput: jobInput,
+			DedupeKey: dedupeKey, ActiveGeneration: generation,
+		})
+		if err == nil {
+			if err := tx.Commit(ctx); err != nil {
+				return service.JobAccepted{}, normalizeError(err)
+			}
+			return service.JobAccepted{JobID: row.ID, Deduplicated: false}, nil
+		}
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return service.JobAccepted{}, normalizeError(err)
+		}
+	}
+}

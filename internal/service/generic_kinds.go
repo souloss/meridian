@@ -7,9 +7,13 @@ import (
 // genericKindItem 是从 dbschema 或 dependency 文档提取的一个已索引条目。
 // 其 Key 遵循 kinds.yaml 针对该 kind 的 itemKey 模板。
 type genericKindItem struct {
-	ItemType   string
-	Key        string
-	Display    map[string]any
+	// ItemType 承载 genericKindItem 的生成 ItemType 值。
+	ItemType string
+	// Key 承载 genericKindItem 的生成 Key 值。
+	Key string
+	// Display 承载 genericKindItem 的生成 Display 值。
+	Display map[string]any
+	// SearchText 承载 genericKindItem 的生成 SearchText 值。
 	SearchText string
 }
 

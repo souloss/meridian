@@ -342,37 +342,73 @@ type NewService struct {
 
 // ProducerStore 是平台生产者配置的持久化边界。
 type ProducerStore interface {
+	// CreateProducerProfile 承载 ProducerStore 的生成 CreateProducerProfile 值。
 	CreateProducerProfile(context.Context, NewProducerProfile) (ProducerProfile, error)
+	// ListAvailableProducerProfiles 承载 ProducerStore 的生成 ListAvailableProducerProfiles 值。
 	ListAvailableProducerProfiles(context.Context, string) ([]ProducerProfile, error)
+	// GetProducerProfile 承载 ProducerStore 的生成 GetProducerProfile 值。
 	GetProducerProfile(context.Context, uuid.UUID) (ProducerProfile, error)
+	// ListProducerProfiles 承载 ProducerStore 的生成 ListProducerProfiles 值。
+	ListProducerProfiles(context.Context, int32, int32) ([]ProducerProfile, int64, error)
+	// UpdateProducerProfile 承载 ProducerStore 的生成 UpdateProducerProfile 值。
+	UpdateProducerProfile(context.Context, uuid.UUID, int64, ProducerProfilePatch) (ProducerProfile, error)
+	// DeleteProducerProfile 承载 ProducerStore 的生成 DeleteProducerProfile 值。
+	DeleteProducerProfile(context.Context, uuid.UUID) error
 }
 
 // DiscoveryStore 是仓库发现、服务验收与源配置的持久化边界。它同时事务性
 // 地入队发现与同步任务。每个方法都保留租户谓词。
 type DiscoveryStore interface {
 	ProducerStore
+	// GetRepository 承载 DiscoveryStore 的生成 GetRepository 值。
 	GetRepository(context.Context, uuid.UUID, uuid.UUID) (RepositoryRecord, error)
+	// EnqueueDiscoveryJob 承载 DiscoveryStore 的生成 EnqueueDiscoveryJob 值。
 	EnqueueDiscoveryJob(context.Context, DiscoverJobInput) (JobAccepted, error)
+	// EnqueueSyncJob 承载 DiscoveryStore 的生成 EnqueueSyncJob 值。
 	EnqueueSyncJob(context.Context, SyncJobInput) (JobAccepted, error)
+	// UpsertDiscoveryCandidate 承载 DiscoveryStore 的生成 UpsertDiscoveryCandidate 值。
 	UpsertDiscoveryCandidate(context.Context, NewDiscoveryCandidate) (DiscoveryCandidateRecord, error)
+	// ListDiscoveryCandidates 承载 DiscoveryStore 的生成 ListDiscoveryCandidates 值。
 	ListDiscoveryCandidates(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]DiscoveryCandidateRecord, int64, error)
+	// GetDiscoveryCandidate 承载 DiscoveryStore 的生成 GetDiscoveryCandidate 值。
 	GetDiscoveryCandidate(context.Context, uuid.UUID, uuid.UUID) (DiscoveryCandidateRecord, error)
+	// AcceptDiscoveryCandidate 承载 DiscoveryStore 的生成 AcceptDiscoveryCandidate 值。
 	AcceptDiscoveryCandidate(context.Context, uuid.UUID, uuid.UUID) error
+	// DismissDiscoveryCandidate 承载 DiscoveryStore 的生成 DismissDiscoveryCandidate 值。
+	DismissDiscoveryCandidate(context.Context, uuid.UUID, uuid.UUID) error
+	// CreateService 承载 DiscoveryStore 的生成 CreateService 值。
 	CreateService(context.Context, NewService) (ServiceRecord, error)
+	// GetServiceBySlug 承载 DiscoveryStore 的生成 GetServiceBySlug 值。
 	GetServiceBySlug(context.Context, uuid.UUID, string) (ServiceRecord, error)
+	// ListServices 承载 DiscoveryStore 的生成 ListServices 值。
+	ListServices(context.Context, uuid.UUID, int32, int32) ([]ServiceRecord, int64, error)
+	// CountServices 承载 DiscoveryStore 的生成 CountServices 值。
 	CountServices(context.Context, uuid.UUID) (int64, int64, error)
+	// CreateSourceSpec 承载 DiscoveryStore 的生成 CreateSourceSpec 值。
 	CreateSourceSpec(context.Context, NewSourceSpec) (SourceSpecRecord, error)
+	// GetSourceSpec 承载 DiscoveryStore 的生成 GetSourceSpec 值。
 	GetSourceSpec(context.Context, uuid.UUID, uuid.UUID) (SourceSpecRecord, error)
 	// GetAiBaseForService 返回某服务/类别现有的 AI 生成 base（存在时）。
 	GetAiBaseForService(context.Context, uuid.UUID, uuid.UUID, string) (SourceSpecRecord, error)
 	// ReplaceAiBaseForService 归档 AI base 并在同一事务中创建仓库 base。
 	ReplaceAiBaseForService(context.Context, uuid.UUID, uuid.UUID, string) error
+	// UpdateSourceSpec 承载 DiscoveryStore 的生成 UpdateSourceSpec 值。
 	UpdateSourceSpec(context.Context, SourceSpecPatch) (SourceSpecRecord, error)
+	// DeleteSourceSpec 承载 DiscoveryStore 的生成 DeleteSourceSpec 值。
+	DeleteSourceSpec(context.Context, uuid.UUID, uuid.UUID, int64) error
+	// EnqueueProduceJob 承载 DiscoveryStore 的生成 EnqueueProduceJob 值。
+	EnqueueProduceJob(context.Context, ProduceJobInput) (JobAccepted, error)
+	// ListSourceSpecsForService 承载 DiscoveryStore 的生成 ListSourceSpecsForService 值。
 	ListSourceSpecsForService(context.Context, uuid.UUID, uuid.UUID) ([]SourceSpecRecord, error)
+	// ListSourceBindings 承载 DiscoveryStore 的生成 ListSourceBindings 值。
 	ListSourceBindings(context.Context, uuid.UUID, uuid.UUID) ([]SourceBindingRecord, error)
+	// CountSourceBindings 承载 DiscoveryStore 的生成 CountSourceBindings 值。
 	CountSourceBindings(context.Context, uuid.UUID, uuid.UUID) (int64, error)
+	// CountActiveBindings 承载 DiscoveryStore 的生成 CountActiveBindings 值。
 	CountActiveBindings(context.Context, uuid.UUID, uuid.UUID) (int64, error)
+	// UpsertRecentService 承载 DiscoveryStore 的生成 UpsertRecentService 值。
 	UpsertRecentService(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, time.Time) error
+	// ListRecentServices 承载 DiscoveryStore 的生成 ListRecentServices 值。
 	ListRecentServices(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]ServiceRecord, int64, error)
 }
 

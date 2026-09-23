@@ -138,3 +138,32 @@ WHERE tenant_id = sqlc.arg(tenant_id)
   AND id = sqlc.arg(id)
   AND deleted_at IS NULL
   AND revision = sqlc.arg(expected_revision);
+
+-- 返回仓库的 webhook 校验秘密摘要（不含凭据），供入站 webhook 签名校验。
+-- name: GetRepositoryWebhookSecretHash :one
+SELECT webhook_secret_hash
+FROM repositories
+WHERE tenant_id = sqlc.arg(tenant_id)
+  AND id = sqlc.arg(id)
+  AND deleted_at IS NULL;
+
+-- 跨租户按 id 定位仓库所属租户（入站 webhook 仅携带 repositoryId）。
+-- name: GetRepositoryTenantByID :one
+SELECT tenant_id, default_branch
+FROM repositories
+WHERE id = sqlc.arg(id)
+  AND deleted_at IS NULL
+LIMIT 1;
+
+-- 为入站 webhook 记录一条 repo.sync 任务（trigger=webhook，scope=repository）。
+-- name: CreateWebhookSyncJob :one
+INSERT INTO jobs (
+  tenant_id, id, type, scope_type, scope_id, ref_type, ref_name, trigger, input,
+  status, max_attempts, dedupe_key, active_generation, replay_safe
+) VALUES (
+  sqlc.arg(tenant_id), sqlc.arg(id), 'repo.sync', 'repository', sqlc.arg(repository_id),
+  sqlc.narg(ref_type), sqlc.narg(ref_name), 'webhook', sqlc.arg(job_input)::jsonb,
+  'pending', 3, sqlc.arg(dedupe_key), sqlc.arg(active_generation), true
+)
+ON CONFLICT (tenant_id, dedupe_key, active_generation) DO NOTHING
+RETURNING *;

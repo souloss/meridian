@@ -333,27 +333,68 @@ type CreateTokenInput struct {
 	ExpiresAt *time.Time
 }
 
+// UpdateUserProfileInput 承载一次平台身份的非秘密字段补丁。
+type UpdateUserProfileInput struct {
+	// DisplayName 是可选的替换展示名。
+	DisplayName *string
+	// Email 是可选的邮箱（可显式置空）。
+	Email *string
+	// SetEmail 表示是否显式提供 Email（区分省略与置空）。
+	SetEmail bool
+	// Status 是可选的替换用户状态。
+	Status *string
+}
+
 // IdentityStore 是身份用例所需的持久化边界。
 type IdentityStore interface {
+	// CreateUser 承载 IdentityStore 的生成 CreateUser 值。
 	CreateUser(context.Context, NewUser) (User, error)
+	// UserByUsername 承载 IdentityStore 的生成 UserByUsername 值。
 	UserByUsername(context.Context, string) (User, string, error)
+	// UserByID 承载 IdentityStore 的生成 UserByID 值。
 	UserByID(context.Context, uuid.UUID) (User, error)
+	// ListUsers 承载 IdentityStore 的生成 ListUsers 值。
 	ListUsers(context.Context, string, int32, int32) ([]User, int64, error)
+	// PromotePlatformAdmin 承载 IdentityStore 的生成 PromotePlatformAdmin 值。
 	PromotePlatformAdmin(context.Context, uuid.UUID, time.Time) (User, error)
+	// CreateRefreshToken 承载 IdentityStore 的生成 CreateRefreshToken 值。
 	CreateRefreshToken(context.Context, NewRefreshToken) error
+	// RefreshTokenPrincipalByDigest 承载 IdentityStore 的生成 RefreshTokenPrincipalByDigest 值。
 	RefreshTokenPrincipalByDigest(context.Context, []byte, time.Time) (RefreshTokenPrincipal, error)
+	// RotateRefreshToken 承载 IdentityStore 的生成 RotateRefreshToken 值。
 	RotateRefreshToken(context.Context, uuid.UUID, uuid.UUID, time.Time) error
+	// RevokeRefreshTokenFamily 承载 IdentityStore 的生成 RevokeRefreshTokenFamily 值。
 	RevokeRefreshTokenFamily(context.Context, uuid.UUID, time.Time) error
+	// ActiveMemberships 承载 IdentityStore 的生成 ActiveMemberships 值。
 	ActiveMemberships(context.Context, uuid.UUID) ([]Membership, error)
+	// ActiveMembership 承载 IdentityStore 的生成 ActiveMembership 值。
 	ActiveMembership(context.Context, uuid.UUID, string) (Membership, error)
+	// CreateTenant 承载 IdentityStore 的生成 CreateTenant 值。
 	CreateTenant(context.Context, NewTenant) (Tenant, error)
+	// TenantBySlug 承载 IdentityStore 的生成 TenantBySlug 值。
 	TenantBySlug(context.Context, string) (Tenant, error)
+	// ListTenants 承载 IdentityStore 的生成 ListTenants 值。
 	ListTenants(context.Context, int32, int32) ([]Tenant, int64, error)
+	// UpdateTenant 承载 IdentityStore 的生成 UpdateTenant 值。
 	UpdateTenant(context.Context, UpdateTenant) (Tenant, error)
+	// PutMembership 承载 IdentityStore 的生成 PutMembership 值。
 	PutMembership(context.Context, uuid.UUID, uuid.UUID, string, time.Time) (Membership, error)
+	// CreateToken 承载 IdentityStore 的生成 CreateToken 值。
 	CreateToken(context.Context, NewToken) (Token, error)
+	// PATPrincipalByDigest 承载 IdentityStore 的生成 PATPrincipalByDigest 值。
 	PATPrincipalByDigest(context.Context, []byte, time.Time) (Principal, error)
+	// TouchToken 承载 IdentityStore 的生成 TouchToken 值。
 	TouchToken(context.Context, uuid.UUID, uuid.UUID, time.Time) error
+	// ListTokens 承载 IdentityStore 的生成 ListTokens 值。
 	ListTokens(context.Context, uuid.UUID, uuid.UUID, int32, int32) ([]Token, int64, error)
+	// RevokeToken 承载 IdentityStore 的生成 RevokeToken 值。
 	RevokeToken(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, time.Time) error
+	// UpdateUserProfile 承载 IdentityStore 的生成 UpdateUserProfile 值。
+	UpdateUserProfile(context.Context, uuid.UUID, int64, UpdateUserProfileInput) (User, error)
+	// UpdateUserPassword 承载 IdentityStore 的生成 UpdateUserPassword 值。
+	UpdateUserPassword(context.Context, uuid.UUID, int64, string) (User, error)
+	// UserPasswordHash 承载 IdentityStore 的生成 UserPasswordHash 值。
+	UserPasswordHash(context.Context, uuid.UUID) (string, error)
+	// DeleteTenant 承载 IdentityStore 的生成 DeleteTenant 值。
+	DeleteTenant(context.Context, uuid.UUID, int64) (TenantDeletionAccepted, error)
 }

@@ -7,7 +7,7 @@ import { assessGoTest, digestSourceFiles, goTestSelector, smokeFixtureStatus, wr
 const catalog = JSON.parse(readFileSync(new URL('./smoke-cases.json', import.meta.url), 'utf8'))
 const mode = process.argv[2] || process.env.SMK
 const milestone = process.env.MILESTONE || 'M5'
-if (!/^M[0-5]$/.test(milestone)) throw new Error('MILESTONE must be M0 through M5')
+if (!/^M[0-6]$/.test(milestone)) throw new Error('MILESTONE must be M0 through M6')
 const ids = mode === '--credentials' ? ['SMK-005', 'SMK-031', 'SMK-035']
   : mode === '--m1-repository' ? ['SMK-032', 'SMK-040']
   : mode === '--m1-golden-path' ? ['SMK-006', 'SMK-007', 'SMK-008', 'SMK-009', 'SMK-010']

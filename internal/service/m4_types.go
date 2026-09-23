@@ -44,14 +44,24 @@ type NewSystemGroup struct {
 
 // SystemGroupStore 是 M4 系统分组与搜索的持久化边界。
 type SystemGroupStore interface {
+	// CreateSystemGroup 承载 SystemGroupStore 的生成 CreateSystemGroup 值。
 	CreateSystemGroup(context.Context, NewSystemGroup) (SystemGroupRecord, error)
+	// GetSystemGroup 承载 SystemGroupStore 的生成 GetSystemGroup 值。
 	GetSystemGroup(context.Context, uuid.UUID, uuid.UUID) (SystemGroupRecord, error)
+	// ListSystemGroups 承载 SystemGroupStore 的生成 ListSystemGroups 值。
 	ListSystemGroups(context.Context, uuid.UUID) ([]SystemGroupRecord, error)
+	// ListSystemGroupMembers 承载 SystemGroupStore 的生成 ListSystemGroupMembers 值。
 	ListSystemGroupMembers(context.Context, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)
 	// ListSystemGroupMembersForGroups 一次批量返回多个分组的成员，供列表/搜索去 N+1。
 	ListSystemGroupMembersForGroups(context.Context, uuid.UUID, []uuid.UUID) (map[uuid.UUID][]uuid.UUID, error)
+	// ReplaceSystemGroupMembers 承载 SystemGroupStore 的生成 ReplaceSystemGroupMembers 值。
 	ReplaceSystemGroupMembers(context.Context, uuid.UUID, uuid.UUID, []uuid.UUID) error
+	// BumpSystemGroupRevision 承载 SystemGroupStore 的生成 BumpSystemGroupRevision 值。
 	BumpSystemGroupRevision(context.Context, uuid.UUID, uuid.UUID, int64) error
+	// UpdateSystemGroup 承载 SystemGroupStore 的生成 UpdateSystemGroup 值。
+	UpdateSystemGroup(context.Context, uuid.UUID, uuid.UUID, int64, SystemGroupPatchInput) (SystemGroupRecord, error)
+	// DeleteSystemGroup 承载 SystemGroupStore 的生成 DeleteSystemGroup 值。
+	DeleteSystemGroup(context.Context, uuid.UUID, uuid.UUID, int64) error
 	// ListServicesByIDs 按 ID 返回租户内服务，按 ID 排序。
 	ListServicesByIDs(context.Context, uuid.UUID, []uuid.UUID) ([]ServiceRecord, error)
 }

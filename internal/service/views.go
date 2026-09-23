@@ -10,25 +10,45 @@ import (
 
 // ViewDefinition 是投影到 API 的内置视图注册表条目。
 type ViewDefinition struct {
-	ID              string
-	NameKey         string
-	Milestone       string
-	Mount           string
-	Component       *string
-	Entrypoint      *string
-	ExternalURL     *string
-	InputMode       string
-	InputKinds      []string
-	InputMinDocs    *int
-	InputMaxDocs    *int
-	InputSameKind   bool
-	InputSameAsset  bool
-	InputScopes     []string
-	ItemTypes       []string
-	DefaultOptions  map[string]any
-	OptionsSchema   map[string]any
-	Columns         []map[string]any
-	ColumnsSource   *string
+	// ID 承载 ViewDefinition 的生成 ID 值。
+	ID string
+	// NameKey 承载 ViewDefinition 的生成 NameKey 值。
+	NameKey string
+	// Milestone 承载 ViewDefinition 的生成 Milestone 值。
+	Milestone string
+	// Mount 承载 ViewDefinition 的生成 Mount 值。
+	Mount string
+	// Component 承载 ViewDefinition 的生成 Component 值。
+	Component *string
+	// Entrypoint 承载 ViewDefinition 的生成 Entrypoint 值。
+	Entrypoint *string
+	// ExternalURL 承载 ViewDefinition 的生成 ExternalURL 值。
+	ExternalURL *string
+	// InputMode 承载 ViewDefinition 的生成 InputMode 值。
+	InputMode string
+	// InputKinds 承载 ViewDefinition 的生成 InputKinds 值。
+	InputKinds []string
+	// InputMinDocs 承载 ViewDefinition 的生成 InputMinDocs 值。
+	InputMinDocs *int
+	// InputMaxDocs 承载 ViewDefinition 的生成 InputMaxDocs 值。
+	InputMaxDocs *int
+	// InputSameKind 承载 ViewDefinition 的生成 InputSameKind 值。
+	InputSameKind bool
+	// InputSameAsset 承载 ViewDefinition 的生成 InputSameAsset 值。
+	InputSameAsset bool
+	// InputScopes 承载 ViewDefinition 的生成 InputScopes 值。
+	InputScopes []string
+	// ItemTypes 承载 ViewDefinition 的生成 ItemTypes 值。
+	ItemTypes []string
+	// DefaultOptions 承载 ViewDefinition 的生成 DefaultOptions 值。
+	DefaultOptions map[string]any
+	// OptionsSchema 承载 ViewDefinition 的生成 OptionsSchema 值。
+	OptionsSchema map[string]any
+	// Columns 承载 ViewDefinition 的生成 Columns 值。
+	Columns []map[string]any
+	// ColumnsSource 承载 ViewDefinition 的生成 ColumnsSource 值。
+	ColumnsSource *string
+	// FallbackColumns 承载 ViewDefinition 的生成 FallbackColumns 值。
 	FallbackColumns []map[string]any
 }
 
@@ -65,35 +85,53 @@ func (views *Views) Registry() []ViewDefinition {
 
 // ViewResolution 描述一次已解析的视图输出。
 type ViewResolution struct {
-	Kind      string
-	View      ViewDefinition
-	Document  *DocumentResolution
-	Items     []AssetItemRecord
-	Nodes     []GraphNode
-	Edges     []GraphEdge
-	Metrics   map[string]any
+	// Kind 承载 ViewResolution 的生成 Kind 值。
+	Kind string
+	// View 承载 ViewResolution 的生成 View 值。
+	View ViewDefinition
+	// Document 承载 ViewResolution 的生成 Document 值。
+	Document *DocumentResolution
+	// Items 承载 ViewResolution 的生成 Items 值。
+	Items []AssetItemRecord
+	// Nodes 承载 ViewResolution 的生成 Nodes 值。
+	Nodes []GraphNode
+	// Edges 承载 ViewResolution 的生成 Edges 值。
+	Edges []GraphEdge
+	// Metrics 承载 ViewResolution 的生成 Metrics 值。
+	Metrics map[string]any
+	// Truncated 承载 ViewResolution 的生成 Truncated 值。
 	Truncated bool
 }
 
 // DocumentResolution 承载一个已解析文档描述符。
 type DocumentResolution struct {
-	VersionID  uuid.UUID
+	// VersionID 承载 DocumentResolution 的生成 VersionID 值。
+	VersionID uuid.UUID
+	// ContentRef 承载 DocumentResolution 的生成 ContentRef 值。
 	ContentRef string
-	MediaType  string
-	ExpiresAt  string
-	URL        string
+	// MediaType 承载 DocumentResolution 的生成 MediaType 值。
+	MediaType string
+	// ExpiresAt 承载 DocumentResolution 的生成 ExpiresAt 值。
+	ExpiresAt string
+	// URL 承载 DocumentResolution 的生成 URL 值。
+	URL string
 }
 
 // GraphNode 是一个已解析的依赖图节点。
 type GraphNode struct {
-	ID        string    `json:"id"`
-	Label     string    `json:"label"`
+	// ID 承载 GraphNode 的生成 ID 值。
+	ID string `json:"id"`
+	// Label 承载 GraphNode 的生成 Label 值。
+	Label string `json:"label"`
+	// ServiceID 承载 GraphNode 的生成 ServiceID 值。
 	ServiceID uuid.UUID `json:"serviceId"`
 }
 
 // GraphEdge 是一条已解析的依赖图边。
 type GraphEdge struct {
+	// Source 承载 GraphEdge 的生成 Source 值。
 	Source string `json:"source"`
+	// Target 承载 GraphEdge 的生成 Target 值。
 	Target string `json:"target"`
 }
 
@@ -278,8 +316,10 @@ func (views *Views) validateArity(definition ViewDefinition, versionIDs []uuid.U
 
 // ScopeSelector 标识作用域视图的目标。
 type ScopeSelector struct {
+	// Type 承载 ScopeSelector 的生成 Type 值。
 	Type string
-	ID   *uuid.UUID
+	// ID 承载 ScopeSelector 的生成 ID 值。
+	ID *uuid.UUID
 }
 
 func (views *Views) tenantMembership(ctx context.Context, actor Principal, tenantSlug, permission string) (Membership, error) {

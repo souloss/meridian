@@ -159,10 +159,14 @@ func (lifecycle *ServiceLifecycle) tenantMembership(ctx context.Context, actor P
 
 // ServicePatchInput 承载一次服务更新的显式 PATCH 字段。
 type ServicePatchInput struct {
+	// DisplayName 承载 ServicePatchInput 的生成 DisplayName 值。
 	DisplayName *string
+	// Description 承载 ServicePatchInput 的生成 Description 值。
 	Description *string
-	Visibility  *string
-	Lifecycle   *string
+	// Visibility 承载 ServicePatchInput 的生成 Visibility 值。
+	Visibility *string
+	// Lifecycle 承载 ServicePatchInput 的生成 Lifecycle 值。
+	Lifecycle *string
 }
 
 func validateServicePatch(input ServicePatchInput) error {

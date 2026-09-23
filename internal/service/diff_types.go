@@ -20,7 +20,8 @@ type DiffChangeKind struct {
 	Summary string
 	// Before 与 After 分别携带两侧原始 JSON 值（缺失时为 nil）。
 	Before any
-	After  any
+	// After 承载 DiffChangeKind 的生成 After 值。
+	After any
 }
 
 // DiffCountsSummary 聚合一次差异结果的变更计数。
@@ -133,18 +134,20 @@ type ShareLinkCreatedResult struct {
 
 // SharedViewResult 是匿名分享视图的解析结果。
 type SharedViewResult struct {
-	// ResourceType 是资源类型。
+	// ResourceType 是资源类型（view | diff_snapshot）。
 	ResourceType string
 	// ExpiresAt 是过期时间。
 	ExpiresAt time.Time
-	// SnapshotID 是快照标识。
+	// SnapshotID 是快照标识（diff_snapshot 链接时有效）。
 	SnapshotID uuid.UUID
-	// CreatedBy 是创建者标识。
+	// CreatedBy 是创建者标识（diff_snapshot 链接时有效）。
 	CreatedBy uuid.UUID
-	// CreatedAt 是创建时间。
+	// CreatedAt 是创建时间（diff_snapshot 链接时有效）。
 	CreatedAt time.Time
-	// Snapshot 是冻结的差异结果。
+	// Snapshot 是冻结的差异结果（diff_snapshot 链接时有效）。
 	Snapshot DiffOutcome
+	// Resolution 是冻结的视图解析结果（view 链接时有效）。
+	Resolution *ViewResolution
 }
 
 // TodoRecord 是一条破坏性变更待办投影。
@@ -251,6 +254,74 @@ type DiffStore interface {
 	GetSourceLayerByPushKey(context.Context, uuid.UUID, uuid.UUID) (LayerRecord, error)
 	// ListServicesByRepositoryOwners 返回拥有某资产的服务 ID。
 	ListServicesByRepositoryOwners(context.Context, uuid.UUID, uuid.UUID) ([]uuid.UUID, error)
+	// ListDiffRuleSets 返回租户内全部差异规则集。
+	ListDiffRuleSets(context.Context, uuid.UUID) ([]DiffRuleSetRecord, error)
+	// GetDiffRuleSet 返回一条差异规则集。
+	GetDiffRuleSet(context.Context, uuid.UUID, uuid.UUID) (DiffRuleSetRecord, error)
+	// CreateDiffRuleSet 创建一条差异规则集。
+	CreateDiffRuleSet(context.Context, NewDiffRuleSet) (DiffRuleSetRecord, error)
+	// UpdateDiffRuleSet 在 If-Match 下更新一条差异规则集。
+	UpdateDiffRuleSet(context.Context, uuid.UUID, uuid.UUID, int64, DiffRuleSetPatch) (DiffRuleSetRecord, error)
+	// DeleteDiffRuleSet 在 If-Match 下删除一条差异规则集。
+	DeleteDiffRuleSet(context.Context, uuid.UUID, uuid.UUID, int64) error
+	// ListDiffSnapshots 返回租户内一页差异快照。
+	ListDiffSnapshots(context.Context, uuid.UUID, int32, int32) ([]DiffSnapshotRecord, int64, error)
+	// DeleteDiffSnapshot 删除一条差异快照。
+	DeleteDiffSnapshot(context.Context, uuid.UUID, uuid.UUID) error
+	// ListShareLinks 返回租户内一页分享链接。
+	ListShareLinks(context.Context, uuid.UUID, int32, int32) ([]ShareLinkRecord, int64, error)
+	// RevokeShareLink 幂等撤销一条分享链接。
+	RevokeShareLink(context.Context, uuid.UUID, uuid.UUID) error
+}
+
+// DiffRuleSetRecord 是一个差异规则集投影。
+type DiffRuleSetRecord struct {
+	// ID 是规则集的标识。
+	ID uuid.UUID
+	// Kind 是规则集适用的资产类别。
+	Kind string
+	// Name 是规则集名称。
+	Name string
+	// Version 是规则集版本号。
+	Version int32
+	// Rules 是规则列表 JSON。
+	Rules []byte
+	// Enabled 表示规则集是否启用。
+	Enabled bool
+	// Revision 是乐观并发版本号。
+	Revision int64
+	// CreatedAt 是创建时间。
+	CreatedAt time.Time
+	// UpdatedAt 是最近更新时间。
+	UpdatedAt time.Time
+}
+
+// NewDiffRuleSet 承载一次差异规则集插入。
+type NewDiffRuleSet struct {
+	// TenantID 是所属租户的标识。
+	TenantID uuid.UUID
+	// ID 是规则集的标识。
+	ID uuid.UUID
+	// Kind 是规则集适用的资产类别。
+	Kind string
+	// Name 是规则集名称。
+	Name string
+	// Version 是规则集版本号。
+	Version int32
+	// Rules 是规则列表 JSON。
+	Rules []byte
+	// Enabled 表示规则集是否启用。
+	Enabled bool
+}
+
+// DiffRuleSetPatch 承载一次差异规则集 PATCH 的显式字段。
+type DiffRuleSetPatch struct {
+	// Name 是替换名称（可为空）。
+	Name *string
+	// Rules 是替换规则列表 JSON（可为空）。
+	Rules []byte
+	// Enabled 是替换启用状态（可为空）。
+	Enabled *bool
 }
 
 // UploadRecord 是一个差异上传投影。

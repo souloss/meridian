@@ -48,6 +48,8 @@ type AuditFilter struct {
 
 // AuditStore 是脱敏审计查询的持久化边界。
 type AuditStore interface {
+	// ListTenantAudits 承载 AuditStore 的生成 ListTenantAudits 值。
 	ListTenantAudits(context.Context, uuid.UUID, AuditFilter, int32, int32) ([]AuditRecord, int64, error)
+	// ListPlatformAudits 承载 AuditStore 的生成 ListPlatformAudits 值。
 	ListPlatformAudits(context.Context, AuditFilter, int32, int32) ([]AuditRecord, int64, error)
 }
