@@ -1,0 +1,99 @@
+{
+  "milestone": "M6",
+  "status": "completed",
+  "commit": "e5d4c3fd58190d216a16a4d3130c76532eee872d",
+  "contractDigest": "sha256:1dd00996546fd432a100f81d2e0a3dc49033a45d6710e6de9a8cb6d39b31f22c",
+  "reportPath": "artifacts/agent/milestones/M6/20260923T185726Z/report.json",
+  "completedBy": "coding-agent",
+  "completedAt": "2026-09-23T18:57:26Z",
+  "workItems": [
+    {
+      "id": "M6-AGENT-001",
+      "status": "passed",
+      "evidence": "artifacts/agent/M6-AGENT-001/20260923T185726Z/report.json"
+    },
+    {
+      "id": "M6-AGENT-002",
+      "status": "passed",
+      "evidence": "artifacts/agent/M6-AGENT-002/20260923T185726Z/report.json"
+    },
+    {
+      "id": "M6-AGENT-003",
+      "status": "passed",
+      "evidence": "artifacts/agent/M6-AGENT-003/20260923T185726Z/report.json"
+    },
+    {
+      "id": "M6-AGENT-004",
+      "status": "passed",
+      "evidence": "artifacts/agent/M6-AGENT-004/20260923T185726Z/report.json"
+    },
+    {
+      "id": "M6-AGENT-005",
+      "status": "passed",
+      "evidence": "artifacts/agent/M6-AGENT-005/20260923T185726Z/report.json"
+    },
+    {
+      "id": "M6-AGENT-006",
+      "status": "passed",
+      "evidence": "artifacts/agent/M6-AGENT-006/20260923T185726Z/report.json"
+    }
+  ],
+  "stories": [],
+  "assertions": [],
+  "deferred": [],
+  "risks": [
+    "M6 契约覆盖收口不新增用户故事：所有 109 个缺口 operation 属于既有 M0–M5 故事的能力面，故 stories/assertions 为空，验收以 openapi 每 operation 均已派工且 smoke 集成测试全绿为准。"
+  ],
+  "nextAction": null,
+  "commands": [
+    {
+      "command": "go build ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M6/20260923T185726Z/commands.log"
+    },
+    {
+      "command": "go vet ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M6/20260923T185726Z/commands.log"
+    },
+    {
+      "command": "go tool sqlc vet",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M6/20260923T185726Z/commands.log"
+    },
+    {
+      "command": "go test ./...",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M6/20260923T185726Z/commands.log"
+    },
+    {
+      "command": "make contracts-validate",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M6/20260923T185726Z/commands.log"
+    },
+    {
+      "command": "make contracts-generate-then-git-diff-exit-code",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M6/20260923T185726Z/commands.log"
+    },
+    {
+      "command": "go test -count=1 -timeout 10m -tags integration ./internal/handler -run \"^TestM6CoverageSmoke$|^TestM6M0CoverageSmoke$\"",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M6/20260923T185726Z/commands.log"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "durationSeconds": 0,
+      "evidence": "artifacts/agent/milestones/M6/20260923T185726Z/commands.log"
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,27 @@
+$ go build ./...
+(no output; exit 0)
+
+$ go vet ./...
+(no output; exit 0)
+
+$ go tool sqlc vet
+(no output; exit 0)
+
+$ go test ./...
+ok  github.com/meridian-labs/meridian/internal/contracttest
+ok  github.com/meridian-labs/meridian/internal/handler
+ok  github.com/meridian-labs/meridian/internal/service
+
+$ make contracts-validate
+../contracts/openapi.yaml: validated in 134ms
+Woohoo! Your API description is valid.
+
+$ make contracts-generate-then-git-diff-exit-code
+(clean diff; exit 0)
+
+$ go test -count=1 -timeout 10m -tags integration ./internal/handler -run "^TestM6CoverageSmoke$|^TestM6M0CoverageSmoke$"
+ok  github.com/meridian-labs/meridian/internal/handler
+
+$ git diff --check
+(no output; exit 0)
+
