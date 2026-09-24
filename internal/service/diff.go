@@ -256,9 +256,14 @@ func (diff *DiffService) PushAssetRevision(ctx context.Context, actor Principal,
 	if name == "" {
 		return PushRevisionResult{}, ErrValidation
 	}
-	// 内容校验由 Kind capability 承担；未知的未来 Kind 保留历史兼容行为，
-	// 等对应插件安装后再启用其校验。
-	if err := diff.validateKindContent(ctx, input.Kind, input.Content); err != nil {
+	// 内容校验按层角色分派：base 层是 kind 文档，交由 Kind capability 校验
+	// （未知的未来 Kind 保留历史兼容，等对应插件安装后再启用）；overlay 层是
+	// platform-v1 overlay 文档，走 ParseOverlay 校验，绝不能当 kind 文档解析。
+	if input.Role == layerRoleOverlay {
+		if _, err := ParseOverlay([]byte(input.Content)); err != nil {
+			return PushRevisionResult{}, err
+		}
+	} else if err := diff.validateKindContent(ctx, input.Kind, input.Content); err != nil {
 		return PushRevisionResult{}, err
 	}
 
